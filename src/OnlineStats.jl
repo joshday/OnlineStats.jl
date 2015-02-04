@@ -1,5 +1,5 @@
 module OnlineStats
 
-# package code goes here
+include("summary.jl")
 
 end # module
