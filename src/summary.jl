@@ -9,24 +9,30 @@
 
 export oMean, update!
 
-###############################################################################
-# Mean
-@doc meta("First batch calculation for online mean", returns = OnlineStat) ->
+#------------------------------------------------------------------------------#
+#                                                                         Mean #
+#------------------------------------------------------------------------------#
+
+#' @@name oMean
+#'
+#' @@description
+#'
+#' The first batch run for online mean estimate
 function oMean(x::Vector)
   return OnlineStat("mean", mean(x), length(x))
 end
 
-@doc "Update an online mean object created from oMean()" ->
 function update!(obj::OnlineStat, data::Vector; mean::Bool = true)
-  b::Int = length(data)
-  obj.estimate = obj.estimate * obj.n / (obj.n + b) + sum(data) / (obj.n + b)
-  obj.n += b
+  if obj.statistic == "mean"
+    b::Int = length(data)
+    obj.estimate = obj.estimate  - (b / (b + obj.n)) * (mean(data) - obj.estimate)
+    obj.n += b
+  else
+    warn("wrong statistic specified")
+  end
 end
 
-@doc "Get trace results for online update of mean" ->
-function meanTrace(data::Vector, b::Int)
 
-end
 
 
 
