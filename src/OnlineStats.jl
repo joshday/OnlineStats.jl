@@ -1,7 +1,6 @@
 module OnlineStats
 
-using Reexport
-@reexport using DataFrames
+using Docile
 
 include("summary.jl")
 
