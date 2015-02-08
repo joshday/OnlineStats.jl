@@ -1,8 +1,6 @@
 using OnlineStats
 using Base.Test
 
-# ALL TESTING NEEDS TO BE REDONE
-
 #------------------------------------------------------------------------------#
 #                                                 Simulate two batches of data #
 #------------------------------------------------------------------------------#
@@ -11,42 +9,24 @@ n1 = 246
 n2 = 978
 x1 = rand(n1)
 x2 = rand(n2)
+x = [x1, x2]
 
+ob = online_summary(x1)
+@test ob.mean[1] == mean(x1)
+@test ob.var[1] == var(x1)
+@test ob.max[1] == maximum(x1)
+@test ob.min[1] == minimum(x1)
 
-#------------------------------------------------------------------------------#
-#                                                      Mean: oMean and update! #
-#------------------------------------------------------------------------------#
-obj = oMean(x1)
-@test obj.statistic == "mean"
-@test obj.estimate == mean(x1)
-@test obj.n == n1
-@test obj.nBatch == 1
+update!(ob, x2)
+@test ob.mean[end] == mean(x)
+@test ob.var[end] == var(x)
+@test ob.max[end] == maximum(x)
+@test ob.min[end] == minimum(x)
 
-update!(obj, x2)
-@test obj.statistic == "mean"
-@test obj.estimate == mean([x1,x2])
-@test obj.n == n1 + n2
-@test obj.nBatch == 2
-
-#------------------------------------------------------------------------------#
-#                                                   Variance: oVar and update! #
-#------------------------------------------------------------------------------#
-obj = oVar(x1)
-@test obj.statistic == "var, mean"
-@test obj.estimate == (var(x1), mean(x1))
-@test obj.n == n1
-@test obj.nBatch == 1
-
-update!(obj, x2)
-@test obj.statistic == "var, mean"
-@test obj.estimate[1] == var([x1, x2])
-@test obj.estimate[2] == mean([x1, x2])
-@test obj.n == n1 + n2
-@test obj.nBatch == 2
-
-
-#------------------------------------------------------------------------------#
-#                                                         Quantile and update! #
-#------------------------------------------------------------------------------#
-obj = oQuantile(x1, .5)
+ob = online_summary(x1)
+update!(ob, x2, false)
+@test ob.mean[1] == mean(x)
+@test ob.var[1] == var(x)
+@test ob.max[1] == maximum(x)
+@test ob.min[1] == minimum(x)
 
