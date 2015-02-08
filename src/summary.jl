@@ -70,45 +70,45 @@ end
 #------------------------------------------------------------------------------#
 
 function update!(obj::Summary, newdata::Vector, add::Bool = true)
-  b::Int = length(newdata)
-  new_mean::Float64 = mean(newdata)
+  n1::Int = obj.n[end]
+  n2::Int = length(newdata)
+  n::Int = n1 + n2
+
+  μ1::Float64 = obj.mean[end]
+  μ2::Float64 = mean(newdata)
+  δ::Float64 = μ2 - μ1
+
+  ss1::Float64 = (n1 - 1) * obj.var[end]
+  ss2::Float64 = vecnorm(newdata - μ2) ^ 2
 
   if add
     # n
-    push!(obj.n, obj.n[end] + b)
+    push!(obj.n, n)
 
     # nb
     push!(obj.nb, obj.nb[end] + 1)
 
     # mean
-    push!(obj.mean, obj.mean[end] + b / obj.n[end] * (new_mean - obj.mean[end]))
+    push!(obj.mean, μ1 + n2 / n * δ)
 
     # var
-    push!(obj.var,
-          ((obj.n[end - 1] - 1) * obj.var[end] +
-            vecnorm(newdata - new_mean)^2 +
-            obj.n[end - 1] * b / obj.n[end] * (new_mean - obj.mean[end-1])^2) /
-            (obj.n[end] - 1))
+    push!(obj.var, (ss1 + ss2 + n1 * n2 / n * δ^2) / (n - 1))
 
     # maximum and minimum
     push!(obj.max, maximum([obj.max[end], newdata]))
     push!(obj.min, minimum([obj.min[end], newdata]))
   else
     # n
-    obj.n[end] = obj.n[end] + b
+    obj.n[end] = n
 
     # nb
     obj.nb[end] = obj.nb[end] + 1
 
     # mean
-    old_mean::Float64 = obj.mean[end]
-    obj.mean[end] += b / obj.n[end] * (new_mean - obj.mean[end])
+    obj.mean[end] = μ1 + n2 / n * δ
 
     # var
-    obj.var[end] = ((obj.n[end] - b - 1) * obj.var[end] +
-      vecnorm(newdata - new_mean)^2 +
-      (obj.n[end] - b) * b / obj.n[end] * (new_mean - old_mean)^2) /
-      (obj.n[end] - 1)
+    obj.var[end] = (ss1 + ss2 + n1 * n2 / n * δ^2) / (n - 1)
 
     # maximum and minimum
     obj.max[end] = maximum([obj.max[end], newdata])
