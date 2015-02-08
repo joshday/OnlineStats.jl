@@ -17,7 +17,7 @@ ob = online_summary(x1)
 @test ob.max[1] == maximum(x1)
 @test ob.min[1] == minimum(x1)
 
-update!(ob, x2)
+update!(ob, x2, true)
 @test ob.mean[end] == mean(x)
 @test ob.var[end] == var(x)
 @test ob.max[end] == maximum(x)
