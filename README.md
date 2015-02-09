@@ -1,5 +1,13 @@
 # OnlineStats
 
-The main thing this package adds is the `OnlineStats` type which keeps track of the current estimate and the number of observations used.
+Online algorithms for statistics.  The driving function in this package is  
 
-The driving function will be `update!()`.  I still have to work out a type system so that `update!` can have different methods for different models/statistics.
+```update!(obj, newdata::Vector, addrow::Bool)```
+
+where obj has one of the following types:  
+- `Summary`  
+- `Quantile` 
+
+`newdata` is the vector of new observations.  
+
+`addrow` is whether the new update should replace the previous update (`false`) or a new row should be added (`true`)
