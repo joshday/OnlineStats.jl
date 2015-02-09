@@ -51,7 +51,7 @@ https://github.com/joshday/online-catalogue
 
 ## Quantile regression
 
-* [*] linear quantile regression
+* [x] linear quantile regression
 * [ ] composite linear quantile regression
 
 ## Variance component model
