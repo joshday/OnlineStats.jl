@@ -1,16 +1,13 @@
 # Author: Josh Day <emailjoshday@gmail.com>
-
 #------------------------------------------------------------------------------#
 #                                                                      Exports #
 #------------------------------------------------------------------------------#
 export Summary
-export update!, state, make_df
-
 
 #------------------------------------------------------------------------------#
 #                                                                 Summary Type #
 #------------------------------------------------------------------------------#
-# fields use vectors in case trace results are desired
+# note: fields use vectors in case trace results are desired
 type Summary
   mean::Vector{Float64}
   var::Vector{Float64}
@@ -18,7 +15,6 @@ type Summary
   min::Vector{Float64}
   n::Vector{Int64}
   nb::Vector{Int64}
-  details
 end
 
 Summary(x::Vector) = Summary([mean(x)],
@@ -26,16 +22,14 @@ Summary(x::Vector) = Summary([mean(x)],
                              [maximum(x)],
                              [minimum(x)],
                              [length(x)],
-                             [1],
-                             "details")
+                             [1])
 
-# Summary(x::DataArray) = Summary([mean(x)],
-#                              [var(x)],
-#                              [maximum(x)],
-#                              [minimum(x)],
-#                              [length(x)],
-#                              [1],
-#                              "details")
+Summary(x::DataArrays.DataArray) = Summary([mean(x)],
+                                           [var(x)],
+                                           [maximum(x)],
+                                           [minimum(x)],
+                                           [length(x)],
+                                           [1])
 
 
 
