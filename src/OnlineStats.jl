@@ -1,7 +1,7 @@
 module OnlineStats
 
-# using Docile
-using DataFrames
+import DataFrames
+import Distributions
 
 include("summary.jl")
 
