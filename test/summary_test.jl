@@ -1,7 +1,6 @@
 using OnlineStats
 using Base.Test
 
-# Quaniles not tested (yet) due to stochastic nature
 
 #------------------------------------------------------------------------------#
 #                                                 Simulate two batches of data #
@@ -22,7 +21,6 @@ ob = online_summary(x1)
 @test ob.var[1] == var(x1)
 @test ob.max[1] == maximum(x1)
 @test ob.min[1] == minimum(x1)
-@test ob.quantile.est == quantile(x1, [.25, .5, .75])'
 
 #------------------------------------------------------------------------------#
 #                                        Batch 2 estimate correct? - row added #
