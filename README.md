@@ -17,9 +17,12 @@ Each type defined in OnlineStats contains the fields
 
 Other fields will be used to store sufficient statistics for online updates.
 
-Types currently implemented are:
+## Note to developers
+Update API docs with
 
-- `Summary`: Analytical estimates of mean, var, max, min
-- `QuantileSGD`: Stochastic Gradient Descent algorithm
-- `QuantileMM`: Majorization-Minimization algorithm
+```
+julia> using Lexicon
+julia> include("src/OnlineStats.jl")
+julia> save("docs/OnlineStats.md", OnlineStats)
+```
 
