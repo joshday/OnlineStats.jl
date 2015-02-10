@@ -23,7 +23,7 @@ Update API docs with
 ```
 julia> using Lexicon
 julia> include("src/OnlineStats.jl")
-julia> save("docs/OnlineStats.md", OnlineStats)
+julia> Lexicon.save("docs/OnlineStats.md", OnlineStats)
 ```
 
 Make webpage changes in master, then use the following

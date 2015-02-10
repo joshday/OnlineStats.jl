@@ -158,16 +158,16 @@ end
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
 
-y1 = rand(111)
-y2 = rand(222)
-y3 = rand(333)
+# y1 = rand(111)
+# y2 = rand(222)
+# y3 = rand(333)
 
-obj = OnlineStats.QuantileMM(y1, τs = [.1, .2, .4])
-y2 = rand(100)
-OnlineStats.update!(obj, y2, false)
-OnlineStats.update!(obj, y3, true)
+# obj = OnlineStats.QuantileMM(y1, [.1, .2, .4])
+# y2 = rand(100)
+# OnlineStats.update!(obj, y2, false)
+# OnlineStats.update!(obj, y3, true)
 
-OnlineStats.state(obj)
+# OnlineStats.state(obj)
 
-println(convert(DataFrame, obj))
+# println(convert(DataFrame, obj))
 
