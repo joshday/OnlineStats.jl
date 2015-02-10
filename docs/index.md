@@ -3,6 +3,7 @@
 **OnlineStats** is a [Julia](http://julialang.org/) package for statistical models in an online setting.  That is, data arrives in a stream or is too large to fit in RAM.
 
 ## Usage
+----
 
 ### Initialize a model with the specified type.  Types available are:
 - `Summary`   

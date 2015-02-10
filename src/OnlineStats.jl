@@ -1,17 +1,16 @@
 module OnlineStats
 
-import DataFrames
-import DataArrays
-import Distributions
 
 using Docile
+using DataFrames
+using Distributions
 
 export update!, state, convert
 
 include("summary/summary.jl")
 include("summary/quantile.jl")
 
-# General Docs
+# General Doc for state()
 @doc """
   Usage: `state(obj)`
 
