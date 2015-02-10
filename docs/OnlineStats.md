@@ -10,7 +10,7 @@ View the current state of estimates in `obj`
 
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:19](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/OnlineStats.jl#L19)
+[/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:19](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/OnlineStats.jl#L19)
 
 ---
 
@@ -18,7 +18,7 @@ View the current state of estimates in `obj`
 Construct `Summary` from Vector
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:20](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/summary/summary.jl#L20)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:20](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/summary/summary.jl#L20)
 
 ---
 
@@ -26,7 +26,7 @@ Construct `Summary` from Vector
 Construct `Summary` from DataArray
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:28](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/summary/summary.jl#L28)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:28](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/summary/summary.jl#L28)
 
 ---
 
@@ -35,7 +35,7 @@ Convert 'obj' to type 'DataFrame'
 
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:109](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/summary/summary.jl#L109)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:109](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/summary/summary.jl#L109)
 
 ---
 
@@ -44,7 +44,7 @@ Update summary statistics with a new batch of data.
 
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:41](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/summary/summary.jl#L41)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:41](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/summary/summary.jl#L41)
 
 ---
 
@@ -53,7 +53,7 @@ Update summary statistics with a new batch of data.
 
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:41](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/summary/summary.jl#L41)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:41](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/summary/summary.jl#L41)
 
 ---
 
@@ -63,6 +63,6 @@ minimum.
 
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:9](https://github.com/joshday/OnlineStats.jl/tree/31c9b9fc9cf6724c7096c7c27cc857d5c4899bda/src/summary/summary.jl#L9)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:9](https://github.com/joshday/OnlineStats.jl/tree/7303b4c92b3072773d7a439b2aa5f252f33abbed/src/summary/summary.jl#L9)
 
 
