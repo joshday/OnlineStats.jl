@@ -2,8 +2,10 @@
 
 export QuantileSGD, QuantileMM
 
+
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------# Quantile Types
+### SGD
 @doc "Stores quantile estimates using a stochastic gradient descent algorithm" ->
 type QuantileSGD
   est::Matrix{Float64}              # Quantiles
@@ -18,6 +20,9 @@ QuantileSGD(y::Vector, τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51) =
   QuantileSGD(quantile(y, τs)', τs, r, [length(y)], [1])
 
 
+
+
+### MM
 @doc "Stores quantile estimating using an online MM algorithm" ->
 type QuantileMM
   est::Matrix{Float64}              # Quantiles
@@ -33,7 +38,7 @@ end
 @doc "Construct QuantileMM from Vector" ->
 function QuantileMM(y::Vector, τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51)
   p::Int = length(τs)
-  qs::Vector = quantile(y, τs)
+  qs::Vector = quantile(y, τs) + .00000001
   s::Vector = [sum(abs(y - qs[i]) .^ -1 .* y) for i in 1:p]
   t::Vector = [sum(abs(y - qs[i]) .^ -1) for i in 1:p]
   o::Float64 = length(y)
@@ -43,8 +48,12 @@ function QuantileMM(y::Vector, τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.5
 end
 
 
+
+
+
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
+### SGD
 @doc "Update quantile estimates using a new batch of data" ->
 function update!(obj::QuantileSGD, newdata::Vector, addrow::Bool = false)
   τs::Vector = obj.τs
@@ -67,6 +76,8 @@ function update!(obj::QuantileSGD, newdata::Vector, addrow::Bool = false)
 end
 
 
+
+### MM
 @doc "Update quantile estimates using a new batch of data" ->
 function update!(obj::QuantileMM, newdata::Vector, addrow::Bool = false)
   τs::Vector = obj.τs
@@ -78,18 +89,20 @@ function update!(obj::QuantileMM, newdata::Vector, addrow::Bool = false)
     obj.s[i] += γ * (sum(w .* newdata) - obj.s[i])
     obj.t[i] += γ * (sum(w) - obj.t[i])
     obj.o += γ * (length(newdata) - obj.o)
-    qs[i] = (s[i] + o * (t * τs[i] - 1)) / t[i]
+    qs[i] = (obj.s[i] + obj.o * (2 * obj.τs[i] - 1)) / obj.t[i]
   end
 
   if addrow
     obj.est = [obj.est, qs']
+    push!(obj.n, obj.n[end] + length(newdata))
+    push!(obj.nb, obj.nb[end] + 1)
   else
     obj.est[end, :] = qs'
+    obj.n[end] = obj.n[end] + length(newdata)
+    obj.nb[end] += 1
   end
-
-  obj.n += length(newdata)
-  obj.nb += 1
 end
+
 
 
 #------------------------------------------------------------------------------#
@@ -102,7 +115,12 @@ function state(obj::QuantileSGD)
 end
 
 function state(obj::QuantileMM)
+  println(join(("τs = ", obj.τs)))
+  println(join(("qs ' ", obj.est[end, :])))
+  println(join(("n = ", obj.n[end])))
+  println(join(("nb = ", obj.nb[end])))
 end
+
 
 
 #------------------------------------------------------------------------------#
@@ -110,10 +128,31 @@ end
 @doc "Convert 'obj' to type 'DataFrame'" ->
 function Base.convert(::Type{DataFrames.DataFrame}, obj::QuantileSGD)
   df = convert(DataFrames.DataFrame, obj.est)
+
+  # Hack to get correct column names
+  τnames = ["q" * string(convert(Int, obj.τs[i] * 100)) for i in 1:length(obj.τs)]
+  τnames = convert(Array{Symbol, 1}, τnames)
+  names!(df, τnames)
+
   df[:n] = obj.n
   df[:nb] = obj.nb
   return df
 end
+
+@doc "Convert 'obj' to type 'DataFrame'" ->
+function Base.convert(::Type{DataFrames.DataFrame}, obj::QuantileMM)
+  df = convert(DataFrames.DataFrame, obj.est)
+
+  # Hack to get correct column names
+  τnames = ["q" * string(convert(Int, obj.τs[i] * 100)) for i in 1:length(obj.τs)]
+  τnames = convert(Array{Symbol, 1}, τnames)
+  names!(df, τnames)
+
+  df[:n] = obj.n
+  df[:nb] = obj.nb
+  return df
+end
+
 
 
 #------------------------------------------------------------------------------#
@@ -123,11 +162,12 @@ y1 = rand(111)
 y2 = rand(222)
 y3 = rand(333)
 
-obj = OnlineStats.QuantileSGD(y1)
+obj = OnlineStats.QuantileMM(y1, τs = [.1, .2, .4])
+y2 = rand(100)
 OnlineStats.update!(obj, y2, false)
 OnlineStats.update!(obj, y3, true)
 
 OnlineStats.state(obj)
 
-convert(DataFrame, obj)
+println(convert(DataFrame, obj))
 
