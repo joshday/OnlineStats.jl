@@ -62,3 +62,9 @@ https://github.com/joshday/online-catalogue
 ## Penalized estimation
 
 * [ ] lasso
+
+## Multivariate statistics
+
+* [ ] principal components analysis
+* [ ] canonical correlation analysis
+* [ ] factor analsis
