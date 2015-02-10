@@ -28,6 +28,5 @@ julia> save("docs/OnlineStats.md", OnlineStats)
 
 Make webpage changes in master, then use the following
 ```
-git push origin `git subtree split --p
-refix mkdocs/site master`:gh-pages --force
+git push origin `git subtree split --prefix site master`:gh-pages --force
 ```
