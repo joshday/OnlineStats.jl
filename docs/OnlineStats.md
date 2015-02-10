@@ -10,7 +10,7 @@ View the current state of estimates in `obj`
 
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:18](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/OnlineStats.jl#L18)
+[/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:18](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/OnlineStats.jl#L18)
 
 ---
 
@@ -18,23 +18,7 @@ View the current state of estimates in `obj`
 Construct QuantileMM from Vector
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:38](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L38)
-
----
-
-#### QuantileMM(y::Array{T, 1}, τs::Array{T, 1})
-Construct QuantileMM from Vector
-
-**source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:38](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L38)
-
----
-
-#### QuantileMM(y::Array{T, 1}, τs::Array{T, 1}, r::Float64)
-Construct QuantileMM from Vector
-
-**source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:38](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L38)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:38](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L38)
 
 ---
 
@@ -42,23 +26,7 @@ Construct QuantileMM from Vector
 Consturct QuantileSGD from Vector
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:18](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L18)
-
----
-
-#### QuantileSGD(y::Array{T, 1}, τs::Array{T, 1})
-Consturct QuantileSGD from Vector
-
-**source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:18](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L18)
-
----
-
-#### QuantileSGD(y::Array{T, 1}, τs::Array{T, 1}, r::Float64)
-Consturct QuantileSGD from Vector
-
-**source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:18](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L18)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:18](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L18)
 
 ---
 
@@ -66,7 +34,7 @@ Consturct QuantileSGD from Vector
 Construct `Summary` from Vector
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:17](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/summary.jl#L17)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:17](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L17)
 
 ---
 
@@ -74,7 +42,7 @@ Construct `Summary` from Vector
 Construct `Summary` from DataArray
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:25](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/summary.jl#L25)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:25](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L25)
 
 ---
 
@@ -82,7 +50,7 @@ Construct `Summary` from DataArray
 Convert 'obj' to type 'DataFrame'
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:142](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L142)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:142](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L142)
 
 ---
 
@@ -90,7 +58,7 @@ Convert 'obj' to type 'DataFrame'
 Convert 'obj' to type 'DataFrame'
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:128](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L128)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:128](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L128)
 
 ---
 
@@ -98,7 +66,7 @@ Convert 'obj' to type 'DataFrame'
 Convert 'obj' to type 'DataFrame'
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:102](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/summary.jl#L102)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:102](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L102)
 
 ---
 
@@ -106,7 +74,7 @@ Convert 'obj' to type 'DataFrame'
 Update quantile estimates using a new batch of data
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:81](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L81)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:81](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L81)
 
 ---
 
@@ -114,7 +82,7 @@ Update quantile estimates using a new batch of data
 Update quantile estimates using a new batch of data
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:81](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L81)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:81](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L81)
 
 ---
 
@@ -122,7 +90,7 @@ Update quantile estimates using a new batch of data
 Update quantile estimates using a new batch of data
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:57](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L57)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:57](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L57)
 
 ---
 
@@ -130,7 +98,7 @@ Update quantile estimates using a new batch of data
 Update quantile estimates using a new batch of data
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:57](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L57)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:57](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L57)
 
 ---
 
@@ -138,7 +106,7 @@ Update quantile estimates using a new batch of data
 Update summary statistics with a new batch of data.
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:36](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/summary.jl#L36)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:36](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L36)
 
 ---
 
@@ -146,7 +114,7 @@ Update summary statistics with a new batch of data.
 Update summary statistics with a new batch of data.
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:36](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/summary.jl#L36)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:36](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L36)
 
 ---
 
@@ -154,7 +122,7 @@ Update summary statistics with a new batch of data.
 Stores quantile estimating using an online MM algorithm
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:26](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L26)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:26](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L26)
 
 ---
 
@@ -162,7 +130,7 @@ Stores quantile estimating using an online MM algorithm
 Stores quantile estimates using a stochastic gradient descent algorithm
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:9](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/quantile.jl#L9)
+[/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:9](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L9)
 
 ---
 
@@ -170,6 +138,6 @@ Stores quantile estimates using a stochastic gradient descent algorithm
 Stores analytical updates for mean, variance, maximum, and minimum.
 
 **source:**
-[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:6](https://github.com/joshday/OnlineStats.jl/tree/6554e9114415528f370cce2ef034dc9ff5064d49/src/summary/summary.jl#L6)
+[/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:6](https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L6)
 
 

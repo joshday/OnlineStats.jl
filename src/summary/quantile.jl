@@ -16,7 +16,7 @@ type QuantileSGD
 end
 
 @doc "Consturct QuantileSGD from Vector" ->
-QuantileSGD(y::Vector, τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51) =
+QuantileSGD(y::Vector; τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51) =
   QuantileSGD(quantile(y, τs)', τs, r, [length(y)], [1])
 
 
@@ -36,7 +36,7 @@ type QuantileMM
 end
 
 @doc "Construct QuantileMM from Vector" ->
-function QuantileMM(y::Vector, τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51)
+function QuantileMM(y::Vector; τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51)
   p::Int = length(τs)
   qs::Vector = quantile(y, τs) + .00000001
   s::Vector = [sum(abs(y - qs[i]) .^ -1 .* y) for i in 1:p]
