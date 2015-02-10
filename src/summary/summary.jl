@@ -3,10 +3,7 @@
 export Summary
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------------# Summary Type
-@doc """
-Stores analytical updates for mean, variance, maximum, and
-minimum.
-"""  ->
+@doc "Stores analytical updates for mean, variance, maximum, and minimum."  ->
 type Summary
   mean::Vector{Float64}
   var::Vector{Float64}
@@ -36,9 +33,7 @@ Summary(y::DataArrays.DataArray) = Summary([mean(y)],
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-@doc """
-Update summary statistics with a new batch of data.
-""" ->
+@doc "Update summary statistics with a new batch of data." ->
 function update!(obj::Summary, newdata::Vector, add::Bool = false)
   n1::Int = obj.n[end]
   n2::Int = length(newdata)
@@ -104,9 +99,7 @@ end
 
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------------# Base.convert
-@doc """
-Convert 'obj' to type 'DataFrame'
-""" ->
+@doc "Convert 'obj' to type 'DataFrame'" ->
 function Base.convert(::Type{DataFrames.DataFrame}, obj::Summary)
   df = DataFrames.DataFrame()
   df[:mean] = obj.mean
