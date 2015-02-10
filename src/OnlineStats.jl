@@ -4,9 +4,18 @@ import DataFrames
 import DataArrays
 import Distributions
 
+using Docile
+
 export update!, state, convert
 
-include("summary.jl")
-include("quantile.jl")
+include("summary/summary.jl")
+include("summary/quantile.jl")
+
+# General Docs
+@doc """
+  Usage: `state(obj)`
+
+View the current state of estimates in `obj`
+""" -> state
 
 end # module

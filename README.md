@@ -19,9 +19,7 @@ Other fields will be used to store sufficient statistics for online updates.
 
 Types currently implemented are:
 
-- `Summary` 
-  - Analytical estimates of mean, var, max, min
-- `Quantile` 
-  - Stochastic estimates of quantiles 
-  - Two algorithms available: subgradient descent or MM
+- `Summary`: Analytical estimates of mean, var, max, min
+- `QuantileSGD`: Stochastic Gradient Descent algorithm
+- `QuantileMM`: Majorization-Minimization algorithm
 

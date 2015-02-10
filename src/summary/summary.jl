@@ -1,13 +1,12 @@
 # Author: Josh Day <emailjoshday@gmail.com>
-#------------------------------------------------------------------------------#
-#                                                                      Exports #
-#------------------------------------------------------------------------------#
-export Summary
 
+export Summary
 #------------------------------------------------------------------------------#
-#                                                                 Summary Type #
-#------------------------------------------------------------------------------#
-# note: fields use vectors in case trace results are desired
+#----------------------------------------------------------------# Summary Type
+@doc """
+Stores analytical updates for mean, variance, maximum, and
+minimum.
+"""  ->
 type Summary
   mean::Vector{Float64}
   var::Vector{Float64}
@@ -17,26 +16,30 @@ type Summary
   nb::Vector{Int64}
 end
 
-Summary(x::Vector) = Summary([mean(x)],
-                             [var(x)],
-                             [maximum(x)],
-                             [minimum(x)],
-                             [length(x)],
+
+@doc "Construct `Summary` from Vector" ->
+Summary(y::Vector) = Summary([mean(y)],
+                             [var(y)],
+                             [maximum(y)],
+                             [minimum(y)],
+                             [length(y)],
                              [1])
 
-Summary(x::DataArrays.DataArray) = Summary([mean(x)],
-                                           [var(x)],
-                                           [maximum(x)],
-                                           [minimum(x)],
-                                           [length(x)],
+@doc "Construct `Summary` from DataArray" ->
+Summary(y::DataArrays.DataArray) = Summary([mean(y)],
+                                           [var(y)],
+                                           [maximum(y)],
+                                           [minimum(y)],
+                                           [length(y)],
                                            [1])
 
 
-
 #------------------------------------------------------------------------------#
-#                                                                      update! #
-#------------------------------------------------------------------------------#
-function update!(obj::Summary, newdata::Vector, addrow::Bool = false)
+#---------------------------------------------------------------------# update!
+@doc """
+Update summary statistics with a new batch of data.
+""" ->
+function update!(obj::Summary, newdata::Vector, add::Bool = false)
   n1::Int = obj.n[end]
   n2::Int = length(newdata)
   n::Int = n1 + n2
@@ -48,7 +51,7 @@ function update!(obj::Summary, newdata::Vector, addrow::Bool = false)
   ss1::Float64 = (n1 - 1) * obj.var[end]
   ss2::Float64 = vecnorm(newdata - μ2) ^ 2
 
-  if addrow
+  if add
     # n
     push!(obj.n, n)
 
@@ -86,9 +89,9 @@ function update!(obj::Summary, newdata::Vector, addrow::Bool = false)
 end
 
 
+
 #------------------------------------------------------------------------------#
-#                                                                        state #
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# state
 function state(obj::Summary)
   println(join(("mean = ", obj.mean[end])))
   println(join(("var = ", obj.var[end])))
@@ -100,8 +103,10 @@ end
 
 
 #------------------------------------------------------------------------------#
-#                                                         convert to DataFrame #
-#------------------------------------------------------------------------------#
+#----------------------------------------------------------------# Base.convert
+@doc """
+Convert 'obj' to type 'DataFrame'
+""" ->
 function Base.convert(::Type{DataFrames.DataFrame}, obj::Summary)
   df = DataFrames.DataFrame()
   df[:mean] = obj.mean
