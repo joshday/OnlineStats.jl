@@ -1,10 +1,10 @@
 # Author: Josh Day <emailjoshday@gmail.com>
 
 export Summary
+
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------------# Summary Type
-@doc "Stores analytical updates for mean, variance, maximum, and minimum."  ->
-type Summary
+type Summary <: ContinuousUnivariateOnlineStat
   mean::Vector{Float64}
   var::Vector{Float64}
   max::Vector{Float64}
@@ -13,27 +13,17 @@ type Summary
   nb::Vector{Int64}
 end
 
+@doc doc"""
+Create Summary object
 
-@doc "Construct `Summary` from Vector" ->
-Summary(y::Vector) = Summary([mean(y)],
-                             [var(y)],
-                             [maximum(y)],
-                             [minimum(y)],
-                             [length(y)],
-                             [1])
-
-@doc "Construct `Summary` from DataArray" ->
-Summary(y::DataArrays.DataArray) = Summary([mean(y)],
-                                           [var(y)],
-                                           [maximum(y)],
-                                           [minimum(y)],
-                                           [length(y)],
-                                           [1])
-
+fields (each is Vector): `mean`, `var`, `max`, `min`, `n`, `nb`
+""" ->
+function Summary(y::Vector)
+  Summary([mean(y)], [var(y)], [maximum(y)], [minimum(y)], [length(y)], [1])
+end
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-@doc "Update summary statistics with a new batch of data." ->
 function update!(obj::Summary, newdata::Vector, add::Bool = false)
   n1::Int = obj.n[end]
   n2::Int = length(newdata)
@@ -99,7 +89,6 @@ end
 
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------------# Base.convert
-@doc "Convert 'obj' to type 'DataFrame'" ->
 function Base.convert(::Type{DataFrames.DataFrame}, obj::Summary)
   df = DataFrames.DataFrame()
   df[:mean] = obj.mean
@@ -110,3 +99,16 @@ function Base.convert(::Type{DataFrames.DataFrame}, obj::Summary)
   df[:nb] = obj.nb
   return df
 end
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive Testing
+
+# x1 = rand(100)
+# x2 = rand(112)
+# x3 = rand(103)
+
+# obj = OnlineStats.Summary(x1)
+# OnlineStats.update!(obj, x2, true)
+# OnlineStats.update!(obj, x3, false)
+

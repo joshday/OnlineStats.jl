@@ -6,8 +6,7 @@ export QuantileSGD, QuantileMM
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------# Quantile Types
 ### SGD
-@doc "Stores quantile estimates using a stochastic gradient descent algorithm" ->
-type QuantileSGD
+type QuantileSGD <: ContinuousUnivariateOnlineStat
   est::Matrix{Float64}              # Quantiles
   τs::Vector{Float64}               # tau values
   r::Float64                        # learning rate
@@ -15,7 +14,21 @@ type QuantileSGD
   nb::Vector{Int64}                 # number of batches used
 end
 
-@doc "Consturct QuantileSGD from Vector" ->
+@doc doc"""
+Create QuantileSGD object
+
+fields:
+
+  - `est::Matrix`: quantile results
+
+  - `τs::Vector`:  quantiles estimated
+
+  - `r::Float64`:  learning rate
+
+  - `n::Vector`:   number of observations used
+
+  - `nb::Vector`:  number of batches used
+""" ->
 QuantileSGD(y::Vector; τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51) =
   QuantileSGD(quantile(y, τs)', τs, r, [length(y)], [1])
 
@@ -23,8 +36,7 @@ QuantileSGD(y::Vector; τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51) =
 
 
 ### MM
-@doc "Stores quantile estimating using an online MM algorithm" ->
-type QuantileMM
+type QuantileMM <: ContinuousUnivariateOnlineStat
   est::Matrix{Float64}              # Quantiles
   τs::Vector{Float64}               # tau values
   r::Float64                        # learning rate
@@ -35,7 +47,23 @@ type QuantileMM
   nb::Vector{Int64}                 # number of batches used
 end
 
-@doc "Construct QuantileMM from Vector" ->
+@doc doc"""
+Create QuantileMM object
+
+fields:
+
+  - `est::Matrix`: quantile results
+
+  - `τs::Vector`:  quantiles estimated
+
+  - `r::Float64`:  learning rate
+
+  - `s::Vector, t::Vector, and o::Float`:  sufficient statistics
+
+  - `n::Vector`:   number of observations used
+
+  - `nb::Vector`:  number of batches used
+""" ->
 function QuantileMM(y::Vector; τs::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51)
   p::Int = length(τs)
   qs::Vector = quantile(y, τs) + .00000001
@@ -54,7 +82,6 @@ end
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
 ### SGD
-@doc "Update quantile estimates using a new batch of data" ->
 function update!(obj::QuantileSGD, newdata::Vector, addrow::Bool = false)
   τs::Vector = obj.τs
   qs::Vector = [i for i in obj.est[end, :]]
@@ -78,7 +105,6 @@ end
 
 
 ### MM
-@doc "Update quantile estimates using a new batch of data" ->
 function update!(obj::QuantileMM, newdata::Vector, addrow::Bool = false)
   τs::Vector = obj.τs
   qs::Vector = [i for i in obj.est[end, :]]
@@ -125,7 +151,6 @@ end
 
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------------# Base.convert
-@doc "Convert 'obj' to type 'DataFrame'" ->
 function Base.convert(::Type{DataFrames.DataFrame}, obj::QuantileSGD)
   df = convert(DataFrames.DataFrame, obj.est)
 
@@ -139,7 +164,6 @@ function Base.convert(::Type{DataFrames.DataFrame}, obj::QuantileSGD)
   return df
 end
 
-@doc "Convert 'obj' to type 'DataFrame'" ->
 function Base.convert(::Type{DataFrames.DataFrame}, obj::QuantileMM)
   df = convert(DataFrames.DataFrame, obj.est)
 
@@ -162,7 +186,7 @@ end
 # y2 = rand(222)
 # y3 = rand(333)
 
-# obj = OnlineStats.QuantileMM(y1, [.1, .2, .4])
+# obj = OnlineStats.QuantileMM(y1, τs = [.1, .2, .4])
 # y2 = rand(100)
 # OnlineStats.update!(obj, y2, false)
 # OnlineStats.update!(obj, y3, true)
