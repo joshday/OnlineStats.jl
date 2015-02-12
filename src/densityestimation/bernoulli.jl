@@ -1,40 +1,41 @@
 # Author: Josh Day <emailjoshday@gmail.com>
 
-export OnlineFitBinomial
+export OnlineFitBernoulli
 
 #------------------------------------------------------------------------------#
 #--------------------------------------------------------# OnlineNormalFit Type
-type OnlineFitBinomial <: DiscreteUnivariateOnlineStat
-    d::Distributions.Binomial
-    stats::Distributions.BinomialStats
+type OnlineFitBernoulli <: DiscreteUnivariateOnlineStat
+    d::Distributions.Bernoulli
+    stats::Distributions.BernoulliStats
 
     n::Int64
     nb::Int64
 end
 
-function onlinefit(::Type{Binomial}, ne::Int64, y::Vector{Int64})
+function onlinefit(::Type{Bernoulli}, y::Vector{Int64})
     n::Int64 = length(y)
-    OnlineFitBinomial(fit(Binomial, ne, y), suffstats(Binomial, ne, y), n, 1)
+    OnlineFitBernoulli(fit(Bernoulli, y), suffstats(Bernoulli, y), n, 1)
 end
 
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitBinomial, newdata::Vector)
-    newstats = suffstats(Binomial, obj.stats.n, newdata)
+function update!(obj::OnlineFitBernoulli, newdata::Vector{Int64})
+    newstats = suffstats(Bernoulli, newdata)
 
-    ns = obj.stats.ns + newstats.ns
-    ne = obj.stats.ne + newstats.ne
+    cnt0 = obj.stats.cnt0 + newstats.cnt0
+    cnt1 = obj.stats.cnt1 + newstats.cnt1
 
-    obj.d = Binomial(obj.stats.n, ns / (ne*obj.n))
-    obj.stats = Distributions.BinomialStats(ns, ne, obj.stats.n)
-    obj.n = ne
+    obj.n = cnt0 + cnt1
+    obj.d = Bernoulli(cnt1 / obj.n)
+    obj.stats = Distributions.BernoulliStats(cnt0, cnt1)
     obj.nb += 1
 end
 
+
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::OnlineFitBinomial)
+function state(obj::OnlineFitBernoulli)
     println(obj.d)
     println("nobs = " * string(obj.n))
     println("  nb = " * string(obj.nb))
