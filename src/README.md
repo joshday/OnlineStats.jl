@@ -9,7 +9,7 @@ https://github.com/joshday/online-catalogue
 * [x] sample mean
 * [x] sample variance
 * [x] skewness
-* [x] kurtosis
+* [x] kurtosis (3rd and 4th central moment updates from Pebay are a little unstable)
 * [x] higher sample moments
 * [x] sample covariance matrix
 * [x] maximum and minimum
@@ -25,13 +25,29 @@ https://github.com/joshday/online-catalogue
 
 ## Distributions
 
-* [ ] univariate normal
+### Univariate
+
+* [x] bernoulli
+* [ ] beta
+* [ ] beta-binomial
+* [x] binomial
+* [ ] cauchy
+* [ ] chi-square
+* [ ] exponential
+* [ ] F-distribution
+* [ ] gamma
+* [ ] inverse gamma
+* [ ] lognormal
+* [x] normal
+* [ ] t-distribution
+* [ ] weibull
+
+### Multivariate
 * [ ] multivariate normal
 * [ ] multivariate normal with missing data
 * [ ] exponential family
-* [ ] univariate t-distribution
 * [ ] multivariate t-distribution
-* [ ] Dirichlet-multinomial
+* [ ] dirichlet-multinomial
 * [ ] negative multinomial
 
 ## Linear regression
