@@ -12,7 +12,6 @@ type OnlineFitNormal <: ContinuousUnivariateOnlineStat
     nb::Int64
 end
 
-
 function onlinefit{T<:Real}(::Type{Normal}, y::Vector{T})
     n::Int64 = length(y)
     OnlineFitNormal(fit(Normal, y), suffstats(Normal, y), n, 1)
@@ -28,7 +27,7 @@ function update!(obj::OnlineFitNormal, newdata::Vector)
     n = n1 + n2
 
     s = obj.stats.s + newstats.s
-    m = obj.stats.m + n1 / n * (newstats.m - obj.stats.m)
+    m = obj.stats.m + n2 / n * (newstats.m - obj.stats.m)
     s2 = obj.stats.s2 + newstats.s2
     tw = n
 
@@ -41,6 +40,6 @@ end
 
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(OnlineFitNormal)
+function state(obj::OnlineFitNormal)
     println(obj.d)
 end

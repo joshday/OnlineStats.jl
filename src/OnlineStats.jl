@@ -16,6 +16,7 @@ include("summary/quantile.jl")
 include("summary/moments.jl")
 
 include("densityestimation/normal.jl")
+include("densityestimation/binomial.jl")
 
 
 # General docs for update!, state, convert
