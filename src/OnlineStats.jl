@@ -1,16 +1,21 @@
 module OnlineStats
 
-
 using DataFrames
 using Docile
+using Distributions
+import Base.merge
 
-import Distributions, Base.convert
+export update!, state, onlinefit
 
-export update!, state, convert
+
 
 include("onlinestat.jl")
+
 include("summary/summary.jl")
 include("summary/quantile.jl")
+include("summary/moments.jl")
+
+include("densityestimation/normal.jl")
 
 
 # General docs for update!, state, convert

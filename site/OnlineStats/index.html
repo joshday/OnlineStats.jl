@@ -107,91 +107,79 @@
 <h1 id="onlinestats">OnlineStats</h1>
 <h2 id="exported">Exported</h2>
 <hr />
-<h4 id="state">state</h4>
-<p>Usage: <code>state(obj)</code></p>
-<p>View the current state of estimates in <code>obj</code></p>
+<h4 id="convert">convert</h4>
+<p><code>convert(DataFrame, obj)</code></p>
+<p>Get <code>obj</code> results as <code>DataFrame</code></p>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/OnlineStats.jl#L18">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:18</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/OnlineStats.jl#L34">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:34</a></p>
+<hr />
+<h4 id="state">state</h4>
+<p><code>state(obj)</code></p>
+<p>Get current state of estimates in <code>obj</code></p>
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/OnlineStats.jl#L28">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:28</a></p>
+<hr />
+<h4 id="update">update!</h4>
+<p><code>update!(obj, newdata::Vector, add::Bool=true)</code></p>
+<p>Update object <code>obj</code> with observations in <code>newdata</code>.  Overwrite previous
+estimates (<code>add = false</code>) or append new estimates (<code>add = true</code>)</p>
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/OnlineStats.jl#L22">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:22</a></p>
 <hr />
 <h4 id="quantilemmyarrayt-1">QuantileMM(y::Array{T, 1})</h4>
-<p>Construct QuantileMM from Vector</p>
+<p>Create QuantileMM object</p>
+<p>fields:</p>
+<ul>
+<li>
+<p><code>est::Matrix</code>: quantile results</p>
+</li>
+<li>
+<p><code>τs::Vector</code>:  quantiles estimated</p>
+</li>
+<li>
+<p><code>r::Float64</code>:  learning rate</p>
+</li>
+<li>
+<p><code>s::Vector, t::Vector, and o::Float</code>:  sufficient statistics</p>
+</li>
+<li>
+<p><code>n::Vector</code>:   number of observations used</p>
+</li>
+<li>
+<p><code>nb::Vector</code>:  number of batches used</p>
+</li>
+</ul>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L38">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:38</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/summary/quantile.jl#L66">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:66</a></p>
 <hr />
 <h4 id="quantilesgdyarrayt-1">QuantileSGD(y::Array{T, 1})</h4>
-<p>Consturct QuantileSGD from Vector</p>
+<p>Create QuantileSGD object</p>
+<p>fields:</p>
+<ul>
+<li>
+<p><code>est::Matrix</code>: quantile results</p>
+</li>
+<li>
+<p><code>τs::Vector</code>:  quantiles estimated</p>
+</li>
+<li>
+<p><code>r::Float64</code>:  learning rate</p>
+</li>
+<li>
+<p><code>n::Vector</code>:   number of observations used</p>
+</li>
+<li>
+<p><code>nb::Vector</code>:  number of batches used</p>
+</li>
+</ul>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L18">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:18</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/summary/quantile.jl#L31">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:31</a></p>
 <hr />
 <h4 id="summaryyarrayt-1">Summary(y::Array{T, 1})</h4>
-<p>Construct <code>Summary</code> from Vector</p>
+<p>Create Summary object</p>
+<p>fields (each is Vector): <code>mean</code>, <code>var</code>, <code>max</code>, <code>min</code>, <code>n</code>, <code>nb</code></p>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L17">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:17</a></p>
-<hr />
-<h4 id="summaryydataarrayt-n">Summary(y::DataArray{T, N})</h4>
-<p>Construct <code>Summary</code> from DataArray</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L25">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:25</a></p>
-<hr />
-<h4 id="converttypedataframe-objquantilemm">convert(::Type{DataFrame}, obj::QuantileMM)</h4>
-<p>Convert 'obj' to type 'DataFrame'</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L142">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:142</a></p>
-<hr />
-<h4 id="converttypedataframe-objquantilesgd">convert(::Type{DataFrame}, obj::QuantileSGD)</h4>
-<p>Convert 'obj' to type 'DataFrame'</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L128">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:128</a></p>
-<hr />
-<h4 id="converttypedataframe-objsummary">convert(::Type{DataFrame}, obj::Summary)</h4>
-<p>Convert 'obj' to type 'DataFrame'</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L102">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:102</a></p>
-<hr />
-<h4 id="updateobjquantilemm-newdataarrayt-1">update!(obj::QuantileMM, newdata::Array{T, 1})</h4>
-<p>Update quantile estimates using a new batch of data</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L81">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:81</a></p>
-<hr />
-<h4 id="updateobjquantilemm-newdataarrayt-1-addrowbool">update!(obj::QuantileMM, newdata::Array{T, 1}, addrow::Bool)</h4>
-<p>Update quantile estimates using a new batch of data</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L81">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:81</a></p>
-<hr />
-<h4 id="updateobjquantilesgd-newdataarrayt-1">update!(obj::QuantileSGD, newdata::Array{T, 1})</h4>
-<p>Update quantile estimates using a new batch of data</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L57">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:57</a></p>
-<hr />
-<h4 id="updateobjquantilesgd-newdataarrayt-1-addrowbool">update!(obj::QuantileSGD, newdata::Array{T, 1}, addrow::Bool)</h4>
-<p>Update quantile estimates using a new batch of data</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L57">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:57</a></p>
-<hr />
-<h4 id="updateobjsummary-newdataarrayt-1">update!(obj::Summary, newdata::Array{T, 1})</h4>
-<p>Update summary statistics with a new batch of data.</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L36">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:36</a></p>
-<hr />
-<h4 id="updateobjsummary-newdataarrayt-1-addbool">update!(obj::Summary, newdata::Array{T, 1}, add::Bool)</h4>
-<p>Update summary statistics with a new batch of data.</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L36">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:36</a></p>
-<hr />
-<h4 id="quantilemm">QuantileMM</h4>
-<p>Stores quantile estimating using an online MM algorithm</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L26">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:26</a></p>
-<hr />
-<h4 id="quantilesgd">QuantileSGD</h4>
-<p>Stores quantile estimates using a stochastic gradient descent algorithm</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/quantile.jl#L9">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:9</a></p>
-<hr />
-<h4 id="summary">Summary</h4>
-<p>Stores analytical updates for mean, variance, maximum, and minimum.</p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/056f3a699ef1e64d61dd9216d42f054acf8b02a0/src/summary/summary.jl#L6">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:6</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/summary/summary.jl#L20">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:20</a></p>
 </div>
         </div>
 

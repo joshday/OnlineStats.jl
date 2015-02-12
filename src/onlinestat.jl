@@ -22,3 +22,4 @@ typealias ContinuousMultivariateOnlineStat OnlineStat{
     Distributions.Multivariate,
     Distributions.Continuous
 }
+
