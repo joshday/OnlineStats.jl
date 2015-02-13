@@ -16,8 +16,8 @@ function CovarianceMatrix(x::Matrix)
     n, p = size(x)
     vec1 = ones(n)
 
-    A = BLAS.syrk('L', 'T', 1.0, x)
-    B = x' * vec1
+    A = BLAS.syrk('L', 'T', 1.0, x) / n
+    B = x' * vec1 / n
     CovarianceMatrix(A, B, n, p, 1)
 end
 
@@ -30,14 +30,18 @@ function Base.merge(obj1::CovarianceMatrix, obj2::CovarianceMatrix)
     end
     n1 = obj1.n
     n2 = obj2.n
+    n = n1 + n2
 
     A1::Matrix = obj1.A
     B1::Vector = obj1.B
     A2::Matrix = obj2.A
     B2::Vector = obj2.B
 
+    A = (n1 * A1 + n2 * A2) / n
+    B = (n1 * B1 + n2 * B2) / n
 
-    CovarianceMatrix(A1 + A2, B1 + B2, obj1.n + obj2.n, obj1.p, obj1.nb + obj2.nb)
+
+    CovarianceMatrix(A, B, n, obj1.p, obj1.nb + obj2.nb)
 end
 
 
@@ -57,7 +61,8 @@ end
 #-----------------------------------------------------------------------# state
 function state(obj::CovarianceMatrix)
     B = obj.B
-    obj.A/ (obj.n - 1) - BLAS.syrk('L','N',1.0, B) / (obj.n*(obj.n-1))
+    obj.A * obj.n / (obj.n - 1) -
+        BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
 end
 
 
