@@ -15,6 +15,7 @@ include("onlinestat.jl")
 include("summary/summary.jl")
 include("summary/quantile.jl")
 include("summary/moments.jl")
+include("summary/covmatrix.jl")
 
 # Density Estimation
 include("densityestimation/normal.jl")
