@@ -2,9 +2,9 @@
 
 Online algorithms for statistics.  The driving function in this package is  
 
-```update!(obj, newdata::Vector)```
-- `obj`: subtype of OnlineStat
-- `newdata`: new Real, Vector, or DataArray  
+```update!(obj, newdata)```  
+- `obj`: subtype of `OnlineStat`  
+- `newdata`: new observations
 
 
 ## Types 
@@ -15,6 +15,11 @@ Each type defined in OnlineStats contains the fields
 - `nb`: number of batches used (display with `n_batches(obj)`)
 
 Other fields will be used to store sufficient statistics for online updates.
+
+## Full Documentation
+Documentation generated using [Docile.jl](https://github.com/MichaelHatherly/Docile.jl), [Lexicon.jl](https://github.com/MichaelHatherly/Lexicon.jl), and [MkDocs](http://www.mkdocs.org) is available [here](http://joshday.github.io/OnlineStats.jl/)
+
+ 
 
 ## Updating API documentation
 Run the following:
@@ -33,3 +38,4 @@ Push website from **master/site** straight to **gh-pages**
 ```
 git push origin `git subtree split --prefix site master`:gh-pages --force
 ```
+
