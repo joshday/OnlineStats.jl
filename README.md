@@ -22,20 +22,17 @@ Documentation generated using [Docile.jl](https://github.com/MichaelHatherly/Doc
  
 
 ## Updating API documentation
-Run the following:
+1) Run the following:
 ```
-julia> using Lexicon
+julia> using Lexicon  
 julia> include("src/OnlineStats.jl")
 julia> Lexicon.save("docs/OnlineStats.md", OnlineStats)
 ```
 
-Make webpage changes only in **master**
+2) Make webpage changes only in **master**
 ```
-mkdocs build  
+mkdocs build --clean
+mkdocs gh-deploy
 ```
 
-Push website from **master/site** straight to **gh-pages**
-```
-git push origin `git subtree split --prefix site master`:gh-pages --force
-```
 

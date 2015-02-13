@@ -43,6 +43,7 @@ https://github.com/joshday/online-catalogue
 * [ ] weibull
 
 ### Multivariate
+* [x] multinomial
 * [ ] multivariate normal
 * [ ] multivariate normal with missing data
 * [ ] exponential family

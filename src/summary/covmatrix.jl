@@ -3,7 +3,7 @@
 export CovarianceMatrix
 
 #------------------------------------------------------------------------------#
-#----------------------------------------------------------------# Summary Type
+#-------------------------------------------------------# CovarianceMatrix Type
 type CovarianceMatrix <: ContinuousMultivariateOnlineStat
     A::Matrix    # X' * X
     B::Vector    # X * 1'
@@ -12,6 +12,17 @@ type CovarianceMatrix <: ContinuousMultivariateOnlineStat
     nb::Int64    # number of batches used
 end
 
+@doc* doc"""
+    Usage: `CovarianceMatrix(x::Matrix)`
+
+    | Field       |  Description                 |
+    |:------------|:-----------------------------|
+    | `A::Matrix` | $ X^T X / n $                |
+    | `B::Matrix` | $ X^T 1_n $                  |
+    | `n::Int64`  | number of observations used  |
+    | `p::Int64`  | number of variables          |
+    | `nb::Int64` | number of batches used       |
+    """ ->
 function CovarianceMatrix(x::Matrix)
     n, p = size(x)
     vec1 = ones(n)
@@ -23,8 +34,8 @@ end
 
 
 #------------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# merge
-function Base.merge(obj1::CovarianceMatrix, obj2::CovarianceMatrix)
+#---------------------------------------------------------------------# update!
+function update!(obj1::CovarianceMatrix, obj2::CovarianceMatrix)
     if obj1.p != obj2.p
         error("different number of variables")
     end
@@ -44,12 +55,9 @@ function Base.merge(obj1::CovarianceMatrix, obj2::CovarianceMatrix)
     CovarianceMatrix(A, B, n, obj1.p, obj1.nb + obj2.nb)
 end
 
-
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------------------# update!
 function update!(obj::CovarianceMatrix, newmat::Matrix)
     obj2 = CovarianceMatrix(newmat)
-    mergeobj = OnlineStats.merge(obj, obj2)
+    mergeobj = update!(obj, obj2)
     obj.A = mergeobj.A
     obj.B = mergeobj.B
     obj.n += obj2.n
@@ -73,21 +81,21 @@ end
 #################################
 
 
-x1 = rand(100,3)
-obj1 = OnlineStats.CovarianceMatrix(x1)
-OnlineStats.state(obj1)
-OnlineStats.state(obj1) - cov(x1)
+# x1 = rand(100,3)
+# obj1 = OnlineStats.CovarianceMatrix(x1)
+# OnlineStats.state(obj1)
+# OnlineStats.state(obj1) - cov(x1)
 
-x2 = rand(100, 3)
-obj2 = OnlineStats.CovarianceMatrix(x2)
-OnlineStats.state(obj2)
-OnlineStats.state(obj2) - cov(x2)
+# x2 = rand(100, 3)
+# obj2 = OnlineStats.CovarianceMatrix(x2)
+# OnlineStats.state(obj2)
+# OnlineStats.state(obj2) - cov(x2)
 
-obj = Base.merge(obj1, obj2)
-OnlineStats.state(obj)
-OnlineStats.state(obj) - cov([x1, x2])
+# obj = OnlineStats.update!(obj1, obj2)
+# OnlineStats.state(obj)
+# OnlineStats.state(obj) - cov([x1, x2])
 
-OnlineStats.update!(obj1, x2)
-OnlineStats.state(obj1)
-OnlineStats.state(obj1) - cov([x1, x2])
+# OnlineStats.update!(obj1, x2)
+# OnlineStats.state(obj1)
+# OnlineStats.state(obj1) - cov([x1, x2])
 

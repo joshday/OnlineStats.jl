@@ -14,6 +14,18 @@ type Moments <: ContinuousUnivariateOnlineStat
     nb::Int64
 end
 
+@doc* doc"""
+    Usage: `Moments(y::Vector)`
+
+    | Field         |  Description                 |
+    |:--------------|:-----------------------------|
+    | `m1::Float64` | $ \mu_1 $                    |
+    | `m2::Float64` | $ \mu_2 $                    |
+    | `m3::Float64` | $ \mu_3 $                    |
+    | `m4::Float64` | $ \mu_4 $                    |
+    | `n::Int64`    | number of observations used  |
+    | `nb::Int64`   | number of batches used       |
+    """ ->
 function Moments(y::Vector)
     n::Int64 = length(y)
     m::Float64 = mean(y)

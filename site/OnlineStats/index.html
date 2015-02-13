@@ -1,193 +1,397 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API - OnlineStats.jl</title>
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script>
+  <script src="../js/theme.js"></script>
+
+  <style>
+    body {font-size: 90%;}
+    pre, code {font-size: 100%;}
+    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
+  </style> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> OnlineStats.jl</a>
         
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+      <ul class="current">
+    
         
+        <span>Manual</span>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../manual/overview">Overview</a>
+                    
+                </li>
+            
+                <li class="toctree-l1 ">
+                    <a class="" href="../manual/summary">Summary</a>
+                    
+                </li>
+            
         
-        <link rel="shortcut icon" href="../img/favicon.ico">
 
-        <title>API - OnlineStats.jl</title>
+    
+        
+            <li class="toctree-l1 current">
+                <a class="current" href=".">API</a>
+            </li>
+        
 
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="../css/prettify-1.0.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
+    
+</ul>
 
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-    </head>
+      </div>
+      &nbsp;
+    </nav>
 
-    <body>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
+        <a href=".."></a>
+      </nav>
 
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-
-            <!-- Main title -->
-            <a class="navbar-brand" href="..">OnlineStats.jl</a>
-        </div>
-
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-            <!-- Main navigation -->
-            <ul class="nav navbar-nav">
-            
-            
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manual <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                    
-                        <li >
-                            <a href="../manual/overview">Overview</a>
-                        </li>
-                    
-                        <li >
-                            <a href="../manual/summary">Summary</a>
-                        </li>
-                    
-                    </ul>
-                </li>
-            
-            
-            
-                <li class="active">
-                    <a href=".">API</a>
-                </li>
-            
-            
-            </ul>
-
-            <!-- Search, Navigation and Repo links -->
-            <ul class="nav navbar-nav navbar-right">
-                
-                <li >
-                    <a rel="next" href="../manual/summary">
-                        <i class="fa fa-arrow-left"></i> Previous
-                    </a>
-                </li>
-                <li class="disabled">
-                    <a rel="prev" >
-                        Next <i class="fa fa-arrow-right"></i>
-                    </a>
-                </li>
-                
-            </ul>
-        </div>
-    </div>
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    <li>API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
 </div>
-
-        <div class="container">
-            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-    
-        <li class="main active"><a href="#onlinestats">OnlineStats</a></li>
-        
-            <li><a href="#exported">Exported</a></li>
-        
-    
-    </ul>
-</div></div>
-            <div class="col-md-9" role="main">
-
+          <div role="main">
+            <div class="section">
+              <style scoped>img.latex-inline { vertical-align: middle; }</style>
 <h1 id="onlinestats">OnlineStats</h1>
 <h2 id="exported">Exported</h2>
 <hr />
-<h4 id="convert">convert</h4>
-<p><code>convert(DataFrame, obj)</code></p>
-<p>Get <code>obj</code> results as <code>DataFrame</code></p>
+<h4 id="covariancematrix">CovarianceMatrix</h4>
+<p>Usage: <code>CovarianceMatrix(x::Matrix)</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>A::Matrix</code></td>
+<td align="left"><img class='latex-inline math-true' alt='XTXn' id='XTXn_1' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAARBAMAAACC64kkAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAdu+Jq5kyZiJUzRBEu92+TX6qAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAzUlEQVQY02NggICF9YIPGLACnoQ+hgI4rx1KM+obsHxNY5jKkABhJjAwSMDU1DMwNjAwhCOYDAEwKf6CaUByGYLJIQCTYl02AUgqIJhgnWDA9hFELIAzGVgZ2KPLHcByn4G49iWcydDIcPoqwzWwE43groYwJRgatBm0QayK/QdgUhBmAAPHA26Q3ZwJvA5QGQgT6EDOAMYAoFumM3D+hkpBmEAHshawnNzAcOQzw95fE8AyUCYrAwNvA3sNtvBsZMAJJHBLBeCU4YZFDgCdEjSUj052tgAAAABJRU5ErkJggg=='></td>
+</tr>
+<tr>
+<td align="left"><code>B::Matrix</code></td>
+<td align="left"><img class='latex-inline math-true' alt='XT1n' id='XT1n_2' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAQBAMAAACMxcAQAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAdu+Jq5kyZiJUzRBEu92+TX6qAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAkUlEQVQY02NggICF9YIPGFAAT0IfQwGcx6hvwPI1jWEqQwID8wGoWD0DYwMDQzgDA6fcBKgQf8E0ILkMiLlgQqzLQCwFZCG2jyBiAbIQw2cgrn2JLMRoBJODC1XsP4AmxJnA64AmNJ2B8zdciFtwugDDkc8Me39BZHnsF+7pY7jAgAYmshmgC4Uxn0EXcmCsAACbDSPEAsp61wAAAABJRU5ErkJggg=='></td>
+</tr>
+<tr>
+<td align="left"><code>n::Int64</code></td>
+<td align="left">number of observations used</td>
+</tr>
+<tr>
+<td align="left"><code>p::Int64</code></td>
+<td align="left">number of variables</td>
+</tr>
+<tr>
+<td align="left"><code>nb::Int64</code></td>
+<td align="left">number of batches used</td>
+</tr>
+</tbody>
+</table>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/OnlineStats.jl#L34">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:34</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/summary/covmatrix.jl#L25">/Users/jtday/.julia/OnlineStats/src/summary/covmatrix.jl:25</a></p>
+<hr />
+<h4 id="moments">Moments</h4>
+<p>Usage: <code>Moments(y::Vector)</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>m1::Float64</code></td>
+<td align="left"><img class='latex-inline math-true' alt='mu1' id='mu1_3' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAKBAMAAAB293L0AAAALVBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAOrOgAAAADnRSTlMAVIlEq5lm7yLdELsydtrDr+4AAAAJcEhZcwAADsQAAA7EAZUrDhsAAABFSURBVAjXY2AQYjBiAAFHhjAwXcEwg4E5gYGrgKuAIeUCA+MG5g0NbBcYWB1YlBcAaU43mTAGIL0cpBZIi0DpiyBaeiMAEQ0Org9c80kAAAAASUVORK5CYII='></td>
+</tr>
+<tr>
+<td align="left"><code>m2::Float64</code></td>
+<td align="left"><img class='latex-inline math-true' alt='mu2' id='mu2_4' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAKBAMAAACZNRnKAAAALVBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAOrOgAAAADnRSTlMAVIlEq5lm7yLdELsydtrDr+4AAAAJcEhZcwAADsQAAA7EAZUrDhsAAABVSURBVAjXY2AQYjBiAANHhjAIo4JhBkNaMAMDVwFXAUfCcgYGxg3MG5oD2BsYWB1YlBcsaGdg4HSTASr2YWBYDtLAa8DAIAJiCDMuYLgIpDnevWMAAFyWDwfnWoWvAAAAAElFTkSuQmCC'></td>
+</tr>
+<tr>
+<td align="left"><code>m3::Float64</code></td>
+<td align="left"><img class='latex-inline math-true' alt='mu3' id='mu3_5' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAKBAMAAACZNRnKAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVIlEq5lm7yLdELsyds1wv11QAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAVUlEQVQI12NgEGIwYgADR4YwCKOCYQZDsiIDA1cBVwHDg+UMDIwbmDc0MIgyMLA6sCgvYNzFwMDpJgNUvJKBYTlYB+cBBhEgxRjAvoDhIpDBJazIAABI2g2gc5TkkwAAAABJRU5ErkJggg=='></td>
+</tr>
+<tr>
+<td align="left"><code>m4::Float64</code></td>
+<td align="left"><img class='latex-inline math-true' alt='mu4' id='mu4_6' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAKBAMAAACZNRnKAAAAMFBMVEX///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv3aB7AAAAD3RSTlMAVIlEq5lm7yLdELsyds1wv11QAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAUklEQVQI12NgEGIwYgADR4YwCKOCYQYDQzIDA1cBVwEDx2MGBsYNzBsa2JQZGFgdWJQXSAEZnG4yYVwGQMZyoHrGtK0NDCJgrcEMDBdBNPOUBgARRg00texAigAAAABJRU5ErkJggg=='></td>
+</tr>
+<tr>
+<td align="left"><code>n::Int64</code></td>
+<td align="left">number of observations used</td>
+</tr>
+<tr>
+<td align="left"><code>nb::Int64</code></td>
+<td align="left">number of batches used</td>
+</tr>
+</tbody>
+</table>
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/summary/moments.jl#L28">/Users/jtday/.julia/OnlineStats/src/summary/moments.jl:28</a></p>
+<hr />
+<h4 id="quantilemm">QuantileMM</h4>
+<p>Usage: <code>QuantileMM(y::Vector)</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>est::Vector</code></td>
+<td align="left">quantile results</td>
+</tr>
+<tr>
+<td align="left"><code>τs::Vector</code></td>
+<td align="left">quantiles estimated</td>
+</tr>
+<tr>
+<td align="left"><code>r::Float64</code></td>
+<td align="left">learning rate</td>
+</tr>
+<tr>
+<td align="left"><code>s::Float64</code></td>
+<td align="left">sufficient statistic 1</td>
+</tr>
+<tr>
+<td align="left"><code>t::Float64</code></td>
+<td align="left">sufficient statistic 2</td>
+</tr>
+<tr>
+<td align="left"><code>o::Float64</code></td>
+<td align="left">sufficient statistic 3</td>
+</tr>
+<tr>
+<td align="left"><code>n::Int64</code></td>
+<td align="left">number of observations used</td>
+</tr>
+<tr>
+<td align="left"><code>nb::Vector</code></td>
+<td align="left">number of batches used</td>
+</tr>
+</tbody>
+</table>
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/summary/quantile.jl#L60">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:60</a></p>
+<hr />
+<h4 id="quantilesgd">QuantileSGD</h4>
+<p>Usage: <code>QuantileSGD(y::Vector)</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>est::Vector</code></td>
+<td align="left">quantile results</td>
+</tr>
+<tr>
+<td align="left"><code>τs::Vector</code></td>
+<td align="left">quantiles estimated</td>
+</tr>
+<tr>
+<td align="left"><code>r::Float64</code></td>
+<td align="left">learning rate</td>
+</tr>
+<tr>
+<td align="left"><code>n::Float64</code></td>
+<td align="left">number of observations used</td>
+</tr>
+<tr>
+<td align="left"><code>nb::Float64</code></td>
+<td align="left">number of batches used</td>
+</tr>
+</tbody>
+</table>
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/summary/quantile.jl#L27">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:27</a></p>
+<hr />
+<h4 id="summary">Summary</h4>
+<p>Usage: <code>Summary(y::Vector)</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>mean::Float64</code></td>
+<td align="left">sample mean</td>
+</tr>
+<tr>
+<td align="left"><code>var::Float64</code></td>
+<td align="left">sample variance</td>
+</tr>
+<tr>
+<td align="left"><code>max::Float64</code></td>
+<td align="left">sample maximum</td>
+</tr>
+<tr>
+<td align="left"><code>min::Float64</code></td>
+<td align="left">sample minimum</td>
+</tr>
+<tr>
+<td align="left"><code>n:Int64</code></td>
+<td align="left">number of observations used</td>
+</tr>
+<tr>
+<td align="left"><code>nb::Int64</code></td>
+<td align="left">number of batches used</td>
+</tr>
+</tbody>
+</table>
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/summary/summary.jl#L28">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:28</a></p>
+<hr />
+<h4 id="onlinefit">onlinefit</h4>
+<p>Usage:</p>
+<pre><code>onlinefit(&lt;&lt;UnivariateDistribution&gt;&gt;, y::Vector)
+onlinefit(&lt;&lt;MultivariateDistribution&gt;&gt;, y::Matrix)
+</code></pre>
+
+<p>Online parametric density estimation.  Creates an object of type
+<code>OnlineFit&lt;&lt;Distribution&gt;&gt;</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>d::&lt;&lt;Distribution&gt;&gt;</code></td>
+<td align="left"><code>Distributions.&lt;&lt;Distribution&gt;&gt;</code></td>
+</tr>
+<tr>
+<td align="left"><code>stats::&lt;&lt;DistributionStats&gt;&gt;</code></td>
+<td align="left"><code>Distributions.&lt;&lt;DistributionStats&gt;&gt;</code></td>
+</tr>
+<tr>
+<td align="left"><code>n::Int64</code></td>
+<td align="left">number of observations used</td>
+</tr>
+<tr>
+<td align="left"><code>nb::Int64</code></td>
+<td align="left">number of batches used</td>
+</tr>
+</tbody>
+</table>
+<p>Examples:</p>
+<pre><code>y1, y2 = randn(100), randn(100)
+obj = onlinefit(Normal, y1)
+update!(obj, y2)
+state(obj)
+</code></pre>
+
+<p><strong>source:</strong>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/OnlineStats.jl#L75">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:75</a></p>
 <hr />
 <h4 id="state">state</h4>
-<p><code>state(obj)</code></p>
-<p>Get current state of estimates in <code>obj</code></p>
+<p>Get current state of estimates with <code>state(obj)</code></p>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/OnlineStats.jl#L28">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:28</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/OnlineStats.jl#L46">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:46</a></p>
 <hr />
 <h4 id="update">update!</h4>
-<p><code>update!(obj, newdata::Vector, add::Bool=true)</code></p>
-<p>Update object <code>obj</code> with observations in <code>newdata</code>.  Overwrite previous
-estimates (<code>add = false</code>) or append new estimates (<code>add = true</code>)</p>
+<p>Update <code>obj</code> with observations in <code>newdata</code> using <code>update(obj, newdata)</code></p>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/OnlineStats.jl#L22">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:22</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/OnlineStats.jl#L42">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:42</a></p>
 <hr />
-<h4 id="quantilemmyarrayt-1">QuantileMM(y::Array{T, 1})</h4>
-<p>Create QuantileMM object</p>
-<p>fields:</p>
-<ul>
-<li>
-<p><code>est::Matrix</code>: quantile results</p>
-</li>
-<li>
-<p><code>τs::Vector</code>:  quantiles estimated</p>
-</li>
-<li>
-<p><code>r::Float64</code>:  learning rate</p>
-</li>
-<li>
-<p><code>s::Vector, t::Vector, and o::Float</code>:  sufficient statistics</p>
-</li>
-<li>
-<p><code>n::Vector</code>:   number of observations used</p>
-</li>
-<li>
-<p><code>nb::Vector</code>:  number of batches used</p>
-</li>
-</ul>
+<h4 id="n_batchesobj">n_batches(obj)</h4>
+<p>Return the number of batches used</p>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/summary/quantile.jl#L66">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:66</a></p>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/OnlineStats.jl#L33">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:33</a></p>
 <hr />
-<h4 id="quantilesgdyarrayt-1">QuantileSGD(y::Array{T, 1})</h4>
-<p>Create QuantileSGD object</p>
-<p>fields:</p>
-<ul>
-<li>
-<p><code>est::Matrix</code>: quantile results</p>
-</li>
-<li>
-<p><code>τs::Vector</code>:  quantiles estimated</p>
-</li>
-<li>
-<p><code>r::Float64</code>:  learning rate</p>
-</li>
-<li>
-<p><code>n::Vector</code>:   number of observations used</p>
-</li>
-<li>
-<p><code>nb::Vector</code>:  number of batches used</p>
-</li>
-</ul>
+<h4 id="n_obsobj">n_obs(obj)</h4>
+<p>Return the number of observations used</p>
 <p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/summary/quantile.jl#L31">/Users/jtday/.julia/OnlineStats/src/summary/quantile.jl:31</a></p>
-<hr />
-<h4 id="summaryyarrayt-1">Summary(y::Array{T, 1})</h4>
-<p>Create Summary object</p>
-<p>fields (each is Vector): <code>mean</code>, <code>var</code>, <code>max</code>, <code>min</code>, <code>n</code>, <code>nb</code></p>
-<p><strong>source:</strong>
-<a href="https://github.com/joshday/OnlineStats.jl/tree/b3ffb64ad2ec89f08d103088fdc723368b714812/src/summary/summary.jl#L20">/Users/jtday/.julia/OnlineStats/src/summary/summary.jl:20</a></p>
-</div>
+<a href="https://github.com/joshday/OnlineStats.jl/tree/40ac77ff87902410a18f9abe4dd009ad4da42d3b/src/OnlineStats.jl#L28">/Users/jtday/.julia/OnlineStats/src/OnlineStats.jl:28</a></p>
+
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../manual/summary" class="btn btn-neutral" title="Summary"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    <!-- Copyright etc -->
+    </p>
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
         </div>
+      </div>
 
+    </section>
+
+  </div>
+
+<div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
         
-
-        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-        <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/prettify-1.0.min.js"></script>
-        <script src="../js/base.js"></script>
-    </body>
+      <span><a href="../manual/summary" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <span style="margin-left: 15px"><a href="" style="color: #fcfcfc">Next &raquo;</a></span>
+    </span>
+</div>
+</body>
 </html>

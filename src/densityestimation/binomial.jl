@@ -12,6 +12,7 @@ type OnlineFitBinomial <: DiscreteUnivariateOnlineStat
     nb::Int64
 end
 
+
 function onlinefit(::Type{Binomial}, ne::Int64, y::Vector{Int64})
     n::Int64 = length(y)
     OnlineFitBinomial(fit(Binomial, ne, y), suffstats(Binomial, ne, y), n, 1)

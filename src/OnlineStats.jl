@@ -3,9 +3,8 @@ module OnlineStats
 using DataFrames
 using Docile
 using Distributions
-import Base.merge
 
-export update!, state, onlinefit, n_obs, n_used
+export update!, state, onlinefit, n_obs, n_batches
 
 
 # Abstract Type structure
@@ -21,36 +20,58 @@ include("summary/covmatrix.jl")
 include("densityestimation/normal.jl")
 include("densityestimation/binomial.jl")
 include("densityestimation/bernoulli.jl")
+# include("densityestimation/beta.jl")
+include("densityestimation/multinomial.jl")
 
 
 # General functions
+@doc doc"Return the number of observations used" ->
 function n_obs(obj)
    obj.n
 end
 
+@doc doc"Return the number of batches used" ->
 function n_batches(obj)
    obj.nb
 end
 
 
-# General docs for update!, state, convert
+# General docs for update!, state, convert, onlinefit
 @doc doc"""
-  `update!(obj, newdata::Vector, add::Bool=true)`
-
-Update object `obj` with observations in `newdata`.  Overwrite previous
-estimates (`add = false`) or append new estimates (`add = true`)
-""" -> update!
+    Update `obj::OnlineStat` with observations in `newdata` using `update(obj, newdata)`
+    """ -> update!
 
 @doc doc"""
-  `state(obj)`
+    Get current state of estimates with `state(obj::OnlineStat)`
+    """ -> state
 
-Get current state of estimates in `obj`
-""" -> state
 
 @doc doc"""
-  `convert(DataFrame, obj)`
+    Usage:
+    ```
+    onlinefit(<<UnivariateDistribution>>, y::Vector)
+    onlinefit(<<MultivariateDistribution>>, y::Matrix)
+    ```
 
-Get `obj` results as `DataFrame`
-""" -> convert
+    Online parametric density estimation.  Creates an object of type
+    `OnlineFit<<Distribution>>`
+
+    | Field                          |  Description                          |
+    |:-------------------------------|:--------------------------------------|
+    | `d::<<Distribution>>`          | `Distributions.<<Distribution>>`      |
+    | `stats::<<DistributionStats>>` | `Distributions.<<DistributionStats>>` |
+    | `n::Int64`                     | number of observations used           |
+    | `nb::Int64`                    | number of batches used                |
+
+
+    Examples:
+    ```
+    y1, y2 = randn(100), randn(100)
+    obj = onlinefit(Normal, y1)
+    update!(obj, y2)
+    state(obj)
+    ```
+
+    """ -> onlinefit
 
 end # module

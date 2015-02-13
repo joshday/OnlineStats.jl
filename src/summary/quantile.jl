@@ -2,7 +2,6 @@
 
 export QuantileSGD, QuantileMM
 
-
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------# Quantile Types
 ### SGD
@@ -15,21 +14,17 @@ type QuantileSGD <: ContinuousUnivariateOnlineStat
 end
 
 
-@doc doc"""
-Create QuantileSGD object
+@doc* doc"""
+    Usage: `QuantileSGD(y::Vector)`
 
-fields:
-
-  - `est::Vector`:  quantile results
-
-  - `τs::Vector`:   quantiles estimated
-
-  - `r::Float64`:   learning rate
-
-  - `n::Float64`:   number of observations used
-
-  - `nb::Float64`:  number of batches used
-""" ->
+    | Field         |  Description                 |
+    |:--------------|:-----------------------------|
+    | `est::Vector` |  quantile results            |
+    | `τs::Vector ` |  quantiles estimated         |
+    | `r::Float64 ` |  learning rate               |
+    | `n::Float64 ` |  number of observations used |
+    | `nb::Float64` |  number of batches used      |
+    """ ->
 QuantileSGD(y::Vector; tau::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51) =
     QuantileSGD(quantile(y, tau), tau, r, length(y), 1)
 
@@ -49,23 +44,20 @@ type QuantileMM <: ContinuousUnivariateOnlineStat
 end
 
 
-@doc doc"""
-Create QuantileMM object
+@doc* doc"""
+    Usage: `QuantileMM(y::Vector)`
 
-fields:
-
-  - `est::Vector`: quantile results
-
-  - `τs::Vector`:  quantiles estimated
-
-  - `r::Float64`:  learning rate
-
-  - `s::Float64, t::Float64, and o::Float64`:  sufficient statistics
-
-  - `n::Int64`:   number of observations used
-
-  - `nb::Vector`:  number of batches used
-""" ->
+    | Field         |  Description                 |
+    |:--------------|:-----------------------------|
+    | `est::Vector` | quantile results             |
+    | `τs::Vector ` | quantiles estimated          |
+    | `r::Float64 ` | learning rate                |
+    | `s::Float64 ` | sufficient statistic 1       |
+    | `t::Float64 ` | sufficient statistic 2       |
+    | `o::Float64 ` | sufficient statistic 3       |
+    | `n::Int64   ` | number of observations used  |
+    | `nb::Vector ` | number of batches used       |
+    """ ->
 function QuantileMM(y::Vector; tau::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.51)
     p::Int = length(tau)
     qs::Vector{Float64} = quantile(y, tau) + .00000001

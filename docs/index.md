@@ -12,15 +12,21 @@
 	quantiles via stochastic gradient descent
 - `QuantileMM`   
 	quantiles via online MM algorithm
+
 	
 The fields `obj.n` (number of observations used) and `obj.nb` (number of batches) are included in all types defined in OnlineStats.
 
 ### Update your model
-- `update!(obj, newdata::Vector)`
+- `update!(obj, newdata)`
 	
 ### View the state of your estimates
 - `state(obj)`  
 
-### Convert `obj` to `DataFrame`
-- `convert(DataFrame, obj)`
 
+## Examples
+----
+```
+julia> using RDatasets
+iris = dataset("datasets", "iris")
+iris = array(iris[:, 1:4])
+```

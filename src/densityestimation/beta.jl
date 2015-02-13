@@ -1,17 +1,19 @@
 # Author: Josh Day <emailjoshday@gmail.com>
 
-####
-#### Distributions.suffstats not implemented for Beta yet
-####
-
 # export OnlineFitBeta
 
+#############################################################
+## Distributions.suffstats not implemented for Beta yet !! ##
+#############################################################
+
+
 # #------------------------------------------------------------------------------#
-# #--------------------------------------------------------# OnlineNormalFit Type
+# #----------------------------------------------------------# OnlineFitBeta Type
 # type OnlineFitBeta <: ContinuousUnivariateOnlineStat
 #     d::Distributions.Beta
-#     stats::Distributions.NormalStats
+#     stats::Distributions.BetaStats
 
 #     n::Int64
 #     nb::Int64
 # end
+

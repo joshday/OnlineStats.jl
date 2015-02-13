@@ -1,7 +1,11 @@
 site_name: OnlineStats.jl
+
 pages:
 - [index.md, Home]
 - [manual/overview.md, Manual]
 - [manual/summary.md, Manual]
 - [OnlineStats.md, API]
-theme: yeti
+
+theme: readthedocs
+
+markdown_extensions: [latex, tables]
