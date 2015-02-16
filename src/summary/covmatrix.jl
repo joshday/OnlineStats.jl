@@ -73,29 +73,3 @@ function state(obj::CovarianceMatrix)
         BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
 end
 
-
-#################################
-#################################
-#################################
-#################################
-#################################
-
-
-# x1 = rand(100,3)
-# obj1 = OnlineStats.CovarianceMatrix(x1)
-# OnlineStats.state(obj1)
-# OnlineStats.state(obj1) - cov(x1)
-
-# x2 = rand(100, 3)
-# obj2 = OnlineStats.CovarianceMatrix(x2)
-# OnlineStats.state(obj2)
-# OnlineStats.state(obj2) - cov(x2)
-
-# obj = OnlineStats.update!(obj1, obj2)
-# OnlineStats.state(obj)
-# OnlineStats.state(obj) - cov([x1, x2])
-
-# OnlineStats.update!(obj1, x2)
-# OnlineStats.state(obj1)
-# OnlineStats.state(obj1) - cov([x1, x2])
-

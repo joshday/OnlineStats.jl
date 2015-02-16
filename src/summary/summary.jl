@@ -14,18 +14,7 @@ type Summary <: ContinuousUnivariateOnlineStat
     nb::Int64
 end
 
-@doc* doc"""
-    Usage: `Summary(y::Vector)`
 
-    | Field           |  Description                 |
-    |:----------------|:-----------------------------|
-    | `mean::Float64` |  sample mean                 |
-    | `var::Float64`  |  sample variance             |
-    | `max::Float64`  |  sample maximum              |
-    | `min::Float64`  |  sample minimum              |
-    | `n:Int64`       |  number of observations used |
-    | `nb::Int64`     |  number of batches used      |
-    """ ->
 function Summary(y::Vector)
     Summary(mean(y), var(y), maximum(y), minimum(y), length(y), 1)
 end
