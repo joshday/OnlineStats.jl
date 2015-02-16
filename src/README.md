@@ -19,19 +19,17 @@ https://github.com/joshday/online-catalogue
 
 ## Density estimation
 
-* [x] Gaussian mixture
+* [ ] Gaussian mixture
 * [ ] frequency polygon
 * [ ] average shifted histograms (ASH)
 
-## Distributions
+## Univariate distributions
 
-### Univariate
-
-* [x] bernoulli
+* [x] Bernoulli
 * [ ] beta
 * [ ] beta-binomial
 * [x] binomial
-* [ ] cauchy
+* [ ] Cauchy
 * [ ] chi-square
 * [ ] exponential
 * [ ] F-distribution
@@ -40,27 +38,27 @@ https://github.com/joshday/online-catalogue
 * [ ] lognormal
 * [x] normal
 * [ ] t-distribution
-* [ ] weibull
+* [ ] Weibull
 
-### Multivariate
+## Multivariate distributions
+
 * [x] multinomial
 * [ ] multivariate normal
 * [ ] multivariate normal with missing data
-* [ ] exponential family
 * [ ] multivariate t-distribution
-* [ ] dirichlet-multinomial
+* [ ] Dirichlet-multinomial
 * [ ] negative multinomial
 
 ## Linear regression
 
-* [x] linear regression by Cholesky
-* [x] linear regression by sweep
+* [ ] linear regression by Cholesky
+* [ ] linear regression by sweep
 * [ ] linear regression with missing data
 * [ ] stepwise regression
 
 ## Generalized linear model (GLM)
 
-* [x] logistic regression
+* [ ] logistic regression
 * [ ] Probit regression
 * [ ] Poisson regression
 * [ ] multinomial logistic regression
@@ -68,7 +66,7 @@ https://github.com/joshday/online-catalogue
 
 ## Quantile regression
 
-* [x] linear quantile regression
+* [ ] linear quantile regression
 * [ ] composite linear quantile regression
 
 ## Variance component model
@@ -84,4 +82,4 @@ https://github.com/joshday/online-catalogue
 
 * [ ] principal components analysis
 * [ ] canonical correlation analysis
-* [ ] factor analsis
+* [ ] factor analysis
