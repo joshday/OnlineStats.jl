@@ -11,18 +11,21 @@ export update!, state, onlinefit, n_obs, n_batches
 include("onlinestat.jl")
 
 # Summary Statistics
+include("summary/covmatrix.jl")
+include("summary/moments.jl")
 include("summary/summary.jl")
 include("summary/quantile.jl")
-include("summary/moments.jl")
-include("summary/covmatrix.jl")
 
 # Density Estimation
-include("densityestimation/normal.jl")
-include("densityestimation/binomial.jl")
 include("densityestimation/bernoulli.jl")
 # include("densityestimation/beta.jl")
-include("densityestimation/multinomial.jl")
+include("densityestimation/binomial.jl")
+include("densityestimation/exponential.jl")
 include("densityestimation/gamma.jl")
+include("densityestimation/multinomial.jl")
+include("densityestimation/normal.jl")
+
+
 
 
 # General functions

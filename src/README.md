@@ -16,25 +16,25 @@
 ## Density estimation
 
 * [ ] Gaussian mixture
-* [ ] frequency polygon
 * [ ] average shifted histograms (ASH)
 
 ## Univariate distributions
 
+ *No `Distributions.suffstats` method.
+
 * [x] Bernoulli
-* [ ] beta
-* [ ] beta-binomial
+* [ ] beta*
 * [x] binomial
-* [ ] Cauchy
-* [ ] chi-square
-* [ ] exponential
-* [ ] F-distribution
-* [ ] gamma
-* [ ] inverse gamma
+* [ ] Cauchy*
+* [ ] chi-square*
+* [x] exponential
+* [ ] F-distribution*
+* [x] gamma
+* [ ] inverse gamma*
 * [ ] lognormal
 * [x] normal
-* [ ] t-distribution
-* [ ] Weibull
+* [ ] t-distribution*
+* [] Weibull*
 
 ## Multivariate distributions
 

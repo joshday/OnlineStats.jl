@@ -1,37 +1,35 @@
 # Author: Josh Day <emailjoshday@gmail.com>
 
-export OnlineFitGamma
+export OnlineFitExponential
 
 #------------------------------------------------------------------------------#
 #--------------------------------------------------------# OnlineGammaFit Type
-type OnlineFitGamma <: ContinuousUnivariateOnlineStat
-    d::Distributions.Gamma
-    stats::Distributions.GammaStats
+type OnlineFitExponential <: ContinuousUnivariateOnlineStat
+    d::Distributions.Exponential
+    stats::Distributions.ExponentialStats
 
     n::Int64
     nb::Int64
 end
 
-function onlinefit{T<:Real}(::Type{Gamma}, y::Vector{T})
+function onlinefit{T<:Real}(::Type{Exponential}, y::Vector{T})
     n::Int64 = length(y)
-    OnlineFitGamma(fit(Gamma, y), suffstats(Gamma, y), n, 1)
+    OnlineFitExponential(fit(Exponential, y), suffstats(Exponential, y), n, 1)
 end
 
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitGamma, newdata::Vector)
-    newstats = suffstats(Gamma, newdata)
-    n1 = obj.stats.tw
-    n2 = newstats.tw
+function update!(obj::OnlineFitExponential, newdata::Vector)
+    newstats = suffstats(Exponential, newdata)
+    n1 = obj.stats.sw
+    n2 = newstats.sw
     n = n1 + n2
 
     sx = obj.stats.sx + newstats.sx
-    slogx = obj.stats.slogx + newstats.slogx
-    tw = n
 
-    obj.stats = Distributions.GammaStats(sx, slogx, n)
-    obj.d = fit_mle(Gamma, obj.stats)
+    obj.stats = Distributions.ExponentialStats(sx, n)
+    obj.d = fit_mle(Exponential, obj.stats)
     obj.n = n
     obj.nb += 1
 end
@@ -39,7 +37,6 @@ end
 
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::OnlineFitGamma)
+function state(obj::OnlineFitExponential)
     println(obj.d)
 end
-
