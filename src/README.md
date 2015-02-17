@@ -2,20 +2,17 @@
 
 ## Summary statistics
 
-|   Item               |   Type
-|----------------------|----------------
-|* [x] sample mean     |  `Summary`
-|* [x] sample variance |  `Summary`
-
-
-* [x] skewness
-* [x] kurtosis (3rd and 4th central moment updates from Pebay are a little unstable)
-* [x] higher sample moments
-* [x] sample covariance matrix
-* [x] maximum and minimum
-* [x] sample quantiles
-* [x] 5-number summary `
-* [x] box plot `Gadfly.plot(obj::FiveNumberSummary)`
+|   Item                  |Associated Type(s)| Notes
+|-------------------------|------------------|------------------
+| [x] sample mean         |  `Summary`       |
+| [x] sample variance     |  `Summary`       |
+| [x] skewness and m3)    |  `Moments`       |
+| [x] kurtosis (and m4)   |  `Moments`       | (3rd and 4th central moment updates from Pebay are a little unstable?)
+|[x] sample covariance matrix| `CovarianceMatrix`|
+|[x] maximum and minimum  |  `Summary`, `FiveNumberSummary` |
+|[x] sample quantiles | `QuantileSGD`, `QuantileMM` |
+|[x] 5-number summary | `FiveNumberSummary`  |
+|[x] box plot  |`Gadfly.plot(obj::FiveNumberSummary)`
 
 ## Density estimation
 
