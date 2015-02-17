@@ -10,7 +10,7 @@
 * [x] sample covariance matrix
 * [x] maximum and minimum
 * [x] sample quantiles
-* [ ] 5-number summary
+* [x] 5-number summary
 * [ ] box plot
 
 ## Density estimation
