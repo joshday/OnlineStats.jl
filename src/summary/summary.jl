@@ -65,12 +65,9 @@ end
 #------------------------------------------------------------------------------#
 #--------------------------------------------------------------------# snapshot
 function state(obj::Summary)
-    println("mean = " * string(obj.mean))
-    println(" var = " * string(obj.var))
-    println(" max = " * string(obj.max))
-    println(" min = " * string(obj.min))
-    println("   n = " * string(obj.n))
-    println("  nb = " * string(obj.nb))
+    names = [:mean, :var, :max, :min, :n, :nb]
+    estimates = [obj.mean, obj.var, obj.max, obj.min, obj.n, obj.nb]
+    return([names estimates])
 end
 
 

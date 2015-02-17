@@ -5,17 +5,16 @@
 #    - Default Constructor(s)
 #  * update!()
 #  * state()
-#  * convert(DataFrame, obj)
 
-# Docile and Markdown are used for generating documentation
+
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# NewType
 type NewType
-  some_statistic::Array  # Vector or Matrix
-  sufficient_stats
-  n::Vector{Int64}
-  nb::Vector{Int64}
+    some_statistic
+    sufficient_stats
+    n::Int64
+    nb::Int64
 end
 
 # default constructor(s)
@@ -23,8 +22,8 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::NewType, newdata::Vector, add::false)
-  # code to update obj
+function update!(obj::NewType, newdata)
+    # code to update obj
 end
 
 
@@ -35,12 +34,3 @@ function state(obj::NewType)
 end
 
 
-#-----------------------------------------------------------------------------#
-#----------------------------------------------------------------# Base.convert
-function Base.convert(::Type{DataFrames.DataFrame}, obj::Summary)
-  df = DataFrames.DataFrame()
-  df[:some_statistic] = some_statistic
-  df[:n] = obj.n
-  df[:nb] = obj.nb
-  return df
-end

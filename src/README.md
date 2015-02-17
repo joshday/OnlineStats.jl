@@ -39,7 +39,7 @@
 ## Multivariate distributions
 
 * [x] multinomial
-* [x] multivariate normal (*covariance matrix needs to be more accurate*)
+* [x] multivariate normal 
 * [ ] multivariate normal with missing data
 * [ ] multivariate t-distribution
 * [ ] Dirichlet-multinomial

@@ -16,6 +16,7 @@ include("summary/covmatrix.jl")
 include("summary/moments.jl")
 include("summary/summary.jl")
 include("summary/quantile.jl")
+include("summary/fivenumber.jl")
 
 # Density Estimation
 include("densityestimation/bernoulli.jl")

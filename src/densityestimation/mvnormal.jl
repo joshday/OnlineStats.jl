@@ -50,16 +50,17 @@ function state(obj::OnlineFitMvNormal)
 end
 
 
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive testing
+# x1 = randn(3, 100)
+# obj = OnlineStats.onlinefit(MvNormal, x1)
+# OnlineStats.state(obj)
 
-x1 = randn(3, 100)
-obj = OnlineStats.onlinefit(MvNormal, x1)
-OnlineStats.state(obj)
-
-x2 = randn(3, 100)
-OnlineStats.update!(obj, x2)
-OnlineStats.state(obj)
+# x2 = randn(3, 100)
+# OnlineStats.update!(obj, x2)
+# OnlineStats.state(obj)
 
 
-obj = OnlineStats.onlinefit(MvNormal, [x1 x2])
-OnlineStats.state(obj)
+# obj = OnlineStats.onlinefit(MvNormal, [x1 x2])
+# OnlineStats.state(obj)
 

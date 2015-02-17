@@ -83,17 +83,17 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::QuantileSGD)
-    println("      tau = " * string(obj.tau))
-    println("quantiles = " * string(obj.est))
-    println("        n = " * string(obj.n))
-    println("       nb = " * string(obj.nb))
+    names::Array{Symbol} = [[symbol("q" * string(int(100*i))) for i in obj.tau],
+                            :n, :nb]
+    estimates = [obj.est, obj.n, obj.nb]
+    return([names estimates])
 end
 
 function state(obj::QuantileMM)
-    println("      tau = " * string(obj.tau))
-    println("quantiles = " * string(obj.est))
-    println("        n = " * string(obj.n))
-    println("       nb = " * string(obj.nb))
+    names::Array{Symbol} = [[symbol("q" * string(int(100*i))) for i in obj.tau],
+                            :n, :nb]
+    estimates = [obj.est, obj.n, obj.nb]
+    return([names estimates])
 end
 
 
@@ -101,7 +101,7 @@ end
 #---------------------------------------------------------# Interactive Testing
 # y1 = rand(111)
 # y2 = rand(222)
-# y3 = rand(333)
+# y3 = rand(1)
 
 # obj = OnlineStats.QuantileMM(y1, tau = [.1, .2, .4])
 # y2 = rand(100)
