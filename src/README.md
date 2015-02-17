@@ -2,82 +2,103 @@
 
 ## [x] Summary statistics
 
-| Item                    |Associated Type(s)| Notes
-|-------------------------|------------------|------------------
-| ////////////////////////////////////|/////////////////////////////////////////////////////////////////////////////// | ///////////////
-| [x] sample mean         |  `Summary`       |
-| [x] sample variance     |  `Summary`       |
-| [x] skewness and m3)    |  `Moments`       |
-| [x] kurtosis (and m4)   |  `Moments`       | Pebay updates unstable?
-|[x] covariance matrix| `CovarianceMatrix`|
-|[x] maximum/minimum  |  `Summary`, `FiveNumberSummary` |
-|[x] sample quantiles | `QuantileSGD`, `QuantileMM` |
-|[x] 5-number summary | `FiveNumberSummary`  |
-|[x] box plot  |`Gadfly.plot(obj::FiveNumberSummary)`
+Notes: `Moments` updates are a little unstable.  Typo in Pebay?
+
+| Item                 | Associated Type(s)
+|----------------------|------------------
+|  Sample Mean         |  `Summary`       
+|  Sample Variance     |  `Summary`       
+|  Skewness (and m3)   |  `Moments`       
+|  Kurtosis (and m4)   |  `Moments`        
+|  Covariance Matrix   | `CovarianceMatrix`
+|  Maximum/Minimum     |  `Summary`, `FiveNumberSummary` 
+|  Sample Quantiles    | `QuantileSGD`, `QuantileMM` 
+|  5-Number Summary    | `FiveNumberSummary`  
+|  Box Plot            |`Gadfly.plot(obj::FiveNumberSummary)`
 
 ## Density estimation
 
-* [ ] Gaussian mixture
-* [ ] average shifted histograms (ASH)
+| Item                             | Associated Type(s)
+|----------------------------------|------------------
+| Gaussian mixture                 |
+| Average Shifted Histograms (ASH) |
 
 ## Univariate distributions
 
- *No `Distributions.suffstats` method.
+ *No `suffstats` method to base type on.
 
-* [x] Bernoulli
-* [ ] beta*
-* [x] binomial
-* [ ] Cauchy*
-* [ ] chi-square*
-* [x] exponential
-* [ ] F-distribution*
-* [x] gamma
-* [ ] inverse gamma*
-* [ ] lognormal
-* [x] normal
-* [ ] t-distribution*
-* [ ] Weibull*
+| Item                 | Associated Type(s)
+|----------------------|------------------
+| Bernoulli            | `OnlineFitBernoulli`
+| Beta                 | *
+| Binomial             | `OnlineFitBinomial`
+| Cauchy               | *
+| Chi-square           | *
+| Exponential          | `OnlineFitExponential`
+| F-distribution       | *
+| Gamma                | `OnlineFitGamma`
+| Inverse Gamma        | *
+| Lognormal            | *
+| Normal               | `OnlineFitNormal`
+| T-distribution       | *
+| Weibull              | *
 
 ## Multivariate distributions
 
-* [x] multinomial
-* [x] multivariate normal 
-* [ ] multivariate normal with missing data
-* [ ] multivariate t-distribution
-* [ ] Dirichlet-multinomial
-* [ ] negative multinomial
+| Item                 | Associated Type(s)
+|----------------------|------------------
+| Multinomial          | `OnlineFitMultinomial`
+| Multivariate Normal  | `OnlineFitMvNormal`
+| Multivariate Normal with missing data | 
+| Multivariate t-distribution           |
+| Dirichlet-Multinomial                 |
+| Negative Multinomial                  |
 
 ## Linear regression
 
-* [ ] linear regression by Cholesky
-* [ ] linear regression by sweep
-* [ ] linear regression with missing data
-* [ ] stepwise regression
+| Item                 | Associated Type(s)
+|----------------------|------------------
+| Cholesky             |
+| Sweep                |
+| Missing Data         |
+| Stepwise regression  |
 
 ## Generalized linear model (GLM)
 
-* [ ] logistic regression
-* [ ] Probit regression
-* [ ] Poisson regression
-* [ ] multinomial logistic regression
-* [ ] Cox model
+| Item                 | Associated Type(s)
+|----------------------|------------------
+| Logistic Regression  | 
+| Probit Regression    | 
+| Poisson Regression   |  
+| Multinomial Logistic Regression |
+| Cox Model            |
 
 ## Quantile regression
 
-* [ ] linear quantile regression
-* [ ] composite linear quantile regression
+| Item                                 | Associated Type(s)
+|--------------------------------------|------------------
+| Linear Quantile Regression           |
+| Composite Linear Quantile Regresison |
 
 ## Variance component model
 
-* [ ] variance component model
-* [ ] linear mixed model
+| Item                     | Associated Type(s)
+|--------------------------|------------------
+| Variance Component Model |
+| Linear Mixed Model       |
 
 ## Penalized estimation
 
-* [ ] lasso
+| Item        | Associated Type(s)
+|-------------|------------------
+| LASSO       |
+| Ridge       |
+| Elastic Net |
 
 ## Multivariate statistics
 
-* [ ] principal components analysis
-* [ ] canonical correlation analysis
-* [ ] factor analysis
+| Item             | Associated Type(s)
+|------------------|------------------
+| PCA              |
+| CCA              |
+| Factor Analysis  |

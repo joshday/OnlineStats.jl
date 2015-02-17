@@ -74,6 +74,8 @@ function update!(obj::Moments, newdata::Vector)
     obj.nb += 1
 end
 
+update!(obj::Moments, x::Real) = update!(obj, [x])
+
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::Moments)

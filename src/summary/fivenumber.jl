@@ -30,6 +30,8 @@ function update!(obj::FiveNumberSummary, newdata::Vector)
     obj.nb += 1
 end
 
+update(obj::FiveNumberSummary, x::Real) = update!(obj, [x])
+
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
@@ -64,13 +66,16 @@ end
 #-----------------------------------------------------------------------------#
 #--------------------------------------------------------# Interactive testing
 
-y1 = rand(1000)*2 + 5
-obj = OnlineStats.FiveNumberSummary(y1)
-display(OnlineStats.state(obj))
+# y1 = rand(1000)*2 + 5
+# obj = OnlineStats.FiveNumberSummary(y1)
+# display(OnlineStats.state(obj))
 
-y2 = rand(1000)*2+ 5
-OnlineStats.update!(obj, y2)
-display(OnlineStats.state(obj))
+# y2 = rand(1000)*2+ 5
+# OnlineStats.update!(obj, y2)
+# display(OnlineStats.state(obj))
 
-Gadfly.plot(obj)
+# y3 = rand(1)*2 + 5
+# OnlineStats.update!(obj, y3)
+# display(OnlineStats.state(obj))
+# Gadfly.plot(obj)
 
