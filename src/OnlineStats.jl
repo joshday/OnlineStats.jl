@@ -4,6 +4,7 @@ using DataFrames
 using Docile
 using Distributions
 import PDMats
+import Gadfly
 
 export update!, state, onlinefit, n_obs, n_batches
 

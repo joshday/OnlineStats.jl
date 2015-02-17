@@ -83,23 +83,16 @@ function state(obj::Moments)
     m4::Float64 = obj.m4
     n::Int64 = obj.n
 
-    println("*Central Moments:")
-    println(join(("m1 = ", m1)))
-    println(join(("m2 = ", m2)))
-    println(join(("m3 = ", m3)))
-    println(join(("m4 = ", m4)))
-    println("")
-    println("*Statistics:")
-    println(join(("skewness = ", m3 / m2 ^ 1.5)))
-    println(join(("kurtosis = ", m4 / m2 ^ 2 - 3.0)))
-    println(join(("n = ", obj.n[end])))
-    println(join(("nb = ", obj.nb[end])))
+    names = [:m1, :m2, :m3, :m4, :skewness, :kurtosis, :n, :nb]
+    estimates = [m1, m2, m3, m4, m3 / m2 ^ 1.5, m4/ m2 ^ 2 - 3.0, obj.n, obj.nb]
+
+    return([names estimates])
 end
 
 
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------# Interactive Testing
-# y1 = rand(100)
+# y1 = rand(1000)
 # y2 = rand(101)
 # y3 = rand(120)
 
@@ -109,7 +102,7 @@ end
 # OnlineStats.update!(obj, y2)
 # OnlineStats.update!(obj, y3)
 
-# OnlineStats.state(obj)
+# display(OnlineStats.state(obj))
 
 # println("")
 # println(mean((y - mean(y)) .^ 2))
