@@ -34,7 +34,7 @@
 * [ ] lognormal
 * [x] normal
 * [ ] t-distribution*
-* [] Weibull*
+* [ ] Weibull*
 
 ## Multivariate distributions
 

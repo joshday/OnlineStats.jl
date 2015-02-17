@@ -3,6 +3,7 @@ module OnlineStats
 using DataFrames
 using Docile
 using Distributions
+import PDMats
 
 export update!, state, onlinefit, n_obs, n_batches
 
@@ -23,7 +24,10 @@ include("densityestimation/binomial.jl")
 include("densityestimation/exponential.jl")
 include("densityestimation/gamma.jl")
 include("densityestimation/multinomial.jl")
+include("densityestimation/mvnormal.jl")
 include("densityestimation/normal.jl")
+
+
 
 
 
