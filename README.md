@@ -6,6 +6,8 @@ Online algorithms for statistics.  The driving function in this package is
 - `obj`: subtype of `OnlineStat`  
 - `newdata`: new observations
 
+Data is updated in **batches**
+
 
 ## Types 
 Each type defined in OnlineStats contains the fields  

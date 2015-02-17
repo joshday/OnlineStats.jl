@@ -12,17 +12,7 @@ type CovarianceMatrix <: ContinuousMultivariateOnlineStat
     nb::Int64    # number of batches used
 end
 
-@doc* doc"""
-    Usage: `CovarianceMatrix(x::Matrix)`
 
-    | Field       |  Description                 |
-    |:------------|:-----------------------------|
-    | `A::Matrix` | $ X^T X / n $                |
-    | `B::Matrix` | $ X^T 1_n $                  |
-    | `n::Int64`  | number of observations used  |
-    | `p::Int64`  | number of variables          |
-    | `nb::Int64` | number of batches used       |
-    """ ->
 function CovarianceMatrix(x::Matrix)
     n, p = size(x)
     vec1 = ones(n)
@@ -67,9 +57,37 @@ end
 
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::CovarianceMatrix)
+function state(obj::CovarianceMatrix, corr=false)
     B = obj.B
-    obj.A * obj.n / (obj.n - 1) -
+    covmat = obj.A * obj.n / (obj.n - 1) -
         BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
+    tril!(covmat)
+
+    if corr
+        V = 1 ./ sqrt(diag(covmat))
+        covmat = V .* covmat .* V'
+    end
+
+    covmat += covmat' - diagm(ones(size(obj.A, 1)))
+    return(covmat)
 end
 
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive Testing
+# x1 = rand(103, 5)
+# x2 = rand(271, 5)
+# x3 = rand(149, 5)
+
+# obj = OnlineStats.CovarianceMatrix(x1)
+# OnlineStats.update!(obj, x2)
+# OnlineStats.update!(obj, x3)
+# mat = OnlineStats.state(obj, true)
+# display(mat)
+# display(cor([x1, x2, x3]))

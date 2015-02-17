@@ -63,7 +63,7 @@ end
 
 
 #------------------------------------------------------------------------------#
-#---------------------------------------------------------------------# update!
+#--------------------------------------------------------------------# snapshot
 function state(obj::Summary)
     println("mean = " * string(obj.mean))
     println(" var = " * string(obj.var))
@@ -86,8 +86,9 @@ end
 
 # OnlineStats.state(obj)
 
-# obj2 = OnlineStats.Summary(rand(1000))
-# update!(obj2, rand(11))
-# update!(obj, obj2)
+# obj2 = OnlineStats.Summary(rand(100))
+# OnlineStats.update!(obj2, rand(1))
+# OnlineStats.update!(obj, obj2)
 
 # OnlineStats.state(obj)
+

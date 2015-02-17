@@ -1,9 +1,5 @@
 # Online algorithms implementation progress
 
-The `online-catalogue` repository describes the algorithms and implementation details.
-
-https://github.com/joshday/online-catalogue
-
 ## Summary statistics
 
 * [x] sample mean

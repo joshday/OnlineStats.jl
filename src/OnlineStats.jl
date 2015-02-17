@@ -22,6 +22,7 @@ include("densityestimation/binomial.jl")
 include("densityestimation/bernoulli.jl")
 # include("densityestimation/beta.jl")
 include("densityestimation/multinomial.jl")
+include("densityestimation/gamma.jl")
 
 
 # General functions

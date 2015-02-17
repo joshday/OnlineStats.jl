@@ -99,24 +99,24 @@ end
 
 #------------------------------------------------------------------------------#
 #----------------------------------------------------------# Interactive Testing
-y1 = rand(100)
-y2 = rand(101)
-y3 = rand(120)
+# y1 = rand(100)
+# y2 = rand(101)
+# y3 = rand(120)
 
-y = [y1, y2, y3]
+# y = [y1, y2, y3]
 
-obj = OnlineStats.Moments(y1)
-OnlineStats.update!(obj, y2)
-OnlineStats.update!(obj, y3)
+# obj = OnlineStats.Moments(y1)
+# OnlineStats.update!(obj, y2)
+# OnlineStats.update!(obj, y3)
 
-OnlineStats.state(obj)
+# OnlineStats.state(obj)
 
-println("")
-println(mean((y - mean(y)) .^ 2))
-println(mean((y - mean(y)) .^ 3))
-println(mean((y - mean(y)) .^ 4))
-println("")
-println(skewness(y))
-println(kurtosis(y))
+# println("")
+# println(mean((y - mean(y)) .^ 2))
+# println(mean((y - mean(y)) .^ 3))
+# println(mean((y - mean(y)) .^ 4))
+# println("")
+# println(skewness(y))
+# println(kurtosis(y))
 
 
