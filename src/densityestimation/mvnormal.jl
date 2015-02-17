@@ -8,13 +8,16 @@ type OnlineFitMvNormal <: ContinuousUnivariateOnlineStat
     d::Distributions.MvNormal
     stats::Distributions.MvNormalStats
 
+    C::CovarianceMatrix
+
     n::Int64
     nb::Int64
 end
 
 function onlinefit{T<:Real}(::Type{MvNormal}, y::Matrix{T})
     n::Int64 = size(y, 2)
-    OnlineFitMvNormal(fit(MvNormal, y), suffstats(MvNormal, y), n, 1)
+    ss = suffstats(MvNormal, y)
+    OnlineFitMvNormal(fit(MvNormal, y), ss, CovarianceMatrix(y'), n, 1)
 end
 
 
@@ -29,10 +32,8 @@ function update!(obj::OnlineFitMvNormal, newdata::Matrix)
     s = obj.stats.s + newstats.s
     m = obj.stats.m + n2 / n * (newstats.m - obj.stats.m)
 
-    A1 = obj.d.Σ.mat * (n1 / (n1 - 1)) + (n1 / (n1-1)) * obj.d.μ * obj.d.μ'
-    A2 = newstats.s2 / (n2 - 1) + (n2 / (n2 - 1)) * newstats.m * newstats.m'
-    A = ((n1 - 1) * A1 + (n2 - 2) * A2) / (n - 1)
-    s2 = A - n / (n-1) * m * m'
+    update!(obj.C, newdata')
+    s2 = state(obj.C) * ((n-1) / n)
     tw = n
 
     obj.d = MvNormal(m, s2)
