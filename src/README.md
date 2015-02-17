@@ -1,15 +1,16 @@
 # Online algorithms implementation progress
 
-## Summary statistics
+## [x] Summary statistics
 
-|   Item                  |Associated Type(s)| Notes
+| Item                    |Associated Type(s)| Notes
 |-------------------------|------------------|------------------
+| ////////////////////////////////////|/////////////////////////////////////////////////////////////////////////////// | ///////////////
 | [x] sample mean         |  `Summary`       |
 | [x] sample variance     |  `Summary`       |
 | [x] skewness and m3)    |  `Moments`       |
-| [x] kurtosis (and m4)   |  `Moments`       | (3rd and 4th central moment updates from Pebay are a little unstable?)
-|[x] sample covariance matrix| `CovarianceMatrix`|
-|[x] maximum and minimum  |  `Summary`, `FiveNumberSummary` |
+| [x] kurtosis (and m4)   |  `Moments`       | Pebay updates unstable?
+|[x] covariance matrix| `CovarianceMatrix`|
+|[x] maximum/minimum  |  `Summary`, `FiveNumberSummary` |
 |[x] sample quantiles | `QuantileSGD`, `QuantileMM` |
 |[x] 5-number summary | `FiveNumberSummary`  |
 |[x] box plot  |`Gadfly.plot(obj::FiveNumberSummary)`
