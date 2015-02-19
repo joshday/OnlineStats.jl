@@ -21,7 +21,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 | Item                             | Associated Type(s)
 |----------------------------------|------------------
 | Gaussian mixture                 |
-| Average Shifted Histograms (ASH) |
+| Average Shifted Histograms (ASH) | `ASH.update!` in [ASH](https://github.com/joshday/ASH.jl) package
 
 ## Univariate distributions
 
