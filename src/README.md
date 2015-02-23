@@ -59,7 +59,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Cholesky             | 
-| Sweep                | 'OnlineLinearModel'
+| Sweep                | `OnlineLinearModel`
 | Missing Data         |
 | Stepwise regression  |
 
