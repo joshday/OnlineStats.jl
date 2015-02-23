@@ -29,7 +29,9 @@ include("densityestimation/multinomial.jl")
 include("densityestimation/mvnormal.jl")
 include("densityestimation/normal.jl")
 
-
+# Linear Model
+include("linearmodel/sweep.jl")
+include("linearmodel/lm.jl")
 
 
 
