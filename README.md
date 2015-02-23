@@ -18,23 +18,13 @@ Each type defined in OnlineStats contains the fields
 
 Other fields will be used to store sufficient statistics for online updates.
 
-## Full Documentation
-Documentation generated using [Docile.jl](https://github.com/MichaelHatherly/Docile.jl), [Lexicon.jl](https://github.com/MichaelHatherly/Lexicon.jl), and [MkDocs](http://www.mkdocs.org) is available [here](http://joshday.github.io/OnlineStats.jl/)
+## Documentation
+TODO: Will be hosted on RTD
 
  
+## Thank you
+A big thank you to the following packages.  I often found myself digging through their source code.
 
-## Updating API documentation
-1) Run the following:
-```
-julia> using Lexicon  
-julia> include("src/OnlineStats.jl")
-julia> Lexicon.save("docs/OnlineStats.md", OnlineStats)
-```
-
-2) Make webpage changes only in **master**
-```
-mkdocs build --clean
-mkdocs gh-deploy
-```
-
-
+- [GLM](https://github.com/JuliaStats/GLM.jl)  
+- [Distributions](https://github.com/JuliaStats/Distributions.jl)  
+- [DataFrames](https://github.com/JuliaStats/DataFrames.jl)

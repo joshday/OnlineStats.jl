@@ -3,6 +3,7 @@ module OnlineStats
 using DataFrames
 using Docile
 using Distributions
+using StatsBase
 import PDMats
 import Gadfly
 
