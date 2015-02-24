@@ -1,26 +1,26 @@
-# QuantileMM
+# CovarianceMatrix
 
 
 ```{julia; term=false; eval=true}
 using OnlineStats
 ```
 
-### Create model with the first batch
+### Create covariance matrix with the first batch
 ```{julia; term=false; eval=true}
-obj = QuantileMM(rand(100), tau=[1:9]/10)
+obj = CovarianceMatrix(10 * randn(100, 5))
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    update!(obj, rand(100))
+    update!(obj, 10 * randn(100, 5))
 end
 ```
 
-### Check estimates
+### Check estimate
 ```{julia; term=true}
 state(obj)
-
-# Maximum difference from truth
-maximum(abs(obj.est - [1:9]/10))
+```
+```{julia; term=true}
+state(obj, true)
 ```

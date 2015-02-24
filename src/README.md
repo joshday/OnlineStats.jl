@@ -11,7 +11,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 |  Sample Variance     |  [`Summary`](../doc/examples/summary.md)        
 |  Skewness (and m3)   |  `Moments`       
 |  Kurtosis (and m4)   |  `Moments`        
-|  Covariance Matrix   | `CovarianceMatrix`
+|  Covariance Matrix   | [`CovarianceMatrix`](../doc/examples/CovarianceMatrix.md)
 |  Maximum/Minimum     |  [`Summary`](../doc/examples/summary.md)  , `FiveNumberSummary` 
 |  Sample Quantiles    | [`QuantileSGD`](../doc/examples/quantilesgd.md), [`QuantileMM`](../doc/examples/quantilemm.md) 
 |  5-Number Summary    | `FiveNumberSummary`  

@@ -1,0 +1,38 @@
+# Compare: `QuantileSGD` vs. `QuantileMM`
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+```
+
+### Create model with the first batch
+```{julia; term=false; eval=true}
+obj_sgd = QuantileSGD(rand(100), tau=[1:9]/10)
+obj_mm = QuantileSGD(rand(100), tau=[1:9]/10)
+```
+
+### Update model with many batches
+```{julia; term=false; eval=true}
+srand(123)
+@time for i = 1:10000
+    update!(obj_sgd, rand(100))
+end
+```
+```{julia; term=false; eval=true}
+srand(123)
+@time for i = 1:10000
+    update!(obj_mm, rand(100))
+end
+```
+
+### Check estimates
+```{julia; term=true}
+state(obj_sgd)
+state(obj_mm)
+
+# SGD: Maximum difference from truth
+maximum(abs(obj_sgd.est - [1:9]/10))
+
+# MM: Maximum difference from truth
+maximum(abs(obj_mm.est - [1:9]/10))
+```

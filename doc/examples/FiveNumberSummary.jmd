@@ -1,26 +1,25 @@
-# QuantileMM
+# FiveNumberSummary
 
 
 ```{julia; term=false; eval=true}
 using OnlineStats
+using Gadfly
 ```
 
-### Create model with the first batch
+### Create 5-number summary with the first batch
 ```{julia; term=false; eval=true}
-obj = QuantileMM(rand(100), tau=[1:9]/10)
+obj = FiveNumberSummary(rand(100))
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
-for i = 1:10000
+for i = 1:1000
     update!(obj, rand(100))
 end
 ```
 
-### Check estimates
+### Check estimate
 ```{julia; term=true}
 state(obj)
-
-# Maximum difference from truth
-maximum(abs(obj.est - [1:9]/10))
+plot(obj)
 ```

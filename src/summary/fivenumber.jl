@@ -1,5 +1,7 @@
 # Author: Josh Day <emailjoshday@gmail.com>
 
+export FiveNumberSummary
+
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# NewType
 type FiveNumberSummary
@@ -53,13 +55,14 @@ end
 
 
 function Gadfly.plot(obj::FiveNumberSummary)
-    s = state(obj)
+    s = state(obj)[1:5, 2]
     iqr = obj.quantile.est[3] - obj.quantile.est[1]
-   Gadfly.plot(lower_fence = [s[2, 2] - 1.5 * iqr],
-               lower_hinge = [s[2,2]],
-               middle = [s[3, 2]],
-               upper_hinge = [s[4, 2]],
-               upper_fence = [s[4, 2] + 1.5 * iqr],
+   Gadfly.plot(lower_fence = [maximum((s[2] - 1.5 * iqr, s[1]))],
+               lower_hinge = [s[2]],
+               middle = [s[3]],
+               upper_hinge = [s[4]],
+               upper_fence = [minimum((s[4] + 1.5 * iqr, s[5]))],
+               # outliers = [s[1], s[5]],
                x = ["Data"], Gadfly.Geom.boxplot)
 end
 
@@ -67,16 +70,19 @@ end
 #-----------------------------------------------------------------------------#
 #--------------------------------------------------------# Interactive testing
 
-# y1 = rand(1000)*2 + 5
-# obj = OnlineStats.FiveNumberSummary(y1)
-# display(OnlineStats.state(obj))
+y1 = randn(1000)*2 + 5
+obj = OnlineStats.FiveNumberSummary(y1)
+display(OnlineStats.state(obj))
 
-# y2 = rand(1000)*2+ 5
-# OnlineStats.update!(obj, y2)
-# display(OnlineStats.state(obj))
+y2 = randn(1000)*2+ 5
+OnlineStats.update!(obj, y2)
+display(OnlineStats.state(obj))
 
-# y3 = rand(1)*2 + 5
-# OnlineStats.update!(obj, y3)
-# display(OnlineStats.state(obj))
-# Gadfly.plot(obj)
+y3 = randn(1)*2 + 5
+OnlineStats.update!(obj, y3)
+display(OnlineStats.state(obj))
+Gadfly.plot(obj)
+
+obj.min
+obj.max
 

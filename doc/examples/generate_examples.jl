@@ -7,7 +7,10 @@ examples = (
     "/OnlineFitBeta.jmd",
     "/Summary.jmd",
     "/QuantileSGD.jmd",
-    "/QuantileMM.jmd"
+    "/QuantileMM.jmd",
+    "/quantilecompare.jmd",
+    "/CovarianceMatrix.jmd",
+    "/FiveNumberSummary.jmd"
     )
 
 

@@ -37,10 +37,10 @@ end
 ````julia
 julia> state(obj)
 6x2 Array{Any,2}:
- :mean     10.0055  
+ :mean     10.0008  
  :var      25.0416  
- :max      32.6835  
- :min     -13.272   
+ :max      34.1132  
+ :min     -15.1531  
  :n         1.0001e6
  :nb    10001.0     
 

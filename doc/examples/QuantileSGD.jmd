@@ -22,5 +22,5 @@ end
 state(obj)
 
 # Maximum difference from truth
-maximum(abs2(obj.est - [1:9]/10))
+maximum(abs(obj.est - [1:9]/10))
 ```

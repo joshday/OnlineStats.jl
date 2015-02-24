@@ -32,5 +32,5 @@ end
 ### Check fit
 ```{julia; term=true}
 coeftable(fit)
-maximum(abs2(coef(fit) - beta))
+maximum(abs(coef(fit) - beta))
 ```
