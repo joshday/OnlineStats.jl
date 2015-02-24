@@ -87,33 +87,33 @@ end
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
 # Batch 1
-x1 = randn(1000, 3)
-y1 = vec(sum(x1, 2)) + randn(1000)
-obj = OnlineStats.OnlineLinearModel(x1, y1)
-OnlineStats.coef(obj)
-OnlineStats.mse(obj)
+# x1 = randn(1000, 3)
+# y1 = vec(sum(x1, 2)) + randn(1000)
+# obj = OnlineStats.OnlineLinearModel(x1, y1)
+# OnlineStats.coef(obj)
+# OnlineStats.mse(obj)
 
-using GLM
-fit = lm(x1, y1)
-StatsBase.coef(fit)
-sum(residuals(fit) .^ 2) / (1000 - 3)
+# using GLM
+# fit = lm(x1, y1)
+# StatsBase.coef(fit)
+# sum(residuals(fit) .^ 2) / (1000 - 3)
 
-# # Batch 2
-x2 = rand(1002, 3)
-y2 = vec(sum(x2, 2)) + randn(1002)
-OnlineStats.update!(obj, x2, y2)
+# # # Batch 2
+# x2 = rand(1002, 3)
+# y2 = vec(sum(x2, 2)) + randn(1002)
+# OnlineStats.update!(obj, x2, y2)
 
-OnlineStats.coef(obj)
-OnlineStats.mse(obj)
-OnlineStats.vcov(obj)
-OnlineStats.stderr(obj)
+# OnlineStats.coef(obj)
+# OnlineStats.mse(obj)
+# OnlineStats.vcov(obj)
+# OnlineStats.stderr(obj)
 
-OnlineStats.state(obj)
-OnlineStats.coeftable(obj)
-OnlineStats.confint(obj)
+# OnlineStats.state(obj)
+# OnlineStats.coeftable(obj)
+# OnlineStats.confint(obj)
 
-fit = lm([x1, x2], [y1, y2])
-GLM.coef(fit)
-GLM.confint(fit)
-sum(residuals(fit) .^ 2) / (2002 - 3)
+# fit = lm([x1, x2], [y1, y2])
+# GLM.coef(fit)
+# GLM.confint(fit)
+# sum(residuals(fit) .^ 2) / (2002 - 3)
 

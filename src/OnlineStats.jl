@@ -22,7 +22,7 @@ include("summary/fivenumber.jl")
 
 # Density Estimation
 include("densityestimation/bernoulli.jl")
-# include("densityestimation/beta.jl")
+include("densityestimation/beta.jl")
 include("densityestimation/binomial.jl")
 include("densityestimation/exponential.jl")
 include("densityestimation/gamma.jl")

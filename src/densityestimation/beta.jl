@@ -1,19 +1,57 @@
 # Author: Josh Day <emailjoshday@gmail.com>
 
-# export OnlineFitBeta
+export OnlineFitBeta
 
-#############################################################
-## Distributions.suffstats not implemented for Beta yet !! ##
-#############################################################
+#------------------------------------------------------------------------------#
+#----------------------------------------------------------# OnlineFitBeta Type
+type OnlineFitBeta <: ContinuousUnivariateOnlineStat
+    d::Distributions.Beta
+    stats::Summary
+
+    n::Int64
+    nb::Int64
+end
+
+function onlinefit{T<:Real}(::Type{Beta}, y::Vector{T})
+    n::Int64 = length(y)
+    stats = Summary(y)
+    m = stats.mean
+    v = stats.var
+    α = m * (m * (1 - m) / v - 1)
+    β = (1 - m) * (m * (1 - m) / v - 1)
+    OnlineFitBeta(Beta(α, β), stats, n, 1)
+end
 
 
-# #------------------------------------------------------------------------------#
-# #----------------------------------------------------------# OnlineFitBeta Type
-# type OnlineFitBeta <: ContinuousUnivariateOnlineStat
-#     d::Distributions.Beta
-#     stats::Distributions.BetaStats
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------------------# update!
+function update!(obj::OnlineFitBeta, newdata::Vector)
+    update!(obj.stats, newdata)
+    m = obj.stats.mean
+    v = obj.stats.var
+    α = m * (m * (1 - m) / v - 1)
+    β = (1 - m) * (m * (1 - m) / v - 1)
+    obj.d = Beta(α, β)
+    obj.n += length(newdata)
+    obj.nb += 1
+end
 
-#     n::Int64
-#     nb::Int64
-# end
+
+#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# state
+function state(obj::OnlineFitBeta)
+    println(obj.d)
+end
+
+
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive Testing
+# x1 = rand(Beta(3,5), 200)
+# obj = OnlineStats.onlinefit(Beta, x1)
+# OnlineStats.state(obj)
+
+# x2 = rand(Beta(3, 5), 10000)
+# OnlineStats.update!(obj, x2)
 
