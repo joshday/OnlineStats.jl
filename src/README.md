@@ -26,12 +26,12 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
 ## Univariate distributions
 
- *No `suffstats` method to base type on.
+ *No `Distributions.suffstats` method to base type on.
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Bernoulli            | `OnlineFitBernoulli`
-| Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)
+| Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)*
 | Binomial             | `OnlineFitBinomial`
 | Cauchy               | *
 | Chi-square           | *

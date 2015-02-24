@@ -3,7 +3,7 @@
 export OnlineFitNormal
 
 #------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineNormalFit Type
+#--------------------------------------------------------# OnlineFitNormal Type
 type OnlineFitNormal <: ContinuousUnivariateOnlineStat
     d::Distributions.Normal
     stats::Distributions.NormalStats

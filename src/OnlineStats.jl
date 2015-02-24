@@ -7,8 +7,31 @@ using StatsBase
 import PDMats
 import Gadfly
 
-export update!, state, onlinefit, n_obs, n_batches
+export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
 
+
+# General functions
+@doc doc"Return the number of observations used" ->
+function n_obs(obj)
+   obj.n
+end
+
+@doc doc"Return the number of batches used" ->
+function n_batches(obj)
+   obj.nb
+end
+
+function make_df(obj)
+    s = OnlineStats.state(obj)
+    names::Vector{Symbol} = s[:, 1]
+    df = convert(DataFrame, s[:, 2]')
+    names!(df, names)
+    return df
+end
+
+function make_df!(obj, df::DataFrame)
+    push!(df, state(obj)[:, 2])
+end
 
 # Abstract Type structure
 include("onlinestat.jl")
@@ -24,6 +47,7 @@ include("summary/fivenumber.jl")
 include("densityestimation/bernoulli.jl")
 include("densityestimation/beta.jl")
 include("densityestimation/binomial.jl")
+# include("densityestimation/dirichlet.jl")
 include("densityestimation/exponential.jl")
 include("densityestimation/gamma.jl")
 include("densityestimation/multinomial.jl")
@@ -34,19 +58,12 @@ include("densityestimation/normal.jl")
 include("linearmodel/sweep.jl")
 include("linearmodel/lm.jl")
 
+# Quantile Regression
+include("quantileregression/quantregsgd.jl")
 
 
 
-# General functions
-@doc doc"Return the number of observations used" ->
-function n_obs(obj)
-   obj.n
-end
 
-@doc doc"Return the number of batches used" ->
-function n_batches(obj)
-   obj.nb
-end
 
 
 # General docs for update!, state, convert, onlinefit

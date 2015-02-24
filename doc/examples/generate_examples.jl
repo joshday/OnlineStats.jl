@@ -11,7 +11,8 @@ examples = (
     "/quantilecompare.jmd",
     "/CovarianceMatrix.jmd",
     "/FiveNumberSummary.jmd",
-    "/Moments.jmd"
+    "/Moments.jmd",
+    "/OnlineQuantRegSGD.jmd"
     )
 
 
