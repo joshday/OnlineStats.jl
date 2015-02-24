@@ -5,7 +5,7 @@
 
 Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
-Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecomparison.md)
+Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecompare.md)
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
