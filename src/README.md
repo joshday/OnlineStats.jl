@@ -30,7 +30,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Bernoulli            | `OnlineFitBernoulli`
-| Beta                 | *
+| Beta                 | `OnlineFitBeta`
 | Binomial             | `OnlineFitBinomial`
 | Cauchy               | *
 | Chi-square           | *
@@ -59,7 +59,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Cholesky             | 
-| Sweep                | `OnlineLinearModel`
+| Sweep                | [`OnlineLinearModel`](../doc/examples/OnlineLinearModel.md)
 | Missing Data         |
 | Stepwise regression  |
 
