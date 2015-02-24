@@ -73,19 +73,19 @@ end
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
-# x1 = rand(100)
-# x2 = rand(112)
-# x3 = rand(103)
+x1 = rand(100)
+x2 = rand(112)
+x3 = rand(103)
 
-# obj = OnlineStats.Summary(x1)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.update!(obj, x3)
+obj = OnlineStats.Summary(x1)
+OnlineStats.update!(obj, x2)
+OnlineStats.update!(obj, x3)
 
-# OnlineStats.state(obj)
+OnlineStats.state(obj)
 
-# obj2 = OnlineStats.Summary(rand(100))
-# OnlineStats.update!(obj2, rand(1))
-# OnlineStats.update!(obj, obj2)
+obj2 = OnlineStats.Summary(rand(100))
+OnlineStats.update!(obj2, rand(1))
+OnlineStats.update!(obj, obj2)
 
-# OnlineStats.state(obj)
+OnlineStats.state(obj)
 

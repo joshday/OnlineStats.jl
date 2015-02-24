@@ -22,7 +22,7 @@ fit = OnlineLinearModel(x, y)
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
-for i = 1:1000
+for i = 1:10000
     x = rand(100, p)
     y = x * beta + randn(100)
     update!(fit, x, y)
@@ -32,4 +32,5 @@ end
 ### Check fit
 ```{julia; term=true}
 coeftable(fit)
+maximum(abs2(coef(fit) - beta))
 ```

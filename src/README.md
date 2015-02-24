@@ -1,17 +1,18 @@
 # Online algorithms implementation progress
 
-## [x] Summary statistics
+
+## Summary statistics
 
 Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-|  Sample Mean         |  `Summary`       
-|  Sample Variance     |  `Summary`       
+|  Sample Mean         |  [`Summary`](../doc/examples/summary.md)       
+|  Sample Variance     |  [`Summary`](../doc/examples/summary.md)        
 |  Skewness (and m3)   |  `Moments`       
 |  Kurtosis (and m4)   |  `Moments`        
 |  Covariance Matrix   | `CovarianceMatrix`
-|  Maximum/Minimum     |  `Summary`, `FiveNumberSummary` 
+|  Maximum/Minimum     |  [`Summary`](../doc/examples/summary.md)  , `FiveNumberSummary` 
 |  Sample Quantiles    | `QuantileSGD`, `QuantileMM` 
 |  5-Number Summary    | `FiveNumberSummary`  
 |  Box Plot            |`Gadfly.plot(obj::FiveNumberSummary)`

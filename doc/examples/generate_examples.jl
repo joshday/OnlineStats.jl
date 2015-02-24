@@ -2,5 +2,14 @@ using Weave
 
 dir = Pkg.dir("OnlineStats", "doc", "examples")
 
-weave(dir * "/OnlineLinearModel.jmd", doctype="github", informat="markdown")
-weave(dir * "/OnlineFitBeta.jmd", doctype="github", informat="markdown")
+examples = (
+    "/OnlineLinearModel.jmd",
+    "/OnlineFitBeta.jmd",
+    "/Summary.jmd",
+    "/QuantileSGD.jmd")
+
+
+
+for i in examples
+    weave(dir * i, doctype="github", informat="markdown")
+end
