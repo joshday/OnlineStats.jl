@@ -3,7 +3,7 @@
 export OnlineFitBernoulli
 
 #------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineNormalFit Type
+#-----------------------------------------------------# OnlineFitBernoulli Type
 type OnlineFitBernoulli <: DiscreteUnivariateOnlineStat
     d::Distributions.Bernoulli
     stats::Distributions.BernoulliStats

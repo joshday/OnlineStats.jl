@@ -3,7 +3,7 @@
 export OnlineFitMultinomial
 
 #------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineNormalFit Type
+#---------------------------------------------------# OnlineFitMultinomial Type
 type OnlineFitMultinomial <: DiscreteMultivariateOnlineStat
     d::Distributions.Multinomial
     stats::Distributions.MultinomialStats

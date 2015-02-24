@@ -3,7 +3,7 @@
 export OnlineFitBinomial
 
 #------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineNormalFit Type
+#------------------------------------------------------# OnlineFitBinomial Type
 type OnlineFitBinomial <: DiscreteUnivariateOnlineStat
     d::Distributions.Binomial
     stats::Distributions.BinomialStats

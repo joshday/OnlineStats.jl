@@ -3,7 +3,7 @@
 export OnlineFitExponential
 
 #------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineGammaFit Type
+#---------------------------------------------------# OnlineFitExponential Type
 type OnlineFitExponential <: ContinuousUnivariateOnlineStat
     d::Distributions.Exponential
     stats::Distributions.ExponentialStats

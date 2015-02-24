@@ -3,7 +3,7 @@
 export OnlineFitGamma
 
 #------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineGammaFit Type
+#---------------------------------------------------------# OnlineFitGamma Type
 type OnlineFitGamma <: ContinuousUnivariateOnlineStat
     d::Distributions.Gamma
     stats::Distributions.GammaStats
