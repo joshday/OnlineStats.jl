@@ -59,16 +59,22 @@ end
 #-----------------------------------------------------------------------# state
 function state(obj::CovarianceMatrix, corr=false)
     B = obj.B
+    p = size(B, 1)
     covmat = obj.A * obj.n / (obj.n - 1) -
         BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
     tril!(covmat)
+
+    for i in 1:p
+        for j in i:p
+            covmat[i, j] = covmat[j, i]
+        end
+    end
 
     if corr
         V = 1 ./ sqrt(diag(covmat))
         covmat = V .* covmat .* V'
     end
 
-    covmat += covmat' - diagm(ones(size(obj.A, 1)))
     return(covmat)
 end
 
@@ -81,13 +87,14 @@ end
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
-# x1 = rand(103, 5)
-# x2 = rand(271, 5)
-# x3 = rand(149, 5)
+# x1 = randn(103, 5)
+# x2 = randn(271, 5)
+# x3 = randn(149, 5)
 
 # obj = OnlineStats.CovarianceMatrix(x1)
 # OnlineStats.update!(obj, x2)
 # OnlineStats.update!(obj, x3)
 # mat = OnlineStats.state(obj, true)
 # display(mat)
-# display(cor([x1, x2, x3]))
+# display(mat - cor([x1, x2, x3]))
+

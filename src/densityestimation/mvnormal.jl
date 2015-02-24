@@ -66,8 +66,12 @@ x2 = randn(3, 100)
 OnlineStats.update!(obj, x2)
 OnlineStats.state(obj)
 OnlineStats.vcov(obj)
-
+OnlineStats.state(obj.C) * ((obj.n-1) / obj.n)
 
 obj = OnlineStats.onlinefit(MvNormal, [x1 x2])
 OnlineStats.state(obj)
+
 cov([x1 x2]') * (199) / 200
+
+fit(MvNormal, [x1 x2])
+
