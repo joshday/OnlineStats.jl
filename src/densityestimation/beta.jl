@@ -40,7 +40,9 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitBeta)
-    println(obj.d)
+    names = [:α, :β, :n, :nb]
+    estimates = [obj.d.α, obj.d.β, obj.n, obj.nb]
+    return([names estimates])
 end
 
 
@@ -48,10 +50,11 @@ end
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
-# x1 = rand(Beta(3,5), 200)
+# x1 = rand(Beta(3,5), 100000)
 # obj = OnlineStats.onlinefit(Beta, x1)
 # OnlineStats.state(obj)
 
 # x2 = rand(Beta(3, 5), 10000)
 # OnlineStats.update!(obj, x2)
+# OnlineStats.state(obj)
 

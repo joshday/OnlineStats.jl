@@ -40,6 +40,20 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitGamma)
-    println(obj.d)
+    names = [:α, :β, :n, :nb]
+    estimates = [obj.d.α, obj.d.β, obj.n, obj.nb]
+    return([names estimates])
 end
+
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive Testing
+# x1 = rand(Gamma(4, 2), 100)
+# obj = OnlineStats.onlinefit(Gamma, x1)
+# OnlineStats.state(obj)
+
+# x2 = rand(Gamma(4, 2), 100)
+# OnlineStats.update!(obj, x2)
+# OnlineStats.state(obj)
 

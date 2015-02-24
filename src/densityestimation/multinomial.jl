@@ -46,9 +46,9 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitMultinomial)
-    println(obj.d)
-    println("    n_obs = " * string(obj.n))
-    println("n_batches = " * string(obj.nb))
+    names = [:ntrials,[symbol("p$i") for i=1:length(obj.d.p)],  :n, :nb]
+    estimates = [obj.d.n, obj.d.p, obj.n, obj.nb]
+    return([names estimates])
 end
 
 

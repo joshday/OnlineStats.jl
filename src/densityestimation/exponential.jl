@@ -38,5 +38,20 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitExponential)
-    println(obj.d)
+    names = [:β, :n, :nb]
+    estimates = [obj.d.β, obj.n, obj.nb]
+    return([names estimates])
 end
+
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive Testing
+# x1 = rand(Exponential(4), 100)
+# obj = OnlineStats.onlinefit(Exponential, x1)
+# OnlineStats.state(obj)
+
+# x2 = rand(Exponential(4), 100)
+# OnlineStats.update!(obj, x2)
+# OnlineStats.state(obj)
+

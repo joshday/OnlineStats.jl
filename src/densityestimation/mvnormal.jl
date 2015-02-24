@@ -46,21 +46,28 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitMvNormal)
-    println(obj.d)
+    names = [[symbol("μ$i") for i=1:length(obj.d.μ)],
+             [symbol("σ$i") for i=1:length(obj.d.μ)],
+             :n, :nb]
+    estimates = [obj.d.μ, sqrt(diag(obj.d.Σ)), obj.n, obj.nb]
+    return([names estimates])
 end
+
+vcov(obj::OnlineFitMvNormal) = obj.d.Σ.mat
 
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive testing
-# x1 = randn(3, 100)
-# obj = OnlineStats.onlinefit(MvNormal, x1)
-# OnlineStats.state(obj)
+x1 = randn(3, 100)
+obj = OnlineStats.onlinefit(MvNormal, x1)
+OnlineStats.state(obj)
 
-# x2 = randn(3, 100)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.state(obj)
+x2 = randn(3, 100)
+OnlineStats.update!(obj, x2)
+OnlineStats.state(obj)
+OnlineStats.vcov(obj)
 
 
-# obj = OnlineStats.onlinefit(MvNormal, [x1 x2])
-# OnlineStats.state(obj)
-
+obj = OnlineStats.onlinefit(MvNormal, [x1 x2])
+OnlineStats.state(obj)
+cov([x1 x2]') * (199) / 200

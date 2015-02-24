@@ -1,0 +1,27 @@
+# OnlineLinearModel
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+using Distributions
+using Gadfly
+```
+
+### Create estimate with first batch
+```{julia; term=false; eval=true}
+x = rand(Beta(3, 5), 100)
+obj = onlinefit(Beta, x)
+```
+
+### Update model with many batches
+```{julia; term=false; eval=true}
+for i = 1:1000
+    x = rand(Beta(3, 5), 100)
+    update!(obj, x)
+end
+```
+
+### Check fit
+```{julia; term=true}
+state(obj)
+```

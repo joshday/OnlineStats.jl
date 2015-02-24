@@ -36,7 +36,21 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitBernoulli)
-    println(obj.d)
-    println("nobs = " * string(obj.n))
-    println("  nb = " * string(obj.nb))
+    names = [:p, :n, :nb]
+    estimates = [obj.d.p, obj.n, obj.nb]
+    return([names estimates])
 end
+
+
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive Testing
+# x1 = rand(Bernoulli(.7), 100)
+# obj = OnlineStats.onlinefit(Bernoulli, x1)
+# OnlineStats.state(obj)
+
+# x2 = rand(Bernoulli(.7), 100)
+# OnlineStats.update!(obj, x2)
+# OnlineStats.state(obj)
+

@@ -25,14 +25,14 @@ function update!(obj::OnlineFitNormal, newdata::Vector)
     n1 = obj.stats.tw
     n2 = newstats.tw
     n = n1 + n2
+    δ = newstats.m - obj.stats.m
 
     s = obj.stats.s + newstats.s
-    m = obj.stats.m + n2 / n * (newstats.m - obj.stats.m)
-    s2 = obj.stats.s2 + newstats.s2
-    tw = n
+    m = obj.stats.m + (n2 / n) * δ
+    s2 = obj.stats.s2 + newstats.s2 + (n1 * n2 / n) * δ^2
 
     obj.d = Normal(m, s2 / n)
-    obj.stats = Distributions.NormalStats(s, m, s2, tw)
+    obj.stats = Distributions.NormalStats(s, m, s2, n)
     obj.n = n
     obj.nb += 1
 end
@@ -41,5 +41,25 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitNormal)
-    println(obj.d)
+    names = [:μ, :σ, :n, :nb]
+    estimates = [obj.d.μ, obj.d.σ, obj.n, obj.nb]
+    return([names estimates])
 end
+
+
+
+#------------------------------------------------------------------------------#
+#---------------------------------------------------------# Interactive testing
+# x1 = randn(3100)
+# mean(x1), var(x1)
+# obj = OnlineStats.onlinefit(Normal, x1)
+# OnlineStats.state(obj)
+
+# x2 = randn(10000)
+# mean([x1, x2]), var([x1, x2])
+# OnlineStats.update!(obj, x2)
+# OnlineStats.state(obj)
+
+# obj = OnlineStats.onlinefit(Normal, [x1, x2])
+# OnlineStats.state(obj)
+
