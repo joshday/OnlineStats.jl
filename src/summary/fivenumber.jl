@@ -54,11 +54,12 @@ end
 
 function Gadfly.plot(obj::FiveNumberSummary)
     s = state(obj)
-   Gadfly.plot(lower_fence = [s[1, 2]],
+    iqr = obj.quantile.est[3] - obj.quantile.est[1]
+   Gadfly.plot(lower_fence = [s[2, 2] - 1.5 * iqr],
                lower_hinge = [s[2,2]],
                middle = [s[3, 2]],
                upper_hinge = [s[4, 2]],
-               upper_fence = [s[5, 2]],
+               upper_fence = [s[4, 2] + 1.5 * iqr],
                x = ["Data"], Gadfly.Geom.boxplot)
 end
 

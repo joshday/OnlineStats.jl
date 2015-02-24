@@ -6,7 +6,9 @@ examples = (
     "/OnlineLinearModel.jmd",
     "/OnlineFitBeta.jmd",
     "/Summary.jmd",
-    "/QuantileSGD.jmd")
+    "/QuantileSGD.jmd",
+    "/QuantileMM.jmd"
+    )
 
 
 

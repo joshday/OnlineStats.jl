@@ -13,7 +13,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 |  Kurtosis (and m4)   |  `Moments`        
 |  Covariance Matrix   | `CovarianceMatrix`
 |  Maximum/Minimum     |  [`Summary`](../doc/examples/summary.md)  , `FiveNumberSummary` 
-|  Sample Quantiles    | `QuantileSGD`, `QuantileMM` 
+|  Sample Quantiles    | [`QuantileSGD`](../doc/examples/quantilesgd.md), [`QuantileMM`](../doc/examples/quantilemm.md) 
 |  5-Number Summary    | `FiveNumberSummary`  
 |  Box Plot            |`Gadfly.plot(obj::FiveNumberSummary)`
 
