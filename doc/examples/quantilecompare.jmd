@@ -3,25 +3,35 @@
 
 ```{julia; term=false; eval=true}
 using OnlineStats
+using Gadfly
+using DataFrames
 ```
 
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
-obj_sgd = QuantileSGD(rand(100), tau=[1:9]/10)
-obj_mm = QuantileSGD(rand(100), tau=[1:9]/10)
+obj_sgd = QuantileSGD(rand(100), tau=[1:9]/10, r=.6)
+obj_mm = QuantileSGD(rand(100), tau=[1:9]/10, r=.6)
+```
+
+### Save results for trace plots
+```{julia; term=false; eval=true}
+results_sgd = make_df(obj_sgd)
+results_mm = make_df(obj_mm)
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 srand(123)
-@time for i = 1:10000
+@time for i = 1:9999
     update!(obj_sgd, rand(100))
+    make_df!(obj_sgd, results_sgd)
 end
 ```
 ```{julia; term=false; eval=true}
 srand(123)
-@time for i = 1:10000
+@time for i = 1:9999
     update!(obj_mm, rand(100))
+    make_df!(obj_mm, results_mm)
 end
 ```
 
@@ -36,3 +46,13 @@ maximum(abs(obj_sgd.est - [1:9]/10))
 # MM: Maximum difference from truth
 maximum(abs(obj_mm.est - [1:9]/10))
 ```
+
+### Check Traceplots
+```{julia; term=false; eval=true}
+results_sgd = melt(results_sgd, 10:11)
+results_mm = melt(results_mm, 10:11)
+
+plot(results_sgd, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
+plot(results_mm, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
+```
+
