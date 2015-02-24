@@ -5,6 +5,8 @@
 
 Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
+Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecomparison.md)
+
 | Item                 | Associated Type(s)
 |----------------------|------------------
 |  Sample Mean         |  [`Summary`](../doc/examples/Summary.md)       
@@ -78,7 +80,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
 | Item                                 | Associated Type(s)
 |--------------------------------------|------------------
-| Linear Quantile Regression           |
+| Linear Quantile Regression           | [`OnlineQuantRegSGD`](../doc/examples/OnlineQuantRegSGD.md)
 | Composite Linear Quantile Regresison |
 
 ## Variance component model
