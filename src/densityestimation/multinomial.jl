@@ -35,7 +35,7 @@ function update!(obj1::OnlineFitMultinomial, obj2::OnlineFitMultinomial)
 end
 
 function update!(obj::OnlineFitMultinomial, x::Matrix)
-    if obj1.stats.n != sum(x[:, 1])
+    if obj.stats.n != sum(x[:, 1])
         throw(ArgumentError("Number of experiments do not match"))
     end
     obj2 = onlinefit(Multinomial, x)

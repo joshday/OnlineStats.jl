@@ -19,7 +19,7 @@ end
 ```
 
 ### Check estimate
-```{julia; term=true}
+```{julia; term=true; out_width=3}
 state(obj)
 plot(obj)
 ```

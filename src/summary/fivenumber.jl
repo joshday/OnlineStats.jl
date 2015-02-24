@@ -23,9 +23,7 @@ end
 #---------------------------------------------------------------------# update!
 function update!(obj::FiveNumberSummary, newdata::Vector)
     n2 = length(newdata)
-    for i in 1:n2
-        update!(obj.quantile, [newdata[i]])
-    end
+    update!(obj.quantile, newdata)
     obj.min = minimum([obj.min, newdata])
     obj.max = maximum([obj.max, newdata])
     obj.n += n2
@@ -70,19 +68,19 @@ end
 #-----------------------------------------------------------------------------#
 #--------------------------------------------------------# Interactive testing
 
-y1 = randn(1000)*2 + 5
-obj = OnlineStats.FiveNumberSummary(y1)
-display(OnlineStats.state(obj))
+# y1 = randn(1000)*2 + 5
+# obj = OnlineStats.FiveNumberSummary(y1)
+# display(OnlineStats.state(obj))
 
-y2 = randn(1000)*2+ 5
-OnlineStats.update!(obj, y2)
-display(OnlineStats.state(obj))
+# y2 = randn(1000)*2+ 5
+# OnlineStats.update!(obj, y2)
+# display(OnlineStats.state(obj))
 
-y3 = randn(1)*2 + 5
-OnlineStats.update!(obj, y3)
-display(OnlineStats.state(obj))
-Gadfly.plot(obj)
+# y3 = randn(1)*2 + 5
+# OnlineStats.update!(obj, y3)
+# display(OnlineStats.state(obj))
+# Gadfly.plot(obj)
 
-obj.min
-obj.max
+# obj.min
+# obj.max
 

@@ -1,45 +1,27 @@
 using OnlineStats
 using Base.Test
 
-
-#------------------------------------------------------------------------------#
-#                                                 Simulate two batches of data #
-#------------------------------------------------------------------------------#
-srand(1234)
-n1 = 246
-n2 = 978
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
 x1 = rand(n1)
 x2 = rand(n2)
 x = [x1, x2]
 
-#------------------------------------------------------------------------------#
-#                                                    Batch 1 estimate correct? #
-#------------------------------------------------------------------------------#
-
-ob = online_summary(x1)
-@test ob.mean[1] == mean(x1)
-@test ob.var[1] == var(x1)
-@test ob.max[1] == maximum(x1)
-@test ob.min[1] == minimum(x1)
-
-#------------------------------------------------------------------------------#
-#                                        Batch 2 estimate correct? - row added #
-#------------------------------------------------------------------------------#
-
-update!(ob, x2, true)
-@test ob.mean[end] == mean(x)
-@test ob.var[end] == var(x)
-@test ob.max[end] == maximum(x)
-@test ob.min[end] == minimum(x)
+ob = Summary(x1)
+@test ob.mean == mean(x1)
+@test ob.var == var(x1)
+@test ob.max == maximum(x1)
+@test ob.min == minimum(x1)
+@test ob.n == n1
+@test ob.nb == 1
 
 
-#------------------------------------------------------------------------------#
-#                                     Batch 2 estimate correct? - row replaced #
-#------------------------------------------------------------------------------#
-ob = online_summary(x1)
-update!(ob, x2, false)
-@test ob.mean[1] == mean(x)
-@test ob.var[1] == var(x)
-@test ob.max[1] == maximum(x)
-@test ob.min[1] == minimum(x)
+update!(ob, x2)
+@test_approx_eq ob.mean mean(x)
+@test_approx_eq ob.var var(x)
+@test ob.max == maximum(x)
+@test ob.min == minimum(x)
+
+# clean up
+x1 = x2 = zeros(2)
 

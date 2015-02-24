@@ -15,7 +15,7 @@ beta = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
 x = rand(100, p)
-y = x * beta + randn(100)
+y = x * beta + 10*randn(100)
 
 fit = OnlineLinearModel(x, y)
 ```
@@ -24,13 +24,14 @@ fit = OnlineLinearModel(x, y)
 ```{julia; term=false; eval=true}
 for i = 1:10000
     x = rand(100, p)
-    y = x * beta + randn(100)
+    y = x * beta + 10*randn(100)
     update!(fit, x, y)
 end
 ```
 
 ### Check fit
 ```{julia; term=true}
-coeftable(fit)
-maximum(abs(coef(fit) - beta))
+coeftable(fit)  # CoefTable
+mse(fit)  # Estimate of MSE
+maximum(abs(beta - coef(fit)))  # Max Absolute Error
 ```

@@ -10,7 +10,8 @@ examples = (
     "/QuantileMM.jmd",
     "/quantilecompare.jmd",
     "/CovarianceMatrix.jmd",
-    "/FiveNumberSummary.jmd"
+    "/FiveNumberSummary.jmd",
+    "/Moments.jmd"
     )
 
 

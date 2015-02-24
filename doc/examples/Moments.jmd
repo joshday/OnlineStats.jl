@@ -1,0 +1,23 @@
+# Moments
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+```
+
+### Create object with the first batch
+```{julia; term=false; eval=true}
+obj = Moments(randn(100))
+```
+
+### Update estimates with many batches
+```{julia; term=false; eval=true}
+for i = 1:10000
+    update!(obj, randn(100))
+end
+```
+
+### Check estimates
+```{julia; term=true}
+state(obj)
+```
