@@ -30,7 +30,7 @@ end
 
 
 ````julia
-elapsed time: 0.879212313 seconds (395991952 bytes allocated, 58.64%
+elapsed time: 0.934686303 seconds (395991952 bytes allocated, 60.70%
 gc time)
 ````
 
@@ -46,7 +46,7 @@ end
 
 
 ````julia
-elapsed time: 0.795719686 seconds (395991872 bytes allocated, 56.04%
+elapsed time: 0.872446879 seconds (395991872 bytes allocated, 56.56%
 gc time)
 ````
 

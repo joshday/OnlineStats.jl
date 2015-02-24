@@ -3,17 +3,18 @@
 
 ```{julia; term=false; eval=true}
 using OnlineStats
+using Gadfly
 ```
 
 ### Create covariance matrix with the first batch
 ```{julia; term=false; eval=true}
-obj = CovarianceMatrix(10 * randn(100, 5))
+obj = CovarianceMatrix(10 * randn(100, 10))
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    update!(obj, 10 * randn(100, 5))
+    update!(obj, 10 * randn(100, 10))
 end
 ```
 
@@ -23,4 +24,5 @@ state(obj)
 ```
 ```{julia; term=true}
 state(obj, true)
+spy(state(obj, true))
 ```
