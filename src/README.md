@@ -30,7 +30,7 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Bernoulli            | `OnlineFitBernoulli`
-| Beta                 | `OnlineFitBeta`
+| Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)
 | Binomial             | `OnlineFitBinomial`
 | Cauchy               | *
 | Chi-square           | *
