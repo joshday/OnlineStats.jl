@@ -1,0 +1,35 @@
+# OnlineLinearModel
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+using Gadfly
+```
+
+### Make true beta
+```{julia; term=false; eval=true}
+p = 10
+beta = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
+```
+
+### Create model with the first batch
+```{julia; term=false; eval=true}
+x = rand(100, p)
+y = x * beta + randn(100)
+
+fit = OnlineLinearModel(x, y)
+```
+
+### Update model with many batches
+```{julia; term=false; eval=true}
+for i = 1:1000
+    x = rand(100, p)
+    y = x * beta + randn(100)
+    update!(fit, x, y)
+end
+```
+
+### Check fit
+```{julia; term=true}
+coeftable(fit)
+```

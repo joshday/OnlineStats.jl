@@ -1,6 +1,7 @@
 # Author(s): Josh Day <emailjoshday@gmail.com>
 
-export OnlineLinearModel, coef
+export OnlineLinearModel
+export mse, coef, coeftable, confint, stderr, vcov, predict
 
 
 #-----------------------------------------------------------------------------#
@@ -26,6 +27,10 @@ function OnlineLinearModel(x::Vector, y::Vector)
 end
 
 
+
+#-----------------------------------------------------------------------------#
+#----------------------------------------------------# StatsBase-ish functions
+
 mse(obj::OnlineLinearModel) = obj.B[end, end] * (obj.n / (obj.n - obj.p))
 
 coef(obj::OnlineLinearModel) = vec(obj.B[end, 1:obj.p])
@@ -45,15 +50,15 @@ function confint(obj::OnlineLinearModel, level::Real)
 end
 confint(obj::OnlineLinearModel) = confint(obj, 0.95)
 
-deviance(obj::OnlineLinearModel) = error("Not Implemented")
-
-loglikelihood(obj::OnlineLinearModel) = error("Not Implemented")
-
 stderr(obj::OnlineLinearModel) = sqrt(diag(vcov(obj)))
 
 vcov(obj::OnlineLinearModel) = -mse(obj) * obj.B[1:end-1, 1:end-1] / obj.n
 
 predict(obj::OnlineLinearModel, X::Matrix) = X * coef(obj)
+
+
+deviance(obj::OnlineLinearModel) =      error("Not Implemented")
+loglikelihood(obj::OnlineLinearModel) = error("Not Implemented")
 
 
 #-----------------------------------------------------------------------------#
