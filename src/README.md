@@ -7,13 +7,13 @@ Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-|  Sample Mean         |  [`Summary`](../doc/examples/summary.md)       
-|  Sample Variance     |  [`Summary`](../doc/examples/summary.md)        
-|  Skewness (and m3)   |  [`Moments`](../doc/examples/moments.md)       
-|  Kurtosis (and m4)   |  [`Moments`](../doc/examples/moments.md)        
+|  Sample Mean         |  [`Summary`](../doc/examples/Summary.md)       
+|  Sample Variance     |  [`Summary`](../doc/examples/Summary.md)        
+|  Skewness (and m3)   |  [`Moments`](../doc/examples/Moments.md)       
+|  Kurtosis (and m4)   |  [`Moments`](../doc/examples/Moments.md)        
 |  Covariance Matrix   | [`CovarianceMatrix`](../doc/examples/CovarianceMatrix.md)
-|  Maximum/Minimum     |  [`Summary`](../doc/examples/summary.md)  , [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md) 
-|  Sample Quantiles    | [`QuantileSGD`](../doc/examples/quantilesgd.md), [`QuantileMM`](../doc/examples/quantilemm.md) 
+|  Maximum/Minimum     |  [`Summary`](../doc/examples/Summary.md)  , [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md) 
+|  Sample Quantiles    | [`QuantileSGD`](../doc/examples/QuantileSGD.md), [`QuantileMM`](../doc/examples/quantileMM.md) 
 |  5-Number Summary    | [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md)   
 |  Box Plot            |[`Gadfly.plot(obj::FiveNumberSummary)`](../doc/examples/FiveNumberSummary.md)  
 
