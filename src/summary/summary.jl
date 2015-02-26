@@ -36,8 +36,8 @@ function update!(obj::Summary, newdata::Vector)
     obj.nb = obj.nb + 1
     obj.mean = μ1 + n2 / n * δ
     obj.var = (ss1 + ss2 + n1 * n2 / n * δ^2) / (n - 1)
-    obj.max = maximum([obj.max, newdata])
-    obj.min = minimum([obj.min, newdata])
+    obj.max = maximum([obj.max; newdata])
+    obj.min = minimum([obj.min; newdata])
 
     return obj
 end
@@ -57,8 +57,8 @@ function update!(obj1::Summary, obj2::Summary)
     obj1.nb += obj2.nb
     obj1.mean += n2 /n * δ
     obj1.var = (ss1 + ss2 + n1 * n2 / n * δ^2) / (n - 1)
-    obj1.max = maximum([obj1.max, obj2.max])
-    obj1.min = minimum([obj1.min, obj2.min])
+    obj1.max = maximum([obj1.max; obj2.max])
+    obj1.min = minimum([obj1.min; obj2.min])
 end
 
 

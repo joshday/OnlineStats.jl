@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/joshday/OnlineStats.jl.svg)](https://travis-ci.org/joshday/OnlineStats.jl)
-[![Coverage Status](https://coveralls.io/repos/joshday/OnlineStats.jl/badge.svg)](https://coveralls.io/r/joshday/OnlineStats.jl)
+[![Coverage Status](https://coveralls.io/repos/joshday/OnlineStats.jl/badge.svg?branch=master)](https://coveralls.io/r/joshday/OnlineStats.jl?branch=master)
 
 # OnlineStats
 

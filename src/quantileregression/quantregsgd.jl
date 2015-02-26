@@ -50,7 +50,7 @@ end
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineQuantRegSGD)
-    names = [[symbol("β$i") for i in 0:length(obj.β)-1], :n, :nb]
+    names = [[symbol("β$i") for i in 0:length(obj.β)-1]; :n; :nb]
     estimates = [obj.β, obj.n, obj.nb]
     return([names estimates])
 end
@@ -59,19 +59,19 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
-x1 = randn(1000)
-y1 = x1 + randn(1000)
-obj = OnlineStats.OnlineQuantRegSGD(x1, y1)
-df = OnlineStats.make_df(obj)
+# x1 = randn(1000)
+# y1 = x1 + randn(1000)
+# obj = OnlineStats.OnlineQuantRegSGD(x1, y1)
+# df = OnlineStats.make_df(obj)
 
-display(OnlineStats.state(obj))
-for i in 1:1000
-    x = randn(1000)
-    y = x + randn(1000)
-    OnlineStats.update!(obj, x, y)
-end
-display(OnlineStats.state(obj))
+# display(OnlineStats.state(obj))
+# for i in 1:1000
+#     x = randn(1000)
+#     y = x + randn(1000)
+#     OnlineStats.update!(obj, x, y)
+# end
+# display(OnlineStats.state(obj))
 
-OnlineStats.make_df!(obj, df)
+# OnlineStats.make_df!(obj, df)
 
-OnlineStats.make_df(obj)
+# OnlineStats.make_df(obj)

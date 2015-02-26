@@ -46,10 +46,10 @@ end
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitMvNormal)
-    names = [[symbol("μ$i") for i=1:length(obj.d.μ)],
-             [symbol("σ$i") for i=1:length(obj.d.μ)],
-             :n, :nb]
-    estimates = [obj.d.μ, sqrt(diag(obj.d.Σ)), obj.n, obj.nb]
+    names = [[symbol("μ$i") for i=1:length(obj.d.μ)];
+             [symbol("σ$i") for i=1:length(obj.d.μ)];
+             :n; :nb]
+    estimates = [obj.d.μ; sqrt(diag(obj.d.Σ)); obj.n; obj.nb]
     return([names estimates])
 end
 
