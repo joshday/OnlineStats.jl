@@ -1,0 +1,42 @@
+# OnlineQuantRegMM
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+using Distributions
+using Gadfly
+```
+
+### Generate Data: Location-Shift Model
+```{julia; term=false; eval=true}
+beta = [1, 2, 3, 4, 5, 0, 0, 0, 0, 0]
+gamma = [0, 1, 1, -1, -1, 2, 2, -2, -2, 0] / 10
+```
+
+### Create model with the first batch
+```{julia; term=false; eval=true}
+X = randn(100, 10)
+errors = (1 + X * gamma) .* randn(100)
+y = X * beta + errors
+
+fit = QuantRegMM(X, y, τ = .7)
+```
+
+### Update model with many batches
+```{julia; term=false; eval=true}
+for i = 1:10000
+	
+	X = randn(100, 10)
+	errors = (1 + X * gamma) .* randn(100)
+	y = X * beta + errors
+
+	update!(fit, X, y)
+end
+```
+
+### Check fit
+```{julia; term=true}
+state(fit)
+trueBeta = [quantile(Normal(), .7); beta + gamma * quantile(Normal(), .7)]
+maximum(abs(trueBeta - fit.β))
+```

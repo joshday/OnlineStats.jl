@@ -4,7 +4,7 @@ Click links to example.
 
 ## Summary statistics
 
-Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecompare.md)
+[Comparison of `QuantileSGD` and `QuantileMM`](../doc/examples/quantilecompare.md)
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
@@ -14,7 +14,7 @@ Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecompare.md)
 |  Kurtosis (and m4)   |  [`Moments`](../doc/examples/Moments.md)        
 |  Covariance Matrix   | [`CovarianceMatrix`](../doc/examples/CovarianceMatrix.md)
 |  Maximum/Minimum     |  [`Summary`](../doc/examples/Summary.md)  , [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md) 
-|  Sample Quantiles    | [`QuantileSGD`](../doc/examples/QuantileSGD.md), [`QuantileMM`](../doc/examples/quantileMM.md) 
+|  Sample Quantiles    | [`QuantileSGD`](../doc/examples/QuantileSGD.md), [`QuantileMM`](../doc/examples/QuantileMM.md) 
 |  5-Number Summary    | [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md)   
 |  Box Plot            |[`Gadfly.plot(obj::FiveNumberSummary)`](../doc/examples/FiveNumberSummary.md)  
 
@@ -77,9 +77,11 @@ Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecompare.md)
 
 ## Quantile regression
 
+[Comparison of `QuantRegSGD` vs. `QuantRegMM`](../doc/examples/quantregcompare.md)
+
 | Item                                 | Associated Type(s)
 |--------------------------------------|------------------
-| Linear Quantile Regression           | [`OnlineQuantRegSGD`](../doc/examples/OnlineQuantRegSGD.md)
+| Linear Quantile Regression           | [`QuantRegSGD`](../doc/examples/QuantRegSGD.md), [`QuantRegMM`](../doc/examples/QuantRegSGD.md)
 | Composite Linear Quantile Regresison |
 
 ## Variance component model

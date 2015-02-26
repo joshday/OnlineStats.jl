@@ -75,6 +75,7 @@ include("linearmodel/lm.jl")
 
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
+include("quantileregression/quantregmm.jl")
 
 
 

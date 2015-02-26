@@ -13,7 +13,6 @@ type OnlineFitBeta <: ContinuousUnivariateOnlineStat
 end
 
 function onlinefit{T<:Real}(::Type{Beta}, y::Vector{T})
-    warn("Beta uses MoM instead of MLE")
     n::Int64 = length(y)
     stats = Summary(y)
     m = stats.mean

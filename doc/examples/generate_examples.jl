@@ -12,9 +12,10 @@ examples = (
     "/CovarianceMatrix.jmd",
     "/FiveNumberSummary.jmd",
     "/Moments.jmd",
-    "/OnlineQuantRegSGD.jmd"
+    "/QuantRegSGD.jmd",
+    "/QuantRegMM.jmd",
+    "/quantregcompare.jmd"
     )
-
 
 
 for i in examples

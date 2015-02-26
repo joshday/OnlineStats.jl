@@ -1,56 +1,62 @@
 # Author(s): Josh Day <emailjoshday@gmail.com>
 
-export OnlineQuantRegSGD
+export QuantRegSGD
 
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------------# OnlineQuantReg
-type OnlineQuantRegSGD <: OnlineStat
+type QuantRegSGD <: OnlineStat
     β::Vector         # Coefficients
     τ::Float64        # Desired conditional quantile
     r::Float64        # learning rate
+    intercept::Bool   # intercept in model?
     n::Int64          # Number of observations used
     nb::Int64         # Number of batches used
 end
 
-function OnlineQuantRegSGD(X::Matrix, y::Vector; τ = 0.5, r = 0.51)
+function QuantRegSGD(X::Matrix, y::Vector; τ = 0.5, r = 0.51,
+                           intercept::Bool = true)
+    if intercept
+        X = [ones(length(y)) X]
+    end
     n, p = size(X)
-    X = [ones(n) X]  # add intercept
-    β = zeros(p + 1)
-    X = ((y .< X*β) - τ) .* X
+    X = ((y .< 0) - τ) .* X
     β = - vec(mean(X, 1))
 
-    OnlineQuantRegSGD(β, τ, r, n, 1)
+    QuantRegSGD(β, τ, r, intercept, n, 1)
 end
 
-function OnlineQuantRegSGD(x::Vector, y::Vector)
-    OnlineQuantRegSGD(reshape(x, length(x), 1), y)
+function QuantRegSGD(x::Vector, y::Vector; args...)
+    QuantRegSGD(reshape(x, length(x), 1), y; args...)
 end
 
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineQuantRegSGD, X::Matrix, y::Vector)
+function update!(obj::QuantRegSGD, X::Matrix, y::Vector)
     n, p = size(X)
-    X = [ones(n) X]  # add intercept
+    if obj.intercept
+        X = [ones(length(y)) X]
+    end
     γ = obj.nb ^ -obj.r
 
     X = ((y .< X*obj.β) - obj.τ) .* X
-    obj.β -= vec(mean(X, 1))
+    obj.β -= γ * vec(mean(X, 1))
 
     obj.n += n
     obj.nb += 1
 end
 
-function update!(obj::OnlineQuantRegSGD, x::Vector, y::Vector)
+function update!(obj::QuantRegSGD, x::Vector, y::Vector)
     update!(obj, reshape(x, length(x), 1), y)
 end
 
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::OnlineQuantRegSGD)
-    names = [[symbol("β$i") for i in 0:length(obj.β)-1]; :n; :nb]
+function state(obj::QuantRegSGD)
+    names = [[symbol("β$i") for i in [1:length(obj.β)] - obj.intercept];
+             :n; :nb]
     estimates = [obj.β, obj.n, obj.nb]
     return([names estimates])
 end
@@ -61,7 +67,7 @@ end
 #---------------------------------------------------------# Interactive Testing
 # x1 = randn(1000)
 # y1 = x1 + randn(1000)
-# obj = OnlineStats.OnlineQuantRegSGD(x1, y1)
+# obj = OnlineStats.QuantRegSGD(x1, y1, τ=.9)
 # df = OnlineStats.make_df(obj)
 
 # display(OnlineStats.state(obj))

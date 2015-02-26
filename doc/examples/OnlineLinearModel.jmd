@@ -3,7 +3,6 @@
 
 ```{julia; term=false; eval=true}
 using OnlineStats
-using Gadfly
 ```
 
 ### Make true beta
