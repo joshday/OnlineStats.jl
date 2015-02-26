@@ -1,9 +1,8 @@
 # Online algorithms implementation progress
 
+Click links to example.
 
 ## Summary statistics
-
-Notes: `Moments` updates are a little unstable.  Typo in Pebay?
 
 Comparison of [QuantileSGD and QuantileMM](../doc/examples/quantilecompare.md)
 
