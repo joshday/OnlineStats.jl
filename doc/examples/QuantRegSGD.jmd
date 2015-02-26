@@ -19,7 +19,7 @@ X = randn(100, 10)
 errors = (1 + X * gamma) .* randn(100)
 y = X * beta + errors
 
-fit = QuantRegSGD(X, y, τ = .6)
+fit = QuantRegSGD(X, y, τ = .7)
 ```
 
 ### Update model with many batches

@@ -43,7 +43,7 @@ end
 
 
 ````julia
-elapsed time: 1.448683079 seconds (492506356 bytes allocated, 41.99%
+elapsed time: 1.529481538 seconds (491948552 bytes allocated, 47.67%
 gc time)
 ````
 
@@ -60,8 +60,8 @@ end
 
 
 ````julia
-elapsed time: 1.406972824 seconds (491948424 bytes allocated, 46.57%
-gc time)
+elapsed time: 1.59696385 seconds (491948424 bytes allocated, 50.39% gc
+time)
 ````
 
 
@@ -72,41 +72,41 @@ gc time)
 ````julia
 julia> state(obj_sgd)
 11x2 Array{Any,2}:
- :q10      0.0990616
- :q20      0.200526 
- :q30      0.299504 
- :q40      0.398422 
+ :q10      0.0990498
+ :q20      0.200525 
+ :q30      0.299503 
+ :q40      0.398423 
  :q50      0.498745 
- :q60      0.601011 
- :q70      0.701337 
- :q80      0.804388 
- :q90      0.901372 
+ :q60      0.60099  
+ :q70      0.701338 
+ :q80      0.804398 
+ :q90      0.901368 
  :n        1.0e6    
  :nb   10000.0      
 
 julia> state(obj_mm)
 11x2 Array{Any,2}:
- :q10      0.0990588
- :q20      0.200527 
- :q30      0.299524 
- :q40      0.398398 
+ :q10      0.0990599
+ :q20      0.200526 
+ :q30      0.299523 
+ :q40      0.398399 
  :q50      0.498746 
- :q60      0.600993 
- :q70      0.70136  
- :q80      0.804377 
- :q90      0.901382 
+ :q60      0.601001 
+ :q70      0.701351 
+ :q80      0.80438  
+ :q90      0.901394 
  :n        1.0e6    
  :nb   10000.0      
 
 julia> 
 # SGD: Maximum difference from truth
 maximum(abs(obj_sgd.est - [1:9]/10))
-0.004387539450411482
+0.004397544718487301
 
 julia> 
 # MM: Maximum difference from truth
 maximum(abs(obj_mm.est - [1:9]/10))
-0.004377316113325924
+0.004380254215353374
 
 ````
 
