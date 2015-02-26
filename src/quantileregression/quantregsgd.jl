@@ -74,3 +74,4 @@ display(OnlineStats.state(obj))
 
 OnlineStats.make_df!(obj, df)
 
+OnlineStats.make_df(obj)

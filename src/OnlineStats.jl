@@ -9,19 +9,27 @@ import Gadfly
 
 export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
 
+# Abstract Type structure
+include("types.jl")
 
-# General functions
+
+###############################################################################
+#
+# Functions for any OnlineStat type
+#
+###############################################################################
 @doc doc"Return the number of observations used" ->
-function n_obs(obj)
+function n_obs{T <: OnlineStat}(obj::T)
    obj.n
 end
 
 @doc doc"Return the number of batches used" ->
-function n_batches(obj)
+function n_batches{T <: OnlineStat}(obj::T)
    obj.nb
 end
 
-function make_df(obj)
+@doc doc"Put object results in a DataFrame" ->
+function make_df{T <: OnlineStat}(obj::T)
     s = OnlineStats.state(obj)
     names::Vector{Symbol} = s[:, 1]
     df = convert(DataFrame, s[:, 2]')
@@ -29,13 +37,20 @@ function make_df(obj)
     return df
 end
 
-function make_df!(obj, df::DataFrame)
+@doc doc"Add the current state of `obj` to a new row in `df`" ->
+function make_df!{T <: OnlineStat}(obj::T, df::DataFrame)
     push!(df, state(obj)[:, 2])
 end
 
-# Abstract Type structure
-include("onlinestat.jl")
 
+
+###############################################################################
+#
+# OnlineStat Types
+#
+# Each file has the type definition and methods for update!() and state()
+#
+###############################################################################
 # Summary Statistics
 include("summary/covmatrix.jl")
 include("summary/moments.jl")
@@ -65,7 +80,11 @@ include("quantileregression/quantregsgd.jl")
 
 
 
-
+###############################################################################
+#
+# API docs for udpate!, state, convert, and onlinefit
+#
+###############################################################################
 # General docs for update!, state, convert, onlinefit
 @doc doc"""
     Update `obj::OnlineStat` with observations in `newdata` using `update(obj, newdata)`
