@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/joshday/OnlineStats.jl.svg)](https://travis-ci.org/joshday/OnlineStats.jl)
+
 # OnlineStats
 
 Online algorithms for statistics.  The driving function in this package is  
