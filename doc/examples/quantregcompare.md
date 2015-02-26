@@ -1,5 +1,5 @@
 
-# Compare: `QuantileSGD` vs. `QuantileMM`
+# Compare: `QuantRegSGD` vs. `QuantRegMM`
 
 
 ````julia
