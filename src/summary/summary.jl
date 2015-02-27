@@ -2,90 +2,77 @@
 
 export Summary
 
-#------------------------------------------------------------------------------#
-#----------------------------------------------------------------# Summary Type
+#----------------------------------------------------------------------------#
+#------------------------------------------------------# Type and Constructors
 type Summary <: ContinuousUnivariateOnlineStat
-    mean::Float64
-    var::Float64
-    max::Float64
-    min::Float64
-
-    n::Int64
-    nb::Int64
+    mean::Mean        # mean
+    var::Var          # variance
+    extrema::Extrema  # max and min
+    n::Int64          # nobs
 end
 
 
 function Summary(y::Vector)
-    Summary(mean(y), var(y), maximum(y), minimum(y), length(y), 1)
+    Summary(Mean(y), Var(y), Extrema(y), length(y))
+end
+
+Summary(y::Real) = Summary([y])
+
+Summary() = Summary(Mean(), Var(), Extrema(), 0)
+
+#----------------------------------------------------------------------------#
+#--------------------------------------------------------------------# update!
+function update!(obj::Summary, y::Vector)
+    update!(obj.mean, y)
+    update!(obj.var, y)
+    update!(obj.extrema, y)
+    obj.n = obj.mean.n
+end
+
+function update!(obj::Summary, y::Real)
+    update!(obj.mean, [y])
+    update!(obj.var, [y])
+    update!(obj.extrema, [y])
+    obj.n = obj.mean.n
 end
 
 
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------------------# update!
-function update!(obj::Summary, newdata::Vector)
-    n1::Int = obj.n
-    n2::Int = length(newdata)
-    n::Int = n1 + n2
-    μ1::Float64 = obj.mean
-    μ2::Float64 = mean(newdata)
-    δ::Float64 = μ2 - μ1
-    ss1::Float64 = (n1 - 1) * obj.var
-    ss2::Float64 = vecnorm(newdata - μ2) ^ 2
-
-    obj.n = n
-    obj.nb = obj.nb + 1
-    obj.mean = μ1 + n2 / n * δ
-    obj.var = (ss1 + ss2 + n1 * n2 / n * δ^2) / (n - 1)
-    obj.max = maximum([obj.max; newdata])
-    obj.min = minimum([obj.min; newdata])
-
-    return obj
-end
-
-
-function update!(obj1::Summary, obj2::Summary)
-    n1::Int = obj1.n
-    n2::Int = obj2.n
-    n::Int = n1 + n2
-    μ1::Float64 = obj1.mean
-    μ2::Float64 = obj2.mean
-    δ::Float64 = μ2 - μ1
-    ss1::Float64 = (n1 - 1) * obj1.var
-    ss2::Float64 = (n2 - 1) * obj2.var
-
-    obj1.n = n
-    obj1.nb += obj2.nb
-    obj1.mean += n2 /n * δ
-    obj1.var = (ss1 + ss2 + n1 * n2 / n * δ^2) / (n - 1)
-    obj1.max = maximum([obj1.max; obj2.max])
-    obj1.min = minimum([obj1.min; obj2.min])
-end
-
-
-#------------------------------------------------------------------------------#
-#--------------------------------------------------------------------# snapshot
+#----------------------------------------------------------------------------#
+#----------------------------------------------------------------------# state
 function state(obj::Summary)
-    names = [:mean, :var, :max, :min, :n, :nb]
-    estimates = [obj.mean, obj.var, obj.max, obj.min, obj.n, obj.nb]
+    names = [:mean, :var, :max, :min, :n]
+    estimates = [obj.mean.mean, obj.var.var * (obj.n - 1) / obj.n,
+                 obj.extrema.max, obj.extrema.min,
+                 obj.n]
     return([names estimates])
 end
 
 
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-x1 = rand(100)
-x2 = rand(112)
-x3 = rand(103)
+#----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# Base
+Base.copy(obj::Summary) = Summary(obj.mean, obj.var, obj.extrema, obj.n)
 
-obj = OnlineStats.Summary(x1)
-OnlineStats.update!(obj, x2)
-OnlineStats.update!(obj, x3)
+function Base.merge(a::Summary, b::Summary)
+    Summary(merge(a.mean, b.mean),
+            merge(a.var, b.var),
+            merge(a.extrema, b.extrema),
+            a.n + b.n)
+end
 
-OnlineStats.state(obj)
+function Base.merge!(a::Summary, b::Summary)
+    merge!(a.mean, b.mean)
+    merge!(a.var, b.var)
+    merge!(a.extrema, b.extrema)
+    a.n += b.n
+end
 
-obj2 = OnlineStats.Summary(rand(100))
-OnlineStats.update!(obj2, rand(1))
-OnlineStats.update!(obj, obj2)
-
-OnlineStats.state(obj)
+function Base.show(io::IO, obj::Summary)
+    @printf(io, "Online Summary\n")
+    @printf(io, " * Mean:     %f\n", obj.mean.mean)
+    @printf(io, " * Variance: %f\n", obj.var.var * obj.n / (obj.n - 1))
+    @printf(io, " * Max:      %f\n", obj.extrema.max)
+    @printf(io, " * Min:      %f\n", obj.extrema.min)
+    @printf(io, " * N:        %d\n", obj.n)
+    return
+end
 

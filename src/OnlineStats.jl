@@ -52,30 +52,33 @@ end
 #
 ###############################################################################
 # Summary Statistics
-include("summary/covmatrix.jl")
-include("summary/moments.jl")
+include("summary/mean.jl")
+include("summary/var.jl")
+include("summary/extrema.jl")
 include("summary/summary.jl")
-include("summary/quantile.jl")
-include("summary/fivenumber.jl")
+# include("summary/covmatrix.jl")
+# include("summary/moments.jl")
+# include("summary/quantile.jl")
+# include("summary/fivenumber.jl")
 
-# Density Estimation
-include("densityestimation/bernoulli.jl")
-include("densityestimation/beta.jl")
-include("densityestimation/binomial.jl")
-# include("densityestimation/dirichlet.jl")
-include("densityestimation/exponential.jl")
-include("densityestimation/gamma.jl")
-include("densityestimation/multinomial.jl")
-include("densityestimation/mvnormal.jl")
-include("densityestimation/normal.jl")
+# # Density Estimation
+# include("densityestimation/bernoulli.jl")
+# include("densityestimation/beta.jl")
+# include("densityestimation/binomial.jl")
+# # include("densityestimation/dirichlet.jl")
+# include("densityestimation/exponential.jl")
+# include("densityestimation/gamma.jl")
+# include("densityestimation/multinomial.jl")
+# include("densityestimation/mvnormal.jl")
+# include("densityestimation/normal.jl")
 
-# Linear Model
-include("linearmodel/sweep.jl")
-include("linearmodel/lm.jl")
+# # Linear Model
+# include("linearmodel/sweep.jl")
+# include("linearmodel/lm.jl")
 
-# Quantile Regression
-include("quantileregression/quantregsgd.jl")
-include("quantileregression/quantregmm.jl")
+# # Quantile Regression
+# include("quantileregression/quantregsgd.jl")
+# include("quantileregression/quantregmm.jl")
 
 
 
@@ -96,32 +99,32 @@ include("quantileregression/quantregmm.jl")
     """ -> state
 
 
-@doc doc"""
-    Usage:
-    ```
-    onlinefit(<<UnivariateDistribution>>, y::Vector)
-    onlinefit(<<MultivariateDistribution>>, y::Matrix)
-    ```
+# @doc doc"""
+#     Usage:
+#     ```
+#     onlinefit(<<UnivariateDistribution>>, y::Vector)
+#     onlinefit(<<MultivariateDistribution>>, y::Matrix)
+#     ```
 
-    Online parametric density estimation.  Creates an object of type
-    `OnlineFit<<Distribution>>`
+#     Online parametric density estimation.  Creates an object of type
+#     `OnlineFit<<Distribution>>`
 
-    | Field                          |  Description                          |
-    |:-------------------------------|:--------------------------------------|
-    | `d::<<Distribution>>`          | `Distributions.<<Distribution>>`      |
-    | `stats::<<DistributionStats>>` | `Distributions.<<DistributionStats>>` |
-    | `n::Int64`                     | number of observations used           |
-    | `nb::Int64`                    | number of batches used                |
+#     | Field                          |  Description                          |
+#     |:-------------------------------|:--------------------------------------|
+#     | `d::<<Distribution>>`          | `Distributions.<<Distribution>>`      |
+#     | `stats::<<DistributionStats>>` | `Distributions.<<DistributionStats>>` |
+#     | `n::Int64`                     | number of observations used           |
+#     | `nb::Int64`                    | number of batches used                |
 
 
-    Examples:
-    ```
-    y1, y2 = randn(100), randn(100)
-    obj = onlinefit(Normal, y1)
-    update!(obj, y2)
-    state(obj)
-    ```
+#     Examples:
+#     ```
+#     y1, y2 = randn(100), randn(100)
+#     obj = onlinefit(Normal, y1)
+#     update!(obj, y2)
+#     state(obj)
+#     ```
 
-    """ -> onlinefit
+#     """ -> onlinefit
 
 end # module

@@ -4,7 +4,7 @@ export Var
 #------------------------------------------------------# Type and Constructors
 type Var <: ContinuousUnivariateOnlineStat
     mean::Float64
-    var::Float64
+    var::Float64    # BIASED variance (makes for easier update)
     n::Int64
 end
 
@@ -52,7 +52,7 @@ end
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# state
 function state(obj::Var)
-    unbiasedvar = obj.var * ((obj.n) / (obj.n -1))
+    unbiasedvar = obj.var * obj.n / (obj.n - 1)
     names = [:mean, :var, :n]
     values = [obj.mean, unbiasedvar, obj.n]
     return([names values])
@@ -103,7 +103,7 @@ end
 function Base.show(io::IO, obj::Var)
     @printf(io, "Online Variance\n")
     @printf(io, " * Mean:     %f\n", obj.mean)
-    @printf(io, " * Variance: %f\n", obj.var)
+    @printf(io, " * Variance: %f\n", obj.var * obj.n / (obj.n - 1))
     @printf(io, " * N:        %d\n", obj.n)
     return
 end
