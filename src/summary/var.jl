@@ -3,9 +3,9 @@ export Var
 #----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
 type Var <: ContinuousUnivariateOnlineStat
-    mean::Float64        # Mean
-    var::Float64         # Biased variance (easier to update)
-    n::Int64             # Number of observations used
+    mean::Float64
+    var::Float64
+    n::Int64
 end
 
 function Var{T <: Real}(y::Vector{T})
@@ -52,8 +52,9 @@ end
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# state
 function state(obj::Var)
+    unbiasedvar = obj.var * ((obj.n) / (obj.n -1))
     names = [:mean, :var, :n]
-    values = [obj.mean, obj.var, obj.n]
+    values = [obj.mean, unbiasedvar, obj.n]
     return([names values])
 end
 
@@ -107,28 +108,3 @@ function Base.show(io::IO, obj::Var)
     return
 end
 
-
-
-x1 = randn(100)
-x2 = randn(100)
-x = [x1; x2]
-obj = OnlineStats.Var(x1)
-OnlineStats.update!(obj, x2)
-obj.var - var(x) * 199 / 200
-
-for i in 1:1000
-    xnew = randn()
-    OnlineStats.update!(obj, xnew)
-    x = [x; xnew]
-end
-obj.var - var(x) * ((length(x) - 1) / length(x))
-OnlineStats.state(obj)
-
-y = randn(100123)
-obj2 = OnlineStats.Var(y)
-merge!(obj, obj2)
-
-obj.mean - mean([x; y])
-obj.var - var([x; y]) * (length([x;y]) - 1) / length([x;y])
-
-obj3 = merge(obj, obj2)

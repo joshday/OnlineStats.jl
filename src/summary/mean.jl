@@ -1,10 +1,10 @@
-export Summary
+export Mean
 
 #----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
 type Mean <: ContinuousUnivariateOnlineStat
     mean::Float64
-    n::Int
+    n::Int64
 end
 
 Mean{T <: Real}(y::Vector{T}) = Mean(mean(y), length(y))
