@@ -4,8 +4,8 @@ using DataFrames
 using Docile
 using Distributions
 using StatsBase
-import PDMats
-import Gadfly
+import PDMats, Distributions
+import Base: copy, merge, merge!, show
 
 export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
 
@@ -56,8 +56,8 @@ include("summary/mean.jl")
 include("summary/var.jl")
 include("summary/extrema.jl")
 include("summary/summary.jl")
-# include("summary/covmatrix.jl")
-# include("summary/moments.jl")
+include("summary/covmatrix.jl")
+include("summary/moments.jl")
 # include("summary/quantile.jl")
 # include("summary/fivenumber.jl")
 
@@ -90,13 +90,13 @@ include("summary/summary.jl")
 #
 ###############################################################################
 # General docs for update!, state, convert, onlinefit
-@doc doc"""
-    Update `obj::OnlineStat` with observations in `newdata` using `update(obj, newdata)`
-    """ -> update!
+# @doc doc"""
+#     Update `obj::OnlineStat` with observations in `newdata` using `update(obj, newdata)`
+#     """ -> update!
 
-@doc doc"""
-    Get current state of estimates with `state(obj::OnlineStat)`
-    """ -> state
+# @doc doc"""
+#     Get current state of estimates with `state(obj::OnlineStat)`
+#     """ -> state
 
 
 # @doc doc"""

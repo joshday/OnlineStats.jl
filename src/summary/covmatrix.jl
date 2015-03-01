@@ -1,61 +1,38 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export CovarianceMatrix
 
-#------------------------------------------------------------------------------#
-#-------------------------------------------------------# CovarianceMatrix Type
+#-----------------------------------------------------------------------------#
+#-------------------------------------------------------# Type and Constructors
 type CovarianceMatrix <: ContinuousMultivariateOnlineStat
     A::Matrix    # X' * X
     B::Vector    # X * 1'
     n::Int64     # number of observations used
     p::Int64     # number of columns (variables)
-    nb::Int64    # number of batches used
 end
 
 
 function CovarianceMatrix(x::Matrix)
     n, p = size(x)
-    vec1 = ones(n)
-
     A = BLAS.syrk('L', 'T', 1.0, x) / n
-    B = x' * vec1 / n
-    CovarianceMatrix(A, B, n, p, 1)
+    B = vec(mean(x, 1))
+    CovarianceMatrix(A, B, n, p)
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj1::CovarianceMatrix, obj2::CovarianceMatrix)
-    if obj1.p != obj2.p
-        error("different number of variables")
-    end
-    n1 = obj1.n
-    n2 = obj2.n
-    n = n1 + n2
+function update!(obj::CovarianceMatrix, x::Matrix)
+    n2 = size(x, 1)
+    A2 = BLAS.syrk('L', 'T', 1.0, x) / n2
+    B2 = vec(mean(x, 1))
 
-    A1::Matrix = obj1.A
-    B1::Vector = obj1.B
-    A2::Matrix = obj2.A
-    B2::Vector = obj2.B
-
-    A = (n1 * A1 + n2 * A2) / n
-    B = (n1 * B1 + n2 * B2) / n
-
-
-    CovarianceMatrix(A, B, n, obj1.p, obj1.nb + obj2.nb)
-end
-
-function update!(obj::CovarianceMatrix, newmat::Matrix)
-    obj2 = CovarianceMatrix(newmat)
-    mergeobj = update!(obj, obj2)
-    obj.A = mergeobj.A
-    obj.B = mergeobj.B
-    obj.n += obj2.n
-    obj.nb += 1
+    obj.n += n2
+    γ = n2 / obj.n
+    obj.A += γ * (A2 - obj.A)
+    obj.B += γ * (B2 - obj.B)
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::CovarianceMatrix, corr=false)
     B = obj.B
@@ -80,21 +57,43 @@ end
 
 
 
+#-----------------------------------------------------------------------------#
+#------------------------------------------------------------------------# Base
+Base.copy(obj::CovarianceMatrix) = CovarianceMatrix(obj.A. obj.B, obj.n, obj.p)
 
+function Base.merge(c1::CovarianceMatrix, c2::CovarianceMatrix)
+    n1 = c1.n
+    n2 = c2.n
+    n = n1 + n2
 
+    A1::Matrix = c1.A
+    B1::Vector = c1.B
+    A2::Matrix = c2.A
+    B2::Vector = c2.B
 
+    γ = n2 / n
+    A = A1 + γ * (A2 - A1)
+    B = B1 + γ * (B2 - B1)
 
+    CovarianceMatrix(A, B, n, c1.p)
+end
 
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-# x1 = randn(103, 5)
-# x2 = randn(271, 5)
-# x3 = randn(149, 5)
+function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
+    n2 = c2.n
+    A2 = c2.A
+    B2 = c2.B
 
-# obj = OnlineStats.CovarianceMatrix(x1)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.update!(obj, x3)
-# mat = OnlineStats.state(obj, true)
-# display(mat)
-# display(mat - cor([x1, x2, x3]))
+    c1.n += n2
+    γ = n2 / c1.n
+    c1.A += γ * (A2 - c1.A)
+    c1.B += γ * (B2 - c1.B)
+end
+
+function Base.show(io::IO, obj::CovarianceMatrix)
+#     @printf(io, " * N: %d\n", obj.n)
+#     @printf(io, " * P: %d\n", obj.p)
+#     return
+    println(io, "Online Covariance Matrix:\n", state(obj))
+end
+
 

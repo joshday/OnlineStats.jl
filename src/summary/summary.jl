@@ -1,5 +1,3 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export Summary
 
 #----------------------------------------------------------------------------#
@@ -26,14 +24,14 @@ function update!(obj::Summary, y::Vector)
     update!(obj.mean, y)
     update!(obj.var, y)
     update!(obj.extrema, y)
-    obj.n = obj.mean.n
+    obj.n += obj.mean.n
 end
 
 function update!(obj::Summary, y::Real)
     update!(obj.mean, [y])
     update!(obj.var, [y])
     update!(obj.extrema, [y])
-    obj.n = obj.mean.n
+    obj.n += 1
 end
 
 

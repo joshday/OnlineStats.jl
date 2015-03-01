@@ -38,6 +38,10 @@ end
 #----------------------------------------------------------------------# Base
 Base.copy(obj::Mean) = Mean(obj.mean, obj.n)
 
+function Base.mean(obj::Mean)
+    return obj.mean
+end
+
 function Base.merge(a::Mean, b::Mean)
     m = a.mean + (b.n / (a.n + b.n)) * (b.mean - a.mean)
     n = a.n + b.n
