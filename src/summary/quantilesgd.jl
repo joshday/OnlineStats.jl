@@ -38,8 +38,9 @@ update!(obj::QuantileSGD, y::Real) = update!(obj, [y])
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::QuantileSGD)
-    names = [[symbol("q" * string(int(100*i))) for i in obj.τ], :n, :nb]
-    estimates = [obj.est, obj.n, obj.nb]
+    names::Array{Symbol} = [[symbol("q" * string(int(100*i))) for i in obj.τ];
+                            :n; :nb]
+    estimates = [obj.est; obj.n; obj.nb]
     return([names estimates])
 end
 
