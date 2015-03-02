@@ -1,11 +1,9 @@
 module OnlineStats
 
-using DataFrames
 using Docile
-using Distributions
-using StatsBase
+using DataFrames, Distributions, StatsBase
 import PDMats, Distributions
-import Base: copy, merge, merge!, show
+import Base: copy, merge, merge!, show, quantile
 
 export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
 
@@ -58,8 +56,9 @@ include("summary/extrema.jl")
 include("summary/summary.jl")
 include("summary/covmatrix.jl")
 include("summary/moments.jl")
-# include("summary/quantile.jl")
-# include("summary/fivenumber.jl")
+include("summary/quantilesgd.jl")
+include("summary/quantilemm.jl")
+include("summary/fivenumber.jl")
 
 # # Density Estimation
 # include("densityestimation/bernoulli.jl")

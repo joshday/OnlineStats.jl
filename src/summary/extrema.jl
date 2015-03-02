@@ -37,6 +37,14 @@ end
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# Base
+Base.max(obj::Extrema) = return obj.max
+
+Base.min(obj::Extrema) = return obj.min
+
+Base.maximum(obj::Extrema) = return obj.max
+
+Base.minimum(obj::Extrema) = return obj.min
+
 Base.copy(obj::Extrema) = Var(obj.max, obj.min, obj.n)
 
 function Base.merge(a::Extrema, b::Extrema)

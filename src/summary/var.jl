@@ -61,13 +61,9 @@ end
 
 #-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
-function Base.mean(obj::Var)
-    return obj.mean
-end
+Base.mean(obj::Var) = return obj.mean
 
-function Base.var(obj::Var)
-    return obj.var
-end
+Base.var(obj::Var) = return obj.var * (obj.n / (obj.n - 1))
 
 Base.copy(obj::Var) = Var(obj.mean, obj.var, obj.n)
 
@@ -110,8 +106,8 @@ end
 
 function Base.show(io::IO, obj::Var)
     @printf(io, "Online Variance\n")
-    @printf(io, " * Mean:     %f\n", obj.mean)
-    @printf(io, " * Variance: %f\n", obj.var * obj.n / (obj.n - 1))
+    @printf(io, " * Mean:     %f\n", mean(obj))
+    @printf(io, " * Variance: %f\n", var(obj))
     @printf(io, " * N:        %d\n", obj.n)
     return
 end

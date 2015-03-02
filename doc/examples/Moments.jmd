@@ -13,11 +13,22 @@ obj = Moments(rand(100))
 ### Update estimates with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    update!(obj, rand(100))
+    # update!(obj, rand(100))
+    obj2 = Moments(rand(100))
+    merge!(obj, obj2)
 end
 ```
 
 ### Check estimates
+Truth:
+
+| Estimate | value
+|----------|--------
+| Mean     | 0.5
+| Var      | 0.08333...
+| Skewness | 0
+| Kurtosis | -1.2
+
 ```{julia; term=true}
 state(obj)
 ```

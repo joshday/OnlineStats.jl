@@ -12,7 +12,7 @@ using OnlineStats
 
 ### Create object with the first batch
 ````julia
-obj = Moments(randn(100))
+obj = Moments(rand(100))
 ````
 
 
@@ -22,7 +22,7 @@ obj = Moments(randn(100))
 ### Update estimates with many batches
 ````julia
 for i = 1:10000
-    update!(obj, randn(100))
+    update!(obj, rand(100))
 end
 ````
 
@@ -31,17 +31,23 @@ end
 
 
 ### Check estimates
+Truth:
+
+| Estimate | value
+|----------|--------
+| Mean     | 0.5
+| Var      | 0.08333...
+| Skewness | 0
+| Kurtosis | -1.2
+
 ````julia
 julia> state(obj)
-8x2 Array{Any,2}:
- :m1            0.00142514
- :m2            1.00867   
- :m3            0.0615038 
- :m4            2.97578   
- :skewness      0.0607123 
- :kurtosis     -0.0751685 
- :n         10100.0       
- :nb            1.0       
+5x2 Array{Any,2}:
+ :mean       0.49986   
+ :var        0.0833943 
+ :skewness   0.00139893
+ :kurtosis  -1.20101   
+ :n          1.0001e6  
 
 ````
 

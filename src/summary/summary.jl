@@ -24,7 +24,7 @@ function update!(obj::Summary, y::Vector)
     update!(obj.mean, y)
     update!(obj.var, y)
     update!(obj.extrema, y)
-    obj.n += obj.mean.n
+    obj.n += length(y)
 end
 
 function update!(obj::Summary, y::Real)
@@ -48,6 +48,14 @@ end
 
 #----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# Base
+Base.mean(obj::Summary) = return mean(obj.mean)
+
+Base.var(obj::Summary) = return var(obj.var)
+
+Base.max(obj::Summary) = return max(obj.extrema)
+
+Base.min(obj::Summary) = return min(obj.extrema)
+
 Base.copy(obj::Summary) = Summary(obj.mean, obj.var, obj.extrema, obj.n)
 
 function Base.merge(a::Summary, b::Summary)
