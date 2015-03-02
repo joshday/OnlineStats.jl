@@ -61,6 +61,15 @@ end
 #------------------------------------------------------------------------# Base
 Base.copy(obj::CovarianceMatrix) = CovarianceMatrix(obj.A. obj.B, obj.n, obj.p)
 
+Base.mean(obj::CovarianceMatrix) = return obj.B
+
+Base.var(obj::CovarianceMatrix) = diag(state(obj::CovarianceMatrix))
+
+Base.cov(obj::CovarianceMatrix) = state(obj::CovarianceMatrix)
+
+Base.cor(obj::CovarianceMatrix) = state(obj::CovarianceMatrix, true)
+
+
 function Base.merge(c1::CovarianceMatrix, c2::CovarianceMatrix)
     n1 = c1.n
     n2 = c2.n
