@@ -16,3 +16,6 @@ end
 
 @test size(make_df(obj_uniform), 1) == 1
 @test size(make_df(obj_uniform), 2) == length(τ) + 2
+@test obj_uniform.n == 100 + 100000*100
+@test obj_uniform.nb == 100001
+
