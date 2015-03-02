@@ -31,6 +31,20 @@ function QuantRegMM(X::Matrix, y::Vector; τ = 0.5, r = 0.51, ϵ = 1e-8,
     QuantRegMM(β, τ, r, ϵ, V, U, intercept, n, 1)
 end
 
+function QuantRegMM(X::Matrix, y::Vector, β::Vector; τ = 0.5, r = 0.51, ϵ = 1e-8,
+                          intercept::Bool = true)
+    if intercept
+        X = [ones(length(y)) X]
+    end
+    n, p = size(X)
+    w = ϵ + abs(y - X * β)
+    u = y ./ w + 2*τ - 1
+    V = X' * (X ./ w)
+    U = X' * u
+    β = inv(V) * U
+    QuantRegMM(β, τ, r, ϵ, V, U, intercept, n, 1)
+end
+
 function QuantRegMM(x::Vector, y::Vector; args...)
     QuantRegMM(reshape(x, length(x), 1), y; args...)
 end
@@ -74,23 +88,9 @@ end
 
 
 #-----------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-# n = 1000
-# p = 5
-# x1 = randn(n, p)
-# y1 = vec(sum(x1, 2)) + randn(n)
-# obj = OnlineStats.QuantRegMM(x1, y1, intercept=false)
-# df = OnlineStats.make_df(obj)
+#------------------------------------------------------------------------# Base
+StatsBase.coef(obj::QuantRegMM) = return obj.β
 
-# display(OnlineStats.state(obj))
-# for i in 1:1000
-#     x = randn(n, p)
-#     y = vec(sum(x, 2)) + randn(n)
-#     OnlineStats.update!(obj, x, y)
-# end
-# display(OnlineStats.state(obj))
-
-# OnlineStats.make_df!(obj, df)
-
-# OnlineStats.make_df(obj)
-
+function Base.show(io::IO, obj::QuantRegMM)
+    println(io, "Online Quantile Regression (MM Algorithm):\n", state(obj))
+end

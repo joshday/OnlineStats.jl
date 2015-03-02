@@ -20,8 +20,22 @@ function QuantRegSGD(X::Matrix, y::Vector; τ = 0.5, r = 0.51,
         X = [ones(length(y)) X]
     end
     n, p = size(X)
+
     X = ((y .< 0) - τ) .* X
     β = - vec(mean(X, 1))
+
+    QuantRegSGD(β, τ, r, intercept, n, 1)
+end
+
+function QuantRegSGD(X::Matrix, y::Vector, β::Vector; τ = 0.5, r = 0.51,
+                           intercept::Bool = true)
+    if intercept
+        X = [ones(length(y)) X]
+    end
+    n, p = size(X)
+
+    X = ((y .< X * β) - τ) .* X
+    β -= vec(mean(X, 1))
 
     QuantRegSGD(β, τ, r, intercept, n, 1)
 end
@@ -64,20 +78,9 @@ end
 
 
 #-----------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-# x1 = randn(1000)
-# y1 = x1 + randn(1000)
-# obj = OnlineStats.QuantRegSGD(x1, y1, τ=.9)
-# df = OnlineStats.make_df(obj)
+#------------------------------------------------------------------------# Base
+StatsBase.coef(obj::QuantRegSGD) = return obj.β
 
-# display(OnlineStats.state(obj))
-# for i in 1:1000
-#     x = randn(1000)
-#     y = x + randn(1000)
-#     OnlineStats.update!(obj, x, y)
-# end
-# display(OnlineStats.state(obj))
-
-# OnlineStats.make_df!(obj, df)
-
-# OnlineStats.make_df(obj)
+function Base.show(io::IO, obj::QuantRegSGD)
+    println(io, "Online Quantile Regression (SGD Algorithm):\n", state(obj))
+end
