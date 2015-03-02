@@ -4,6 +4,7 @@
 ```{julia; term=false; eval=true}
 using OnlineStats
 using Gadfly
+using StatsBase
 ```
 
 ### Create covariance matrix with the first batch
@@ -19,10 +20,15 @@ end
 ```
 
 ### Check estimate
+
+#### Columns means are available from `obj`
 ```{julia; term=true}
-state(obj)
+mean(obj)
 ```
+
+#### Covariance Matrix or Correlation Matrix
 ```{julia; term=true}
-state(obj, true)
-spy(state(obj, true))
+cov(obj)
+cor(obj)
+spy(cor(obj))
 ```

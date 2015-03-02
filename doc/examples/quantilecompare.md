@@ -14,8 +14,8 @@ using DataFrames
 
 ### Create model with the first batch
 ````julia
-obj_sgd = QuantileSGD(rand(100), tau=[1:9]/10, r=.6)
-obj_mm = QuantileSGD(rand(100), tau=[1:9]/10, r=.6)
+obj_sgd = QuantileSGD(rand(100), τ=[1:9]/10, r=.6)
+obj_mm = QuantileMM(rand(100), τ=[1:9]/10, r=.6)
 ````
 
 
@@ -23,6 +23,9 @@ obj_mm = QuantileSGD(rand(100), tau=[1:9]/10, r=.6)
 
 
 ### Save results for trace plots
+
+`make_df` constructs a `DataFrame` from any subtype of `OnlineStat`.
+
 ````julia
 results_sgd = make_df(obj_sgd)
 results_mm = make_df(obj_mm)
@@ -33,18 +36,21 @@ results_mm = make_df(obj_mm)
 
 
 ### Update model with many batches
+
+`make_df!(df, obj)` adds a row to `df::DataFrame` using the current state of `obj<:OnlineStat`.  This is useful for generating trace plots.
+
 ````julia
 srand(123)
 @time for i = 1:9999
     update!(obj_sgd, rand(100))
-    make_df!(obj_sgd, results_sgd)
+    make_df!(results_sgd, obj_sgd)
 end
 ````
 
 
 ````julia
-elapsed time: 1.529481538 seconds (491948552 bytes allocated, 47.67%
-gc time)
+elapsed time: 1.50462606 seconds (483848380 bytes allocated, 43.77% gc
+time)
 ````
 
 
@@ -54,14 +60,14 @@ gc time)
 srand(123)
 @time for i = 1:9999
     update!(obj_mm, rand(100))
-    make_df!(obj_mm, results_mm)
+    make_df!(results_mm, obj_mm)
 end
 ````
 
 
 ````julia
-elapsed time: 1.59696385 seconds (491948424 bytes allocated, 50.39% gc
-time)
+elapsed time: 1.716931792 seconds (480513996 bytes allocated, 33.67%
+gc time)
 ````
 
 
@@ -72,41 +78,41 @@ time)
 ````julia
 julia> state(obj_sgd)
 11x2 Array{Any,2}:
- :q10      0.0990498
- :q20      0.200525 
- :q30      0.299503 
- :q40      0.398423 
+ :q10      0.0990626
+ :q20      0.200547 
+ :q30      0.299526 
+ :q40      0.398426 
  :q50      0.498745 
- :q60      0.60099  
- :q70      0.701338 
- :q80      0.804398 
- :q90      0.901368 
+ :q60      0.601001 
+ :q70      0.701346 
+ :q80      0.804389 
+ :q90      0.901383 
  :n        1.0e6    
  :nb   10000.0      
 
 julia> state(obj_mm)
 11x2 Array{Any,2}:
- :q10      0.0990599
- :q20      0.200526 
- :q30      0.299523 
- :q40      0.398399 
- :q50      0.498746 
- :q60      0.601001 
- :q70      0.701351 
- :q80      0.80438  
- :q90      0.901394 
+ :q10      0.0993301
+ :q20      0.200007 
+ :q30      0.299797 
+ :q40      0.400161 
+ :q50      0.500338 
+ :q60      0.600613 
+ :q70      0.700748 
+ :q80      0.801023 
+ :q90      0.900373 
  :n        1.0e6    
  :nb   10000.0      
 
 julia> 
 # SGD: Maximum difference from truth
-maximum(abs(obj_sgd.est - [1:9]/10))
-0.004397544718487301
+maxabs(obj_sgd.est - [1:9]/10)
+0.004388525552945999
 
 julia> 
 # MM: Maximum difference from truth
-maximum(abs(obj_mm.est - [1:9]/10))
-0.004380254215353374
+maxabs(obj_mm.est - [1:9]/10)
+0.0010229396671924684
 
 ````
 

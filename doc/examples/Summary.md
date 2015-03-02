@@ -36,13 +36,12 @@ end
 ### Check summary statistics
 ````julia
 julia> state(obj)
-6x2 Array{Any,2}:
- :mean     10.0059  
- :var      25.0038  
- :max      34.0041  
- :min     -13.7301  
- :n         1.0001e6
- :nb    10001.0     
+5x2 Array{Any,2}:
+ :mean    9.99712 
+ :var    25.056   
+ :max    33.1864  
+ :min   -12.5228  
+ :n       1.0001e6
 
 ````
 

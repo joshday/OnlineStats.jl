@@ -3,8 +3,7 @@
 
 ```{julia; term=false; eval=true}
 using OnlineStats
-using Distributions
-using Gadfly
+using Distributions, StatsBase, Gadfly
 ```
 
 ### Generate Data: Location-Shift Model
@@ -36,7 +35,6 @@ end
 
 ### Check fit
 ```{julia; term=true}
-state(fit)
 trueBeta = [quantile(Normal(), .7); beta + gamma * quantile(Normal(), .7)]
-maximum(abs(trueBeta - fit.β))
+maxabs(trueBeta - coef(fit))
 ```

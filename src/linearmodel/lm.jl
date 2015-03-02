@@ -1,41 +1,43 @@
-# Author(s): Josh Day <emailjoshday@gmail.com>
-
 export OnlineLinearModel
-export mse, coef, coeftable, confint, stderr, vcov, predict
-
+export mse
 
 #-----------------------------------------------------------------------------#
-#----------------------------------------------------------# OnlineLinearModel
+#-------------------------------------------------------# Type and Constructors
 type OnlineLinearModel <: OnlineStat
     A::Matrix         # A = [X y]' * [X y]
     B::Matrix         # "Swept" version of A
+    int::Bool         # intercept in model?
     p::Int64          # Number of predictors
     n::Int64          # Number of observations used
     nb::Int64         # Number of batches used
 end
 
-function OnlineLinearModel(X::Matrix, y::Vector)
+function OnlineLinearModel(X::Matrix, y::Vector; int::Bool = true)
     n, p = size(X)
+    if int
+        X = [ones(n) X]
+        p += 1
+    end
     A = BLAS.syrk('L', 'T', 1.0, [X y]) / n
     B = sweep!(copy(A), 1:p)
-    OnlineLinearModel(A, B, p, n, 1)
+    OnlineLinearModel(A, B, int, p, n, 1)
 end
 
-function OnlineLinearModel(x::Vector, y::Vector)
+function OnlineLinearModel(x::Vector, y::Vector; int::Bool = true)
     n = length(x)
-    OnlineLinearModel(reshape(x, n, 1), y)
+    OnlineLinearModel(reshape(x, n, 1), y, int=int)
 end
 
 
 
 #-----------------------------------------------------------------------------#
-#----------------------------------------------------# StatsBase-ish functions
+#------------------------------------------------------------------------# Base
 
 mse(obj::OnlineLinearModel) = obj.B[end, end] * (obj.n / (obj.n - obj.p))
 
-coef(obj::OnlineLinearModel) = vec(obj.B[end, 1:obj.p])
+StatsBase.coef(obj::OnlineLinearModel) = vec(obj.B[end, 1:obj.p])
 
-function coeftable(obj::OnlineLinearModel)
+function StatsBase.coeftable(obj::OnlineLinearModel)
     β = coef(obj)
     se = stderr(obj)
     ts = β ./ se
@@ -44,27 +46,44 @@ function coeftable(obj::OnlineLinearModel)
               ["x$i" for i = 1:obj.p], 4)
 end
 
-function confint(obj::OnlineLinearModel, level::Real)
+function StatsBase.confint(obj::OnlineLinearModel, level::Real)
     hcat(coef(obj),coef(obj)) + stderr(obj) *
     quantile(TDist(obj.n - obj.p), (1. - level)/2.) * [1. -1.]
 end
-confint(obj::OnlineLinearModel) = confint(obj, 0.95)
+StatsBase.confint(obj::OnlineLinearModel) = confint(obj, 0.95)
 
-stderr(obj::OnlineLinearModel) = sqrt(diag(vcov(obj)))
+StatsBase.stderr(obj::OnlineLinearModel) = sqrt(diag(vcov(obj)))
 
-vcov(obj::OnlineLinearModel) = -mse(obj) * obj.B[1:end-1, 1:end-1] / obj.n
+StatsBase.vcov(obj::OnlineLinearModel) = -mse(obj) * obj.B[1:end-1, 1:end-1] / obj.n
 
-predict(obj::OnlineLinearModel, X::Matrix) = X * coef(obj)
+StatsBase.predict(obj::OnlineLinearModel, X::Matrix) = X * coef(obj)
+
+StatsBase.deviance(obj::OnlineLinearModel) =
+    error("Not implemented for OnlineLinearModel")
+
+StatsBase.loglikelihood(obj::OnlineLinearModel) =
+    error("Not implemented for OnlineLinearModel")
 
 
-deviance(obj::OnlineLinearModel) =      error("Not Implemented")
-loglikelihood(obj::OnlineLinearModel) = error("Not Implemented")
+# function Base.merge(m1::OnlineLinearModel, m2::OnlineLinearModel)
+# end
+
+# function Base.merge!(m1::OnlineLinearModel, m2::OnlineLinearModel)
+# end
+
+function Base.show(io::IO, obj::OnlineLinearModel)
+    println(io, "Online Linear Model:\n", coeftable(obj))
+end
 
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineLinearModel, X, y)
+function update!(obj::OnlineLinearModel, X::Matrix, y::Vector)
     n, p = size(X)
+    if obj.int
+        X = [ones(n) X]
+        p += 1
+    end
     γ = n / (obj.n + n)
 
     obj.A += γ * (BLAS.syrk('L', 'T', 1.0, [X y]) / n - obj.A)
@@ -73,6 +92,8 @@ function update!(obj::OnlineLinearModel, X, y)
     obj.nb += 1
 end
 
+update!(obj::OnlineLinearModel, x::Vector, y::Vector) =
+    update!(obj, reshape(x, length(x), 1), y)
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
@@ -81,39 +102,4 @@ function state(obj::OnlineLinearModel)
     estimates = [coef(obj), obj.n, obj.nb]
     return([names estimates])
 end
-
-
-
-#-----------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-# Batch 1
-# x1 = randn(1000, 3)
-# y1 = vec(sum(x1, 2)) + randn(1000)
-# obj = OnlineStats.OnlineLinearModel(x1, y1)
-# OnlineStats.coef(obj)
-# OnlineStats.mse(obj)
-
-# using GLM
-# fit = lm(x1, y1)
-# StatsBase.coef(fit)
-# sum(residuals(fit) .^ 2) / (1000 - 3)
-
-# # # Batch 2
-# x2 = rand(1002, 3)
-# y2 = vec(sum(x2, 2)) + randn(1002)
-# OnlineStats.update!(obj, x2, y2)
-
-# OnlineStats.coef(obj)
-# OnlineStats.mse(obj)
-# OnlineStats.vcov(obj)
-# OnlineStats.stderr(obj)
-
-# OnlineStats.state(obj)
-# OnlineStats.coeftable(obj)
-# OnlineStats.confint(obj)
-
-# fit = lm([x1, x2], [y1, y2])
-# GLM.coef(fit)
-# GLM.confint(fit)
-# sum(residuals(fit) .^ 2) / (2002 - 3)
 

@@ -12,7 +12,7 @@ using OnlineStats
 
 ### Create model with the first batch
 ````julia
-obj = QuantileMM(rand(100), tau=[1:9]/10)
+obj = QuantileMM(rand(100), τ=[1:9]/10)
 ````
 
 
@@ -34,22 +34,22 @@ end
 ````julia
 julia> state(obj)
 11x2 Array{Any,2}:
- :q10      0.10152 
- :q20      0.199526
- :q30      0.299651
- :q40      0.401378
- :q50      0.500413
- :q60      0.600747
- :q70      0.699568
- :q80      0.800909
- :q90      0.900548
- :n        1.0001e6
- :nb   10001.0     
+ :q10      0.0998468
+ :q20      0.200027 
+ :q30      0.299924 
+ :q40      0.399661 
+ :q50      0.500237 
+ :q60      0.600467 
+ :q70      0.700304 
+ :q80      0.799679 
+ :q90      0.899978 
+ :n        1.0001e6 
+ :nb   10001.0      
 
 julia> 
 # Maximum difference from truth
-maximum(abs(obj.est - [1:9]/10))
-0.0015199772358479996
+maxabs(obj.est - [1:9]/10)
+0.0004668304727072359
 
 ````
 

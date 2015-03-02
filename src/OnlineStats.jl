@@ -4,6 +4,8 @@ using Docile
 using DataFrames, Distributions, StatsBase
 import PDMats, Distributions
 import Base: copy, merge, merge!, show, quantile
+import Gadfly
+
 
 export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
 
@@ -36,7 +38,7 @@ function make_df{T <: OnlineStat}(obj::T)
 end
 
 @doc doc"Add the current state of `obj` to a new row in `df`" ->
-function make_df!{T <: OnlineStat}(obj::T, df::DataFrame)
+function make_df!{T <: OnlineStat}(df::DataFrame, obj::T)
     push!(df, state(obj)[:, 2])
 end
 
@@ -64,7 +66,7 @@ include("summary/fivenumber.jl")
 # include("densityestimation/bernoulli.jl")
 # include("densityestimation/beta.jl")
 # include("densityestimation/binomial.jl")
-# # include("densityestimation/dirichlet.jl")
+# include("densityestimation/dirichlet.jl")
 # include("densityestimation/exponential.jl")
 # include("densityestimation/gamma.jl")
 # include("densityestimation/multinomial.jl")
@@ -72,12 +74,12 @@ include("summary/fivenumber.jl")
 # include("densityestimation/normal.jl")
 
 # # Linear Model
-# include("linearmodel/sweep.jl")
-# include("linearmodel/lm.jl")
+include("linearmodel/sweep.jl")
+include("linearmodel/lm.jl")
 
 # # Quantile Regression
-# include("quantileregression/quantregsgd.jl")
-# include("quantileregression/quantregmm.jl")
+include("quantileregression/quantregsgd.jl")
+include("quantileregression/quantregmm.jl")
 
 
 

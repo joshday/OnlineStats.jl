@@ -8,18 +8,20 @@ using Gadfly
 
 ### Create 5-number summary with the first batch
 ```{julia; term=false; eval=true}
-obj = FiveNumberSummary(rand(100))
+obj = FiveNumberSummary(randn(100))
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:1000
-    update!(obj, rand(100))
+    update!(obj, randn(100))
 end
 ```
 
 ### Check estimate
-```{julia; term=true; out_width=3}
+```{julia; term=true; fig_width=3}
 state(obj)
 plot(obj)
 ```
+
+Boxplot whiskers have length 1.5*IQR.  Maximum and minimum are the only outliers available since quantiles are approximate.

@@ -3,6 +3,7 @@
 
 ```{julia; term=false; eval=true}
 using OnlineStats
+using StatsBase
 ```
 
 ### Make true beta
@@ -16,7 +17,7 @@ beta = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 x = rand(100, p)
 y = x * beta + 10*randn(100)
 
-fit = OnlineLinearModel(x, y)
+fit = OnlineLinearModel(x, y, int=false)
 ```
 
 ### Update model with many batches
@@ -32,5 +33,5 @@ end
 ```{julia; term=true}
 coeftable(fit)  # CoefTable
 mse(fit)  # Estimate of MSE
-maximum(abs(beta - coef(fit)))  # Max Absolute Error
+maxabs(beta - coef(fit))  # Max Absolute Error
 ```

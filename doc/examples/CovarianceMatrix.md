@@ -5,6 +5,7 @@
 ````julia
 using OnlineStats
 using Gadfly
+using StatsBase
 ````
 
 
@@ -32,8 +33,31 @@ end
 
 
 ### Check estimate
+
+#### Columns means are available from `obj`
 ````julia
-julia> state(obj)
+julia> mean(obj)
+10-element Array{Float64,1}:
+ -6.47985e-5
+ -0.0142967 
+ -0.00079486
+  0.00938917
+ -0.0034235 
+ -0.0158189 
+ -0.00903558
+ -0.0063915 
+  0.00532231
+ -0.0110858 
+
+````
+
+
+
+
+
+#### Covariance Matrix or Correlation Matrix
+````julia
+julia> cov(obj)
 10x10 Array{Float64,2}:
  100.013      -0.146892     0.179198   …   -0.142358     -0.13261   
   -0.146892   99.6293      -0.0154037      -0.137993     -0.222839  
@@ -46,13 +70,7 @@ julia> state(obj)
   -0.142358   -0.137993    -0.112897      100.105        -0.0687822 
   -0.13261    -0.222839     0.018043       -0.0687822   100.086     
 
-````
-
-
-
-
-````julia
-julia> state(obj, true)
+julia> cor(obj)
 10x10 Array{Float64,2}:
   1.0          -0.00147155    0.00178955   …  -0.00142274   -0.00132544 
  -0.00147155    1.0          -0.000154124     -0.00138177   -0.00223157 
@@ -65,7 +83,7 @@ julia> state(obj, true)
  -0.00142274   -0.00138177   -0.00112692       1.0          -0.000687165
  -0.00132544   -0.00223157    0.000180119     -0.000687165   1.0        
 
-julia> spy(state(obj, true))
+julia> spy(cor(obj))
 
 ````
 

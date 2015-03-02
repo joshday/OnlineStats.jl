@@ -4,7 +4,7 @@ dir = Pkg.dir("OnlineStats", "doc", "examples")
 
 examples = (
     "/OnlineLinearModel.jmd",
-    "/OnlineFitBeta.jmd",
+#     "/OnlineFitBeta.jmd",
     "/Summary.jmd",
     "/QuantileSGD.jmd",
     "/QuantileMM.jmd",
