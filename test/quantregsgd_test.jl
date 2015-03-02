@@ -9,7 +9,7 @@ y = vec(sum(x, 2)) + randn(100)
 obj1 = QuantRegSGD(x, y, τ = .7, r = .8)
 obj2 = QuantRegSGD(x, y, ones(6), τ = .7, r = .8)
 
-for i in 1:10000
+for i in 1:100000
     x = randn(100, 5)
     y = vec(sum(x, 2)) + randn(100)
 

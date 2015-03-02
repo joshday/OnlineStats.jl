@@ -6,7 +6,7 @@ using Distributions
 obj_uniform = QuantileMM(rand(100), τ = τ, r = .7)
 obj_normal = QuantileMM(randn(100), τ = τ, r = .7)
 
-for i in 1:10000
+for i in 1:100000
     update!(obj_uniform, rand(100))
     update!(obj_normal, randn(100))
 end

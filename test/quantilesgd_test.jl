@@ -6,7 +6,7 @@ using Distributions
 obj_uniform = QuantileSGD(rand(100), τ = τ, r = .8)
 obj_normal = QuantileSGD(randn(100), τ = τ, r = .8)
 
-for i in 1:10000
+for i in 1:100000
     update!(obj_uniform, rand(100))
     update!(obj_normal, randn(100))
 end
