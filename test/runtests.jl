@@ -10,8 +10,12 @@ include("moments_test.jl")
 include("quantilesgd_test.jl")
 include("quantilemm_test.jl")
 
+include("linearmodel_test.jl")
+
+include("quantilemm_test.jl")
+include("quantilesgd_test.jl")
 
 # include("densityestimation_test.jl")
-# include("linearmodel_test.jl")
+
 
 
