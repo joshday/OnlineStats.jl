@@ -3,18 +3,16 @@
 
 # OnlineStats
 
-Online algorithms for statistics.  The driving function in this package is  
+Online algorithms for statistics.  See [Examples](doc/examples) and [Implementation Progress](src)
+
+The driving function in this package is  
 
 ```update!(obj, newdata)```  
 - `obj`: subtype of `OnlineStat`  
 - `newdata`: new observations (typically Vector or Matrix)
 
-Data is updated in **batches**
-
-
 ## Types 
 
-See implementation progress in [src/README.md](src/README.md)
 
 Each type defined in OnlineStats contains the fields  
 
@@ -25,11 +23,6 @@ Each type defined in OnlineStats contains the fields
 Other fields will be used to store sufficient statistics for online updates.
 
 
-
-## Documentation
-See `doc/` and `doc/examples`
-
- 
 ## Thank you
 I often find myself looking through the source code of the following packages.  
 
