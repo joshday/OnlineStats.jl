@@ -10,15 +10,15 @@ x = [x1, x2]
 obj = Moments(x1)
 @test mean(obj) == mean(x1)
 @test_approx_eq var(obj)  var(x1)
-@test_approx_eq_eps(skewness(obj), skewness(x1) * (obj.n / (obj.n - 1)), 1e-2)
-@test_approx_eq_eps(kurtosis(obj), kurtosis(x1), 1e-2)
+@test_approx_eq_eps(skewness(obj), skewness(x1) * (obj.n / (obj.n - 1)), .1)
+@test_approx_eq_eps(kurtosis(obj), kurtosis(x1), .1)
 @test obj.n == n1
 
 update!(obj, x2)
 @test_approx_eq mean(obj)  mean(x)
 @test_approx_eq var(obj)  var(x)
-@test_approx_eq_eps(skewness(obj), skewness(x) * (obj.n / (obj.n - 1)), 1e-2)
-@test_approx_eq_eps(kurtosis(obj), kurtosis(x), 1e-2)
+@test_approx_eq_eps(skewness(obj), skewness(x) * (obj.n / (obj.n - 1)), .1)
+@test_approx_eq_eps(kurtosis(obj), kurtosis(x), .1)
 @test obj.n == n
 
 obj1 = Moments(x1)
@@ -30,8 +30,8 @@ merge!(obj1, obj2)
 @test_approx_eq mean(obj1) mean(obj3)
 @test_approx_eq var(obj1) var(obj3)
 
-@test_approx_eq_eps(mean(x), mean(obj1), 1e-2)
-@test_approx_eq_eps(var(x), var(obj1), 1e-2)
+@test_approx_eq_eps(mean(x), mean(obj1), .1)
+@test_approx_eq_eps(var(x), var(obj1), .1)
 
 # clean up
 x1, x2, x = zeros(3)
