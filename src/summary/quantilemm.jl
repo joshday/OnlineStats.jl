@@ -54,8 +54,8 @@ update!(obj::QuantileMM, y::Real) = update!(obj, [y])
 #-----------------------------------------------------------------------# state
 function state(obj::QuantileMM)
     names::Array{Symbol} = [[symbol("q" * string(int(100*i))) for i in obj.τ];
-                            :n; :nb]
-    estimates = [obj.est; obj.n; obj.nb]
+                            :r; :n; :nb]
+    estimates = [obj.est; obj.r; obj.n; obj.nb]
     return([names estimates])
 end
 

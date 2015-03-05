@@ -9,9 +9,8 @@ import Gadfly
 
 export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
 
-# Abstract Type structure
+# Abstract Types
 include("types.jl")
-
 
 ###############################################################################
 #
@@ -51,6 +50,7 @@ end
 # Each file has the type definition and methods for update!() and state()
 #
 ###############################################################################
+
 # Summary Statistics
 include("summary/mean.jl")
 include("summary/var.jl")
@@ -62,7 +62,7 @@ include("summary/quantilesgd.jl")
 include("summary/quantilemm.jl")
 include("summary/fivenumber.jl")
 
-# # Density Estimation
+# Density Estimation
 # include("densityestimation/bernoulli.jl")
 # include("densityestimation/beta.jl")
 # include("densityestimation/binomial.jl")
@@ -73,14 +73,16 @@ include("summary/fivenumber.jl")
 # include("densityestimation/mvnormal.jl")
 # include("densityestimation/normal.jl")
 
-# # Linear Model
+# Linear Model
 include("linearmodel/sweep.jl")
 include("linearmodel/lm.jl")
 
-# # Quantile Regression
+# Quantile Regression
 include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
 
+# Other
+include("trace.jl")
 
 
 
