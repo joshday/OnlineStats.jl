@@ -13,14 +13,12 @@ The driving function in this package is
 
 ## Types 
 
+The typical field structure for methods in `OnlineStats`:
 
-Each type defined in OnlineStats contains the fields  
+- `estimate`: Current estimate
+- `sufficient_stats`:  Values needed to update estimate
+- `n`: number of observations (display with `n_obs(obj)`)
 
-- `<<estimate>>`: Vector of saved estimates
-- `n`: number of observations used (display with `n_obs(obj)`)
-- `nb`: number of batches used (display with `n_batches(obj)`)
-
-Other fields will be used to store sufficient statistics for online updates.
 
 
 ## Thank you
