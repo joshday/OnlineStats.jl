@@ -14,7 +14,8 @@ examples = (
     "/Moments.jmd",
     "/QuantRegSGD.jmd",
     "/QuantRegMM.jmd",
-    "/quantregcompare.jmd"
+    "/quantregcompare.jmd",
+    "/OnlineNormalMix.jmd"
     )
 
 

@@ -1,0 +1,34 @@
+# OnlineNormalMix
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+using Distributions
+using Gadfly
+```
+
+### True Model/Generate Data
+```{julia; term=false; eval=true}
+trueModel = MixtureModel(Normal, [(0, 4), (2, 3), (7, 5), (10, 10)])
+x = rand(trueModel, 100_000)
+plot(trueModel, -20, 40)
+```
+
+### Create model with the first batch
+```{julia; term=false; eval=true}
+obj = OnlineNormalMix(x[1:100], k=4)
+```
+
+### Update model with many batches of size 100
+```{julia; term=false; eval=true}
+for i = 2:1000
+    newvals = (i - 1) * 100 + 1 : 100 * i
+    update!(obj, x[newvals])
+end
+```
+
+### Check fit
+```{julia; term=false; eval=true}
+plot(obj.model, x)
+plot(obj.model, -30, 50)
+```

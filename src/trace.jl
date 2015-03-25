@@ -19,10 +19,10 @@ end
 
 
 function trace_df{T<:ContinuousUnivariateOnlineStat}(::Type{T}, y::Vector,
-                                                  b::Int64, start=0; args...)
+                                                  b::Int64, start; args...)
     n = length(y)
     ybatch = y[1:b]
-    obj = T([0]; args...)
+    obj = T([start]; args...)
     df = make_df(obj)
 
     for i in 1:n/b

@@ -22,7 +22,7 @@ Click links to example.
 
 | Item                             | Associated Type(s)
 |----------------------------------|------------------
-| Gaussian mixture                 |
+| Gaussian mixture                 | [`OnlineNormalMix`](../doc/examples/OnlineNormalMix.md)
 | Average Shifted Histograms (ASH) | `AverageShiftedHistograms.update!` in [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl).  See also [Univariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update.md), [Bivariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update2.md)
 
 ## Univariate distributions

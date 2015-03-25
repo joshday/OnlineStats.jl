@@ -53,7 +53,7 @@ end
 
 
 ````julia
-elapsed time: 1.315678034 seconds (353256812 bytes allocated, 42.53%
+elapsed time: 1.393142548 seconds (351893288 bytes allocated, 39.16%
 gc time)
 ````
 
@@ -73,7 +73,7 @@ end
 
 
 ````julia
-elapsed time: 1.588089959 seconds (412770620 bytes allocated, 41.68%
+elapsed time: 1.717707679 seconds (412687096 bytes allocated, 40.67%
 gc time)
 ````
 
@@ -114,7 +114,7 @@ trueBeta = [quantile(Normal(), .3), ones(5)]
 julia> 
 # SGD: Maximum difference from truth
 maxabs(coef(obj_sgd) - trueBeta)
-0.06045950565744185
+0.060459505657441404
 
 julia> 
 # MM: Maximum difference from truth

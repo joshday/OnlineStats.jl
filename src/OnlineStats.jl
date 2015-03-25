@@ -1,8 +1,8 @@
 module OnlineStats
 
 using Docile
-using DataFrames, Distributions, StatsBase
-import PDMats, Distributions
+using DataFrames, Distributions, StatsBase, Clustering
+import PDMats, Distributions, GaussianMixtures
 import Base: copy, merge, merge!, show, quantile
 import Gadfly
 
@@ -50,6 +50,8 @@ end
 # Each file has the type definition and methods for update!() and state()
 #
 ###############################################################################
+# Other
+include("trace.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
@@ -62,16 +64,20 @@ include("summary/quantilesgd.jl")
 include("summary/quantilemm.jl")
 include("summary/fivenumber.jl")
 
+# Parametric Density
+# include("parametricdensity/bernoulli.jl")
+# include("parametricdensity/beta.jl")
+# include("parametricdensity/binomial.jl")
+# include("parametricdensity/dirichlet.jl")
+# include("parametricdensity/exponential.jl")
+# include("parametricdensity/gamma.jl")
+# include("parametricdensity/multinomial.jl")
+# include("parametricdensity/mvnormal.jl")
+# include("parametricdensity/normal.jl")
+
 # Density Estimation
-# include("densityestimation/bernoulli.jl")
-# include("densityestimation/beta.jl")
-# include("densityestimation/binomial.jl")
-# include("densityestimation/dirichlet.jl")
-# include("densityestimation/exponential.jl")
-# include("densityestimation/gamma.jl")
-# include("densityestimation/multinomial.jl")
-# include("densityestimation/mvnormal.jl")
-# include("densityestimation/normal.jl")
+include("densityestimation/offlinenormalmix.jl")
+include("densityestimation/normalmix.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
@@ -81,8 +87,7 @@ include("linearmodel/lm.jl")
 include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
 
-# Other
-include("trace.jl")
+
 
 
 

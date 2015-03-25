@@ -27,12 +27,8 @@ function update!(obj::Summary, y::Vector)
     obj.n += length(y)
 end
 
-function update!(obj::Summary, y::Real)
-    update!(obj.mean, [y])
-    update!(obj.var, [y])
-    update!(obj.extrema, [y])
-    obj.n += 1
-end
+update!(obj::Summary, y::Real) = update!(obj, [y])
+
 
 
 #----------------------------------------------------------------------------#
