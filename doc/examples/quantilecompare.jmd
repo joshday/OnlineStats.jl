@@ -55,10 +55,10 @@ maxabs(obj_mm.est - [1:9]/10)
 
 ### Check Traceplots
 ```{julia; term=false; eval=true}
-results_sgd = melt(results_sgd, 10:11)
-results_mm = melt(results_mm, 10:11)
+results_sgd_melt = melt(results_sgd, 10:12)
+results_mm_melt = melt(results_mm, 10:12)
 
-plot(results_sgd, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
-plot(results_mm, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
+plot(results_sgd_melt, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
+plot(results_mm_melt, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
 ```
 

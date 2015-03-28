@@ -1,6 +1,7 @@
 using OnlineStats
 using Base.Test
 using GLM
+println("linearmodel_test.jl")
 
 
 x = randn(100, 10)

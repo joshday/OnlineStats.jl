@@ -1,5 +1,6 @@
 using OnlineStats
 using Base.Test
+println("covmatrix_test.jl")
 
 # create 4 batches
 n1, n2, n3, n4 = rand(1:1_000_000, 4)

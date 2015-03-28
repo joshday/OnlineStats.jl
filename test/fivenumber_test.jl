@@ -1,7 +1,7 @@
 using OnlineStats
 using Base.Test
 using Distributions
-
+println("fivenumber_test.jl")
 
 obj_uniform = FiveNumberSummary(rand(100), r = .7)
 obj_normal = FiveNumberSummary(randn(100), r = .7)

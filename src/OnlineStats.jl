@@ -65,9 +65,9 @@ include("summary/quantilemm.jl")
 include("summary/fivenumber.jl")
 
 # Parametric Density
-# include("parametricdensity/bernoulli.jl")
-# include("parametricdensity/beta.jl")
-# include("parametricdensity/binomial.jl")
+include("parametricdensity/bernoulli.jl")
+include("parametricdensity/beta.jl")
+include("parametricdensity/binomial.jl")
 # include("parametricdensity/dirichlet.jl")
 # include("parametricdensity/exponential.jl")
 # include("parametricdensity/gamma.jl")

@@ -1,5 +1,6 @@
 using OnlineStats
 using Base.Test
+println("var_test.jl")
 
 n1, n2 = rand(1:1_000_000, 2)
 n = n1 + n2

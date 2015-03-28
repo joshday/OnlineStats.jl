@@ -49,7 +49,7 @@ end
 
 
 ````julia
-elapsed time: 1.858553807 seconds (505490288 bytes allocated, 49.01%
+elapsed time: 1.794185683 seconds (505490288 bytes allocated, 49.03%
 gc time)
 ````
 
@@ -66,7 +66,7 @@ end
 
 
 ````julia
-elapsed time: 2.315507547 seconds (493971328 bytes allocated, 38.97%
+elapsed time: 1.875505267 seconds (493971328 bytes allocated, 36.54%
 gc time)
 ````
 
@@ -78,30 +78,30 @@ gc time)
 ````julia
 julia> state(obj_sgd)
 12x2 Array{Any,2}:
- :q10      0.0990616
- :q20      0.200537 
- :q30      0.299516 
- :q40      0.398425 
- :q50      0.498746 
- :q60      0.60101  
- :q70      0.701376 
- :q80      0.804393 
- :q90      0.901374 
+ :q10      0.0990649
+ :q20      0.200543 
+ :q30      0.299504 
+ :q40      0.398423 
+ :q50      0.498776 
+ :q60      0.600991 
+ :q70      0.701341 
+ :q80      0.804396 
+ :q90      0.901383 
  :r        0.6      
  :n        1.0e6    
  :nb   10000.0      
 
 julia> state(obj_mm)
 12x2 Array{Any,2}:
- :q10      0.0993261
- :q20      0.199842 
- :q30      0.30036  
- :q40      0.399957 
- :q50      0.500336 
- :q60      0.600581 
- :q70      0.700774 
- :q80      0.801108 
- :q90      0.90034  
+ :q10      0.0994492
+ :q20      0.199849 
+ :q30      0.299908 
+ :q40      0.399933 
+ :q50      0.500564 
+ :q60      0.600628 
+ :q70      0.700795 
+ :q80      0.801095 
+ :q90      0.900348 
  :r        0.6      
  :n        1.0e6    
  :nb   10000.0      
@@ -109,12 +109,12 @@ julia> state(obj_mm)
 julia> 
 # SGD: Maximum difference from truth
 maxabs(obj_sgd.est - [1:9]/10)
-0.004393047320199406
+0.004395945085507003
 
 julia> 
 # MM: Maximum difference from truth
 maxabs(obj_mm.est - [1:9]/10)
-0.001107627410528056
+0.0010954992068422653
 
 ````
 
@@ -124,11 +124,11 @@ maxabs(obj_mm.est - [1:9]/10)
 
 ### Check Traceplots
 ````julia
-results_sgd = melt(results_sgd, 10:11)
-results_mm = melt(results_mm, 10:11)
+results_sgd_melt = melt(results_sgd, 10:12)
+results_mm_melt = melt(results_mm, 10:12)
 
-plot(results_sgd, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
-plot(results_mm, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
+plot(results_sgd_melt, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
+plot(results_mm_melt, x="n", y="value", color="variable", yintercept=[1:9]/10, Geom.line, Geom.hline)
 ````
 
 

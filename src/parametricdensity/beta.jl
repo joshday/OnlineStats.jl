@@ -2,12 +2,11 @@
 
 export OnlineFitBeta
 
-#------------------------------------------------------------------------------#
-#----------------------------------------------------------# OnlineFitBeta Type
+#----------------------------------------------------------------------------#
+#------------------------------------------------------# Type and Constructors
 type OnlineFitBeta <: ContinuousUnivariateOnlineStat
     d::Distributions.Beta
     stats::Summary
-
     n::Int64
     nb::Int64
 end
@@ -15,20 +14,20 @@ end
 function onlinefit{T<:Real}(::Type{Beta}, y::Vector{T})
     n::Int64 = length(y)
     stats = Summary(y)
-    m = stats.mean
-    v = stats.var
+    m = mean(stats)
+    v = var(stats)
     α = m * (m * (1 - m) / v - 1)
     β = (1 - m) * (m * (1 - m) / v - 1)
     OnlineFitBeta(Beta(α, β), stats, n, 1)
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
 function update!(obj::OnlineFitBeta, newdata::Vector)
     update!(obj.stats, newdata)
-    m = obj.stats.mean
-    v = obj.stats.var
+    m = mean(obj.stats)
+    v = var(obj.stats)
     α = m * (m * (1 - m) / v - 1)
     β = (1 - m) * (m * (1 - m) / v - 1)
     obj.d = Beta(α, β)
@@ -37,7 +36,7 @@ function update!(obj::OnlineFitBeta, newdata::Vector)
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitBeta)
     names = [:α, :β, :n, :nb]
@@ -48,13 +47,21 @@ end
 
 
 
+#----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# Base
+function Base.show(io::IO, obj::OnlineFitBeta)
+    @printf(io, "OnlineFitBeta\n")
+    @printf(io, " * α: %f\n", obj.d.α)
+    @printf(io, " * β: %f\n", obj.d.β)
+end
+
+
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive Testing
 # x1 = rand(Beta(3,5), 100000)
 # obj = OnlineStats.onlinefit(Beta, x1)
 # OnlineStats.state(obj)
 
-# x2 = rand(Beta(3, 5), 10000)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.state(obj)
-
+# # x2 = rand(Beta(3, 5), 10000)
+# # OnlineStats.update!(obj, x2)
+# # OnlineStats.state(obj)

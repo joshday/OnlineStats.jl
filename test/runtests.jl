@@ -1,21 +1,21 @@
 using OnlineStats
 using Base.Test
 
-include("mean_test.jl")
-include("var_test.jl")
-include("summary_test.jl")
-include("covmatrix_test.jl")
-include("extrema_test.jl")
-include("moments_test.jl")
-include("quantilesgd_test.jl")
-include("quantilemm_test.jl")
+@time include("mean_test.jl")
+@time include("var_test.jl")
+@time include("summary_test.jl")
+@time include("covmatrix_test.jl")
+@time include("extrema_test.jl")
+@time include("moments_test.jl")
+@time include("quantilesgd_test.jl")
+@time include("quantilemm_test.jl")
 
-include("linearmodel_test.jl")
+@time include("linearmodel_test.jl")
 
-include("quantilemm_test.jl")
-include("quantilesgd_test.jl")
+@time include("quantregmm_test.jl")
+@time include("quantregsgd_test.jl")
 
-# include("densityestimation_test.jl")
+@time include("densityestimation_test.jl")
 
 
 

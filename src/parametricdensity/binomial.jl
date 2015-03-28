@@ -1,39 +1,32 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export OnlineFitBinomial
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #------------------------------------------------------# OnlineFitBinomial Type
 type OnlineFitBinomial <: DiscreteUnivariateOnlineStat
     d::Distributions.Binomial
-    stats::Distributions.BinomialStats
-
+    nsuccess::Int64
     n::Int64
     nb::Int64
 end
 
 
-function onlinefit(::Type{Binomial}, ne::Int64, y::Vector{Int64})
+function onlinefit(::Type{Binomial}, ntrials::Int64, y::Vector{Int64})
     n::Int64 = length(y)
-    OnlineFitBinomial(fit(Binomial, ne, y), suffstats(Binomial, ne, y), n, 1)
+    OnlineFitBinomial(fit(Binomial, ntrials, y), sum(y), n, 1)
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitBinomial, newdata::Vector)
-    newstats = suffstats(Binomial, obj.stats.n, newdata)
-
-    ns = obj.stats.ns + newstats.ns
-    ne = obj.stats.ne + newstats.ne
-
-    obj.d = Binomial(obj.stats.n, ns / (ne * obj.d.n))
-    obj.stats = Distributions.BinomialStats(ns, ne, obj.stats.n)
-    obj.n = ne
+function update!(obj::OnlineFitBinomial, newdata::Vector{Int64})
+    obj.nsuccess += sum(newdata)
+    obj.n += length(newdata)
+    obj.d = Binomial(obj.d.n, obj.nsuccess / (obj.n * obj.d.n))
     obj.nb += 1
 end
 
-#------------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitBinomial)
     names = [:ntrials, :p, :n, :nb]
@@ -42,6 +35,13 @@ function state(obj::OnlineFitBinomial)
 end
 
 
+#----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# Base
+function Base.show(io::IO, obj::OnlineFitBinomial)
+    @printf(io, "OnlineFitBinomial\n")
+    @printf(io, " * n: %f\n", obj.d.n)
+    @printf(io, " * p: %f\n", obj.d.p)
+end
 
 
 

@@ -1,22 +1,21 @@
-# OnlineFitBeta
+# OnlineFitBernoulli
 
 
 ```{julia; term=false; eval=true}
 using OnlineStats
 using Distributions
-using Gadfly
 ```
 
 ### Create estimate with first batch
 ```{julia; term=false; eval=true}
-x = rand(Beta(3, 5), 100)
-obj = onlinefit(Beta, x)
+x = rand(Bernoulli(.3), 100)
+obj = onlinefit(Bernoulli, x)
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    x = rand(Beta(3, 5), 100)
+    x = rand(Bernoulli(.3), 100)
     update!(obj, x)
 end
 ```
@@ -24,4 +23,5 @@ end
 ### Check fit
 ```{julia; term=true}
 state(obj)
+mean(obj.d)
 ```

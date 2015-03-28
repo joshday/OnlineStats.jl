@@ -1,6 +1,7 @@
 using OnlineStats
 using Base.Test
 using Distributions
+println("quantregmm_test.jl")
 
 
 x = randn(100, 5)

@@ -15,9 +15,13 @@ The driving function in this package is
 
 The typical field structure for methods in `OnlineStats`:
 
-- `estimate`: Current estimate
-- `sufficient_stats`:  Values needed to update estimate
-- `n`: number of observations (display with `n_obs(obj)`)
+```
+type OnlineStatistic
+	estimate         # current estimate
+	sufficient_stat  # values needed to update estimate
+	n                # Number of observations used
+end
+```
 
 
 

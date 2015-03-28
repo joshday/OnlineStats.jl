@@ -1,12 +1,13 @@
 using OnlineStats
 using Base.Test
 using Distributions
+println("quantilemm_test.jl")
 
 τ = [1:0.5:9]/10
 obj_uniform = QuantileMM(rand(100), τ = τ, r = .7)
 obj_normal = QuantileMM(randn(100), τ = τ, r = .7)
 
-for i in 1:100000
+for i in 1:100_000
     update!(obj_uniform, rand(100))
     update!(obj_normal, randn(100))
 end
@@ -16,6 +17,6 @@ end
 
 @test size(make_df(obj_uniform), 1) == 1
 @test size(make_df(obj_uniform), 2) == length(τ) + 3
-@test obj_uniform.n == 100 + 100000*100
+@test obj_uniform.n == 100 + 100_000*100
 @test obj_uniform.nb == 100001
 

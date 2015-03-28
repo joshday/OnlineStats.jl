@@ -1,6 +1,7 @@
 using OnlineStats
 using Base.Test
 using Distributions
+println("quantilesgd_test.jl")
 
 τ = [1:0.5:9]/10
 obj_uniform = QuantileSGD(rand(100), τ = τ, r = .8)

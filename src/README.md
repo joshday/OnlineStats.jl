@@ -31,8 +31,8 @@ Click links to example.
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-| Bernoulli            | `OnlineFitBernoulli`
-| Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)*
+| Bernoulli            | [`OnlineFitBernoulli`](../doc/examples/OnlineFitBernoulli.md)
+| Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)
 | Binomial             | `OnlineFitBinomial`
 | Cauchy               | *
 | Chi-square           | *
