@@ -54,7 +54,7 @@ end
 
 
 ````julia
-elapsed time: 0.149183651 seconds (36556696 bytes allocated, 44.67% gc
+elapsed time: 0.181600041 seconds (36556696 bytes allocated, 52.12% gc
 time)
 ````
 
@@ -63,7 +63,7 @@ time)
 
 ````julia
 srand(123)
-@time for i = 1:9999
+@time for i = 1:999
 	X = randn!(X)
     y = vec([ones(100) X] * trueBeta) + randn(100)
 
@@ -74,8 +74,8 @@ end
 
 
 ````julia
-elapsed time: 1.522353211 seconds (427565608 bytes allocated, 40.24%
-gc time)
+elapsed time: 0.209091 seconds (42630488 bytes allocated, 39.28% gc
+time)
 ````
 
 
@@ -95,12 +95,12 @@ julia> coef(obj_sgd)
 
 julia> coef(obj_mm)
 6-element Array{Float64,1}:
- -0.527165
-  0.997568
-  2.00217 
-  3.00052 
-  4.00008 
-  4.99934 
+ -0.522822
+  1.01017 
+  1.99824 
+  3.00001 
+  3.99689 
+  4.98878 
 
 julia> 
 trueBetaTau = [quantile(Normal(), .3), [1:5]]
@@ -120,7 +120,7 @@ maxabs(coef(obj_sgd) - trueBetaTau)
 julia> 
 # MM: Maximum difference from truth
 maxabs(coef(obj_mm) - trueBetaTau)
-0.0027649352335803457
+0.011219246380731462
 
 ````
 

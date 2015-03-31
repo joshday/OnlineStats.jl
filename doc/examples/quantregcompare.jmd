@@ -40,7 +40,7 @@ end
 ```
 ```{julia; term=false; eval=true}
 srand(123)
-@time for i = 1:9999
+@time for i = 1:999
 	X = randn!(X)
     y = vec([ones(100) X] * trueBeta) + randn(100)
 
