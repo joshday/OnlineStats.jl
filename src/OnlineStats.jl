@@ -83,6 +83,10 @@ include("densityestimation/normalmix.jl")
 include("linearmodel/sweep.jl")
 include("linearmodel/lm.jl")
 
+# GLM
+include("glm/logisticregsgd.jl")
+include("glm/logisticregmm.jl")
+
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
