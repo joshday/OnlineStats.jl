@@ -85,30 +85,30 @@ end
 
 
 # # Testing
-p = 10
-β = ([1:p] - p/2) / p
-xs = randn(100, p)
-ys = vec(logitexp(xs * β))
-for i in 1:length(ys)
-    ys[i] = rand(Distributions.Bernoulli(ys[i]))
-end
-# obj = OnlineStats.LogRegMM(xs, ys, r=., β = [0; β])
-obj = OnlineStats.LogRegMM(xs, ys, r=.7)
+# p = 10
+# β = ([1:p] - p/2) / p
+# xs = randn(100, p)
+# ys = vec(logitexp(xs * β))
+# for i in 1:length(ys)
+#     ys[i] = rand(Distributions.Bernoulli(ys[i]))
+# end
+# # obj = OnlineStats.LogRegMM(xs, ys, r=., β = [0; β])
+# obj = OnlineStats.LogRegMM(xs, ys, r=.7)
 
-df = OnlineStats.make_df(obj)
+# df = OnlineStats.make_df(obj)
 
-for i in 1:999
-    xs = randn(100, p)
-    ys = vec(logitexp(xs * β))
-    for i in 1:length(ys)
-        ys[i] = rand(Distributions.Bernoulli(ys[i]))
-    end
-    OnlineStats.update!(obj, xs, ys)
-    OnlineStats.make_df!(df, obj)
-end
+# for i in 1:999
+#     xs = randn(100, p)
+#     ys = vec(logitexp(xs * β))
+#     for i in 1:length(ys)
+#         ys[i] = rand(Distributions.Bernoulli(ys[i]))
+#     end
+#     OnlineStats.update!(obj, xs, ys)
+#     OnlineStats.make_df!(df, obj)
+# end
 
-df_melt = melt(df, p+2:p+3)
+# df_melt = melt(df, p+2:p+3)
 
-Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line,
-            yintercept=β, Gadfly.Geom.hline,
-            Gadfly.Scale.y_continuous(minvalue=-1, maxvalue=1))
+# Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line,
+#             yintercept=β, Gadfly.Geom.hline,
+#             Gadfly.Scale.y_continuous(minvalue=-1, maxvalue=1))
