@@ -1,0 +1,49 @@
+# LogRegMM
+
+
+```{julia; term=false; eval=true}
+using OnlineStats
+using Distributions, StatsBase, Gadfly, DataFrames
+```
+
+### Function to help generate data
+```{julia; term=false; eval=true}
+logitexp(x) = 1 / (1 + exp(-x))
+@vectorize_1arg Real logitexp
+```
+
+### Create model with the first batch
+```{julia; term=false; eval=true}
+β = ([1:10] - 10/2) / 10
+xs = randn(100, 10)
+ys = vec(logitexp(xs * β))
+for i in 1:length(ys)
+    ys[i] = rand(Distributions.Bernoulli(ys[i]))
+end
+
+obj = OnlineStats.LogRegMM(xs, ys, r=.7)
+df = OnlineStats.make_df(obj) # Save estimates to DataFrame
+```
+
+### Update model with many batches
+```{julia; term=false; eval=true}
+for i in 1:999
+    xs = randn(100, 10)
+    ys = vec(logitexp(xs * β))
+    for i in 1:length(ys)
+        ys[i] = rand(Distributions.Bernoulli(ys[i]))
+    end
+
+    OnlineStats.update!(obj, xs, ys)
+    OnlineStats.make_df!(df, obj)  # append results to DataFrame
+end
+```
+
+### Check fit
+```{julia; term=true}
+coef(obj)
+df_melt = melt(df, 12:13)
+Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line,
+            yintercept=β, Gadfly.Geom.hline,
+            Gadfly.Scale.y_continuous(minvalue=-1, maxvalue=1))
+```

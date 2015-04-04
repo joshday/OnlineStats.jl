@@ -8,8 +8,9 @@ logitexp(x) = 1 / (1 + exp(-x))
 type LogRegMM <: OnlineStat
     β::Vector             # Coefficients
     int::Bool             # Add intercept?
-    S1::Matrix            # Sufficient statistic 1
-    S2::Vector            # Sufficient statistic 2
+    t1::Vector            # Sufficient statistic 1
+    t2::Matrix            # Sufficient statistic 2
+    t3::Vector            # Sufficient statistic 3
     r::Float64            # learning rate
     n::Int64
     nb::Int64
@@ -26,14 +27,15 @@ function LogRegMM(X::Array, y::Vector; r = 0.51, intercept = true,
         X = [ones(length(y)) X]
         p += 1
     end
-    y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
+    y = y .== sort(unique(y))[2]  # convert y to 0 or 1
 
-    S1 = X'X / n
-    S2 = X' * ((y + 1) / 2 - logitexp(X * β)) / n
+    t1 = X' * (y - logitexp(X * β))
+    t2 = X'X
+    t3 = X'X * β
 
-    β += 4 * inv(S1) * S2
+    β = 4 * inv(t2) * (t3 + t1)
 
-    LogRegMM(β, intercept, S1, S2, r, n, 1)
+    LogRegMM(β, intercept, t1, t2, t3, r, n, 1)
 end
 
 
@@ -43,16 +45,17 @@ function update!(obj::LogRegMM, X::Matrix, y::Vector)
     if obj.int
         X = [ones(length(y)) X]
     end
-    y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
+    y = y .== unique(sort(y))[2]  # convert y to 0 or 1
     n = length(y)
 
     obj.nb += 1
-    γ = 1 / (obj.nb)
-#     obj.S1 += γ * (X'X  - obj.S1) / n
-    obj.S1 += n / (obj.n + n) * (X'X  - obj.S1)
-    obj.S2 += γ * (X' * ((y + 1) / 2 - logitexp(X * obj.β)) / n  - obj.S2)
+    γ = obj.nb ^ -obj.r
 
-    obj.β += 4 * inv(obj.S1) * obj.S2
+    obj.t1 += γ * (X' * (y - logitexp(X * obj.β)) - obj.t1)
+    obj.t2 += γ * (X'X - obj.t2)
+    obj.t3 += γ * (X'X * obj.β - obj.t3)
+
+    obj.β = inv(obj.t2) * (obj.t3 + obj.t1)
     obj.n += n
 end
 
@@ -82,25 +85,30 @@ end
 
 
 # # Testing
-x = randn(100, 10)
-y = vec(logitexp(sum(x, 2)))
-for i in 1:length(y)
-    y[i] = rand(Bernoulli(y[i]))
+p = 10
+β = ([1:p] - p/2) / p
+xs = randn(100, p)
+ys = vec(logitexp(xs * β))
+for i in 1:length(ys)
+    ys[i] = rand(Distributions.Bernoulli(ys[i]))
 end
-obj = OnlineStats.LogRegMM(x, y, r=.51)
+# obj = OnlineStats.LogRegMM(xs, ys, r=., β = [0; β])
+obj = OnlineStats.LogRegMM(xs, ys, r=.7)
 
 df = OnlineStats.make_df(obj)
 
-for i in 1:9999
-    x = randn(100, 10)
-    y = vec(logitexp(sum(x, 2)))
-    for i in 1:length(y)
-        y[i] = rand(Bernoulli(y[i]))
+for i in 1:999
+    xs = randn(100, p)
+    ys = vec(logitexp(xs * β))
+    for i in 1:length(ys)
+        ys[i] = rand(Distributions.Bernoulli(ys[i]))
     end
-    OnlineStats.update!(obj, x, y)
+    OnlineStats.update!(obj, xs, ys)
     OnlineStats.make_df!(df, obj)
 end
 
-df_melt = melt(df, 12:13)
+df_melt = melt(df, p+2:p+3)
 
-Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line)
+Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line,
+            yintercept=β, Gadfly.Geom.hline,
+            Gadfly.Scale.y_continuous(minvalue=-1, maxvalue=1))

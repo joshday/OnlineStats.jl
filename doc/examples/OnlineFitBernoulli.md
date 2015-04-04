@@ -37,12 +37,12 @@ end
 ````julia
 julia> state(obj)
 3x2 Array{Any,2}:
- :p       0.299465
+ :p       0.300462
  :n       1.0001e6
  :nb  10001.0     
 
 julia> mean(obj.d)
-0.2994650534946505
+0.30046195380461954
 
 ````
 

@@ -69,7 +69,7 @@ Click links to example.
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-| Logistic Regression  | 
+| Logistic Regression  | [`LogRegMM`](../doc/examples/LogRegMM.md)
 | Probit Regression    | 
 | Poisson Regression   |  
 | Multinomial Logistic Regression |
