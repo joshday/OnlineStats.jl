@@ -1,7 +1,7 @@
 module OnlineStats
 
 using Docile
-using DataFrames, Distributions, StatsBase, Clustering
+using DataFrames, Distributions, StatsBase
 import PDMats, Distributions, GaussianMixtures
 import Base: copy, merge, merge!, show, quantile
 import Gadfly
@@ -86,6 +86,7 @@ include("linearmodel/lm.jl")
 # GLM
 include("glm/logisticregsgd.jl")
 include("glm/logisticregmm.jl")
+include("glm/logisticregsn.jl")
 
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
