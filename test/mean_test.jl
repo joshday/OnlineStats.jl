@@ -2,6 +2,7 @@ using OnlineStats
 using Base.Test
 println("mean_test.jl")
 
+# Mean, update!, merge, merge!, Base.mean
 n1, n2 = rand(1:1_000_000, 2)
 n = n1 + n2
 x1 = rand(n1)
@@ -24,6 +25,22 @@ merge!(obj1, obj2)
 @test_approx_eq obj1.mean obj3.mean
 @test_approx_eq mean(x) mean(obj1)
 
+
+# empty constructor, state, Base.mean, n_obs, Base.copy
+obj = Mean()
+@test obj.mean == 0.0
+@test obj.n == 0
+@test state(obj) == [[:mean, :n] [0.0, 0]]
+@test mean(obj) == 0.0
+update!(obj, x1)
+@test mean(obj) == mean(x1)
+@test n_obs(obj) == n1
+obj1 = copy(obj)
+@test mean(obj) == mean(x1)
+@test n_obs(obj) == n1
+obj2 = Mean(x1[1])
+@test mean(obj2) == x1[1]
+@test n_obs(obj2) == 1
 
 # clean up
 x1, x2, x = zeros(3)

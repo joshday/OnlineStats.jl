@@ -2,6 +2,8 @@ using OnlineStats
 using Base.Test
 println("var_test.jl")
 
+
+# "Standard" form: Var(x1), Base.mean, Base.var, merge, merge!
 n1, n2 = rand(1:1_000_000, 2)
 n = n1 + n2
 x1 = rand(n1)
@@ -28,6 +30,26 @@ merge!(obj1, obj2)
 
 @test_approx_eq mean(x) mean(obj1)
 @test_approx_eq var(x) var(obj1)
+
+
+# empty constructor, Base.mean, Base.var, state, copy
+obj = Var()
+@test obj.mean == 0.0
+@test obj.var == 0.0
+@test obj.n == 0
+@test n_obs(obj) == 0
+@test mean(obj) == 0.0
+@test var(obj) == 0.0
+@test state(obj) == [[:mean, :var, :n] [0., 0., 0.]]
+update!(obj, x1)
+@test mean(obj) == mean(x1)
+@test_approx_eq var(obj)  var(x1)
+@test obj.n == n1
+obj1 = copy(obj)
+@test mean(obj1) == mean(x1)
+@test_approx_eq var(obj1)  var(x1)
+@test obj.n == n1
+
 
 # clean up
 x1, x2, x = zeros(3)
