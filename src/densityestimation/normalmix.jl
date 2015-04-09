@@ -1,8 +1,8 @@
-export OnlineNormalMix
+export NormalMix
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type OnlineNormalMix <: ContinuousUnivariateOnlineStat
+type NormalMix <: ContinuousUnivariateOnlineStat
     model::MixtureModel{Univariate, Continuous, Normal}    # MixtureModel
     s1::Vector{Float64}             # sum of weights
     s2::Vector{Float64}             # sum of (weights .* y)
@@ -12,7 +12,7 @@ type OnlineNormalMix <: ContinuousUnivariateOnlineStat
     nb::Int64                       # number of batches
 end
 
-function OnlineNormalMix(y::Vector{Float64},
+function NormalMix(y::Vector{Float64},
                          obj::MixtureModel{Univariate, Continuous, Normal};
                          r=.51)
     n = length(y)
@@ -27,15 +27,15 @@ function OnlineNormalMix(y::Vector{Float64},
     s2 = vec(sum(w .* y, 1))
     s3 = vec(sum(w .* y .* y, 1))
 
-    OnlineNormalMix(obj, s1, s2, s3, r, n, 1)
+    NormalMix(obj, s1, s2, s3, r, n, 1)
 end
 
-function OnlineNormalMix(y::Vector{Float64}; k = 2, r=.51,
+function NormalMix(y::Vector{Float64}; k = 2, r=.51,
                          obj::MixtureModel{Univariate, Continuous, Normal} =
                              MixtureModel(map((u, v) -> Normal(u, v),
                                               [quantile(y, [1:k]/(k+1))],
                                               var(y) / sqrt(k) * ones(k))))
-    OnlineNormalMix(y, obj, r = r)
+    NormalMix(y, obj, r = r)
 end
 
 
@@ -43,7 +43,7 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineNormalMix, y::Vector{Float64})
+function update!(obj::NormalMix, y::Vector{Float64})
     n = length(y)
     nj = length(components(obj))
     π = probs(obj)
@@ -78,7 +78,7 @@ end
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::OnlineNormalMix)
+function state(obj::NormalMix)
     names = [:mean; :var]
     estimates = [mean(obj); var(obj)]
     for i in 1:length(components(obj.model))
@@ -95,27 +95,27 @@ end
 
 #-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
-Base.copy(obj::OnlineNormalMix) = OnlineNormalMix(obj.model, obj.s1, obj.s2,
+Base.copy(obj::NormalMix) = NormalMix(obj.model, obj.s1, obj.s2,
                                                   obj.s3, obj.n, obj.nb)
 
-Base.mean(obj::OnlineNormalMix) = return mean(obj.model)
+Base.mean(obj::NormalMix) = return mean(obj.model)
 
-means(obj::OnlineNormalMix) = means(obj.model)
+means(obj::NormalMix) = means(obj.model)
 
-stds(obj::OnlineNormalMix) = stds(obj.model)
+stds(obj::NormalMix) = stds(obj.model)
 
-Distributions.pdf(obj::OnlineNormalMix, x) = pdf(obj.model, x)
+Distributions.pdf(obj::NormalMix, x) = pdf(obj.model, x)
 
-Distributions.logpdf(obj::OnlineNormalMix, x) = logpdf(obj.model, x)
+Distributions.logpdf(obj::NormalMix, x) = logpdf(obj.model, x)
 
-Distributions.components(obj::OnlineNormalMix) = components(obj.model)
+Distributions.components(obj::NormalMix) = components(obj.model)
 
-Distributions.probs(obj::OnlineNormalMix) = probs(obj.model)
+Distributions.probs(obj::NormalMix) = probs(obj.model)
 
-Distributions.var(obj::OnlineNormalMix) = var(obj.model)
+Distributions.var(obj::NormalMix) = var(obj.model)
 
-function Base.show(io::IO, obj::OnlineNormalMix)
-    println("OnlineNormalMix:")
+function Base.show(io::IO, obj::NormalMix)
+    println("NormalMix:")
     show(obj.model)
 end
 
@@ -133,7 +133,7 @@ end
 # x = rand(trueModel, n)
 
 
-# obj, results = OnlineStats.trace_df(OnlineStats.OnlineNormalMix, x, 100, x[1:100], k=3,
+# obj, results = OnlineStats.trace_df(OnlineStats.NormalMix, x, 100, x[1:100], k=3,
 #                                     r = .50001)
 # μresults = results[:, [1,4,7,10,11]]
 # σresults = results[:, [2,5,8,10,11]]
