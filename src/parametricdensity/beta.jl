@@ -51,7 +51,7 @@ end
 Base.copy(obj::OnlineFitBeta) = OnlineFitBeta(obj.d, obj.stats, obj.n, obj.nb)
 
 function Base.show(io::IO, obj::OnlineFitBeta)
-    @printf(io, "OnlineFitBeta (nobs = %i)\n", obj.n)
+    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
     show(obj.d)
 end
 

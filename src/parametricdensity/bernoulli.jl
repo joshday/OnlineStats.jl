@@ -41,7 +41,7 @@ function Base.copy(obj::OnlineFitBernoulli)
 end
 
 function Base.show(io::IO, obj::OnlineFitBernoulli)
-    @printf(io, "OnlineFitBernoulli (nobs = %i)\n", obj.n)
+    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
     show(obj.d)
 end
 

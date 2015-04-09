@@ -42,7 +42,7 @@ function Base.copy(obj::OnlineFitBinomial)
 end
 
 function Base.show(io::IO, obj::OnlineFitBinomial)
-    @printf(io, "OnlineFitBinomial (nobs = %i)\n", obj.n)
+    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
     show(obj.d)
 end
 

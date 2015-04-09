@@ -10,24 +10,24 @@ type Summary <: ContinuousUnivariateOnlineStat
 end
 
 
-function Summary(y::Vector)
+function Summary{T <: Real}(y::Vector{T})
     Summary(Mean(y), Var(y), Extrema(y), length(y))
 end
 
-Summary(y::Real) = Summary([y])
+Summary{T <: Real}(y::T) = Summary([y])
 
 Summary() = Summary(Mean(), Var(), Extrema(), 0)
 
 #----------------------------------------------------------------------------#
 #--------------------------------------------------------------------# update!
-function update!(obj::Summary, y::Vector)
+function update!{T <: Real}(obj::Summary, y::Vector{T})
     update!(obj.mean, y)
     update!(obj.var, y)
     update!(obj.extrema, y)
     obj.n += length(y)
 end
 
-update!(obj::Summary, y::Real) = update!(obj, [y])
+update!{T <: Real}(obj::Summary, y::T) = update!(obj, [y])
 
 
 

@@ -9,7 +9,7 @@ end
 
 Mean{T <: Real}(y::Vector{T}) = Mean(mean(y), length(y))
 
-Mean(y::Real) = Mean([y])
+Mean{T <: Real}(y::T) = Mean([y])
 
 Mean() = Mean(0.0, 0)
 
@@ -22,7 +22,7 @@ function update!{T <: Real}(obj::Mean, y::Vector{T})
     obj.mean += (n2 / obj.n) * (mean(y) - obj.mean)
 end
 
-update!(obj::Mean, y::Real) = update!(obj, [y])
+update!{T <: Real}(obj::Mean, y::T) = update!(obj, [y])
 
 
 #----------------------------------------------------------------------------#

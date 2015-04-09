@@ -1,6 +1,5 @@
 using OnlineStats
 using Base.Test
-using Distributions
 println("quantregmm_test.jl")
 
 

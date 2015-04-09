@@ -37,7 +37,7 @@ obj = Var()
 @test obj.mean == 0.0
 @test obj.var == 0.0
 @test obj.n == 0
-@test n_obs(obj) == 0
+@test nobs(obj) == 0
 @test mean(obj) == 0.0
 @test var(obj) == 0.0
 @test state(obj) == [[:mean, :var, :n] [0., 0., 0.]]
@@ -49,7 +49,7 @@ obj1 = copy(obj)
 @test mean(obj1) == mean(x1)
 @test_approx_eq var(obj1)  var(x1)
 @test obj.n == n1
-
+@test nobs(obj) == n1
 
 # clean up
 x1, x2, x = zeros(3)

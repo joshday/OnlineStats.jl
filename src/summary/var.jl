@@ -17,7 +17,7 @@ function Var{T <: Real}(y::Vector{T})
     end
 end
 
-Var(y::Real) = Var([y])
+Var{T <: Real}(y::T) = Var([y])
 
 Var() = Var(0.0, 0.0, 0)
 
@@ -44,7 +44,7 @@ function update!{T <: Real}(obj::Var, y::Vector{T})
     obj.n = n
 end
 
-function update!(obj::Var, y::Real)
+function update!{T <: Real}(obj::Var, y::T)
     update!(obj, [y])
 end
 

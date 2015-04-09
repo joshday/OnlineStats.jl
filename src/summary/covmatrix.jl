@@ -10,7 +10,7 @@ type CovarianceMatrix <: ContinuousMultivariateOnlineStat
 end
 
 
-function CovarianceMatrix(x::Matrix)
+function CovarianceMatrix{T <: Real}(x::Matrix{T})
     n, p = size(x)
     A = BLAS.syrk('L', 'T', 1.0, x) / n
     B = vec(mean(x, 1))
@@ -20,7 +20,7 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::CovarianceMatrix, x::Matrix)
+function update!{T <: Real}(obj::CovarianceMatrix, x::Matrix{T})
     n2 = size(x, 1)
     A2 = BLAS.syrk('L', 'T', 1.0, x) / n2
     B2 = vec(mean(x, 1))
@@ -99,9 +99,6 @@ function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
 end
 
 function Base.show(io::IO, obj::CovarianceMatrix)
-#     @printf(io, " * N: %d\n", obj.n)
-#     @printf(io, " * P: %d\n", obj.p)
-#     return
     println(io, "Online Covariance Matrix:\n", state(obj))
 end
 

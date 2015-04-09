@@ -10,7 +10,7 @@ end
 
 Extrema{T <: Real}(y::Vector{T}) = Extrema(maximum(y), minimum(y), length(y))
 
-Extrema(y::Real) = Extrema([y])
+Extrema{T <: Real}(y::T) = Extrema([y])
 
 Extrema() = Extrema(-Inf, Inf, 0)
 
@@ -23,7 +23,7 @@ function update!{T <: Real}(obj::Extrema, y::Vector{T})
     obj.n += length(y)
 end
 
-update!(obj::Extrema, y::Real) = update!(obj, [y])
+update!{T <: Real}(obj::Extrema, y::T) = update!(obj, [y])
 
 
 #----------------------------------------------------------------------------#
@@ -45,7 +45,7 @@ Base.maximum(obj::Extrema) = return obj.max
 
 Base.minimum(obj::Extrema) = return obj.min
 
-Base.copy(obj::Extrema) = Var(obj.max, obj.min, obj.n)
+Base.copy(obj::Extrema) = Extrema(obj.max, obj.min, obj.n)
 
 function Base.merge(a::Extrema, b::Extrema)
     Extrema(maximum([a.max, b.max]), minimum([a.min, b.min]), a.n + b.n)
