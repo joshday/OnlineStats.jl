@@ -2,6 +2,8 @@ using OnlineStats
 using Base.Test
 println("extrema_test.jl")
 
+
+# Extrema, update!, merge, merge!, max, min,
 n1, n2 = rand(1:1_000_000, 2)
 n = n1 + n2
 x1 = rand(n1)
@@ -32,6 +34,22 @@ merge!(obj1, obj2)
 @test min(obj1) == minimum(obj1)
 @test max(obj1) == maximum(x)
 @test min(obj1) == minimum(x)
+
+
+# Empty constructor, state, copy
+obj = Extrema()
+@test max(obj) == -Inf
+@test min(obj) == Inf
+@test n_obs(obj) == 0
+update!(obj, x1)
+@test max(obj) == maximum(x1)
+@test min(obj) == minimum(x1)
+@test n_obs(obj) == n1
+obj1 = copy(obj)
+@test max(obj1) == maximum(x1)
+@test min(obj1) == minimum(x1)
+@test n_obs(obj1) == n1
+@test state(obj) == [[:max, :min, :n] [max(obj), min(obj), n_obs(obj)]]
 
 
 # clean up

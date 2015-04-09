@@ -10,7 +10,7 @@ type OnlineFitBinomial <: DiscreteUnivariateOnlineStat
 end
 
 
-function onlinefit(::Type{Binomial}, ntrials::Int64, y::Vector{Int64})
+function onlinefit{T <: Integer}(::Type{Binomial}, ntrials::Int64, y::Vector{T})
     n::Int64 = length(y)
     OnlineFitBinomial(fit(Binomial, ntrials, y), sum(y), n, 1)
 end
@@ -18,7 +18,7 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitBinomial, newdata::Vector{Int64})
+function update!{T <: Integer}(obj::OnlineFitBinomial, newdata::Vector{T})
     obj.nsuccess += sum(newdata)
     obj.n += length(newdata)
     obj.d = Binomial(obj.d.n, obj.nsuccess / (obj.n * obj.d.n))
@@ -37,21 +37,12 @@ end
 
 #----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# Base
-function Base.show(io::IO, obj::OnlineFitBinomial)
-    @printf(io, "OnlineFitBinomial\n")
-    @printf(io, " * n: %f\n", obj.d.n)
-    @printf(io, " * p: %f\n", obj.d.p)
+function Base.copy(obj::OnlineFitBinomial)
+    OnlineFitBinomial(obj.d, obj.nsuccess, obj.n, obj.nb)
 end
 
+function Base.show(io::IO, obj::OnlineFitBinomial)
+    @printf(io, "OnlineFitBinomial (nobs = %i)\n", obj.n)
+    show(obj.d)
+end
 
-
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-# x1 = rand(Binomial(25, .7), 100)
-# obj = OnlineStats.onlinefit(Binomial, 25, x1)
-# OnlineStats.state(obj)
-
-# x2 = rand(Binomial(25, .7), 100)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.state(obj)
- 

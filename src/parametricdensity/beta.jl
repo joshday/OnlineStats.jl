@@ -1,5 +1,3 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export OnlineFitBeta
 
 #----------------------------------------------------------------------------#
@@ -22,9 +20,10 @@ function onlinefit{T<:Real}(::Type{Beta}, y::Vector{T})
 end
 
 
+
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitBeta, newdata::Vector)
+function update!{T<:Real}(obj::OnlineFitBeta, newdata::Vector{T})
     update!(obj.stats, newdata)
     m = mean(obj.stats)
     v = var(obj.stats)
@@ -34,6 +33,7 @@ function update!(obj::OnlineFitBeta, newdata::Vector)
     obj.n += length(newdata)
     obj.nb += 1
 end
+
 
 
 #-----------------------------------------------------------------------------#
@@ -46,22 +46,12 @@ end
 
 
 
-
 #----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# Base
+Base.copy(obj::OnlineFitBeta) = OnlineFitBeta(obj.d, obj.stats, obj.n, obj.nb)
+
 function Base.show(io::IO, obj::OnlineFitBeta)
-    @printf(io, "OnlineFitBeta\n")
-    @printf(io, " * α: %f\n", obj.d.α)
-    @printf(io, " * β: %f\n", obj.d.β)
+    @printf(io, "OnlineFitBeta (nobs = %i)\n", obj.n)
+    show(obj.d)
 end
 
-
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-# x1 = rand(Beta(3,5), 100000)
-# obj = OnlineStats.onlinefit(Beta, x1)
-# OnlineStats.state(obj)
-
-# # x2 = rand(Beta(3, 5), 10000)
-# # OnlineStats.update!(obj, x2)
-# # OnlineStats.state(obj)

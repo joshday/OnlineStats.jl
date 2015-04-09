@@ -26,8 +26,11 @@ OnlineStats.update!(obj, x2)
 @test obj.n == n1 + n2
 @test obj.nb == 2
 
-# clean up
-x1, x2, x = zeros(3)
+@test state(obj) == [[:p, :n, :nb] [mean(x), n1 + n2, 2]]
+obj2 = copy(obj)
+@test state(obj2) == [[:p, :n, :nb] [mean(x), n1 + n2, 2]]
+@test mean(obj2) == mean(x)
+
 
 
 
@@ -53,41 +56,71 @@ OnlineStats.update!(obj, x2)
 @test obj.n == n1 + n2
 @test obj.nb == 2
 
-# clean up
-x1, x2, x = zeros(3)
+@test state(obj) == [[:α, :β, :n, :nb] [obj.d.α, obj.d.β, n1+n2, 2]]
+obj2 = copy(obj)
+@test state(obj2) == [[:α, :β, :n, :nb] [obj.d.α, obj.d.β, n1+n2, 2]]
+
 
 
 
 #------------------------------------------------------------------------------#
 #                                                                     Binomial #
 #------------------------------------------------------------------------------#
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# n = rand(1:1000, 1)[1]
-# p = rand(1)[1]
-# x1 = rand(Binomial(n, p), n1)
-# x2 = rand(Binomial(n, p), n2)
-# x = [x1, x2]
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+n = rand(1:1000, 1)[1]
+p = rand(1)[1]
+x1 = rand(Binomial(n, p), n1)
+x2 = rand(Binomial(n, p), n2)
+x = [x1, x2]
 
-# obj = onlinefit(Binomial, n, x1)
-# @test obj.d.n == n
-# @test obj.d.p == sum(x1) / (n * n1)
-# @test obj.stats.ns == sum(x1)
-# @test obj.stats.ne == n1
-# @test obj.n == n1
-# @test obj.nb == 1
+obj = onlinefit(Binomial, n, x1)
+@test obj.d.n == n
+@test obj.d.p == sum(x1) / (n * n1)
+@test obj.nsuccess == sum(x1)
+@test obj.n == n1
+@test obj.nb == 1
 
-# OnlineStats.update!(obj, x2)
-# @test obj.d.n == n
-# @test obj.d.p == sum(x) / (n * (n1 + n2))
-# @test obj.stats.ns == sum(x)
-# @test obj.stats.ne == n1 + n2
-# @test obj.n == n1 + n2
-# @test obj.nb == 2
+OnlineStats.update!(obj, x2)
+@test obj.d.n == n
+@test obj.d.p == sum(x) / (n * (n1 + n2))
+@test obj.nsuccess == sum(x)
+@test obj.n == n1 + n2
+@test obj.nb == 2
 
-# # clean up
-# x1, x2, x = zeros(3)
+@test state(obj) == [[:ntrials, :p, :n, :nb] [obj.d.n, obj.d.p, obj.n, obj.nb]]
+obj2 = copy(obj)
+@test state(obj2) == [[:ntrials, :p, :n, :nb] [obj.d.n, obj.d.p, obj.n, obj.nb]]
 
+
+
+
+#------------------------------------------------------------------------------#
+#                                                                    Dirichlet #
+#------------------------------------------------------------------------------#
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+αlength = rand(3:20, 1)[1]
+α = rand(.5:.1:20, αlength)
+x1 = rand(Dirichlet(α), n1)
+x2 = rand(Dirichlet(α), n2)
+x = [x1 x2]
+
+obj = onlinefit(Dirichlet, x1)
+@test obj.slogp == vec(sum(log(x1), 2) / n1)
+@test obj.n == n1
+@test obj.nb == 1
+
+update!(obj, x2)
+@test length(obj.d.alpha) == αlength
+@test_approx_eq_eps obj.d.alpha fit(Dirichlet, x).alpha 1e-8 # fit is wrong sometimes
+@test obj.n == n1 + n2
+@test obj.nb == 2
+
+@test state(obj) == hcat([[symbol("α$i") for i in 1:length(obj.d.alpha)], :n, :nb],
+                     [obj.d.alpha, obj.n, obj.nb])
+obj2 = copy(obj)
+@test state(obj2) == state(obj)
 
 #------------------------------------------------------------------------------#
 #                                                                  Exponential #

@@ -15,7 +15,7 @@ using Base.Test
 # @time include("quantregmm_test.jl")
 # @time include("quantregsgd_test.jl")
 
-# @time include("densityestimation_test.jl")
+@time include("densityestimation_test.jl")
 
 
 

@@ -2,6 +2,8 @@ using OnlineStats
 using Base.Test
 println("summary_test.jl")
 
+
+# Summary(x1), merge, merge!, mean, var, max, min
 n1 = rand(1:1_000_000, 1)[1]
 n2 = rand(1:1_000_000, 1)[1]
 x1 = rand(n1)
@@ -41,6 +43,9 @@ merge!(ob, ob2)
 @test_approx_eq var(ob) var(x)
 @test max(ob) == maximum(x)
 @test min(ob) == minimum(x)
+
+
+
 
 # clean up
 x1, x2, x = zeros(3)

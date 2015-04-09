@@ -1,61 +1,69 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export OnlineFitDirichlet
-
-# No fit_mle(Dirichlet, obj.stats) method yet
 
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------# OnlineFitDirichlet Type
 type OnlineFitDirichlet <: ContinuousUnivariateOnlineStat
     d::Distributions.Dirichlet
-    stats::Distributions.DirichletStats
-
+    slogp::Vector{Float64}
     n::Int64
     nb::Int64
 end
 
 function onlinefit{T<:Real}(::Type{Dirichlet}, y::Matrix{T})
     n::Int64 = size(y, 2)
-    OnlineFitDirichlet(fit(Dirichlet, y), suffstats(Dirichlet, y), n, 1)
+    OnlineFitDirichlet(fit(Dirichlet, y), suffstats(Dirichlet, y).slogp / n, n, 1)
 end
 
 
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-# function update!(obj::OnlineFitDirichlet, newdata::Vector)
-#     newstats = suffstats(Dirichlet, newdata)
-#     n1 = obj.stats.tw
-#     n2 = newstats.tw
-#     n = n1 + n2
+function update!{T<:Real}(obj::OnlineFitDirichlet, newdata::Matrix{T})
+    n2 = size(newdata, 2)
+    slogp = suffstats(Dirichlet, newdata).slogp / n2
+    obj.n += n2
+    obj.slogp += (n2 / obj.n) * (slogp - obj.slogp)
+    α = obj.d.alpha
+    obj.d = Distributions.fit_dirichlet!(obj.slogp, α)
 
-#     slogp = obj.stats.slogp + newstats.slogp
-
-#     obj.stats = Distributions.DirichletStats(slogp, n)
-#     obj.d = fit_mle(Dirichlet, obj.stats)
-#     obj.n = n
-#     obj.nb += 1
-# end
+#     obj.d = Dirichlet(α)
+    obj.nb += 1
+end
 
 
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitDirichlet)
-    names = [:α0, [symbol("α$i") for i in 1:length(obj.d.alpha)], :n, :nb]
-    estimates = [obj.d.alpha0, obj.d.alpha, obj.n, obj.nb]
+    names = [[symbol("α$i") for i in 1:length(obj.d.alpha)], :n, :nb]
+    estimates = [obj.d.alpha, obj.n, obj.nb]
     return([names estimates])
 end
 
 
 
+#----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# Base
+Base.copy(obj::OnlineFitDirichlet) =
+    OnlineFitDirichlet(obj.d, obj.slogp, obj.n, obj.nb)
+
+function Base.show(io::IO, obj::OnlineFitDirichlet)
+    @printf(io, "OnlineFitDirichlet (nobs = %i)\n", obj.n)
+    show(obj.d)
+end
+
+
 #------------------------------------------------------------------------------#
 #---------------------------------------------------------# Interactive testing
-# x1 = rand(Dirichlet([.2, .3, .5]), 100)
-# obj = OnlineStats.onlinefit(Dirichlet, x1)
-# OnlineStats.state(obj)
+α = [1, 10, 4, 8, 2]
+x1 = rand(Dirichlet(α), 100)
+obj = OnlineStats.onlinefit(Dirichlet, x1)
+OnlineStats.state(obj)
 
-# x2 = rand(Dirichlet([.2, .3, .5]), 100)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.state(obj)
+for i in 1:10000
+    x2 = rand(Dirichlet(α), 100)
+    OnlineStats.update!(obj, x2)
+end
+
+OnlineStats.state(obj)
 
 # obj = OnlineStats.onlinefit(Normal, [x1, x2])
 # OnlineStats.state(obj)

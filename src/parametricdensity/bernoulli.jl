@@ -1,9 +1,7 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export OnlineFitBernoulli
 
 #-----------------------------------------------------------------------------#
-#-----------------------------------------------------# OnlineFitBernoulli Type
+#-------------------------------------------------------# Type and Constructors
 type OnlineFitBernoulli <: DiscreteUnivariateOnlineStat
     d::Distributions.Bernoulli
     n1::Int64
@@ -11,7 +9,7 @@ type OnlineFitBernoulli <: DiscreteUnivariateOnlineStat
     nb::Int64
 end
 
-function onlinefit(::Type{Bernoulli}, y::Vector{Int64})
+function onlinefit{T <: Integer}(::Type{Bernoulli}, y::Vector{T})
     n::Int64 = length(y)
     OnlineFitBernoulli(fit(Bernoulli, y), sum(y), n, 1)
 end
@@ -19,7 +17,7 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitBernoulli, newdata::Vector{Int64})
+function update!{T <: Integer}(obj::OnlineFitBernoulli, newdata::Vector{T})
     obj.n1 += sum(newdata)
     obj.n += length(newdata)
     obj.d = Bernoulli(obj.n1 / obj.n)
@@ -38,19 +36,13 @@ end
 
 #-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
-function Base.show(io::IO, obj::OnlineFitBernoulli)
-    @printf(io, "OnlineFitBernoulli\n")
-    @printf(io, " * p: %f\n", obj.d.p)
+function Base.copy(obj::OnlineFitBernoulli)
+    OnlineFitBernoulli(obj.d, obj.n1, obj.n, obj.nb)
 end
 
+function Base.show(io::IO, obj::OnlineFitBernoulli)
+    @printf(io, "OnlineFitBernoulli (nobs = %i)\n", obj.n)
+    show(obj.d)
+end
 
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-x1 = rand(Bernoulli(.7), 100)
-obj = OnlineStats.onlinefit(Bernoulli, x1)
-OnlineStats.state(obj)
-
-x2 = rand(Bernoulli(.7), 100)
-OnlineStats.update!(obj, x2)
-OnlineStats.state(obj)
-
+Base.mean(obj::OnlineFitBernoulli) = mean(obj.d)
