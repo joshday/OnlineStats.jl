@@ -1,4 +1,4 @@
-# LogRegMM
+# LogRegSGD
 
 
 ```{julia; term=false; eval=true}
@@ -21,7 +21,7 @@ for i in 1:length(ys)
     ys[i] = rand(Bernoulli(ys[i]))
 end
 
-obj = LogRegMM(xs, ys, r=.8)
+obj = LogRegSGD(xs, ys, r=.7)
 df = make_df(obj) # Save estimates to DataFrame
 ```
 
@@ -31,7 +31,7 @@ for i in 1:999
     xs = randn(100, 10)
     ys = vec(logitexp(xs * β))
     for i in 1:length(ys)
-        ys[i] = rand(Distributions.Bernoulli(ys[i]))
+        ys[i] = rand(Bernoulli(ys[i]))
     end
 
     update!(obj, xs, ys)
@@ -45,5 +45,5 @@ coef(obj)
 df_melt = melt(df, 12:13)
 plot(df_melt, x=:n, y=:value, color=:variable, Geom.line,
             yintercept=β, Geom.hline,
-            Scale.y_continuous(minvalue=-.6, maxvalue=.6))
+            Scale.y_continuous(minvalue=-.75, maxvalue=.75))
 ```

@@ -46,11 +46,10 @@ function StatsBase.coeftable(obj::OnlineLinearModel)
               ["x$i" for i = 1:obj.p], 4)
 end
 
-function StatsBase.confint(obj::OnlineLinearModel, level::Real)
+function StatsBase.confint{T <: Real}(obj::OnlineLinearModel, level::T = 0.95)
     hcat(coef(obj),coef(obj)) + stderr(obj) *
     quantile(TDist(obj.n - obj.p), (1. - level)/2.) * [1. -1.]
 end
-StatsBase.confint(obj::OnlineLinearModel) = confint(obj, 0.95)
 
 StatsBase.stderr(obj::OnlineLinearModel) = sqrt(diag(vcov(obj)))
 

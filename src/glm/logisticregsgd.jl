@@ -1,6 +1,9 @@
 export LogRegSGD
 
 
+logitexp(x) = 1 / (1 + exp(-x))
+@vectorize_1arg Real logitexp
+
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
 type LogRegSGD <: OnlineStat
@@ -36,7 +39,8 @@ function update!(obj::LogRegSGD, X::Matrix, y::Vector)
         X = [ones(length(y)) X]
     end
     y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
-    obj.β += vec(mean(y ./ (1 + exp(y .* X * obj.β)) .* X, 1))
+    γ = obj.nb ^ -obj.r
+    obj.β += γ * vec(mean(y ./ (1 + exp(y .* X * obj.β)) .* X, 1))
     obj.n += length(y)
     obj.nb += 1
 end
@@ -66,22 +70,30 @@ end
 
 
 
-# # Testing
-# x = randn(100)
-# y = vec(logitexp(x))
-# for i in 1:length(y)
-#     y[i] = rand(Bernoulli(y[i]))
+# Testing
+# β = ([1:10] - 10/2) / 10
+# xs = randn(100, 10)
+# ys = vec(logitexp(xs * β))
+# for i in 1:length(ys)
+#     ys[i] = rand(Bernoulli(ys[i]))
 # end
-# obj = OnlineStats.LogRegSGD(reshape(x, 100, 1), y)
 
-# for i in 1:10000
-#     x = randn(100)
-#     y = vec(logitexp(x))
-#     for i in 1:length(y)
-#         y[i] = rand(Bernoulli(y[i]))
+# obj = OnlineStats.LogRegSGD(xs, ys, r=.51)
+# df = OnlineStats.make_df(obj) # Save estimates to DataFrame
+
+# for i in 1:9999
+#     xs = randn(100, 10)
+#     ys = vec(logitexp(xs * β))
+#     for i in 1:length(ys)
+#         ys[i] = rand(Bernoulli(ys[i]))
 #     end
-#     OnlineStats.update!(obj, reshape(x, 100, 1), y)
+
+#     OnlineStats.update!(obj, xs, ys)
+#     OnlineStats.make_df!(df, obj)
 # end
 
-# OnlineStats.state(obj)
+# df_melt = melt(df, 12:13)
+# plot(df_melt, x=:n, y=:value, color=:variable, Geom.line,
+#             yintercept=β, Geom.hline,
+#             Scale.y_continuous(minvalue=-.75, maxvalue=.75))
 

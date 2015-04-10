@@ -2,12 +2,13 @@ module OnlineStats
 
 using Docile
 using DataFrames, Distributions, StatsBase
-import PDMats, Distributions, GaussianMixtures
+import PDMats, Distributions
 import Base: copy, merge, merge!, show, quantile
+import StatsBase: nobs, vcov, coef, confint, coeftable, predict
 import Gadfly
 
 
-export update!, state, onlinefit, n_obs, n_batches, make_df, make_df!
+export update!, state, onlinefit, nobs, make_df, make_df!
 
 # Abstract Types
 include("types.jl")
@@ -18,13 +19,8 @@ include("types.jl")
 #
 ###############################################################################
 @doc doc"Return the number of observations used" ->
-function n_obs{T <: OnlineStat}(obj::T)
+function nobs{T <: OnlineStat}(obj::T)
    obj.n
-end
-
-@doc doc"Return the number of batches used" ->
-function n_batches{T <: OnlineStat}(obj::T)
-   obj.nb
 end
 
 @doc doc"Put object results in a DataFrame" ->
@@ -68,12 +64,12 @@ include("summary/fivenumber.jl")
 include("parametricdensity/bernoulli.jl")
 include("parametricdensity/beta.jl")
 include("parametricdensity/binomial.jl")
-# include("parametricdensity/dirichlet.jl")
-# include("parametricdensity/exponential.jl")
-# include("parametricdensity/gamma.jl")
-# include("parametricdensity/multinomial.jl")
-# include("parametricdensity/mvnormal.jl")
-# include("parametricdensity/normal.jl")
+include("parametricdensity/dirichlet.jl")
+include("parametricdensity/exponential.jl")
+include("parametricdensity/gamma.jl")
+include("parametricdensity/multinomial.jl")
+include("parametricdensity/mvnormal.jl")
+include("parametricdensity/normal.jl")
 
 # Density Estimation
 include("densityestimation/offlinenormalmix.jl")
@@ -82,6 +78,7 @@ include("densityestimation/normalmix.jl")
 # Linear Model
 include("linearmodel/sweep.jl")
 include("linearmodel/lm.jl")
+include("linearmodel/ridge.jl")
 
 # GLM
 include("glm/logisticregsgd.jl")

@@ -27,23 +27,21 @@ Click links to example.
 
 ## Univariate distributions
 
- *No `Distributions.suffstats` method to base type on.
-
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Bernoulli            | [`OnlineFitBernoulli`](../doc/examples/OnlineFitBernoulli.md)
 | Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)
 | Binomial             | `OnlineFitBinomial`
-| Cauchy               | *
-| Chi-square           | *
+| Cauchy               | 
+| Chi-square           | 
 | Exponential          | `OnlineFitExponential`
-| F-distribution       | *
+| F-distribution       | 
 | Gamma                | `OnlineFitGamma`
-| Inverse Gamma        | *
-| Lognormal            | *
+| Inverse Gamma        | 
+| Lognormal            | 
 | Normal               | `OnlineFitNormal`
-| T-distribution       | *
-| Weibull              | *
+| T-distribution       | 
+| Weibull              | 
 
 ## Multivariate distributions
 
@@ -69,7 +67,7 @@ Click links to example.
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-| Logistic Regression  | [`LogRegMM`](../doc/examples/LogRegMM.md)
+| Logistic Regression  | [`LogRegMM`](../doc/examples/LogRegMM.md), `LogRegSGD`, `LogRegSN`
 | Probit Regression    | 
 | Poisson Regression   |  
 | Multinomial Logistic Regression |

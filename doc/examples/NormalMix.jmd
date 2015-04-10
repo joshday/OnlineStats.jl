@@ -1,4 +1,4 @@
-# OnlineNormalMix
+# NormalMix
 
 
 ```{julia; term=false; eval=true}
@@ -16,7 +16,7 @@ plot(trueModel, -20, 40)
 
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
-obj = OnlineNormalMix(x[1:100], k=4)
+obj = NormalMix(x[1:100], k=4)
 ```
 
 ### Update model with many batches of size 100

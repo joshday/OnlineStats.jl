@@ -1,5 +1,5 @@
 
-# OnlineNormalMix
+# NormalMix
 
 
 ````julia
@@ -20,27 +20,27 @@ plot(trueModel, -20, 40)
 ````
 
 
-![](figures/OnlineNormalMix_2_1.png)
+![](figures/NormalMix_2_1.png)
 
 
 
 ### Create model with the first batch
 ````julia
-obj = OnlineNormalMix(x[1:100], k=4)
+obj = NormalMix(x[1:100], k=4)
 ````
 
 
 ````julia
-OnlineNormalMix:
+NormalMix:
 MixtureModel{Normal}(K = 4)
-components[1] (prior =
-0.2500): Normal(μ=-1.1944494924938276, σ=24.03501034917221)
-components[2] (prior = 0.2500): Normal(μ=1.5149606027702482,
-σ=24.03501034917221)
-components[3] (prior = 0.2500):
-Normal(μ=4.907028138228168, σ=24.03501034917221)
-components[4] (prior
-= 0.2500): Normal(μ=11.25007403030572, σ=24.03501034917221)
+components[1] (prior = 0.2500):
+Normal(μ=-1.175020114360571, σ=24.792101072570414)
+components[2]
+(prior = 0.2500): Normal(μ=2.7307447444755972, σ=24.792101072570414)
+components[3] (prior = 0.2500): Normal(μ=5.371832857847965,
+σ=24.792101072570414)
+components[4] (prior = 0.2500):
+Normal(μ=9.624114103814465, σ=24.792101072570414)
 ````
 
 
@@ -66,7 +66,7 @@ plot(obj.model, -30, 50)
 ````
 
 
-![](figures/OnlineNormalMix_5_1.png)
-![](figures/OnlineNormalMix_5_2.png)
+![](figures/NormalMix_5_1.png)
+![](figures/NormalMix_5_2.png)
 
 
