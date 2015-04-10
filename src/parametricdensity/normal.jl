@@ -1,44 +1,31 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export OnlineFitNormal
 
-#------------------------------------------------------------------------------#
-#--------------------------------------------------------# OnlineFitNormal Type
+#-----------------------------------------------------------------------------#
+#-------------------------------------------------------# Type and Constructors
 type OnlineFitNormal <: ContinuousUnivariateOnlineStat
     d::Distributions.Normal
-    stats::Distributions.NormalStats
-
+    v::Var
     n::Int64
     nb::Int64
 end
 
 function onlinefit{T<:Real}(::Type{Normal}, y::Vector{T})
     n::Int64 = length(y)
-    OnlineFitNormal(fit(Normal, y), suffstats(Normal, y), n, 1)
+    OnlineFitNormal(fit(Normal, y), Var(y), n, 1)
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitNormal, newdata::Vector)
-    newstats = suffstats(Normal, newdata)
-    n1 = obj.stats.tw
-    n2 = newstats.tw
-    n = n1 + n2
-    δ = newstats.m - obj.stats.m
-
-    s = obj.stats.s + newstats.s
-    m = obj.stats.m + (n2 / n) * δ
-    s2 = obj.stats.s2 + newstats.s2 + (n1 * n2 / n) * δ^2
-
-    obj.d = Normal(m, s2 / n)
-    obj.stats = Distributions.NormalStats(s, m, s2, n)
-    obj.n = n
+function update!{T<:Real}(obj::OnlineFitNormal, newdata::Vector{T})
+    update!(obj.v, newdata)
+    obj.n = nobs(obj.v)
+    obj.d = Normal(mean(obj.v), sqrt(var(obj.v)))
     obj.nb += 1
 end
 
 
-#------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitNormal)
     names = [:μ, :σ, :n, :nb]
@@ -48,18 +35,13 @@ end
 
 
 
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive testing
-# x1 = randn(3100)
-# mean(x1), var(x1)
-# obj = OnlineStats.onlinefit(Normal, x1)
-# OnlineStats.state(obj)
+#-----------------------------------------------------------------------------#
+#------------------------------------------------------------------------# Base
+Base.copy(obj::OnlineFitNormal) =
+    OnlineFitNormal(obj.d, obj.v, obj.n, obj.nb)
 
-# x2 = randn(10000)
-# mean([x1, x2]), var([x1, x2])
-# OnlineStats.update!(obj, x2)
-# OnlineStats.state(obj)
-
-# obj = OnlineStats.onlinefit(Normal, [x1, x2])
-# OnlineStats.state(obj)
+function Base.show(io::IO, obj::OnlineFitNormal)
+    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
+    show(obj.d)
+end
 

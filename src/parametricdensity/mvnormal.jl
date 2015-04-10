@@ -1,49 +1,31 @@
-# Author: Josh Day <emailjoshday@gmail.com>
-
 export OnlineFitMvNormal
 
-#------------------------------------------------------------------------------#
-#------------------------------------------------------# OnlineFitMvNormal Type
+#-----------------------------------------------------------------------------#
+#-------------------------------------------------------# Type and Constructors
 type OnlineFitMvNormal <: ContinuousUnivariateOnlineStat
     d::Distributions.MvNormal
-    stats::Distributions.MvNormalStats
-
-    C::CovarianceMatrix
-
+    c::CovarianceMatrix
     n::Int64
     nb::Int64
 end
 
-function onlinefit{T<:Real}(::Type{MvNormal}, y::Matrix{T})
-    n::Int64 = size(y, 2)
-    ss = suffstats(MvNormal, y)
-    OnlineFitMvNormal(fit(MvNormal, y), ss, CovarianceMatrix(y'), n, 1)
-end
+onlinefit{T<:Real}(::Type{MvNormal}, y::Matrix{T}) =
+    OnlineFitMvNormal(fit(MvNormal, y), CovarianceMatrix(y'), size(y, 2), 1)
 
 
-#------------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::OnlineFitMvNormal, newdata::Matrix)
-    newstats = suffstats(MvNormal, newdata)
-    n1 = obj.stats.tw
-    n2 = newstats.tw
-    n = n1 + n2
-
-    s = obj.stats.s + newstats.s
-    m = obj.stats.m + n2 / n * (newstats.m - obj.stats.m)
-
-    update!(obj.C, newdata')
-    s2 = state(obj.C) * ((n-1) / n)
-    tw = n
-
-    obj.d = MvNormal(m, s2)
-    obj.stats = Distributions.MvNormalStats(s, m, s2, tw)
-    obj.n = n
-    obj.nb = obj.nb + 1
+function update!{T<:Real}(obj::OnlineFitMvNormal, newdata::Matrix{T})
+    update!(obj.c, newdata')
+    obj.n = nobs(obj.c)
+    obj.d = MvNormal(mean(obj.c), cov(obj.c))
+    obj.nb += 1
 end
 
 
-#------------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::OnlineFitMvNormal)
     names = [[symbol("μ$i") for i=1:length(obj.d.μ)];
@@ -56,22 +38,13 @@ end
 vcov(obj::OnlineFitMvNormal) = obj.d.Σ.mat
 
 
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive testing
-# x1 = randn(3, 100)
-# obj = OnlineStats.onlinefit(MvNormal, x1)
-# OnlineStats.state(obj)
 
-# x2 = randn(3, 100)
-# OnlineStats.update!(obj, x2)
-# OnlineStats.state(obj)
-# OnlineStats.vcov(obj)
-# OnlineStats.state(obj.C) * ((obj.n-1) / obj.n)
+#-----------------------------------------------------------------------------#
+#------------------------------------------------------------------------# Base
+Base.copy(obj::OnlineFitMvNormal) =
+    OnlineFitMvNormal(obj.d, obj.c, obj.n, obj.nb)
 
-# obj = OnlineStats.onlinefit(MvNormal, [x1 x2])
-# OnlineStats.state(obj)
-
-# cov([x1 x2]') * (199) / 200
-
-# fit(MvNormal, [x1 x2])
-
+function Base.show(io::IO, obj::OnlineFitMvNormal)
+    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
+    show(obj.d)
+end

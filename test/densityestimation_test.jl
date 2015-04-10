@@ -44,8 +44,8 @@ x2 = rand(Beta(α, β), n2)
 x = [x1, x2]
 
 obj = onlinefit(Beta, x1)
-@test mean(obj.d) == mean(x1)
-@test_approx_eq var(obj.d) var(x1)
+@test_approx_eq_eps mean(obj.d) mean(x1) 1e-10
+@test_approx_eq_eps var(obj.d) var(x1) 1e-10
 @test obj.n == n1
 @test obj.nb == 1
 
@@ -216,55 +216,69 @@ obj1 = copy(obj)
 @test obj1.nb == 2
 
 
+
 #------------------------------------------------------------------------------#
 #                                                                     MvNormal #
 #------------------------------------------------------------------------------#
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+d = rand(1:10, 1)[1]
+x1 = rand(MvNormal(zeros(d), eye(d)), n1)
+x2 = rand(MvNormal(zeros(d), eye(d)), n2)
+x = [x1  x2]
 
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# d = rand(1:10, 1)[1]
-# x1 = rand(MvNormal(zeros(d), PDMat(eye(d))), n1)
-# x2 = rand(MvNormal(zeros(d), PDMat(eye(d))), n2)
-# x = [x1  x2]
+obj = onlinefit(MvNormal, x1)
+@test_approx_eq obj.d.μ  vec(mean(x1, 2))
+@test_approx_eq mean(obj.c) vec(mean(x1, 2))
+@test_approx_eq cov(obj.c)  cov(x1')
+@test_approx_eq_eps cov(obj.c) obj.d.Σ.mat 1e-4
+@test obj.n == n1
+@test obj.nb == 1
 
-# obj = onlinefit(MvNormal, x1)
-# @test_approx_eq  obj.d.μ  vec(mean(x1, 2))
-# @test_approx_eq  obj.d.Σ.mat  PDMat(cov(x1') * (n1 - 1) / n1).mat
-# @test obj.n == n1
-# @test obj.nb == 1
+OnlineStats.update!(obj, x2)
+@test_approx_eq  obj.d.μ  vec(mean(x, 2))
+@test_approx_eq mean(obj.c) vec(mean(x, 2))
+@test_approx_eq cov(obj.c) cov(x')
+@test obj.n == n1 + n2
+@test obj.nb == 2
 
-# OnlineStats.update!(obj, x2)
-# @test_approx_eq  obj.d.μ  vec(mean(x, 2))
-# @test_approx_eq  obj.d.Σ.mat  PDMat(cov(x') * (n1 + n2 - 1) / (n1 + n2)).mat
-# @test obj.n == n1 + n2
-# @test obj.nb == 2
-
-# # clean up
-# x1, x2, x = zeros(3)
+obj1 = copy(obj)
+@test_approx_eq  obj1.d.μ  vec(mean(x, 2))
+@test_approx_eq mean(obj1.c) vec(mean(x, 2))
+@test_approx_eq cov(obj1.c) cov(x')
+@test obj1.n == n1 + n2
+@test obj1.nb == 2
 
 
 
 #------------------------------------------------------------------------------#
 #                                                                       Normal #
 #------------------------------------------------------------------------------#
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+x1 = randn(n1)
+x2 = randn(n2)
+x = [x1, x2]
 
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# x1 = randn(n1)
-# x2 = randn(n2)
-# x = [x1, x2]
+obj = onlinefit(Normal, x1)
+@test mean(obj.v) == mean(x1)
+@test_approx_eq mean(obj.d) mean(obj.v)
+@test_approx_eq var(obj.v) var(x1)
+@test obj.n == n1
+@test obj.nb == 1
 
-# obj = onlinefit(Normal, x1)
-# @test_approx_eq(obj.stats.m, mean(x1))
-# @test_approx_eq(obj.d.μ, mean(x1))
-# @test obj.n == n1
-# @test obj.nb == 1
+update!(obj, x2)
+@test_approx_eq obj.d.σ std(x)
+@test_approx_eq obj.d.μ mean(x)
+@test_approx_eq mean(obj.v) mean(x)
+@test_approx_eq var(obj.v) var(x)
+@test obj.n == n1 + n2
+@test obj.nb == 2
 
-# update!(obj, x2)
-# @test_approx_eq(obj.stats.m, mean(x))
-# @test_approx_eq(obj.d.μ, mean(x))
-# @test obj.n == n1 + n2
-# @test obj.nb == 2
-
-# # clean up
-# x1, x2, x = zeros(3)
+obj1 = copy(obj)
+@test_approx_eq obj1.d.σ std(x)
+@test_approx_eq obj1.d.μ mean(x)
+@test_approx_eq mean(obj1.v) mean(x)
+@test_approx_eq var(obj1.v) var(x)
+@test obj1.n == n1 + n2
+@test obj1.nb == 2
