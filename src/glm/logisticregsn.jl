@@ -8,8 +8,7 @@ logitexp(x) = 1 / (1 + exp(-x))
 type LogRegSN <: OnlineStat
     β::Vector             # Coefficients
     int::Bool             # Add intercept?
-    t1::Vector            # Sufficient statistic 1
-    t2::Matrix            # Sufficient statistic 2
+    t::Matrix             # X'X / n
     r::Float64            # learning rate
     n::Int64
     nb::Int64
@@ -28,12 +27,11 @@ function LogRegSN(X::Array, y::Vector; r = 0.51, intercept = true,
     end
     y = y .== sort(unique(y))[2]  # convert y to 0 or 1
 
-    t1 = X' * (y - logitexp(X * β)) / n
-    t2 = X'X / n
 
-    β += inv(t2) * t1
+    t = X'X / n
+    β += inv(t) * X' * (y - logitexp(X * β)) / n
 
-    LogRegSN(β, intercept, t1, t2, r, n, 1)
+    LogRegSN(β, intercept, t, r, n, 1)
 end
 
 
@@ -49,12 +47,9 @@ function update!(obj::LogRegSN, X::Matrix, y::Vector)
     obj.nb += 1
     obj.n += n
     γ = obj.nb ^ -obj.r
-    γ₂ = obj.nb ^ - .7
 
-    obj.t1 += γ * (X' * (y - logitexp(X * obj.β)) / n - obj.t1)
-    obj.t2 += n / (obj.n) * (X'X / n - obj.t2)
-
-    obj.β += γ₂ * inv(obj.t2) * obj.t1
+    obj.t += (n / obj.n) * (X'X / n - obj.t)
+    obj.β += γ * 4 * inv(obj.t) * X' * (y - logitexp(X * obj.β)) / n
 end
 
 
@@ -91,7 +86,7 @@ for i in 1:length(ys)
     ys[i] = rand(Distributions.Bernoulli(ys[i]))
 end
 
-obj = OnlineStats.LogRegSN(xs, ys, r=.51)
+obj = OnlineStats.LogRegSN(xs, ys, r=1)
 
 df = OnlineStats.make_df(obj)
 
@@ -107,6 +102,6 @@ end
 
 df_melt = melt(df, p+2:p+3)
 Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line,
-            yintercept=β, Gadfly.Geom.hline,
+            yintercept=β, Gadfly.Geom.hline(color="black"),
             Gadfly.Scale.y_continuous(minvalue=-.6, maxvalue=.6))
 

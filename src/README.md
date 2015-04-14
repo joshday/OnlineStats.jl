@@ -9,7 +9,8 @@ Click links to example.
 | Item                 | Associated Type(s)
 |----------------------|------------------
 |  Sample Mean         |  [`Summary`](../doc/examples/Summary.md)       
-|  Sample Variance     |  [`Summary`](../doc/examples/Summary.md)        
+|  Sample Variance     |  [`Summary`](../doc/examples/Summary.md)   
+| Extrema              | `Extrema`     
 |  Skewness (and m3)   |  [`Moments`](../doc/examples/Moments.md)       
 |  Kurtosis (and m4)   |  [`Moments`](../doc/examples/Moments.md)        
 |  Covariance Matrix   | [`CovarianceMatrix`](../doc/examples/CovarianceMatrix.md)
@@ -22,7 +23,7 @@ Click links to example.
 
 | Item                             | Associated Type(s)
 |----------------------------------|------------------
-| Gaussian mixture                 | [`OnlineNormalMix`](../doc/examples/OnlineNormalMix.md)
+| Gaussian mixture                 | [`NormalMix`](../doc/examples/NormalMix.md)
 | Average Shifted Histograms (ASH) | `AverageShiftedHistograms.update!` in [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl).  See also [Univariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update.md), [Bivariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update2.md)
 
 ## Univariate distributions

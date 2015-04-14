@@ -18,6 +18,11 @@ obj = onlinefit(Bernoulli, x)
 ````
 
 
+````julia
+Bernoulli(p=0.25)
+````
+
+
 
 
 
@@ -37,12 +42,12 @@ end
 ````julia
 julia> state(obj)
 3x2 Array{Any,2}:
- :p       0.300305
+ :p       0.299711
  :n       1.0001e6
  :nb  10001.0     
 
 julia> mean(obj.d)
-0.3003049695030497
+0.29971102889711027
 
 ````
 

@@ -67,7 +67,7 @@ julia> trueBeta = [quantile(Normal(), .7); beta + gamma * quantile(Normal(), .7)
   0.0     
 
 julia> maxabs(trueBeta - coef(fit))
-0.006399658767272776
+0.0063996587672723315
 
 ````
 
