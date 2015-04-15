@@ -10,11 +10,10 @@ Click links to example.
 |----------------------|------------------
 |  Sample Mean         |  [`Summary`](../doc/examples/Summary.md)       
 |  Sample Variance     |  [`Summary`](../doc/examples/Summary.md)   
-| Extrema              | `Extrema`     
 |  Skewness (and m3)   |  [`Moments`](../doc/examples/Moments.md)       
 |  Kurtosis (and m4)   |  [`Moments`](../doc/examples/Moments.md)        
 |  Covariance Matrix   | [`CovarianceMatrix`](../doc/examples/CovarianceMatrix.md)
-|  Maximum/Minimum     |  [`Summary`](../doc/examples/Summary.md)  , [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md) 
+|  Maximum/Minimum     |  [`Summary`](../doc/examples/Summary.md)  , [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md), `Extrema`
 |  Sample Quantiles    | [`QuantileSGD`](../doc/examples/QuantileSGD.md), [`QuantileMM`](../doc/examples/QuantileMM.md) 
 |  5-Number Summary    | [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md)   
 |  Box Plot            |[`Gadfly.plot(obj::FiveNumberSummary)`](../doc/examples/FiveNumberSummary.md)  
