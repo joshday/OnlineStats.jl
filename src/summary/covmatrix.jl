@@ -52,7 +52,7 @@ function state(obj::CovarianceMatrix, corr=false)
         covmat = V .* covmat .* V'
     end
 
-    return(covmat)
+    return covmat
 end
 
 
@@ -64,6 +64,8 @@ Base.copy(obj::CovarianceMatrix) = CovarianceMatrix(obj.A. obj.B, obj.n, obj.p)
 Base.mean(obj::CovarianceMatrix) = return obj.B
 
 Base.var(obj::CovarianceMatrix) = diag(state(obj::CovarianceMatrix))
+
+Base.std(obj::CovarianceMatrix) = sqrt(diag(state(obj::CovarianceMatrix)))
 
 Base.cov(obj::CovarianceMatrix) = state(obj::CovarianceMatrix)
 

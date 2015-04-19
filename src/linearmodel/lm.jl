@@ -1,43 +1,98 @@
-export OnlineLinearModel
-export mse
+export LinReg
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type OnlineLinearModel <: OnlineStat
-    A::Matrix         # A = [X y]' * [X y]
-    B::Matrix         # "Swept" version of A
-    int::Bool         # intercept in model?
-    p::Int64          # Number of predictors
-    n::Int64          # Number of observations used
-    nb::Int64         # Number of batches used
+
+# This type stores the necessary information to generate OLS, ridge, lasso, and
+# elastic net estimates
+type LinReg <: OnlineStat
+    C::CovarianceMatrix  # Cov([X y])
+    S::Matrix{Float64}   # "Swept" version of C
+    intercept::Bool      # Include intercept?
+    standardize_x::Bool  # Standardize X?
+    standardize_y::Bool  # Standardize y?
+    p::Int64             # Number of predictors
+    n::Int64             # Number of observations used
 end
 
-function OnlineLinearModel(X::Matrix, y::Vector; int::Bool = true)
+function LinReg{T <: Real, S <: Real}(X::Array{T}, y::Vector{S};
+                                      intercept = true,
+                                      standardize_x = true,
+                                      standardize_y = false)
     n, p = size(X)
-    if int
-        X = [ones(n) X]
-        p += 1
-    end
-    A = BLAS.syrk('L', 'T', 1.0, [X y]) / n
-    B = sweep!(copy(A), 1:p)
-    OnlineLinearModel(A, B, int, p, n, 1)
-end
-
-function OnlineLinearModel(x::Vector, y::Vector; int::Bool = true)
-    n = length(x)
-    OnlineLinearModel(reshape(x, n, 1), y, int=int)
+    C = CovarianceMatrix([X y])
+    LinReg(C, cor(C), intercept, standardize_x, standardize_y, p, n)
 end
 
 
 
 #-----------------------------------------------------------------------------#
-#------------------------------------------------------------------------# Base
+#---------------------------------------------------------------------# update!
+function update!{T <: Real, S <: Real}(obj::LinReg, X::Array{T}, y::Vector{S})
+    update!(obj.C, [X y])
+    obj.n += size(X, 1)
+end
 
-mse(obj::OnlineLinearModel) = obj.B[end, end] * (obj.n / (obj.n - obj.p))
 
-StatsBase.coef(obj::OnlineLinearModel) = vec(obj.B[end, 1:obj.p])
 
-function StatsBase.coeftable(obj::OnlineLinearModel)
+#-----------------------------------------------------------------------------#
+#------------------------------------------------------------------------# fit!
+# OLS
+function StatsBase.fit!(obj::LinReg, standardize::Bool = false)
+    if standardize
+        obj.S = cor(obj.C)
+    else
+        obj.S = copy(obj.C.A)
+    end
+    sweep!(obj.S, 1:obj.p)
+end
+
+# Ridge
+# function fit!{P <: Penalty}(obj::LinReg, p::Type{P}, λ = 0)
+#     obj.S = cor(obj.C)
+#     if λ != 0
+#         obj.S += diagm([rep(λ, obj.p), 0])
+#     end
+#     sweep!(obj.S, 1:obj.p)
+# end
+
+
+#-----------------------------------------------------------------------------#
+#-----------------------------------------------------------------------# state
+function state(obj::LinReg, standardize::Bool = false)
+    names = [[symbol("x$i") for i in 1:obj.p], :n, :nb]
+    estimates = [coef(obj, standardize), obj.n, obj.nb]
+    return([names estimates])
+end
+
+# function state(obj::LinReg, ::Type{Ridge}, λ)
+#     names = [[symbol("x$i") for i in 1:obj.p], :λ, :n, :nb]
+#     estimates = [coef(obj, Ridge, λ), λ, obj.n, obj.nb]
+#     return([names estimates])
+# end
+
+
+#-----------------------------------------------------------------------------#
+#-------------------------------------------------------------------------# mse
+function mse(obj::LinReg)
+    fit!(obj)
+    obj.S[end, end] * (obj.n / (obj.n - obj.p))
+end
+
+# function mse(obj::LinReg, ::Type{Ridge}, λ)
+#     fit!(obj, Ridge, λ)
+#     obj.S[end, end] * (obj.n / (obj.n - obj.p))
+# end
+
+
+#-----------------------------------------------------------------------------#
+#-------------------------------------------------------------------# OLS: Base
+function StatsBase.coef(obj::LinReg, standardize::Bool = false)
+    fit!(obj, standardize)
+    vec(obj.S[end, 1:obj.p])
+end
+
+function StatsBase.coeftable(obj::LinReg)
     β = coef(obj)
     se = stderr(obj)
     ts = β ./ se
@@ -46,59 +101,57 @@ function StatsBase.coeftable(obj::OnlineLinearModel)
               ["x$i" for i = 1:obj.p], 4)
 end
 
-function StatsBase.confint{T <: Real}(obj::OnlineLinearModel, level::T = 0.95)
+function StatsBase.confint{T <: Real}(obj::LinReg, level::T = 0.95)
     hcat(coef(obj),coef(obj)) + stderr(obj) *
     quantile(TDist(obj.n - obj.p), (1. - level)/2.) * [1. -1.]
 end
 
-StatsBase.stderr(obj::OnlineLinearModel) = sqrt(diag(vcov(obj)))
+StatsBase.stderr(obj::LinReg) = sqrt(diag(vcov(obj)))
 
-StatsBase.vcov(obj::OnlineLinearModel) = -mse(obj) * obj.B[1:end-1, 1:end-1] / obj.n
+StatsBase.vcov(obj::LinReg) = -mse(obj) * obj.S[1:end-1, 1:end-1] / obj.n
 
-StatsBase.predict(obj::OnlineLinearModel, X::Matrix) = X * coef(obj)
+StatsBase.predict(obj::LinReg, X::Matrix) = X * coef(obj)
 
-StatsBase.deviance(obj::OnlineLinearModel) =
-    error("Not implemented for OnlineLinearModel")
-
-StatsBase.loglikelihood(obj::OnlineLinearModel) =
-    error("Not implemented for OnlineLinearModel")
-
-
-# function Base.merge(m1::OnlineLinearModel, m2::OnlineLinearModel)
-# end
-
-# function Base.merge!(m1::OnlineLinearModel, m2::OnlineLinearModel)
-# end
-
-function Base.show(io::IO, obj::OnlineLinearModel)
+function Base.show(io::IO, obj::LinReg)
     println(io, "Online Linear Model:\n", coeftable(obj))
 end
 
 
 #-----------------------------------------------------------------------------#
-#---------------------------------------------------------------------# update!
-function update!(obj::OnlineLinearModel, X::Matrix, y::Vector)
-    n, p = size(X)
-    if obj.int
-        X = [ones(n) X]
-        p += 1
-    end
-    γ = n / (obj.n + n)
+#-----------------------------------------------------------------# Ridge: Base
+# function StatsBase.coef(obj::LinReg, ::Type{Ridge}, λ)
+#     fit!(obj, Ridge, λ)
+#     σ = std(obj.C)
+#     μ = mean(obj.C)
+#     β = vec(obj.S[end, 1:obj.p]) .* (σ[end] ./ σ[1:end-1])
+#     β₀ = μ[end] - β' * μ[1:end-1]
+#     return [β₀; β]
+# end
 
-    obj.A += γ * (BLAS.syrk('L', 'T', 1.0, [X y]) / n - obj.A)
-    obj.B = sweep!(copy(obj.A), 1:obj.p)
-    obj.n += n
-    obj.nb += 1
-end
 
-update!(obj::OnlineLinearModel, x::Vector, y::Vector) =
-    update!(obj, reshape(x, length(x), 1), y)
 
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-function state(obj::OnlineLinearModel)
-    names = [[symbol("x$i") for i in 1:obj.p], :n, :nb]
-    estimates = [coef(obj), obj.n, obj.nb]
-    return([names estimates])
-end
 
+
+
+
+
+# Testing
+
+n, p = 100, 50
+x = randn(n, p)
+β = [1:p]
+y = x * β + randn(n)
+obj = OnlineStats.LinReg(x, y)
+
+
+
+
+
+# for i in 1:1000
+#     x = randn(n, p)
+#     y = x * β + randn(n)
+#     OnlineStats.update!(obj, x, y)
+# end
+
+# coef(obj)
+# coef(obj, OnlineStats.Ridge, 1)

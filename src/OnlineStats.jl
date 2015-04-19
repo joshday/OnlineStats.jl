@@ -4,7 +4,7 @@ using Docile
 using DataFrames, Distributions, StatsBase
 import PDMats, Distributions
 import Base: copy, merge, merge!, show, quantile
-import StatsBase: nobs, vcov, coef, confint, coeftable, predict
+import StatsBase: nobs, vcov, coef, confint, coeftable, predict, fit, fit!
 import Gadfly
 
 
@@ -78,7 +78,7 @@ include("densityestimation/normalmix.jl")
 # Linear Model
 include("linearmodel/sweep.jl")
 include("linearmodel/lm.jl")
-include("linearmodel/ridge.jl")
+# include("linearmodel/ridge.jl")
 
 # GLM
 include("glm/logisticregsgd.jl")

@@ -3,23 +3,23 @@ using Weave
 dir = Pkg.dir("OnlineStats", "doc", "examples")
 
 examples = (
-    "/OnlineLinearModel.jmd",
-    "/OnlineFitBernoulli.jmd",
-    "/OnlineFitBeta.jmd",
-    "/Summary.jmd",
-    "/QuantileSGD.jmd",
-    "/QuantileMM.jmd",
-    "/quantilecompare.jmd",
-    "/CovarianceMatrix.jmd",
-    "/FiveNumberSummary.jmd",
-    "/Moments.jmd",
-    "/QuantRegSGD.jmd",
-    "/QuantRegMM.jmd",
-    "/quantregcompare.jmd",
-    "/NormalMix.jmd",
+#     "/OnlineLinearModel.jmd",
+#     "/OnlineFitBernoulli.jmd",
+#     "/OnlineFitBeta.jmd",
+#     "/Summary.jmd",
+#     "/QuantileSGD.jmd",
+#     "/QuantileMM.jmd",
+#     "/quantilecompare.jmd",
+#     "/CovarianceMatrix.jmd",
+#     "/FiveNumberSummary.jmd",
+#     "/Moments.jmd",
+#     "/QuantRegSGD.jmd",
+#     "/QuantRegMM.jmd",
+#     "/quantregcompare.jmd",
+#     "/NormalMix.jmd",
     "/LogRegMM.jmd",
     "/LogRegSGD.jmd",
-    "/RidgeReg.jmd"
+#     "/RidgeReg.jmd"
     )
 
 

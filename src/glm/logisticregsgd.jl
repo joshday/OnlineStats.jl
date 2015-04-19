@@ -28,6 +28,10 @@ function LogRegSGD(X::Array, y::Vector; r = 0.51, intercept = true,
     y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
     β += vec(mean(y ./ (1 + exp(y .* X * β)) .* X, 1))
 
+    # likelihood version
+#     y = (y .== unique(sort(y))[2]) - 1 # convert y to 0 / 1
+#     β += vec(X' * (y - logitexp(X * β)))
+
     LogRegSGD(β, intercept, r, n, 1)
 end
 
@@ -41,6 +45,12 @@ function update!(obj::LogRegSGD, X::Matrix, y::Vector)
     y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
     γ = obj.nb ^ -obj.r
     obj.β += γ * vec(mean(y ./ (1 + exp(y .* X * obj.β)) .* X, 1))
+
+    # likelihood version
+#     y = (y .== unique(sort(y))[2]) - 1 # convert y to 0 / 1
+#     obj.β += γ * vec(X' * (y - logitexp(X * obj.β)))
+
+
     obj.n += length(y)
     obj.nb += 1
 end

@@ -1,51 +1,40 @@
-export RidgeReg, mse
+export RidgeReg
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
 type RidgeReg <: OnlineStat
-    A::Matrix{Float64}  # A = [X y]' * [X y] / n
-    B::Matrix{Float64}  # "Swept" version of A
-    int::Bool           # intercept in model?
-    p::Int64            # Number of predictors
-    n::Int64            # Number of observations used
-    nb::Int64           # Number of batches used
+    C::CovarianceMatrix  # Cov([X y])
+    S::Matrix{Float64}   # "Swept" version of C
+    p::Int64             # Number of predictors
+    n::Int64             # Number of observations used
+    nb::Int64            # Number of batches used
 end
 
-function RidgeReg{T <: Real, S <: Real}(X::Matrix{T}, y::Vector{S};
-                                        int::Bool = true)
+function RidgeReg{T <: Real}(X::Array{T}, y::Vector{T})
     n, p = size(X)
-    if int
-        X = [ones(n) X]
-        p += 1
-    end
-    A = BLAS.syrk('L', 'T', 1.0, [X y]) / n
-    RidgeReg(A, A, int, p, n, 1)
-end
-
-function RidgeReg{T <: Real, S <: Real}(x::Vector{T}, y::Vector{S};
-                                                 int::Bool = true)
-    RidgeReg(reshape(x, length(x), 1), y, int=int)
+    C = CovarianceMatrix([X y])
+    RidgeReg(C, cov(C), p, n, 1)
 end
 
 
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!{T <: Real, S <: Real}(obj::RidgeReg, X::Matrix{T}, y::Vector{S})
-    n, p = size(X)
-    if obj.int
-        X = [ones(n) X]
-        p += 1
-    end
-    γ = n / (obj.n + n)
-
-    obj.A += γ * (BLAS.syrk('L', 'T', 1.0, [X y]) / n - obj.A)
-    obj.n += n
+function update!{T <: Real}(obj::RidgeReg, X::Array{T}, y::Vector{T})
+    update!(obj.C, [X y])
+    obj.n += size(X, 1)
     obj.nb += 1
 end
 
-update!{T <: Real, S <: Real}(obj::OnlineLinearModel, x::Vector{T}, y::Vector{S}) =
-    update!(obj, reshape(x, length(x), 1), y)
+
+
+#-----------------------------------------------------------------------------#
+#------------------------------------------------------------------------# fit!
+function StatsBase.fit!(obj::RidgeReg, λ)
+    obj.S = cov(obj.C)
+    obj.S[1:end-1, 1:end-1] += diagm(rep(λ, obj.p))
+    sweep!(obj.S, 1:obj.p)
+end
 
 
 
@@ -60,45 +49,34 @@ end
 
 
 #-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# Other
-# Sweep augmented matrix based on lambda value
-function sweep!{T}(obj::RidgeReg, λ::T = 0)
-    obj.B = copy(obj.A)
-    obj.B[1:end-1, 1:end-1] += diagm(fill(λ / obj.n, obj.p))
-    sweep!(obj.B, 1:obj.p)
-end
-
-function mse{T <: Real}(obj::RidgeReg, λ::T = 0)
-    sweep!(obj, λ)
-    obj.B[end, end] * (obj.n / (obj.n - obj.p))
-end
-
-
-
-#-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
+function mse{T <: Real}(obj::RidgeReg, λ::T = 0)
+    fit!(obj, λ)
+    obj.S[end, end] * (obj.n / (obj.n - obj.p))
+end
+
 function StatsBase.coef{T <: Real}(obj::RidgeReg, λ::T = 0)
-    sweep!(obj, λ)
-    vec(obj.B[end, 1:obj.p])
+    fit!(obj, λ)
+    vec(obj.S[end, 1:obj.p])
 end
 
-function StatsBase.coeftable{T <: Real}(obj::RidgeReg, λ::T = 0)
-    β = coef(obj, λ)
-    se = stderr(obj, λ)
-    ts = β ./ se
-    CoefTable([β se ts ccdf(FDist(1, obj.n - obj.p), abs2(ts))],
-              ["Estimate","Std.Error","t value", "Pr(>|t|)"],
-              ["x$i" for i = 1:obj.p], 4)
-end
+# function StatsBase.coeftable{T <: Real}(obj::RidgeReg, λ::T = 0)
+#     β = coef(obj, λ)
+#     se = stderr(obj, λ)
+#     ts = β ./ se
+#     CoefTable([β se ts ccdf(FDist(1, obj.n - obj.p), abs2(ts))],
+#               ["Estimate","Std.Error","t value", "Pr(>|t|)"],
+#               ["x$i" for i = 1:obj.p], 4)
+# end
 
-function StatsBase.confint{T <: Real}(obj::RidgeReg, λ = 0, level::T = .95)
-    hcat(coef(obj, λ),coef(obj, λ)) + stderr(obj, λ) *
-    quantile(TDist(obj.n - obj.p), (1. - level)/2.) * [1. -1.]
-end
+# function StatsBase.confint{T <: Real}(obj::RidgeReg, λ = 0, level::T = .95)
+#     hcat(coef(obj, λ),coef(obj, λ)) + stderr(obj, λ) *
+#     quantile(TDist(obj.n - obj.p), (1. - level)/2.) * [1. -1.]
+# end
 
-StatsBase.stderr(obj::RidgeReg, λ = 0) = sqrt(diag(vcov(obj, λ)))
+# StatsBase.stderr(obj::RidgeReg, λ = 0) = sqrt(diag(vcov(obj, λ)))
 
-StatsBase.vcov(obj::RidgeReg, λ = 0) = -mse(obj, λ) * obj.B[1:end-1, 1:end-1] / obj.n
+# StatsBase.vcov(obj::RidgeReg, λ = 0) = -mse(obj, λ) * obj.S[1:end-1, 1:end-1] / obj.n
 
 function StatsBase.predict{T <: Real}(obj::RidgeReg, X::Matrix{T}, λ = 0)
     X * coef(obj, λ)
@@ -121,16 +99,28 @@ end
 
 # testing
 
-x = randn(100, 10)
-y = vec(sum(x, 2)) + randn(100)
+n, p = 100, 50
+x = randn(n, p)
+β = [1:p]
+y = x * β + randn(n)
 obj = OnlineStats.RidgeReg(x, y)
 obj1 = OnlineStats.OnlineLinearModel(x, y)
 
 
 for i in 1:100
-    x = randn(100, 10)
-    y = vec(sum(x, 2)) + randn(100)
+    x = randn(n, p)
+    y = x * β + randn(n)
     OnlineStats.update!(obj, x, y)
     OnlineStats.update!(obj1, x, y)
 end
 
+λs = 0:.1:6
+results = zeros(length(λs), obj.p + 1)
+for i in 1:length(λs)
+    results[i, :] = [coef(obj, λs[i])' λs[i]]
+end
+
+df = convert(DataFrame, results)
+names!(df, [[symbol("x$i") for i in 1:obj.p], :λ])
+df_melt = melt(df, obj.p + 1)
+plot(df_melt, x=:λ, y=:value, color=:variable, Geom.line)
