@@ -22,13 +22,13 @@ end
 #---------------------------------------------------------------------# update!
 function update!{T <: Real}(obj::CovarianceMatrix, x::Matrix{T})
     n2 = size(x, 1)
-    A2 = BLAS.syrk('L', 'T', 1.0, x) / n2
-    B2 = vec(mean(x, 1))
-
     obj.n += n2
     γ = n2 / obj.n
-    obj.A += γ * (A2 - obj.A)
-    obj.B += γ * (B2 - obj.B)
+
+    # Update B
+    obj.B += γ * (vec(mean(x, 1)) - obj.B)
+    # Update A
+    BLAS.syrk!('L', 'T', γ, x / sqrt(n2), 1 - γ, obj.A)
 end
 
 
@@ -67,9 +67,43 @@ Base.var(obj::CovarianceMatrix) = diag(state(obj::CovarianceMatrix))
 
 Base.std(obj::CovarianceMatrix) = sqrt(diag(state(obj::CovarianceMatrix)))
 
-Base.cov(obj::CovarianceMatrix) = state(obj::CovarianceMatrix)
+function Base.cov(obj::CovarianceMatrix)
+    B = obj.B
+    p = size(B, 1)
+    covmat = obj.A * obj.n / (obj.n - 1) -
+        BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
 
-Base.cor(obj::CovarianceMatrix) = state(obj::CovarianceMatrix, true)
+    for i in 1:p
+        for j in i:p
+            covmat[i, j] = covmat[j, i]
+        end
+    end
+
+    if corr
+        V = 1 ./ sqrt(diag(covmat))
+        covmat = V .* covmat .* V'
+    end
+
+    return covmat
+end
+
+function Base.cor(obj::CovarianceMatrix)
+    B = obj.B
+    p = size(B, 1)
+    covmat = obj.A * obj.n / (obj.n - 1) -
+        BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
+
+    for i in 1:p
+        for j in i:p
+            covmat[i, j] = covmat[j, i]
+        end
+    end
+
+    V = 1 ./ sqrt(diag(covmat))
+    covmat = V .* covmat .* V'
+
+    return covmat
+end
 
 
 function Base.merge(c1::CovarianceMatrix, c2::CovarianceMatrix)
