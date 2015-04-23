@@ -39,7 +39,6 @@ function state(obj::CovarianceMatrix, corr=false)
     p = size(B, 1)
     covmat = obj.A * obj.n / (obj.n - 1) -
         BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
-    tril!(covmat)
 
     for i in 1:p
         for j in i:p
@@ -72,18 +71,11 @@ function Base.cov(obj::CovarianceMatrix)
     p = size(B, 1)
     covmat = obj.A * obj.n / (obj.n - 1) -
         BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
-
     for i in 1:p
         for j in i:p
             covmat[i, j] = covmat[j, i]
         end
     end
-
-    if corr
-        V = 1 ./ sqrt(diag(covmat))
-        covmat = V .* covmat .* V'
-    end
-
     return covmat
 end
 
@@ -92,16 +84,13 @@ function Base.cor(obj::CovarianceMatrix)
     p = size(B, 1)
     covmat = obj.A * obj.n / (obj.n - 1) -
         BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
-
     for i in 1:p
         for j in i:p
             covmat[i, j] = covmat[j, i]
         end
     end
-
     V = 1 ./ sqrt(diag(covmat))
     covmat = V .* covmat .* V'
-
     return covmat
 end
 

@@ -33,3 +33,4 @@ abstract Unpenalized <: Penalty
 abstract Lasso <: Penalty
 abstract Ridge <: Penalty
 abstract ElasticNet <: Penalty
+abstract Stepwise <: Penalty

@@ -77,7 +77,8 @@ include("densityestimation/normalmix.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-include("linearmodel/lm.jl")
+include("linearmodel/linreg.jl")
+include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
 
 # GLM
