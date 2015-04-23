@@ -35,23 +35,11 @@ end
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::CovarianceMatrix, corr=false)
-    B = obj.B
-    p = size(B, 1)
-    covmat = obj.A * obj.n / (obj.n - 1) -
-        BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
-
-    for i in 1:p
-        for j in i:p
-            covmat[i, j] = covmat[j, i]
-        end
-    end
-
     if corr
-        V = 1 ./ sqrt(diag(covmat))
-        covmat = V .* covmat .* V'
+        return cor(obj)
+    else
+        return cov(obj)
     end
-
-    return covmat
 end
 
 
@@ -62,9 +50,9 @@ Base.copy(obj::CovarianceMatrix) = CovarianceMatrix(obj.A. obj.B, obj.n, obj.p)
 
 Base.mean(obj::CovarianceMatrix) = return obj.B
 
-Base.var(obj::CovarianceMatrix) = diag(state(obj::CovarianceMatrix))
+Base.var(obj::CovarianceMatrix) = diag(cov(obj::CovarianceMatrix))
 
-Base.std(obj::CovarianceMatrix) = sqrt(diag(state(obj::CovarianceMatrix)))
+Base.std(obj::CovarianceMatrix) = sqrt(var(obj::CovarianceMatrix))
 
 function Base.cov(obj::CovarianceMatrix)
     B = obj.B
