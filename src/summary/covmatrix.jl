@@ -2,7 +2,7 @@ export CovarianceMatrix
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type CovarianceMatrix <: ContinuousMultivariateOnlineStat
+type CovarianceMatrix <: ContinuousMatrixOnlineStat{Analytical}
     A::Matrix    # X' * X
     B::Vector    # X * 1'
     n::Int64     # number of observations used

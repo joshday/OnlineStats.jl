@@ -2,7 +2,7 @@ export Mean
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Mean <: ContinuousUnivariateOnlineStat
+type Mean <: ContinuousUnivariateOnlineStat{Analytical}
     mean::Float64
     n::Int64
 end

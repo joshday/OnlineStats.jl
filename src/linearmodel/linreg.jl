@@ -2,9 +2,7 @@ export LinReg
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-
-# This type stores the necessary information to generate OLS estimates
-type LinReg <: OnlineStat
+type LinReg <: ContinuousMultivariateOnlineStat{Analytical}
     C::CovarianceMatrix  # Cov([X y])
     S::Matrix{Float64}   # "Swept" version of C
     p::Int64             # Number of predictors
@@ -21,7 +19,8 @@ end
 
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!{T <: Real, S <: Real}(obj::LinReg, X::Array{T}, y::Vector{S})
+function update!{T <: Real, S <: Real}(obj::LinReg, X::Array{T},
+                                       y::Vector{S})
     update!(obj.C, [X y])
     obj.n += size(X, 1)
 end
@@ -117,17 +116,17 @@ end
 
 # Testing
 
-using StatsBase
-n, p = 1000, 250
-truep = [1:10]
-x = randn(n, p)
-β = [truep; zeros(p - length(truep))]
-y = x * β + randn(n)
+# using StatsBase
+# n, p = 1000, 250
+# truep = [1:10]
+# x = randn(n, p)
+# β = [truep; zeros(p - length(truep))]
+# y = x * β + randn(n)
 
-obj = OnlineStats.LinReg(x, y)
-@time for i in 2:100
-    copy!(x, randn(n, p))
-    copy!(y, x * β + randn(n))
-    OnlineStats.update!(obj, x, y)
-end
-resid = y - predict(obj, x)
+# obj = OnlineStats.LinReg(x, y)
+# @time for i in 2:100
+#     copy!(x, randn(n, p))
+#     copy!(y, x * β + randn(n))
+#     OnlineStats.update!(obj, x, y)
+# end
+# resid = y - predict(obj, x)

@@ -2,7 +2,7 @@ export Var
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Var <: ContinuousUnivariateOnlineStat
+type Var <: ContinuousUnivariateOnlineStat{Analytical}
     mean::Float64
     var::Float64    # BIASED variance (makes for easier update)
     n::Int64
