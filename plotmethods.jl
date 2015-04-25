@@ -1,7 +1,7 @@
 # Boxplot from FiveNumberSummary
-function Gadfly.plot(obj::FiveNumberSummary)
-    s = state(obj)[1:5, 2]
-    iqr = obj.quantile.est[3] - obj.quantile.est[1]
+function Gadfly.plot(obj::OnlineStats.FiveNumberSummary)
+    s = OnlineStats.state(obj)[:value]
+    iqr = s[3] - s[1]
     Gadfly.plot(
         Gadfly.layer(lower_fence = [maximum((s[2] - 1.5 * iqr, s[1]))],
               lower_hinge = [s[2]],
