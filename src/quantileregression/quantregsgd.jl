@@ -5,11 +5,11 @@ export QuantRegSGD
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------------# OnlineQuantReg
-type QuantRegSGD <: OnlineStat
+type QuantRegSGD <: MultivariateOnlineStat
     β::Vector         # Coefficients
     τ::Float64        # Desired conditional quantile
     r::Float64        # learning rate
-    intercept::Bool   # intercept in model?
+    intercept::Bool   # add intercept to model?
     n::Int64          # Number of observations used
     nb::Int64         # Number of batches used
 end
@@ -69,10 +69,10 @@ end
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::QuantRegSGD)
-    names = [[symbol("β$i") for i in [1:length(obj.β)] - obj.intercept];
-             :n; :nb]
-    estimates = [obj.β, obj.n, obj.nb]
-    return([names estimates])
+    DataFrame(variable = [symbol("β$i") for i in [1:length(obj.β)] - obj.intercept],
+              value = obj.β,
+              r = obj.r,
+              n = nobs(obj))
 end
 
 

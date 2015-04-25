@@ -57,8 +57,8 @@ include("summary/fivenumber.jl")
 # include("glm/logisticregsn.jl")
 
 # Quantile Regression
-# include("quantileregression/quantregsgd.jl")
-# include("quantileregression/quantregmm.jl")
+include("quantileregression/quantregsgd.jl")
+include("quantileregression/quantregmm.jl")
 
 
 

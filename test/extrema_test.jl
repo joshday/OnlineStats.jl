@@ -1,6 +1,6 @@
 using OnlineStats
 using Base.Test
-println("extrema_test.jl")
+println("* extrema_test.jl")
 
 
 # Extrema, update!, merge, merge!, max, min,
@@ -49,8 +49,11 @@ obj1 = copy(obj)
 @test max(obj1) == maximum(x1)
 @test min(obj1) == minimum(x1)
 @test nobs(obj1) == n1
-@test state(obj) == [[:max, :min, :n] [max(obj), min(obj), nobs(obj)]]
+@test state(obj) == DataFrames.DataFrame(
+    variable = [:max, :min],
+    value = [max(obj), min(obj)],
+    n = nobs(obj))
 
 
 # clean up
-x1, x2, x = zeros(3)
+x1 = x2 = x = 0

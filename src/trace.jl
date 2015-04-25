@@ -23,6 +23,7 @@ function trace_df{T <: OnlineStat}(::Type{T}, y::Array, b::Int64; args...)
 end
 
 
+# Get trace results for two types
 # function trace_df{T <: UnivariateOnlineStat, S <: UnivariateOnlineStat}(
 #         ::Type{T}, ::Type{S}, y::Vector, b::Int64)
 

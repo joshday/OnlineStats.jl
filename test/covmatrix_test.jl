@@ -1,6 +1,6 @@
 using OnlineStats
 using Base.Test
-println("covmatrix_test.jl")
+println("* covmatrix_test.jl")
 
 # create 4 batches
 n1, n2, n3, n4 = rand(1:1_000_000, 4)
@@ -11,17 +11,17 @@ x4 = rand(n4, 10)
 
 # update!
 obj = OnlineStats.CovarianceMatrix(x1)
+@test state(obj) == convert(DataFrames.DataFrame, cov(obj))
 OnlineStats.update!(obj, x2)
 OnlineStats.update!(obj, x3)
 OnlineStats.update!(obj, x4)
 
 # Check that covariance matrix is approximately equal to truth
 c = cov([x1,x2,x3,x4])
+cobj = OnlineStats.cov(obj)
 for i in 1:10
     for j in 1:i
-        @test_approx_eq_eps(c[i,j],
-                            OnlineStats.state(obj)[i,j],
-                            1e-10)
+        @test_approx_eq_eps(c[i,j], cobj[i,j], 1e-10)
     end
 end
 
@@ -54,5 +54,5 @@ end
 @test obj5.n == obj.n
 
 # Remove large matrices
-x1, x2, x3, x4 = zeros(4)
+x1 = x2 = x3 = x4 = 0;
 

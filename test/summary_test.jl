@@ -1,6 +1,6 @@
 using OnlineStats
 using Base.Test
-println("summary_test.jl")
+println("* summary_test.jl")
 
 
 # Summary(x1), merge, merge!, mean, var, max, min
@@ -16,6 +16,11 @@ ob = Summary(x1)
 @test ob.extrema.max == maximum(x1)
 @test ob.extrema.min == minimum(x1)
 @test ob.n == n1
+
+@test state(ob) == DataFrames.DataFrame(
+    variable = [:μ, :σ², :max, :min],
+    value = [mean(ob), var(ob), maximum(x1), minimum(x1)],
+    n = nobs(ob))
 
 update!(ob, x2)
 @test_approx_eq ob.mean.mean mean(x)
@@ -48,5 +53,5 @@ merge!(ob, ob2)
 
 
 # clean up
-x1, x2, x = zeros(3)
+x1 = x2 = x = 0;
 

@@ -4,7 +4,7 @@ export QuantRegMM
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------# QuantRegMM
-type QuantRegMM <: OnlineStat
+type QuantRegMM <: MultivariateOnlineStat
     β::Vector         # Coefficients
     τ::Float64        # Desired conditional quantile
     r::Float64        # learning rate
@@ -79,10 +79,10 @@ end
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::QuantRegMM)
-    names = [[symbol("β$i") for i in [1:length(obj.β)] - obj.intercept];
-             :n; :nb]
-    estimates = [obj.β, obj.n, obj.nb]
-    return([names estimates])
+    DataFrame(variable = [symbol("β$i") for i in [1:length(obj.β)] - obj.intercept],
+              value = obj.β,
+              r = obj.r,
+              n = nobs(obj))
 end
 
 

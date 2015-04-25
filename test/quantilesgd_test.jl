@@ -1,13 +1,13 @@
 using OnlineStats
 using Base.Test
-using Distributions
-println("quantilesgd_test.jl")
+println("* quantilesgd_test.jl")
 
 τ = [1:0.5:9]/10
 obj_uniform = QuantileSGD(rand(100), τ = τ, r = .8)
 obj_normal = QuantileSGD(randn(100), τ = τ, r = .8)
+@test typeof(state(obj_normal)) == DataFrames.DataFrame
 
-for i in 1:100000
+for i in 1:100_000
     update!(obj_uniform, rand(100))
     update!(obj_normal, randn(100))
 end
@@ -15,8 +15,8 @@ end
 @test_approx_eq_eps(maxabs(obj_uniform.est - τ), 0, .01)
 @test_approx_eq_eps(maxabs(obj_normal.est - quantile(Normal(), τ)), 0, .01)
 
-@test size(make_df(obj_uniform), 1) == 1
-@test size(make_df(obj_uniform), 2) == length(τ) + 3
+@test size(state(obj_uniform), 1) == length(τ)
+@test size(state(obj_uniform), 2) == 4
 @test obj_uniform.n == 100 + 100000*100
 @test obj_uniform.nb == 100001
 

@@ -1,6 +1,6 @@
 using OnlineStats
 using Base.Test
-println("sweep_test.jl")
+println("* sweep_test.jl")
 
 for i in 1:10
     n = rand(1:10_000, 1)[1]

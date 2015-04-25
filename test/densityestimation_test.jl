@@ -1,7 +1,7 @@
 using OnlineStats
 using Base.Test
 using Distributions, PDMats
-println("densityestimation_test.jl")
+println("* densityestimation_test.jl")
 
 #------------------------------------------------------------------------------#
 #                                                                    Bernoulli #

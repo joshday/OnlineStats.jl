@@ -38,7 +38,7 @@ function state(obj::CovarianceMatrix, cormat=false)
     if cormat
         df = convert(DataFrame, cor(obj))
     else
-        df = convert(DataFrame, cor(obj))
+        df = convert(DataFrame, cov(obj))
     end
     return df
 end

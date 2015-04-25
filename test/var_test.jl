@@ -1,6 +1,6 @@
 using OnlineStats
 using Base.Test
-println("var_test.jl")
+println("* var_test.jl")
 
 
 # "Standard" form: Var(x1), Base.mean, Base.var, merge, merge!
@@ -40,7 +40,7 @@ obj = Var()
 @test nobs(obj) == 0
 @test mean(obj) == 0.0
 @test var(obj) == 0.0
-@test state(obj) == [[:mean, :var, :n] [0., 0., 0.]]
+@test state(obj) == DataFrames.DataFrame(variable = :σ² , value = 0., n=0)
 update!(obj, x1)
 @test mean(obj) == mean(x1)
 @test_approx_eq var(obj)  var(x1)
@@ -52,4 +52,4 @@ obj1 = copy(obj)
 @test nobs(obj) == n1
 
 # clean up
-x1, x2, x = zeros(3)
+x1 = x2 = x = 0;

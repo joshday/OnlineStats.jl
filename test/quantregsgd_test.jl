@@ -1,6 +1,6 @@
 using OnlineStats
 using Base.Test
-println("quantregsgd_test.jl")
+println("* quantregsgd_test.jl")
 
 
 x = randn(100, 5)
@@ -24,3 +24,5 @@ for i in 2:6
     @test_approx_eq_eps(coef(obj1)[i], 1, .1)
     @test_approx_eq_eps(coef(obj2)[i], 1, .1)
 end
+
+@test typeof(state(obj1)) == DataFrames.DataFrame

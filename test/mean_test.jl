@@ -30,7 +30,7 @@ merge!(obj1, obj2)
 obj = Mean()
 @test obj.mean == 0.0
 @test obj.n == 0
-@test state(obj) == [[:mean, :n] [0.0, 0]]
+@test state(obj) == DataFrames.DataFrame(variable = :μ, value = 0., n=0)
 @test mean(obj) == 0.0
 update!(obj, x1)
 @test mean(obj) == mean(x1)
@@ -43,4 +43,4 @@ obj2 = Mean(x1[1])
 @test nobs(obj2) == 1
 
 # clean up
-x1, x2, x = zeros(3)
+x1 = x2 = x = 0;
