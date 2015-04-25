@@ -2,7 +2,7 @@ export Moments
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Moments <: ContinuousUnivariateOnlineStat
+type Moments <: MultivariateOnlineStat
     m1m2::Var
     m3::Float64
     m4::Float64
@@ -30,12 +30,11 @@ function update!(obj::Moments, y::Vector)
 
     update!(obj.m1m2, y)
 
-#     c = (1 - γ)^2 - γ*(1-γ) + γ^2
     c = 1 - γ * (1 - γ)
     m4 += γ * (m4_ - m4) + γ * (1 - γ) * δ *
         ((c * δ^3) + 6 * (m2_ + γ * (m2 - m2_))*δ  + 4 * (m3_ - m3))
 
-    m3 += γ * (m3_ - m3) + γ * (1 - γ) * ((n1 - n2) / n) * δ^3
+    m3 += γ * (m3_ - m3) + γ * (1 - γ) * ((n1 - n2) / n) * δ ^ 3
     m3 += 3 * γ * ((1 - γ) * m2_ - γ * m2) * δ
 
     obj.m3 = m3
@@ -49,19 +48,9 @@ update!(obj::Moments, y::Real) = update!(obj, [y])
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::Moments)
-    n::Int64 = obj.n
-    m1::Float64 = obj.m1m2.mean
-    ubvar::Float64 = obj.m1m2.var * (n / (n-1))
-    m3::Float64 = obj.m3
-    m4::Float64 = obj.m4
-
-    names = [:mean, :var, :skewness, :kurtosis, :n]
-    estimates = [m1,
-                 ubvar,
-                 m3 / ubvar ^ 1.5,
-                 m4/ ubvar ^ 2 - 3.0, n]
-
-    return([names estimates])
+    DataFrame(variable = [:μ, :σ², :skewness, :kurtosis],
+              value = [mean(obj), var(obj), skewness(obj), kurtosis(obj)],
+              n = nobs(obj))
 end
 
 
@@ -71,7 +60,7 @@ Base.mean(m::Moments) = return m.m1m2.mean
 
 Base.var(m::Moments) = return m.m1m2.var  * (m.n / (m.n - 1))
 
-StatsBase.skewness(m::Moments) =return m.m3 / var(m)^1.5
+StatsBase.skewness(m::Moments) = return m.m3 / var(m)^1.5
 
 StatsBase.kurtosis(m::Moments) = return m.m4 / var(m)^2 - 3.0
 

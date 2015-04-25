@@ -2,7 +2,7 @@ export Mean
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Mean <: ContinuousUnivariateOnlineStat{Analytical}
+type Mean <: UnivariateOnlineStat
     mean::Float64
     n::Int64
 end
@@ -27,11 +27,7 @@ update!{T <: Real}(obj::Mean, y::T) = update!(obj, [y])
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# state
-function state(obj::Mean)
-    names = [:mean, :n]
-    values = [obj.mean, obj.n]
-    return([names values])
-end
+state(obj::Mean) = DataFrame(variable = :μ, value = mean(obj), n = nobs(obj))
 
 
 #----------------------------------------------------------------------------#

@@ -2,7 +2,7 @@ export QuantileMM
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type QuantileMM <: ContinuousUnivariateOnlineStat
+type QuantileMM <: MultivariateOnlineStat
     est::Vector{Float64}              # Quantiles
     τ::Vector{Float64}                # tau values
     r::Float64                        # learning rate
@@ -53,10 +53,10 @@ update!(obj::QuantileMM, y::Real) = update!(obj, [y])
 #------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::QuantileMM)
-    names::Array{Symbol} = [[symbol("q" * string(int(100*i))) for i in obj.τ];
-                            :r; :n; :nb]
-    estimates = [obj.est; obj.r; obj.n; obj.nb]
-    return([names estimates])
+    DataFrame(variable = [symbol("q" * string(int(100*i))) for i in obj.τ],
+              value = obj.est,
+              r = obj.r,
+              n = nobs(obj))
 end
 
 
@@ -82,25 +82,3 @@ function Base.show(io::IO, obj::QuantileMM)
     println(io, "Online Quantile (Online MM):\n", state(obj))
     return
 end
-
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-y1 = rand(111)
-y2 = rand(222)
-y3 = rand(1)
-
-obj = OnlineStats.QuantileMM(y1, τ = [.1, .2, .4])
-y2 = rand(100)
-OnlineStats.update!(obj, y2)
-OnlineStats.update!(obj, y3)
-OnlineStats.state(obj)
-
-obj = OnlineStats.QuantileSGD(y1, τ = [.1, .2, .4])
-y2 = rand(100)
-OnlineStats.update!(obj, y2)
-OnlineStats.update!(obj, y3)
-OnlineStats.state(obj)
-
-OnlineStats.update!(obj, .5)
-
-

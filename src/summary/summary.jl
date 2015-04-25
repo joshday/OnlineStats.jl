@@ -2,7 +2,7 @@ export Summary
 
 #----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
-type Summary <: ContinuousUnivariateOnlineStat
+type Summary <: MultivariateOnlineStat
     mean::Mean        # mean
     var::Var          # variance
     extrema::Extrema  # max and min
@@ -34,11 +34,9 @@ update!{T <: Real}(obj::Summary, y::T) = update!(obj, [y])
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# state
 function state(obj::Summary)
-    names = [:mean, :var, :max, :min, :n]
-    estimates = [obj.mean.mean, obj.var.var * (obj.n - 1) / obj.n,
-                 obj.extrema.max, obj.extrema.min,
-                 obj.n]
-    return([names estimates])
+    DataFrame(variable = [:μ, :σ², :max, :min],
+              value = [mean(obj), var(obj), max(obj), min(obj)],
+              n = nobs(obj))
 end
 
 

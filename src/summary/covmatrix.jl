@@ -2,7 +2,7 @@ export CovarianceMatrix
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type CovarianceMatrix <: ContinuousMatrixOnlineStat{Analytical}
+type CovarianceMatrix <: MatrixvariateOnlineStat
     A::Matrix    # X' * X
     B::Vector    # X * 1'
     n::Int64     # number of observations used
@@ -34,12 +34,13 @@ end
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::CovarianceMatrix, corr=false)
-    if corr
-        return cor(obj)
+function state(obj::CovarianceMatrix, cormat=false)
+    if cormat
+        df = convert(DataFrame, cor(obj))
     else
-        return cov(obj)
+        df = convert(DataFrame, cor(obj))
     end
+    return df
 end
 
 
@@ -112,7 +113,7 @@ function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
 end
 
 function Base.show(io::IO, obj::CovarianceMatrix)
-    println(io, "Online Covariance Matrix:\n", state(obj))
+    println(io, "Online Covariance Matrix:\n", cov(obj))
 end
 
 

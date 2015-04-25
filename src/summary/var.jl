@@ -2,7 +2,7 @@ export Var
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Var <: ContinuousUnivariateOnlineStat{Analytical}
+type Var <: UnivariateOnlineStat
     mean::Float64
     var::Float64    # BIASED variance (makes for easier update)
     n::Int64
@@ -51,12 +51,7 @@ end
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::Var)
-    unbiasedvar = obj.var * (obj.n / (obj.n - 1))
-    names = [:mean, :var, :n]
-    values = [obj.mean, unbiasedvar, obj.n]
-    return([names values])
-end
+state(obj::Var) = DataFrame(variable = :σ², value = var(obj), n = nobs(obj))
 
 
 #-----------------------------------------------------------------------------#

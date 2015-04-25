@@ -2,7 +2,7 @@ export Extrema
 
 #----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
-type Extrema <: ContinuousUnivariateOnlineStat
+type Extrema <: MultivariateOnlineStat
     max::Float64
     min::Float64
     n::Int64
@@ -29,9 +29,9 @@ update!{T <: Real}(obj::Extrema, y::T) = update!(obj, [y])
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# state
 function state(obj::Extrema)
-    names = [:max, :min, :n]
-    values = [obj.max, obj.min, obj.n]
-    return([names values])
+    DataFrame(variable = [:max, :min],
+              value = [max(obj), min(obj)],
+              n = nobs(obj))
 end
 
 

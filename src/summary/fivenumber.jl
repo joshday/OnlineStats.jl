@@ -2,7 +2,7 @@ export FiveNumberSummary
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type FiveNumberSummary <: ContinuousUnivariateOnlineStat
+type FiveNumberSummary <: MultivariateOnlineStat
     min::Float64
     quantile::QuantileSGD
     max::Float64
@@ -35,34 +35,9 @@ update(obj::FiveNumberSummary, x::Real) = update!(obj, [x])
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::FiveNumberSummary)
-    names = [:min, :q25, :q50, :q75, :max, :n, :nb]
-    estimates = [obj.min, obj.quantile.est, obj.max, obj.n, obj.nb]
-    return([names estimates])
-end
-
-
-
-#-----------------------------------------------------------------------------#
-#--------------------------------------------------------------------# Boxplot
-function state(obj::FiveNumberSummary)
-    names = [:min, :q25, :q50, :q75, :max, :n, :nb]
-    estimates = [obj.min, obj.quantile.est, obj.max, obj.n, obj.nb]
-    return([names estimates])
-end
-
-
-function Gadfly.plot(obj::FiveNumberSummary)
-    s = state(obj)[1:5, 2]
-    iqr = obj.quantile.est[3] - obj.quantile.est[1]
-    Gadfly.plot(
-        Gadfly.layer(lower_fence = [maximum((s[2] - 1.5 * iqr, s[1]))],
-              lower_hinge = [s[2]],
-              middle = [s[3]],
-              upper_hinge = [s[4]],
-              upper_fence = [minimum((s[4] + 1.5 * iqr, s[5]))],
-              # outliers = [s[1], s[5]],
-              x = ["Data"], Gadfly.Geom.boxplot),
-        Gadfly.layer(x = ["Data"], y=[s[1], s[5]], Gadfly.Geom.point))
+    DataFrame(variable = [:min, :q25, :q50, :q75, :max],
+              value = [obj.min, obj.quantile.est, obj.max],
+              n = nobs(obj))
 end
 
 

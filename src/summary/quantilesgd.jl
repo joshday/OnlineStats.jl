@@ -2,7 +2,7 @@ export QuantileSGD
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type QuantileSGD <: ContinuousUnivariateOnlineStat
+type QuantileSGD <: MultivariateOnlineStat
     est::Vector{Float64}              # Quantile estimates
     τ::Vector{Float64}                # tau values (which quantiles)
     r::Float64                        # learning rate
@@ -21,10 +21,9 @@ QuantileSGD(y::Real; args...) = QuantileSGD([y], args)
 #-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
 function update!(obj::QuantileSGD, y::Vector)
-    γ::Float64 = obj.nb ^ - obj.r
 
     for i in 1:length(obj.τ)
-        obj.est[i] -= γ * (mean(y .< obj.est[i]) - obj.τ[i])
+        obj.est[i] -= (obj.nb ^ - obj.r) * (mean(y .< obj.est[i]) - obj.τ[i])
     end
 
     obj.n += length(y)
@@ -34,16 +33,14 @@ end
 update!(obj::QuantileSGD, y::Real) = update!(obj, [y])
 
 
-
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
 function state(obj::QuantileSGD)
-    names::Array{Symbol} = [[symbol("q" * string(int(100*i))) for i in obj.τ];
-                            :r; :n; :nb]
-    estimates = [obj.est; obj.r; obj.n; obj.nb]
-    return([names estimates])
+    DataFrame(variable = [symbol("q" * string(int(100*i))) for i in obj.τ],
+              value = obj.est,
+              r = obj.r,
+              n = nobs(obj))
 end
-
 
 
 #-----------------------------------------------------------------------------#

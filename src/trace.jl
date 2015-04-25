@@ -1,43 +1,47 @@
 export trace_df
 
-function trace_df{T<:ContinuousUnivariateOnlineStat}(::Type{T}, y::Vector,
-                                                  b::Int64; args...)
+function trace_df{T <: OnlineStat}(::Type{T}, y::Array, b::Int64; args...)
+    T <: MatrixvariateOnlineStat &&
+        error("Matrixvariate estimates do not work with trace_df")
+
+    # Create object with first batch
     n = length(y)
-    ybatch = y[1:b]
+    ind = 1:b
+    ybatch = y[ind]
     obj = T(ybatch; args...)
-    df = make_df(obj)
+    df = state(obj)
 
+    # Update DataFrame with each batch
     for i in 2:n/b
-        ind = b * (i - 1) + 1 : b*i
-        ybatch = y[ind]
+        ind += b
+        copy!(ybatch, y[ind])
         update!(obj, ybatch)
-        make_df!(df, obj)
+        addstate!(df, obj)
     end
 
     return obj, df
 end
 
 
-function trace_df{T<:ContinuousUnivariateOnlineStat}(::Type{T}, y::Vector,
-                                                  b::Int64, start; args...)
-    n = length(y)
-    ybatch = y[1:b]
-    obj = T([start]; args...)
-    df = make_df(obj)
+# function trace_df{T <: UnivariateOnlineStat, S <: UnivariateOnlineStat}(
+#         ::Type{T}, ::Type{S}, y::Vector, b::Int64)
 
-    for i in 1:n/b
-        ind = b * (i - 1) + 1 : b*i
-        ybatch = y[ind]
-        update!(obj, ybatch)
-        make_df!(df, obj)
-    end
+#     n = length(y)
+#     ind = 1:b
+#     ybatch = y[ind]
+#     obj1 = T(ybatch)
+#     obj2 = S(ybatch)
+#     df = state(obj1)
+#     addstate!(df, obj2)
 
-    return obj, df
-end
+#     for i in 2:n/b
+#         ind += b
+#         copy!(ybatch, y[ind])
+#         update!(obj1, ybatch)
+#         update!(obj2, ybatch)
+#         addstate!(df, obj1)
+#         addstate!(df, obj2)
+#     end
 
-
-# Testing:
-# x = rand(Gamma(5,1), 10000)
-# qtrace = OnlineStats.trace_df(OnlineStats.QuantileSGD, x, 10, τ = [.7], r=.6)
-# qtrace[1]
-# qtrace[2]
+#     return obj, df
+# end
