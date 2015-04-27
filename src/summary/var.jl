@@ -1,8 +1,5 @@
-export Var
-
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Var <: UnivariateOnlineStat
+type Var <: ScalarOnlineStat
     mean::Float64
     var::Float64    # BIASED variance (makes for easier update)
     n::Int64
@@ -22,39 +19,37 @@ Var{T <: Real}(y::T) = Var([y])
 Var() = Var(0.0, 0.0, 0)
 
 
-#-----------------------------------------------------------------------------#
+#-------------------------------------------------------------# param and value
+param(obj::Var) = [:μ, :σ²]
+
+value(obj::Var) = [mean(obj), var(obj)]
+
+
 #---------------------------------------------------------------------# update!
 function update!{T <: Real}(obj::Var, y::Vector{T})
-    var2 = Var(y)
+    var2 = Var(y) # to get unbiased variance
     n1 = obj.n
     n2 = var2.n
     n = n1 + n2
     μ1 = obj.mean
-    μ2 = var2.mean
+    μ2 = mean(y)
     δ = μ2 - μ1
     γ = n2 / n
 
     obj.mean += γ * δ
 
-    if n2 > 1
-        obj.var += γ * (var2.var - obj.var) + γ * (1 - γ) * δ^2
-    else
-        obj.var = (n1 / n) * obj.var + (y[1] - μ1) * (y[1] - obj.mean) /n
-    end
+    obj.var += γ * (var2.var - obj.var) + γ * (1 - γ) * δ ^ 2
+
     obj.n = n
 end
 
 function update!{T <: Real}(obj::Var, y::T)
-    update!(obj, [y])
+    δ = y - obj.mean
+    obj.n += 1
+    obj.var = ((obj.n - 1) / obj.n) * obj.var + δ ^ 2 / obj.n
 end
 
 
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-state(obj::Var) = DataFrame(variable = :σ², value = var(obj), n = nobs(obj))
-
-
-#-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
 Base.mean(obj::Var) = return obj.mean
 
@@ -98,12 +93,3 @@ function Base.merge!(a::Var, b::Var)
     end
     a.n = n
 end
-
-function Base.show(io::IO, obj::Var)
-    @printf(io, "Online Variance\n")
-    @printf(io, " * Mean:     %f\n", mean(obj))
-    @printf(io, " * Variance: %f\n", var(obj))
-    @printf(io, " * N:        %d\n", obj.n)
-    return
-end
-

@@ -1,8 +1,5 @@
-export Summary
-
-#----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
-type Summary <: MultivariateOnlineStat
+type Summary <: ScalarOnlineStat
     mean::Mean        # mean
     var::Var          # variance
     extrema::Extrema  # max and min
@@ -18,7 +15,13 @@ Summary{T <: Real}(y::T) = Summary([y])
 
 Summary() = Summary(Mean(), Var(), Extrema(), 0)
 
-#----------------------------------------------------------------------------#
+
+#-------------------------------------------------------------# param and value
+param(obj::Summary) = [:μ, :σ², :max, :min]
+
+value(obj::Summary) = [mean(obj), var(obj), max(obj), min(obj)]
+
+
 #--------------------------------------------------------------------# update!
 function update!{T <: Real}(obj::Summary, y::Vector{T})
     update!(obj.mean, y)
@@ -31,16 +34,6 @@ update!{T <: Real}(obj::Summary, y::T) = update!(obj, [y])
 
 
 
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------# state
-function state(obj::Summary)
-    DataFrame(variable = [:μ, :σ², :max, :min],
-              value = [mean(obj), var(obj), max(obj), min(obj)],
-              n = nobs(obj))
-end
-
-
-#----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# Base
 Base.mean(obj::Summary) = return mean(obj.mean)
 
@@ -65,14 +58,3 @@ function Base.merge!(a::Summary, b::Summary)
     merge!(a.extrema, b.extrema)
     a.n += b.n
 end
-
-function Base.show(io::IO, obj::Summary)
-    @printf(io, "Online Summary\n")
-    @printf(io, " * Mean:     %f\n", obj.mean.mean)
-    @printf(io, " * Variance: %f\n", obj.var.var * obj.n / (obj.n - 1))
-    @printf(io, " * Max:      %f\n", obj.extrema.max)
-    @printf(io, " * Min:      %f\n", obj.extrema.min)
-    @printf(io, " * N:        %d\n", obj.n)
-    return
-end
-

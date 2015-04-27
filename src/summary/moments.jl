@@ -1,8 +1,6 @@
 export Moments
-
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Moments <: MultivariateOnlineStat
+type Moments <: ScalarOnlineStat
     m1m2::Var
     m3::Float64
     m4::Float64
@@ -15,7 +13,12 @@ function Moments(y::Vector)
 end
 
 
-#-----------------------------------------------------------------------------#
+#-------------------------------------------------------------# param and value
+param(obj::Moments) = [:μ, :σ², :skewness, :kurtosis]
+
+value(obj::Moments) = [mean(obj), var(obj), skewness(obj), kurtosis(obj)]
+
+
 #---------------------------------------------------------------------# update!
 function update!(obj::Moments, y::Vector)
     vary = Var(y)
@@ -45,16 +48,6 @@ end
 update!(obj::Moments, y::Real) = update!(obj, [y])
 
 
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-function state(obj::Moments)
-    DataFrame(variable = [:μ, :σ², :skewness, :kurtosis],
-              value = [mean(obj), var(obj), skewness(obj), kurtosis(obj)],
-              n = nobs(obj))
-end
-
-
-#-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
 Base.mean(m::Moments) = return m.m1m2.mean
 
@@ -94,14 +87,3 @@ function Base.merge!(obj::Moments, obj2::Moments)
     obj.m4 = m4
     obj.n += n2
 end
-
-function Base.show(io::IO, obj::Moments)
-    @printf(io, "Online Moments\n")
-    @printf(io, " * Mean:     %f\n", mean(obj))
-    @printf(io, " * Variance: %f\n", var(obj))
-    @printf(io, " * Skewness: %f\n", skewness(obj))
-    @printf(io, " * Kurtosis: %f\n", kurtosis(obj))
-    @printf(io, " * N:        %d\n", obj.n)
-    return
-end
-
