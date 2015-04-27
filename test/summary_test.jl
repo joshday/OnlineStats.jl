@@ -20,7 +20,7 @@ ob = Summary(x1)
 @test state(ob) == DataFrames.DataFrame(
     variable = [:μ, :σ², :max, :min],
     value = [mean(ob), var(ob), maximum(x1), minimum(x1)],
-    n = nobs(ob))
+    nobs = nobs(ob))
 
 update!(ob, x2)
 @test_approx_eq ob.mean.mean mean(x)

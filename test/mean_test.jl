@@ -1,5 +1,5 @@
 using OnlineStats
-using Base.Test
+using Base.Test, DataFrames
 println("mean_test.jl")
 
 # Mean, update!, merge, merge!, Base.mean
@@ -30,7 +30,7 @@ merge!(obj1, obj2)
 obj = Mean()
 @test obj.mean == 0.0
 @test obj.n == 0
-@test state(obj) == DataFrames.DataFrame(variable = :μ, value = 0., n=0)
+@test state(obj, DataFrame) == DataFrame(variable = :μ, value = 0., nobs=0)
 @test mean(obj) == 0.0
 update!(obj, x1)
 @test mean(obj) == mean(x1)

@@ -5,9 +5,9 @@ using Docile
 
 import Distributions
 # import PDMats  # Why is this needed?
-import DataFrames
+import DataFrames: DataFrame
 import Base: copy, merge, merge!, show, quantile
-import StatsBase
+import StatsBase: nobs, skewness, kurtosis
 
 
 #-----------------------------------------------------------------------------#

@@ -1,29 +1,25 @@
-export OnlineFitBeta
-
-#----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
-type OnlineFitBeta <: ContinuousUnivariateOnlineStat
+type FitBeta <: UnivariateFitDistribution
     d::Distributions.Beta
-    stats::Summary
+    stats::Var
     n::Int64
-    nb::Int64
 end
 
-function onlinefit{T<:Real}(::Type{Beta}, y::Vector{T})
+function onlinefit{T <: Real}(::Type{Beta}, y::Vector{T})
+    warn("FitBeta Uses method of moments, not MLE")
     n::Int64 = length(y)
-    stats = Summary(y)
+    stats = Var(y)
     m = mean(stats)
     v = var(stats)
     α = m * (m * (1 - m) / v - 1)
     β = (1 - m) * (m * (1 - m) / v - 1)
-    OnlineFitBeta(Beta(α, β), stats, n, 1)
+    FitBeta(Beta(α, β), stats, n)
 end
 
+FitBeta{T <: Real}(y::Vector{T}) = onlinefit(Beta, y)
 
-
-#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!{T<:Real}(obj::OnlineFitBeta, newdata::Vector{T})
+function update!{T<:Real}(obj::FitBeta, newdata::Vector{T})
     update!(obj.stats, newdata)
     m = mean(obj.stats)
     v = var(obj.stats)
@@ -31,27 +27,8 @@ function update!{T<:Real}(obj::OnlineFitBeta, newdata::Vector{T})
     β = (1 - m) * (m * (1 - m) / v - 1)
     obj.d = Beta(α, β)
     obj.n += length(newdata)
-    obj.nb += 1
 end
 
 
-
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-function state(obj::OnlineFitBeta)
-    names = [:α, :β, :n, :nb]
-    estimates = [obj.d.α, obj.d.β, obj.n, obj.nb]
-    return([names estimates])
-end
-
-
-
-#----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# Base
-Base.copy(obj::OnlineFitBeta) = OnlineFitBeta(obj.d, obj.stats, obj.n, obj.nb)
-
-function Base.show(io::IO, obj::OnlineFitBeta)
-    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
-    show(obj.d)
-end
-
+Base.copy(obj::FitBeta) = FitBeta(obj.d, obj.stats, obj.n)

@@ -15,6 +15,7 @@ end
 @test_approx_eq_eps(maxabs(obj_uniform.est - τ), 0, .01)
 @test_approx_eq_eps(maxabs(obj_normal.est - quantile(Normal(), τ)), 0, .01)
 
+@test typeof(state(obj_normal)) == DataFrames.DataFrame
 @test size(state(obj_uniform), 1) == length(τ)
 @test size(state(obj_uniform), 2) == 4
 @test obj_uniform.n == 100 + 100000*100

@@ -40,7 +40,7 @@ obj = Var()
 @test nobs(obj) == 0
 @test mean(obj) == 0.0
 @test var(obj) == 0.0
-@test state(obj) == DataFrames.DataFrame(variable = :σ² , value = 0., n=0)
+@test state(obj) == DataFrames.DataFrame(variable = :σ² , value = 0., nobs=0)
 update!(obj, x1)
 @test mean(obj) == mean(x1)
 @test_approx_eq var(obj)  var(x1)
