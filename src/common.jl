@@ -1,5 +1,5 @@
 
-StatsBase.nobs{T <: OnlineStat}(obj::T) = obj.n
+nobs{T <: OnlineStat}(obj::T) = obj.n
 
 
 #------------------------------------------------------------# ScalarOnlineStat
@@ -14,8 +14,10 @@ function Base.show{T <: ScalarStat}(io::IO, obj::T)
     @printf(io, " * nobs:  %d\n", nobs(obj))
 end
 
-function DataFrames.DataFrame{T <: ScalarStat}(obj::T)
-    DataFrames.DataFrame(variable = state_names(obj),
-                         values = state(obj),
-                         nobs = nobs(obj))
+function DataFrame{T <: ScalarStat}(obj::T)
+    DataFrame(variable = state_names(obj),
+              values = state(obj),
+              nobs = nobs(obj))
 end
+
+Base.push!{T <: ScalarStat}(df::DataFrame, obj::T) = append!(df, DataFrame(obj))

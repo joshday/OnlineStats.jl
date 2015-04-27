@@ -53,9 +53,9 @@ Base.mean(m::Moments) = return m.m1m2.mean
 
 Base.var(m::Moments) = return m.m1m2.var  * (m.n / (m.n - 1))
 
-StatsBase.skewness(m::Moments) = return m.m3 / var(m)^1.5
+skewness(m::Moments) = return m.m3 / var(m)^1.5
 
-StatsBase.kurtosis(m::Moments) = return m.m4 / var(m)^2 - 3.0
+kurtosis(m::Moments) = return m.m4 / var(m)^2 - 3.0
 
 Base.copy(obj::Moments) = return Moments(obj.m1m2, obj.m3, obj.m4, obj.n)
 
