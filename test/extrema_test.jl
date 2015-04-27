@@ -52,7 +52,7 @@ obj1 = copy(obj)
 @test state(obj) == DataFrames.DataFrame(
     variable = [:max, :min],
     value = [max(obj), min(obj)],
-    n = nobs(obj))
+    nobs = nobs(obj))
 
 
 # clean up

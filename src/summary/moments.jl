@@ -1,6 +1,6 @@
 export Moments
 #-------------------------------------------------------# Type and Constructors
-type Moments <: ScalarOnlineStat
+type Moments <: ScalarStat
     m1m2::Var
     m3::Float64
     m4::Float64
@@ -13,10 +13,10 @@ function Moments(y::Vector)
 end
 
 
-#-------------------------------------------------------------# param and value
-param(obj::Moments) = [:μ, :σ², :skewness, :kurtosis]
+#-----------------------------------------------------------------------# state
+state_names(obj::Moments) = [:μ, :σ², :skewness, :kurtosis]
 
-value(obj::Moments) = [mean(obj), var(obj), skewness(obj), kurtosis(obj)]
+state(obj::Moments) = [mean(obj), var(obj), skewness(obj), kurtosis(obj)]
 
 
 #---------------------------------------------------------------------# update!
@@ -53,9 +53,9 @@ Base.mean(m::Moments) = return m.m1m2.mean
 
 Base.var(m::Moments) = return m.m1m2.var  * (m.n / (m.n - 1))
 
-StatsBase.skewness(m::Moments) = return m.m3 / var(m)^1.5
+skewness(m::Moments) = return m.m3 / var(m)^1.5
 
-StatsBase.kurtosis(m::Moments) = return m.m4 / var(m)^2 - 3.0
+kurtosis(m::Moments) = return m.m4 / var(m)^2 - 3.0
 
 Base.copy(obj::Moments) = return Moments(obj.m1m2, obj.m3, obj.m4, obj.n)
 

@@ -1,6 +1,7 @@
 using OnlineStats
 using Base.Test
-using Distributions, PDMats
+using Distributions, PDMats, DataFrames
+DF = DataFrames
 println("* densityestimation_test.jl")
 
 #------------------------------------------------------------------------------#
@@ -17,18 +18,16 @@ obj = OnlineStats.onlinefit(Bernoulli, x1)
 @test obj.d.p == mean(x1)
 @test obj.n1 == sum(x1)
 @test obj.n == n1
-@test obj.nb == 1
 
 OnlineStats.update!(obj, x2)
 @test obj.d.p == mean(x)
 @test obj.n1 == sum([x1; x2])
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
-@test state(obj) == [[:p, :n, :nb] [mean(x), n1 + n2, 2]]
+@test typeof(state(obj)) == DF.DataFrame
 obj2 = copy(obj)
-@test state(obj2) == [[:p, :n, :nb] [mean(x), n1 + n2, 2]]
-@test mean(obj2) == mean(x)
+@test state(obj2) == DF.DataFrame(variable = :p, value = mean(x), nobs = n1 + n2)
+@test mean(obj2.d) == mean(x)
 @test nobs(obj) == n1 + n2
 
 
@@ -47,17 +46,16 @@ obj = onlinefit(Beta, x1)
 @test_approx_eq_eps mean(obj.d) mean(x1) 1e-10
 @test_approx_eq_eps var(obj.d) var(x1) 1e-10
 @test obj.n == n1
-@test obj.nb == 1
 
 OnlineStats.update!(obj, x2)
 @test_approx_eq mean(obj.d) mean(x)
 @test_approx_eq var(obj.d) var(x)
 @test obj.n == n1 + n2
-@test obj.nb == 2
-
-@test state(obj) == [[:α, :β, :n, :nb] [obj.d.α, obj.d.β, n1+n2, 2]]
+@test state(obj) == DF.DataFrame(variable=[:α, :β], value = [obj.d.α, obj.d.β],
+                                 nobs = n1 + n2)
 obj2 = copy(obj)
-@test state(obj2) == [[:α, :β, :n, :nb] [obj.d.α, obj.d.β, n1+n2, 2]]
+@test state(obj2) == DF.DataFrame(variable=[:α, :β], value = [obj.d.α, obj.d.β],
+                                 nobs = n1 + n2)
 
 
 
@@ -77,18 +75,18 @@ obj = onlinefit(Binomial, n, x1)
 @test obj.d.p == sum(x1) / (n * n1)
 @test obj.nsuccess == sum(x1)
 @test obj.n == n1
-@test obj.nb == 1
 
 OnlineStats.update!(obj, x2)
 @test obj.d.n == n
 @test obj.d.p == sum(x) / (n * (n1 + n2))
 @test obj.nsuccess == sum(x)
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
-@test state(obj) == [[:ntrials, :p, :n, :nb] [obj.d.n, obj.d.p, obj.n, obj.nb]]
+@test typeof(state(obj)) == DF.DataFrame
 obj2 = copy(obj)
-@test state(obj2) == [[:ntrials, :p, :n, :nb] [obj.d.n, obj.d.p, obj.n, obj.nb]]
+@test state(obj2) == DF.DataFrame(variable = [:n, :p],
+                                 value = Union(Float64,Int64)[obj.d.n, obj.d.p],
+                                 nobs = nobs(obj))
 
 
 
@@ -106,16 +104,13 @@ x = [x1 x2]
 obj = onlinefit(Dirichlet, x1)
 @test obj.slogp == vec(sum(log(x1), 2) / n1)
 @test obj.n == n1
-@test obj.nb == 1
 
 update!(obj, x2)
 @test length(obj.d.alpha) == αlength
 @test_approx_eq_eps obj.d.alpha fit(Dirichlet, x).alpha 1e-8 # fit is wrong sometimes
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
-@test state(obj) == hcat([[symbol("α$i") for i in 1:length(obj.d.alpha)], :n, :nb],
-                     [obj.d.alpha, obj.n, obj.nb])
+@test typeof(state(obj)) == DF.DataFrame
 obj2 = copy(obj)
 @test state(obj2) == state(obj)
 
@@ -135,17 +130,17 @@ obj = onlinefit(Exponential, x1)
 @test obj.d.β == mean(x1)
 @test obj.n == n1
 @test nobs(obj) == n1
-@test obj.nb == 1
 
 OnlineStats.update!(obj, x2)
 @test_approx_eq  obj.d.β mean(x)
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 obj1 = copy(obj)
+@test typeof(state(obj1)) == DF.DataFrame
+@test state(obj1) == state(obj)
+@test state(obj) == DataFrame(variable = :β, value = mean(obj.d), nobs = obj.n)
 @test_approx_eq  obj.d.β mean(x)
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 
 
@@ -163,17 +158,19 @@ obj = onlinefit(Gamma, x1)
 @test mean(obj.m) == mean(x1)
 @test mean(obj.mlog) == mean(log(x1))
 @test obj.n == n1
-@test obj.nb == 1
 
 OnlineStats.update!(obj, x2)
+@test typeof(state(obj)) == DF.DataFrame
+@test state(obj) == DataFrame(variable = [:α, :β],
+                              value = [obj.d.α, obj.d.β],
+                              nobs = nobs(obj))
 @test_approx_eq_eps mean(obj.m) mean(x) 1e-6
 @test_approx_eq_eps mean(obj.mlog) mean(log(x)) 1e-6
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 obj1 = copy(obj)
+@test state(obj1) == state(obj)
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 
 #------------------------------------------------------------------------------#
@@ -196,7 +193,6 @@ obj = onlinefit(Multinomial, x1)
 @test_approx_eq obj.d.p Multinomial(n, vec(sum(x1, 2) / (n * n1))).p
 @test obj.n == n1
 @test nobs(obj) == n1
-@test obj.nb == 1
 
 
 OnlineStats.update!(obj, x2)
@@ -205,15 +201,16 @@ OnlineStats.update!(obj, x2)
 @test obj.d.n == Multinomial(n, vec(sum(x1, 2) / (n * n1))).n
 @test_approx_eq obj.d.p Multinomial(n, vec(sum(x, 2) / (n * (n1 + n2)))).p
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 obj1 = copy(obj)
+@test state(obj1) == state(obj)
+@test typeof(state(obj)) == DF.DataFrame
+@test names(state(obj)) == [:variable, :value, :nobs]
 @test obj1.d.n == n
 @test_approx_eq  obj1.d.p  sum(x, 2) / (n * (n1 + n2))
 @test obj1.d.n == Multinomial(n, vec(sum(x1, 2) / (n * n1))).n
 @test_approx_eq obj1.d.p Multinomial(n, vec(sum(x, 2) / (n * (n1 + n2)))).p
 @test obj1.n == n1 + n2
-@test obj1.nb == 2
 
 
 
@@ -233,21 +230,18 @@ obj = onlinefit(MvNormal, x1)
 @test_approx_eq cov(obj.c)  cov(x1')
 @test_approx_eq_eps cov(obj.c) obj.d.Σ.mat 1e-4
 @test obj.n == n1
-@test obj.nb == 1
 
 OnlineStats.update!(obj, x2)
 @test_approx_eq  obj.d.μ  vec(mean(x, 2))
 @test_approx_eq mean(obj.c) vec(mean(x, 2))
 @test_approx_eq cov(obj.c) cov(x')
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 obj1 = copy(obj)
 @test_approx_eq  obj1.d.μ  vec(mean(x, 2))
 @test_approx_eq mean(obj1.c) vec(mean(x, 2))
 @test_approx_eq cov(obj1.c) cov(x')
 @test obj1.n == n1 + n2
-@test obj1.nb == 2
 
 
 
@@ -265,7 +259,6 @@ obj = onlinefit(Normal, x1)
 @test_approx_eq mean(obj.d) mean(obj.v)
 @test_approx_eq var(obj.v) var(x1)
 @test obj.n == n1
-@test obj.nb == 1
 
 update!(obj, x2)
 @test_approx_eq obj.d.σ std(x)
@@ -273,12 +266,15 @@ update!(obj, x2)
 @test_approx_eq mean(obj.v) mean(x)
 @test_approx_eq var(obj.v) var(x)
 @test obj.n == n1 + n2
-@test obj.nb == 2
 
 obj1 = copy(obj)
+@test typeof(state(obj)) == DF.DataFrame
+@test state(obj1) == state(obj)
+@test state(obj) == DataFrame(variable = [:μ, :σ],
+                              value = [mean(obj.d), std(obj.d)],
+                              nobs = nobs(obj))
 @test_approx_eq obj1.d.σ std(x)
 @test_approx_eq obj1.d.μ mean(x)
 @test_approx_eq mean(obj1.v) mean(x)
 @test_approx_eq var(obj1.v) var(x)
 @test obj1.n == n1 + n2
-@test obj1.nb == 2

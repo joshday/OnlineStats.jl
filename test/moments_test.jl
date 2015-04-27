@@ -13,7 +13,7 @@ obj = Moments(x1)
 @test state(obj) == DataFrames.DataFrame(
     variable = [:μ, :σ², :skewness, :kurtosis],
     value = [mean(obj), var(obj), skewness(obj), kurtosis(obj)],
-    n = nobs(obj))
+    nobs = nobs(obj))
 
 @test mean(obj) == mean(x1)
 @test_approx_eq var(obj)  var(x1)

@@ -1,6 +1,6 @@
 export Extrema
 #------------------------------------------------------# Type and Constructors
-type Extrema <: ScalarOnlineStat
+type Extrema <: ScalarStat
     max::Float64
     min::Float64
     n::Int64
@@ -13,10 +13,10 @@ Extrema{T <: Real}(y::T) = Extrema([y])
 Extrema() = Extrema(-Inf, Inf, 0)
 
 
-#-------------------------------------------------------------# param and value
-param(obj::Extrema) = [:max, :min]
+#-----------------------------------------------------------------------# state
+state_names(obj::Extrema) = [:max, :min]
 
-value(obj::Extrema) = [max(obj), min(obj)]
+state(obj::Extrema) = [max(obj), min(obj)]
 
 
 #--------------------------------------------------------------------# update!

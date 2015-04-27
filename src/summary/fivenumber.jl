@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FiveNumberSummary <: ScalarOnlineStat
+type FiveNumberSummary <: ScalarStat
     min::Float64
     quantile::QuantileSGD
     max::Float64
@@ -15,10 +15,10 @@ end
 FiveNumberSummary(y::Real; r = .7) = FiveNumberSummary([y], r)
 
 
-#-------------------------------------------------------------# param and value
-param(obj::FiveNumberSummary) = [:min, :q1, :median, :q3, :max]
+#-----------------------------------------------------------------------# state
+state_names(obj::FiveNumberSummary) = [:min, :q1, :median, :q3, :max]
 
-value(obj::FiveNumberSummary) = [obj.min; copy(obj.quantile.est); obj.max]
+state(obj::FiveNumberSummary) = [obj.min; copy(obj.quantile.est); obj.max]
 
 
 #---------------------------------------------------------------------# update!

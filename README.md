@@ -5,12 +5,6 @@
 
 Online algorithms for statistics.  See [Examples](doc/examples) and [Implementation Progress](src)
 
-The driving function in this package is  
-
-```update!(obj, newdata)```  
-- `obj`: subtype of `OnlineStat`  
-- `newdata`: new observations (typically Vector or Matrix)
-
 ## Types 
 
 The typical field structure for methods in `OnlineStats`:
@@ -23,6 +17,11 @@ type OnlineStatistic
 end
 ```
 
+## Exported functions
+
+- `state(obj)`: return current estimates
+- `update!(obj, y)`: update estimates in `obj` with data in `y`
+- `nobs(obj)`: return number of observations used
 
 
 ## Thank you

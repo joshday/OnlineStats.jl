@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileMM <: ScalarOnlineStat
+type QuantileMM <: ScalarStat
     est::Vector{Float64}              # Quantiles
     τ::Vector{Float64}                # tau values
     r::Float64                        # learning rate
@@ -21,13 +21,13 @@ function QuantileMM(y::Vector; τ::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.6)
     QuantileMM(qs, τ, r, s, t, o, length(y), 1)
 end
 
-QuantileMM(y::Real; args...) = QuantileMM([y], args)
+QuantileMM(y::Real; args...) = QuantileMM([y], args...)
 
 
-#-------------------------------------------------------------# param and value
-param(obj::QuantileMM) = [symbol("τ_$i") for i in obj.τ]
+#-----------------------------------------------------------------------# state
+state_names(obj::QuantileMM) = [symbol("τ_$i") for i in obj.τ]
 
-value(obj::QuantileMM) = copy(obj.est)
+state(obj::QuantileMM) = copy(obj.est)
 
 
 #---------------------------------------------------------------------# update!

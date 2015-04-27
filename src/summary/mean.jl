@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type Mean <: ScalarOnlineStat
+type Mean <: ScalarStat
     mean::Float64
     n::Int64
 end
@@ -11,13 +11,12 @@ Mean{T <: Real}(y::T) = Mean([y])
 Mean() = Mean(0.0, 0)
 
 
-#-------------------------------------------------------------# param and value
-param(obj::Mean) = :μ
+#-----------------------------------------------------------------------# state
+state_names(obj::Mean) = [:μ]
+state(obj::Mean) = [mean(obj)]
 
-value(obj::Mean) = obj.mean
 
-
-#--------------------------------------------------------------------# update!
+#---------------------------------------------------------------------# update!
 function update!{T <: Real}(obj::Mean, y::Vector{T})
     n2 = length(y)
     obj.n += n2
@@ -29,7 +28,7 @@ function update!{T <: Real}(obj::Mean, y::T)
 end
 
 
-#----------------------------------------------------------------------# Base
+#------------------------------------------------------------------------# Base
 Base.copy(obj::Mean) = Mean(obj.mean, obj.n)
 
 Base.mean(obj::Mean) = obj.mean

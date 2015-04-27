@@ -1,18 +1,17 @@
-export OnlineFitGamma
+export FitGamma
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type OnlineFitGamma <: ContinuousUnivariateOnlineStat
+type FitGamma <: OnlineUnivariateDistribution
     d::Distributions.Gamma
     m::Mean
     mlog::Mean
     n::Int64
-    nb::Int64
 end
 
 function onlinefit{T<:Real}(::Type{Gamma}, y::Vector{T})
     n::Int64 = length(y)
-    OnlineFitGamma(fit(Gamma, y), Mean(y), Mean(log(y)), n, 1)
+    FitGamma(fit(Gamma, y), Mean(y), Mean(log(y)), n)
 end
 
 
@@ -25,7 +24,7 @@ end
         1.0 / z
     end
 
-    function fit_mle(::Type{Gamma}, obj::OnlineFitGamma;
+    function fit_mle(::Type{Gamma}, obj::FitGamma;
         alpha0::Float64=NaN, maxiter::Int=1000, tol::Float64=1.0e-16)
 
         mx = mean(obj.m)
@@ -47,45 +46,14 @@ end
     end
 
 
-function update!(obj::OnlineFitGamma, newdata::Vector)
+function update!(obj::FitGamma, newdata::Vector)
     update!(obj.m, newdata)
     update!(obj.mlog, log(newdata))
     obj.n = nobs(obj.m)
     obj.d = fit_mle(Gamma, obj)
-    obj.nb += 1
 end
-
-
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-function state(obj::OnlineFitGamma)
-    names = [:α, :β, :n, :nb]
-    estimates = [obj.d.α, obj.d.β, obj.n, obj.nb]
-    return([names estimates])
-end
-
 
 
 #-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
-Base.copy(obj::OnlineFitGamma) =
-    OnlineFitGamma(obj.d, obj.m, obj.mlog, obj.n, obj.nb)
-
-function Base.show(io::IO, obj::OnlineFitGamma)
-    @printf(io, "OnlineFit (nobs = %i)\n", obj.n)
-    show(obj.d)
-end
-
-
-#------------------------------------------------------------------------------#
-#---------------------------------------------------------# Interactive Testing
-x1 = rand(Gamma(4, 2), 100)
-obj = OnlineStats.onlinefit(Gamma, x1)
-OnlineStats.state(obj)
-
-for i in 1: 1000
-    x2 = rand(Gamma(4, 2), 100)
-    OnlineStats.update!(obj, x2)
-end
-OnlineStats.state(obj)
-
+Base.copy(obj::FitGamma) = FitGamma(obj.d, obj.m, obj.mlog, obj.n)
