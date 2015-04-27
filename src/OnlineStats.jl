@@ -21,6 +21,8 @@ export update!, state, addstate!, onlinefit, nobs
 # Abstract Types
 include("types.jl")
 
+include("weighting.jl")
+
 # Other
 include("trace.jl")
 
@@ -76,9 +78,8 @@ nobs(obj::OnlineStat) = obj.n
 
 "`addstate(df, obj)`: Add `state(obj)` results to a new row in `df`"
 # function addstate!{O <: OnlineStat}(df::DataFrame, obj::O)
-function addstate!(df::DataFrame, obj::OnlineStat)
-    append!(df, state(obj))
-end
+
+Base.push!(df::DataFrame, obj::OnlineStat) = append!(df, state(obj))
 
 #-----------------------------------------------------------------------------#
 # Docstrings for functions

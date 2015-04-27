@@ -1,33 +1,16 @@
 export Var
 
 
-# NOTE: i put this here just so it's easy to review in a single file.. should be moved elsewhere... weighting.jl?
-# NOTE: we call weight with n1 = "# old obs" and n2 = "# new obs"
-abstract Weighting
-weight(obj::OnlineStat, numUpdates::Int = 1) = weight(obj.weighting, nobs(obj), numUpdates)
-
-immutable EqualWeighting <: Weighting end
-weight(w::EqualWeighting, n1::Int, n2::Int) = n1 > 0 || n2 > 0 ? Float64(n2 / (n1 + n2)) : 1.0
-
-
-immutable ExponentialWeighting <: Weighting
-    λ::Float64
-end
-ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))           # creates an exponential weighting with a lookback window of approximately "lookback" observations
-weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(), n1, n2), w.λ)    # uses equal weighting until we collect enough observations... then uses exponential weighting
-
-
-smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
-
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
 # type Var <: UnivariateOnlineStat
-type Var{T<:Weighting} <: OnlineStat  # NOTE: i'm assuming we can remove the parameter from OnlineStat, but it may be required for a reason I don't understand
-    mean::Float64
+type Var{W<:Weighting} <: OnlineStat  # NOTE: i'm assuming we can remove the parameter from OnlineStat, but it may be required for a reason I don't understand
+    # mean::Float64
+    mean::Mean{W}
     var::Float64    # BIASED variance (makes for easier update)
     n::Int64
-    weighting::T
+    weighting::W
 end
 
 # NOTE: if y was empty, mean(y) == NaN... probably don't want that
@@ -52,9 +35,12 @@ end
 
 # NOTE: you don't need the parametric method signature here if you're not using the type T in the method
 # NOTE: since you're implicitly converting to a Float64 anyway, you might as well expect that and force the call to convert immediately... it's clearer
-Var(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Var(y, 0., 1, wgt)
+# Var(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Var(y, 0., 1, wgt)
 
-Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(0., 0., 0, wgt)
+# pass to vector constructor
+Var(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Var([y], wgt)
+
+Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(Mean(wgt), 0., 0, wgt)
 
 
 #-----------------------------------------------------------------------------#
@@ -96,7 +82,8 @@ function update!(obj::Var, y::Float64)
     λ = weight(obj)
     μ = mean(obj)
 
-    obj.mean = smooth(μ, y, λ)
+    # obj.mean = smooth(μ, y, λ)
+    update!(obj.mean, y)
     obj.var = smooth(obj.var, (y - μ) * (y - mean(obj)), λ)
     obj.n += 1
     return
@@ -128,6 +115,7 @@ end
 # NOTE: i'm a little confused why you create a dataframe at all here... it's it always 1 row? wouldn't a tuple or something be more appropriate?  i'm not sure i see how state() is used...
 # state(obj::Var) = DataFrame(variable = :σ², value = var(obj), n = nobs(obj))
 
+state(obj::Var) = var(obj)
 
 #-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
