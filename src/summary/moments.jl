@@ -13,10 +13,10 @@ function Moments(y::Vector)
 end
 
 
-#-------------------------------------------------------------# param and value
-param(obj::Moments) = [:μ, :σ², :skewness, :kurtosis]
+#-----------------------------------------------------------------------# state
+state_names(obj::Moments) = [:μ, :σ², :skewness, :kurtosis]
 
-value(obj::Moments) = [mean(obj), var(obj), skewness(obj), kurtosis(obj)]
+state(obj::Moments) = [mean(obj), var(obj), skewness(obj), kurtosis(obj)]
 
 
 #---------------------------------------------------------------------# update!

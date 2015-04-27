@@ -16,10 +16,10 @@ Summary{T <: Real}(y::T) = Summary([y])
 Summary() = Summary(Mean(), Var(), Extrema(), 0)
 
 
-#-------------------------------------------------------------# param and value
-param(obj::Summary) = [:μ, :σ², :max, :min]
+#-----------------------------------------------------------------------# state
+state_names(obj::Summary) = [:μ, :σ², :max, :min]
 
-value(obj::Summary) = [mean(obj), var(obj), max(obj), min(obj)]
+state(obj::Summary) = [mean(obj), var(obj), max(obj), min(obj)]
 
 
 #--------------------------------------------------------------------# update!

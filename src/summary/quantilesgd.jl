@@ -14,10 +14,10 @@ QuantileSGD(y::Vector; τ::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.6) =
 QuantileSGD(y::Real; args...) = QuantileSGD([y], args)
 
 
-#-------------------------------------------------------------# param and value
-param(obj::QuantileSGD) = [symbol("τ_$i") for i in obj.τ]
+#-----------------------------------------------------------------------# state
+state_names(obj::QuantileSGD) = [symbol("τ_$i") for i in obj.τ]
 
-value(obj::QuantileSGD) = copy(obj.est)
+state(obj::QuantileSGD) = copy(obj.est)
 
 
 #---------------------------------------------------------------------# update!

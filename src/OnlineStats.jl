@@ -3,12 +3,40 @@ module OnlineStats
 using Docile
 @document
 
-using DataFrames, Distributions
-import PDMats, Distributions
+import Distributions
+# import PDMats  # Why is this needed?
+import DataFrames
 import Base: copy, merge, merge!, show, quantile
-import StatsBase: nobs, vcov, coef, confint, coeftable, predict, fit, fit!
+import StatsBase
 
-export update!, state, addstate!, onlinefit, nobs
+
+#-----------------------------------------------------------------------------#
+# Exports
+#-----------------------------------------------------------------------------#
+export
+    # abstract types
+    OnlineStat,
+    ScalarOnlineStat,
+
+    # concrete types
+    Mean,
+    Var,
+    Extrema,
+    Summary,
+    QuantileMM,
+    QuantileSGD,
+    FiveNumberSummary,
+#     FitBernoulli,
+#     FitBinomial,
+#     FitBeta,
+#     FitDirichlet,
+
+    # functions
+    update!,
+    state,
+    onlinefit,
+    tracedata
+
 
 #-----------------------------------------------------------------------------#
 # Source files
@@ -17,14 +45,14 @@ export update!, state, addstate!, onlinefit, nobs
 include("types.jl")
 
 # Other
-include("trace.jl")
+# include("tracedata.jl")
+include("common.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
 include("summary/var.jl")
 include("summary/extrema.jl")
 include("summary/summary.jl")
-include("summary/covmatrix.jl")
 include("summary/moments.jl")
 include("summary/quantilesgd.jl")
 include("summary/quantilemm.jl")
@@ -57,29 +85,10 @@ include("summary/fivenumber.jl")
 # include("glm/logisticregsn.jl")
 
 # Quantile Regression
-include("quantileregression/quantregsgd.jl")
-include("quantileregression/quantregmm.jl")
+# include("quantileregression/quantregsgd.jl")
+# include("quantileregression/quantregmm.jl")
 
-
-
-#-----------------------------------------------------------------------------#
-# Functions for any OnlineStat type
-#-----------------------------------------------------------------------------#
-"Return the number of observations used"
-nobs{T <: OnlineStat}(obj::T) = obj.n
-
-"`addstate(df, obj)`: Add `state(obj)` results to a new row in `df`"
-function addstate!{O <: OnlineStat}(df::DataFrame, obj::O)
-    append!(df, state(obj))
-end
-
-#-----------------------------------------------------------------------------#
-# Docstrings for functions
-#-----------------------------------------------------------------------------#
-"`state(obj)`: Return a DataFrame with the current estimate and nobs"
-state
-
-"`update!(obj, newdata)`: Use `newdata` to update estimates in `obj`"
-update!
+# Multivariate
+# include("multivariate/covmatrix.jl")
 
 end # module
