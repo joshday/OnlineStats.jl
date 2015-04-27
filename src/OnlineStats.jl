@@ -3,6 +3,11 @@ module OnlineStats
 using Docile
 @document
 
+# NOTE: I really dislike "using" other packages from within a package.  I have no idea when looking at the code what functions belong to DataFrames, Distributions, etc
+# NOTE: I prefer either:
+#		 import XXX; XXX.xxx()   							# explicit calls... annoying but easiest to understand what is being called.  best for one-off library calls
+#    import XXX; const X = XXX; X.xxx()   # explicit call with a shortened name
+#    import XXX: xxx; xxx()               # now you don't have to qualify the call, but at least if i do a search across files for the definition of xxx, i'll see that it came from the XXX module
 using DataFrames, Distributions
 import PDMats, Distributions
 import Base: copy, merge, merge!, show, quantile
@@ -66,10 +71,12 @@ include("quantileregression/quantregmm.jl")
 # Functions for any OnlineStat type
 #-----------------------------------------------------------------------------#
 "Return the number of observations used"
-nobs{T <: OnlineStat}(obj::T) = obj.n
+# nobs{T <: OnlineStat}(obj::T) = obj.n
+nobs(obj::OnlineStat) = obj.n
 
 "`addstate(df, obj)`: Add `state(obj)` results to a new row in `df`"
-function addstate!{O <: OnlineStat}(df::DataFrame, obj::O)
+# function addstate!{O <: OnlineStat}(df::DataFrame, obj::O)
+function addstate!(df::DataFrame, obj::OnlineStat)
     append!(df, state(obj))
 end
 
