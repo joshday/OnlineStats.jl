@@ -1,8 +1,6 @@
 export Extrema
-
-#----------------------------------------------------------------------------#
 #------------------------------------------------------# Type and Constructors
-type Extrema <: MultivariateOnlineStat
+type Extrema <: ScalarOnlineStat
     max::Float64
     min::Float64
     n::Int64
@@ -15,7 +13,12 @@ Extrema{T <: Real}(y::T) = Extrema([y])
 Extrema() = Extrema(-Inf, Inf, 0)
 
 
-#----------------------------------------------------------------------------#
+#-------------------------------------------------------------# param and value
+param(obj::Extrema) = [:max, :min]
+
+value(obj::Extrema) = [max(obj), min(obj)]
+
+
 #--------------------------------------------------------------------# update!
 function update!{T <: Real}(obj::Extrema, y::Vector{T})
     obj.max = maximum([obj.max; y])
@@ -26,16 +29,6 @@ end
 update!{T <: Real}(obj::Extrema, y::T) = update!(obj, [y])
 
 
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------# state
-function state(obj::Extrema)
-    DataFrame(variable = [:max, :min],
-              value = [max(obj), min(obj)],
-              n = nobs(obj))
-end
-
-
-#----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# Base
 Base.max(obj::Extrema) = return obj.max
 
@@ -56,12 +49,3 @@ function Base.merge!(a::Extrema, b::Extrema)
     a.min = min(a.min, b.min)
     a.n += b.n
 end
-
-function Base.show(io::IO, obj::Extrema)
-    @printf(io, "Online Extrema\n")
-    @printf(io, " * Max: %f\n", obj.max)
-    @printf(io, " * Min: %f\n", obj.min)
-    @printf(io, " * N:   %d\n", obj.n)
-    return
-end
-

@@ -1,12 +1,9 @@
 export Var
 
 
-
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-# type Var <: UnivariateOnlineStat
-type Var{W<:Weighting} <: OnlineStat  # NOTE: i'm assuming we can remove the parameter from OnlineStat, but it may be required for a reason I don't understand
-    # mean::Float64
+type Var{W<:Weighting} <: ScalarOnlineStat
     mean::Mean{W}
     var::Float64    # BIASED variance (makes for easier update)
     n::Int64
@@ -43,7 +40,12 @@ Var(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Var([y], wgt)
 Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(Mean(wgt), 0., 0, wgt)
 
 
-#-----------------------------------------------------------------------------#
+#-------------------------------------------------------------# param and value
+param(obj::Var) = [:μ, :σ²]
+
+value(obj::Var) = [mean(obj), var(obj)]
+
+
 #---------------------------------------------------------------------# update!
 # function update!{T <: Real}(obj::Var, y::Vector{T})
 #     var2 = Var(y)

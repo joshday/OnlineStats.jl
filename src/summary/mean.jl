@@ -1,8 +1,5 @@
-export Mean
-
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type Mean <: UnivariateOnlineStat
+type Mean <: ScalarOnlineStat
     mean::Float64
     n::Int64
 end
@@ -14,7 +11,12 @@ Mean{T <: Real}(y::T) = Mean([y])
 Mean() = Mean(0.0, 0)
 
 
-#----------------------------------------------------------------------------#
+#-------------------------------------------------------------# param and value
+param(obj::Mean) = :μ
+
+value(obj::Mean) = obj.mean
+
+
 #--------------------------------------------------------------------# update!
 function update!{T <: Real}(obj::Mean, y::Vector{T})
     n2 = length(y)
@@ -22,21 +24,15 @@ function update!{T <: Real}(obj::Mean, y::Vector{T})
     obj.mean += (n2 / obj.n) * (mean(y) - obj.mean)
 end
 
-update!{T <: Real}(obj::Mean, y::T) = update!(obj, [y])
+function update!{T <: Real}(obj::Mean, y::T)
+    obj.mean += (1 / obj.n) * (y - obj.mean)
+end
 
 
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------# state
-state(obj::Mean) = DataFrame(variable = :μ, value = mean(obj), n = nobs(obj))
-
-
-#----------------------------------------------------------------------------#
 #----------------------------------------------------------------------# Base
 Base.copy(obj::Mean) = Mean(obj.mean, obj.n)
 
-function Base.mean(obj::Mean)
-    return obj.mean
-end
+Base.mean(obj::Mean) = obj.mean
 
 function Base.merge(a::Mean, b::Mean)
     m = a.mean + (b.n / (a.n + b.n)) * (b.mean - a.mean)
@@ -47,11 +43,4 @@ end
 function Base.merge!(a::Mean, b::Mean)
     a.mean += (b.n / (a.n + b.n)) * (b.mean - a.mean)
     a.n += b.n
-end
-
-function Base.show(io::IO, obj::Mean)
-    @printf(io, "Online Mean\n")
-    @printf(io, " * Mean: %f\n", obj.mean)
-    @printf(io, " * N:    %d\n", obj.n)
-    return
 end
