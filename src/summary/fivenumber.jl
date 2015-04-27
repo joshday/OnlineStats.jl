@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FiveNumberSummary <: ScalarOnlineStat
+type FiveNumberSummary <: ScalarStat
     min::Float64
     quantile::QuantileSGD
     max::Float64

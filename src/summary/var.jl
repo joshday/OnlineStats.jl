@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type Var <: ScalarOnlineStat
+type Var <: ScalarStat
     mean::Float64
     var::Float64    # BIASED variance (makes for easier update)
     n::Int64

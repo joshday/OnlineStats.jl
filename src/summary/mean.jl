@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type Mean <: ScalarOnlineStat
+type Mean <: ScalarStat
     mean::Float64
     n::Int64
 end

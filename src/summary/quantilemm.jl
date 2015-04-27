@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileMM <: ScalarOnlineStat
+type QuantileMM <: ScalarStat
     est::Vector{Float64}              # Quantiles
     τ::Vector{Float64}                # tau values
     r::Float64                        # learning rate

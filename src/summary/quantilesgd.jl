@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileSGD <: ScalarOnlineStat
+type QuantileSGD <: ScalarStat
     est::Vector{Float64}              # Quantile estimates
     τ::Vector{Float64}                # tau values (which quantiles)
     r::Float64                        # learning rate

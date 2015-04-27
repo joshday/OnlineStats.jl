@@ -1,6 +1,6 @@
 export Moments
 #-------------------------------------------------------# Type and Constructors
-type Moments <: ScalarOnlineStat
+type Moments <: ScalarStat
     m1m2::Var
     m3::Float64
     m4::Float64

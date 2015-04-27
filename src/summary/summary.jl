@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type Summary <: ScalarOnlineStat
+type Summary <: ScalarStat
     mean::Mean        # mean
     var::Var          # variance
     extrema::Extrema  # max and min

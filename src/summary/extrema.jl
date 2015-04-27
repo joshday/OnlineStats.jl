@@ -1,6 +1,6 @@
 export Extrema
 #------------------------------------------------------# Type and Constructors
-type Extrema <: ScalarOnlineStat
+type Extrema <: ScalarStat
     max::Float64
     min::Float64
     n::Int64
