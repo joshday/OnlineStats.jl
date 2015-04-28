@@ -25,13 +25,13 @@ function Base.show(io::IO, o::ScalarStat)
     # @printf(io, " * nobs:  %d\n", nobs(o))
 end
 
-# NOTE: I'm assuming the goal is to create a table like:
-# μ    |   σ²   |  n
-# ---------------------
-# 1.0  |   2.0  |  5
-# 1.5  |   2.1  |  10
-# 1.6  |   2.2  |  15
 
-DataFrame(o::ScalarStat) = DataFrame(state(o), statenames(o))
+# Why doesn't this work in 0.3.7?
+# DataFrame(o::ScalarStat) = DataFrame(state(o), statenames(o))
+
+function DataFrame(o::ScalarStat)
+    df = convert(DataFrame, state(o)')
+    names!(df, statenames(o))
+end
 
 Base.push!(df::DataFrame, o::ScalarStat) = push!(df, state(o))
