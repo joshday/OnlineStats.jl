@@ -11,7 +11,7 @@ import Distributions:
     MixtureModel,
     pdf, cdf, logpdf, loglikelihood, probs, components
 # import PDMats  # Why is this needed?
-import DataFrames: DataFrame
+import DataFrames: DataFrame, names!
 import Base: copy, merge, merge!, show, quantile
 import StatsBase: nobs, skewness, kurtosis
 
