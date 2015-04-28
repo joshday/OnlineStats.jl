@@ -1,80 +1,65 @@
-export Var
 
-
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
 type Var{W<:Weighting} <: ScalarStat
-    mean::Mean{W}
-    var::Float64    # BIASED variance (makes for easier update)
+    μ::Float64
+    biasedvar::Float64    # BIASED variance (makes for easier update)
     n::Int64
     weighting::W
 end
 
-const DEFAULT_WEIGHTING = EqualWeighting()
 
 function Var{T <: Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING)
-    obj = Var(wgt)
-    update!(obj, y)  # apply the weighting scheme, as opposed to initializing with classic variance
-    obj
+    o = Var(wgt)
+    update!(o, y)  # apply the weighting scheme, as opposed to initializing with classic variance
+    o
 end
 
-# pass to vector constructor
 Var(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Var([y], wgt)
-
-Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(Mean(wgt), 0., 0, wgt)
+Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(0., 0., 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
-state_names(obj::Var) = [:μ, :σ²]
-state(obj::Var) = [mean(obj), var(obj)]
 
+state_names(o::Var) = [:μ, :σ², :nobs]
+state(o::Var) = [mean(o), var(o), nobs(o)]
+
+Base.mean(o::Var) = o.μ
+Base.var(o::Var) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
 
 #---------------------------------------------------------------------# update!
 
 
-# NOTE: does this seem cleaner to you?  I don't think it's (much) slower in the vector case, but the singleton case *should* be faster... but i haven't tested at all
-function update!(obj::Var, y::Vector)
-    for yi in y
-        update!(obj, yi)
-    end
-end
+function update!(o::Var, y::Float64)
+    n = nobs(o)
+    λ = weight(o)
+    μ = mean(o)
 
-function update!(obj::Var, y::Float64)
-    n = nobs(obj)
-    λ = weight(obj)
-    μ = mean(obj)
-
-    # obj.mean = smooth(μ, y, λ)
-    update!(obj.mean, y)
-    obj.var = smooth(obj.var, (y - μ) * (y - mean(obj)), λ)
-    obj.n += 1
+    o.μ = smooth(μ, y, λ)
+    o.biasedvar = smooth(o.biasedvar, (y - μ) * (y - mean(o)), λ)
+    o.n += 1
     return
 end
-
-
-
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-
-state(obj::Var) = var(obj)
 
 #-----------------------------------------------------------------------------#
 #------------------------------------------------------------------------# Base
-Base.mean(obj::Var) = obj.mean
-Base.var(obj::Var) = (n = nobs(obj); (n < 2 ? 0. : obj.var * n / (n - 1)))
 
-Base.copy(obj::Var) = Var(obj.mean, obj.var, obj.n, obj.weighting)
+Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
 
 # NOTE:
-function Base.empty!(obj::Var)
-    obj.mean = 0.
-    obj.var = 0.
-    obj.n = 0
+function Base.empty!(o::Var)
+    o.μ = 0.
+    o.biasedvar = 0.
+    o.n = 0
     return
 end
 
-# function Base.merge(a::Var, b::Var)
-# end
+function Base.merge!(o1::Var, o2::Var)
+    λ = mergeweight(o1, o2)
+    o1.μ = smooth(o1.μ, o2.μ, λ)
+    o1.biasedvar = smooth(o1.biasedvar, o2.biasedvar, λ)
+    o1.n += nobs(o2)
+    o1
+end
 
 
 

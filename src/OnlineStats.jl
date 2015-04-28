@@ -33,8 +33,10 @@ export
     FiveNumberSummary,
 
     # functions
+    nobs,
     update!,
     state,
+    statenames,
     onlinefit,
     tracedata,
     em                  # offline EM algorithm for Normal mixture
