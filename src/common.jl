@@ -2,7 +2,7 @@
 nobs{T <: OnlineStat}(obj::T) = obj.n
 
 
-#------------------------------------------------------------# ScalarOnlineStat
+#------------------------------------------------------------------# ScalarStat
 function Base.show(io::IO, obj::ScalarStat)
     paramnames = statenames(obj)
     paramvalues = state(obj)
@@ -13,6 +13,7 @@ function Base.show(io::IO, obj::ScalarStat)
         @printf(io, " * %s:  %f\n", paramnames[i], paramvalues[i])
     end
 end
+
 
 function DataFrame(obj::ScalarStat)
     st = state(obj)[1 : end - 1]

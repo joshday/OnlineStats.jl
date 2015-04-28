@@ -1,15 +1,19 @@
 #-------------------------------------------------------# Type and Constructors
-type Mean <: ScalarStat
+type Mean{W <: Weighting} <: ScalarStat
     mean::Float64
     n::Int64
+    weighting::W
 end
 
-Mean{T <: Real}(y::Vector{T}) = Mean(mean(y), length(y))
+function Mean{T <: Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING)
+    obj = Mean(wgt)
+    update!(obj, y)
+    obj
+end
 
-Mean{T <: Real}(y::T) = Mean([y])
+Mean(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Mean([y], wgt)
 
-Mean() = Mean(0.0, 0)
-
+Mean(wgt::Weighting = DEFAULT_WEIGHTING) = Mean(0., 0, wgt)
 
 #-----------------------------------------------------------------------# state
 state_names(obj::Mean) = [:μ]
@@ -17,14 +21,19 @@ state(obj::Mean) = [mean(obj)]
 
 
 #---------------------------------------------------------------------# update!
-function update!{T <: Real}(obj::Mean, y::Vector{T})
-    n2 = length(y)
-    obj.n += n2
-    obj.mean += (n2 / obj.n) * (mean(y) - obj.mean)
+function update!(obj::Mean, y::Float64)
+    n = nobs(obj)
+    λ = weight(obj)
+
+    obj.mean = smooth(obj.mean, y, λ)
+    obj.n += 1
+    return
 end
 
-function update!{T <: Real}(obj::Mean, y::T)
-    obj.mean += (1 / obj.n) * (y - obj.mean)
+function update!(obj::Mean, y::Vector)
+    for yi in y
+        update!(obj, yi)
+    end
 end
 
 
