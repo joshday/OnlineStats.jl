@@ -26,7 +26,6 @@ function Base.show(io::IO, o::ScalarStat)
 end
 
 # NOTE: I'm assuming the goal is to create a table like:
-
 # μ    |   σ²   |  n
 # ---------------------
 # 1.0  |   2.0  |  5

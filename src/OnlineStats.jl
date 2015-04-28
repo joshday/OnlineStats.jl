@@ -3,6 +3,7 @@ module OnlineStats
 using Docile
 @document
 
+import Compat: @compat
 import Distributions:
     Continuous, Discrete, Univariate, Multivariate,
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,

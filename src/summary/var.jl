@@ -20,7 +20,7 @@ Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(0., 0., 0, wgt)
 
 #-----------------------------------------------------------------------# state
 
-state_names(o::Var) = [:μ, :σ², :nobs]
+statenames(o::Var) = [:μ, :σ², :nobs]
 state(o::Var) = [mean(o), var(o), nobs(o)]
 
 Base.mean(o::Var) = o.μ

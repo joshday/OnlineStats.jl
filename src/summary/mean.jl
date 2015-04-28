@@ -18,7 +18,7 @@ Mean(wgt::Weighting = DEFAULT_WEIGHTING) = Mean(0., 0, wgt)
 
 #-----------------------------------------------------------------------# state
 
-state_names(o::Mean) = [:μ, :nobs]
+statenames(o::Mean) = [:μ, :nobs]
 state(o::Mean) = [mean(o), nobs(o)]
 
 Base.mean(o::Mean) = o.μ
