@@ -20,7 +20,7 @@ Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(0., 0., 0, wgt)
 
 #-----------------------------------------------------------------------# state
 
-state_names(o::Var) = [:μ, :σ², :nobs]
+statenames(o::Var) = [:μ, :σ², :nobs]
 state(o::Var) = [mean(o), var(o), nobs(o)]
 
 Base.mean(o::Var) = o.μ
@@ -39,9 +39,6 @@ function update!(o::Var, y::Float64)
     o.n += 1
     return
 end
-
-#-----------------------------------------------------------------------------#
-#------------------------------------------------------------------------# Base
 
 Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
 

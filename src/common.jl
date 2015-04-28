@@ -16,23 +16,22 @@ function Base.show(io::IO, o::ScalarStat)
     snames = statenames(o)
     svals = state(o)
 
-    # @printf(io, "Online %s\n", string(typeof(o)))
     println(io, "Online ", string(typeof(o)))
-    # for i in 1:length(snames)
-    for (i, sname) in enumerate(snames)
+    for (i, sname) in enumerate(snames[1 : end - 1])
         @printf(io, " * %s:  %f\n", sname, svals[i])
     end
-    # @printf(io, " * nobs:  %d\n", nobs(o))
+
+    # Better formatting (no decimal) for nobs
+    @printf(io, " * %s:  %d\n", snames[end], svals[end])
 end
 
-# NOTE: I'm assuming the goal is to create a table like:
 
-# μ    |   σ²   |  n
-# ---------------------
-# 1.0  |   2.0  |  5
-# 1.5  |   2.1  |  10
-# 1.6  |   2.2  |  15
+# Why doesn't this work in 0.3.7?
+# DataFrame(o::ScalarStat) = DataFrame(state(o), statenames(o))
 
-DataFrame(o::ScalarStat) = DataFrame(state(o), statenames(o))
+function DataFrame(o::ScalarStat)
+    df = convert(DataFrame, state(o)')
+    names!(df, statenames(o))
+end
 
 Base.push!(df::DataFrame, o::ScalarStat) = push!(df, state(o))

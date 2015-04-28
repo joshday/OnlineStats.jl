@@ -1,7 +1,6 @@
 DataFrames
 Docile
 Distributions
-SmoothingKernels
 StatsBase
-Gadfly
 GLM
+Compat

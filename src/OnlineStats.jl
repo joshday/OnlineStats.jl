@@ -3,6 +3,7 @@ module OnlineStats
 using Docile
 @document
 
+import Compat: @compat
 import Distributions:
     Continuous, Discrete, Univariate, Multivariate,
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
@@ -10,7 +11,7 @@ import Distributions:
     MixtureModel,
     pdf, cdf, logpdf, loglikelihood, probs, components
 # import PDMats  # Why is this needed?
-import DataFrames: DataFrame
+import DataFrames: DataFrame, names!
 import Base: copy, merge, merge!, show, quantile
 import StatsBase: nobs, skewness, kurtosis
 
@@ -22,6 +23,9 @@ export
     # abstract types
     OnlineStat,
     ScalarOnlineStat,
+    Weighting,
+    EqualWeighting,
+    ExponentialWeighting,
 
     # concrete types
     Mean,
@@ -39,7 +43,8 @@ export
     statenames,
     onlinefit,
     tracedata,
-    em                  # offline EM algorithm for Normal mixture
+    em, # offline EM algorithm for Normal mixture
+    smooth
 
 
 #-----------------------------------------------------------------------------#
@@ -47,6 +52,7 @@ export
 #-----------------------------------------------------------------------------#
 # Abstract Types
 include("types.jl")
+include("weighting.jl")
 
 include("weighting.jl")
 
@@ -57,15 +63,15 @@ include("common.jl")
 # Summary Statistics
 include("summary/mean.jl")
 include("summary/var.jl")
-include("summary/extrema.jl")
-include("summary/summary.jl")
-include("summary/moments.jl")
-include("summary/quantilesgd.jl")
-include("summary/quantilemm.jl")
-include("summary/fivenumber.jl")
+# include("summary/extrema.jl")
+# include("summary/summary.jl")
+# include("summary/moments.jl")
+# include("summary/quantilesgd.jl")
+# include("summary/quantilemm.jl")
+# include("summary/fivenumber.jl")
 
 # Parametric Density
-# include("parametricdensity/bernoulli.jl")
+include("parametricdensity/bernoulli.jl")
 # include("parametricdensity/beta.jl")
 # include("parametricdensity/binomial.jl")
 # include("parametricdensity/dirichlet.jl")
