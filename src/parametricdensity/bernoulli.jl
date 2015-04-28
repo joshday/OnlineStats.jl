@@ -28,12 +28,6 @@ state(obj::FitBernoulli) = [obj.d.p, obj.n]
 
 
 #---------------------------------------------------------------------# update!
-function update!{T <: Integer}(obj::FitBernoulli, y::Vector{T})
-    for yi in y
-        update!(obj, yi)
-    end
-end
-
 function update!(obj::FitBernoulli, y::Integer)
     λ = weight(obj)
     obj.p = smooth(obj.p, float64(y), λ)
@@ -45,5 +39,5 @@ end
 
 #------------------------------------------------------------------------# Base
 function Base.copy(obj::FitBernoulli)
-    FitBernoulli(obj.d, obj.n1, obj.n)
+    FitBernoulli(obj.d, obj.p, obj.n, obj.weighting)
 end
