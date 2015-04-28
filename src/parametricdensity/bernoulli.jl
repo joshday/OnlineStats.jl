@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitBernoulli <: UnivariateFitDistribution
+type FitBernoulli <: ScalarStat
     d::Distributions.Bernoulli
     n1::Int64
     n::Int64

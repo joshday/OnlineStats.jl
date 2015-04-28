@@ -2,6 +2,7 @@
 nobs{T <: OnlineStat}(obj::T) = obj.n
 
 
+
 #------------------------------------------------------------# ScalarOnlineStat
 function Base.show{T <: ScalarStat}(io::IO, obj::T)
     paramnames = state_names(obj)

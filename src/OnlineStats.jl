@@ -3,7 +3,12 @@ module OnlineStats
 using Docile
 @document
 
-import Distributions
+import Distributions:
+    Continuous, Discrete, Univariate, Multivariate,
+    Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
+    MvNormal, Normal,
+    MixtureModel,
+    pdf, cdf, logpdf, loglikelihood, probs, components
 # import PDMats  # Why is this needed?
 import DataFrames: DataFrame
 import Base: copy, merge, merge!, show, quantile
@@ -26,16 +31,13 @@ export
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
-#     FitBernoulli,
-#     FitBinomial,
-#     FitBeta,
-#     FitDirichlet,
 
     # functions
     update!,
     state,
     onlinefit,
-    tracedata
+    tracedata,
+    em                  # offline EM algorithm for Normal mixture
 
 
 #-----------------------------------------------------------------------------#
