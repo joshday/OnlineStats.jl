@@ -1,9 +1,3 @@
-
-
-export ExponentialWeighting,
-			 smooth
-
-
 abstract Weighting
 
 weighting(o) = o.weighting
@@ -24,7 +18,7 @@ immutable EqualWeighting <: Weighting end
 immutable ExponentialWeighting <: Weighting
     λ::Float64
 end
-ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))           # creates an exponential weighting with a lookback window of approximately "lookback" observations
+@compat ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))           # creates an exponential weighting with a lookback window of approximately "lookback" observations
 weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(), n1, n2), w.λ)    # uses equal weighting until we collect enough observations... then uses exponential weighting
 
 
