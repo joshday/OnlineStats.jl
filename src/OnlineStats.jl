@@ -22,6 +22,9 @@ export
     # abstract types
     OnlineStat,
     ScalarOnlineStat,
+    Weighting,
+    EqualWeighting,
+    ExponentialWeighting,
 
     # concrete types
     Mean,
@@ -35,9 +38,11 @@ export
     # functions
     update!,
     state,
+    statenames,
     onlinefit,
     tracedata,
-    em                  # offline EM algorithm for Normal mixture
+    em, # offline EM algorithm for Normal mixture
+    smooth
 
 
 #-----------------------------------------------------------------------------#
@@ -45,6 +50,7 @@ export
 #-----------------------------------------------------------------------------#
 # Abstract Types
 include("types.jl")
+include("weighting.jl")
 
 # Other
 # include("tracedata.jl")
@@ -53,15 +59,15 @@ include("common.jl")
 # Summary Statistics
 include("summary/mean.jl")
 include("summary/var.jl")
-include("summary/extrema.jl")
-include("summary/summary.jl")
-include("summary/moments.jl")
-include("summary/quantilesgd.jl")
-include("summary/quantilemm.jl")
-include("summary/fivenumber.jl")
+# include("summary/extrema.jl")
+# include("summary/summary.jl")
+# include("summary/moments.jl")
+# include("summary/quantilesgd.jl")
+# include("summary/quantilemm.jl")
+# include("summary/fivenumber.jl")
 
 # Parametric Density
-# include("parametricdensity/bernoulli.jl")
+include("parametricdensity/bernoulli.jl")
 # include("parametricdensity/beta.jl")
 # include("parametricdensity/binomial.jl")
 # include("parametricdensity/dirichlet.jl")
