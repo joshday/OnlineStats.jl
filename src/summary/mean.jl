@@ -1,54 +1,52 @@
+
 #-------------------------------------------------------# Type and Constructors
-type Mean{W <: Weighting} <: ScalarStat
-    mean::Float64
+type Mean{W<:Weighting} <: ScalarStat
+    μ::Float64
     n::Int64
     weighting::W
 end
 
-function Mean{T <: Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING)
-    obj = Mean(wgt)
-    update!(obj, y)
-    obj
+function Mean{T<:Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING)
+    o = Mean(wgt)
+    update!(o, y)
+    o
 end
 
 Mean(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Mean([y], wgt)
-
 Mean(wgt::Weighting = DEFAULT_WEIGHTING) = Mean(0., 0, wgt)
 
-#-----------------------------------------------------------------------# state
-state_names(obj::Mean) = [:μ]
-state(obj::Mean) = [mean(obj)]
 
+#-----------------------------------------------------------------------# state
+
+state_names(o::Mean) = [:μ, :nobs]
+state(o::Mean) = [mean(o), nobs(o)]
+
+Base.mean(o::Mean) = o.μ
 
 #---------------------------------------------------------------------# update!
-function update!(obj::Mean, y::Float64)
-    n = nobs(obj)
-    λ = weight(obj)
 
-    obj.mean = smooth(obj.mean, y, λ)
-    obj.n += 1
+update!{T<:Real}(o::Mean, y::Vector{T}) = (for yi in y; update!(o, yi); end)
+
+function update!(o::Mean, y::Float64)
+    o.μ = smooth(o.μ, y, weight(o))
+    o.n += 1
     return
 end
 
-function update!(obj::Mean, y::Vector)
-    for yi in y
-        update!(obj, yi)
-    end
-end
-
-
 #------------------------------------------------------------------------# Base
-Base.copy(obj::Mean) = Mean(obj.mean, obj.n)
 
-Base.mean(obj::Mean) = obj.mean
 
-function Base.merge(a::Mean, b::Mean)
-    m = a.mean + (b.n / (a.n + b.n)) * (b.mean - a.mean)
-    n = a.n + b.n
-    return Mean(m, n)
+Base.copy(o::Mean) = Mean(o.μ, o.n, o.weighting)
+
+function Base.empty!(o::Mean)
+    o.μ = 0.
+    o.n = 0
+    return
 end
 
-function Base.merge!(a::Mean, b::Mean)
-    a.mean += (b.n / (a.n + b.n)) * (b.mean - a.mean)
-    a.n += b.n
+function Base.merge!(o1::Mean, o2::Mean)
+    λ = mergeweight(o1, o2)
+    o1.μ = smooth(o1.μ, o2.μ, λ)
+    o1.n += nobs(o2)
+    o1
 end

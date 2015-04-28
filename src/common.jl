@@ -1,34 +1,38 @@
-#------------------------------------------------------------------# OnlineStat
-nobs{T <: OnlineStat}(obj::T) = obj.n
+
+nobs(o::OnlineStat) = o.n
 
 
-#------------------------------------------------------------------# ScalarStat
-function Base.show(io::IO, obj::ScalarStat)
-    paramnames = statenames(obj)
-    paramvalues = state(obj)
+update!{T<:Real}(o::ScalarStat, y::Vector{T}) = (for yi in y; update!(o, yi); end)
 
-    @printf(io, "Online %s\n", string(typeof(obj)))
+function Base.merge(o1::OnlineStat, o2::OnlineStat)
+    o1copy = copy(o1)
+    merge!(o1copy, o2)
+    o1copy
+end
 
-    for i in 1:length(paramnames)
-        @printf(io, " * %s:  %f\n", paramnames[i], paramvalues[i])
+
+#------------------------------------------------------------# ScalarOnlineStat
+function Base.show(io::IO, o::ScalarStat)
+    snames = statenames(o)
+    svals = state(o)
+
+    # @printf(io, "Online %s\n", string(typeof(o)))
+    println(io, "Online ", string(typeof(o)))
+    # for i in 1:length(snames)
+    for (i, sname) in enumerate(snames)
+        @printf(io, " * %s:  %f\n", sname, svals[i])
     end
+    # @printf(io, " * nobs:  %d\n", nobs(o))
 end
 
+# NOTE: I'm assuming the goal is to create a table like:
 
-function DataFrame(obj::ScalarStat)
-    st = state(obj)[1 : end - 1]
-    stn = statenames(obj)[1 : end - 1]
+# μ    |   σ²   |  n
+# ---------------------
+# 1.0  |   2.0  |  5
+# 1.5  |   2.1  |  10
+# 1.6  |   2.2  |  15
 
-    DataFrame(variable = stn, values = st, nobs = nobs(obj))
-end
+DataFrame(o::ScalarStat) = DataFrame(state(o), statenames(o))
 
-
-function Base.push!(df::DataFrame, obj::ScalarStat)
-    st = state(obj)[1 : end - 1]
-    stn = statenames(obj)[1 : end - 1]
-
-    mat = [stn st]
-    for i in 1:length(st)
-        push!(df, [mat[i, :] nobs(obj)])
-    end
-end
+Base.push!(df::DataFrame, o::ScalarStat) = push!(df, state(o))
