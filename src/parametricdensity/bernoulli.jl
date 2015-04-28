@@ -9,9 +9,9 @@ end
 function onlinefit{T <: Integer}(::Type{Bernoulli},
                                  y::Vector{T},
                                  wgt::Weighting = DEFAULT_WEIGHTING)
-    obj = FitBernoulli(wgt)
-    update!(obj, y)
-    obj
+    o = FitBernoulli(wgt)
+    update!(o, y)
+    o
 end
 
 FitBernoulli{T <: Integer}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING) =
@@ -22,15 +22,15 @@ FitBernoulli(wgt::Weighting = DEFAULT_WEIGHTING) =
 
 
 #-----------------------------------------------------------------------# state
-statenames(obj::FitBernoulli) = [:p, :nobs]
+statenames(o::FitBernoulli) = [:p, :nobs]
 
-state(obj::FitBernoulli) = [obj.d.p, obj.n]
+state(o::FitBernoulli) = [o.d.p, o.n]
 
 
 #---------------------------------------------------------------------# update!
 function update!(obj::FitBernoulli, y::Integer)
     λ = weight(obj)
-    obj.p = smooth(obj.p, float64(y), λ)
+    obj.p = smooth(obj.p, @compat(Float64(y)), λ)
     obj.d = Bernoulli(obj.p)
     obj.n += 1
     return

@@ -31,63 +31,64 @@ obj2 = copy(obj)
 @test_approx_eq(mean(obj2.d), mean(x))
 @test nobs(obj) == n1 + n2
 
+obj = onlinefit(Bernoulli, x1, ExponentialWeighting(.01))
+@test weighting(obj) == ExponentialWeighting(.01)
 
+obj = onlinefit(Bernoulli, x1, ExponentialWeighting(1000))
+@test weighting(obj) == ExponentialWeighting(1000)
 
 #------------------------------------------------------------------------------#
 #                                                                         Beta #
 #------------------------------------------------------------------------------#
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# α, β = rand(1:0.1:10, 2)
-# x1 = rand(Beta(α, β), n1)
-# x2 = rand(Beta(α, β), n2)
-# x = [x1, x2]
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+α, β = rand(1:0.1:10, 2)
+x1 = rand(Beta(α, β), n1)
+x2 = rand(Beta(α, β), n2)
+x = [x1, x2]
 
-# obj = onlinefit(Beta, x1)
-# @test_approx_eq_eps mean(obj.d) mean(x1) 1e-10
-# @test_approx_eq_eps var(obj.d) var(x1) 1e-10
-# @test obj.n == n1
+obj = onlinefit(Beta, x1)
+@test_approx_eq_eps mean(obj.d) mean(x1) 1e-10
+@test_approx_eq_eps var(obj.d) var(x1) 1e-10
+@test obj.n == n1
 
-# OnlineStats.update!(obj, x2)
-# @test_approx_eq mean(obj.d) mean(x)
-# @test_approx_eq var(obj.d) var(x)
-# @test obj.n == n1 + n2
-# @test state(obj) == DF.DataFrame(variable=[:α, :β], value = [obj.d.α, obj.d.β],
-#                                  nobs = n1 + n2)
-# obj2 = copy(obj)
-# @test state(obj2) == DF.DataFrame(variable=[:α, :β], value = [obj.d.α, obj.d.β],
-#                                  nobs = n1 + n2)
+OnlineStats.update!(obj, x2)
+@test_approx_eq mean(obj.d) mean(x)
+@test_approx_eq var(obj.d) var(x)
+@test obj.n == n1 + n2
+@test statenames(obj) == [:α, :β, :nobs]
+@test state(obj) == [obj.d.α, obj.d.β, obj.n]
+obj2 = copy(obj)
+@test DataFrame(obj2) == DataFrame(obj)
 
 
 
 #------------------------------------------------------------------------------#
 #                                                                     Binomial #
 #------------------------------------------------------------------------------#
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# n = rand(1:1000, 1)[1]
-# p = rand(1)[1]
-# x1 = rand(Binomial(n, p), n1)
-# x2 = rand(Binomial(n, p), n2)
-# x = [x1, x2]
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+ntrials = rand(1:1000, 1)[1]
+p = rand(1)[1]
+x1 = rand(Binomial(ntrials, p), n1)
+x2 = rand(Binomial(ntrials, p), n2)
+x = [x1, x2]
 
-# obj = onlinefit(Binomial, n, x1)
-# @test obj.d.n == n
-# @test obj.d.p == sum(x1) / (n * n1)
-# @test obj.nsuccess == sum(x1)
-# @test obj.n == n1
+obj = onlinefit(Binomial, x1, n = ntrials)
+@test obj.d.n == ntrials
+@test_approx_eq(obj.d.p, sum(x1) / (ntrials * n1))
+@test obj.n == n1
 
-# OnlineStats.update!(obj, x2)
-# @test obj.d.n == n
-# @test obj.d.p == sum(x) / (n * (n1 + n2))
-# @test obj.nsuccess == sum(x)
-# @test obj.n == n1 + n2
+OnlineStats.update!(obj, x2)
+@test obj.d.n == ntrials
+@test_approx_eq(obj.d.p, sum(x) / (ntrials * (n1 + n2)))
+@test obj.n == n1 + n2
 
-# @test typeof(state(obj)) == DF.DataFrame
-# obj2 = copy(obj)
-# @test state(obj2) == DF.DataFrame(variable = [:n, :p],
-#                                  value = Union(Float64,Int64)[obj.d.n, obj.d.p],
-#                                  nobs = nobs(obj))
+@test state(obj) == [obj.d.n, obj.d.p, obj.n]
+obj2 = copy(obj)
+@test statenames(obj2) == [:n, :p, :nobs]
+@test DataFrame(obj2) == DataFrame(n = obj.d.n, p = obj.d.p, nobs = obj.n)
+
 
 
 
