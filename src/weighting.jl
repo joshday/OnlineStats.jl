@@ -17,8 +17,8 @@ smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
 
 immutable EqualWeighting <: Weighting end
 
-weight(w::EqualWeighting, n1::Int, n2::Int) =
-    n1 > 0 || n2 > 0 ? @compat Float64(n2 / (n1 + n2)) : 1.0
+@compat weight(w::EqualWeighting, n1::Int, n2::Int) =
+    n1 > 0 || n2 > 0 ? Float64(n2 / (n1 + n2)) : 1.0
 
 
 immutable ExponentialWeighting <: Weighting
