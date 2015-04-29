@@ -6,6 +6,8 @@ weight(o::OnlineStat, numUpdates::Int = 1) = weight(weighting(o), nobs(o), numUp
 
 smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
 
+default(::Type{Weighting}) = EqualWeighting()
+
 
 #---------------------------------------------------------------------------#
 
@@ -39,8 +41,3 @@ adjusted_nobs(o::OnlineStat) = adjusted_nobs(nobs(o), weighting(o))
 adjusted_nobs(n::Int, w::EqualWeighting) = n
 adjusted_nobs(n::Int, w::ExponentialWeighting) = min(n, 2 / w.λ - 1) # minimum of n and effective lookback window
 
-
-#---------------------------------------------------------------------------#
-
-
-const DEFAULT_WEIGHTING = EqualWeighting()

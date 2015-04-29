@@ -8,17 +8,17 @@ end
 
 function onlinefit{T <: Integer}(::Type{Binomial},
                                  y::Vector{T},
-                                 wgt::Weighting = DEFAULT_WEIGHTING;
+                                 wgt::Weighting = default(Weighting);
                                  n = 1) # n = number of independent Bernoulli trials
     obj = FitBinomial(wgt, n = n)
     update!(obj, y)
     obj
 end
 
-FitBinomial{T <: Integer}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING; n = 1) =
+FitBinomial{T <: Integer}(y::Vector{T}, wgt::Weighting = default(Weighting); n = 1) =
     onlinefit(Binomial, y, wgt, n = n)
 
-FitBinomial(wgt::Weighting = DEFAULT_WEIGHTING; n = 1) =
+FitBinomial(wgt::Weighting = default(Weighting); n = 1) =
     FitBinomial(Binomial(n, 0), 0., 0, wgt)
 
 

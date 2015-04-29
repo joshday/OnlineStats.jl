@@ -8,7 +8,7 @@ end
 
 function onlinefit{T <: Real}(::Type{Beta},
                               y::Vector{T},
-                              wgt::Weighting = DEFAULT_WEIGHTING)
+                              wgt::Weighting = default(Weighting))
     warn("FitBeta Uses method of moments, not MLE")
     o = FitBeta(wgt)
     n::Int64 = length(y)
@@ -16,10 +16,10 @@ function onlinefit{T <: Real}(::Type{Beta},
     o
 end
 
-FitBeta{T <: Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING) =
+FitBeta{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Beta, y, wgt)
 
-FitBeta(wgt::Weighting = DEFAULT_WEIGHTING) =
+FitBeta(wgt::Weighting = default(Weighting)) =
     FitBeta(Beta(), Var(wgt), 0, wgt)
 
 
