@@ -25,7 +25,7 @@ FitBinomial(wgt::Weighting = DEFAULT_WEIGHTING; n = 1) =
 #-----------------------------------------------------------------------# state
 statenames(obj::FitBinomial) = [:n, :p, :nobs]
 
-state(obj::FitBinomial) = Real[obj.d.n, obj.d.p, obj.n]
+state(obj::FitBinomial) = [obj.d.n, obj.d.p, obj.n]
 
 
 #---------------------------------------------------------------------# update!

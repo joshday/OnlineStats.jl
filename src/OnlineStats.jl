@@ -8,6 +8,7 @@ import Distributions:
     Continuous, Discrete, Univariate, Multivariate,
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
     MvNormal, Normal,
+    fit_dirichlet!,
     MixtureModel,
     pdf, cdf, logpdf, loglikelihood, probs, components
 # import PDMats  # Why is this needed?
@@ -43,7 +44,8 @@ export
     onlinefit,
     tracedata,
     em, # offline EM algorithm for Normal mixture
-    smooth
+    smooth,
+    weighting
 
 
 #-----------------------------------------------------------------------------#
@@ -69,9 +71,9 @@ include("summary/var.jl")
 
 # Parametric Density
 include("parametricdensity/bernoulli.jl")
-# include("parametricdensity/beta.jl")
-# include("parametricdensity/binomial.jl")
-# include("parametricdensity/dirichlet.jl")
+include("parametricdensity/beta.jl")
+include("parametricdensity/binomial.jl")
+include("parametricdensity/dirichlet.jl")
 # include("parametricdensity/exponential.jl")
 # include("parametricdensity/gamma.jl")
 # include("parametricdensity/multinomial.jl")

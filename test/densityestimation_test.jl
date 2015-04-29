@@ -95,15 +95,15 @@ obj2 = copy(obj)
 #------------------------------------------------------------------------------#
 #                                                                    Dirichlet #
 #------------------------------------------------------------------------------#
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# αlength = rand(3:20, 1)[1]
-# α = rand(.5:.1:20, αlength)
-# x1 = rand(Dirichlet(α), n1)
-# x2 = rand(Dirichlet(α), n2)
-# x = [x1 x2]
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+αlength = rand(3:20, 1)[1]
+α = rand(.5:.1:20, αlength)
+x1 = rand(Dirichlet(α), n1)
+x2 = rand(Dirichlet(α), n2)
+x = [x1 x2]
 
-# obj = onlinefit(Dirichlet, x1)
+obj = onlinefit(Dirichlet, x1)
 # @test obj.slogp == vec(sum(log(x1), 2) / n1)
 # @test obj.n == n1
 

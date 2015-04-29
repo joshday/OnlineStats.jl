@@ -1,31 +1,51 @@
 #------------------------------------------------------# Type and Constructors
-type FitDirichlet <: MultivariateFitDistribution
-    d::Distributions.Dirichlet
-    slogp::Vector{Float64}
+type FitDirichlet{W <: Weighting} <: ScalarStat
+    d::Dirichlet
+    meanlogx::Vector{Float64}
     n::Int64
+    weighting::W
 end
 
-# First batch may give incorrect estimates (issue with fit(Dirichlet, y)).
-# Since suffstats are correct, second batch estimates looks good.
-function onlinefit{T <: Real}(::Type{Dirichlet}, y::Matrix{T})
-    n::Int64 = size(y, 2)
-    FitDirichlet(fit(Dirichlet, y), suffstats(Dirichlet, y).slogp / n, n)
+function onlinefit(::Type{Dirichlet},
+                   y::Array{Float64},
+                   wgt::Weighting = DEFAULT_WEIGHTING)
+    o = FitDirichlet(wgt; d = size(y, 1))
+    update!(o, y)
+    o
 end
 
-FitDirichlet{T <: Real}(y::Matrix{T}) = onlinefit(Dirichlet, y)
+FitDirichlet(y::Array{Float64}, wgt::Weighting = DEFAULT_WEIGHTING) =
+    onlinefit(Dirichlet, y, wgt)
+
+FitDirichlet(wgt::Weighting = DEFAULT_WEIGHTING; d = 2) =
+    FitDirichlet(Dirichlet([]), zeros(d), 0, wgt)
+
+
+#-----------------------------------------------------------------------# state
+statenames(o::FitDirichlet) = [[symbol("α$i") for i in 1:length(o.meanlogx)]; :nobs]
+
+state(o::FitDirichlet) = [o.d.alpha; o.n]
 
 
 #---------------------------------------------------------------------# update!
-function update!{T<:Real}(obj::FitDirichlet, newdata::Matrix{T})
-    n2 = size(newdata, 2)
-    slogp = suffstats(Dirichlet, newdata).slogp / n2
-    obj.n += n2
-    obj.slogp += (n2 / obj.n) * (slogp - obj.slogp)
-    α = obj.d.alpha
-    obj.d = Distributions.fit_dirichlet!(obj.slogp, α)
+# Since MLE is via Newton's method, it's MUCH faster to do batch updates
+function update!(o::FitDirichlet, y::Matrix{Float64})
+    n2 = size(y, 2)
+    λ = weight(o, n2)
+    o.meanlogx = smooth(o.meanlogx, vec(mean(log(y), 2)), λ)
+
+    if isempty(o.d.alpha) # fit_dirichlet! needs good starting values
+        o.d = fit_dirichlet!(o.meanlogx, exp(copy(o.meanlogx)))
+    else
+        o.d = fit_dirichlet!(o.meanlogx, o.d.alpha)
+    end
+    o.n += n2
+    return
 end
+
+update!(o::FitDirichlet, y::Vector{Float64}) = update!(o, y')
 
 
 #-----------------------------------------------------------------------# Base
-Base.copy(obj::FitDirichlet) = FitDirichlet(obj.d, obj.slogp, obj.n)
+Base.copy(o::FitDirichlet) = FitDirichlet(o.d, o.slogp, o.n, o.weighting)
 
