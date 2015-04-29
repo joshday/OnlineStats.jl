@@ -10,7 +10,7 @@ Online algorithms for statistics.  See [Examples](doc/examples) and [Implementat
 
 A simplified `OnlineStats` type structure:
 
-```
+```julia
 type OnlineStatistic
 	estimate         # current estimate
 	sufficient_stat  # values needed to update estimate
