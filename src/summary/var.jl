@@ -39,7 +39,7 @@ function update!(o::Var, y::Float64)
     return
 end
 
-Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
+# Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
 
 # NOTE:
 function Base.empty!(o::Var)

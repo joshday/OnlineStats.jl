@@ -4,6 +4,9 @@ nobs(o::OnlineStat) = o.n
 
 update!{T<:Real}(o::OnlineStat, y::Vector{T}) = (for yi in y; update!(o, yi); end)
 
+
+Base.copy(o::OnlineStat) = deepcopy(o)
+
 function Base.merge(o1::OnlineStat, o2::OnlineStat)
     o1copy = copy(o1)
     merge!(o1copy, o2)

@@ -19,6 +19,12 @@ immutable EqualWeighting <: Weighting end
 
 immutable ExponentialWeighting <: Weighting
     λ::Float64
+
+    # ensure λ stays between 0 and 1
+    function ExponentialWeighting(λ::Float64)
+    	@assert λ >= 0. && λ <= 1.
+    	new(λ)
+    end
 end
 @compat ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))           # creates an exponential weighting with a lookback window of approximately "lookback" observations
 weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(), n1, n2), w.λ)    # uses equal weighting until we collect enough observations... then uses exponential weighting
