@@ -39,7 +39,3 @@ function update!(obj::FitBeta, y::Float64)
     obj.d = Beta(α, β)
     obj.n += 1
 end
-
-
-#-----------------------------------------------------------------------# Base
-Base.copy(obj::FitBeta) = FitBeta(obj.d, obj.stats, obj.n, obj.weighting)

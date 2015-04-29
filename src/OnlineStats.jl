@@ -36,6 +36,7 @@ export
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
+    CovarianceMatrix,
     FitBernoulli,
     FitBeta,
     FitBinomial,
@@ -43,6 +44,7 @@ export
     FitExponential,
     FitGamma,
     FitMultinomial,
+    FitMvNormal,
 
     # functions
     nobs,
@@ -110,6 +112,6 @@ include("distributions/multinomial.jl")
 # include("quantileregression/quantregmm.jl")
 
 # Multivariate
-# include("multivariate/covmatrix.jl")
+include("multivariate/covmatrix.jl")
 
 end # module

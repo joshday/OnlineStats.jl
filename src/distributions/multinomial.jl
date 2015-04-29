@@ -9,16 +9,16 @@ end
 
 function onlinefit{T <: Integer}(::Type{Multinomial},
                                  y::Matrix{T},
-                                 wgt::Weighting = DEFAULT_WEIGHTING)
+                                 wgt::Weighting = default(Weighting))
     o = FitMultinomial(wgt)
     update!(o, y)
     o
 end
 
-FitMultinomial{T <: Integer}(y::Matrix{T}, wgt::Weighting = DEFAULT_WEIGHTING) =
+FitMultinomial{T <: Integer}(y::Matrix{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Multinomial, y, wgt)
 
-function FitMultinomial(wgt::Weighting = DEFAULT_WEIGHTING)
+function FitMultinomial(wgt::Weighting = default(Weighting))
     FitMultinomial(Multinomial(1, [0., 1.]), zeros(0), 0, wgt)
 end
 
@@ -52,18 +52,12 @@ end
 
 
 #------------------------------------------------------------------------# Base
-Base.copy(o::FitMultinomial) = FitMultinomial(o.d, o.means, o.n, o.weighting)
-
 function Base.show(io::IO, o::FitMultinomial)
-    snames = statenames(o)
-    svals = state(o)
-
     println(io, "Online ", string(typeof(o)))
-    @printf(io, " * %s:  %d\n", snames[1], svals[1])
-    for i in 2:length(snames) - 1
-        @printf(io, " * %s:  %f\n", snames[i], svals[i])
-    end
-    @printf(io, " * %s:  %d\n", snames[end], svals[end])
+    print(" * ")
+    show(o.d)
+    println()
+    @printf(io, " * %s:  %d\n", :nobs, nobs(o))
 end
 
 function DataFrame(o::FitMultinomial)

@@ -2,7 +2,7 @@ export FitNormal
 
 #-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type FitNormal <: OnlineUnivariateDistribution
+type FitNormal <: ScalarStat
     d::Distributions.Normal
     v::Var
     n::Int64
@@ -21,7 +21,3 @@ function update!{T<:Real}(obj::FitNormal, newdata::Vector{T})
     obj.n = nobs(obj.v)
     obj.d = Normal(mean(obj.v), sqrt(var(obj.v)))
 end
-
-#-----------------------------------------------------------------------------#
-#------------------------------------------------------------------------# Base
-Base.copy(obj::FitNormal) = FitNormal(obj.d, obj.v, obj.n)

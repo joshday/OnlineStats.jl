@@ -1,80 +1,68 @@
-export CovarianceMatrix
 
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type CovarianceMatrix <: MatrixvariateOnlineStat{Analytical}
-    A::Matrix    # X' * X
-    B::Vector    # X * 1'
-    n::Int64     # number of observations used
-    p::Int64     # number of columns (variables)
+type CovarianceMatrix{W <: Weighting} <: OnlineStat
+    A::Matrix{Float64}    # X' * X / n
+    B::Vector{Float64}    # X * 1' / n (column means)
+    n::Int64              # number of observations used
+    weighting::W
 end
 
-
-function CovarianceMatrix{T <: Real}(x::Matrix{T})
-    n, p = size(x)
-    A = BLAS.syrk('L', 'T', 1.0, x) / n
-    B = vec(mean(x, 1))
-    CovarianceMatrix(A, B, n, p)
+# (p by p) covariance matrix from an (n by p) data matrix
+function CovarianceMatrix{T <: Real}(x::Matrix{T}, wgt::Weighting = default(Weighting))
+    o = CovarianceMatrix(wgt; p = size(x, 2))
+    update!(o, x)
+    o
 end
 
+CovarianceMatrix(wgt::Weighting = default(Weighting); p = 2) =
+    CovarianceMatrix(zeros(p,p), zeros(p), 0, wgt)
 
-#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------# state
+statenames(o::CovarianceMatrix) = [:μ, :Σ, :nobs]
+
+state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
+
+
 #---------------------------------------------------------------------# update!
-function update!{T <: Real}(obj::CovarianceMatrix, x::Matrix{T})
+function update!{T <: Real}(o::CovarianceMatrix, x::Matrix{T})
     n2 = size(x, 1)
-    obj.n += n2
-    γ = n2 / obj.n
+    λ = weight(o, n2)
+    o.n += n2
 
     # Update B
-    obj.B += γ * (vec(mean(x, 1)) - obj.B)
+    o.B = smooth(o.B, vec(mean(x,1)), λ)
     # Update A
-    BLAS.syrk!('L', 'T', γ, x / sqrt(n2), 1 - γ, obj.A)
+    BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1 - λ, o.A)
 end
 
 
-#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::CovarianceMatrix, cormat=false)
-    if cormat
-        df = convert(DataFrame, cor(obj))
-    else
-        df = convert(DataFrame, cov(obj))
-    end
-    return df
-end
+Base.mean(o::CovarianceMatrix) = return o.B
 
+Base.var(o::CovarianceMatrix) = diag(cov(o::CovarianceMatrix))
 
+Base.std(o::CovarianceMatrix) = sqrt(var(o::CovarianceMatrix))
 
-#-----------------------------------------------------------------------------#
-#------------------------------------------------------------------------# Base
-Base.copy(obj::CovarianceMatrix) = CovarianceMatrix(obj.A. obj.B, obj.n, obj.p)
-
-Base.mean(obj::CovarianceMatrix) = return obj.B
-
-Base.var(obj::CovarianceMatrix) = diag(cov(obj::CovarianceMatrix))
-
-Base.std(obj::CovarianceMatrix) = sqrt(var(obj::CovarianceMatrix))
-
-function Base.cov(obj::CovarianceMatrix)
-    B = obj.B
+function Base.cov(o::CovarianceMatrix)
+    B = o.B
     p = size(B, 1)
-    covmat = obj.A * obj.n / (obj.n - 1) -
-        BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
-    for i in 1:p
-        for j in i:p
+    covmat = o.n / (o.n - 1) * (o.A - BLAS.syrk('L','N',1.0, B))
+    for j in 1:p
+        for i in 1:j - 1
             covmat[i, j] = covmat[j, i]
         end
     end
     return covmat
 end
 
-function Base.cor(obj::CovarianceMatrix)
-    B = obj.B
+function Base.cor(o::CovarianceMatrix)
+    B = o.B
     p = size(B, 1)
-    covmat = obj.A * obj.n / (obj.n - 1) -
-        BLAS.syrk('L','N',1.0, B) * obj.n / (obj.n - 1)
-    for i in 1:p
-        for j in i:p
+    covmat = o.A * o.n / (o.n - 1) -
+        BLAS.syrk('L','N',1.0, B) * o.n / (o.n - 1)
+    for j in 1:p
+        for i in 1:j - 1
             covmat[i, j] = covmat[j, i]
         end
     end
@@ -84,23 +72,9 @@ function Base.cor(obj::CovarianceMatrix)
 end
 
 
-function Base.merge(c1::CovarianceMatrix, c2::CovarianceMatrix)
-    n1 = c1.n
-    n2 = c2.n
-    n = n1 + n2
 
-    A1::Matrix = c1.A
-    B1::Vector = c1.B
-    A2::Matrix = c2.A
-    B2::Vector = c2.B
 
-    γ = n2 / n
-    A = A1 + γ * (A2 - A1)
-    B = B1 + γ * (B2 - B1)
-
-    CovarianceMatrix(A, B, n, c1.p)
-end
-
+#------------------------------------------------------------------------# Base
 function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
     n2 = c2.n
     A2 = c2.A
@@ -112,8 +86,10 @@ function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
     c1.B += γ * (B2 - c1.B)
 end
 
-function Base.show(io::IO, obj::CovarianceMatrix)
-    println(io, "Online Covariance Matrix:\n", cov(obj))
+function Base.show(io::IO, o::CovarianceMatrix)
+    println(io, "Online Covariance Matrix:\n", cov(o))
 end
 
-
+function DataFrame(o::CovarianceMatrix, corr = false)
+    convert(DataFrame, corr? cor(o) :cov(o))
+end

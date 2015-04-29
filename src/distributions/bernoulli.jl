@@ -36,8 +36,3 @@ function update!(obj::FitBernoulli, y::Integer)
     return
 end
 
-
-#------------------------------------------------------------------------# Base
-function Base.copy(obj::FitBernoulli)
-    FitBernoulli(obj.d, obj.p, obj.n, obj.weighting)
-end

@@ -5,7 +5,6 @@ using Distributions
 @time include("mean_test.jl")
 @time include("var_test.jl")
 # @time include("summary_test.jl")
-# @time include("covmatrix_test.jl")
 # @time include("extrema_test.jl")
 # @time include("moments_test.jl")
 # @time include("quantilesgd_test.jl")
@@ -17,6 +16,8 @@ using Distributions
 # @time include("quantregsgd_test.jl")
 
 @time include("densityestimation_test.jl")
+
+@time include("covmatrix_test.jl")
 
 
 
