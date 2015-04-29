@@ -11,7 +11,8 @@ x4 = rand(n4, 10)
 
 # update!
 obj = OnlineStats.CovarianceMatrix(x1)
-@test state(obj) == convert(DataFrames.DataFrame, cov(obj))
+@test statenames(obj) == [:μ, :Σ, :nobs]
+@test state(obj) == Any[mean(obj), cov(obj), nobs(obj)]
 OnlineStats.update!(obj, x2)
 OnlineStats.update!(obj, x3)
 OnlineStats.update!(obj, x4)

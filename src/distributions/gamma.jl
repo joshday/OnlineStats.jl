@@ -9,16 +9,16 @@ end
 
 function onlinefit(::Type{Gamma},
                    y::Vector{Float64},
-                   wgt::Weighting = DEFAULT_WEIGHTING)
+                   wgt::Weighting = default(Weighting))
     o = FitGamma(wgt)
     update!(o, y)
     o
 end
 
-FitGamma(y::Vector{Float64}, wgt::Weighting = DEFAULT_WEIGHTING) =
+FitGamma(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
     onlinefit(Gamma, y, wgt)
 
-FitGamma(wgt::Weighting = DEFAULT_WEIGHTING) =
+FitGamma(wgt::Weighting = default(Weighting)) =
     FitGamma(Gamma(), Mean(wgt), Mean(wgt), 0, wgt)
 
 

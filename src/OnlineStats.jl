@@ -36,6 +36,7 @@ export
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
+    CovarianceMatrix,
     FitBernoulli,
     FitBeta,
     FitBinomial,
@@ -43,6 +44,9 @@ export
     FitExponential,
     FitGamma,
     FitMultinomial,
+    FitMvNormal,
+    FitNormal,
+    
     OnlineFLS,
 
     # functions
@@ -87,7 +91,7 @@ include("distributions/exponential.jl")
 include("distributions/gamma.jl")
 include("distributions/multinomial.jl")
 # include("distributions/mvnormal.jl")
-# include("distributions/normal.jl")
+include("distributions/normal.jl")
 
 # Density Estimation
 # include("densityestimation/offlinenormalmix.jl")
@@ -110,6 +114,6 @@ include("linearmodel/ofls.jl")
 # include("quantileregression/quantregmm.jl")
 
 # Multivariate
-# include("multivariate/covmatrix.jl")
+include("multivariate/covmatrix.jl")
 
 end # module

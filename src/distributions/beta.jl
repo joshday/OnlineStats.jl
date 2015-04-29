@@ -11,7 +11,6 @@ function onlinefit{T <: Real}(::Type{Beta},
                               wgt::Weighting = default(Weighting))
     warn("FitBeta Uses method of moments, not MLE")
     o = FitBeta(wgt)
-    n::Int64 = length(y)
     update!(o, y)
     o
 end
@@ -39,7 +38,3 @@ function update!(obj::FitBeta, y::Float64)
     obj.d = Beta(α, β)
     obj.n += 1
 end
-
-
-#-----------------------------------------------------------------------# Base
-Base.copy(obj::FitBeta) = FitBeta(obj.d, obj.stats, obj.n, obj.weighting)

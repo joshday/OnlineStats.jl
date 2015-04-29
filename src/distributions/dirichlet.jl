@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitDirichlet{W <: Weighting} <: ScalarStat
+type FitDirichlet{W <: Weighting} <: OnlineStat
     d::Dirichlet
     meanlogx::Vector{Float64}
     n::Int64
@@ -46,6 +46,18 @@ end
 update!(o::FitDirichlet, y::Vector{Float64}) = update!(o, y')
 
 
-#-----------------------------------------------------------------------# Base
-Base.copy(o::FitDirichlet) = FitDirichlet(o.d, o.meanlogx, o.n, o.weighting)
+#------------------------------------------------------------------------# Base
+function Base.show(io::IO, o::FitDirichlet)
+    println(io, "Online ", string(typeof(o)))
+    print(" * ")
+    show(o.d)
+    println()
+    @printf(io, " * %s:  %d\n", :nobs, nobs(o))
+end
 
+function DataFrame(o::FitDirichlet)
+    df = convert(DataFrame, state(o)')
+    names!(df, statenames(o))
+end
+
+Base.push!(df::DataFrame, o::FitDirichlet) = push!(df, state(o))

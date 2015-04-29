@@ -24,7 +24,7 @@ FitBinomial(wgt::Weighting = default(Weighting); n = 1) =
 #-----------------------------------------------------------------------# state
 statenames(o::FitBinomial) = [:n, :p, :nobs]
 
-state(o::FitBinomial) = [o.d.n, o.d.p, obj.n]
+state(o::FitBinomial) = [o.d.n, o.d.p, o.n]
 
 
 #---------------------------------------------------------------------# update!
@@ -34,10 +34,4 @@ function update!(o::FitBinomial, y::Integer)
     o.d = Binomial(o.d.n, p)
     o.n += 1
     return
-end
-
-
-#-----------------------------------------------------------------------# Base
-function Base.copy(obj::FitBinomial)
-    FitBinomial(o.d, obj.n, obj.weighting)
 end
