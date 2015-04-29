@@ -42,6 +42,7 @@ export
     FitDirichlet,
     FitExponential,
     FitGamma,
+    FitMultinomial,
 
     # functions
     nobs,
@@ -85,7 +86,7 @@ include("distributions/binomial.jl")
 include("distributions/dirichlet.jl")
 include("distributions/exponential.jl")
 include("distributions/gamma.jl")
-# include("distributions/multinomial.jl")
+include("distributions/multinomial.jl")
 # include("distributions/mvnormal.jl")
 # include("distributions/normal.jl")
 
