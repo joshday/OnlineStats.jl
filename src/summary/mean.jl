@@ -25,8 +25,6 @@ Base.mean(o::Mean) = o.μ
 
 #---------------------------------------------------------------------# update!
 
-# update!{T<:Real}(o::Mean, y::Vector{T}) = (for yi in y; update!(o, yi); end)
-
 function update!(o::Mean, y::Float64)
     o.μ = smooth(o.μ, y, weight(o))
     o.n += 1

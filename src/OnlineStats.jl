@@ -38,6 +38,7 @@ export
     FiveNumberSummary,
 
     # functions
+    nobs,
     update!,
     state,
     statenames,
@@ -53,6 +54,8 @@ export
 #-----------------------------------------------------------------------------#
 # Abstract Types
 include("types.jl")
+include("weighting.jl")
+
 include("weighting.jl")
 
 # Other
