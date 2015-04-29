@@ -34,7 +34,7 @@ function update!(o::FitDirichlet, y::Matrix{Float64})
     λ = weight(o, n2)
     o.meanlogx = smooth(o.meanlogx, vec(mean(log(y), 2)), λ)
 
-    if isempty(o.d.alpha) # fit_dirichlet! needs good starting values
+    if isempty(o.d.alpha) # fit_dirichlet! needs decent starting values
         o.d = fit_dirichlet!(o.meanlogx, exp((o.meanlogx)))
     else
         o.d = fit_dirichlet!(o.meanlogx, o.d.alpha)

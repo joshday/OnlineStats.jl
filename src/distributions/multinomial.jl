@@ -1,6 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-# NOT ScalarStat because of ambiguous function definition of update! in common.jl
-type FitMultinomial{W <: Weighting} <: OnlineStat
+type FitMultinomial{W <: Weighting} <: VectorStat
     d::Multinomial
     means::Vector{Float64}
     n::Int64
@@ -18,9 +17,9 @@ end
 FitMultinomial{T <: Integer}(y::Matrix{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Multinomial, y, wgt)
 
-function FitMultinomial(wgt::Weighting = default(Weighting))
+FitMultinomial(wgt::Weighting = default(Weighting)) =
     FitMultinomial(Multinomial(1, [0., 1.]), zeros(0), 0, wgt)
-end
+
 
 
 #-----------------------------------------------------------------------# state
@@ -60,9 +59,9 @@ function Base.show(io::IO, o::FitMultinomial)
     @printf(io, " * %s:  %d\n", :nobs, nobs(o))
 end
 
-function DataFrame(o::FitMultinomial)
-    df = convert(DataFrame, state(o)')
-    names!(df, statenames(o))
-end
+# function DataFrame(o::FitMultinomial)
+#     df = convert(DataFrame, state(o)')
+#     names!(df, statenames(o))
+# end
 
-Base.push!(df::DataFrame, o::FitMultinomial) = push!(df, state(o))
+# Base.push!(df::DataFrame, o::FitMultinomial) = push!(df, state(o))

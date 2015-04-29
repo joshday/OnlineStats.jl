@@ -19,7 +19,7 @@ Create data for traceplot using starting value `o`.
 getrows(x::Vector, rows) = x[rows]
 getrows(x::Matrix, rows) = x[rows,:]
 
-# This is very cool.  I think we need the type union since MatrixStat objects aren't "traceable"
+# This is very cool.
 # adjusted to take the batch size first
 function tracedata(o::NonMatrixStat, b::Int64, args...)
     # Create object with first batch

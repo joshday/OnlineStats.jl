@@ -33,26 +33,26 @@ obj3 = OnlineStats.CovarianceMatrix(x3)
 obj4 = OnlineStats.CovarianceMatrix(x4)
 
 # merge and merge!
-obj3 = merge(obj3, obj4)
-merge!(obj2, obj3)
-obj5 = merge(obj1, obj2)
-merge!(obj1, obj2)
-@test obj1.n == obj.n
-for i in 1:10
-    for j in 1:i
-        @test_approx_eq obj1.A[i, j] obj.A[i, j]
-            end
-end
+# obj3 = merge(obj3, obj4)
+# merge!(obj2, obj3)
+# obj5 = merge(obj1, obj2)
+# merge!(obj1, obj2)
+# @test obj1.n == obj.n
+# for i in 1:10
+#     for j in 1:i
+#         @test_approx_eq obj1.A[i, j] obj.A[i, j]
+#             end
+# end
 
-for i in 1:10
-    @test_approx_eq obj1.B[i] obj.B[i]
-    @test_approx_eq obj5.B[i] obj.B[i]
-    for j in 1:i
-       @test_approx_eq obj5.A[i, j] obj.A[i, j]
-    end
-end
+# for i in 1:10
+#     @test_approx_eq obj1.B[i] obj.B[i]
+#     @test_approx_eq obj5.B[i] obj.B[i]
+#     for j in 1:i
+#        @test_approx_eq obj5.A[i, j] obj.A[i, j]
+#     end
+# end
 
-@test obj5.n == obj.n
+# @test obj5.n == obj.n
 
 # Remove large matrices
 x1 = x2 = x3 = x4 = 0;

@@ -5,6 +5,7 @@ using Docile
 
 import Compat: @compat
 import Distributions:
+    VariateForm,
     Continuous, Discrete, Univariate, Multivariate,
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
     MvNormal, Normal,
