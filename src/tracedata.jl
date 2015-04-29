@@ -1,41 +1,38 @@
 """
-`tracedata(obj, y, b, args...)`
+`tracedata(o, y, b, args...)`
 
-Create data for traceplot using starting value `obj`.
+Create data for traceplot using starting value `o`.
 
 ### Arguments:
-* `obj`       : Subtype of OnlineStat
+* `o`         : Subtype of OnlineStat
 * `y`         : data
 * `b`         : batch size to update estimates with
 * `args`      : additional arguments passed to `OnlineStat()`
 
 ### Returns:
-* `obj` updated with data in `y`
+* `o` updated with data in `y`
 * DataFrame with trace data
 """
 :tracedata
 
 
-function DataFrames.DataFrame{T <: ScalarStat}(obj::T)
-    DataFrames.DataFrame(variable = state_names(obj),
-                         value = state(obj),
-                         nobs = nobs(obj))
-end
+getrows(x::Vector, rows) = x[rows]
+getrows(x::Matrix, rows) = x[rows,:]
 
-
-function tracedata{T <: ScalarStat}(obj::Type{T}, y::Array, b::Int64; args...)
+# adjusted to take the batch size first
+function tracedata(o::OnlineStat, b::Int64, args...)
     # Create object with first batch
-    n = length(y)
-    ind = 1:b
-    df = DataFrame(obj)
+    n = size(args[1],1)
+    rng = 1:b
+    df = DataFrame(o)
 
     # Update DataFrame with each batch
     for i in 2:n/b
-        ind += b
-        copy!(ybatch, y[ind])
-        update!(obj, ybatch)
-        addstate!(df, obj)
+        rng += b
+        batch_args = map(x->getrows(x,rng), args)
+        update!(o, batch_args...)
+        push!(df, o)
     end
 
-    return obj, df
+    df
 end

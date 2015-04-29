@@ -15,27 +15,33 @@ end
 
 
 #------------------------------------------------------------------# ScalarStat
-function Base.show(io::IO, o::ScalarStat)
+
+# temporary fix for the "how to print" problem... lets come up with something nicer
+mystring(f::Float64) = @sprintf("%f", f)
+mystring(x) = string(x)
+
+
+function Base.show(io::IO, o::OnlineStat)
     snames = statenames(o)
     svals = state(o)
 
     println(io, "Online ", string(typeof(o)))
-    for (i, sname) in enumerate(snames[1 : end - 1])
-        @printf(io, " * %s:  %f\n", sname, svals[i])
+    for (i, sname) in enumerate(snames)
+        @printf(io, " * %8s:  %s\n", sname, mystring(svals[i]))
     end
 
-    # Better formatting (no decimal) for nobs
-    @printf(io, " * %s:  %d\n", snames[end], svals[end])
+    # # Better formatting (no decimal) for nobs
+    # @printf(io, " * %s:  %d\n", snames[end], svals[end])
 end
 
 
 # Why doesn't this work in 0.3.7?
-# DataFrame(o::ScalarStat) = DataFrame(state(o), statenames(o))
+# DataFrame(o::OnlineStat) = DataFrame(state(o), statenames(o))
 
-function DataFrame(o::ScalarStat)
+function DataFrame(o::OnlineStat)
     df = convert(DataFrame, state(o)')
     names!(df, statenames(o))
 end
 
-Base.push!(df::DataFrame, o::ScalarStat) = push!(df, state(o))
+Base.push!(df::DataFrame, o::OnlineStat) = push!(df, state(o))
 

@@ -8,15 +8,19 @@
 #   δ close to 0 corresponds to large μ, which means the parameter vector β changes slowly
 #   δ close to 1 corresponds to small μ, which means the parameter vector β changes quickly
 
+
+# TODO: allow for time-varying Vω???
+
+
 #-------------------------------------------------------# Type and Constructors
 
 type OnlineFLS <: VectorStat
-	p::Int  # number of independent vars
+	p::Int  		# number of independent vars
 	Vω::MatF    # pxp (const) covariance matrix of Δβₜ
 	Vε::Var     # variance of error term... use exponential weighting with δ as the weight param
 
 	n::Int
-	β::VecF # the current estimate in: yₜ = Xₜβₜ + εₜ
+	β::VecF 		# the current estimate in: yₜ = Xₜβₜ + εₜ
 
 	# these are needed to update β
 	R::MatF     # pxp matrix
@@ -26,9 +30,11 @@ type OnlineFLS <: VectorStat
 	function OnlineFLS(p::Int, δ::Float64)
 
 		# calculate the covariance matrix Vω from the smoothing parameter δ
-		@assert δ > 0. && δ < 1.
+		@assert δ > 0. && δ <= 1.
 		μ = (1. - δ) / δ
 		Vω = eye(p) / μ
+		println("μ = ", μ)
+		println("Vω:\n", Vω)
 
 		Vε = Var(ExponentialWeighting(δ))
 		
@@ -48,33 +54,28 @@ function OnlineFLS(y::Float64, x::VecF, δ::Float64)
 end
 
 function OnlineFLS(y::VecF, X::MatF, δ::Float64)
-	p = size(X,1)
+	p = size(X,2)
 	o = OnlineFLS(p, δ)
 	update!(o, y, X)
 	o
 end
 
-
-
-
-
 #-----------------------------------------------------------------------# state
 
-statenames(o::OnlineFLS) = [:β, :nobs]
-state(o::OnlineFLS) = [β(o), nobs(o)]
+statenames(o::OnlineFLS) = [:β, :Vε, :nobs]
+state(o::OnlineFLS) = Any[β(o), var(o.Vε), nobs(o)]
 
 β(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
 
 #---------------------------------------------------------------------# update!
 
-# NOTE: assumes X mat is (p x T), where T is the number of observations
-# NOTE: Julia has column-major matrices, which means that accessing the data one column at a time will be faster.
-# 			We should think about using ArrayViews or similar when optimizing
+# NOTE: assumes X mat is (T x p), where T is the number of observations
+# TODO: optimize
 function update!(o::OnlineFLS, y::VecF, X::MatF)
-	@assert length(y) == size(X,2)
+	@assert length(y) == size(X,1)
 	for i in length(y)
-		update!(o, y[i], X[:,i])
+		update!(o, y[i], vec(X[i,:]))
 	end
 end
 
@@ -88,7 +89,7 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	o.R += var(o.Vε) - (o.q * o.K) * o.K'
 	Rx = o.R * x
 	o.q = dot(x, Rx)
-	o.K = Rx / o.Q
+	o.K = Rx / o.q
 
 	# update β
 	o.β += o.K * ε

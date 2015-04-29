@@ -46,6 +46,8 @@ export
     FitMultinomial,
     FitMvNormal,
     FitNormal,
+    
+    OnlineFLS,
 
     # functions
     nobs,
@@ -67,10 +69,8 @@ export
 include("types.jl")
 include("weighting.jl")
 
-include("weighting.jl")
-
 # Other
-# include("tracedata.jl")
+include("tracedata.jl")
 include("common.jl")
 
 # Summary Statistics
@@ -106,6 +106,7 @@ include("linearmodel/sweep.jl")
 # include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
+include("linearmodel/ofls.jl")
 
 # GLM
 # include("glm/logisticregsgd.jl")
