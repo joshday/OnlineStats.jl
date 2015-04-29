@@ -1,4 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
+# NOT ScalarStat because of ambiguous function definition of update! in common.jl
 type FitMultinomial{W <: Weighting} <: OnlineStat
     d::Multinomial
     means::Vector{Float64}
