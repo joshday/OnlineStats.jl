@@ -8,14 +8,14 @@ type Var{W<:Weighting} <: ScalarStat
 end
 
 
-function Var{T <: Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING)
+function Var{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
     o = Var(wgt)
     update!(o, y)  # apply the weighting scheme, as opposed to initializing with classic variance
     o
 end
 
-Var(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Var([y], wgt)
-Var(wgt::Weighting = DEFAULT_WEIGHTING) = Var(0., 0., 0, wgt)
+Var(y::Float64, wgt::Weighting = default(Weighting)) = Var([y], wgt)
+Var(wgt::Weighting = default(Weighting)) = Var(0., 0., 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
@@ -30,7 +30,6 @@ Base.var(o::Var) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
 
 
 function update!(o::Var, y::Float64)
-    n = nobs(o)
     λ = weight(o)
     μ = mean(o)
 
@@ -40,7 +39,7 @@ function update!(o::Var, y::Float64)
     return
 end
 
-Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
+# Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
 
 # NOTE:
 function Base.empty!(o::Var)

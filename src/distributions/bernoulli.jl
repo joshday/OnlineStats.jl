@@ -8,16 +8,16 @@ end
 
 function onlinefit{T <: Integer}(::Type{Bernoulli},
                                  y::Vector{T},
-                                 wgt::Weighting = DEFAULT_WEIGHTING)
+                                 wgt::Weighting = default(Weighting))
     o = FitBernoulli(wgt)
     update!(o, y)
     o
 end
 
-FitBernoulli{T <: Integer}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING) =
+FitBernoulli{T <: Integer}(y::Vector{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Bernoulli, y, wgt)
 
-FitBernoulli(wgt::Weighting = DEFAULT_WEIGHTING) =
+FitBernoulli(wgt::Weighting = default(Weighting)) =
     FitBernoulli(Bernoulli(0), 0., 0, wgt)
 
 

@@ -6,14 +6,14 @@ type Mean{W<:Weighting} <: ScalarStat
     weighting::W
 end
 
-function Mean{T<:Real}(y::Vector{T}, wgt::Weighting = DEFAULT_WEIGHTING)
+function Mean{T<:Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
     o = Mean(wgt)
     update!(o, y)
     o
 end
 
-Mean(y::Float64, wgt::Weighting = DEFAULT_WEIGHTING) = Mean([y], wgt)
-Mean(wgt::Weighting = DEFAULT_WEIGHTING) = Mean(0., 0, wgt)
+Mean(y::Float64, wgt::Weighting = default(Weighting)) = Mean([y], wgt)
+Mean(wgt::Weighting = default(Weighting)) = Mean(0., 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
@@ -34,7 +34,7 @@ end
 #------------------------------------------------------------------------# Base
 
 
-Base.copy(o::Mean) = Mean(o.μ, o.n, o.weighting)
+# Base.copy(o::Mean) = Mean(o.μ, o.n, o.weighting)
 
 function Base.empty!(o::Mean)
     o.μ = 0.

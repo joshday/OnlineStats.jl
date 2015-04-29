@@ -8,16 +8,16 @@ end
 
 function onlinefit(::Type{Dirichlet},
                    y::Array{Float64},
-                   wgt::Weighting = DEFAULT_WEIGHTING)
+                   wgt::Weighting = default(Weighting))
     o = FitDirichlet(wgt; d = size(y, 1))
     update!(o, y)
     o
 end
 
-FitDirichlet(y::Array{Float64}, wgt::Weighting = DEFAULT_WEIGHTING) =
+FitDirichlet(y::Array{Float64}, wgt::Weighting = default(Weighting)) =
     onlinefit(Dirichlet, y, wgt)
 
-FitDirichlet(wgt::Weighting = DEFAULT_WEIGHTING; d = 2) =
+FitDirichlet(wgt::Weighting = default(Weighting); d = 2) =
     FitDirichlet(Dirichlet([]), zeros(d), 0, wgt)
 
 
