@@ -56,7 +56,8 @@ export
     tracedata,
     em, # offline EM algorithm for Normal mixture
     smooth,
-    weighting
+    weighting,
+    sweep!
 
 
 #-----------------------------------------------------------------------------#
@@ -101,7 +102,7 @@ include("distributions/normal.jl")
 # include("densityestimation/normalmix.jl")
 
 # Linear Model
-# include("linearmodel/sweep.jl")
+include("linearmodel/sweep.jl")
 # include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")

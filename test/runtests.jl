@@ -11,6 +11,7 @@ using Distributions
 # @time include("quantilemm_test.jl")
 
 # @time include("linearmodel_test.jl")
+@time include("sweep_test.jl")
 
 # @time include("quantregmm_test.jl")
 # @time include("quantregsgd_test.jl")
