@@ -37,6 +37,7 @@ export
     QuantileSGD,
     FiveNumberSummary,
     CovarianceMatrix,
+
     FitBernoulli,
     FitBeta,
     FitBinomial,
@@ -46,7 +47,7 @@ export
     FitMultinomial,
     FitMvNormal,
     FitNormal,
-    
+
     OnlineFLS,
 
     # functions

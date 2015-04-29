@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type CovarianceMatrix{W <: Weighting} <: OnlineStat
+type CovarianceMatrix{W <: Weighting} <: MatrixStat
     A::Matrix{Float64}    # X' * X / n
     B::Vector{Float64}    # X * 1' / n (column means)
     n::Int64              # number of observations used
@@ -75,21 +75,21 @@ end
 
 
 #------------------------------------------------------------------------# Base
-function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
-    n2 = c2.n
-    A2 = c2.A
-    B2 = c2.B
+# function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
+#     n2 = c2.n
+#     A2 = c2.A
+#     B2 = c2.B
 
-    c1.n += n2
-    γ = n2 / c1.n
-    c1.A += γ * (A2 - c1.A)
-    c1.B += γ * (B2 - c1.B)
-end
+#     c1.n += n2
+#     γ = n2 / c1.n
+#     c1.A += γ * (A2 - c1.A)
+#     c1.B += γ * (B2 - c1.B)
+# end
 
 function Base.show(io::IO, o::CovarianceMatrix)
     println(io, "Online Covariance Matrix:\n", cov(o))
 end
 
 function DataFrame(o::CovarianceMatrix, corr = false)
-    convert(DataFrame, corr? cor(o) :cov(o))
+    convert(DataFrame, corr ? cor(o) : cov(o))
 end

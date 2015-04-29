@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitMvNormal{W <: Weighting} <: OnlineStat
+type FitMvNormal{W <: Weighting} <: MatrixStat
     d::MvNormal
     c::CovarianceMatrix{W}
     n::Int64
@@ -24,7 +24,7 @@ FitMvNormal(wgt::Weighting = default(Weighting); d = 2) =
 #-----------------------------------------------------------------------# state
 statenames(o::FitMvNormal) = [:μ, :Σ, :nobs]
 
-state(o::FitMvNormal) = Any[o.d.μ, o.d.Σ, o.n]
+state(o::FitMvNormal) = Any[o.d.μ, o.d.Σ.mat, o.n]
 
 #---------------------------------------------------------------------# update!
 function update!(o::FitMvNormal, newdata::Matrix{Float64})
