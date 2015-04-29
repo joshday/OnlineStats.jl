@@ -123,28 +123,27 @@ obj2 = copy(obj)
 #------------------------------------------------------------------------------#
 #                                                                  Exponential #
 #------------------------------------------------------------------------------#
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# θ = rand(1:1000, 1)[1]
-# x1 = rand(Exponential(θ), n1)
-# x2 = rand(Exponential(θ), n2)
-# x = [x1, x2]
+n1 = rand(1:1_000_000, 1)[1]
+n2 = rand(1:1_000_000, 1)[1]
+θ = rand(1:1000, 1)[1]
+x1 = rand(Exponential(θ), n1)
+x2 = rand(Exponential(θ), n2)
+x = [x1, x2]
 
-# obj = onlinefit(Exponential, x1)
-# @test obj.d.β == mean(x1)
-# @test obj.n == n1
-# @test nobs(obj) == n1
+obj = onlinefit(Exponential, x1)
+@test_approx_eq(obj.d.β, mean(x1))
+@test obj.n == n1
+@test nobs(obj) == n1
 
-# OnlineStats.update!(obj, x2)
-# @test_approx_eq  obj.d.β mean(x)
-# @test obj.n == n1 + n2
+OnlineStats.update!(obj, x2)
+@test_approx_eq  obj.d.β mean(x)
+@test obj.n == n1 + n2
 
-# obj1 = copy(obj)
-# @test typeof(state(obj1)) == DF.DataFrame
-# @test state(obj1) == state(obj)
-# @test state(obj) == DataFrame(variable = :β, value = mean(obj.d), nobs = obj.n)
-# @test_approx_eq  obj.d.β mean(x)
-# @test obj.n == n1 + n2
+obj1 = copy(obj)
+@test state(obj) == [obj.d.β, obj.n]
+@test statenames(obj) == [:β, :nobs]
+@test state(obj1) == state(obj)
+@test DataFrame(obj) == DataFrame(β = obj.d.β, nobs = obj.n)
 
 
 

@@ -36,6 +36,11 @@ export
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
+    FitBernoulli,
+    FitBeta,
+    FitBinomial,
+    FitDirichlet,
+    FitExponential,
 
     # functions
     nobs,
@@ -73,15 +78,15 @@ include("summary/var.jl")
 # include("summary/fivenumber.jl")
 
 # Parametric Density
-include("parametricdensity/bernoulli.jl")
-include("parametricdensity/beta.jl")
-include("parametricdensity/binomial.jl")
-include("parametricdensity/dirichlet.jl")
-# include("parametricdensity/exponential.jl")
-# include("parametricdensity/gamma.jl")
-# include("parametricdensity/multinomial.jl")
-# include("parametricdensity/mvnormal.jl")
-# include("parametricdensity/normal.jl")
+include("distributions/bernoulli.jl")
+include("distributions/beta.jl")
+include("distributions/binomial.jl")
+include("distributions/dirichlet.jl")
+include("distributions/exponential.jl")
+# include("distributions/gamma.jl")
+# include("distributions/multinomial.jl")
+# include("distributions/mvnormal.jl")
+# include("distributions/normal.jl")
 
 # Density Estimation
 # include("densityestimation/offlinenormalmix.jl")
