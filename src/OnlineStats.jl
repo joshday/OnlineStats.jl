@@ -82,6 +82,9 @@ include("summary/var.jl")
 # include("summary/quantilemm.jl")
 # include("summary/fivenumber.jl")
 
+# Multivariate
+include("multivariate/covmatrix.jl")
+
 # Parametric Density
 include("distributions/bernoulli.jl")
 include("distributions/beta.jl")
@@ -90,7 +93,7 @@ include("distributions/dirichlet.jl")
 include("distributions/exponential.jl")
 include("distributions/gamma.jl")
 include("distributions/multinomial.jl")
-# include("distributions/mvnormal.jl")
+include("distributions/mvnormal.jl")
 include("distributions/normal.jl")
 
 # Density Estimation
@@ -112,7 +115,6 @@ include("distributions/normal.jl")
 # include("quantileregression/quantregsgd.jl")
 # include("quantileregression/quantregmm.jl")
 
-# Multivariate
-include("multivariate/covmatrix.jl")
+
 
 end # module
