@@ -104,18 +104,20 @@ x2 = rand(Dirichlet(α), n2)
 x = [x1 x2]
 
 obj = onlinefit(Dirichlet, x1)
-# @test obj.slogp == vec(sum(log(x1), 2) / n1)
-# @test obj.n == n1
+@test obj.meanlogx == vec(mean(log(x1), 2))
+@test obj.n == n1
 
-# update!(obj, x2)
-# @test length(obj.d.alpha) == αlength
-# @test_approx_eq_eps obj.d.alpha fit(Dirichlet, x).alpha 1e-8 # fit is wrong sometimes
-# @test obj.n == n1 + n2
+update!(obj, x2)
+@test length(obj.d.alpha) == αlength
+@test_approx_eq obj.d.alpha fit(Dirichlet, x).alpha
+@test obj.n == n1 + n2
 
-# @test typeof(state(obj)) == DF.DataFrame
-# obj2 = copy(obj)
-# @test state(obj2) == state(obj)
-
+@test state(obj) == [obj.d.alpha; nobs(obj)]
+@test statenames(obj) == [[symbol("α$i") for i in 1:αlength]; :nobs]
+obj2 = copy(obj)
+@test state(obj2) == state(obj)
+@test names(DataFrame(obj)) == statenames(obj)
+@test DataFrame(obj)[1, end] == nobs(obj)
 
 
 #------------------------------------------------------------------------------#

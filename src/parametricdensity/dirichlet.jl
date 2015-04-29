@@ -47,5 +47,5 @@ update!(o::FitDirichlet, y::Vector{Float64}) = update!(o, y')
 
 
 #-----------------------------------------------------------------------# Base
-Base.copy(o::FitDirichlet) = FitDirichlet(o.d, o.slogp, o.n, o.weighting)
+Base.copy(o::FitDirichlet) = FitDirichlet(o.d, o.meanlogx, o.n, o.weighting)
 
