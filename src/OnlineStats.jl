@@ -45,6 +45,7 @@ export
     FitGamma,
     FitMultinomial,
     FitMvNormal,
+    FitNormal,
 
     # functions
     nobs,
@@ -90,7 +91,7 @@ include("distributions/exponential.jl")
 include("distributions/gamma.jl")
 include("distributions/multinomial.jl")
 # include("distributions/mvnormal.jl")
-# include("distributions/normal.jl")
+include("distributions/normal.jl")
 
 # Density Estimation
 # include("densityestimation/offlinenormalmix.jl")

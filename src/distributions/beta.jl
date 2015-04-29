@@ -11,7 +11,6 @@ function onlinefit{T <: Real}(::Type{Beta},
                               wgt::Weighting = default(Weighting))
     warn("FitBeta Uses method of moments, not MLE")
     o = FitBeta(wgt)
-    n::Int64 = length(y)
     update!(o, y)
     o
 end
