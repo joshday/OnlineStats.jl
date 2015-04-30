@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type Var{W<:Weighting} <: ScalarStat
+type Var{W<:Weighting} <: OnlineStat
     μ::Float64
     biasedvar::Float64    # BIASED variance (makes for easier update)
     n::Int64

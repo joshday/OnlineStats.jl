@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type FitNormal{W <: Weighting} <: ScalarStat
+type FitNormal{W <: Weighting} <: OnlineStat
     d::Normal
     v::Var{W}
     n::Int64

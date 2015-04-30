@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitGamma{W <: Weighting} <: ScalarStat
+type FitGamma{W <: Weighting} <: OnlineStat
     d::Gamma
     m::Mean{W}
     mlog::Mean{W}

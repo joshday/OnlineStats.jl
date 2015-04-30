@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitExponential{W <: Weighting} <: ScalarStat
+type FitExponential{W <: Weighting} <: OnlineStat
     d::Exponential
     n::Int64
     weighting::W

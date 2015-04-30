@@ -21,7 +21,7 @@ getrows(x::Matrix, rows) = x[rows,:]
 
 # This is very cool.
 # adjusted to take the batch size first
-function tracedata(o::NonMatrixStat, b::Int64, args...)
+function tracedata(o::OnlineStat, b::Int64, args...)
     # Create object with first batch
     n = size(args[1],1)
     rng = 1:b

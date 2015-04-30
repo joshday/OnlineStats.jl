@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitBinomial{W <: Weighting} <: ScalarStat
+type FitBinomial{W <: Weighting} <: OnlineStat
     d::Binomial
     n::Int64
     weighting::W

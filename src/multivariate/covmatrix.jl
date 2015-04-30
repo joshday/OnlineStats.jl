@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type CovarianceMatrix{W <: Weighting} <: MatrixStat
+type CovarianceMatrix{W <: Weighting} <: OnlineStat
     A::Matrix{Float64}    # X' * X / n
     B::Vector{Float64}    # X * 1' / n (column means)
     n::Int64              # number of observations used

@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitMultinomial{W <: Weighting} <: VectorStat
+type FitMultinomial{W <: Weighting} <: OnlineStat
     d::Multinomial
     means::Vector{Float64}
     n::Int64

@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitBernoulli{W <: Weighting} <: ScalarStat
+type FitBernoulli{W <: Weighting} <: OnlineStat
     d::Bernoulli
     p::Float64  # success probability
     n::Int64

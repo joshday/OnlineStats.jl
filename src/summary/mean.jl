@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type Mean{W<:Weighting} <: ScalarStat
+type Mean{W<:Weighting} <: OnlineStat
     μ::Float64
     n::Int64
     weighting::W
