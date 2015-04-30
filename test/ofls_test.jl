@@ -16,7 +16,7 @@ function getsampledata(; n = 1000, p = 10, σₑ = 0.1, σ = 0.01)
 	cumsum!(β, β)   			# now do the cumulative sum with β₀ as the starting vector
 
 	# now create the dependent series
-	y = 5.0 + vec(sum(X .* β, 2)) + e   # dependent
+	y = 500.0 + vec(sum(X .* β, 2)) + e   # dependent
 
 	n, p, y, X, e, β
 end
@@ -30,9 +30,13 @@ function ofls_test()
 		@fact size(X) => (n,p)
 		@fact size(β) => (n,p)
 
-		# lets do the OFLS fit for δ == 1 (i.e. should be constant βₜ)
-		fls = OnlineFLS(p, 1.0)
-		df = tracedata(fls, y, X)
+		# # this doesn't really belong here as is:
+		# # lets do the OFLS fit
+		# fls = OnlineFLS(p, 0.00001)
+		# df = tracedata(fls, y, X)
+
+		# # do a plot (need to change this if plot(X) isn't available?)
+		# plot([y float(df[:yhat])][2:end,:])
 
 	end
 end
