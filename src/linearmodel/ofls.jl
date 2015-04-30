@@ -10,13 +10,14 @@
 
 
 # TODO: allow for time-varying Vω???
-
+#  to accomplish... lets represent Vω as a vector of Var's (i.e. the diagonal of Vω)
 
 #-------------------------------------------------------# Type and Constructors
 
-type OnlineFLS <: VectorStat
+type OnlineFLS <: OnlineStat
 	p::Int  		# number of independent vars
 	Vω::MatF    # pxp (const) covariance matrix of Δβₜ
+	# Vω::Vector{Var}
 	Vε::Var     # variance of error term... use exponential weighting with δ as the weight param
 
 	n::Int
@@ -86,13 +87,22 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	update!(o.Vε, ε)
 	
 	# update sufficient stats to get the Kalman gain
-	o.R += var(o.Vε) - (o.q * o.K) * o.K'
+	o.R += o.Vω - (o.q * o.K) * o.K'
 	Rx = o.R * x
-	o.q = dot(x, Rx)
+	o.q = dot(x, Rx) + var(o.Vε)
 	o.K = Rx / o.q
+
+	@LOG y x
+	# @LOG ε var(o.Vε)
+	# @LOG o.R
+	# @LOG Rx
+	# @LOG o.q
+	# @LOG o.K
 
 	# update β
 	o.β += o.K * ε
+
+	@LOG o.β
 
 	# finish
 	o.n += 1
@@ -114,3 +124,39 @@ end
 function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
 	# TODO
 end
+
+
+function StatsBase.coef(o::OnlineFLS)
+	# TODO
+end
+
+function StatsBase.coeftable(o::OnlineFLS)
+	# TODO
+end
+
+function StatsBase.confint(o::OnlineFLS, level::Float64 = 0.95)
+	# TODO
+end
+
+# predicts yₜ for a given xₜ
+function StatsBase.predict(o::OnlineFLS, x::VecF)
+	dp = o.β[1]
+	for i in 2:o.p
+		dp += o.β[i] * x[i-1]
+	end
+	dp
+end
+
+# NOTE: uses most recent estimate of βₜ to predict the whole matrix
+function StatsBase.predict(o::OnlineFLS, X::MatF)
+	n = size(X,1)
+	pred = zeros(n)
+	for i in 1:n
+		pred[i] = StatsBase.predict(o, vec(X[i,:]))
+	end
+	pred
+end
+
+
+
+
