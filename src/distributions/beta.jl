@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitBeta{W <: Weighting} <: ScalarStat
+type FitBeta{W <: Weighting} <: OnlineStat
     d::Beta
     stats::Var{W}
     n::Int64

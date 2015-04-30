@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitDirichlet{W <: Weighting} <: VectorStat
+type FitDirichlet{W <: Weighting} <: OnlineStat
     d::Dirichlet
     meanlogx::Vector{Float64}
     n::Int64

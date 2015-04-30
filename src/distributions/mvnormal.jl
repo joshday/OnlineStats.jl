@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitMvNormal{W <: Weighting} <: MatrixStat
+type FitMvNormal{W <: Weighting} <: OnlineStat
     d::MvNormal
     c::CovarianceMatrix{W}
     n::Int64

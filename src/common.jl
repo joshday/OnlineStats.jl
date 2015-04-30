@@ -2,7 +2,7 @@
 nobs(o::OnlineStat) = o.n
 
 
-update!{T<:Real}(o::ScalarStat, y::Vector{T}) = (for yi in y; update!(o, yi); end)
+update!{T<:Real}(o::OnlineStat, y::Vector{T}) = (for yi in y; update!(o, yi); end)
 
 
 Base.copy(o::OnlineStat) = deepcopy(o)
@@ -22,7 +22,7 @@ mystring(x) = string(x)
 
 
 
-function Base.show(io::IO, o::NonMatrixStat)
+function Base.show(io::IO, o::OnlineStat)
     snames = statenames(o)
     svals = state(o)
 

@@ -86,18 +86,18 @@ include("summary/var.jl")
 # include("summary/fivenumber.jl")
 
 # Multivariate
-# include("multivariate/covmatrix.jl")
+include("multivariate/covmatrix.jl")
 
 # Parametric Density
-# include("distributions/bernoulli.jl")
-# include("distributions/beta.jl")
-# include("distributions/binomial.jl")
-# include("distributions/dirichlet.jl")
-# include("distributions/exponential.jl")
-# include("distributions/gamma.jl")
-# include("distributions/multinomial.jl")
-# include("distributions/mvnormal.jl")
-# include("distributions/normal.jl")
+include("distributions/bernoulli.jl")
+include("distributions/beta.jl")
+include("distributions/binomial.jl")
+include("distributions/dirichlet.jl")
+include("distributions/exponential.jl")
+include("distributions/gamma.jl")
+include("distributions/multinomial.jl")
+include("distributions/mvnormal.jl")
+include("distributions/normal.jl")
 
 # Density Estimation
 # include("densityestimation/offlinenormalmix.jl")
