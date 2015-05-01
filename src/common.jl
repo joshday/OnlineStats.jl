@@ -28,11 +28,11 @@ function Base.show(io::IO, o::OnlineStat)
 
     println(io, "Online ", string(typeof(o)))
     for (i, sname) in enumerate(snames)
-        @printf(io, " * %8s:  %s\n", sname, mystring(svals[i]))
-    end
+#         @printf(io, " * %8s:  %s\n", sname, mystring(svals[i]))
 
-    # # Better formatting (no decimal) for nobs
-    # @printf(io, " * %s:  %d\n", snames[end], svals[end])
+        # This should cover it as long as state(o) returns Any[]
+        @printf(io, " * %8s:  %s\n", sname, string(svals[i]))
+    end
 end
 
 
