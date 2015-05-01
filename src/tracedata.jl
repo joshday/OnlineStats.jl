@@ -28,11 +28,11 @@ function tracedata(o::OnlineStat, b::Int64, args...)
     df = DataFrame(o)
 
     # Update DataFrame with each batch
-    for i in 2:n/b
-        rng += b
+    for i in 1:n/b
         batch_args = map(x->getrows(x,rng), args)
         update!(o, batch_args...)
         push!(df, o)
+        rng += b
     end
 
     df
