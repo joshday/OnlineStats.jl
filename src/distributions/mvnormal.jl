@@ -27,11 +27,14 @@ statenames(o::FitMvNormal) = [:μ, :Σ, :nobs]
 state(o::FitMvNormal) = Any[o.d.μ, o.d.Σ.mat, o.n]
 
 #---------------------------------------------------------------------# update!
-function update!(o::FitMvNormal, newdata::Matrix{Float64})
-    update!(o.c, newdata')
+function update!(o::FitMvNormal, y::Matrix{Float64})
+    update!(o.c, y')
     o.n = nobs(o.c)
     o.d = MvNormal(mean(o.c), cov(o.c))
 end
+
+update!(o::FitMvNormal, y::Vector{Float64}) = update!(o, y')
+
 
 #------------------------------------------------------------------------# Base
 function Base.show(io::IO, o::FitMvNormal)

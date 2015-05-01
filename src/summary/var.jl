@@ -21,7 +21,7 @@ Var(wgt::Weighting = default(Weighting)) = Var(0., 0., 0, wgt)
 #-----------------------------------------------------------------------# state
 
 statenames(o::Var) = [:μ, :σ², :nobs]
-state(o::Var) = [mean(o), var(o), nobs(o)]
+state(o::Var) = Any[mean(o), var(o), nobs(o)]
 
 Base.mean(o::Var) = o.μ
 Base.var(o::Var) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))

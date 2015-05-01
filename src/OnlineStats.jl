@@ -31,6 +31,7 @@ export
     Weighting,
     EqualWeighting,
     ExponentialWeighting,
+    StochasticWeighting,
 
     # concrete types
     Mean,
@@ -87,7 +88,7 @@ include("summary/var.jl")
 # include("summary/extrema.jl")
 # include("summary/summary.jl")
 # include("summary/moments.jl")
-# include("summary/quantilesgd.jl")
+include("summary/quantilesgd.jl")
 # include("summary/quantilemm.jl")
 # include("summary/fivenumber.jl")
 

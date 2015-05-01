@@ -58,10 +58,3 @@ function Base.show(io::IO, o::FitMultinomial)
     println()
     @printf(io, " * %s:  %d\n", :nobs, nobs(o))
 end
-
-# function DataFrame(o::FitMultinomial)
-#     df = convert(DataFrame, state(o)')
-#     names!(df, statenames(o))
-# end
-
-# Base.push!(df::DataFrame, o::FitMultinomial) = push!(df, state(o))

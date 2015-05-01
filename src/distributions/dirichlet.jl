@@ -28,8 +28,8 @@ state(o::FitDirichlet) = [o.d.alpha; o.n]
 
 
 #---------------------------------------------------------------------# update!
-# Since MLE is via Newton's method, it's MUCH faster to do batch updates
-function update!(o::FitDirichlet, y::Matrix{Float64})
+# Since MLE is via Newton's method, it's much faster to do batch updates
+function batchupdate!(o::FitDirichlet, y::Matrix{Float64})
     n2 = size(y, 2)
     λ = weight(o, n2)
     o.meanlogx = smooth(o.meanlogx, vec(mean(log(y), 2)), λ)
@@ -43,7 +43,7 @@ function update!(o::FitDirichlet, y::Matrix{Float64})
     return
 end
 
-update!(o::FitDirichlet, y::Vector{Float64}) = update!(o, y')
+update!(o::FitDirichlet, y::Vector{Float64}) = batchupdate!(o, y')
 
 
 #------------------------------------------------------------------------# Base

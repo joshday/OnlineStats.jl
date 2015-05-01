@@ -1,13 +1,14 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileMM <: ScalarStat
-    est::Vector{Float64}              # Quantiles
-    τ::Vector{Float64}                # tau values
-    r::Float64                        # learning rate
-    s::Vector{Float64}                # sufficients stats for MM (s, t, and o)
-    t::Vector{Float64}
+type QuantileMM{W <: Weighting} <: OnlineStat
+    est::VecF              # Quantile estimates
+    τ::VecF                # tau values
+    r::Float64             # learning rate
+    s::VecF                # sufficients stats for MM (s, t, and o)
+    t::VecF
     o::Float64
-    n::Int64                          # number of observations used
-    nb::Int64                         # number of batches used
+    n::Int64              # number of observations used
+    nb::Int64             # number of batches used
+    weighting::W
 end
 
 function QuantileMM(y::Vector; τ::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.6)

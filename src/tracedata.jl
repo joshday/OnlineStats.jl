@@ -19,18 +19,16 @@ Create data for traceplot using starting value `o`.
 getrows(x::Vector, rows) = x[rows]
 getrows(x::Matrix, rows) = x[rows,:]
 
-# This is very cool.
+
 # adjusted to take the batch size first
 function tracedata(o::OnlineStat, b::Int64, args...)
-    # Create object with first batch
+    
+    # Create DataFrame
     n = size(args[1],1)
-    # rng = 1:b
     i = 1
     df = DataFrame(o; addFirstRow = false)
 
     # Update DataFrame with each batch
-    # for i in 2:n/b
-        # rng += b
     while i <= n
         rng = i:min(i+b-1,n)
         batch_args = map(x->getrows(x,rng), args)

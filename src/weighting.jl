@@ -3,7 +3,6 @@ abstract Weighting
 weighting(o) = o.weighting
 weight(o::OnlineStat, numUpdates::Int = 1) = weight(weighting(o), nobs(o), numUpdates)
 
-
 smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
 
 default(::Type{Weighting}) = EqualWeighting()
@@ -28,6 +27,25 @@ immutable ExponentialWeighting <: Weighting
 end
 @compat ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))           # creates an exponential weighting with a lookback window of approximately "lookback" observations
 weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(), n1, n2), w.λ)    # uses equal weighting until we collect enough observations... then uses exponential weighting
+
+
+#---------------------------------------------------------------------------# Stochastic
+type StochasticWeighting <: Weighting
+    r::Float64
+    nb::Int64   # number of batches
+    λ::Float64  # minimum step size
+    function StochasticWeighting(r::Float64 = .51, λ::Float64 = 0.)
+        @assert r > .5 && r <= 1
+        @assert λ >= 0. && λ <= 1.
+        new(r, 0, λ)
+    end
+end
+@compat function weight(w::StochasticWeighting, n1, n2)
+    w.nb += 1
+    max(Float64(w.nb) ^ -w.r, w.λ)
+end
+# nextbatch!(w::StochasticWeighting) = (w.nb += 1)
+# nextbatch!(o::OnlineStat) = nextbatch!(o.weighting)
 
 
 #---------------------------------------------------------------------------#
