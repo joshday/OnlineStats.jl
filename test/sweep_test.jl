@@ -3,7 +3,7 @@ module Sweep_test
 using OnlineStats
 using FactCheck
 
-facts("sweep!()") do
+facts("*** sweep!() ***") do
     for rep in 1:5
         n = rand(1:10_000, 1)[1]
         p = rand(1:min(n-1, 1000), 1)[1]

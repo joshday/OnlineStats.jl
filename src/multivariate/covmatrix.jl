@@ -10,7 +10,7 @@ end
 # (p by p) covariance matrix from an (n by p) data matrix
 function CovarianceMatrix{T <: Real}(x::Matrix{T}, wgt::Weighting = default(Weighting))
     o = CovarianceMatrix(wgt; p = size(x, 2))
-    update!(o, x)
+    updatebatch!(o, x)
     o
 end
 
@@ -25,7 +25,7 @@ state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
 
 
 #---------------------------------------------------------------------# update!
-function update!{T <: Real}(o::CovarianceMatrix, x::Matrix{T})
+function updatebatch!(o::CovarianceMatrix, x::MatF)
     n2 = size(x, 1)
     λ = weight(o, n2)
     o.n += n2
@@ -34,6 +34,7 @@ function update!{T <: Real}(o::CovarianceMatrix, x::Matrix{T})
     o.B = smooth(o.B, vec(mean(x,1)), λ)
     # Update A
     BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1 - λ, o.A)
+    return
 end
 
 

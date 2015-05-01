@@ -10,7 +10,7 @@ function onlinefit(::Type{Dirichlet},
                    y::Array{Float64},
                    wgt::Weighting = default(Weighting))
     o = FitDirichlet(wgt; d = size(y, 1))
-    update!(o, y)
+    batchupdate!(o, y)
     o
 end
 
@@ -39,19 +39,9 @@ end
 
 update!(o::FitDirichlet, y::Vector{Float64}) = batchupdate!(o, y')
 
-
-#------------------------------------------------------------------------# Base
-function Base.show(io::IO, o::FitDirichlet)
-    println(io, "Online ", string(typeof(o)))
-    print(" * ")
-    show(o.d)
-    println()
-    @printf(io, " * %s:  %d\n", :nobs, nobs(o))
+function update!(o::FitDirichlet, y::Matrix{Float64})
+    for i in 1:size(y, 2)
+        batchupdate!(o, y[:, i]')
+    end
 end
 
-function DataFrame(o::FitDirichlet)
-    df = convert(DataFrame, state(o)')
-    names!(df, statenames(o))
-end
-
-Base.push!(df::DataFrame, o::FitDirichlet) = push!(df, state(o))

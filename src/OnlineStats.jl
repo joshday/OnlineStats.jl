@@ -64,6 +64,7 @@ export
     # functions
     nobs,
     update!,
+    batchupdate!,
     state,
     statenames,
     onlinefit,
