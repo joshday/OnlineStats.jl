@@ -1,284 +1,295 @@
 module DistributionTest
-
+using FactCheck
 using OnlineStats
-using Base.Test
-using Distributions, PDMats, DataFrames
-println("* densityestimation_test.jl")
+using Distributions
+using DataFrames
+
+facts("*** Distributions ***") do
 
 #------------------------------------------------------------------------------#
 #                                                                    Bernoulli #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-p = rand(1)[1]
-x1 = rand(Bernoulli(p), n1)
-x2 = rand(Bernoulli(p), n2)
-x = [x1, x2]
 
-obj = OnlineStats.onlinefit(Bernoulli, x1)
-@test_approx_eq(obj.d.p, mean(x1))
-@test obj.n == n1
+context("Bernoulli") do
+    n1 = rand(1:1_000_000)
+    n2 = rand(1:1_000_000)
+    p = rand()
+    x1 = rand(Bernoulli(p), n1)
+    x2 = rand(Bernoulli(p), n2)
+    x = [x1, x2]
 
-OnlineStats.update!(obj, x2)
-@test_approx_eq(obj.d.p, mean(x))
-@test obj.n == n1 + n2
+    o = OnlineStats.onlinefit(Bernoulli, x1)
+    @fact o.d.p => roughly(mean(x1))
+    @fact o.n => n1
 
-@test state(obj) == [obj.d.p, obj.n]
-@test statenames(obj) == [:p, :nobs]
-@test typeof(DataFrame(obj)) == DataFrame
-obj2 = copy(obj)
-@test DataFrame(obj2) == DataFrame(p = obj.d.p, nobs = n1 + n2)
-@test_approx_eq(mean(obj2.d), mean(x))
-@test nobs(obj) == n1 + n2
+    OnlineStats.update!(o, x2)
+    @fact o.d.p => roughly(mean(x))
+    @fact o.n => n1 + n2
 
-obj = onlinefit(Bernoulli, x1, ExponentialWeighting(.01))
-@test weighting(obj) == ExponentialWeighting(.01)
+    @fact state(o) => [o.d, o.n]
+    @fact statenames(o) => [:dist, :nobs]
+    @fact typeof(DataFrame(o)) => DataFrame
+    o2 = copy(o)
+    @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = n1 + n2)
+    @fact mean(o2.d) => roughly(mean(x))
+    @fact nobs(o) => n1 + n2
 
-obj = onlinefit(Bernoulli, x1, ExponentialWeighting(1000))
-@test weighting(obj) == ExponentialWeighting(1000)
+    o = onlinefit(Bernoulli, x1, ExponentialWeighting(.01))
+    @fact weighting(o) => ExponentialWeighting(.01)
+
+    o = onlinefit(Bernoulli, x1, ExponentialWeighting(1000))
+    @fact weighting(o) => ExponentialWeighting(1000)
+end
 
 #------------------------------------------------------------------------------#
 #                                                                         Beta #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-α, β = rand(1:0.1:10, 2)
-x1 = rand(Beta(α, β), n1)
-x2 = rand(Beta(α, β), n2)
-x = [x1, x2]
+context("Beta") do
+    n1 = rand(1:1_000_000)
+    n2 = rand(1:1_000_000)
+    α, β = rand(1:0.1:10, 2)
+    x1 = rand(Beta(α, β), n1)
+    x2 = rand(Beta(α, β), n2)
+    x = [x1, x2]
 
-obj = onlinefit(Beta, x1)
-@test_approx_eq_eps mean(obj.d) mean(x1) 1e-10
-@test_approx_eq_eps var(obj.d) var(x1) 1e-10
-@test obj.n == n1
+    o = onlinefit(Beta, x1)
+    @fact mean(o.d) => roughly(mean(x1))
+    @fact var(o.d) => roughly(var(x1))
+    @fact o.n => n1
 
-OnlineStats.update!(obj, x2)
-@test_approx_eq mean(obj.d) mean(x)
-@test_approx_eq var(obj.d) var(x)
-@test obj.n == n1 + n2
-@test statenames(obj) == [:α, :β, :nobs]
-@test state(obj) == [obj.d.α, obj.d.β, obj.n]
-obj2 = copy(obj)
-@test DataFrame(obj2) == DataFrame(obj)
-
+    OnlineStats.update!(o, x2)
+    @fact mean(o.d) => roughly(mean(x))
+    @fact var(o.d) => roughly(var(x))
+    @fact o.n => n1 + n2
+    @fact statenames(o) => [:dist, :nobs]
+    @fact state(o) => [o.d, o.n]
+    o2 = copy(o)
+    @fact DataFrame(o2) => DataFrame(o)
+    @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = n1 + n2)
+end
 
 
 #------------------------------------------------------------------------------#
 #                                                                     Binomial #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-ntrials = rand(1:1000, 1)[1]
-p = rand(1)[1]
-x1 = rand(Binomial(ntrials, p), n1)
-x2 = rand(Binomial(ntrials, p), n2)
-x = [x1, x2]
+context("Binomial") do
+    n1 = rand(1:1_000_000)
+    n2 = rand(1:1_000_000)
+    ntrials = rand(1:1000)
+    p = rand(1)[1]
+    x1 = rand(Binomial(ntrials, p), n1)
+    x2 = rand(Binomial(ntrials, p), n2)
+    x = [x1, x2]
 
-obj = onlinefit(Binomial, x1, n = ntrials)
-@test obj.d.n == ntrials
-@test_approx_eq(obj.d.p, sum(x1) / (ntrials * n1))
-@test obj.n == n1
+    o = onlinefit(Binomial, x1, n = ntrials)
+    @fact o.d.n => ntrials
+    @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
+    @fact o.n => n1
 
-OnlineStats.update!(obj, x2)
-@test obj.d.n == ntrials
-@test_approx_eq(obj.d.p, sum(x) / (ntrials * (n1 + n2)))
-@test obj.n == n1 + n2
+    OnlineStats.update!(o, x2)
+    @fact o.d.n => ntrials
+    @fact o.d.p => roughly(sum(x) / (ntrials * (n1 + n2)))
+    @fact o.n => n1 + n2
 
-@test state(obj) == [obj.d.n, obj.d.p, obj.n]
-obj2 = copy(obj)
-@test statenames(obj2) == [:n, :p, :nobs]
-@test DataFrame(obj2) == DataFrame(n = obj.d.n, p = obj.d.p, nobs = obj.n)
-
+    @fact state(o) => [o.d, o.n]
+    o2 = copy(o)
+    @fact statenames(o2) => [:dist, :nobs]
+    @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = o.n)
+end
 
 
 
 #------------------------------------------------------------------------------#
 #                                                                    Dirichlet #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-αlength = rand(3:20, 1)[1]
-α = rand(.5:.1:20, αlength)
-x1 = rand(Dirichlet(α), n1)
-x2 = rand(Dirichlet(α), n2)
-x = [x1 x2]
+context("Dirichlet") do
+    n1 = rand(1:1_000_000)
+    n2 = rand(1:1_000_000)
+    αlength = rand(3:20)
+    α = rand(.5:.1:20, αlength)
+    x1 = rand(Dirichlet(α), n1)
+    x2 = rand(Dirichlet(α), n2)
+    x = [x1 x2]
 
-obj = onlinefit(Dirichlet, x1)
-@test obj.meanlogx == vec(mean(log(x1), 2))
-@test obj.n == n1
+    o = onlinefit(Dirichlet, x1)
+    @fact o.meanlogx => vec(mean(log(x1), 2))
+    @fact o.n => n1
 
-update!(obj, x2)
-@test length(obj.d.alpha) == αlength
+    batchupdate!(o, x2)
+    @fact length(o.d.alpha) => αlength
 
-# Okay if this fails, fit(Dirichlet, x) sometimes gives strange results
-@test_approx_eq obj.d.alpha fit(Dirichlet, x).alpha
-@test obj.n == n1 + n2
 
-@test state(obj) == [obj.d.alpha; nobs(obj)]
-@test statenames(obj) == [[symbol("α$i") for i in 1:αlength]; :nobs]
-obj2 = copy(obj)
-@test state(obj2) == state(obj)
-@test names(DataFrame(obj)) == statenames(obj)
-@test DataFrame(obj)[1, end] == nobs(obj)
+    @fact o.d.alpha => roughly(fit(Dirichlet, x).alpha) "failure ok. fit() is to blame"
+    @fact o.n => n1 + n2
 
+    @fact state(o) => [o.d, o.n]
+    @fact statenames(o) => [:dist, :nobs]
+    o2 = copy(o)
+    @fact state(o2)[2] => state(o)[2]
+    @fact names(DataFrame(o)) => statenames(o)
+    @fact DataFrame(o)[1, end] => nobs(o)
+end
 
 #------------------------------------------------------------------------------#
 #                                                                  Exponential #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-θ = rand(1:1000, 1)[1]
-x1 = rand(Exponential(θ), n1)
-x2 = rand(Exponential(θ), n2)
-x = [x1, x2]
+context("Exponential") do
+    n1 = rand(1:1_000_000, 1)[1]
+    n2 = rand(1:1_000_000, 1)[1]
+    θ = rand(1:1000, 1)[1]
+    x1 = rand(Exponential(θ), n1)
+    x2 = rand(Exponential(θ), n2)
+    x = [x1, x2]
 
-obj = onlinefit(Exponential, x1)
-@test_approx_eq(obj.d.β, mean(x1))
-@test obj.n == n1
-@test nobs(obj) == n1
+    o = onlinefit(Exponential, x1)
+    @fact o.d.β => roughly(mean(x1))
+    @fact o.n => n1
+    @fact nobs(o) => n1
 
-OnlineStats.update!(obj, x2)
-@test_approx_eq  obj.d.β mean(x)
-@test obj.n == n1 + n2
+    OnlineStats.update!(o, x2)
+    @fact o.d.β => roughly(mean(x))
+    @fact o.n => n1 + n2
 
-obj1 = copy(obj)
-@test state(obj) == [obj.d.β, obj.n]
-@test statenames(obj) == [:β, :nobs]
-@test state(obj1) == state(obj)
-@test DataFrame(obj) == DataFrame(β = obj.d.β, nobs = obj.n)
-
+    o1 = copy(o)
+    @fact state(o) => [o.d, o.n]
+    @fact statenames(o) => [:dist, :nobs]
+    @fact state(o1) => state(o)
+    @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
+end
 
 
 #------------------------------------------------------------------------------#
 #                                                                        Gamma #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-α, β = rand(1:0.1:100, 2)
-x1 = rand(Gamma(α, β), n1)
-x2 = rand(Gamma(α, β), n2)
-x = [x1, x2]
+context("Gamma") do
+    n1 = rand(1:1_000_000, 1)[1]
+    n2 = rand(1:1_000_000, 1)[1]
+    α, β = rand(1:0.1:100, 2)
+    x1 = rand(Gamma(α, β), n1)
+    x2 = rand(Gamma(α, β), n2)
+    x = [x1, x2]
 
-obj = onlinefit(Gamma, x1)
-@test_approx_eq(mean(obj.m), mean(x1))
-@test_approx_eq(mean(obj.mlog), mean(log(x1)))
-@test obj.n == n1
+    o = onlinefit(Gamma, x1)
+    @fact mean(o.m) => roughly(mean(x1))
+    @fact mean(o.mlog) => roughly(mean(log(x1)))
+    @fact o.n => n1
 
-OnlineStats.update!(obj, x2)
-@test state(obj) == [obj.d.α, obj.d.β, obj.n]
-@test statenames(obj) == [:α, :β, :nobs]
-@test_approx_eq_eps mean(obj.m) mean(x) 1e-6
-@test_approx_eq_eps mean(obj.mlog) mean(log(x))  1e-6
-@test obj.n == n1 + n2
+    OnlineStats.update!(o, x2)
+    @fact state(o) => [o.d, o.n]
+    @fact statenames(o) => [:dist, :nobs]
+    @fact mean(o.m) => roughly(mean(x))
+    @fact mean(o.mlog) => roughly(mean(log(x)))
+    @fact o.n => n1 + n2
 
-obj1 = copy(obj)
-@test state(obj1) == state(obj)
-@test obj.n == n1 + n2
-
+    o1 = copy(o)
+    @fact state(o1) => state(o)
+    @fact o.n => n1 + n2
+    @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
+end
 
 #------------------------------------------------------------------------------#
 #                                                                  Multinomial #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-n = rand(1:100, 1)[1]
-ncat = rand(1:20, 1)[1]
-p = rand(ncat)
-p /= sum(p)
-x1 = rand(Multinomial(n, p), n1)
-x2 = rand(Multinomial(n, p), n2)
-x = [x1 x2]
+context("Multinomial") do
+    n1 = rand(1:1_000_000, 1)[1]
+    n2 = rand(1:1_000_000, 1)[1]
+    n = rand(1:100, 1)[1]
+    ncat = rand(1:20, 1)[1]
+    p = rand(ncat)
+    p /= sum(p)
+    x1 = rand(Multinomial(n, p), n1)
+    x2 = rand(Multinomial(n, p), n2)
+    x = [x1 x2]
 
-obj = onlinefit(Multinomial, x1)
-@test obj.d.n == n
-@test_approx_eq  obj.d.p  sum(x1, 2) / (n * n1)
-@test obj.d.n == Multinomial(n, vec(sum(x1, 2) / (n * n1))).n
-@test_approx_eq obj.d.p Multinomial(n, vec(sum(x1, 2) / (n * n1))).p
-@test obj.n == n1
-@test nobs(obj) == n1
+    o = onlinefit(Multinomial, x1)
+    @fact o.d.n => n
+    @fact o.d.p => roughly(vec(sum(x1, 2) / (n * n1)))
+    @fact o.n => n1
+    @fact nobs(o) => n1
 
 
-OnlineStats.update!(obj, x2)
-@test obj.d.n == n
-@test_approx_eq  obj.d.p  sum(x, 2) / (n * (n1 + n2))
-@test obj.d.n == Multinomial(n, vec(sum(x1, 2) / (n * n1))).n
-@test_approx_eq obj.d.p Multinomial(n, vec(sum(x, 2) / (n * (n1 + n2)))).p
-@test obj.n == n1 + n2
+    OnlineStats.update!(o, x2)
+    @fact o.d.n => n
+    @fact o.d.p => roughly(vec(sum(x, 2) / (n * (n1 + n2))))
+    @fact o.n => n1 + n2
 
-obj1 = copy(obj)
-@test state(obj1) == state(obj)
-# @test typeof(state(obj)) == DF.DataFrame
-@test statenames(obj) == [:n; [symbol("p$i") for i in 1:ncat]; :nobs]
-@test obj1.d.n == n
-@test_approx_eq  obj1.d.p  sum(x, 2) / (n * (n1 + n2))
-@test obj1.d.n == Multinomial(n, vec(sum(x1, 2) / (n * n1))).n
-@test_approx_eq obj1.d.p Multinomial(n, vec(sum(x, 2) / (n * (n1 + n2)))).p
-@test obj1.n == n1 + n2
+    o1 = copy(o)
+    @fact state(o) => [o.d, o.n]
+    @fact statenames(o) => [:dist, :nobs]
+    @fact o1.d.n => n
+    @fact o1.d.p => roughly(vec(sum(x, 2) / (n * (n1 + n2))))
+    @fact o1.n => n1 + n2
 
-@test names(DataFrame(obj)) == statenames(obj)
-
+    @fact names(DataFrame(o)) => statenames(o)
+    @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
+end
 
 #------------------------------------------------------------------------------#
 #                                                                     MvNormal #
 #------------------------------------------------------------------------------#
-# n1 = rand(1:1_000_000, 1)[1]
-# n2 = rand(1:1_000_000, 1)[1]
-# d = rand(1:10, 1)[1]
-# x1 = rand(MvNormal(zeros(d), eye(d)), n1)
-# x2 = rand(MvNormal(zeros(d), eye(d)), n2)
-# x = [x1  x2]
+context("MvNormal") do
+    n1 = rand(1:1_000_000)
+    n2 = rand(1:1_000_000)
+    d = rand(3:10)
+    x1 = rand(MvNormal(zeros(d), eye(d)), n1)
+    x2 = rand(MvNormal(zeros(d), eye(d)), n2)
+    x = [x1  x2]
 
-# obj = onlinefit(MvNormal, x1)
-# @test_approx_eq obj.d.μ  vec(mean(x1, 2))
-# @test_approx_eq mean(obj.c) vec(mean(x1, 2))
-# @test_approx_eq cov(obj.c)  cov(x1')
-# @test_approx_eq_eps cov(obj.c) obj.d.Σ.mat 1e-4
-# @test obj.n == n1
+    o = onlinefit(MvNormal, x1)
+    @fact o.d.μ => roughly(vec(mean(x1, 2)))
+    @fact mean(o.c) => roughly(vec(mean(x1, 2)))
+    @fact cov(o.c) => roughly(cov(x1'))
+    @fact cov(o.c) => roughly(o.d.Σ.mat)
+    @fact o.n => n1
 
-# OnlineStats.update!(obj, x2)
-# @test_approx_eq  obj.d.μ  vec(mean(x, 2))
-# @test_approx_eq mean(obj.c) vec(mean(x, 2))
-# @test_approx_eq cov(obj.c) cov(x')
-# @test obj.n == n1 + n2
+    OnlineStats.updatebatch!(o, x2)
+    @fact o.d.μ => roughly(vec(mean(x, 2)))
+    @fact mean(o.c) => roughly(vec(mean(x, 2)))
+    @fact cov(o.c) => roughly(cov(x'))
+    @fact o.n => n1 + n2
 
-# obj1 = copy(obj)
-# @test_approx_eq  obj1.d.μ  vec(mean(x, 2))
-# @test_approx_eq mean(obj1.c) vec(mean(x, 2))
-# @test_approx_eq cov(obj1.c) cov(x')
-# @test obj1.n == n1 + n2
-
+    o1 = copy(o)
+    @fact o1.d.μ => roughly(vec(mean(x, 2)))
+    @fact mean(o1.c) => roughly(vec(mean(x, 2)))
+    @fact cov(o1.c) => roughly(cov(x'))
+    @fact o1.n => n1 + n2
+    @fact state(o) => [o.d, o.n]
+end
 
 
 #------------------------------------------------------------------------------#
 #                                                                       Normal #
 #------------------------------------------------------------------------------#
-n1 = rand(1:1_000_000, 1)[1]
-n2 = rand(1:1_000_000, 1)[1]
-x1 = randn(n1)
-x2 = randn(n2)
-x = [x1, x2]
+context("Normal") do
+    n1 = rand(1:1_000_000, 1)[1]
+    n2 = rand(1:1_000_000, 1)[1]
+    x1 = randn(n1)
+    x2 = randn(n2)
+    x = [x1, x2]
 
-obj = onlinefit(Normal, x1)
-@test_approx_eq mean(obj.v) mean(x1)
-@test_approx_eq mean(obj.d) mean(obj.v)
-@test_approx_eq var(obj.v) var(x1)
-@test obj.n == n1
+    o = onlinefit(Normal, x1)
+    @fact mean(o.v) => roughly(mean(x1))
+    @fact mean(o.d) => roughly(mean(o.v))
+    @fact var(o.v) => roughly(var(x1))
+    @fact o.n => n1
 
-update!(obj, x2)
-@test_approx_eq obj.d.σ std(x)
-@test_approx_eq obj.d.μ mean(x)
-@test_approx_eq mean(obj.v) mean(x)
-@test_approx_eq var(obj.v) var(x)
-@test obj.n == n1 + n2
+    update!(o, x2)
+    @fact o.d.σ => roughly(std(x))
+    @fact o.d.μ => roughly(mean(x))
+    @fact mean(o.v) => roughly(mean(x))
+    @fact var(o.v) => roughly(var(x))
+    @fact o.n => n1 + n2
 
-obj1 = copy(obj)
-@test statenames(obj) == [:μ, :σ, :nobs]
-@test state(obj) == [obj.d.μ, obj.d.σ, obj.n]
-@test state(obj1) == state(obj)
-@test_approx_eq obj1.d.σ std(x)
-@test_approx_eq obj1.d.μ mean(x)
-@test_approx_eq mean(obj1.v) mean(x)
-@test_approx_eq var(obj1.v) var(x)
-@test obj1.n == n1 + n2
+    o1 = copy(o)
+    @fact statenames(o) => [:dist, :nobs]
+    @fact state(o) => [o.d, o.n]
+    @fact state(o1) => state(o)
+    @fact o1.d.σ => roughly(std(x))
+    @fact o1.d.μ => roughly(mean(x))
+    @fact mean(o1.v) => roughly(mean(x))
+    @fact var(o1.v) => roughly(var(x))
+    @fact o1.n => n1 + n2
+end
 
+end # facts
 end # module

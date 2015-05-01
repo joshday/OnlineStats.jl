@@ -3,7 +3,7 @@ module Extrema_test
 using OnlineStats
 using FactCheck
 
-facts("Extrema") do
+facts("*** Extrema ***") do
     # Extrema, update!, merge, merge!, max, min,
     n1, n2 = rand(1:1_000_000, 2)
     n = n1 + n2
