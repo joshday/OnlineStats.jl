@@ -1,9 +1,8 @@
-using OnlineStats
-using Base.Test
-using Distributions
+module OnlineStatsTests
+using FactCheck
 
-@time include("mean_test.jl")
-@time include("var_test.jl")
+# @time include("mean_test.jl")
+# @time include("var_test.jl")
 # @time include("summary_test.jl")
 # @time include("extrema_test.jl")
 # @time include("moments_test.jl")
@@ -16,9 +15,10 @@ using Distributions
 # @time include("quantregmm_test.jl")
 # @time include("quantregsgd_test.jl")
 
-@time include("distribution_test.jl")
+# @time include("distribution_test.jl")
 
-@time include("covmatrix_test.jl")
+# @time include("covmatrix_test.jl")
 
-
+FactCheck.exitstatus()
+end # module
 
