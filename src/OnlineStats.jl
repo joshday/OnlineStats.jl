@@ -5,20 +5,26 @@ using Docile
 
 import Compat: @compat
 import Distributions:
-    VariateForm,
-    Continuous, Discrete, Univariate, Multivariate,
+    # Distributions
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
-    MvNormal, Normal,
+    MvNormal, Normal, MixtureModel,
+
+    # Other
     fit_dirichlet!,
-    MixtureModel,
-    pdf, cdf, logpdf, loglikelihood, probs, components
+
+    # Methods for DistributionStat
+    pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
+    failprob, scale, location, shape, rate, ncategories, ntrials, dof,
+    mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
+    entropy, mgf, cf, insupport, pdf, logpdf, loglikelihood, cdf, logcdf, ccdf,
+    logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
 # import PDMats  # Why is this needed?
 import DataFrames: DataFrame, names!
 import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
 import StatsBase
-import StatsBase: nobs, skewness, kurtosis
+import StatsBase: nobs, skewness, kurtosis, mode, modes
 
 
 #-----------------------------------------------------------------------------#
@@ -85,7 +91,7 @@ include("common.jl")
 # Summary Statistics
 include("summary/mean.jl")
 include("summary/var.jl")
-# include("summary/extrema.jl")
+include("summary/extrema.jl")
 # include("summary/summary.jl")
 # include("summary/moments.jl")
 include("summary/quantilesgd.jl")

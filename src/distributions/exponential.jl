@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitExponential{W <: Weighting} <: OnlineStat
+type FitExponential{W <: Weighting} <: DistributionStat
     d::Exponential
     n::Int64
     weighting::W
@@ -18,12 +18,6 @@ FitExponential(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
 
 FitExponential(wgt::Weighting = default(Weighting)) =
     FitExponential(Exponential(), 0, wgt)
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitExponential) = [:β, :nobs]
-
-state(o::FitExponential) = [o.d.β, o.n]
 
 
 #---------------------------------------------------------------------# update!

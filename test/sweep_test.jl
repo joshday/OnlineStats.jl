@@ -1,5 +1,6 @@
+module Sweep_test
+
 using OnlineStats
-using Base.Test
 using FactCheck
 
 facts("sweep!()") do
@@ -25,6 +26,7 @@ facts("sweep!()") do
     end
 end
 
+end  # module
 
 
 

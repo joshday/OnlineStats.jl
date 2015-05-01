@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitBernoulli{W <: Weighting} <: OnlineStat
+type FitBernoulli{W <: Weighting} <: DistributionStat
     d::Bernoulli
     p::Float64  # success probability
     n::Int64
@@ -19,12 +19,6 @@ FitBernoulli{T <: Integer}(y::Vector{T}, wgt::Weighting = default(Weighting)) =
 
 FitBernoulli(wgt::Weighting = default(Weighting)) =
     FitBernoulli(Bernoulli(0), 0., 0, wgt)
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitBernoulli) = [:p, :nobs]
-
-state(o::FitBernoulli) = [o.d.p, o.n]
 
 
 #---------------------------------------------------------------------# update!

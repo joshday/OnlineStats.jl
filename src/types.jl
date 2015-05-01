@@ -1,7 +1,7 @@
 #------------------------------------------------------------------# OnlineStat
 abstract OnlineStat
 
-
+abstract DistributionStat <: OnlineStat
 
 
 
