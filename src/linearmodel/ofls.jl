@@ -2,7 +2,7 @@
 # implements the online flexible least squares algorithm... modeled on Montana et al (2009):
 #   "Flexible least squares for temporal data mining and statistical arbitrage"
 
-# Our cost function: Cₜ(βₜ; μ) = (yₜ - xₜ'βₜ)² + μ Δβₜ
+# Our cost function: Cₜ(βₜ; μ) = (yₜ - xₜ'βₜ)² + μ ‖Δβₜ‖²
 #   Below we use Vω = μ⁻¹Iₚ  along with a nicer to use relationship: μ = (1 - δ) / δ
 #   We accept 0 <= δ <= 1 as a constructor argument which controls the weighting of new observations
 #   δ close to 0 corresponds to large μ, which means the parameter vector β changes slowly
@@ -40,8 +40,8 @@ type OnlineFLS <: OnlineStat
 		@assert δ > 0. && δ <= 1.
 		μ = (1. - δ) / δ
 		Vω = eye(p) / μ
-		println("μ = ", μ)
-		println("Vω:\n", Vω)
+		# println("μ = ", μ)
+		# println("Vω:\n", Vω)
 
 		# wgt = ExponentialWeighting(δ)
 		Vε = Var(wgt)
