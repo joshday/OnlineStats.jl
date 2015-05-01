@@ -82,10 +82,20 @@ Base.beta(o::OnlineFLS) = o.β
 
 if0then1(x::Float64) = (x == 0. ? 1. : x)
 
-normalize_y(o::OnlineFLS, y::Float64) = (y - mean(o.yvar)) / if0then1(var(o.yvar))
-normalize_x(o::OnlineFLS, x::VecF) = (x - map(mean, o.xvars)) ./ map(x->if0then1(var(x)), o.xvars)
-denormalize_y(o::OnlineFLS, y::Float64) = y * var(o.yvar) + mean(o.yvar)
-denormalize_x(o::OnlineFLS, x::VecF) = x .* map(var, o.xvars) + map(mean, o.xvars)
+# sqrt_var(x) = sqrt(var(x))
+
+
+# normalize_y(o::OnlineFLS, y::Float64) = (y - mean(o.yvar)) / if0then1(sqrt_var(o.yvar))
+# denormalize_y(o::OnlineFLS, y::Float64) = y * sqrt_var(o.yvar) + mean(o.yvar)
+
+# normalize_x(o::OnlineFLS, x::VecF) = (x - map(mean, o.xvars)) ./ map(xi->if0then1(sqrt_var(xi)), o.xvars)
+# denormalize_x(o::OnlineFLS, x::VecF) = x .* map(sqrt_var, o.xvars) + map(mean, o.xvars)
+
+center_y(o::OnlineFLS, y::Float64) = y - mean(o.yvar)
+uncenter_y(o::OnlineFLS, y::Float64) = y + mean(o.yvar)
+
+center_x(o::OnlineFLS, x::VecF) = x - map(mean, o.xvars)
+uncenter_x(o::OnlineFLS, x::VecF) = x + map(mean, o.xvars)
 
 
 # NOTE: assumes X mat is (T x p), where T is the number of observations
@@ -108,8 +118,8 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	end
 	# @LOG o.yvar o.xvars
 
-	y = normalize_y(o, y)
-	x = normalize_x(o, x)
+	y = center_y(o, y)
+	x = center_x(o, x)
 	# @LOG y x
 
 	# calc error and update error variance
@@ -134,8 +144,7 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 
 	@LOG o.β
 
-	# finish
-	o.yhat = denormalize_y(o, yhat)
+	o.yhat = uncenter_y(o, yhat)
 	o.n += 1
 	return
 

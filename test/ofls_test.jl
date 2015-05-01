@@ -13,7 +13,7 @@ function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
 
 	# create a time varying βₜ = βₜ₋₁ + ωₜ
 	β = σβ * randn(n,p)
-	β[1,:] = rand(p)      # β₀ is random uniforms
+	β[1,:] = 10*rand(p)      # β₀ is random uniforms
 	cumsum!(β, β)   			# now do the cumulative sum with β₀ as the starting vector
 
 	# now create the dependent series
