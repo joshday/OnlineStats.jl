@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitGamma{W <: Weighting} <: OnlineStat
+type FitGamma{W <: Weighting} <: DistributionStat
     d::Gamma
     m::Mean{W}
     mlog::Mean{W}
@@ -20,12 +20,6 @@ FitGamma(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
 
 FitGamma(wgt::Weighting = default(Weighting)) =
     FitGamma(Gamma(), Mean(wgt), Mean(wgt), 0, wgt)
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitGamma) = [:α, :β, :nobs]
-
-state(o::FitGamma) = [o.d.α, o.d.β, o.n]
 
 
 #---------------------------------------------------------------------# update!

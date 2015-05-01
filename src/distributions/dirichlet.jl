@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitDirichlet{W <: Weighting} <: OnlineStat
+type FitDirichlet{W <: Weighting} <: DistributionStat
     d::Dirichlet
     meanlogx::Vector{Float64}
     n::Int64
@@ -19,12 +19,6 @@ FitDirichlet(y::Array{Float64}, wgt::Weighting = default(Weighting)) =
 
 FitDirichlet(wgt::Weighting = default(Weighting); d = 2) =
     FitDirichlet(Dirichlet([]), zeros(d), 0, wgt)
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitDirichlet) = [[symbol("α$i") for i in 1:length(o.meanlogx)]; :nobs]
-
-state(o::FitDirichlet) = [o.d.alpha; o.n]
 
 
 #---------------------------------------------------------------------# update!

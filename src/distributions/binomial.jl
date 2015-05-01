@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitBinomial{W <: Weighting} <: OnlineStat
+type FitBinomial{W <: Weighting} <: DistributionStat
     d::Binomial
     n::Int64
     weighting::W
@@ -19,12 +19,6 @@ FitBinomial{T <: Integer}(y::Vector{T}, wgt::Weighting = default(Weighting); n =
 
 FitBinomial(wgt::Weighting = default(Weighting); n = 1) =
     FitBinomial(Binomial(n, 0), 0, wgt)
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitBinomial) = [:n, :p, :nobs]
-
-state(o::FitBinomial) = [o.d.n, o.d.p, o.n]
 
 
 #---------------------------------------------------------------------# update!

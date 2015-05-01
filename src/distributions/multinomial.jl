@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type FitMultinomial{W <: Weighting} <: OnlineStat
+type FitMultinomial{W <: Weighting} <: DistributionStat
     d::Multinomial
     means::Vector{Float64}
     n::Int64
@@ -19,13 +19,6 @@ FitMultinomial{T <: Integer}(y::Matrix{T}, wgt::Weighting = default(Weighting)) 
 
 FitMultinomial(wgt::Weighting = default(Weighting)) =
     FitMultinomial(Multinomial(1, [0., 1.]), zeros(0), 0, wgt)
-
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitMultinomial) = [:n; [symbol("p$i") for i in 1:length(o.d.p)]; :nobs]
-
-state(o::FitMultinomial) = [o.d.n, o.d.p, o.n]
 
 
 #---------------------------------------------------------------------# update!

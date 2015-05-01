@@ -1,7 +1,7 @@
 module OnlineStatsTests
 using FactCheck
 
-# @time include("mean_test.jl")
+@time include("mean_test.jl")
 # @time include("var_test.jl")
 # @time include("summary_test.jl")
 @time include("extrema_test.jl")

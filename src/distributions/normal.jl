@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type FitNormal{W <: Weighting} <: OnlineStat
+type FitNormal{W <: Weighting} <: DistributionStat
     d::Normal
     v::Var{W}
     n::Int64
@@ -20,11 +20,6 @@ FitNormal(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
 
 FitNormal(wgt::Weighting = default(Weighting)) = FitNormal(Normal(), Var(wgt), 0, wgt)
 
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitNormal) = [:μ, :σ, :nobs]
-
-state(o::FitNormal) = [o.d.μ, o.d.σ, o.n]
 
 #---------------------------------------------------------------------# update!
 function update!{T<:Real}(obj::FitNormal, newdata::Vector{T})

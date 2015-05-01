@@ -1,5 +1,5 @@
 #------------------------------------------------------# Type and Constructors
-type FitBeta{W <: Weighting} <: OnlineStat
+type FitBeta{W <: Weighting} <: DistributionStat
     d::Beta
     stats::Var{W}
     n::Int64
@@ -20,12 +20,6 @@ FitBeta{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting)) =
 
 FitBeta(wgt::Weighting = default(Weighting)) =
     FitBeta(Beta(), Var(wgt), 0, wgt)
-
-
-#-----------------------------------------------------------------------# state
-statenames(o::FitBeta) = [:α, :β, :nobs]
-
-state(o::FitBeta) = [o.d.α, o.d.β, o.n]
 
 
 #---------------------------------------------------------------------# update!

@@ -1,54 +1,53 @@
 
-# I put this in a module so you can do reload("mean_test.jl") and 
+# I put this in a module so you can do reload("mean_test.jl") and
 # the "using" statements are re-run to include new code
 module MeanTest
 
 using OnlineStats
-using Base.Test, DataFrames
-println("mean_test.jl")
-
-# Mean, update!, merge, merge!, Base.mean
-n1, n2 = rand(1:1_000_000, 2)
-n = n1 + n2
-x1 = rand(n1)
-x2 = rand(n2)
-x = [x1, x2]
-
-obj = Mean(x1)
-@test_approx_eq obj.μ mean(x1)
-@test obj.n == n1
-
-update!(obj, x2)
-@test_approx_eq obj.μ  mean(x)
-@test obj.n == n
-
-obj1 = Mean(x1)
-obj2 = Mean(x2)
-obj3 = merge(obj1, obj2)
-merge!(obj1, obj2)
-@test obj1.n == obj3.n
-@test_approx_eq obj1.μ obj3.μ
-@test_approx_eq mean(x) mean(obj1)
+using DataFrames
+using FactCheck
 
 
-# empty constructor, state, Base.mean, nobs, Base.copy
-obj = Mean()
-@test obj.μ == 0.0
-@test obj.n == 0
-# @test state(obj, DataFrame) == DataFrame(variable = :μ, value = 0., nobs=0)
-@test mean(obj) == 0.0
-update!(obj, x1)
-@test_approx_eq mean(obj) mean(x1)
-@test nobs(obj) == n1
-obj1 = copy(obj)
-@test_approx_eq mean(obj) mean(x1)
-@test nobs(obj) == n1
-obj2 = Mean(x1[1])
-@test mean(obj2) == x1[1]
-@test nobs(obj2) == 1
+facts("Mean") do
+    # Mean, update!, merge, merge!, Base.mean
+    n1, n2 = rand(1:1_000_000, 2)
+    n = n1 + n2
+    x1 = rand(n1)
+    x2 = rand(n2)
+    x = [x1, x2]
 
-# clean up
-x1 = x2 = x = 0;
+    obj = Mean(x1)
+    @fact obj.μ => roughly(mean(x1))
+    @fact obj.n => n1
+
+#     update!(obj, x2)
+#     @fact_approx_eq obj.μ  mean(x)
+#     @fact obj.n => n
+
+#     obj1 = Mean(x1)
+#     obj2 = Mean(x2)
+#     obj3 = merge(obj1, obj2)
+#     merge!(obj1, obj2)
+#     @fact obj1.n => obj3.n
+#     @fact_approx_eq obj1.μ obj3.μ
+#     @fact_approx_eq mean(x) mean(obj1)
 
 
+#     # empty constructor, state, Base.mean, nobs, Base.copy
+#     obj = Mean()
+#     @fact obj.μ => 0.0
+#     @fact obj.n => 0
+#     # @fact state(obj, DataFrame) => DataFrame(variable = :μ, value = 0., nobs=0)
+#     @fact mean(obj) => 0.0
+#     update!(obj, x1)
+#     @fact_approx_eq mean(obj) mean(x1)
+#     @fact nobs(obj) => n1
+#     obj1 = copy(obj)
+#     @fact_approx_eq mean(obj) mean(x1)
+#     @fact nobs(obj) => n1
+#     obj2 = Mean(x1[1])
+#     @fact mean(obj2) => x1[1]
+#     @fact nobs(obj2) => 1
+
+end
 end

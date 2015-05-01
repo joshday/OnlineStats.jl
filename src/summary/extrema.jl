@@ -1,4 +1,3 @@
-export Extrema
 #------------------------------------------------------# Type and Constructors
 type Extrema <: OnlineStat
     max::Float64
