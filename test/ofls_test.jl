@@ -3,6 +3,7 @@
 using FactCheck
 
 
+
 function getsampledata(; n = 1000, p = 10, σₑ = 0.1, σ = 0.01)
 	
 	# generate independent series and errors
@@ -30,13 +31,18 @@ function ofls_test()
 		@fact size(X) => (n,p)
 		@fact size(β) => (n,p)
 
+		# ***
+
 		# # this doesn't really belong here as is:
 		# # lets do the OFLS fit
-		# fls = OnlineFLS(p, 0.00001)
-		# df = tracedata(fls, y, X)
+		# fls = OnlineStats.OnlineFLS(p, 0.0001, OnlineStats.ExponentialWeighting(200))
+		# df = tracedata(fls, 1, y, X)
 
-		# # do a plot (need to change this if plot(X) isn't available?)
-		# plot([y float(df[:yhat])][2:end,:])
+		# # do a plot of y vs yhat (need to change this to match your plotting package...
+		# # I have a custom plotting package that is not currently open source, but may be eventually)
+		# plot([y OnlineStats.getnice(df, :yhat)])
 
 	end
+
+	FactCheck.exitstatus()
 end

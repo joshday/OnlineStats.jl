@@ -34,7 +34,7 @@ type OnlineFLS <: OnlineStat
 
 	yhat::Float64  #most recent estimate of y
 
-	function OnlineFLS(p::Int, δ::Float64)
+	function OnlineFLS(p::Int, δ::Float64, wgt::Weighting = default(Weighting))
 
 		# calculate the covariance matrix Vω from the smoothing parameter δ
 		@assert δ > 0. && δ <= 1.
@@ -43,7 +43,7 @@ type OnlineFLS <: OnlineStat
 		println("μ = ", μ)
 		println("Vω:\n", Vω)
 
-		wgt = ExponentialWeighting(δ)
+		# wgt = ExponentialWeighting(δ)
 		Vε = Var(wgt)
 		yvar = Var(wgt)
 		xvars = Var[Var(wgt) for i in 1:p]
@@ -56,16 +56,16 @@ type OnlineFLS <: OnlineStat
 end
 
 
-function OnlineFLS(y::Float64, x::VecF, δ::Float64)
+function OnlineFLS(y::Float64, x::VecF, δ::Float64, wgt::Weighting = default(Weighting))
 	p = length(x)
-	o = OnlineFLS(p, δ)
+	o = OnlineFLS(p, δ, wgt)
 	update!(o, y, x)
 	o
 end
 
-function OnlineFLS(y::VecF, X::MatF, δ::Float64)
+function OnlineFLS(y::VecF, X::MatF, δ::Float64, wgt::Weighting = default(Weighting))
 	p = size(X,2)
-	o = OnlineFLS(p, δ)
+	o = OnlineFLS(p, δ, wgt)
 	update!(o, y, X)
 	o
 end
@@ -124,7 +124,7 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	o.K = Rx / if0then1(o.q)
 
 	# @LOG ε var(o.Vε)
-	# @LOG o.R
+	# @LOG diag(o.R)
 	# @LOG Rx
 	# @LOG o.q
 	# @LOG o.K
@@ -147,7 +147,12 @@ function Base.empty!(o::OnlineFLS)
 	empty!(o.Vε)
 	o.n = 0
 	o.β = zeros(p)
-	o.R = zeros(p,p)
+
+	# since Rₜ = Pₜ₋₁ + Vω, and P₀⁻¹ ≃ 0ₚ, lets initialize R with a big number along the diagonals
+	# o.R = zeros(p,p)
+	# o.R = eye(p)
+	o.R = copy(o.Vω)
+	
 	o.q = 0.
 	o.K = zeros(p)
 	o.yhat = 0.

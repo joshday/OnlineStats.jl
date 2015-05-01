@@ -14,6 +14,8 @@ import Distributions:
     pdf, cdf, logpdf, loglikelihood, probs, components
 # import PDMats  # Why is this needed?
 import DataFrames: DataFrame, names!
+import DataArrays
+import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
 import StatsBase
 import StatsBase: nobs, skewness, kurtosis

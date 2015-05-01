@@ -24,15 +24,19 @@ getrows(x::Matrix, rows) = x[rows,:]
 function tracedata(o::OnlineStat, b::Int64, args...)
     # Create object with first batch
     n = size(args[1],1)
-    rng = 1:b
-    df = DataFrame(o)
+    # rng = 1:b
+    i = 1
+    df = DataFrame(o; addFirstRow = false)
 
     # Update DataFrame with each batch
-    for i in 2:n/b
-        rng += b
+    # for i in 2:n/b
+        # rng += b
+    while i <= n
+        rng = i:min(i+b-1,n)
         batch_args = map(x->getrows(x,rng), args)
         update!(o, batch_args...)
         push!(df, o)
+        i += b
     end
 
     df

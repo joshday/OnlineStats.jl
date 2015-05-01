@@ -39,10 +39,28 @@ end
 # Why doesn't this work in 0.3.7?
 # DataFrame(o::OnlineStat) = DataFrame(state(o), statenames(o))
 
-function DataFrame(o::OnlineStat)
-    df = convert(DataFrame, state(o)')
-    names!(df, statenames(o))
+function DataFrame(o::OnlineStat; addFirstRow::Bool = true)
+    s = state(o)
+    df = DataFrame(map(typeof, s), statenames(o), 0)
+    if addFirstRow
+        push!(df, s)
+    end
+    df
+    # df = convert(DataFrame, state(o)')
+    # names!(df, statenames(o))
 end
 
 Base.push!(df::DataFrame, o::OnlineStat) = push!(df, state(o))
+
+
+# some nice helper functions to extract stuff from dataframes... 
+# this might exist already in dataframes... didn't look too hard
+
+function getnice(df::DataFrame, s::Symbol)
+    data = df[s]
+    makenice(data)
+end
+
+makenice{T<:Vector}(da::DataArray{T}) = hcat(da...)'
+makenice{T<:Number}(da::DataArray{T}) = DataArrays.array(da)
 
