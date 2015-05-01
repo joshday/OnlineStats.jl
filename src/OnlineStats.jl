@@ -14,7 +14,10 @@ import Distributions:
     pdf, cdf, logpdf, loglikelihood, probs, components
 # import PDMats  # Why is this needed?
 import DataFrames: DataFrame, names!
+import DataArrays
+import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
+import StatsBase
 import StatsBase: nobs, skewness, kurtosis
 
 
@@ -68,6 +71,9 @@ export
 #-----------------------------------------------------------------------------#
 # Source files
 #-----------------------------------------------------------------------------#
+
+include("log.jl")
+
 # Abstract Types
 include("types.jl")
 include("weighting.jl")
@@ -109,7 +115,7 @@ include("linearmodel/sweep.jl")
 # include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
-# include("linearmodel/ofls.jl")
+include("linearmodel/ofls.jl")
 
 # GLM
 # include("glm/logisticregsgd.jl")
