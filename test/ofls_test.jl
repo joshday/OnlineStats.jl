@@ -1,7 +1,7 @@
 
 
 using FactCheck
-
+FactCheck.clear_results()  # TODO: remove
 
 
 function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
@@ -22,7 +22,36 @@ function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
 	n, p, dy, dX, ε, β
 end
 
+function dofls(p, y, X)
+	fls = OnlineStats.OnlineFLS(p, 0.0001, OnlineStats.ExponentialWeighting(200))
+	OnlineStats.tracedata(fls, 1, y, X)
+end
+
+function dofls_checks()
+	context("fls_checks") do
+		σx = 2.0
+		n, p, y, X, ε, β = getsampledata(σx = σx)
+		df = dofls(p, y, X)
+		@fact size(df,1) => n
+
+		context("check final σx") do
+			for sxi in df[:σx][end]
+				@fact abs(sxi/σx-1)  => less_than(0.2)
+			end
+		end
+
+		r2 = 1 - var(y-OnlineStats.getnice(df,:yhat)) / var(y)
+		@fact r2 => greater_than(0.8)
+
+		# endsz = 20
+		# rng = n-endsz+1:n
+		# @fact sumabs2(y[rng] - OnlineStats.getnice(df,:yhat)[rng]) / endsz => less_than(0.1 * mean(abs(y[rng])))
+	end
+end
+
+
 function ofls_test()
+
 	facts("Test OnlineFLS") do
 
 		n, p, y, X, ε, β = getsampledata()
@@ -32,6 +61,16 @@ function ofls_test()
 		@fact size(β) => (n,p)
 
 		# ***
+
+		OnlineStats.log_severity(OnlineStats.ERROR)  # turn off most logging
+
+		df = dofls(p,y,X)
+		@fact df => anything
+		@fact dofls(p, y, X) => anything  # just make sure there's no errors
+
+		if !FactCheck.exitstatus()
+			dofls_checks()
+		end
 
 		# # this doesn't really belong here as is:
 		# # lets do the OFLS fit

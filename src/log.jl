@@ -15,9 +15,50 @@ function backtracestring()
 	"[$filename:$filenum]"
 end
 
-LOG(args...) = println(join(vcat(map(string,args)..., backtracestring()), " "))
 
+
+
+# --------------------------------------------------------
+
+@enum LogSeverity DEBUG INFO ERROR
+
+type SevObj
+	sev::LogSeverity
+end
+
+const LOG_SEVERITY = SevObj(INFO)
+
+log_severity() = LOG_SEVERITY.sev
+log_severity(sev::LogSeverity) = (LOG_SEVERITY.sev = sev)
+
+Base.isless(sev1::LogSeverity, sev2::LogSeverity) = sev1.val < sev2.val
+
+# --------------------------------------------------------
+
+LOG(args...) = LOG(INFO, args...)
+
+function LOG(sev::LogSeverity, args...)
+	if sev >= log_severity()
+		println(string(log_severity()), ": ", join(vcat(map(string,args)..., backtracestring()), " "))
+	end
+end
+
+
+# default to INFO
 macro LOG(symbols...)
+	# s1 = eval(symbols[1])
+	# local sev
+	# if isa(s1, LogSeverity)
+	# 	sev = s1
+	# 	symbols = symbols[2:end]
+	# else 
+	# end
+
+	sev = INFO
+	if sev < log_severity()
+		return
+	end
+
   expr = :(LOG())
   for s in symbols
     push!(expr.args, "$s:")
