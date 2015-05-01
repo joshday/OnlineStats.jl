@@ -57,15 +57,7 @@ function Base.cov(o::CovarianceMatrix)
 end
 
 function Base.cor(o::CovarianceMatrix)
-    B = o.B
-    p = size(B, 1)
-    covmat = o.A * o.n / (o.n - 1) -
-        BLAS.syrk('L','N',1.0, B) * o.n / (o.n - 1)
-    for j in 1:p
-        for i in 1:j - 1
-            covmat[i, j] = covmat[j, i]
-        end
-    end
+    covmat = cov(o)
     V = 1 ./ sqrt(diag(covmat))
     covmat = V .* covmat .* V'
     return covmat
@@ -75,21 +67,9 @@ end
 
 
 #------------------------------------------------------------------------# Base
-# function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
-#     n2 = c2.n
-#     A2 = c2.A
-#     B2 = c2.B
-
-#     c1.n += n2
-#     γ = n2 / c1.n
-#     c1.A += γ * (A2 - c1.A)
-#     c1.B += γ * (B2 - c1.B)
-# end
-
-function Base.show(io::IO, o::CovarianceMatrix)
-    println(io, "Online Covariance Matrix:\n", cov(o))
-end
-
-function DataFrame(o::CovarianceMatrix, corr = false)
-    convert(DataFrame, corr ? cor(o) : cov(o))
+function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
+    λ = mergeweight(c1, c2)
+    c1.A = smooth(c1.A, c2.A, λ)
+    c1.B = smooth(c1.B, c2.B, λ)
+    c1.n += n2
 end
