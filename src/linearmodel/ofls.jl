@@ -72,8 +72,8 @@ end
 
 #-----------------------------------------------------------------------# state
 
-statenames(o::OnlineFLS) = [:β, :σε, :yhat, :nobs]
-state(o::OnlineFLS) = Any[β(o), sqrt(var(o.Vε)), o.yhat, nobs(o)]
+statenames(o::OnlineFLS) = [:β, :σy, :σx, :σε, :yhat, :nobs]
+state(o::OnlineFLS) = Any[β(o), sqrt(var(o.yvar)), sqrt(map(var,o.xvars)), sqrt(var(o.Vε)), o.yhat, nobs(o)]
 
 β(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
