@@ -1,6 +1,6 @@
 export Extrema
 #------------------------------------------------------# Type and Constructors
-type Extrema <: ScalarStat
+type Extrema <: OnlineStat
     max::Float64
     min::Float64
     n::Int64
@@ -14,35 +14,23 @@ Extrema() = Extrema(-Inf, Inf, 0)
 
 
 #-----------------------------------------------------------------------# state
-state_names(obj::Extrema) = [:max, :min]
-
-state(obj::Extrema) = [max(obj), min(obj)]
+statenames(o::Extrema) = [:max, :min, :nobs]
+state(o::Extrema) = Any[maximum(o), minimum(o), nobs(o)]
 
 
 #--------------------------------------------------------------------# update!
-function update!{T <: Real}(obj::Extrema, y::Vector{T})
-    obj.max = maximum([obj.max; y])
-    obj.min = minimum([obj.min; y])
-    obj.n += length(y)
+function update!(o::Extrema, y::Float64)
+    o.max = max(o.max, y)
+    o.min = min(o.min, y)
+    o.n += 1
 end
-
-update!{T <: Real}(obj::Extrema, y::T) = update!(obj, [y])
-
 
 #----------------------------------------------------------------------# Base
-Base.max(obj::Extrema) = return obj.max
+Base.maximum(o::Extrema) = return o.max
 
-Base.min(obj::Extrema) = return obj.min
+Base.minimum(o::Extrema) = return o.min
 
-Base.maximum(obj::Extrema) = return obj.max
-
-Base.minimum(obj::Extrema) = return obj.min
-
-Base.copy(obj::Extrema) = Extrema(obj.max, obj.min, obj.n)
-
-function Base.merge(a::Extrema, b::Extrema)
-    Extrema(maximum([a.max, b.max]), minimum([a.min, b.min]), a.n + b.n)
-end
+Base.copy(o::Extrema) = Extrema(o.max, o.min, o.n)
 
 function Base.merge!(a::Extrema, b::Extrema)
     a.max = max(a.max, b.max)

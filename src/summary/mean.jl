@@ -32,10 +32,6 @@ function update!(o::Mean, y::Float64)
 end
 
 #------------------------------------------------------------------------# Base
-
-
-# Base.copy(o::Mean) = Mean(o.μ, o.n, o.weighting)
-
 function Base.empty!(o::Mean)
     o.μ = 0.
     o.n = 0
