@@ -71,6 +71,7 @@ export
     tracedata,
     em, # offline EM algorithm for Normal mixture
     smooth,
+    smooth!,
     weighting,
     sweep!
 

@@ -5,6 +5,20 @@ weight(o::OnlineStat, numUpdates::Int = 1) = weight(weighting(o), nobs(o), numUp
 
 smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
 
+# This removes garbage collection time from updating arrays
+function smooth!{T <: Real}(avg::Vector{T}, v::Vector{T}, λ::Float64)
+    for i in 1:length(avg)
+        avg[i] = smooth(avg[i], v[i], λ)
+    end
+end
+
+function smooth!{T <: Real}(avg::Matrix{T}, v::Matrix{T}, λ::Float64)
+    n, p = size(avg)
+    for j in 1:p, i in 1:n
+        avg[i,j] = smooth(avg[i, j], v[i, j], λ)
+    end
+end
+
 default(::Type{Weighting}) = EqualWeighting()
 
 
