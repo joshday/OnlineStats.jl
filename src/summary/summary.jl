@@ -37,7 +37,6 @@ end
 
 #-----------------------------------------------------------------------# Base
 function Base.merge!(a::Summary, b::Summary)
-    merge!(a.mean, b.mean)
     merge!(a.var, b.var)
     merge!(a.extrema, b.extrema)
     a.n += b.n

@@ -4,7 +4,7 @@ using OnlineStats
 using Distributions
 using DataFrames
 
-facts("*** Distributions ***") do
+facts("Distributions") do
 
 #------------------------------------------------------------------------------#
 #                                                                    Bernoulli #

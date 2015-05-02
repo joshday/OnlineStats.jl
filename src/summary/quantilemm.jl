@@ -1,5 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileMM{W <: Weighting} <: OnlineStat
+type QuantileMM <: OnlineStat
     est::VecF              # Quantile estimates
     τ::VecF                # tau values
     r::Float64             # learning rate
@@ -8,11 +8,11 @@ type QuantileMM{W <: Weighting} <: OnlineStat
     o::Float64
     n::Int64              # number of observations used
     nb::Int64             # number of batches used
-    weighting::W
+    weighting::StochasticWeighting
 end
 
 function QuantileMM(y::Vector; τ::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.6)
-    p::Int = length(τ)
+    p = length(τ)
     qs::Vector{Float64} = quantile(y, τ) + .00000001
     s::Vector{Float64} = [sum(abs(y - qs[i]) .^ -1 .* y) for i in 1:p]
     t::Vector{Float64} = [sum(abs(y - qs[i]) .^ -1) for i in 1:p]
@@ -26,32 +26,35 @@ QuantileMM(y::Real; args...) = QuantileMM([y], args...)
 
 
 #-----------------------------------------------------------------------# state
-state_names(obj::QuantileMM) = [symbol("τ_$i") for i in obj.τ]
+state_names(o::QuantileMM) = [:quantiles, :nobs]
 
-state(obj::QuantileMM) = copy(obj.est)
+state(o::QuantileMM) = Any[o.est, nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
-function update!(obj::QuantileMM, y::Vector)
-    γ::Float64 = obj.nb ^ - obj.r
+function update!(o::QuantileMM, y::Vector)
+    γ::Float64 = o.nb ^ - o.r
     n = length(y)
+    o.o = smooth(o.o, n, γ)
 
-    for i in 1:length(obj.τ)
+    for i in 1:length(o.τ)
         # Update sufficient statistics
-        w::Vector = abs(y - obj.est[i]) .^ -1
-        obj.s[i] += γ * (sum(w .* y) - obj.s[i])
-        obj.t[i] += γ * (sum(w) - obj.t[i])
-        obj.o += γ * (n - obj.o)
+        w::Vector = abs(y - o.est[i]) .^ -1
+        o.s[i] = smooth(o.s[i], w'y, γ)
+        o.t[i] = smooth(o.t[i], sum(w), γ)
+#         o.s[i] += γ * (sum(w .* y) - o.s[i])
+#         o.t[i] += γ * (sum(w) - o.t[i])
+#         o.o += γ * (n - o.o)
         # Update quantile
-        obj.est[i] = (obj.s[i] + obj.o * (2 * obj.τ[i] - 1)) / obj.t[i]
+        o.est[i] = (o.s[i] + o.o * (2 * o.τ[i] - 1)) / o.t[i]
     end
 
-    obj.n = obj.n + n
-    obj.nb += 1
+    o.n = o.n + n
+    o.nb += 1
 end
 
-update!(obj::QuantileMM, y::Real) = update!(obj, [y])
+update!(o::QuantileMM, y::Real) = update!(o, [y])
 
 
 #------------------------------------------------------------------------# Base
-Base.copy(obj::QuantileMM) = QuantileMM(obj.est, obj.τ, obj.r, obj.n, obj.nb)
+Base.copy(o::QuantileMM) = QuantileMM(o.est, o.τ, o.r, o.n, o.nb)

@@ -5,7 +5,7 @@ using DataFrames
 using FactCheck
 
 
-facts("*** Var ***") do
+facts("Var") do
     n1, n2 = rand(1:1_000_000, 2)
     n = n1 + n2
     x1 = rand(n1)

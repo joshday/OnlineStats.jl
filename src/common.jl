@@ -37,8 +37,6 @@ function DataFrame(o::OnlineStat; addFirstRow::Bool = true)
         push!(df, s)
     end
     df
-    # df = convert(DataFrame, state(o)')
-    # names!(df, statenames(o))
 end
 
 Base.push!(df::DataFrame, o::OnlineStat) = push!(df, state(o))

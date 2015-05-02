@@ -30,16 +30,18 @@ end
 
 
 #-----------------------------------------------------------------------# state
-statenames(o::QuantileSGD) = [[symbol("τ_($i)") for i in o.τ]; :nobs]
+statenames(o::QuantileSGD) = [:quantiles; :nobs]
 
-state(o::QuantileSGD) = [o.q, nobs(o)]
+state(o::QuantileSGD) = Any[o.q; nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
 function update!(o::QuantileSGD, y::Float64)
     o.n += 1
-    γ = weight(o)
-    o.q -= γ * ((y .< o.q) - o.τ)
+    γ = weight!(o.weighting)
+    for i in 1:length(o.q)
+        o.q[i] -= γ * ((y < o.q[i]) - o.τ[i])
+    end
     return
 end
 

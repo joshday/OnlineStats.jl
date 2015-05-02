@@ -18,7 +18,7 @@ import Distributions:
     mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
     entropy, mgf, cf, insupport, pdf, logpdf, loglikelihood, cdf, logcdf, ccdf,
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
-# import PDMats  # Why is this needed?
+# import PDMats  # Is this needed?
 import DataFrames: DataFrame, names!
 import DataArrays
 import DataArrays: DataArray
