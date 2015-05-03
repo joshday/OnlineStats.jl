@@ -6,8 +6,7 @@ using FactCheck
 @time include("summary_test.jl")
 @time include("extrema_test.jl")
 # @time include("moments_test.jl")
-# @time include("quantilesgd_test.jl")
-# @time include("quantilemm_test.jl")
+@time include("quantiles_test.jl")
 
 # @time include("linearmodel_test.jl")
 @time include("sweep_test.jl")

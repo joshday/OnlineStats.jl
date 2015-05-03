@@ -115,7 +115,7 @@ context("Dirichlet") do
     @fact o.meanlogx => vec(mean(log(x1), 2))
     @fact o.n => n1
 
-    batchupdate!(o, x2)
+    updatebatch!(o, x2)
     @fact length(o.d.alpha) => αlength
 
 

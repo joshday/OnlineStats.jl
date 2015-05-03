@@ -14,12 +14,12 @@ facts("Var") do
 
     o = Var(x1)
     @fact o.μ => roughly(mean(x1))
-    @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1))
+    @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1), 1e-8)
     @fact o.n => n1
 
     update!(o, x2)
     @fact o.μ => roughly(mean(x))
-    @fact o.biasedvar => roughly(var(x) * ((n -1) / n))
+    @fact o.biasedvar => roughly(var(x) * ((n -1) / n), 1e-8)
     @fact o.n => n
 
     o1 = Var(x1)
@@ -31,7 +31,7 @@ facts("Var") do
     @fact o1.biasedvar => roughly(o3.biasedvar)
 
     @fact mean(x) => roughly(mean(o1))
-    @fact var(x) => roughly(var(o1)) "might need special batch update for Var?"
+    @fact var(x) => roughly(var(o1), 1e-8) "might need special batch update for Var?"
 
 
     o = Var()
