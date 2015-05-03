@@ -60,6 +60,8 @@ end
     w.nb += 1
     max(Float64(w.nb) ^ -w.r, w.λ)
 end
+weight!(o::OnlineStat) = weight!(o.weighting)
+
 
 
 #---------------------------------------------------------------------------#
