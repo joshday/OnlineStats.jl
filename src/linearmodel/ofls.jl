@@ -12,8 +12,6 @@
 # TODO: allow for time-varying Vω???
 #  to accomplish... lets represent Vω as a vector of Variance's (i.e. the diagonal of Vω)
 
-# TODO: track Variance of y/x's, and normalize/denormalize before update
-
 #-------------------------------------------------------# Type and Constructors
 
 type OnlineFLS <: OnlineStat
@@ -69,28 +67,16 @@ end
 
 #-----------------------------------------------------------------------# state
 
-statenames(o::OnlineFLS) = [:β, :yvar, :xvars, :σε, :yhat, :nobs]
-state(o::OnlineFLS) = Any[β(o), o.yvar, o.xvars, std(o.Vε), o.yhat, nobs(o)]
+nonzerostd(x) = if0then1(std(x))
 
-β(o::OnlineFLS) = o.β
+# state vars: [normalizedBeta, rawBeta, Variance(y), Variance(x), std(ε), mostRecentEstimateOfY, nobs]
+statenames(o::OnlineFLS) = [:βₙ, :β, :yvar, :xvars, :σε, :yhat, :nobs]
+state(o::OnlineFLS) = Any[o.β, (o.β * std(o.yvar) ./ map(nonzerostd, o.xvars)), o.yvar, o.xvars, std(o.Vε), o.yhat, nobs(o)]
+
+βₙ(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
 
 #---------------------------------------------------------------------# update!
-
-
-# sqrt_var(x) = sqrt(var(x))
-
-# normalize_y(o::OnlineFLS, y::Float64) = (y - mean(o.yvar)) / if0then1(sqrt_var(o.yvar))
-# denormalize_y(o::OnlineFLS, y::Float64) = y * sqrt_var(o.yvar) + mean(o.yvar)
-
-# normalize_x(o::OnlineFLS, x::VecF) = (x - map(mean, o.xvars)) ./ map(xi->if0then1(sqrt_var(xi)), o.xvars)
-# denormalize_x(o::OnlineFLS, x::VecF) = x .* map(sqrt_var, o.xvars) + map(mean, o.xvars)
-
-# center_y(o::OnlineFLS, y::Float64) = y - mean(o.yvar)
-# uncenter_y(o::OnlineFLS, y::Float64) = y + mean(o.yvar)
-
-# center_x(o::OnlineFLS, x::VecF) = x - map(mean, o.xvars)
-# uncenter_x(o::OnlineFLS, x::VecF) = x + map(mean, o.xvars)
 
 
 # NOTE: assumes X mat is (T x p), where T is the number of observations
@@ -128,7 +114,7 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	# update β
 	o.β += o.K * ε
 
-	# @LOG o.β
+	@DEBUG o.β
 
 	# save the denormalized estimate of y
 	o.yhat = denormalize(o.yvar, yhat)
@@ -154,7 +140,7 @@ function Base.empty!(o::OnlineFLS)
 end
 
 function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
-	# TODO
+	error("Merging undefined for FLS")
 end
 
 

@@ -20,13 +20,25 @@ end
 
 # --------------------------------------------------------
 
-if VERSION < v"0.4-"
-	include("enum.jl")
-	using Enum
+# if VERSION < v"0.4-"
+# 	include("enum.jl")
+# 	using Enum
+# end
+
+# @enum LogSeverity DEBUG INFO ERROR
+
+immutable LogSeverity
+	val::Int
 end
 
-@enum LogSeverity DEBUG INFO ERROR
+const DEBUG = LogSeverity(0)
+const INFO = LogSeverity(1)
+const ERROR = LogSeverity(2)
 
+
+Base.string(sev::LogSeverity) = (sev == DEBUG ? "DEBUG" : (sev == INFO ? "INFO" : "ERROR"))
+Base.print(io::IO, sev::LogSeverity) = print(io, string(sev))
+Base.show(io::IO, sev::LogSeverity) = print(io, string(sev))
 
 type SevObj
 	sev::LogSeverity
@@ -52,12 +64,34 @@ end
 
 # default to INFO
 macro LOG(symbols...)
-	sev = INFO
-	if sev < log_severity()
-		return
-	end
+	# sev = INFO
+	# if sev < log_severity()
+	# 	return
+	# end
 
   expr = :(LOG())
+  for s in symbols
+    push!(expr.args, "$s:")
+    push!(expr.args, esc(s))
+  end
+  expr
+end
+
+macro ERROR(symbols...)
+  expr = :(LOG(ERROR))
+  for s in symbols
+    push!(expr.args, "$s:")
+    push!(expr.args, esc(s))
+  end
+  expr
+end
+
+macro DEBUG(symbols...)
+	# if DEBUG < log_severity()
+	# 	return
+	# end
+
+  expr = :(LOG(DEBUG))
   for s in symbols
     push!(expr.args, "$s:")
     push!(expr.args, esc(s))
