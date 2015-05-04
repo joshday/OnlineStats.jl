@@ -1,23 +1,23 @@
 #-------------------------------------------------------# Type and Constructors
 type Means{W <: Weighting} <: OnlineStat
     μ::VecF
-    dim::Int64  # length of μ
-    n::Int64
+    p::Int  # length of μ
+    n::Int
     weighting::W
 end
 
 
 function Means(y::MatF, wgt::Weighting = default(Weighting))
-    o = Means(wgt, size(y, 2))
+    o = Means(size(y, 2), wgt)
     update!(o, y)
     o
 end
 function Means(y::VecF, wgt::Weighting = default(Weighting))
-    o = Means(wgt, length(y))
+    o = Means(length(y), wgt)
     update!(o, y)
     o
 end
-Means(wgt::Weighting = default(Weighting), dim = 2) = Means(zeros(dim), dim, 0, wgt)
+Means(p::Int, wgt::Weighting = default(Weighting)) = Means(zeros(p), p, 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
@@ -33,7 +33,7 @@ function update!(o::Means, y::VecF)
     o.n += 1
     return
 end
--
+
 function update!(o::Means, y::MatF)
     for i in 1:size(y,1)
         update!(o, vec(y[i, :]))

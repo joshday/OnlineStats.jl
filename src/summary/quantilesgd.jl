@@ -37,7 +37,7 @@ state(o::QuantileSGD) = Any[copy(o.q), o.τ, nobs(o)]
 #---------------------------------------------------------------------# update!
 function update!(o::QuantileSGD, y::Float64)
     o.n += 1
-    γ = weight!(o.weighting)
+    γ = weight(o)
     for i in 1:length(o.q)
         o.q[i] -= γ * ((y < o.q[i]) - o.τ[i])
     end
@@ -46,7 +46,7 @@ end
 
 function updatebatch!(o::QuantileSGD, y::VecF)
     o.n += length(y)
-    γ = weight!(o)
+    γ = weight(o)
     for i in 1:length(o.q)
         o.q[i] -= γ * (mean(y < o.q[i]) - o.τ[i])
     end
