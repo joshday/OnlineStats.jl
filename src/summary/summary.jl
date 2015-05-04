@@ -1,6 +1,6 @@
 #------------------------------------------------------# Type and Constructors
 type Summary{W <: Weighting} <: OnlineStat
-    var::Var          # mean and variance
+    var::Variance{W}  # mean and variance
     extrema::Extrema  # max and min
     n::Int64          # nobs
     weighting::W
@@ -14,7 +14,7 @@ function Summary{T<:Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
 end
 
 Summary(y::Float64, wgt::Weighting = default(Weighting)) = Summary([y], wgt)
-Summary(wgt::Weighting = default(Weighting)) = Summary(Var(wgt), Extrema(), 0, wgt)
+Summary(wgt::Weighting = default(Weighting)) = Summary(Variance(wgt), Extrema(), 0, wgt)
 
 
 #-----------------------------------------------------------------------# state

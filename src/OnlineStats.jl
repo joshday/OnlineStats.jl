@@ -41,7 +41,7 @@ export
 
     # concrete types
     Mean,
-    Var,
+    Variance,
     Extrema,
     Summary,
     QuantileMM,

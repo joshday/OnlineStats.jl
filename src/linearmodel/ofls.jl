@@ -10,19 +10,19 @@
 
 
 # TODO: allow for time-varying Vω???
-#  to accomplish... lets represent Vω as a vector of Var's (i.e. the diagonal of Vω)
+#  to accomplish... lets represent Vω as a vector of Variance's (i.e. the diagonal of Vω)
 
-# TODO: track Var of y/x's, and normalize/denormalize before update
+# TODO: track Variance of y/x's, and normalize/denormalize before update
 
 #-------------------------------------------------------# Type and Constructors
 
 type OnlineFLS <: OnlineStat
 	p::Int  		# number of independent vars
 	Vω::MatF    # pxp (const) covariance matrix of Δβₜ
-	# Vω::Vector{Var}
-	Vε::Var     # variance of error term... use exponential weighting with δ as the weight param
-	yvar::Var   # used for normalization
-	xvars::Vector{Var}  # used for normalization
+	# Vω::Vector{Variance}
+	Vε::Variance     # variance of error term... use exponential weighting with δ as the weight param
+	yvar::Variance   # used for normalization
+	xvars::Vector{Variance}  # used for normalization
 
 	n::Int
 	β::VecF 		# the current estimate in: yₜ = Xₜβₜ + εₜ
@@ -40,10 +40,10 @@ type OnlineFLS <: OnlineStat
 		@assert δ > 0. && δ <= 1.
 		μ = (1. - δ) / δ
 		Vω = eye(p) / μ
-		Vε = Var(wgt)
+		Vε = Variance(wgt)
 		
-		yvar = Var(wgt)
-		xvars = Var[Var(wgt) for i in 1:p]
+		yvar = Variance(wgt)
+		xvars = [Variance(wgt) for i in 1:p]
 		
 		# create and init the object
 		o = new(p, Vω, Vε, yvar, xvars)

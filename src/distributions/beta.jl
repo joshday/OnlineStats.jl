@@ -1,7 +1,7 @@
 #------------------------------------------------------# Type and Constructors
 type FitBeta{W <: Weighting} <: DistributionStat
     d::Beta
-    stats::Var{W}
+    stats::Variance{W}
     n::Int64
     weighting::W
 end
@@ -19,12 +19,12 @@ FitBeta{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Beta, y, wgt)
 
 FitBeta(wgt::Weighting = default(Weighting)) =
-    FitBeta(Beta(), Var(wgt), 0, wgt)
+    FitBeta(Beta(), Variance(wgt), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
 function update!(obj::FitBeta, y::Float64)
-    update!(obj.stats, y)  # Weighting is applied to updating Var
+    update!(obj.stats, y)  # Weighting is applied to updating Variance
     m = mean(obj.stats)
     v = var(obj.stats)
     α = m * (m * (1 - m) / v - 1)

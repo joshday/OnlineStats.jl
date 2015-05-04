@@ -5,14 +5,14 @@ using DataFrames
 using FactCheck
 
 
-facts("Var") do
+facts("Variance") do
     n1, n2 = rand(1:1_000_000, 2)
     n = n1 + n2
     x1 = rand(n1)
     x2 = rand(n2)
     x = [x1; x2]
 
-    o = Var(x1)
+    o = Variance(x1)
     @fact o.μ => roughly(mean(x1))
     @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1), 1e-8)
     @fact o.n => n1
@@ -22,8 +22,8 @@ facts("Var") do
     @fact o.biasedvar => roughly(var(x) * ((n -1) / n), 1e-8)
     @fact o.n => n
 
-    o1 = Var(x1)
-    o2 = Var(x2)
+    o1 = Variance(x1)
+    o2 = Variance(x2)
     o3 = merge(o1, o2)
     merge!(o1, o2)
     @fact o1.n => o3.n
@@ -31,10 +31,10 @@ facts("Var") do
     @fact o1.biasedvar => roughly(o3.biasedvar)
 
     @fact mean(x) => roughly(mean(o1))
-    @fact var(x) => roughly(var(o1), 1e-8) "might need special batch update for Var?"
+    @fact var(x) => roughly(var(o1), 1e-8) "might need special batch update for Variance?"
 
 
-    o = Var()
+    o = Variance()
     @fact o.μ => 0.0
     @fact o.biasedvar => 0.0
     @fact o.n => 0

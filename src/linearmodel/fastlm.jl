@@ -3,7 +3,7 @@
 type FastLM <: OnlineStat
     p::Int64       # length(β)
     β::VecF
-    xyvar::Vars{ExponentialWeighting}
+    xyvar::Variances{ExponentialWeighting}
     n::Int64
     weighting::StochasticWeighting
 end
@@ -23,7 +23,7 @@ function FastLM(x::VecF, y::Float64, wgt::StochasticWeighting = StochasticWeight
 end
 
 FastLM(p::Int, wgt::StochasticWeighting = StochasticWeighting(), start = zeros(p)) =
-    FastLM(p, zeros(p), Vars(p, ExponentialWeighting(wgt.λ)), 0, wgt)
+    FastLM(p, zeros(p), Variances(p, ExponentialWeighting(wgt.λ)), 0, wgt)
 
 
 #-----------------------------------------------------------------------# state

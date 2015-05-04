@@ -2,7 +2,7 @@
 #-------------------------------------------------------# Type and Constructors
 type FitNormal{W <: Weighting} <: DistributionStat
     d::Normal
-    v::Var{W}
+    v::Variance{W}
     n::Int64
     w::W
 end
@@ -18,7 +18,7 @@ end
 FitNormal(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
     onlinefit(Normal, y, wgt)
 
-FitNormal(wgt::Weighting = default(Weighting)) = FitNormal(Normal(), Var(wgt), 0, wgt)
+FitNormal(wgt::Weighting = default(Weighting)) = FitNormal(Normal(), Variance(wgt), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
