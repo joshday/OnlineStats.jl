@@ -86,7 +86,7 @@ export
 # Source files
 #-----------------------------------------------------------------------------#
 
-# include("log.jl")
+include("log.jl")
 
 # Abstract Types
 include("types.jl")

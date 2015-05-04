@@ -18,9 +18,10 @@ type OnlineFLS <: OnlineStat
 	p::Int  		# number of independent vars
 	Vω::MatF    # pxp (const) covariance matrix of Δβₜ
 	# Vω::Vector{Variance}
-	Vε::Variance     # variance of error term... use exponential weighting with δ as the weight param
+	Vε::Variance     # variance of error term
 	yvar::Variance   # used for normalization
 	xvars::Vector{Variance}  # used for normalization
+	# weighting::W  # weighting scheme for Variances... algo convergence is dictated by Vω
 
 	n::Int
 	β::VecF 		# the current estimate in: yₜ = Xₜβₜ + εₜ
@@ -38,8 +39,8 @@ type OnlineFLS <: OnlineStat
 		@assert δ > 0. && δ <= 1.
 		μ = (1. - δ) / δ
 		Vω = eye(p) / μ
+
 		Vε = Variance(wgt)
-		
 		yvar = Variance(wgt)
 		xvars = [Variance(wgt) for i in 1:p]
 		
@@ -70,10 +71,10 @@ end
 nonzerostd(x) = if0then1(std(x))
 
 # state vars: [normalizedBeta, rawBeta, Variance(y), Variance(x), std(ε), mostRecentEstimateOfY, nobs]
-statenames(o::OnlineFLS) = [:βₙ, :β, :yvar, :xvars, :σε, :yhat, :nobs]
+statenames(o::OnlineFLS) = [:βn, :β, :yvar, :xvars, :σε, :yhat, :nobs]
 state(o::OnlineFLS) = Any[o.β, (o.β * std(o.yvar) ./ map(nonzerostd, o.xvars)), o.yvar, o.xvars, std(o.Vε), o.yhat, nobs(o)]
 
-βₙ(o::OnlineFLS) = o.β
+βn(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
 
 #---------------------------------------------------------------------# update!
