@@ -1,9 +1,9 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileSGD{W <: Weighting} <: OnlineStat
+type QuantileSGD <: OnlineStat
     q::VecF              # Quantile estimates
     τ::VecF                # tau values (which quantiles)
     n::Int64               # number of observations used
-    weighting::W
+    weighting::StochasticWeighting
 end
 
 function QuantileSGD(y::VecF,
@@ -30,23 +30,26 @@ end
 
 
 #-----------------------------------------------------------------------# state
-statenames(o::QuantileSGD) = [[symbol("τ_($i)") for i in o.τ]; :nobs]
-
-state(o::QuantileSGD) = [o.q, nobs(o)]
+statenames(o::QuantileSGD) = [:quantiles, :τ, :nobs]
+state(o::QuantileSGD) = Any[copy(o.q), o.τ, nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
 function update!(o::QuantileSGD, y::Float64)
     o.n += 1
-    γ = weight(o)
-    o.q -= γ * ((y .< o.q) - o.τ)
+    γ = weight!(o.weighting)
+    for i in 1:length(o.q)
+        o.q[i] -= γ * ((y < o.q[i]) - o.τ[i])
+    end
     return
 end
 
 function updatebatch!(o::QuantileSGD, y::VecF)
     o.n += length(y)
-    γ = weight(o, o.w.nb)
-    o.q -= γ * (vec(mean(y .< o.q', 1)) - o.τ)
+    γ = weight!(o)
+    for i in 1:length(o.q)
+        o.q[i] -= γ * (mean(y < o.q[i]) - o.τ[i])
+    end
     return
 end
 

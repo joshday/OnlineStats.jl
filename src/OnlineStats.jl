@@ -18,7 +18,7 @@ import Distributions:
     mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
     entropy, mgf, cf, insupport, pdf, logpdf, loglikelihood, cdf, logcdf, ccdf,
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
-# import PDMats  # Why is this needed?
+# import PDMats  # Is this needed?
 import DataFrames: DataFrame, names!
 import DataArrays
 import DataArrays: DataArray
@@ -71,6 +71,7 @@ export
     tracedata,
     em, # offline EM algorithm for Normal mixture
     smooth,
+    smooth!,
     weighting,
     sweep!
 
@@ -79,7 +80,7 @@ export
 # Source files
 #-----------------------------------------------------------------------------#
 
-include("log.jl")
+# include("log.jl")
 
 # Abstract Types
 include("types.jl")
@@ -93,7 +94,7 @@ include("common.jl")
 include("summary/mean.jl")
 include("summary/var.jl")
 include("summary/extrema.jl")
-# include("summary/summary.jl")
+include("summary/summary.jl")
 # include("summary/moments.jl")
 include("summary/quantilesgd.jl")
 # include("summary/quantilemm.jl")
@@ -122,7 +123,7 @@ include("linearmodel/sweep.jl")
 # include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
-include("linearmodel/ofls.jl")
+# include("linearmodel/ofls.jl")
 
 # GLM
 # include("glm/logisticregsgd.jl")

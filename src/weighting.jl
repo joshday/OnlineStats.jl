@@ -3,9 +3,25 @@ abstract Weighting
 weighting(o) = o.weighting
 weight(o::OnlineStat, numUpdates::Int = 1) = weight(weighting(o), nobs(o), numUpdates)
 
+default(::Type{Weighting}) = EqualWeighting()
+
+#---------------------------------------------------------------------------#
+
 smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
 
-default(::Type{Weighting}) = EqualWeighting()
+# This removes garbage collection time when updating arrays
+function smooth!{T}(avg::Vector{T}, v::Vector{T}, λ::Float64)
+    for i in 1:length(avg)
+        avg[i] = smooth(avg[i], v[i], λ)
+    end
+end
+
+function smooth!{T}(avg::Matrix{T}, v::Matrix{T}, λ::Float64)
+    n, p = size(avg)
+    for j in 1:p, i in 1:n
+        avg[i,j] = smooth(avg[i, j], v[i, j], λ)
+    end
+end
 
 
 #---------------------------------------------------------------------------#
@@ -30,7 +46,7 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 
 
 #---------------------------------------------------------------------------# Stochastic
-type StochasticWeighting <: Weighting
+type StochasticWeighting
     r::Float64
     nb::Int64   # number of batches
     λ::Float64  # minimum step size
@@ -40,12 +56,12 @@ type StochasticWeighting <: Weighting
         new(r, 0, λ)
     end
 end
-@compat function weight(w::StochasticWeighting, n1, n2)
+@compat function weight!(w::StochasticWeighting)
     w.nb += 1
     max(Float64(w.nb) ^ -w.r, w.λ)
 end
-# nextbatch!(w::StochasticWeighting) = (w.nb += 1)
-# nextbatch!(o::OnlineStat) = nextbatch!(o.weighting)
+weight!(o::OnlineStat) = weight!(o.weighting)
+
 
 
 #---------------------------------------------------------------------------#

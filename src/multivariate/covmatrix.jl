@@ -31,7 +31,7 @@ function updatebatch!(o::CovarianceMatrix, x::MatF)
     o.n += n2
 
     # Update B
-    o.B = smooth(o.B, vec(mean(x,1)), λ)
+    smooth!(o.B, vec(mean(x,1)), λ)
     # Update A
     BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1 - λ, o.A)
     return

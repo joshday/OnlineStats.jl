@@ -1,57 +1,78 @@
 #-------------------------------------------------------# Type and Constructors
-type QuantileMM{W <: Weighting} <: OnlineStat
-    est::VecF              # Quantile estimates
+type QuantileMM <: OnlineStat
+    q::VecF              # Quantile qimates
     τ::VecF                # tau values
-    r::Float64             # learning rate
+
     s::VecF                # sufficients stats for MM (s, t, and o)
     t::VecF
     o::Float64
+
     n::Int64              # number of observations used
-    nb::Int64             # number of batches used
-    weighting::W
+    weighting::StochasticWeighting
 end
 
-function QuantileMM(y::Vector; τ::Vector = [0.25, 0.5, 0.75], r::Float64 = 0.6)
-    p::Int = length(τ)
-    qs::Vector{Float64} = quantile(y, τ) + .00000001
-    s::Vector{Float64} = [sum(abs(y - qs[i]) .^ -1 .* y) for i in 1:p]
-    t::Vector{Float64} = [sum(abs(y - qs[i]) .^ -1) for i in 1:p]
-    o::Float64 = length(y)
-    qs = [(s[i] + o * (2 * τ[i] - 1)) / t[i] for i in 1:p]
-
-    QuantileMM(qs, τ, r, s, t, o, length(y), 1)
+function QuantileMM(y::VecF,
+                    wgt::StochasticWeighting = StochasticWeighting();
+                    τ::VecF = [.25, .5, .75],
+                    start::VecF = quantile(y, τ))
+    o = QuantileMM(wgt, τ = τ, start = start)
+    update!(o, y)
+    o
 end
 
-QuantileMM(y::Real; args...) = QuantileMM([y], args...)
+function QuantileMM(y::Float64,
+                    wgt::StochasticWeighting = StochasticWeighting();
+                    τ::VecF = [.25, .5, .75],
+                    start::VecF = zeros(length(τ)))
+    QuantileMM([y], wgt, τ = τ, start = start)
+end
+
+function QuantileMM(wgt::StochasticWeighting = StochasticWeighting();
+                    τ = [.25, .5, .75],
+                    start::VecF = zeros(length(τ)))
+    p = length(τ)
+    QuantileMM(start, τ, zeros(p), zeros(p), 0., 0, wgt)
+end
 
 
 #-----------------------------------------------------------------------# state
-state_names(obj::QuantileMM) = [symbol("τ_$i") for i in obj.τ]
-
-state(obj::QuantileMM) = copy(obj.est)
+statenames(o::QuantileMM) = [:quantiles, :τ, :nobs]
+state(o::QuantileMM) = Any[copy(o.q), o.τ, nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
-function update!(obj::QuantileMM, y::Vector)
-    γ::Float64 = obj.nb ^ - obj.r
-    n = length(y)
-
-    for i in 1:length(obj.τ)
-        # Update sufficient statistics
-        w::Vector = abs(y - obj.est[i]) .^ -1
-        obj.s[i] += γ * (sum(w .* y) - obj.s[i])
-        obj.t[i] += γ * (sum(w) - obj.t[i])
-        obj.o += γ * (n - obj.o)
-        # Update quantile
-        obj.est[i] = (obj.s[i] + obj.o * (2 * obj.τ[i] - 1)) / obj.t[i]
+function update!(o::QuantileMM, y::Float64)
+    γ = weight!(o)
+    o.o = smooth(o.o, 1., γ)
+    o.n += 1
+    for j in 1:length(o.τ)
+        w::Float64 = 1 / abs(y - o.q[j])
+        o.s[j] = smooth(o.s[j], w * y, γ)
+        o.t[j] = smooth(o.t[j], w, γ)
+        o.q[j] = (o.s[j] + o.o * (2 * o.τ[j] - 1)) / o.t[j]
     end
-
-    obj.n = obj.n + n
-    obj.nb += 1
 end
 
-update!(obj::QuantileMM, y::Real) = update!(obj, [y])
+
+function updatebatch!(o::QuantileMM, y::VecF)
+    γ = weight!(o)
+    n = length(y)
+    o.o = smooth(o.o, n, γ)
+
+    for i in 1:length(o.τ)
+        # Update sufficient statistics
+        w::Vector = abs(y - o.q[i]) .^ -1
+        o.s[i] = smooth(o.s[i], w'y, γ)
+        o.t[i] = smooth(o.t[i], sum(w), γ)
+#         o.s[i] += γ * (sum(w .* y) - o.s[i])
+#         o.t[i] += γ * (sum(w) - o.t[i])
+#         o.o += γ * (n - o.o)
+        # Update quantile
+        o.q[i] = (o.s[i] + o.o * (2 * o.τ[i] - 1)) / o.t[i]
+    end
+
+    o.n += n
+    o.nb += 1
+end
 
 
-#------------------------------------------------------------------------# Base
-Base.copy(obj::QuantileMM) = QuantileMM(obj.est, obj.τ, obj.r, obj.n, obj.nb)

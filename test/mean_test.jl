@@ -5,7 +5,7 @@ using DataFrames
 using FactCheck
 
 
-facts("*** Mean ***") do
+facts("Mean") do
     # Mean, update!, merge, merge!, Base.mean
     n1, n2 = rand(1:1_000_000, 2)
     n = n1 + n2
