@@ -10,7 +10,7 @@ import Distributions:
     MvNormal, Normal, MixtureModel,
 
     # Other
-    fit_dirichlet!,
+    fit_dirichlet!, Univariate, Continuous,
 
     # Methods for DistributionStat
     pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
@@ -123,7 +123,7 @@ include("distributions/mvnormal.jl")
 include("distributions/normal.jl")
 
 # Density Estimation
-# include("densityestimation/offlinenormalmix.jl")
+include("densityestimation/offlinenormalmix.jl")
 # include("densityestimation/normalmix.jl")
 
 # Linear Model
