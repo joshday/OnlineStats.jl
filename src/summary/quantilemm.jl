@@ -42,7 +42,7 @@ state(o::QuantileMM) = Any[copy(o.q), o.τ, nobs(o)]
 
 #---------------------------------------------------------------------# update!
 function update!(o::QuantileMM, y::Float64)
-    γ = weight!(o)
+    γ = weight(o)
     o.o = smooth(o.o, 1., γ)
     o.n += 1
     for j in 1:length(o.τ)
@@ -55,7 +55,7 @@ end
 
 
 function updatebatch!(o::QuantileMM, y::VecF)
-    γ = weight!(o)
+    γ = weight(o)
     n = length(y)
     o.o = smooth(o.o, n, γ)
 

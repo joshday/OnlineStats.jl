@@ -46,7 +46,7 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 
 
 #---------------------------------------------------------------------------# Stochastic
-type StochasticWeighting
+type StochasticWeighting <: Weighting
     r::Float64
     nb::Int64   # number of batches
     λ::Float64  # minimum step size
@@ -56,11 +56,11 @@ type StochasticWeighting
         new(r, 0, λ)
     end
 end
-@compat function weight!(w::StochasticWeighting)
-    w.nb += 1
+@compat function weight(w::StochasticWeighting, unused, n2)
+    w.nb += n2
     max(Float64(w.nb) ^ -w.r, w.λ)
 end
-weight!(o::OnlineStat) = weight!(o.weighting)
+
 
 
 

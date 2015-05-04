@@ -20,11 +20,11 @@ import Distributions:
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
 # import PDMats  # Is this needed?
 import DataFrames: DataFrame, names!
-import DataArrays
+
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
 import StatsBase
-import StatsBase: nobs, skewness, kurtosis, mode, modes
+import StatsBase: nobs, skewness, kurtosis, mode, modes, coef
 
 
 #-----------------------------------------------------------------------------#
@@ -41,13 +41,17 @@ export
 
     # concrete types
     Mean,
-    Var,
+    Variance,
+    Moments,
     Extrema,
     Summary,
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
+
     CovarianceMatrix,
+    Means,
+    Variances,
 
     FitBernoulli,
     FitBeta,
@@ -60,11 +64,13 @@ export
     FitNormal,
 
     OnlineFLS,
+    LinReg,
+    FastLM,
 
     # functions
     nobs,
     update!,
-    batchupdate!,
+    updatebatch!,
     state,
     statenames,
     onlinefit,
@@ -95,13 +101,15 @@ include("summary/mean.jl")
 include("summary/var.jl")
 include("summary/extrema.jl")
 include("summary/summary.jl")
-# include("summary/moments.jl")
+include("summary/moments.jl")
 include("summary/quantilesgd.jl")
-# include("summary/quantilemm.jl")
+include("summary/quantilemm.jl")
 # include("summary/fivenumber.jl")
 
 # Multivariate
 include("multivariate/covmatrix.jl")
+include("multivariate/means.jl")
+include("multivariate/vars.jl")
 
 # Parametric Density
 include("distributions/bernoulli.jl")
@@ -120,7 +128,8 @@ include("distributions/normal.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-# include("linearmodel/linreg.jl")
+include("linearmodel/fastlm.jl")
+include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
 # include("linearmodel/ofls.jl")
