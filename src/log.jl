@@ -20,7 +20,13 @@ end
 
 # --------------------------------------------------------
 
+if VERSION < v"0.4-"
+	include("enum.jl")
+	using Enum
+end
+
 @enum LogSeverity DEBUG INFO ERROR
+
 
 type SevObj
 	sev::LogSeverity
