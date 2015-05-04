@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type Var{W<:Weighting} <: OnlineStat
+type Variance{W<:Weighting} <: OnlineStat
     μ::Float64
     biasedvar::Float64    # BIASED variance (makes for easier update)
     n::Int64
@@ -8,28 +8,29 @@ type Var{W<:Weighting} <: OnlineStat
 end
 
 
-function Var{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
-    o = Var(wgt)
+function Variance{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
+    o = Variance(wgt)
     update!(o, y)  # apply the weighting scheme, as opposed to initializing with classic variance
     o
 end
 
-Var(y::Float64, wgt::Weighting = default(Weighting)) = Var([y], wgt)
-Var(wgt::Weighting = default(Weighting)) = Var(0., 0., 0, wgt)
+Variance(y::Float64, wgt::Weighting = default(Weighting)) = Variance([y], wgt)
+Variance(wgt::Weighting = default(Weighting)) = Variance(0., 0., 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
 
-statenames(o::Var) = [:μ, :σ², :nobs]
-state(o::Var) = Any[mean(o), var(o), nobs(o)]
+statenames(o::Variance) = [:μ, :σ², :nobs]
+state(o::Variance) = Any[mean(o), var(o), nobs(o)]
 
-Base.mean(o::Var) = o.μ
-Base.var(o::Var) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
+Base.mean(o::Variance) = o.μ
+Base.var(o::Variance) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
+Base.std(o::Variance) = sqrt(var(o))
 
 #---------------------------------------------------------------------# update!
 
 
-function update!(o::Var, y::Float64)
+function update!(o::Variance, y::Float64)
     λ = weight(o)
     μ = mean(o)
 
@@ -39,17 +40,17 @@ function update!(o::Var, y::Float64)
     return
 end
 
-# Base.copy(o::Var) = Var(o.μ, o.biasedvar, o.n, o.weighting)
+# Base.copy(o::Variance) = Variance(o.μ, o.biasedvar, o.n, o.weighting)
 
 # NOTE:
-function Base.empty!(o::Var)
+function Base.empty!(o::Variance)
     o.μ = 0.
     o.biasedvar = 0.
     o.n = 0
     return
 end
 
-function Base.merge!(o1::Var, o2::Var)
+function Base.merge!(o1::Variance, o2::Variance)
     λ = mergeweight(o1, o2)
     o1.μ = smooth(o1.μ, o2.μ, λ)
     o1.biasedvar = smooth(o1.biasedvar, o2.biasedvar, λ)

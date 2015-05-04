@@ -9,7 +9,7 @@ end
 function onlinefit(::Type{MvNormal},
                    y::Matrix{Float64},
                    wgt::Weighting = default(Weighting))
-    o = FitMvNormal(wgt; dim = size(y, 1))
+    o = FitMvNormal(size(y, 1), wgt)
     updatebatch!(o, y)
     o
 end
@@ -17,8 +17,8 @@ end
 FitMvNormal(y::Matrix{Float64}, wgt::Weighting = default(Weighting)) =
     onlinefit(MvNormal, y, wgt)
 
-FitMvNormal(wgt::Weighting = default(Weighting); dim = 2) =
-    FitMvNormal(MvNormal(zeros(dim), eye(dim)), CovarianceMatrix(wgt, p = dim), 0, wgt)
+FitMvNormal(p::Int, wgt::Weighting = default(Weighting)) =
+    FitMvNormal(MvNormal(zeros(p), eye(p)), CovarianceMatrix(p, wgt), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
