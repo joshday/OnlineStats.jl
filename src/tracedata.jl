@@ -21,8 +21,8 @@ getrows(x::Matrix, rows) = x[rows,:]
 
 
 # adjusted to take the batch size first
-function tracedata(o::OnlineStat, b::Int64, args...)
-    
+function tracedata(o::OnlineStat, b::Int64, args...; batch = false)
+
     # Create DataFrame
     n = size(args[1],1)
     i = 1
@@ -32,7 +32,7 @@ function tracedata(o::OnlineStat, b::Int64, args...)
     while i <= n
         rng = i:min(i+b-1,n)
         batch_args = map(x->getrows(x,rng), args)
-        update!(o, batch_args...)
+        batch? updatebatch!(o, batch_args...) : update!(o, batch_args...)
         push!(df, o)
         i += b
     end
