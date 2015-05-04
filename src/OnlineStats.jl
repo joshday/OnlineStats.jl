@@ -20,7 +20,7 @@ import Distributions:
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
 # import PDMats  # Is this needed?
 import DataFrames: DataFrame, names!
-
+import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
 import StatsBase
