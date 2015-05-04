@@ -65,7 +65,7 @@ export
 
     OnlineFLS,
     LinReg,
-    FastLM,
+    LinRegSGD,
 
     # functions
     nobs,
@@ -86,7 +86,7 @@ export
 # Source files
 #-----------------------------------------------------------------------------#
 
-# include("log.jl")
+include("log.jl")
 
 # Abstract Types
 include("types.jl")
@@ -128,7 +128,7 @@ include("distributions/normal.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-include("linearmodel/fastlm.jl")
+include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
