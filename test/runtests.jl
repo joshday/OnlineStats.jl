@@ -8,7 +8,7 @@ using FactCheck
 # @time include("moments_test.jl")
 @time include("quantiles_test.jl")
 
-# @time include("linearmodel_test.jl")
+@time include("linearmodel_test.jl")
 @time include("sweep_test.jl")
 
 # @time include("quantregmm_test.jl")
@@ -16,7 +16,7 @@ using FactCheck
 
 @time include("distribution_test.jl")
 
-# @time include("covmatrix_test.jl")
+@time include("covmatrix_test.jl")
 
 FactCheck.exitstatus()
 end # module
