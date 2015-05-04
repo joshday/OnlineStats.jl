@@ -1,21 +1,20 @@
-
 #-------------------------------------------------------# Type and Constructors
 type CovarianceMatrix{W <: Weighting} <: OnlineStat
-    A::Matrix{Float64}    # X' * X / n
-    B::Vector{Float64}    # X * 1' / n (column means)
-    n::Int64              # number of observations used
+    A::MatF           # X' * X / n
+    B::VecF           # X * 1' / n (column means)
+    n::Int64
     weighting::W
 end
 
 # (p by p) covariance matrix from an (n by p) data matrix
 function CovarianceMatrix{T <: Real}(x::Matrix{T}, wgt::Weighting = default(Weighting))
-    o = CovarianceMatrix(wgt; p = size(x, 2))
+    o = CovarianceMatrix(size(x, 2), wgt)
     updatebatch!(o, x)
     o
 end
 
-CovarianceMatrix(wgt::Weighting = default(Weighting); p = 2) =
-    CovarianceMatrix(zeros(p,p), zeros(p), 0, wgt)
+CovarianceMatrix(p::Int, wgt::Weighting = default(Weighting)) =
+    CovarianceMatrix(zeros(p, p), zeros(p), 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
