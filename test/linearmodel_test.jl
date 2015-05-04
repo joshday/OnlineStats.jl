@@ -1,31 +1,22 @@
+module LinearModelTest
+
 using OnlineStats
-using Base.Test
+using FactCheck
 using GLM
-println("linearmodel_test.jl")
+using StatsBase
 
+facts("LinearModel") do
+    n = rand(1:100_000)
+    p = rand(1:min(n-1, 100))
 
-x = randn(100, 10)
-y = vec(sum(x, 2)) + randn(100)
+    x = randn(n, p)
+    β = [1:p]
+    y = x * β + randn(n)
 
-# First batch accuracy
-obj = OnlineLinearModel(x, y)
-glm = lm([ones(100) x], y)
-for i in 2:11
-    @test_approx_eq(coef(obj)[i], coef(glm)[i])
+    # First batch accuracy
+    obj = LinReg(x, y)
+    glm = lm([ones(n) x], y)
+    @fact coef(obj) => roughly(coef(glm))
 end
 
-
-# Convergence
-for i in 1:1000
-    x = randn(100, 10)
-    y = vec(sum(x, 2)) + randn(100)
-
-    update!(obj, x, y)
-end
-
-for i in 2:11
-    @test_approx_eq_eps(coef(obj)[i], 1, .01)
-end
-@test_approx_eq_eps(coef(obj)[1], 0, .01)
-@test_approx_eq_eps(mse(obj), 1, .01)
-
+end # module
