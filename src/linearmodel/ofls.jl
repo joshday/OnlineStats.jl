@@ -10,19 +10,19 @@
 
 
 # TODO: allow for time-varying Vω???
-#  to accomplish... lets represent Vω as a vector of Var's (i.e. the diagonal of Vω)
+#  to accomplish... lets represent Vω as a vector of Variance's (i.e. the diagonal of Vω)
 
-# TODO: track Var of y/x's, and normalize/denormalize before update
+# TODO: track Variance of y/x's, and normalize/denormalize before update
 
 #-------------------------------------------------------# Type and Constructors
 
 type OnlineFLS <: OnlineStat
 	p::Int  		# number of independent vars
 	Vω::MatF    # pxp (const) covariance matrix of Δβₜ
-	# Vω::Vector{Var}
-	Vε::Var     # variance of error term... use exponential weighting with δ as the weight param
-	yvar::Var   # used for normalization
-	xvars::Vector{Var}  # used for normalization
+	# Vω::Vector{Variance}
+	Vε::Variance     # variance of error term... use exponential weighting with δ as the weight param
+	yvar::Variance   # used for normalization
+	xvars::Vector{Variance}  # used for normalization
 
 	n::Int
 	β::VecF 		# the current estimate in: yₜ = Xₜβₜ + εₜ
@@ -40,13 +40,10 @@ type OnlineFLS <: OnlineStat
 		@assert δ > 0. && δ <= 1.
 		μ = (1. - δ) / δ
 		Vω = eye(p) / μ
-		# println("μ = ", μ)
-		# println("Vω:\n", Vω)
-
-		# wgt = ExponentialWeighting(δ)
-		Vε = Var(wgt)
-		yvar = Var(wgt)
-		xvars = Var[Var(wgt) for i in 1:p]
+		Vε = Variance(wgt)
+		
+		yvar = Variance(wgt)
+		xvars = [Variance(wgt) for i in 1:p]
 		
 		# create and init the object
 		o = new(p, Vω, Vε, yvar, xvars)
@@ -72,20 +69,28 @@ end
 
 #-----------------------------------------------------------------------# state
 
-statenames(o::OnlineFLS) = [:β, :σy, :σx, :σε, :yhat, :nobs]
-state(o::OnlineFLS) = Any[β(o), sqrt(var(o.yvar)), sqrt(map(var,o.xvars)), sqrt(var(o.Vε)), o.yhat, nobs(o)]
+statenames(o::OnlineFLS) = [:β, :yvar, :xvars, :σε, :yhat, :nobs]
+state(o::OnlineFLS) = Any[β(o), o.yvar, o.xvars, std(o.Vε), o.yhat, nobs(o)]
 
 β(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
 
 #---------------------------------------------------------------------# update!
 
-if0then1(x::Float64) = (x == 0. ? 1. : x)
 
-normalize_y(o::OnlineFLS, y::Float64) = (y - mean(o.yvar)) / if0then1(var(o.yvar))
-normalize_x(o::OnlineFLS, x::VecF) = (x - map(mean, o.xvars)) ./ map(x->if0then1(var(x)), o.xvars)
-denormalize_y(o::OnlineFLS, y::Float64) = y * var(o.yvar) + mean(o.yvar)
-denormalize_x(o::OnlineFLS, x::VecF) = x .* map(var, o.xvars) + map(mean, o.xvars)
+# sqrt_var(x) = sqrt(var(x))
+
+# normalize_y(o::OnlineFLS, y::Float64) = (y - mean(o.yvar)) / if0then1(sqrt_var(o.yvar))
+# denormalize_y(o::OnlineFLS, y::Float64) = y * sqrt_var(o.yvar) + mean(o.yvar)
+
+# normalize_x(o::OnlineFLS, x::VecF) = (x - map(mean, o.xvars)) ./ map(xi->if0then1(sqrt_var(xi)), o.xvars)
+# denormalize_x(o::OnlineFLS, x::VecF) = x .* map(sqrt_var, o.xvars) + map(mean, o.xvars)
+
+# center_y(o::OnlineFLS, y::Float64) = y - mean(o.yvar)
+# uncenter_y(o::OnlineFLS, y::Float64) = y + mean(o.yvar)
+
+# center_x(o::OnlineFLS, x::VecF) = x - map(mean, o.xvars)
+# uncenter_x(o::OnlineFLS, x::VecF) = x + map(mean, o.xvars)
 
 
 # NOTE: assumes X mat is (T x p), where T is the number of observations
@@ -99,18 +104,9 @@ end
 
 function update!(o::OnlineFLS, y::Float64, x::VecF)
 
-	# update x/y vars and normalize
-	# @LOG y x
-	# @LOG o.yvar o.xvars
-	update!(o.yvar, y)
-	for (i,xi) in enumerate(x)
-		update!(o.xvars[i], xi)
-	end
-	# @LOG o.yvar o.xvars
-
-	y = normalize_y(o, y)
-	x = normalize_x(o, x)
-	# @LOG y x
+	# normalize y and x
+	y = normalize!(o.yvar, y)
+	x = normalize!(o.xvars, x)
 
 	# calc error and update error variance
 	yhat = dot(x, o.β)
@@ -132,10 +128,11 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	# update β
 	o.β += o.K * ε
 
-	@LOG o.β
+	# @LOG o.β
 
-	# finish
-	o.yhat = denormalize_y(o, yhat)
+	# save the denormalized estimate of y
+	o.yhat = denormalize(o.yvar, yhat)
+
 	o.n += 1
 	return
 
@@ -148,9 +145,7 @@ function Base.empty!(o::OnlineFLS)
 	o.n = 0
 	o.β = zeros(p)
 
-	# since Rₜ = Pₜ₋₁ + Vω, and P₀⁻¹ ≃ 0ₚ, lets initialize R with a big number along the diagonals
-	# o.R = zeros(p,p)
-	# o.R = eye(p)
+	# since Rₜ = Pₜ₋₁ + Vω, initialize with Vω
 	o.R = copy(o.Vω)
 	
 	o.q = 0.
@@ -177,7 +172,7 @@ end
 
 # predicts yₜ for a given xₜ
 function StatsBase.predict(o::OnlineFLS, x::VecF)
-	yhat = denormalize_y(o, dot(o.β, normalize_x(o, x)))
+	denormalize(o.yvar, dot(o.β, normalize(o.xvars, x)))
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix

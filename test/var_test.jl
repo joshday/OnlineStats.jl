@@ -56,9 +56,10 @@ facts("Variance") do
     end
 
     context("Variances") do
-        n, p = rand(1:1_000_000, 2)
+        n = rand(1:1_000_000)
+        p = rand(2:100)
         x1 = rand(n, p)
-        o = Variance(x1)
+        o = Variances(x1)
         @fact statenames(o) => [:μ, :σ², :nobs]
         @fact state(o) => Any[mean(o), var(o), nobs(o)]
         @fact var(o) => roughly(vec(var(x1, 1)), )
