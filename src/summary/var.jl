@@ -25,6 +25,21 @@ state(o::Var) = Any[mean(o), var(o), nobs(o)]
 
 Base.mean(o::Var) = o.μ
 Base.var(o::Var) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
+Base.std(o::Var) = sqrt(var(o))
+
+#-----------------------------------------------------------------------# normalize
+
+if0then1(x::Float64) = (x == 0. ? 1. : x)
+
+normalize(o::Var, y::Float64) = (y - mean(o)) / if0then1(std(o))
+denormalize(o::Var, y::Float64) = y * std(o) + mean(o)
+
+function normalize!(o::Var, y::Float64)
+    update!(o, y)
+    normalize(o, y)
+end
+
+normalize!(os::Vector{Var}, y::VecF) = map(normalize!, os, y)
 
 #---------------------------------------------------------------------# update!
 

@@ -46,14 +46,6 @@ end
 
 # default to INFO
 macro LOG(symbols...)
-	# s1 = eval(symbols[1])
-	# local sev
-	# if isa(s1, LogSeverity)
-	# 	sev = s1
-	# 	symbols = symbols[2:end]
-	# else 
-	# end
-
 	sev = INFO
 	if sev < log_severity()
 		return

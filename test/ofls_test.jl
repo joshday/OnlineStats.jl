@@ -35,8 +35,8 @@ function dofls_checks()
 		@fact size(df,1) => n
 
 		context("check final σx") do
-			for sxi in df[:σx][end]
-				@fact abs(sxi/σx-1)  => less_than(0.2)
+			for sxi in df[:xvars][end]
+				@fact abs(std(sxi)/σx-1)  => less_than(0.2)
 			end
 		end
 

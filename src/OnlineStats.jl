@@ -80,7 +80,7 @@ export
 # Source files
 #-----------------------------------------------------------------------------#
 
-# include("log.jl")
+include("log.jl")
 
 # Abstract Types
 include("types.jl")
@@ -123,7 +123,7 @@ include("linearmodel/sweep.jl")
 # include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
-# include("linearmodel/ofls.jl")
+include("linearmodel/ofls.jl")
 
 # GLM
 # include("glm/logisticregsgd.jl")
