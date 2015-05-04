@@ -36,12 +36,20 @@ function dofls_checks()
 
 		context("check final σx") do
 			for sxi in df[:xvars][end]
-				@fact abs(std(sxi)/σx-1)  => less_than(0.2)
+				@fact std(sxi) => roughly(σx, rtol=0.2)
+				# @fact abs(std(sxi)/σx-1)  => less_than(0.2)
 			end
 		end
 
 		r2 = 1 - var(y-OnlineStats.getnice(df,:yhat)) / var(y)
 		@fact r2 => greater_than(0.8)
+
+		βhat = OnlineStats.getnice(df, :β)[end,:]
+		context("check β") do
+			for i in 1:p
+				@fact β[end,i] => roughly(βhat[i], rtol=0.3)
+			end
+		end
 
 		# endsz = 20
 		# rng = n-endsz+1:n
@@ -62,6 +70,7 @@ function ofls_test()
 
 		# ***
 
+		sev = OnlineStats.log_severity()
 		OnlineStats.log_severity(OnlineStats.ERROR)  # turn off most logging
 
 		df = dofls(p,y,X)
@@ -80,6 +89,9 @@ function ofls_test()
 		# # do a plot of y vs yhat (need to change this to match your plotting package...
 		# # I have a custom plotting package that is not currently open source, but may be eventually)
 		# plot([y OnlineStats.getnice(df, :yhat)])
+
+		# put logging back the way it was
+		OnlineStats.log_severity(sev)
 
 	end
 
