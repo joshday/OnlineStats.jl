@@ -23,6 +23,10 @@ state(o::Mean) = Any[mean(o), nobs(o)]
 
 Base.mean(o::Mean) = o.μ
 
+center(o::Mean, y::Float64) = y - mean(o)
+center!(o::Mean, y::Float64) = (update!(o, y); center(o, y))
+uncenter(o::Mean, y::Float64) = y + mean(o)
+
 #---------------------------------------------------------------------# update!
 
 function update!(o::Mean, y::Float64)

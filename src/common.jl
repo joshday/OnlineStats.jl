@@ -13,6 +13,13 @@ function Base.merge(o1::OnlineStat, o2::OnlineStat)
 end
 
 
+
+row(M::MatF, i::Int) = vec(M[i,:])
+col(M::MatF, i::Int) = M[:,i]
+row!(M::MatF, i::Int, v::VecF) = (M[i,:] = v)
+col!(M::MatF, i::Int, v::VecF) = (M[:,i] = v)
+
+
 #------------------------------------------------------------------------# Show
 # temporary fix for the "how to print" problem... lets come up with something nicer
 mystring(f::Float64) = @sprintf("%f", f)
