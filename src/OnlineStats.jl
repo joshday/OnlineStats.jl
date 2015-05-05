@@ -22,7 +22,7 @@ import Distributions:
 import DataFrames: DataFrame, names!
 import DataArrays
 import DataArrays: DataArray
-import Base: copy, merge, merge!, show, quantile
+import Base: copy, merge, merge!, show, quantile, maximum, minimum
 import Clustering  # kmeans for starting values of NormalMix
 import StatsBase
 import StatsBase: nobs, skewness, kurtosis, mode, modes, coef
@@ -109,7 +109,7 @@ include("summary/summary.jl")
 include("summary/moments.jl")
 include("summary/quantilesgd.jl")
 include("summary/quantilemm.jl")
-# include("summary/fivenumber.jl")
+include("summary/fivenumber.jl")
 
 # Multivariate
 include("multivariate/covmatrix.jl")

@@ -1,39 +1,42 @@
 #-------------------------------------------------------# Type and Constructors
-type FiveNumberSummary <: ScalarStat
-    min::Float64
-    quantile::QuantileSGD
-    max::Float64
+type FiveNumberSummary <: OnlineStat
+    extrema::Extrema
+    quantiles::QuantileSGD
     n::Int64
-    nb::Int64
 end
 
-function FiveNumberSummary(y::Vector; r = .7)
-    FiveNumberSummary(minimum(y), QuantileSGD(y, r = r), maximum(y),
-                      length(y), 1)
-end
+# function FiveNumberSummary(y::Vector; r = .7)
+#     FiveNumberSummary(minimum(y), QuantileSGD(y, r = r), maximum(y),
+#                       length(y), 1)
+# end
 
-FiveNumberSummary(y::Real; r = .7) = FiveNumberSummary([y], r)
+function FiveNumberSummary(wgt::StochasticWeighting = StochasticWeighting();
+                           start = zeros(3))
+    FiveNumberSummary(Extrema(), QuantileSGD(wgt, start = start), 0)
+end
 
 
 #-----------------------------------------------------------------------# state
-state_names(obj::FiveNumberSummary) = [:min, :q1, :median, :q3, :max]
+statenames(o::FiveNumberSummary) = [:min, :q1, :median, :q3, :max, :nobs]
+state(o::FiveNumberSummary) = [minimum(o); copy(o.quantiles.q); maximum(o); nobs(o)]
 
-state(obj::FiveNumberSummary) = [obj.min; copy(obj.quantile.est); obj.max]
+minimum(o::FiveNumberSummary) = minimum(o.extrema)
+maximum(o::FiveNumberSummary) = maximum(o.extrema)
+
 
 
 #---------------------------------------------------------------------# update!
-function update!(obj::FiveNumberSummary, y::Vector)
-    n2 = length(y)
-    update!(obj.quantile, y)
-    obj.min = minimum([obj.min, y])
-    obj.max = maximum([obj.max, y])
-    obj.n += n2
-    obj.nb += 1
+function update!(o::FiveNumberSummary, y::Float64)
+    update!(o.extrema, y)
+    update!(o.quantiles, y)
+    o.n += 1
+    return
 end
 
-update(obj::FiveNumberSummary, x::Real) = update!(obj, [x])
+function updatebatch!(o::FiveNumberSummary, y::VecF)
+    updatebatch!(o.extrema, y)
+    updatebatch!(o.quantiles, y)
+    o.n += length(y)
+    return
+end
 
-
-#----------------------------------------------------------------------# Base
-Base.copy(obj::FiveNumberSummary) = FiveNumberSummary(obj.min, obj.quantile,
-                                                      obj.max, obj.n, obj.nb)

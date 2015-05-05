@@ -1,4 +1,3 @@
-# The best approach is to use start = em()
 #-------------------------------------------------------# Type and Constructors
 type NormalMix <: DistributionStat
     d::MixtureModel{Univariate, Continuous, Normal}    # MixtureModel
@@ -46,7 +45,6 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
     π = probs(o)
     γ = weight(o)
 
-
     w::MatF = zeros(n, nc)
     for j = 1:nc, i = 1:n
         @inbounds w[i, j] = π[j] * pdf(components(o)[j], y[i])
@@ -58,18 +56,6 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
     smooth!(o.s1, s1, γ)
     smooth!(o.s2, s2, γ)
     smooth!(o.s3, s3, γ)
-
-
-#     w::VecF = zeros(n)
-#     for j in 1:nc
-#             w[i] = π[j] * pdf(components(o)[j], y[i])
-
-#         w ./ sum(w)
-#         o.s1[j] = smooth(o.s1[j], sum(w), γ)
-#         o.s2[j] = smooth(o.s2[j], sum(w .* y) , γ)
-#         o.s3[j] = smooth(o.s3[j], sum(w .* y .^ 2), γ)
-#     end
-
 
     π = o.s1
     π ./= sum(π)

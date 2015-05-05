@@ -16,6 +16,9 @@ Extrema() = Extrema(-Inf, Inf, 0)
 statenames(o::Extrema) = [:max, :min, :nobs]
 state(o::Extrema) = Any[maximum(o), minimum(o), nobs(o)]
 
+maximum(o::Extrema) = o.max
+minimum(o::Extrema) = o.min
+
 
 #--------------------------------------------------------------------# update!
 function update!(o::Extrema, y::Float64)
@@ -24,13 +27,13 @@ function update!(o::Extrema, y::Float64)
     o.n += 1
 end
 
+function updatebatch!(o::Extrema, y::VecF)
+    o.max = max(o.max, maximum(y))
+    o.min = min(o.min, minimum(y))
+    o.n += length(y)
+end
+
 #----------------------------------------------------------------------# Base
-Base.maximum(o::Extrema) = return o.max
-
-Base.minimum(o::Extrema) = return o.min
-
-Base.copy(o::Extrema) = Extrema(o.max, o.min, o.n)
-
 function Base.merge!(a::Extrema, b::Extrema)
     a.max = max(a.max, b.max)
     a.min = min(a.min, b.min)

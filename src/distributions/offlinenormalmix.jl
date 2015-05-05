@@ -90,8 +90,7 @@ end
 
 
 #-------------------------------------------------------------------------# cdf
-function cdf{T<:Real}(
-        o::MixtureModel{Univariate, Continuous}, x::T)
+function cdf(o::MixtureModel{Univariate, Continuous, Normal}, x::Float64)
     π = probs(o)
     result = 0.0
     for j in 1:length(π)
