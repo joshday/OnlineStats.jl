@@ -62,7 +62,9 @@ facts("Variance") do
         o = Variances(x1)
         @fact statenames(o) => [:μ, :σ², :nobs]
         @fact state(o) => Any[mean(o), var(o), nobs(o)]
-        @fact var(o) => roughly(vec(var(x1, 1)), )
+        @fact var(o) => roughly(vec(var(x1, 1)), 1e-8)
+        @fact mean(o) => roughly(vec(mean(x1, 1)))
+        @fact std(o) => roughly(vec(std(x1, 1)), 1e-8)
     end
 
 end # facts

@@ -10,7 +10,7 @@ import Distributions:
     MvNormal, Normal, MixtureModel,
 
     # Other
-    fit_dirichlet!,
+    fit_dirichlet!, Univariate, Continuous,
 
     # Methods for DistributionStat
     pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
@@ -23,6 +23,7 @@ import DataFrames: DataFrame, names!
 import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
+import Clustering  # kmeans for starting values of NormalMix
 import StatsBase
 import StatsBase: nobs, skewness, kurtosis, mode, modes, coef
 
@@ -53,6 +54,8 @@ export
     Means,
     Variances,
 
+    NormalMix,
+
     FitBernoulli,
     FitBeta,
     FitBinomial,
@@ -65,7 +68,7 @@ export
 
     OnlineFLS,
     LinReg,
-    FastLM,
+    LinRegSGD,
 
     # functions
     nobs,
@@ -121,14 +124,12 @@ include("distributions/gamma.jl")
 include("distributions/multinomial.jl")
 include("distributions/mvnormal.jl")
 include("distributions/normal.jl")
-
-# Density Estimation
-# include("densityestimation/offlinenormalmix.jl")
-# include("densityestimation/normalmix.jl")
+include("distributions/offlinenormalmix.jl")
+include("distributions/normalmix.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-include("linearmodel/fastlm.jl")
+include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")

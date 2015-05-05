@@ -49,6 +49,14 @@ function update!(o::Variances, y::MatF)
     return
 end
 
+function standardize!(o::Variances, y::VecF)
+    update!(o, y)
+    ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
+end
+
+function standardize(o::Variances, y::VecF)
+    ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
+end
 
 #------------------------------------------------------------------------# Base
 function Base.empty!(o::Variances)

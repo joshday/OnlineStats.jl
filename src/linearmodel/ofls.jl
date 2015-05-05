@@ -41,9 +41,10 @@ type OnlineFLS <: OnlineStat
 		Vω = eye(p) / μ
 
 		Vε = Variance(wgt)
+
 		yvar = Variance(wgt)
 		xvars = [Variance(wgt) for i in 1:p]
-		
+
 		# create and init the object
 		o = new(p, Vω, Vε, yvar, xvars)
 		empty!(o)
@@ -99,7 +100,7 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	yhat = dot(x, o.β)
 	ε = y - yhat
 	update!(o.Vε, ε)
-	
+
 	# update sufficient stats to get the Kalman gain
 	o.R += o.Vω - (o.q * o.K) * o.K'
 	Rx = o.R * x
@@ -134,7 +135,7 @@ function Base.empty!(o::OnlineFLS)
 
 	# since Rₜ = Pₜ₋₁ + Vω, initialize with Vω
 	o.R = copy(o.Vω)
-	
+
 	o.q = 0.
 	o.K = zeros(p)
 	o.yhat = 0.
