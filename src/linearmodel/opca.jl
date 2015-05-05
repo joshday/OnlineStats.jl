@@ -65,11 +65,11 @@ function update!(o::OnlinePCA, x::VecF)
 			# update the ith principal component
 			# remember... o.e[i] == norm(o.V[:,i])
 			# Vi = o.V[:,i]
-			Vi = row(o.V, i) * o.e[i]
+			Vi = row(o.V, i)
 			smooth!(Vi, u * (dot(u, Vi) / o.e[i]), λ)
 			o.e[i] = norm(Vi)
 			# o.V[:,i] = Vi
-			row!(o.V, i, Vi / o.e[i])
+			row!(o.V, i, Vi)
 
 			# TODO: which is the correct loading... Vi or Vi/ei???
 
