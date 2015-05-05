@@ -15,6 +15,7 @@ using FactCheck
 # @time include("quantregsgd_test.jl")
 
 @time include("distribution_test.jl")
+@time include("normalmix_test.jl")
 
 @time include("covmatrix_test.jl")
 

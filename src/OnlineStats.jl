@@ -23,6 +23,7 @@ import DataFrames: DataFrame, names!
 import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile
+import Clustering  # kmeans for starting values of NormalMix
 import StatsBase
 import StatsBase: nobs, skewness, kurtosis, mode, modes, coef
 
@@ -52,6 +53,8 @@ export
     CovarianceMatrix,
     Means,
     Variances,
+
+    NormalMix,
 
     FitBernoulli,
     FitBeta,
@@ -121,10 +124,8 @@ include("distributions/gamma.jl")
 include("distributions/multinomial.jl")
 include("distributions/mvnormal.jl")
 include("distributions/normal.jl")
-
-# Density Estimation
-include("densityestimation/offlinenormalmix.jl")
-# include("densityestimation/normalmix.jl")
+include("distributions/offlinenormalmix.jl")
+include("distributions/normalmix.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
