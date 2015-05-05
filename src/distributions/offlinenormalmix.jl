@@ -7,9 +7,31 @@ function stds(m::MixtureModel{Univariate, Continuous, Normal})
     map(std, components(m))
 end
 
+
+#---------------------------------------------------------------------# emstart
+function emstart(p::Int, y::VecF;
+                 algorithm::Symbol = :kmeans, verbose = false, tol = 1e-6, maxit = 100)
+    if algorithm == :naive
+        μ = quantile(y, [1:p] / (p + 1))
+        σ = fill(std(y) / sqrt(p), p)
+        π = ones(p) / p
+    elseif algorithm == :kmeans
+        clust = Clustering.kmeans(y', p)
+        μ = vec(clust.centers)
+        σ = fill(std(y) / sqrt(p), p)
+#         π = clust.counts / sum(clust.counts)
+        π = ones(p) / p
+    else
+        error("$algorithm is not recognized.  Choose :kmeans or :naive")
+    end
+    m = MixtureModel(map((u,v) -> Normal(u, v), μ, σ), π)
+    m = em(m, y, tol = tol, maxit = maxit, verbose = verbose)
+end
+
+
 #--------------------------------------------------------------------------# em
 function em(o::MixtureModel{Univariate, Continuous, Normal}, y::VecF;
-            tol::Float64 = 1e-5,
+            tol::Float64 = 1e-6,
             maxit::Int = 100,
             verbose::Bool = false)
 
@@ -81,11 +103,14 @@ end
 
 
 # Testing
-# trueModel = MixtureModel(Normal, [(0, 1), (3, 2), (10, 5)], [.2, .3, .5])
-# x = rand(trueModel, 10000)
+if false
+    trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.5, .5])
+    x = rand(trueModel, 10000)
 
-# myfit = MixtureModel(Normal, [(0, 1), (2, 1), (4, 1)])
-# @time myfit = OnlineStats.em(myfit, x, tol=1e-5, maxit=500, verbose=true)
-# Gadfly.plot(fit, x)
-# Gadfly.plot(fit, -5, 25)
+    @time myfit1 = OnlineStats.emstart(2, x, algorithm = :naive, tol = 1e-10)
+    @time myfit2 = OnlineStats.emstart(2, x, algorithm = :kmeans, tol = 1e-10)
 
+    include("src/plotmethods.jl")
+    Gadfly.plot(myfit, x)
+    Gadfly.plot(myfit, -5, 25)
+end
