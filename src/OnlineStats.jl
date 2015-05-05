@@ -134,6 +134,7 @@ include("linearmodel/linreg.jl")
 # include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
 include("linearmodel/ofls.jl")
+include("linearmodel/opca.jl")
 
 # GLM
 # include("glm/logisticregsgd.jl")

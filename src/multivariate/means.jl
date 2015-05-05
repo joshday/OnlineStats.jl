@@ -27,6 +27,11 @@ state(o::Means) = Any[mean(o), nobs(o)]
 
 Base.mean(o::Means) = o.μ
 
+
+center(o::Means, y::VecF) = y - mean(o)
+center!(o::Means, y::VecF) = (update!(o, y); center(o, y))
+uncenter(o::Means, y::VecF) = y + mean(o)
+
 #---------------------------------------------------------------------# update!
 function update!(o::Means, y::VecF)
     o.μ = smooth(o.μ, y, weight(o))

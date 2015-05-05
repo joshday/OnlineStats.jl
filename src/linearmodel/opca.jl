@@ -4,18 +4,40 @@
 
 type OnlinePCA{W<:Weighting} <: OnlineStat
 
-	V::MatF  # (k x d) pca loading matrix... eigvecs of cov (note: V[:,i] = v[:,i] / norm(V[:,i]))
-	e::VecF	 # (k x 1) eigenvalues  (note: ith eigval ==  norm(V[:,i]))
 	d::Int  # number of input vars
   k::Int  # number of principal components
-  n::Int
   weighting::W
-  μs::Means{W}
+  n::Int
 
+	V::MatF  # (k x d) pca loading matrix... eigvecs of cov (note: V[:,i] = v[:,i] / norm(V[:,i]))
+	e::VecF	 # (k x 1) eigenvalues  (note: ith eigval ==  norm(V[:,i]))
+  μs::Means{W}
+ end
+
+function OnlinePCA(d::Int, k::Int, wgt::Weighting = default(Weighting))
+	OnlinePCA(d, k, wgt, 0, zeros(k,d), zeros(k), Means(d, wgt))
+end
+
+
+function OnlinePCA(x::VecF, k::Int, wgt::Weighting = default(Weighting))
+	o = OnlinePCA(length(x), k, wgt)
+	update!(o, x)
+	o
+end
+
+function OnlinePCA(X::MatF, k::Int, wgt::Weighting = default(Weighting))
+	o = OnlinePCA(size(X,2), k, wgt)
+	update!(o, X)
+	o
 end
 
 
 
+#-----------------------------------------------------------------------# state
+
+# state vars: [normalizedBeta, rawBeta, Variance(y), Variance(x), std(ε), mostRecentEstimateOfY, nobs]
+statenames(o::OnlinePCA) = [:V, :e, :μs, :nobs]
+state(o::OnlinePCA) = Any[o.V, o.e, mean(o.μs), nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
@@ -26,9 +48,7 @@ end
 
 function update!(o::OnlinePCA, x::VecF)
 
-	update!(o.μs, x)
-	u = x - mean(o.μs)
-
+	u = center!(o.μs, x)
 	λ = weight(o)
 
 	for i in 1:min(o.k, o.n)
@@ -36,16 +56,20 @@ function update!(o::OnlinePCA, x::VecF)
 		if o.e[i] == 0. # this should be more robust than checking i == o.n
 
 			# initialize ith principal component
-			o.V[:,i] = u
+			# o.V[:,i] = u
+			row!(o.V, i, u)
+			o.e[i] = norm(row(o.V, i))
 
 		else
 
 			# update the ith principal component
 			# remember... o.e[i] == norm(o.V[:,i])
-			Vi = o.V[:,i]
+			# Vi = o.V[:,i]
+			Vi = row(o.V, i) * o.e[i]
 			smooth!(Vi, u * (dot(u, Vi) / o.e[i]), λ)
 			o.e[i] = norm(Vi)
-			o.V[:,i] = Vi
+			# o.V[:,i] = Vi
+			row!(o.V, i, Vi / o.e[i])
 
 			# TODO: which is the correct loading... Vi or Vi/ei???
 
@@ -66,6 +90,22 @@ function update!(o::OnlinePCA, X::MatF)
 	end
 end
 
+
+
+function Base.empty!(o::OnlinePCA)
+	o.V = zeros(o.k, o.d)
+	o.e = zeros(o.k)
+	o.n = 0
+	o.μs = Means(o.d, o.weighting)
+end
+
+function Base.merge!(o1::OnlinePCA, o2::OnlinePCA)
+	error("Merging undefined for PCA")
+end
+
+
+# returns a vector y = Vx
+StatsBase.predict(o::OnlinePCA, x::VecF) = o.V * center(o.μs, x)
 
 
 # ------------------------------------------------------------ unused
