@@ -78,7 +78,9 @@ export
     statenames,
     onlinefit,
     tracedata,
-    em, # offline EM algorithm for Normal mixture
+    em,
+    means,
+    stds,
     smooth,
     smooth!,
     weighting,

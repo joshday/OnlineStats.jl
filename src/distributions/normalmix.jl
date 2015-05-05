@@ -11,7 +11,7 @@ end
 
 
 function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting(),
-                   start = emstart(p, y, verbose = true))
+                   start = emstart(p, y, verbose = false))
     o = NormalMix(p, wgt, start)
     updatebatch!(o, y)
     o
@@ -28,24 +28,48 @@ function NormalMix(p::Int, wgt::StochasticWeighting = StochasticWeighting(),
 end
 
 
+#------------------------------------------------------------------------# state
+statenames(o::NormalMix) = [:μ, :σ, :π, :nobs]
+state(o::NormalMix) = Any[means(o), stds(o), probs(o), nobs(o)]
+
+means(o::NormalMix) = means(o.d)
+stds(o::NormalMix) = stds(o.d)
+
+components(o::NormalMix) = components(o.d)
+probs(o::NormalMix) = probs(o.d)
+
+
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::NormalMix, y::Vector{Float64})
     n = length(y)
     nc = length(components(o))
     π = probs(o)
+    γ = weight(o)
+
+
     w::MatF = zeros(n, nc)
-    for i = 1:n, j = 1:nc
-        w[i, j] = π[j] * pdf(o.d.components[j], y[i])
+    for j = 1:nc, i = 1:n
+        @inbounds w[i, j] = π[j] * pdf(components(o)[j], y[i])
     end
     w ./= sum(w, 2)
     s1 = vec(sum(w, 1))
     s2 = vec(sum(w .* y, 1))
     s3 = vec(sum(w .* y .* y, 1))
-
-    γ = weight(o)
     smooth!(o.s1, s1, γ)
     smooth!(o.s2, s2, γ)
     smooth!(o.s3, s3, γ)
+
+
+#     w::VecF = zeros(n)
+#     for j in 1:nc
+#             w[i] = π[j] * pdf(components(o)[j], y[i])
+
+#         w ./ sum(w)
+#         o.s1[j] = smooth(o.s1[j], sum(w), γ)
+#         o.s2[j] = smooth(o.s2[j], sum(w .* y) , γ)
+#         o.s3[j] = smooth(o.s3[j], sum(w .* y .^ 2), γ)
+#     end
+
 
     π = o.s1
     π ./= sum(π)
@@ -56,15 +80,31 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
     o.n += n
 end
 
+function update!(o::NormalMix, y::Float64)
+    γ = weight(o)
+    p = length(o.s1)
 
-#------------------------------------------------------------------------# state
-statenames(o::NormalMix) = [:μ, :σ, :π, :nobs]
-state(o::NormalMix) = Any[means(o), stds(o), probs(o), nobs(o)]
+    w::VecF = zeros(p)
+    for j in 1:p
+        w[j] = pdf(o.d.components[j], y)
+    end
+    w /= sum(w)
+    for j in 1:p
+        o.s1[j] = smooth(o.s1[j], w[j], γ)
+        o.s2[j] = smooth(o.s2[j], w[j] * y, γ)
+        o.s3[j] = smooth(o.s3[j], w[j] * y * y, γ)
+    end
 
-means(o::NormalMix) = means(o.d)
-stds(o::NormalMix) = stds(o.d)
+    π = o.s1
+    π ./= sum(π)
+    μ = o.s2 ./ o.s1
+    σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
 
-components(o::NormalMix) = components(o.d)
-probs(o::NormalMix) = probs(o.d)
+    o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
+    o.n += 1
+end
+
+
+
 
 

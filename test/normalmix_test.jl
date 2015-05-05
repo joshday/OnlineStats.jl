@@ -5,7 +5,7 @@ using Distributions
 using FactCheck
 
 facts("NormalMix") do
-    context("Offline ") do
+    context("Offline: emstart() and em()") do
         n = 10_000
         trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.5, .5])
         x = rand(trueModel, n)
@@ -13,10 +13,48 @@ facts("NormalMix") do
         myfit2 = OnlineStats.emstart(2, x, algorithm = :kmeans, tol = 1e-10)
         @fact probs(myfit1) => roughly([.5, .5], .05)
         @fact probs(myfit2) => roughly([.5, .5], .05)
+        diff = sort(means(myfit1)) - sort(means(myfit2))
+        @fact diff => roughly(zeros(2), .001)
+        diff = sort(stds(myfit1)) - sort(stds(myfit2))
+        @fact diff => roughly(zeros(2), .001)
+        @fact sort(means(myfit1)) => roughly([0., 10.], atol = .5)
+        @fact sort(means(myfit2)) => roughly([0., 10.], atol = .5)
     end
 
-    context("Online ") do
-        # TODO
+    context("Online: updatebatch!") do
+        n = 100_000
+        trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
+        x = rand(trueModel, n)
+        rng = 1:100
+        o = NormalMix(2, x[rng], StochasticWeighting(.8))
+        while maximum(rng) + 100 <= n
+            rng += 100
+            updatebatch!(o, x[rng])
+        end
+        @fact sort(means(o)) => roughly([0., 10.], .1)
+        @fact sort(stds(o)) => roughly([1., 5.], .1)
+        @fact sort(probs(o)) => roughly([.3, .7], .1)
+        @fact statenames(o) => [:μ, :σ, :π, :nobs]
+        @fact state(o) => Any[means(o), stds(o), probs(o), nobs(o)]
+    end
+
+    context("Online: update!") do
+        n = 100_000
+        trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
+        x = rand(trueModel, n)
+        rng = 1:100
+        o = NormalMix(2, x[rng], StochasticWeighting(1.))
+        i = 101
+        while i <= n
+            update!(o, x[i])
+            i += 1
+        end
+        @fact sort(means(o)) => roughly([0., 10.], 2) "weak test"
+        @fact sort(stds(o)) => roughly([1., 5.], 2) "weak test"
+        @fact sort(probs(o)) => roughly([.3, .7], .1)
+        @fact statenames(o) => [:μ, :σ, :π, :nobs]
+        @fact state(o) => Any[means(o), stds(o), probs(o), nobs(o)]
+        o = NormalMix(2, x[rng], StochasticWeighting(.8))
     end
 end
 
