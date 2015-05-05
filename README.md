@@ -11,6 +11,7 @@ Online algorithms for statistics.  See [Examples](doc/examples) and [Implementat
 A simplified `OnlineStats` type structure:
 
 ```julia
+
 type OnlineStatistic
 	estimate         # current estimate
 	sufficient_stat  # values needed to update estimate
@@ -21,14 +22,23 @@ end
 
 ## Exported functions
 
-| Function Name     |   Return Value                                     |
-|-------------------|----------------------------------------------------|
-| `state(obj)`      | vector of current estimates                        |
-| `statenames(obj)` | corresponding names to `state(obj)`                |
-| `update!(obj, y)` | update estimates in `obj` with data `y`            |
-| `nobs(obj)`       | number of observations                             |
-| `DataFrame(obj)`  | construct a `DataFrame` from `obj`                 |
-| `push!(df, obj)`  | add new row(s) to `df` with current state of `obj` |
+- `state(o)`
+	- return vector of current estimates
+- `statenames(o)` 
+	- return corresponding names to `state(o)`
+- `update!(o, y)`
+	- update estimate in `o` using data `y` with weighting scheme defined by `o.weighting` 
+	- Observations are weighted in order of appearance
+- `updatebatch!(o, y)`
+	- update estimate in `o` using data `y` with weighting scheme defined by 	`o.weighting` 
+	- Each observation gets equal weight
+- `nobs(o)`
+	- return the number of observations 
+- `DataFrame(o)`
+	- construct a `DataFrame` from `o` with column names `statenames(o)` and values `state(o)`
+- `push!(df, o)` 
+	- add `state(o)` to a new row of `df` 
+
 
 
 
