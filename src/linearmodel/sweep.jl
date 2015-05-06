@@ -1,4 +1,7 @@
-export sweep!
+"""
+Symmetric sweep of matrix A.  Only the lower triangular part is read and swept.
+"""
+:sweep!
 
 
 function sweep!(A::Matrix{Float64}, k::Int, inv::Bool=false)
@@ -48,6 +51,4 @@ function sweep!(A::Matrix{Float64}, S::Vector{Int}, inv::Bool=false)
     return A
 end
 
-@doc """
-Symmetric sweep of matrix A.  Only the lower triangular part is read and swept.
-""" -> sweep!
+
