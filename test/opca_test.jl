@@ -12,16 +12,14 @@ function getsampledata(; n = 1000, d = 50, k = 10, σx = 0.3, σpc = 1.0)
 	# "true" loading matrix
 	V = rand(k, d)
 
-	# random series for k principal components
-	PC = (rand(k) * σpc)' .* randn(n,k)
-	# PC = qr(PC)[1]  # do a qr factorization to ensure PC are orthogonal to each other
-	PC = svd(PC)[1]
+	# "true" values for k principal components
+	Z = (rand(k) * σpc)' .* randn(n,k)
+	Z = svd(Z)[1]  # ensure latent vectors are orthogonal
 
-	# generate series built from k principal components and errors
-	X = PC * V + σx * randn(n,d)
-	# e = σe * randn(n)		# errors
+	# generate sample X matrix built from k principal components and errors
+	X = Z * V + σx * randn(n,d)
 
-	n, d, k, σx, σpc, V, PC, X
+	n, d, k, σx, σpc, V, Z, X
 end
 
 function dopca(X, k)
@@ -32,7 +30,7 @@ end
 function dofls_checks()
 	context("fls_checks") do
 		σx = 2.0
-		n, d, k, σx, σpc, V, PC, X = getsampledata(σx = σx)
+		n, d, k, σx, σpc, V, Z, X = getsampledata(σx = σx)
 		df = dopca(X, k)
 		@fact size(df,1) => n
 
@@ -64,7 +62,7 @@ function opca_test()
 
 	facts("Test OnlinePCA") do
 
-		n, d, k, σx, σpc, V, PC, X = getsampledata()
+		n, d, k, σx, σpc, V, Z, X = getsampledata()
 
 		# @fact size(y) => (n,)
 		# @fact size(X) => (n,k)

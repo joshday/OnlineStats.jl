@@ -8,6 +8,9 @@
 #   δ close to 0 corresponds to large μ, which means the parameter vector β changes slowly
 #   δ close to 1 corresponds to small μ, which means the parameter vector β changes quickly
 
+# OnlineFLS: Thomas Breloff (Cointegrated Technologies)
+
+
 
 # TODO: allow for time-varying Vω???
 #  to accomplish... lets represent Vω as a vector of Variance's (i.e. the diagonal of Vω)
