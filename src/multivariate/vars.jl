@@ -31,6 +31,13 @@ Base.mean(o::Variances) = copy(o.μ)
 Base.var(o::Variances) = (n = nobs(o); (n < 2 ? zeros(length(o.μ)) : o.biasedvar * n / (n - 1)))
 Base.std(o::Variances) = sqrt(var(o))
 
+center(o::Variances, y::VecF) = y - mean(o)
+center!(o::Variances, y::VecF) = (update!(o, y); center(o, y))
+uncenter(o::Variances, y::VecF) = y + mean(o)
+
+standardize(o::Variances, y::VecF) = (y - mean(o)) ./ std(o)
+standardize!(o::Variances, y::VecF) = (update!(o, y); standardize(o, y))
+unstandardize(o::Variances, y::VecF) = y .* std(o) + mean(o)
 
 #---------------------------------------------------------------------# update!
 function update!(o::Variances, y::VecF)

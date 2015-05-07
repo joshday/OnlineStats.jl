@@ -1,86 +1,49 @@
-# Author(s): Josh Day <emailjoshday@gmail.com>
-
-export QuantRegSGD
-
-
-#-----------------------------------------------------------------------------#
-#-------------------------------------------------------------# OnlineQuantReg
-type QuantRegSGD <: MultivariateOnlineStat
-    β::Vector         # Coefficients
+#-------------------------------------------------------# Type and Constructors
+type QuantRegSGD{W <: Weighting} <: OnlineStat
+    β::VecF           # Coefficients
     τ::Float64        # Desired conditional quantile
-    r::Float64        # learning rate
-    intercept::Bool   # add intercept to model?
-    n::Int64          # Number of observations used
-    nb::Int64         # Number of batches used
+    n::Int            # Number of observations used
+    weighting::W
 end
 
-function QuantRegSGD(X::Matrix, y::Vector; τ = 0.5, r = 0.51,
-                           intercept::Bool = true)
-    if intercept
-        X = [ones(length(y)) X]
-    end
+function QuantRegSGD(p::Int, wgt::Weighting = StochasticWeighting();
+                     τ::Float64 = .5, start = zeros(p))
+    @assert τ > 0 && τ < 1
+    QuantRegSGD(start, τ, 0, wgt)
+end
+
+function QuantRegSGD(X::MatF, y::VecF, wgt::Weighting = StochasticWeighting();
+                     τ::Float64 = .5, start = zeros(size(X, 2)))
     n, p = size(X)
-
-    X = ((y .< 0) - τ) .* X
-    β = - vec(mean(X, 1))
-
-    QuantRegSGD(β, τ, r, intercept, n, 1)
-end
-
-function QuantRegSGD(X::Matrix, y::Vector, β::Vector; τ = 0.5, r = 0.51,
-                           intercept::Bool = true)
-    if intercept
-        X = [ones(length(y)) X]
-    end
-    n, p = size(X)
-
-    X = ((y .< X * β) - τ) .* X
-    β -= vec(mean(X, 1))
-
-    QuantRegSGD(β, τ, r, intercept, n, 1)
-end
-
-function QuantRegSGD(x::Vector, y::Vector; args...)
-    QuantRegSGD(reshape(x, length(x), 1), y; args...)
+    o = QuantRegSGD(p, wgt, τ = τ, start = start)
+    update!(o, X, y)
+    o
 end
 
 
-#-----------------------------------------------------------------------------#
-#---------------------------------------------------------------------# update!
-function update!(obj::QuantRegSGD, X::Matrix, y::Vector)
-    n, p = size(X)
-    if obj.intercept
-        X = [ones(length(y)) X]
-    end
-    γ = obj.nb ^ -obj.r
-
-    X = ((y .< X*obj.β) - obj.τ) .* X
-    obj.β -= γ * vec(mean(X, 1))
-
-    obj.n += n
-    obj.nb += 1
-end
-
-function update!(obj::QuantRegSGD, x::Vector, y::Vector)
-    update!(obj, reshape(x, length(x), 1), y)
-end
-
-
-#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::QuantRegSGD)
-    DataFrame(variable = [symbol("β$i") for i in [1:length(obj.β)] - obj.intercept],
-              value = obj.β,
-              r = obj.r,
-              n = nobs(obj))
+statenames(o::QuantRegSGD) = [:β, :τ, :nobs]
+state(o::QuantRegSGD) = Any[copy(o.β), o.τ, nobs(o)]
+
+coef(o::QuantRegSGD) = copy(o.β)
+
+
+#---------------------------------------------------------------------# update!
+function updatebatch!(o::QuantRegSGD, X::MatF, y::VecF)
+    n = length(y)
+    γ = weight(o)
+    o.β -= γ * vec(mean(((y .< X * o.β) - o.τ) .* X, 1))
+    o.n += n
 end
 
+function update!(o::QuantRegSGD, x::VecF, y::Float64)
+    γ = weight(o)
+    o.β -= γ * ((y < (x' * o.β)[1]) - o.τ) * x
+    o.n += 1
+end
 
-
-#-----------------------------------------------------------------------------#
-#------------------------------------------------------------------------# Base
-StatsBase.coef(obj::QuantRegSGD) = return obj.β
-
-function Base.show(io::IO, obj::QuantRegSGD)
-    println(io, "Online Quantile Regression (SGD Algorithm):\n", state(obj))
+function update!(o::QuantRegSGD, x::MatF, y::VecF)
+    for i in 1:length(y)
+        update!(o, vec(x[i, :]), y[i])
+    end
 end

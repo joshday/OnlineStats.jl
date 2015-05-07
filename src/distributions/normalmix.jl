@@ -28,9 +28,6 @@ end
 
 
 #------------------------------------------------------------------------# state
-statenames(o::NormalMix) = [:μ, :σ, :π, :nobs]
-state(o::NormalMix) = Any[means(o), stds(o), probs(o), nobs(o)]
-
 means(o::NormalMix) = means(o.d)
 stds(o::NormalMix) = stds(o.d)
 
@@ -65,6 +62,7 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += n
 end
+
 
 function update!(o::NormalMix, y::Float64)
     γ = weight(o)

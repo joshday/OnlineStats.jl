@@ -1,7 +1,7 @@
 module OnlineStats
 
-using Docile
-@document
+import Docile
+Docile.@document
 
 import Compat: @compat
 import Distributions:
@@ -55,7 +55,6 @@ export
     Variances,
 
     NormalMix,
-
     FitBernoulli,
     FitBeta,
     FitBinomial,
@@ -69,6 +68,8 @@ export
     OnlineFLS,
     LinReg,
     LinRegSGD,
+    QuantRegSGD,
+    QuantRegMM,
 
     # functions
     nobs,
@@ -144,8 +145,8 @@ include("linearmodel/opca.jl")
 # include("glm/logisticregsn.jl")
 
 # Quantile Regression
-# include("quantileregression/quantregsgd.jl")
-# include("quantileregression/quantregmm.jl")
+include("quantileregression/quantregsgd.jl")
+include("quantileregression/quantregmm.jl")
 
 
 
