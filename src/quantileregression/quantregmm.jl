@@ -61,16 +61,3 @@ function updatebatch!(o::QuantRegMM, X::MatF, y::VecF)
     o.β = o.XtWX \ o.Xu
     o.n += n
 end
-
-
-#######################
-#testing
-srand(100)
-x = rand(100,4); x_int = [ones(100) x]; y = vec(sum(x,2)) + randn(100)
-o = OnlineStats.QuantRegMM(x_int, y)
-
-for i in 1:1000
-    x = rand(100,4); x_int = [ones(100) x]; y = vec(sum(x,2)) + randn(100)
-    OnlineStats.updatebatch!(o, x_int, y)
-end
-o
