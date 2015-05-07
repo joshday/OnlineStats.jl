@@ -1,6 +1,10 @@
 
 
 using FactCheck
+
+# test for roughly equal with offline algorithm?
+# using MultivariateStats
+
 FactCheck.clear_results()  # TODO: remove
 
 
@@ -8,7 +12,7 @@ FactCheck.clear_results()  # TODO: remove
 
 
 function getsampledata(; n = 1000, d = 50, k = 10, σx = 0.3, σpc = 1.0)
-	
+
 	# "true" loading matrix
 	V = rand(k, d)
 

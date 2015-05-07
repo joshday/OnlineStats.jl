@@ -4,6 +4,7 @@ import Docile
 Docile.@document
 
 import Compat: @compat
+import MultivariateStats: fit, PCA
 import Distributions:
     # Distributions
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
