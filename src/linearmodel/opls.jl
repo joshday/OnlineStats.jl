@@ -5,11 +5,23 @@
 # implements an online partial least squares (OPLS) algorithm... modeled on Zeng et al (2014) [1]:
 #		"Incremental partial least squares analysis of big streaming data"
 
-# Method:
-# There are 2 phases... model update and beta extraction.
 
-# Model update is based on the goal of trying to maximize Cov(y, Xw) for some dx1 vector of weights w.
-# i.e. we're looking for a linear combination of the X-components which produces high covariance with y.
+
+# Goal: We're looking for a linear combination of the X-components which produces high covariance with y.
+# 			We then fit the reduced-dimension regression y = Zβ + e, where Z = XW has k columns of uncorrelated series.
+
+# Reason:  If X has high multicolinearity between components, there will likely be overfitting
+#					 problems for the model y = Xβ + e
+
+
+# Method:
+# There are 3 phases... model update, weight matrix extraction, and finally least squares fitting.
+
+
+# Model update: 
+
+# We are trying to maximize Cov(y, Xw) for some dx1 vector of weights w... 
+#	this will approximate the loadings for the first latent vector.
 # Taking the derivative of a Lagrange function gives us the solution w = Xᵀy / ‖Xᵀy‖
 # Our online model updates the estimate of v := Xᵀy, and also tracks the decomposition of X using OnlinePCA
 # in order to estimate the covariance matrix C := XᵀX/n, to reduce cpu/memory usage
@@ -21,12 +33,31 @@
 #			 = λyₜXₜ + ∑ᵗ⁻¹ [λ(1-λ)ᵗ⁻¹⁻ⁱyᵢXᵢ]
 #			 = λyₜXₜ + (1-λ)vₜ₋₁
 
+# Weight matrix building:
+
 # When the state is requested: "PLS projection directions are computed from a Gram-Schmidt orthonormalization
 # of the Krylov sequence" [1]
 # This gives us the weighting matrix W:
 #		W := [v, Cv\{v}, C²v\{v,Cv}, ... Cᴷ⁻¹v\{v,Cv,...,Cᴷ⁻²v}]
 
 # where "f/{g,h...} refers to the components of f that are orthogonal to the space spanned by {g,h,...}" [1]
+
+
+# Regression:
+
+# Now that we have our weight matrix W, we can project X into a reduced dimensional space, 
+#	and should get more robust regression results.
+#		Z = XW
+#		y = Zβ + e
+
+
+# Summary:
+# 	update v estimate
+#		update OnlinePCA estimate (V) of first l pca vectors
+#   build W matrix, and project Z = XW
+#		regress y = Zβ + e
+#		state = (v, V, W, β)
+
 
 #-------------------------------------------------------# Type and Constructors
 
@@ -35,6 +66,7 @@ type OnlinePLS <: OnlineStat
 	l::Int 				# num latent vars in OnlinePCA
 	k::Int 				# num latent vars in PLS
 
+	v::VecF				# (d x 1) vector -- estimate of first column of 
 
 	function OnlinePLS(p::Int, δ::Float64, wgt::Weighting = default(Weighting))
 	end
