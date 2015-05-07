@@ -38,7 +38,8 @@
 # When the state is requested: "PLS projection directions are computed from a Gram-Schmidt orthonormalization
 # of the Krylov sequence" [1]
 # This gives us the weighting matrix W:
-#		W := [v, Cv\{v}, C²v\{v,Cv}, ... Cᴷ⁻¹v\{v,Cv,...,Cᴷ⁻²v}]
+#		V := [v, Cv\{v}, C²v\{v,Cv}, ... Cᴷ⁻¹v\{v,Cv,...,Cᴷ⁻²v}]
+#		W := [V₁/‖V₁‖, ..., Vₖ/‖Vₖ‖]
 
 # where "f/{g,h...} refers to the components of f that are orthogonal to the space spanned by {g,h,...}" [1]
 
@@ -107,6 +108,36 @@ end
 
 function update!(o::OnlinePLS, y::Float64, x::VecF)
 
+	# update v1 and pca
+	smooth!(o.v1, y * x, weight(o))
+	update!(o.pca, x)
+
+	# recompute W
+	V = VecF[]
+	W = VecF[]
+	vi = copy(o.v1)
+	w = copy(o.v1)
+	for i in 1:o.k
+		if i > 1
+			# multiply Cw
+			nextw = zeros(o.d)
+			for j in 1:o.l
+				pcaUj = row(o.pca.U, j)  # dx1 vector
+				pcaVj = row(o.pca.V, j)	 # dx1 vector -- normalized -- eigenvector
+				nextw += pcaUj * dot(pcaVj, w) / o.n  # TODO:  I don't like this n here... doesn't make sense with exponential weighting... how to change??
+			end
+		end
+
+		# compute vi and add to V
+		vi = copy(w)
+		for j in 1:i-1
+			vi -= vi .* V[j] .* V[j]
+		end
+		push!(V, vi)
+
+		# add normalized vi to W
+		push!(W, vi / norm(vi))
+	end
 
 	o.n += 1
 	return
