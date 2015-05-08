@@ -100,7 +100,7 @@ function dopls_checks()
 	context("pls_checks") do
 
 		# note: this should be almost exact
-		testpls(σx = 0.0, k = 1)
+		testpls(σx = 0.0, k = 4)
 
 	end
 end

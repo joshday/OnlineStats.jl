@@ -62,26 +62,26 @@
 
 #-------------------------------------------------------# Type and Constructors
 
-type OnlinePLS{W} <: OnlineStat
+type OnlinePLS{W<:Weighting} <: OnlineStat
 	d::Int  			# num dependent vars
 	l::Int 				# num latent vars in OnlinePCA
 	k::Int 				# num latent vars in PLS
 	n::Int
-	wgt::W
+	weighting::W
 
 	ymean::Mean{W}
 	xmeans::Means{W}
 
 	v1::VecF				# (d x 1) vector -- estimate of first column of V
 	W::MatF 				# (d x k) matrix (see fls comment below)
-	pca::OnlinePCA  # tracks pca decomposition of X
+	pca::OnlinePCA{W}  # tracks pca decomposition of X
 	fls::OnlineFLS  # flexible least squares to solve for β: y = (XW)β + e
-
-	function OnlinePLS(d::Int, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
-		new(d, l, k, 0, wgt, Mean(wgt), Means(d, wgt), zeros(d), zeros(d, k), OnlinePCA(d, l, wgt), OnlineFLS(k, δ, wgt))
-	end
 end
 
+
+function OnlinePLS(d::Int, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+	OnlinePLS(d, l, k, 0, wgt, Mean(wgt), Means(d, wgt), zeros(d), zeros(d, k), OnlinePCA(d, l, wgt), OnlineFLS(k, δ, wgt))
+end
 
 function OnlinePLS(y::Float64, x::VecF, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
 	d = length(x)
