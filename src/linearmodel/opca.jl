@@ -27,7 +27,7 @@ type OnlinePCA{W<:Weighting} <: OnlineStat
 	U::MatF  # (k x d)
 	V::MatF  # (k x d)
 	e::VecF	 # (k x 1)
-  μs::Means{W}
+  xmeans::Means{W}
  end
 
 function OnlinePCA(d::Int, k::Int, wgt::Weighting = default(Weighting))
@@ -51,8 +51,8 @@ end
 
 #-----------------------------------------------------------------------# state
 
-statenames(o::OnlinePCA) = [:U, :V, :e, :μs, :nobs]
-state(o::OnlinePCA) = Any[o.U, o.V, o.e, mean(o.μs), nobs(o)]
+statenames(o::OnlinePCA) = [:U, :V, :e, :xmeans, :nobs]
+state(o::OnlinePCA) = Any[copy(o.U), copy(o.V), copy(o.e), copy(mean(o.xmeans)), nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
@@ -65,7 +65,7 @@ state(o::OnlinePCA) = Any[o.U, o.V, o.e, mean(o.μs), nobs(o)]
 
 function update!(o::OnlinePCA, x::VecF)
 
-	x = center!(o.μs, x)
+	x = center!(o.xmeans, x)
 	λ = weight(o)
 
 	for i in 1:min(o.k, o.n)
@@ -118,7 +118,7 @@ function Base.empty!(o::OnlinePCA)
 	o.V = zeros(o.k, o.d)
 	o.e = zeros(o.k)
 	o.n = 0
-	o.μs = Means(o.d, o.weighting)
+	o.xmeans = Means(o.d, o.weighting)
 end
 
 function Base.merge!(o1::OnlinePCA, o2::OnlinePCA)
@@ -126,8 +126,17 @@ function Base.merge!(o1::OnlinePCA, o2::OnlinePCA)
 end
 
 
-# returns a vector y = Vx
-StatsBase.predict(o::OnlinePCA, x::VecF) = uncenter(o.μs, o.V * center(o.μs, x))
+# returns a vector z = Vx
+StatsBase.predict(o::OnlinePCA, x::VecF) = o.V * center(o.xmeans, x)
+
+function StatsBase.predict(o::OnlinePCA, X::MatF)
+	n = size(X,1)
+	Z = zeros(n, o.k)
+	for i in 1:n
+		row!(Z, i, StatsBase.predict(o, row(X,i)))
+	end
+	Z
+end
 
 
 # ------------------------------------------------------------ unused

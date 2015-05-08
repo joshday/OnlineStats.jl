@@ -62,36 +62,46 @@
 
 #-------------------------------------------------------# Type and Constructors
 
-type OnlinePLS <: OnlineStat
+type OnlinePLS{W} <: OnlineStat
 	d::Int  			# num dependent vars
 	l::Int 				# num latent vars in OnlinePCA
 	k::Int 				# num latent vars in PLS
+	n::Int
+	wgt::W
 
-	v::VecF				# (d x 1) vector -- estimate of first column of 
+	ymean::Mean{W}
+	xmeans::Means{W}
 
-	function OnlinePLS(p::Int, δ::Float64, wgt::Weighting = default(Weighting))
+	v1::VecF				# (d x 1) vector -- estimate of first column of V
+	W::MatF 				# (d x k) matrix (see fls comment below)
+	pca::OnlinePCA  # tracks pca decomposition of X
+	fls::OnlineFLS  # flexible least squares to solve for β: y = (XW)β + e
+
+	function OnlinePLS(d::Int, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+		new(d, l, k, 0, wgt, Mean(wgt), Means(d, wgt), zeros(d), zeros(d, k), OnlinePCA(d, l, wgt), OnlineFLS(k, δ, wgt))
 	end
 end
 
 
-function OnlinePLS(y::Float64, x::VecF, δ::Float64, wgt::Weighting = default(Weighting))
-	# p = length(x)
-	# o = OnlinePLS(p, δ, wgt)
-	# update!(o, y, x)
-	# o
+function OnlinePLS(y::Float64, x::VecF, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+	d = length(x)
+	o = OnlinePLS(d, l, k, δ, wgt)
+	update!(o, y, x)
+	o
 end
 
-function OnlinePLS(y::VecF, X::MatF, δ::Float64, wgt::Weighting = default(Weighting))
-	# p = size(X,2)
-	# o = OnlinePLS(p, δ, wgt)
-	# update!(o, y, X)
-	# o
+function OnlinePLS(y::VecF, X::MatF, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+	d = size(X,2)
+	o = OnlinePLS(d, l, k, δ, wgt)
+	update!(o, y, X)
+	o
 end
 
 #-----------------------------------------------------------------------# state
 
-statenames(o::OnlinePLS) = [:nobs]
-state(o::OnlinePLS) = Any[nobs(o)]
+# note: pca and fls refer to the states of the respective objects
+statenames(o::OnlinePLS) = [:v1, :pca, :W, :fls, :nobs]
+state(o::OnlinePLS) = Any[copy(o.v1), state(o.pca), copy(o.W), state(o.fls), nobs(o)]
 
 
 #---------------------------------------------------------------------# update!
@@ -108,15 +118,20 @@ end
 
 function update!(o::OnlinePLS, y::Float64, x::VecF)
 
+	# center x and y
+	y = center!(o.ymean, y)
+	x = center!(o.xmeans, x)
+
 	# update v1 and pca
 	smooth!(o.v1, y * x, weight(o))
 	update!(o.pca, x)
 
 	# recompute W
 	V = VecF[]
-	W = VecF[]
 	vi = copy(o.v1)
 	w = copy(o.v1)
+
+	# do the gram-schmidt process
 	for i in 1:o.k
 		if i > 1
 			# multiply Cw
@@ -136,8 +151,11 @@ function update!(o::OnlinePLS, y::Float64, x::VecF)
 		push!(V, vi)
 
 		# add normalized vi to W
-		push!(W, vi / norm(vi))
+		row!(o.W, i, vi / norm(vi))
 	end
+
+	# update fls regression
+	update!(o.fls, y, o.W * x)
 
 	o.n += 1
 	return
@@ -148,6 +166,13 @@ end
 function Base.empty!(o::OnlinePLS)
 	# TODO
 	o.n = 0
+	empty!(o.ymean)
+	empty!(o.xmeans)
+	o.v1 = zeros(o.d)
+	o.W = zeros(o.d, o.k)
+	empty!(o.pca)
+	empty!(o.fls)
+	nothing
 end
 
 function Base.merge!(o1::OnlinePLS, o2::OnlinePLS)
@@ -169,7 +194,13 @@ end
 
 # predicts yₜ for a given xₜ
 function StatsBase.predict(o::OnlinePLS, x::VecF)
-	# TODO
+	# center x
+	# multiply Wx to get a (kx1) vector of latent vars
+	# y = predict(fls,Wx)
+	# uncenter y
+	x = center(o.xmeans, x)
+	y = predict(o.fls, o.W * x)
+	uncenter(o.ymean, y)
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
@@ -177,7 +208,7 @@ function StatsBase.predict(o::OnlinePLS, X::MatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n
-		pred[i] = StatsBase.predict(o, vec(X[i,:]))
+		pred[i] = predict(o, vec(X[i,:]))
 	end
 	pred
 end
