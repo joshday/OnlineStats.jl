@@ -54,6 +54,7 @@ export
     CovarianceMatrix,
     Means,
     Variances,
+    AnalyticalPCA,
 
     NormalMix,
     FitBernoulli,
@@ -117,6 +118,7 @@ include("summary/fivenumber.jl")
 include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
+include("multivariate/analyticalpca.jl")
 
 # Parametric Density
 include("distributions/bernoulli.jl")
