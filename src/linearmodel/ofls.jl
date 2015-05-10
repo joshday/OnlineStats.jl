@@ -8,6 +8,9 @@
 #   δ close to 0 corresponds to large μ, which means the parameter vector β changes slowly
 #   δ close to 1 corresponds to small μ, which means the parameter vector β changes quickly
 
+# OnlineFLS: Thomas Breloff (Cointegrated Technologies)
+
+
 
 # TODO: allow for time-varying Vω???
 #  to accomplish... lets represent Vω as a vector of Variance's (i.e. the diagonal of Vω)
@@ -73,7 +76,7 @@ nonzerostd(x) = if0then1(std(x))
 
 # state vars: [normalizedBeta, rawBeta, Variance(y), Variance(x), std(ε), mostRecentEstimateOfY, nobs]
 statenames(o::OnlineFLS) = [:βn, :β, :yvar, :xvars, :σε, :yhat, :nobs]
-state(o::OnlineFLS) = Any[o.β, (o.β * std(o.yvar) ./ map(nonzerostd, o.xvars)), o.yvar, o.xvars, std(o.Vε), o.yhat, nobs(o)]
+state(o::OnlineFLS) = Any[copy(o.β), (o.β * std(o.yvar) ./ map(nonzerostd, o.xvars)), copy(o.yvar), copy(o.xvars), std(o.Vε), o.yhat, nobs(o)]
 
 βn(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
