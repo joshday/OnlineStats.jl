@@ -74,9 +74,12 @@ end
 function testpls(; n = 1000, d = 50, l = 20, k = 10, δ = 0.99, σx = 0.3, σpc = 1.0, σy = 1.0)
 	
 	V, Z, X, yV, y = getsampledata_pls(n, d, k, σx, σpc, σy)
-	pls = OnlineStats.OnlinePLS(d, l, k, δ, ewgt)
+	pls = OnlineStats.OnlinePLS(y, X, l, k, δ, ewgt)
 
 	# TODO: tests
+	yhat = OnlineStats.predict(pls, X)
+	rng = n-100:n
+	scatter(yhat[rng], y[rng])
 end
 
 

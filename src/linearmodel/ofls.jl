@@ -23,7 +23,7 @@ type OnlineFLS <: OnlineStat
 	# Vω::Vector{Variance}
 	Vε::Variance     # variance of error term
 	yvar::Variance   # used for normalization
-	xvars::Vector{Variance}  # used for normalization
+	xvars::Variances  # used for normalization
 	# weighting::W  # weighting scheme for Variances... algo convergence is dictated by Vω
 
 	n::Int
@@ -46,7 +46,8 @@ type OnlineFLS <: OnlineStat
 		Vε = Variance(wgt)
 
 		yvar = Variance(wgt)
-		xvars = [Variance(wgt) for i in 1:p]
+		xvars = Variances(p, wgt)
+		# xvars = [Variance(wgt) for i in 1:p]
 
 		# create and init the object
 		o = new(p, Vω, Vε, yvar, xvars)
@@ -72,11 +73,11 @@ end
 
 #-----------------------------------------------------------------------# state
 
-nonzerostd(x) = if0then1(std(x))
+# nonzerostd(x) = if0then1(std(x))
 
 # state vars: [normalizedBeta, rawBeta, Variance(y), Variance(x), std(ε), mostRecentEstimateOfY, nobs]
 statenames(o::OnlineFLS) = [:βn, :β, :yvar, :xvars, :σε, :yhat, :nobs]
-state(o::OnlineFLS) = Any[copy(o.β), (o.β * std(o.yvar) ./ map(nonzerostd, o.xvars)), copy(o.yvar), copy(o.xvars), std(o.Vε), o.yhat, nobs(o)]
+state(o::OnlineFLS) = Any[copy(o.β), o.β * std(o.yvar) ./ map(if0then1, std(o.xvars)), copy(o.yvar), copy(o.xvars), std(o.Vε), o.yhat, nobs(o)]
 
 βn(o::OnlineFLS) = o.β
 Base.beta(o::OnlineFLS) = o.β
@@ -95,9 +96,9 @@ end
 
 function update!(o::OnlineFLS, y::Float64, x::VecF)
 
-	# normalize y and x
-	y = normalize!(o.yvar, y)
-	x = normalize!(o.xvars, x)
+	# standardize y and x
+	y = standardize!(o.yvar, y)
+	x = standardize!(o.xvars, x)
 
 	# calc error and update error variance
 	yhat = dot(x, o.β)
@@ -122,7 +123,7 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 	@DEBUG o.β
 
 	# save the denormalized estimate of y
-	o.yhat = denormalize(o.yvar, yhat)
+	o.yhat = unstandardize(o.yvar, yhat)
 
 	o.n += 1
 	return
@@ -163,7 +164,7 @@ end
 
 # predicts yₜ for a given xₜ
 function StatsBase.predict(o::OnlineFLS, x::VecF)
-	denormalize(o.yvar, dot(o.β, normalize(o.xvars, x)))
+	unstandardize(o.yvar, dot(o.β, standardize(o.xvars, x)))
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
@@ -171,7 +172,7 @@ function StatsBase.predict(o::OnlineFLS, X::MatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n
-		pred[i] = StatsBase.predict(o, vec(X[i,:]))
+		pred[i] = predict(o, row(X,i))
 	end
 	pred
 end

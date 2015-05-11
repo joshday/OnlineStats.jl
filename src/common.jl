@@ -25,13 +25,33 @@ col!(M::MatF, i::Int, v::VecF) = (M[:,i] = v)
 mystring(f::Float64) = @sprintf("%f", f)
 mystring(x) = string(x)
 
+
+name(o::OnlineStat) = string(typeof(o))
+
+
+function Base.print{T<:OnlineStat}(io::IO, v::Vector{T})
+    print(io, "[")
+    print(io, join(v, ", "))
+    print(io, "]")
+end
+
+function Base.print(io::IO, o::OnlineStat)
+    snames = statenames(o)
+    svals = state(o)
+    print(io, name(o), "{")
+    for (i,sname) in enumerate(snames)
+        print(io, i > 1 ? " " : "", sname, "=", svals[i])
+    end
+    print(io, "}")
+end
+
 function Base.show(io::IO, o::OnlineStat)
     snames = statenames(o)
     svals = state(o)
 
-    println(io, "Online ", string(typeof(o)))
+    println(io, "Online_", name(o))
     for (i, sname) in enumerate(snames)
-        @printf(io, " * %8s:  %s\n", sname, mystring(svals[i]))
+        println(io, @sprintf(" * %8s:  %s\n", sname, mystring(svals[i])))
     end
 end
 

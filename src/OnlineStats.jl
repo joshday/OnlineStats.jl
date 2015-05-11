@@ -26,7 +26,7 @@ import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile, maximum, minimum
 import Clustering  # kmeans for starting values of NormalMix
 import StatsBase
-import StatsBase: nobs, skewness, kurtosis, mode, modes, coef
+import StatsBase: nobs, skewness, kurtosis, mode, modes, coef, coeftable, confint, predict
 
 
 #-----------------------------------------------------------------------------#

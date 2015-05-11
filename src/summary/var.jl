@@ -7,6 +7,7 @@ type Variance{W<:Weighting} <: OnlineStat
     weighting::W
 end
 
+name(o::Variance) = "OVar"
 
 function Variance{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
     o = Variance(wgt)
@@ -27,19 +28,19 @@ Base.mean(o::Variance) = o.μ
 Base.var(o::Variance) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
 Base.std(o::Variance) = sqrt(var(o))
 
-#-----------------------------------------------------------------------# normalize
+#-----------------------------------------------------------------------# standardize
 
 if0then1(x::Float64) = (x == 0. ? 1. : x)
 
-normalize(o::Variance, y::Float64) = (y - mean(o)) / if0then1(std(o))
-denormalize(o::Variance, y::Float64) = y * std(o) + mean(o)
+standardize(o::Variance, y::Float64) = (y - mean(o)) / if0then1(std(o))
+unstandardize(o::Variance, y::Float64) = y * std(o) + mean(o)
 
-function normalize!(o::Variance, y::Float64)
+function standardize!(o::Variance, y::Float64)
     update!(o, y)
-    normalize(o, y)
+    standardize(o, y)
 end
 
-normalize!(os::Vector{Variance}, y::VecF) = map(normalize!, os, y)
+standardize!(os::Vector{Variance}, y::VecF) = map(standardize!, os, y)
 
 #---------------------------------------------------------------------# update!
 

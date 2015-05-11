@@ -78,6 +78,8 @@ type OnlinePLS{W<:Weighting} <: OnlineStat
 	fls::OnlineFLS  # flexible least squares to solve for β: y = (XW)β + e
 end
 
+name(o::OnlinePLS) = "OPLS"
+
 
 function OnlinePLS(d::Int, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
 	OnlinePLS(d, l, k, 0, wgt, Mean(wgt), Means(d, wgt), zeros(d), zeros(d, k), OnlinePCA(d, l, wgt), OnlineFLS(k, δ, wgt))
@@ -111,8 +113,8 @@ state(o::OnlinePLS) = Any[copy(o.v1), state(o.pca), copy(o.W), state(o.fls), nob
 # TODO: optimize
 function update!(o::OnlinePLS, y::VecF, X::MatF)
 	@assert length(y) == size(X,1)
-	for i in length(y)
-		update!(o, y[i], vec(X[i,:]))
+	for i in 1:length(y)
+		update!(o, y[i], row(X,i))
 	end
 end
 
@@ -123,7 +125,9 @@ function update!(o::OnlinePLS, y::Float64, x::VecF)
 	x = center!(o.xmeans, x)
 
 	# update v1 and pca
+	# @LOG y x y*x
 	smooth!(o.v1, y * x, weight(o))
+	# @LOG o.v1
 	update!(o.pca, x)
 
 	# recompute W
@@ -151,11 +155,12 @@ function update!(o::OnlinePLS, y::Float64, x::VecF)
 		push!(V, vi)
 
 		# add normalized vi to W
-		row!(o.W, i, vi / norm(vi))
+		col!(o.W, i, vi / if0then1(norm(vi)))
 	end
 
 	# update fls regression
-	update!(o.fls, y, o.W * x)
+	update!(o.fls, y, o.W' * x)
+	@LOG o.fls
 
 	o.n += 1
 	return
@@ -199,7 +204,7 @@ function StatsBase.predict(o::OnlinePLS, x::VecF)
 	# y = predict(fls,Wx)
 	# uncenter y
 	x = center(o.xmeans, x)
-	y = predict(o.fls, o.W * x)
+	y = predict(o.fls, o.W' * x)
 	uncenter(o.ymean, y)
 end
 
