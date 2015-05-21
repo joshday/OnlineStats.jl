@@ -132,4 +132,4 @@ invlogccdf(o::DistributionStat) = invlogccdf(o.d)
 rand(o::DistributionStat) = rand(o.d)
 rand(o::DistributionStat, n_or_dims) = rand(o.d, n_or_dims)
 rand!(o::DistributionStat, arr) = rand!(o.d, arr)
-# whew!
+

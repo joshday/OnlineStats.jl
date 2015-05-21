@@ -6,7 +6,7 @@ examples = (
 #     "/OnlineLinearModel.jmd",
 #     "/OnlineFitBernoulli.jmd",
 #     "/OnlineFitBeta.jmd",
-#     "/Summary.jmd",
+    "/Summary.jmd",
 #     "/QuantileSGD.jmd",
 #     "/QuantileMM.jmd",
 #     "/quantilecompare.jmd",
@@ -17,8 +17,8 @@ examples = (
 #     "/QuantRegMM.jmd",
 #     "/quantregcompare.jmd",
 #     "/NormalMix.jmd",
-    "/LogRegMM.jmd",
-    "/LogRegSGD.jmd",
+#     "/LogRegMM.jmd",
+#     "/LogRegSGD.jmd",
 #     "/RidgeReg.jmd"
     )
 

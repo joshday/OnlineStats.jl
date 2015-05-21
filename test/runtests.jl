@@ -10,13 +10,13 @@ using FactCheck
 
 @time include("linearmodel_test.jl")
 @time include("sweep_test.jl")
-
 @time include("quantreg_test.jl")
 
 @time include("distribution_test.jl")
 @time include("normalmix_test.jl")
 
 @time include("covmatrix_test.jl")
+@time include("analyticalpca_test.jl")
 
 FactCheck.exitstatus()
 end # module

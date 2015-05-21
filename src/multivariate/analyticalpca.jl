@@ -7,7 +7,7 @@ type AnalyticalPCA{W <: Weighting} <: OnlineStat
 
     # eigen:
     values::VecF
-    vectors::MatF
+    vectors::MatF  # currently sorted smallest to largest: this is what eig() does
 
     n::Int64
 end
@@ -32,9 +32,9 @@ state(o::AnalyticalPCA) = Any[o.vectors, o.values, o.n]
 function updatebatch!(o::AnalyticalPCA, X::MatF)
     updatebatch!(o.C, X)
     if o.corr
-        o.values, o.vectors = eig(cor(o.C))
+        o.values, o.vectors = eig(Symmetric(cor(o.C)))
     else
-        o.values, o.vectors = eig(cov(o.C))
+        o.values, o.vectors = eig(Symmetric(cov(o.C)))
     end
     o.n += 1
 end

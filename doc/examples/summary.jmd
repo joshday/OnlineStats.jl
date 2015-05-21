@@ -2,25 +2,22 @@
 
 
 ```{julia; term=false; eval=true}
-using OnlineStats
-using Distributions
+using OnlineStats, DataFrames
 ```
 
 ### Create fit with the first batch
 ```{julia; term=false; eval=true}
-x = rand(Normal(10, 5), 100)
-obj = Summary(x)
+obj = Summary(randn(100))
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    x = rand(Normal(10, 5), 100)
-    update!(obj, x)
+    update!(obj, randn(100))
 end
 ```
 
 ### Check summary statistics
 ```{julia; term=true}
-state(obj)
+DataFrame(obj)
 ```
