@@ -15,12 +15,12 @@ facts("Variance") do
 
         o = Variance(x1)
         @fact o.μ => roughly(mean(x1))
-        @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1), 1e-8)
+        @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1), 1e-7)
         @fact o.n => n1
 
         update!(o, x2)
         @fact o.μ => roughly(mean(x))
-        @fact o.biasedvar => roughly(var(x) * ((n -1) / n), 1e-8)
+        @fact o.biasedvar => roughly(var(x) * ((n -1) / n), 1e-7)
         @fact o.n => n
 
         o1 = Variance(x1)
@@ -62,9 +62,9 @@ facts("Variance") do
         o = Variances(x1)
         @fact statenames(o) => [:μ, :σ², :nobs]
         @fact state(o) => Any[mean(o), var(o), nobs(o)]
-        @fact var(o) => roughly(vec(var(x1, 1)), 1e-8)
+        @fact var(o) => roughly(vec(var(x1, 1)), 1e-7)
         @fact mean(o) => roughly(vec(mean(x1, 1)))
-        @fact std(o) => roughly(vec(std(x1, 1)), 1e-8)
+        @fact std(o) => roughly(vec(std(x1, 1)), 1e-7)
     end
 
 end # facts

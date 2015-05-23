@@ -2,8 +2,7 @@
 
 
 ```{julia; term=false; eval=true}
-using OnlineStats
-using StatsBase
+using OnlineStats, StatsBase
 ```
 
 ### Make true beta
@@ -14,18 +13,18 @@ beta = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
-x = rand(100, p)
-y = x * beta + 10*randn(100)
+X = rand(100, p)
+y = X * beta + 10 * randn(100)
 
-fit = OnlineLinearModel(x, y, int=false)
+fit = LinReg(X, y)
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    x = rand(100, p)
-    y = x * beta + 10*randn(100)
-    update!(fit, x, y)
+    rand!(X)
+    y = X * beta + 10 * randn(100)
+    updatebatch!(fit, X, y)
 end
 ```
 

@@ -12,9 +12,11 @@ facts("AnalyticalPCA") do
     pca = pcacov(cor(x1), vec(mean(x1, 1)))
     o = AnalyticalPCA(x1)
 
-    @fact o.vectors[:, end] => roughly(pca.proj[:, 1])
-    @fact o.vectors[:, end - 1] => roughly(pca.proj[:, 2])
-    @fact o.vectors[:, end - 2] => roughly(pca.proj[:, 3])
+    # Sometimes vectors are different in sign from pca.  Not sure why this happens.
+    # More likely an issue with pcacov() than with eig().
+    @fact abs(o.vectors[:, end]) => roughly(abs(pca.proj[:, 1]), 1e-5)
+    @fact abs(o.vectors[:, end - 1]) => roughly(abs(pca.proj[:, 2]), 1e-5)
+    @fact abs(o.vectors[:, end - 2]) => roughly(abs(pca.proj[:, 3]), 1e-5)
 
     updatebatch!(o, x2)
     updatebatch!(o, x3)

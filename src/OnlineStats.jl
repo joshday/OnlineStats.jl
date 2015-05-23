@@ -8,7 +8,7 @@ import MultivariateStats: fit, PCA
 import Distributions:
     # Distributions
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
-    MvNormal, Normal, MixtureModel,
+    MvNormal, Normal, MixtureModel, FDist, TDist,
 
     # Other
     fit_dirichlet!, Univariate, Continuous,
@@ -26,7 +26,9 @@ import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile, maximum, minimum
 import Clustering  # kmeans for starting values of NormalMix
 import StatsBase
-import StatsBase: nobs, skewness, kurtosis, mode, modes, coef, coeftable, confint, predict
+import StatsBase:
+    nobs, skewness, kurtosis, mode, modes, coef, coeftable, CoefTable, confint,
+    predict, stderr, vcov
 
 
 #-----------------------------------------------------------------------------#

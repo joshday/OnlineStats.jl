@@ -34,8 +34,8 @@ facts("NormalMix") do
         @fact sort(means(o)) => roughly([0., 10.], .1)
         @fact sort(stds(o)) => roughly([1., 5.], .1)
         @fact sort(probs(o)) => roughly([.3, .7], .1)
-        @fact statenames(o) => [:μ, :σ, :π, :nobs]
-        @fact state(o) => Any[means(o), stds(o), probs(o), nobs(o)]
+        @fact statenames(o) => [:dist, :nobs]
+        @fact state(o) => Any[o.d, nobs(o)]
     end
 
     context("Online: update!") do
@@ -52,8 +52,8 @@ facts("NormalMix") do
         @fact sort(means(o)) => roughly([0., 10.], 2) "weak test"
         @fact sort(stds(o)) => roughly([1., 5.], 2) "weak test"
         @fact sort(probs(o)) => roughly([.3, .7], .1)
-        @fact statenames(o) => [:μ, :σ, :π, :nobs]
-        @fact state(o) => Any[means(o), stds(o), probs(o), nobs(o)]
+        @fact statenames(o) => [:dist, :nobs]
+        @fact state(o) => Any[o.d, nobs(o)]
         o = NormalMix(2, x[rng], StochasticWeighting(.8))
     end
 end

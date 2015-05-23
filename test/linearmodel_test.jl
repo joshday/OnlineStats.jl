@@ -15,7 +15,7 @@ facts("LinearModel") do
 
     # First batch accuracy
     obj = LinReg(x, y)
-    glm = lm([ones(n) x], y)
+    glm = lm(x, y)
     @fact coef(obj) => roughly(coef(glm))
 end
 
