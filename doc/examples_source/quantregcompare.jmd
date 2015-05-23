@@ -2,10 +2,7 @@
 
 
 ```{julia; term=false; eval=true}
-using OnlineStats
-using Gadfly
-using Distributions
-using DataFrames
+using OnlineStats, Gadfly, Distributions, DataFrames
 ```
 
 ### Create model with the first batch

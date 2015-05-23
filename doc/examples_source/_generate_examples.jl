@@ -1,18 +1,17 @@
 using Weave
 
-dir = Pkg.dir("OnlineStats", "doc", "examples")
+src = Pkg.dir("OnlineStats", "doc", "examples_source")
+dst = Pkg.dir("OnlineStats", "doc")
 
 examples = (
 #     "/OnlineLinearModel.jmd",
-#     "/OnlineFitBernoulli.jmd",
-#     "/OnlineFitBeta.jmd",
     "/Summary.jmd",
-#     "/QuantileSGD.jmd",
-#     "/QuantileMM.jmd",
-#     "/quantilecompare.jmd",
-#     "/CovarianceMatrix.jmd",
+    "/QuantileSGD.jmd",
+    "/QuantileMM.jmd",
+    "/quantilecompare.jmd",
+    "/CovarianceMatrix.jmd",
 #     "/FiveNumberSummary.jmd",
-#     "/Moments.jmd",
+    "/Moments.jmd",
 #     "/QuantRegSGD.jmd",
 #     "/QuantRegMM.jmd",
 #     "/quantregcompare.jmd",
@@ -24,5 +23,6 @@ examples = (
 
 
 for i in examples
-    weave(dir * i, doctype="github", informat="markdown")
+    weave(src * i, doctype = "github", informat = "markdown",
+          out_path = dst)
 end

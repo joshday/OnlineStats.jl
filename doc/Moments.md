@@ -3,7 +3,7 @@
 
 
 ````julia
-using OnlineStats
+using OnlineStats, DataFrames
 ````
 
 
@@ -12,7 +12,7 @@ using OnlineStats
 
 ### Create object with the first batch
 ````julia
-obj = Moments(rand(100))
+o = Moments(rand(100))
 ````
 
 
@@ -22,9 +22,7 @@ obj = Moments(rand(100))
 ### Update estimates with many batches
 ````julia
 for i = 1:10000
-    # update!(obj, rand(100))
-    obj2 = Moments(rand(100))
-    merge!(obj, obj2)
+    update!(o, rand(100))
 end
 ````
 
@@ -43,14 +41,14 @@ Truth:
 | Kurtosis | -1.2
 
 ````julia
-julia> state(obj)
-5x2 Array{Any,2}:
- :mean       0.499913 
- :var        0.0834051
- :skewness  -0.0016452
- :kurtosis  -1.20199  
- :n          1.0001e6 
+julia> DataFrame(o)
+1x5 DataFrame
+| Row | μ        | σ²        | skewness     | kurtosis | nobs    |
+|-----|----------|-----------|--------------|----------|---------|
+| 1   | 0.499999 | 0.0832945 | -0.000144205 | -1.20046 | 1000100 |
 
 ````
+
+
 
 

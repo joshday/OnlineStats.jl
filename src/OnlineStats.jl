@@ -81,6 +81,7 @@ export
     statenames,
     onlinefit,
     tracedata,
+    unpack_vectors,
     em,
     means,
     stds,

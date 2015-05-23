@@ -19,8 +19,6 @@ Create data for traceplot using starting value `o`.
 getrows(x::Vector, rows) = x[rows]
 getrows(x::Matrix, rows) = x[rows, :]
 
-
-# adjusted to take the batch size first
 function tracedata(o::OnlineStat, b::Int64, args...; batch = false)
 
     # Create DataFrame
@@ -38,4 +36,34 @@ function tracedata(o::OnlineStat, b::Int64, args...; batch = false)
     end
 
     df
+end
+
+
+
+
+# For OnlineStats with vector output, put the DataFrame created by tracedata()
+# in a nicer structure (for making traceplots).
+#
+# The function appends DataFrames created from each row
+
+function unpack_vectors(df::DataFrame)
+    n, p = size(df)
+    dfnames = names(df)
+    resultdf = DataFrame()
+
+    # Get first row as DataFrame.  Gets correct names and eltypes for append!()
+    for j in 1:p
+        resultdf[dfnames[j]] = copy(df[1, j])
+    end
+
+    # For each row, make a DataFrame and append it to resultdf
+    for i in 2:n
+        tempdf = DataFrame()
+        for j in 1:p
+            tempdf[dfnames[j]] = copy(df[i, j])
+        end
+        append!(resultdf, tempdf)
+    end
+
+    resultdf
 end

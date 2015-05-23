@@ -2,25 +2,24 @@
 
 
 ```{julia; term=false; eval=true}
-using OnlineStats
+using OnlineStats, DataFrames
 ```
 
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
-obj = QuantileMM(rand(100), τ=[1:9]/10)
+o = QuantileMM(rand(100), τ=[.1:.2:.9])
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
 for i = 1:10000
-    update!(obj, rand(100))
+    update!(o, rand(100))
 end
 ```
 
 ### Check estimates
-```{julia; term=true}
-state(obj)
+Since true distribution is Uniform(0, 1), true quantiles equal τ.
 
-# Maximum difference from truth
-maxabs(obj.est - [1:9]/10)
+```{julia; term=true}
+DataFrame(o)
 ```

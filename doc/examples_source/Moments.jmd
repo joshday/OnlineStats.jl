@@ -2,20 +2,18 @@
 
 
 ```{julia; term=false; eval=true}
-using OnlineStats
+using OnlineStats, DataFrames
 ```
 
 ### Create object with the first batch
-```{julia; term=false; eval=true}
-obj = Moments(rand(100))
+```{julia; term = false; eval = true}
+o = Moments(rand(100))
 ```
 
 ### Update estimates with many batches
-```{julia; term=false; eval=true}
+```{julia; term = false; eval = true}
 for i = 1:10000
-    # update!(obj, rand(100))
-    obj2 = Moments(rand(100))
-    merge!(obj, obj2)
+    update!(o, rand(100))
 end
 ```
 
@@ -29,6 +27,6 @@ Truth:
 | Skewness | 0
 | Kurtosis | -1.2
 
-```{julia; term=true}
-state(obj)
+```{julia; term = true;}
+DataFrame(o)
 ```
