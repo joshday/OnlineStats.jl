@@ -1,27 +1,45 @@
+
 # FiveNumberSummary
 
 
-```{julia; term=false; eval=true}
+````julia
 using OnlineStats, Gadfly, DataFrames
-```
+````
+
+
+
+
 
 ### Create 5-number summary with the first batch
-```{julia; term=false; eval=true}
+````julia
 o = FiveNumberSummary(randn(100))
-```
+````
+
+
+
+
 
 ### Update model with many batches
-```{julia; term=false; eval=true}
+````julia
 for i = 1:1000
     update!(o, randn(100))
 end
-```
+````
+
+
+
+
 
 
 ### Check estimate
-```{julia; term=true; fig_width=3}
-DataFrame(o)
+````julia
+julia> DataFrame(o)
+1x6 DataFrame
+| Row | min      | q1        | median    | q3       | max     | nobs     |
+|-----|----------|-----------|-----------|----------|---------|----------|
+| 1   | -4.58248 | -0.722049 | 0.0130044 | 0.695389 | 4.26556 | 100100.0 |
 
+julia> 
 # Code for plotting a FiveNumberSummary oect (see src/plotmethods.jl)
 function Gadfly.plot(o::OnlineStats.FiveNumberSummary)
     s = OnlineStats.state(o)
@@ -36,8 +54,17 @@ function Gadfly.plot(o::OnlineStats.FiveNumberSummary)
               x = ["Data"], Gadfly.Geom.boxplot),
         Gadfly.layer(x = ["Data"], y=[s[1], s[5]], Gadfly.Geom.point))
 end
+plot (generic function with 7 methods)
 
+julia> 
 plot(o)
-```
+
+````
+
+
+![](figures/FiveNumberSummary_4_1.png)
+
+
+
 
 Boxplot whiskers have length 1.5*IQR.  Maximum and minimum are the only outliers available since quantiles are approximate.

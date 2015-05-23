@@ -5,12 +5,14 @@ type FiveNumberSummary <: OnlineStat
     n::Int64
 end
 
-# function FiveNumberSummary(y::Vector; r = .7)
-#     FiveNumberSummary(minimum(y), QuantileSGD(y, r = r), maximum(y),
-#                       length(y), 1)
-# end
+function FiveNumberSummary(y::Vector, wgt::Weighting = StochasticWeighting();
+                           start = zeros(3))
+    o = FiveNumberSummary(wgt, start = start)
+    update!(o, y)
+    o
+end
 
-function FiveNumberSummary(wgt::StochasticWeighting = StochasticWeighting();
+function FiveNumberSummary(wgt::Weighting = StochasticWeighting();
                            start = zeros(3))
     FiveNumberSummary(Extrema(), QuantileSGD(wgt, start = start), 0)
 end
@@ -31,6 +33,12 @@ function update!(o::FiveNumberSummary, y::Float64)
     update!(o.quantiles, y)
     o.n += 1
     return
+end
+
+function update!(o::FiveNumberSummary, y::VecF)
+    for yi in y
+        update!(o, yi)
+    end
 end
 
 function updatebatch!(o::FiveNumberSummary, y::VecF)

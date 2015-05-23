@@ -29,9 +29,9 @@ Save data for traceplots
 
 
 ````julia
-elapsed time: 0.149283349 seconds (8937592 bytes allocated)
-elapsed
-time: 0.276685311 seconds (8938112 bytes allocated, 21.63% gc time)
+elapsed time: 0.281288578 seconds (10248040 bytes allocated, 25.78% gc
+time)
+elapsed time: 0.287433214 seconds (10883072 bytes allocated)
 ````
 
 

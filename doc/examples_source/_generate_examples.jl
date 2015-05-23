@@ -4,13 +4,13 @@ src = Pkg.dir("OnlineStats", "doc", "examples_source")
 dst = Pkg.dir("OnlineStats", "doc")
 
 examples = (
-#     "/OnlineLinearModel.jmd",
+    "/LinReg.jmd",
     "/Summary.jmd",
     "/QuantileSGD.jmd",
     "/QuantileMM.jmd",
     "/quantilecompare.jmd",
     "/CovarianceMatrix.jmd",
-#     "/FiveNumberSummary.jmd",
+    "/FiveNumberSummary.jmd",
     "/Moments.jmd",
 #     "/QuantRegSGD.jmd",
 #     "/QuantRegMM.jmd",
