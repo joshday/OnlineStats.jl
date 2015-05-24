@@ -23,7 +23,7 @@ facts("Summary") do
 
     update!(o, x2)
     @fact o.var.μ => roughly(mean(x))
-    @fact o.var.biasedvar => roughly(var(x) * (o.n - 1) / o.n, 1e-8)
+    @fact o.var.biasedvar => roughly(var(x) * (o.n - 1) / o.n, 1e-7)
     @fact o.extrema.max => maximum(x)
     @fact o.extrema.min => minimum(x)
     @fact o.n => n1 + n2
@@ -32,19 +32,19 @@ facts("Summary") do
     o2 = Summary(x2)
     o3 = merge(o, o2)
     @fact o3.var.μ => roughly(mean(x))
-    @fact o3.var.biasedvar => roughly(var(x) * (o3.n - 1) / o3.n, 1e-8)
+    @fact o3.var.biasedvar => roughly(var(x) * (o3.n - 1) / o3.n, 1e-7)
     @fact o3.extrema.max => maximum(x)
     @fact o3.extrema.min => minimum(x)
 
     merge!(o, o2)
     @fact o.var.μ => roughly(o3.var.μ)
-    @fact o.var.biasedvar => roughly(o3.var.biasedvar, 1e-8)
+    @fact o.var.biasedvar => roughly(o3.var.biasedvar, 1e-7)
     @fact o.extrema.max => o3.extrema.max
     @fact o.extrema.min => o3.extrema.min
     @fact o.n => o3.n
 
     @fact mean(o) => roughly(mean(x))
-    @fact var(o) => roughly(var(x), 1e-8)
+    @fact var(o) => roughly(var(x), 1e-7)
     @fact maximum(o) => maximum(x)
     @fact minimum(o) => minimum(x)
 end
