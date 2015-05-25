@@ -18,7 +18,7 @@ FitDirichlet(y::Array{Float64}, wgt::Weighting = default(Weighting)) =
     onlinefit(Dirichlet, y, wgt)
 
 FitDirichlet(wgt::Weighting = default(Weighting); d = 2) =
-    FitDirichlet(Dirichlet([]), zeros(d), 0, wgt)
+    FitDirichlet(Dirichlet([.1]), zeros(d), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
@@ -28,7 +28,7 @@ function updatebatch!(o::FitDirichlet, y::Matrix{Float64})
     λ = weight(o, n2)
     o.meanlogx = smooth(o.meanlogx, vec(mean(log(y), 2)), λ)
 
-    if isempty(o.d.alpha) # fit_dirichlet! needs decent starting values
+    if o.n == 0 # fit_dirichlet! needs decent starting values
         o.d = fit_dirichlet!(o.meanlogx, exp((o.meanlogx)))
     else
         o.d = fit_dirichlet!(o.meanlogx, o.d.alpha)
