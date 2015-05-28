@@ -17,7 +17,6 @@ examples = (
     "/NormalMix.jmd",
 #     "/LogRegMM.jmd",
 #     "/LogRegSGD.jmd",
-#     "/RidgeReg.jmd"
     )
 
 
