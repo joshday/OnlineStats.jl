@@ -46,7 +46,7 @@ end
 #
 # The function appends DataFrames created from each row
 
-function unpack_vectors(df::DataFrame)
+function unpack_vectors(df::DataFrame, indexsymbol::String = "β")
     n, p = size(df)
     dfnames = names(df)
     resultdf = DataFrame()
@@ -56,12 +56,17 @@ function unpack_vectors(df::DataFrame)
         resultdf[dfnames[j]] = copy(df[1, j])
     end
 
+    # add column for vectorindex
+    colvec = [symbol("$indexsymbol$i") for i in 1:size(resultdf, 1)]
+    resultdf[:vectorindex] = copy(colvec)
+
     # For each row, make a DataFrame and append it to resultdf
     for i in 2:n
         tempdf = DataFrame()
         for j in 1:p
             tempdf[dfnames[j]] = copy(df[i, j])
         end
+        tempdf[:vectorindex] = copy(colvec)
         append!(resultdf, tempdf)
     end
 

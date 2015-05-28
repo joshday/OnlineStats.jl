@@ -4,33 +4,35 @@ Click links to example.
 
 ## Summary statistics
 
-[Comparison of `QuantileSGD` and `QuantileMM`](../doc/examples/quantilecompare.md)
+[Comparison of `QuantileSGD` and `QuantileMM`](../doc/quantilecompare.md)
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-|  Sample Mean         |  [`Summary`](../doc/examples/Summary.md)       
-|  Sample Variance     |  [`Summary`](../doc/examples/Summary.md)   
-|  Skewness (and m3)   |  [`Moments`](../doc/examples/Moments.md)       
-|  Kurtosis (and m4)   |  [`Moments`](../doc/examples/Moments.md)        
-|  Covariance Matrix   | [`CovarianceMatrix`](../doc/examples/CovarianceMatrix.md)
-|  Maximum/Minimum     |  [`Summary`](../doc/examples/Summary.md)  , [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md), `Extrema`
-|  Sample Quantiles    | [`QuantileSGD`](../doc/examples/QuantileSGD.md), [`QuantileMM`](../doc/examples/QuantileMM.md) 
-|  5-Number Summary    | [`FiveNumberSummary`](../doc/examples/FiveNumberSummary.md)   
-|  Box Plot            |[`Gadfly.plot(obj::FiveNumberSummary)`](../doc/examples/FiveNumberSummary.md)  
+|  Sample Mean         |  `Mean`, `Means`, [`Summary`](../doc/Summary.md)       
+|  Sample Variance     |  `Variance`, `Variances`, [`Summary`](../doc/Summary.md)   
+|  Skewness (and m3)   |  [`Moments`](../doc/Moments.md)       
+|  Kurtosis (and m4)   |  [`Moments`](../doc/Moments.md)        
+|  Covariance Matrix   | [`CovarianceMatrix`](../doc/CovarianceMatrix.md)
+|  Maximum/Minimum     |  [`Summary`](../doc/Summary.md)  , [`FiveNumberSummary`](../doc/FiveNumberSummary.md), `Extrema`
+|  Sample Quantiles    | [`QuantileSGD`](../doc/QuantileSGD.md), [`QuantileMM`](../doc/QuantileMM.md) 
+|  5-Number Summary    | [`FiveNumberSummary`](../doc/FiveNumberSummary.md)   
+|  Box Plot            |[`Gadfly.plot(obj::FiveNumberSummary)`](../doc/FiveNumberSummary.md)  
 
 ## Density estimation
 
 | Item                             | Associated Type(s)
 |----------------------------------|------------------
-| Gaussian mixture                 | [`NormalMix`](../doc/examples/NormalMix.md)
+| Gaussian mixture                 | `NormalMix`
 | Average Shifted Histograms (ASH) | `AverageShiftedHistograms.update!` in [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl).  See also [Univariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update.md), [Bivariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update2.md)
 
 ## Univariate distributions
 
+`OnlineFit____` objects can be created via `onlinefit(Dist, x)`
+
 | Item                 | Associated Type(s)
 |----------------------|------------------
-| Bernoulli            | [`OnlineFitBernoulli`](../doc/examples/OnlineFitBernoulli.md)
-| Beta                 | [`OnlineFitBeta`](../doc/examples/OnlineFitBeta.md)
+| Bernoulli            | `OnlineFitBernoulli`
+| Beta                 | `OnlineFitBeta`
 | Binomial             | `OnlineFitBinomial`
 | Cauchy               | 
 | Chi-square           | 
@@ -59,7 +61,7 @@ Click links to example.
 | Item                 | Associated Type(s)
 |----------------------|------------------
 | Cholesky             | 
-| Sweep                | [`OnlineLinearModel`](../doc/examples/OnlineLinearModel.md)
+| Sweep                | [`LinReg`](../doc/LinReg.md)
 | Missing Data         |
 | Stepwise regression  |
 
@@ -67,7 +69,7 @@ Click links to example.
 
 | Item                 | Associated Type(s)
 |----------------------|------------------
-| Logistic Regression  | [`LogRegMM`](../doc/examples/LogRegMM.md), `LogRegSGD`, `LogRegSN`
+| Logistic Regression  | `LogRegMM`, `LogRegSGD`, `LogRegSN`
 | Probit Regression    | 
 | Poisson Regression   |  
 | Multinomial Logistic Regression |
@@ -75,11 +77,10 @@ Click links to example.
 
 ## Quantile regression
 
-[Comparison of `QuantRegSGD` vs. `QuantRegMM`](../doc/examples/quantregcompare.md)
 
 | Item                                 | Associated Type(s)
 |--------------------------------------|------------------
-| Linear Quantile Regression           | [`QuantRegSGD`](../doc/examples/QuantRegSGD.md), [`QuantRegMM`](../doc/examples/QuantRegSGD.md)
+| Linear Quantile Regression           | [`QuantRegSGD`](../doc/QuantRegSGD.md), [`QuantRegMM`](../doc/QuantRegMM.md)
 | Composite Linear Quantile Regresison |
 
 ## Variance component model

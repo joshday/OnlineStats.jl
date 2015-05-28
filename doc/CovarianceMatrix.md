@@ -12,7 +12,19 @@ using OnlineStats, StatsBase, Distributions
 
 ### Create covariance matrix with the first batch
 ````julia
-mydist =  MvNormal(zeros(3), 10 * [1 .2 .4; .2 1 .3; .4 .3 1])
+julia> mycov = 10 * [1 .2 .4; .2 1 .3; .4 .3 1]
+3x3 Array{Float64,2}:
+ 10.0   2.0   4.0
+  2.0  10.0   3.0
+  4.0   3.0  10.0
+
+````
+
+
+
+
+````julia
+mydist =  MvNormal(zeros(3), mycov)
 o = CovarianceMatrix(rand(mydist, 100)')
 ````
 
@@ -37,9 +49,9 @@ end
 ````julia
 julia> mean(o)
 3-element Array{Float64,1}:
-  0.00189071
- -0.002702  
-  0.00286422
+  0.00400834 
+ -0.000434358
+ -0.00236657 
 
 ````
 
@@ -51,15 +63,15 @@ julia> mean(o)
 ````julia
 julia> cov(o)
 3x3 Array{Float64,2}:
- 9.98952  1.9985   4.00656
- 1.9985   9.99055  3.00082
- 4.00656  3.00082  9.98436
+ 10.0133   1.99375  3.989  
+  1.99375  9.97986  2.99624
+  3.989    2.99624  9.99608
 
 julia> cor(o)
 3x3 Array{Float64,2}:
- 1.0       0.200049  0.40118 
- 0.200049  1.0       0.300459
- 0.40118   0.300459  1.0     
+ 1.0       0.199444  0.398714
+ 0.199444  1.0       0.299985
+ 0.398714  0.299985  1.0     
 
 ````
 

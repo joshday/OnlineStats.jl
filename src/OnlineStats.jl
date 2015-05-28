@@ -20,7 +20,7 @@ import Distributions:
     entropy, mgf, cf, insupport, pdf, logpdf, loglikelihood, cdf, logcdf, ccdf,
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
 # import PDMats  # Is this needed?
-import DataFrames: DataFrame, names!
+import DataFrames: DataFrame, names!, pool!
 import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile, maximum, minimum
@@ -84,6 +84,7 @@ export
     onlinefit,
     tracedata,
     unpack_vectors,
+    mse,
     em,
     means,
     stds,
