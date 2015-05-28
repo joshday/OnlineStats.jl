@@ -7,6 +7,7 @@ using OnlineStats, DataFrames
 
 ### Create fit with the first batch
 ```{julia; term=false; eval=true}
+srand(620)
 o = Summary(randn(100))
 ```
 

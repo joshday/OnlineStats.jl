@@ -7,6 +7,7 @@ using OnlineStats, Gadfly, DataFrames
 
 ### Create data
 ```{julia; term=false; eval=true}
+srand(625)
 x = rand(1_000_000)
 ```
 

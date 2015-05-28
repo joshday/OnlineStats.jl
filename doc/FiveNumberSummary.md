@@ -12,6 +12,7 @@ using OnlineStats, Gadfly, DataFrames
 
 ### Create 5-number summary with the first batch
 ````julia
+srand(619)
 o = FiveNumberSummary(randn(100))
 ````
 
@@ -37,7 +38,7 @@ julia> DataFrame(o)
 1x6 DataFrame
 | Row | min      | q1        | median     | q3       | max     | nobs     |
 |-----|----------|-----------|------------|----------|---------|----------|
-| 1   | -4.25621 | -0.691573 | -0.0335729 | 0.648676 | 4.29795 | 100100.0 |
+| 1   | -5.02526 | -0.695795 | -0.0139218 | 0.671007 | 4.50278 | 100100.0 |
 
 julia> 
 # Code for plotting a FiveNumberSummary oect (see src/plotmethods.jl)
@@ -54,7 +55,7 @@ function Gadfly.plot(o::OnlineStats.FiveNumberSummary)
               x = ["Data"], Gadfly.Geom.boxplot),
         Gadfly.layer(x = ["Data"], y=[s[1], s[5]], Gadfly.Geom.point))
 end
-plot (generic function with 7 methods)
+plot (generic function with 9 methods)
 
 julia> 
 plot(o)

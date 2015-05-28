@@ -11,6 +11,7 @@ mycov = 10 * [1 .2 .4; .2 1 .3; .4 .3 1]
 ```
 ```{julia; term = false; eval = true}
 mydist =  MvNormal(zeros(3), mycov)
+srand(622)
 o = CovarianceMatrix(rand(mydist, 100)')
 ```
 

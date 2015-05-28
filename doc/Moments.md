@@ -12,6 +12,7 @@ using OnlineStats, DataFrames
 
 ### Create object with the first batch
 ````julia
+srand(12354)
 o = Moments(rand(100))
 ````
 
@@ -43,9 +44,9 @@ Truth:
 ````julia
 julia> DataFrame(o)
 1x5 DataFrame
-| Row | μ        | σ²       | skewness    | kurtosis | nobs    |
-|-----|----------|----------|-------------|----------|---------|
-| 1   | 0.500016 | 0.083362 | 0.000958117 | -1.20065 | 1000100 |
+| Row | μ        | σ²        | skewness   | kurtosis | nobs    |
+|-----|----------|-----------|------------|----------|---------|
+| 1   | 0.499807 | 0.0834782 | 0.00163693 | -1.20164 | 1000100 |
 
 ````
 

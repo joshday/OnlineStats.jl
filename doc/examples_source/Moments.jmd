@@ -7,6 +7,7 @@ using OnlineStats, DataFrames
 
 ### Create object with the first batch
 ```{julia; term = false; eval = true}
+srand(12354)
 o = Moments(rand(100))
 ```
 

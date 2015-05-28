@@ -1,7 +1,8 @@
+
 # NormalMix
 
 
-```{julia; term=false; eval=true}
+````julia
 using OnlineStats, Distributions, Gadfly
 
 # add plot methods from plotmethods.jl
@@ -31,31 +32,68 @@ function Gadfly.plot(o::MixtureModel{Univariate, Continuous, Normal}, x;
         Gadfly.Theme(default_color = Gadfly.color("black"))),
         Gadfly.layer(x = x, Gadfly.Geom.histogram(density = true), order = 0))
 end
-```
+````
+
+
+
+
 
 ### True Model/Generate Data
-```{julia; term=false; eval=true}
+````julia
 srand(123)
 trueModel = MixtureModel(Normal, [(0, 4), (2, 3), (7, 5), (10, 10)])
 x = rand(trueModel, 100_000)
 plot(trueModel, -20, 40)
-```
+````
+
+
+![](figures/NormalMix_2_1.png)
+
+
 
 ### Create model with the first batch
-```{julia; term=false; eval=true}
+````julia
 obj = NormalMix(4, x[1:100])
-```
+````
+
+
+````julia
+OnlineNormalMix, nobs:100
+MixtureModel{Normal}(K = 4)
+components[1]
+(prior = 0.1483): Normal(μ=14.453704167613214, σ=6.690122117916772)
+components[2] (prior = 0.1025): Normal(μ=-3.4458131923369035,
+σ=4.925055852102986)
+components[3] (prior = 0.3690):
+Normal(μ=1.8915158800377008, σ=3.2173221682007163)
+components[4]
+(prior = 0.3801): Normal(μ=8.213376299562198, σ=4.182344365948208)
+````
+
+
+
+
 
 ### Update model with many batches of size 100
-```{julia; term=false; eval=true}
+````julia
 for i = 2:1000
     newvals = (i - 1) * 100 + 1 : 100 * i
     update!(obj, x[newvals])
 end
-```
+````
+
+
+
+
 
 ### Check fit
-```{julia; term=false; eval=true}
+````julia
 plot(obj.d, x)
 plot(obj.d, -30, 50)
-```
+````
+
+
+![](figures/NormalMix_5_1.png)
+![](figures/NormalMix_5_2.png)
+
+

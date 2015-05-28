@@ -13,6 +13,7 @@ beta = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
+srand(621)
 X = rand(100, p)
 y = X * beta + 10 * randn(100)
 

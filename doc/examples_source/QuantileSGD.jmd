@@ -7,6 +7,7 @@ using OnlineStats, DataFrames
 
 ### Create model with the first batch
 ```{julia; term = false; eval = true}
+srand(6123)
 o = QuantileSGD(rand(100), StochasticWeighting(.7), τ = [.1:.2:.9])
 ```
 

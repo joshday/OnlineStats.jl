@@ -12,6 +12,7 @@ using OnlineStats, Gadfly, DataFrames
 
 ### Create data
 ````julia
+srand(625)
 x = rand(1_000_000)
 ````
 
@@ -29,9 +30,9 @@ Save data for traceplots
 
 
 ````julia
-elapsed time: 0.145873038 seconds (8937592 bytes allocated)
+elapsed time: 0.156458088 seconds (8937592 bytes allocated)
 elapsed
-time: 0.1925884 seconds (8937808 bytes allocated)
+time: 0.217621366 seconds (8937808 bytes allocated)
 ````
 
 
