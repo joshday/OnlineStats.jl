@@ -18,7 +18,7 @@ FitDirichlet(y::Array{Float64}, wgt::Weighting = default(Weighting)) =
     onlinefit(Dirichlet, y, wgt)
 
 FitDirichlet(wgt::Weighting = default(Weighting); d = 2) =
-    FitDirichlet(Dirichlet([.1]), zeros(d), 0, wgt)
+    FitDirichlet(Dirichlet(ones(d)), zeros(d), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
