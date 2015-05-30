@@ -1,114 +1,79 @@
-export LogRegMM
+inverselogit(x) = 1 / (1 + exp(-x))
+@vectorize_1arg Real inverselogit
 
-logitexp(x) = 1 / (1 + exp(-x))
-@vectorize_1arg Real logitexp
-
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type LogRegMM <: OnlineStat
-    β::Vector             # Coefficients
-    int::Bool             # Add intercept?
-    t1::Vector            # Sufficient statistic 1
-    t2::Matrix            # Sufficient statistic 2
-    t3::Vector            # Sufficient statistic 3
-    r::Float64            # learning rate
-    n::Int64
-    nb::Int64
+type LogRegMM{W <: Weighting} <: OnlineStat
+    β::VecF
+    t1::VecF            # Sufficient statistic 1
+    t2::MatF            # Sufficient statistic 2
+    t3::VecF            # Sufficient statistic 3
+    n::Int
+    weighting::W
 end
 
-function LogRegMM(X::Array, y::Vector; r = 0.51, intercept = true,
-                         β = zeros(size(X, 2) + intercept))
-    if length(unique(y)) != 2
-        error("response vector does not have two categories")
-    end
+function LogRegMM(p::Int, wgt::Weighting = StochasticWeighting(); start = zeros(p))
+    LogRegMM(start, zeros(p), zeros(p, p), zeros(p), 0, wgt)
+end
 
-    n, p = size(X)
-    if intercept
-        X = [ones(length(y)) X]
-        p += 1
-    end
-    y = y .== sort(unique(y))[2]  # convert y to 0 or 1
-
-    t1 = X' * (y - logitexp(X * β)) / n
-    t2 = X'X / n
-    t3 = X'X * β / n
-
-    β = 4 * inv(t2) * (t3 + 4 * t1)
-
-    LogRegMM(β, intercept, t1, t2, t3, r, n, 1)
+function LogRegMM(X::MatF, y::Vector, wgt::Weighting = StochasticWeighting();
+                  start::VecF = zeros(size(X, 2)), batch::Bool = true)
+    o = LogRegMM(size(X, 2), wgt; start = start)
+    batch ? updatebatch!(o, X, y) : update!(o, X, y)
+    o
 end
 
 
-#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::LogRegMM, X::Matrix, y::Vector)
-    if obj.int
-        X = [ones(length(y)) X]
-    end
-    y = y .== unique(sort(y))[2]  # convert y to 0 or 1
+function updatebatch!(o::LogRegMM, X::MatF, y::Vector)
     n = length(y)
+    all([y[i] in [0, 1] for i in 1:n]) || error("y values must be 0 or 1")
 
-    obj.nb += 1
-    γ = obj.nb ^ -obj.r
+    γ = weight(o)
 
-    obj.t1 += γ * (X' * (y - logitexp(X * obj.β)) / n - obj.t1)
-    obj.t2 += γ * (X'X / n - obj.t2)
-    obj.t3 += γ * (X'X * obj.β / n - obj.t3)
+    xtx_n::MatF = X'X / n
 
-    obj.β = inv(obj.t2) * (obj.t3 + 4 * obj.t1)
-    obj.n += n
+    smooth!(o.t1, X' * (y - inverselogit(X * o.β)) / n, γ)
+    smooth!(o.t2, xtx_n, γ)
+    smooth!(o.t3, xtx_n * o.β, γ)
+
+    o.β = Symmetric(o.t2) \ (o.t3 + 4 * o.t1)
+    o.n += n
 end
 
 
-
-#-----------------------------------------------------------------------------#
-#-----------------------------------------------------------------------# state
-function state(obj::LogRegMM)
-    names = [[symbol("β$i") for i in [1:length(obj.β)] - obj.int];
-             :n; :nb]
-    estimates = [obj.β, obj.n, obj.nb]
-    return([names estimates])
+# Singleton updates may have issue with singularities
+function update!(o::LogRegMM, x::VecF, y)
+    updatebatch!(o, reshape(x, 1, length(x)), [y])
 end
 
-
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------# Base
-StatsBase.coef(obj::LogRegMM) = return obj.β
-
-function Base.show(io::IO, obj::LogRegMM)
-    println(io, "Online Logistic Regression (MM Algorithm):\n", state(obj))
-end
-
-
-
-
-
-
-# # Testing
-p = 10
-β = ([1:p] - p/2) / p
-xs = randn(100, p)
-ys = vec(logitexp(xs * β))
-for i in 1:length(ys)
-    ys[i] = rand(Distributions.Bernoulli(ys[i]))
-end
-# obj = OnlineStats.LogRegMM(xs, ys, r=., β = [0; β])
-obj = OnlineStats.LogRegMM(xs, ys, r=.7)
-
-df = OnlineStats.make_df(obj)
-
-for i in 1:999
-    xs = randn(100, p)
-    ys = vec(logitexp(xs * β))
-    for i in 1:length(ys)
-        ys[i] = rand(Distributions.Bernoulli(ys[i]))
+function update!(o::LogRegMM, X::MatF, y::Vector{Int})
+    for i in 1:length(y)
+        update!(o, vec(x[i, :]), y[i])
     end
-    OnlineStats.update!(obj, xs, ys)
-    OnlineStats.make_df!(df, obj)
 end
 
-df_melt = melt(df, p+2:p+3)
 
-Gadfly.plot(df_melt, x=:n, y=:value, color=:variable, Gadfly.Geom.line,
-            yintercept=β, Gadfly.Geom.hline,
-            Gadfly.Scale.y_continuous(minvalue=-1, maxvalue=1))
+#-----------------------------------------------------------------------# state
+state(o::LogRegMM) = Any[copy(o.β), nobs(o)]
+statenames(o::LogRegMM) = [:β, :nobs]
+
+StatsBase.coef(o::LogRegMM) = copy(o.β)
+StatsBase.predict(o::LogRegMM, X::MatF) = inverselogit(X * o.β)
+
+
+
+####################### Testing
+# β = [-.5:.1:.5]
+# X = [ones(100) randn(100, 10)]
+# y = int(OnlineStats.inverselogit(X * β) .> rand(100))
+
+# o = OnlineStats.LogRegMM(X, y, OnlineStats.StochasticWeighting(.51))
+# df = DataFrame(o)
+
+# for i in 1:9999
+#     X = [ones(100) randn(100, 10)]
+#     y = int(OnlineStats.inverselogit(X * β) .< rand(100))
+
+#     OnlineStats.updatebatch!(o, X, y)
+#     push!(df, o)  # append results to DataFrame
+# end

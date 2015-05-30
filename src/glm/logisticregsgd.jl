@@ -1,109 +1,64 @@
-export LogRegSGD
+inverselogit(x) = 1 / (1 + exp(-x))
+@vectorize_1arg Real inverselogit
 
 
-logitexp(x) = 1 / (1 + exp(-x))
-@vectorize_1arg Real logitexp
-
-#-----------------------------------------------------------------------------#
 #-------------------------------------------------------# Type and Constructors
-type LogRegSGD <: OnlineStat
-    β::Vector             # Coefficients
-    int::Bool             # Add intercept?
-    r::Float64            # learning rate
+type LogRegSGD{W <: Weighting} <: OnlineStat
+    β::VecF             # Coefficients
     n::Int64
-    nb::Int64
+    weighting::W
 end
 
-function LogRegSGD(X::Array, y::Vector; r = 0.51, intercept = true,
-                         β = zeros(size(X, 2) + intercept))
-    if length(unique(y)) != 2
-        error("response vector does not have two categories")
-    end
+function LogRegSGD(p::Int, wgt::Weighting = StochasticWeighting();
+                   start::VecF = zeros(p))
+    LogRegSGD(start, 0, wgt)
+end
 
-    n, p = size(X)
-    if intercept
-        X = [ones(length(y)) X]
-        p += 1
-    end
-    y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
-    β += vec(mean(y ./ (1 + exp(y .* X * β)) .* X, 1))
-
-    # likelihood version
-#     y = (y .== unique(sort(y))[2]) - 1 # convert y to 0 / 1
-#     β += vec(X' * (y - logitexp(X * β)))
-
-    LogRegSGD(β, intercept, r, n, 1)
+function LogRegSGD(X::MatF, y::Vector, wgt::Weighting = StochasticWeighting();
+                   start::VecF = zeros(size(X, 2)), batch::Bool = true)
+    o = LogRegSGD(size(X, 2), wgt, start = start)
+    batch ? updatebatch!(o, X, y) : update!(o, X, y)
+    o
 end
 
 
-#-----------------------------------------------------------------------------#
 #---------------------------------------------------------------------# update!
-function update!(obj::LogRegSGD, X::Matrix, y::Vector)
-    if obj.int
-        X = [ones(length(y)) X]
-    end
-    y = 2 * (y .== unique(sort(y))[2]) - 1 # convert y to -1 or 1
-    γ = obj.nb ^ -obj.r
-    obj.β += γ * vec(mean(y ./ (1 + exp(y .* X * obj.β)) .* X, 1))
+function updatebatch!(o::LogRegSGD, X::Matrix, y::Vector)
+    n = length(y)
+    all([y[i] in [0, 1] for i in 1:n]) || error("y values must be 0 or 1")
 
-    # likelihood version
-#     y = (y .== unique(sort(y))[2]) - 1 # convert y to 0 / 1
-#     obj.β += γ * vec(X' * (y - logitexp(X * obj.β)))
+    γ = weight(o)
 
+    o.β += γ * vec(X' * (y - inverselogit(X * o.β)))
 
-    obj.n += length(y)
-    obj.nb += 1
+    o.n += n
 end
 
 
-
-#-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------# state
-function state(obj::LogRegSGD)
-    names = [[symbol("β$i") for i in [1:length(obj.β)] - obj.int];
-             :n; :nb]
-    estimates = [obj.β, obj.n, obj.nb]
-    return([names estimates])
-end
+statenames(o::LogRegSGD) = [:β, :nobs]
+state(o::LogRegSGD) = Any[copy(o.β), nobs(o)]
 
-
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------# Base
-StatsBase.coef(obj::LogRegSGD) = return obj.β
-
-function Base.show(io::IO, obj::LogRegSGD)
-    println(io, "Online Logistic Regression (SGD Algorithm):\n", state(obj))
-end
+StatsBase.coef(o::LogRegSGD) = copy(o.β)
 
 
 
 
 
 
-# Testing
-# β = ([1:10] - 10/2) / 10
-# xs = randn(100, 10)
-# ys = vec(logitexp(xs * β))
-# for i in 1:length(ys)
-#     ys[i] = rand(Bernoulli(ys[i]))
-# end
+####################### Testing
+# β = [-.5:.1:.5]
+# X = [ones(100) randn(100, 10)]
+# y = int(OnlineStats.inverselogit(X * β) .> rand(100))
 
-# obj = OnlineStats.LogRegSGD(xs, ys, r=.51)
-# df = OnlineStats.make_df(obj) # Save estimates to DataFrame
+# o = OnlineStats.LogRegSGD(X, y, OnlineStats.StochasticWeighting(.7))
+# df = DataFrame(o)
 
 # for i in 1:9999
-#     xs = randn(100, 10)
-#     ys = vec(logitexp(xs * β))
-#     for i in 1:length(ys)
-#         ys[i] = rand(Bernoulli(ys[i]))
-#     end
+#     X = [ones(100) randn(100, 10)]
+#     y = int(OnlineStats.inverselogit(X * β) .< rand(100))
 
-#     OnlineStats.update!(obj, xs, ys)
-#     OnlineStats.make_df!(df, obj)
+#     OnlineStats.updatebatch!(o, X, y)
+#     push!(df, o)  # append results to DataFrame
 # end
-
-# df_melt = melt(df, 12:13)
-# plot(df_melt, x=:n, y=:value, color=:variable, Geom.line,
-#             yintercept=β, Geom.hline,
-#             Scale.y_continuous(minvalue=-.75, maxvalue=.75))
-
+# coef(o)

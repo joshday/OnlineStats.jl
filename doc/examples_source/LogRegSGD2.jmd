@@ -1,4 +1,4 @@
-# LogRegSGD
+# LogRegSGD2
 
 
 ```{julia; term=false; eval=true}
@@ -17,7 +17,7 @@ inverselogit(x) = 1 / (1 + exp(-x))
 X = [ones(100) randn(100, 10)]
 y = int(inverselogit(X * β) .> rand(100))
 
-o = LogRegSGD(X, y, StochasticWeighting(1.0))
+o = LogRegSGD2(X, y, StochasticWeighting(.6))
 df = DataFrame(o)  # Create DataFrame
 ```
 

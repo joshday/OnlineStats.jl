@@ -2,48 +2,41 @@
 
 
 ```{julia; term=false; eval=true}
-using OnlineStats
-using Distributions, StatsBase, Gadfly, DataFrames
+using OnlineStats, Distributions, StatsBase, Gadfly, DataFrames
 ```
 
 ### Function to help generate data
 ```{julia; term=false; eval=true}
-logitexp(x) = 1 / (1 + exp(-x))
-@vectorize_1arg Real logitexp
+inverselogit(x) = 1 / (1 + exp(-x))
+@vectorize_1arg Real inverselogit
 ```
 
 ### Create model with the first batch
 ```{julia; term=false; eval=true}
-β = ([1:10] - 10/2) / 10
-xs = randn(100, 10)
-ys = vec(logitexp(xs * β))
-for i in 1:length(ys)
-    ys[i] = rand(Bernoulli(ys[i]))
-end
+β = [-.5:.1:.5]
+X = [ones(100) randn(100, 10)]
+y = int(inverselogit(X * β) .> rand(100))
 
-obj = LogRegMM(xs, ys, r=.8)
-df = make_df(obj) # Save estimates to DataFrame
+o = LogRegMM(X, y, StochasticWeighting(.8))
+df = DataFrame(o)  # Create DataFrame
 ```
 
 ### Update model with many batches
 ```{julia; term=false; eval=true}
-for i in 1:999
-    xs = randn(100, 10)
-    ys = vec(logitexp(xs * β))
-    for i in 1:length(ys)
-        ys[i] = rand(Distributions.Bernoulli(ys[i]))
-    end
+for i in 1:9999
+    X = [ones(100) randn(100, 10)]
+    y = int(inverselogit(X * β) .> rand(100))
 
-    update!(obj, xs, ys)
-    make_df!(df, obj)  # append results to DataFrame
+    updatebatch!(o, X, y)
+    push!(df, o)  # append results to DataFrame
 end
 ```
 
 ### Check fit
 ```{julia; term=true}
-coef(obj)
-df_melt = melt(df, 12:13)
-plot(df_melt, x=:n, y=:value, color=:variable, Geom.line,
-            yintercept=β, Geom.hline,
+coef(o)
+df_unpacked = unpack_vectors(df)
+plot(df_unpacked, x = :nobs, y = :β, color = :vectorindex, Geom.line,
+            yintercept = β, Geom.hline(color = "black"),
             Scale.y_continuous(minvalue=-.6, maxvalue=.6))
 ```

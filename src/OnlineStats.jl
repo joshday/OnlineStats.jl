@@ -74,6 +74,9 @@ export
     LinRegSGD,
     QuantRegSGD,
     QuantRegMM,
+    LogRegMM,
+    LogRegSGD,
+    LogRegSGD2,
 
     # functions
     nobs,
@@ -148,9 +151,10 @@ include("linearmodel/opca.jl")
 include("linearmodel/opls.jl")
 
 # GLM
-# include("glm/logisticregsgd.jl")
-# include("glm/logisticregmm.jl")
-# include("glm/logisticregsn.jl")
+include("glm/logisticregsgd.jl")
+include("glm/logisticregsgd2.jl")
+include("glm/logisticregmm.jl")
+
 
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
