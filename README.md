@@ -3,7 +3,7 @@
 
 # OnlineStats
 
-Online algorithms for statistics.  See [Examples](doc/examples) and [Implementation Progress](src)
+Online algorithms for statistics.  See [Examples and Implementation Progress](src/README)
 
 
 ## Types 
@@ -12,11 +12,11 @@ A simplified `OnlineStats` type structure:
 
 ```julia
 
-type OnlineStatistic
+type OnlineStatistic{W <: Weighting}
 	estimate         # current estimate
 	sufficient_stat  # values needed to update estimate
 	n                # Number of observations used
-	weighting        # How should new observations be weighted
+	weighting::W     # How should new observations be weighted
 end
 ```
 
@@ -38,6 +38,10 @@ end
 	- construct a `DataFrame` from `o` with column names `statenames(o)` and values `state(o)`
 - `push!(df, o)` 
 	- add `state(o)` to a new row of `df` 
+- `tracedata(o, b, y...; batch = false)`
+	- Create Dataframe of trace results from object `o` using batch size `b` and data `y...`.  If `batch = true`, updates will be done with `updatebatch!` instead of `update`.  Each row of the Dataframe is a snapshow of the object.
+- `unpack_vectors(df)` 
+	- If `tracedata` is used on a vector-valued statistic, `unpack_vectors` is used to give each value of the vector its own row
 
 
 
