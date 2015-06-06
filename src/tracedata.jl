@@ -40,13 +40,12 @@ end
 
 
 
-
 # For OnlineStats with vector output, put the DataFrame created by tracedata()
 # in a nicer structure (for making traceplots).
 #
 # The function appends DataFrames created from each row
 
-function unpack_vectors(df::DataFrame, indexsymbol::String = "β")
+function unpack_vectors(df::DataFrame, indexchar::String = "β")
     n, p = size(df)
     dfnames = names(df)
     resultdf = DataFrame()
@@ -56,9 +55,9 @@ function unpack_vectors(df::DataFrame, indexsymbol::String = "β")
         resultdf[dfnames[j]] = copy(df[1, j])
     end
 
-    # add column for vectorindex
-    colvec = [symbol("$indexsymbol$i") for i in 1:size(resultdf, 1)]
-    resultdf[:vectorindex] = copy(colvec)
+    # add column for variable (index of the vector)
+    colvec = [symbol("$indexchar$i") for i in 1:size(resultdf, 1)]
+    resultdf[:variable] = copy(colvec)
 
     # For each row, make a DataFrame and append it to resultdf
     for i in 2:n
@@ -66,9 +65,27 @@ function unpack_vectors(df::DataFrame, indexsymbol::String = "β")
         for j in 1:p
             tempdf[dfnames[j]] = copy(df[i, j])
         end
-        tempdf[:vectorindex] = copy(colvec)
+        tempdf[:variable] = copy(colvec)
         append!(resultdf, tempdf)
     end
 
+    resultdf
+end
+
+
+function unpack_distribution(df)
+    typeof(df[1,1]) <: UnivariateDistribution ||
+        error("First row does not have UnivariateDistribution")
+
+    # create first row to get correct names and data types
+    resultdf = convert(DataFrame, [params(df[1,1])...]')
+    @compat resultdf[:nobs] = Int(df[1,end])
+    names!(resultdf, [names(df[1,1]); :nobs])
+
+    p = length(params(df[1,1]))
+
+    for i in 2:size(df, 1)
+        push!(resultdf, [[params(df[i,1])...]; df[i, end]])
+    end
     resultdf
 end

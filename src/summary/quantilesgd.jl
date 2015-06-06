@@ -2,7 +2,7 @@
 type QuantileSGD <: OnlineStat
     q::VecF              # Quantile estimates
     τ::VecF                # tau values (which quantiles)
-    n::Int64               # number of observations used
+    n::Int64
     weighting::StochasticWeighting
 end
 

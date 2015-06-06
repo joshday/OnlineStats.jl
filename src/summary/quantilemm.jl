@@ -57,22 +57,19 @@ end
 function updatebatch!(o::QuantileMM, y::VecF)
     γ = weight(o)
     n = length(y)
-    o.o = smooth(o.o, n, γ)
+    @compat o.o = smooth(o.o, Float64(n), γ)
 
     for i in 1:length(o.τ)
         # Update sufficient statistics
         w::Vector = abs(y - o.q[i]) .^ -1
-        o.s[i] = smooth(o.s[i], w'y, γ)
+        o.s[i] = smooth(o.s[i], sum(w .* y), γ)
         o.t[i] = smooth(o.t[i], sum(w), γ)
-#         o.s[i] += γ * (sum(w .* y) - o.s[i])
-#         o.t[i] += γ * (sum(w) - o.t[i])
-#         o.o += γ * (n - o.o)
         # Update quantile
         o.q[i] = (o.s[i] + o.o * (2 * o.τ[i] - 1)) / o.t[i]
     end
 
     o.n += n
-    o.nb += 1
+    return
 end
 
 
