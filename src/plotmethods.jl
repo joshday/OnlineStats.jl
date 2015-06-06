@@ -18,7 +18,7 @@ end
 
 
 #--------------------------------------------------------------# Normal Mixture
-function Gadfly.plot(o::MixtureModel{Univariate, Continuous, Normal}, a, b;
+function Gadfly.plot(o::MixtureModel{Univariate, Continuous, Normal}, a::Int, b::Int,
                      args...)
     plotvec = [x -> pdf(o, x)]
     legendvec = ["Mixture"]
@@ -33,13 +33,14 @@ end
 
 
 #----------------------------------------# Normal Mixture overlaid on histogram
-function Gadfly.plot(o::MixtureModel{Univariate, Continuous, Normal}, x;
+function Gadfly.plot(o::MixtureModel{Univariate, Continuous, Normal}, x::Vector,
                      args...)
     a = maximum(x)
     b = minimum(x)
-    xvals = a:(b-a)/1000:b
+    xvals = linspace(a, b, 1000)
     yvals = pdf(o, xvals)
-    Gadfly.plot(Gadfly.layer(x = xvals, y=yvals, Gadfly.Geom.line, order = 1,
+    Gadfly.plot(Gadfly.layer(x = xvals, y = yvals, Gadfly.Geom.line, order = 1,
         Gadfly.Theme(default_color = Gadfly.color("black"))),
-        Gadfly.layer(x = x, Gadfly.Geom.histogram(density = true), order = 0))
+        Gadfly.layer(x = x, Gadfly.Geom.histogram(density = true), order = 0),
+                args...)
 end
