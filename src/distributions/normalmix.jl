@@ -9,19 +9,19 @@ type NormalMix <: DistributionStat
 end
 
 
-function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting(),
+function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting();
                    start = emstart(p, y, verbose = false))
-    o = NormalMix(p, wgt, start)
+    o = NormalMix(p, wgt, start = start)
     updatebatch!(o, y)
     o
 end
-function NormalMix(p::Int, y::Float64, wgt::StochasticWeighting = StochasticWeighting(),
+function NormalMix(p::Int, y::Float64, wgt::StochasticWeighting = StochasticWeighting();
                    start = MixtureModel(map((u,v) -> Normal(u, v), zeros(p), ones(p))))
-    o = NormalMix(p, wgt, start)
+    o = NormalMix(p, wgt, start = start)
     update!(o, y)
     o
 end
-function NormalMix(p::Int, wgt::StochasticWeighting = StochasticWeighting(),
+function NormalMix(p::Int, wgt::StochasticWeighting = StochasticWeighting();
                    start = MixtureModel(map((u,v) -> Normal(u, v), zeros(p), ones(p))))
     NormalMix(start, zeros(p), zeros(p), zeros(p), 0, wgt)
 end
@@ -61,6 +61,7 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
 
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += n
+    return
 end
 
 
@@ -86,6 +87,7 @@ function update!(o::NormalMix, y::Float64)
 
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += 1
+    return
 end
 
 

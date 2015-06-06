@@ -84,7 +84,7 @@ makenice{T<:Number}(da::DataArray{T}) = DataArrays.array(da)
 
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
-    println("Online" * string(typeof(o)) * ", nobs:" * string(nobs(o)))
+    println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))
     show(o.d)
 end
 
