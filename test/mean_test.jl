@@ -47,9 +47,9 @@ facts("Mean") do
         @fact mean(o2) => x1[1]
         @fact nobs(o2) => 1
 
-        @fact OnlineStats.center(o, mean(o)) => 0.0
-        @fact OnlineStats.uncenter(o, -mean(o)) => 0.0
-        @fact OnlineStats.center!(o, mean(o)) => 0.0
+        @fact OnlineStats.center(o, mean(o)) => roughly(0.0)
+        @fact OnlineStats.uncenter(o, -mean(o)) => roughly(0.0)
+        @fact OnlineStats.center!(o, mean(o)) => roughly(0.0)
 
         empty!(o)
         @fact mean(o) => 0.0
@@ -58,13 +58,37 @@ facts("Mean") do
     end
 
     context("Means") do
-        n = rand(1:1_000_000)
+        n = rand(1:100_000)
         p = rand(2:100)
         x1 = rand(n, p)
         o = Means(x1)
         @fact statenames(o) => [:μ, :nobs]
         @fact state(o) => Any[mean(o), nobs(o)]
         @fact mean(o) => roughly(vec(mean(x1, 1)))
+
+        x2 = rand(n, p)
+        updatebatch!(o, x2)
+        @fact mean(o) => roughly(vec(mean([x1; x2], 1)), 1e-3)
+
+        x1 = rand(10)
+        x2 = rand(10)
+        o = Means(x1)
+        @fact mean(o) => x1
+
+        @fact OnlineStats.center(o, x1) => zeros(10)
+        @fact OnlineStats.center!(o, x2) => x2 - vec(mean([x1 x2], 2))
+        @fact OnlineStats.uncenter(o, -mean(o)) => roughly(zeros(10))
+
+        empty!(o)
+        @fact mean(o) => zeros(10)
+        @fact nobs(o) => 0
+
+        o1 = Means(x1)
+        o2 = Means(x2)
+        o3 = merge!(o1, o2)
+        update!(o1, x2)
+        @fact mean(o1) => mean(o3)
+        @fact nobs(o1) => nobs(o3)
     end
 
 end # facts
