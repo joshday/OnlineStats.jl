@@ -7,7 +7,10 @@ default(::Type{Weighting}) = EqualWeighting()
 
 #---------------------------------------------------------------------------#
 
-smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
+# smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
+
+# More stable version?
+smooth{T}(avg::T, v::T, λ::Float64) = avg + λ * (v - avg)
 
 # This removes garbage collection time when updating arrays
 function smooth!{T}(avg::Vector{T}, v::Vector{T}, λ::Float64)
@@ -51,8 +54,9 @@ type StochasticWeighting <: Weighting
     nb::Int64   # number of batches
     λ::Float64  # minimum step size
     function StochasticWeighting(r::Float64 = .51, λ::Float64 = 0.)
-        @assert r > .5 && r <= 1
+        @assert r > .0 && r <= 1
         @assert λ >= 0. && λ <= 1.
+        r <= .5 && warn("r <= .5 is only valid for using Polyak/Ruppert Averaging")
         new(r, 0, λ)
     end
 end

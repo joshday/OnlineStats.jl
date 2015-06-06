@@ -11,7 +11,7 @@ import Distributions:
     MvNormal, Normal, MixtureModel, FDist, TDist,
 
     # Other
-    fit_dirichlet!, Univariate, Continuous,
+    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
 
     # Methods for DistributionStat
     pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
