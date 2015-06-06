@@ -46,7 +46,7 @@ function update!(o::Means, y::MatF)
 end
 
 function updatebatch!(o::Means, y::MatF)
-    smooth!(o.μ, vec(mean(y, 1)), weight(o))
+    smooth!(o.μ, vec(mean(y, 1)), weight(o, size(y, 1)))
     o.n += size(y, 1)
     return
 end
