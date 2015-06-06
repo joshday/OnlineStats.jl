@@ -13,38 +13,48 @@ facts("Mean") do
         x2 = rand(n2)
         x = [x1, x2]
 
-        obj = Mean(x1)
-        @fact obj.μ => roughly(mean(x1))
-        @fact obj.n => n1
+        o = Mean(x1)
+        @fact o.μ => roughly(mean(x1))
+        @fact o.n => n1
 
-        update!(obj, x2)
-        @fact obj.μ => roughly(mean(x))
-        @fact obj.n => n
+        update!(o, x2)
+        @fact o.μ => roughly(mean(x))
+        @fact o.n => n
 
-        obj1 = Mean(x1)
-        obj2 = Mean(x2)
-        obj3 = merge(obj1, obj2)
-        merge!(obj1, obj2)
-        @fact obj1.n => obj3.n
-        @fact obj1.μ => roughly(obj3.μ)
-        @fact mean(x)=> roughly(mean(obj1))
+        o1 = Mean(x1)
+        o2 = Mean(x2)
+        o3 = merge(o1, o2)
+        merge!(o1, o2)
+        @fact o1.n => o3.n
+        @fact o1.μ => roughly(o3.μ)
+        @fact mean(x)=> roughly(mean(o1))
 
 
         # empty constructor, state, Base.mean, nobs, Base.copy
-        obj = Mean()
-        @fact obj.μ => 0.0
-        @fact obj.n => 0
-        # @fact state(obj, DataFrame) => DataFrame(variable = :μ, value = 0., nobs=0)
-        @fact mean(obj) => 0.0
-        update!(obj, x1)
-        @fact mean(obj) => roughly(mean(x1))
-        @fact nobs(obj) => n1
-        obj1 = copy(obj)
-        @fact mean(obj) => roughly(mean(x1))
-        @fact nobs(obj) => n1
-        obj2 = Mean(x1[1])
-        @fact mean(obj2) => x1[1]
-        @fact nobs(obj2) => 1
+        o = Mean()
+        @fact o.μ => 0.0
+        @fact o.n => 0
+        @fact state(o) => Any[0.0, 0]
+        @fact statenames(o) => [:μ, :nobs]
+        @fact mean(o) => 0.0
+        update!(o, x1)
+        @fact mean(o) => roughly(mean(x1))
+        @fact nobs(o) => n1
+        o1 = copy(o)
+        @fact mean(o) => roughly(mean(x1))
+        @fact nobs(o) => n1
+        o2 = Mean(x1[1])
+        @fact mean(o2) => x1[1]
+        @fact nobs(o2) => 1
+
+        @fact OnlineStats.center(o, mean(o)) => 0.0
+        @fact OnlineStats.uncenter(o, -mean(o)) => 0.0
+        @fact OnlineStats.center!(o, mean(o)) => 0.0
+
+        empty!(o)
+        @fact mean(o) => 0.0
+        @fact nobs(o) => 0
+        @fact OnlineStats.weight(o, 1) => 1.
     end
 
     context("Means") do
