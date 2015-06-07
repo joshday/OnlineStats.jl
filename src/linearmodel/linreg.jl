@@ -55,7 +55,7 @@ end
 function confint{T <: Real}(o::LinReg, level::T = 0.95)
     β = coef(o)
     mult = stderr(o) * quantile(TDist(o.n - length(β)), (1. - level) / 2.)
-    hcat(β, β) + stderr(o) * mult * [1. -1.]
+    hcat(β, β) + mult * [1. -1.]
 end
 
 stderr(o::LinReg) = sqrt(diag(vcov(o)))
