@@ -69,6 +69,8 @@ facts("Variance") do
         @fact OnlineStats.unstandardize(o, x) => x * std(o) + mean(o)
         OnlineStats.standardize!(o, 0.)
         @fact nobs(o) => 102
+        o = Variance()
+        @fact OnlineStats.standardize!(o, 1.) => 0.
 
         empty!(o)
         @fact mean(o) => 0.

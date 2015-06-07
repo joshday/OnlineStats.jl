@@ -227,34 +227,34 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
 #                                                                     MvNormal #
 #------------------------------------------------------------------------------#
-    context("MvNormal") do
-        n1 = rand(1:1_000_000)
-        n2 = rand(1:1_000_000)
-        d = rand(3:10)
-        x1 = rand(MvNormal(zeros(d), eye(d)), n1)
-        x2 = rand(MvNormal(zeros(d), eye(d)), n2)
-        x = [x1  x2]
+#     context("MvNormal") do
+#         n1 = rand(1:1_000_000)
+#         n2 = rand(1:1_000_000)
+#         d = rand(3:10)
+#         x1 = rand(MvNormal(zeros(d), eye(d)), n1)
+#         x2 = rand(MvNormal(zeros(d), eye(d)), n2)
+#         x = [x1  x2]
 
-        o = onlinefit(MvNormal, x1)
-        @fact o.d.μ => roughly(vec(mean(x1, 2)))
-        @fact mean(o.c) => roughly(vec(mean(x1, 2)))
-        @fact cov(o.c) => roughly(cov(x1'))
-        @fact cov(o.c) => roughly(o.d.Σ.mat)
-        @fact o.n => n1
+#         o = onlinefit(MvNormal, x1)
+#         @fact o.d.μ => roughly(vec(mean(x1, 2)))
+#         @fact mean(o.c) => roughly(vec(mean(x1, 2)))
+#         @fact cov(o.c) => roughly(cov(x1'))
+#         @fact cov(o.c) => roughly(o.d.Σ.mat)
+#         @fact o.n => n1
 
-        OnlineStats.updatebatch!(o, x2)
-        @fact o.d.μ => roughly(vec(mean(x, 2)))
-        @fact mean(o.c) => roughly(vec(mean(x, 2)))
-        @fact cov(o.c) => roughly(cov(x'))
-        @fact o.n => n1 + n2
+#         OnlineStats.updatebatch!(o, x2)
+#         @fact o.d.μ => roughly(vec(mean(x, 2)))
+#         @fact mean(o.c) => roughly(vec(mean(x, 2)))
+#         @fact cov(o.c) => roughly(cov(x'))
+#         @fact o.n => n1 + n2
 
-        o1 = copy(o)
-        @fact o1.d.μ => roughly(vec(mean(x, 2)))
-        @fact mean(o1.c) => roughly(vec(mean(x, 2)))
-        @fact cov(o1.c) => roughly(cov(x'))
-        @fact o1.n => n1 + n2
-        @fact state(o) => [o.d, o.n]
-    end
+#         o1 = copy(o)
+#         @fact o1.d.μ => roughly(vec(mean(x, 2)))
+#         @fact mean(o1.c) => roughly(vec(mean(x, 2)))
+#         @fact cov(o1.c) => roughly(cov(x'))
+#         @fact o1.n => n1 + n2
+#         @fact state(o) => [o.d, o.n]
+#     end
 
 
 #------------------------------------------------------------------------------#
@@ -293,7 +293,8 @@ facts("Distributions") do
         x = randn(100)
         o1 = FitNormal(x)
         o2 = onlinefit(Normal, x)
-        @fact o1 => o2
+        @fact o1.d => o2.d
+        @fact nobs(o1) => nobs(o2)
     end
 
 end # facts
