@@ -79,6 +79,7 @@ export
     LogRegSGD2,
 
     # functions
+    nobs,
     update!,
     updatebatch!,
     state,
