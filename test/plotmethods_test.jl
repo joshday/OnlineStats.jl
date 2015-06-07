@@ -1,4 +1,4 @@
-module CommonTest
+module PlotMethodsTest
 
 using OnlineStats, FactCheck, Gadfly
 

@@ -32,7 +32,7 @@ facts("Variance") do
         @fact o1.biasedvar => roughly(o3.biasedvar)
 
         @fact mean(x) => roughly(mean(o1))
-        @fact var(x) => roughly(var(o1), 1e-5) "might need special batch update for Variance?"
+        @fact var(x) => roughly(var(o1), 1e-5)
 
 
         o = Variance()
