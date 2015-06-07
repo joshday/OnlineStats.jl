@@ -42,7 +42,7 @@ end
 
 
 #------------------------------------------------------------------------# Base
-function StatsBase.coeftable(o::LinReg)
+function coeftable(o::LinReg)
     β = coef(o)
     p = length(β)
     se = stderr(o)
@@ -52,17 +52,17 @@ function StatsBase.coeftable(o::LinReg)
               ["x$i" for i = 1:p], 4)
 end
 
-function StatsBase.confint{T <: Real}(o::LinReg, level::T = 0.95)
+function confint{T <: Real}(o::LinReg, level::T = 0.95)
     β = coef(o)
-    hcat(β, β) + stderr(o) *
-    quantile(TDist(o.n - length(β)), (1. - level)/2.) * [1. -1.]
+    mult = stderr(o) * quantile(TDist(o.n - length(β)), (1. - level) / 2.)
+    hcat(β, β) + stderr(o) * mult * [1. -1.]
 end
 
-StatsBase.stderr(o::LinReg) = sqrt(diag(vcov(o)))
+stderr(o::LinReg) = sqrt(diag(vcov(o)))
 
-StatsBase.vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / o.n)
+vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / o.n)
 
-function StatsBase.predict(o::LinReg, x::Matrix; addintercept = false)
+function predict(o::LinReg, x::Matrix; addintercept = false)
     if addintercept
         β = coef(o)
         β[1] + x * β[2:end]

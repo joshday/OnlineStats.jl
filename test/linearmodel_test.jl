@@ -6,7 +6,7 @@ using GLM
 using StatsBase
 
 facts("LinearModel") do
-    n = rand(1:100_000)
+    n = rand(10_000:100_000)
     p = rand(1:min(n-1, 100))
 
     x = randn(n, p)
@@ -36,6 +36,18 @@ facts("LinearModel") do
     @fact ct1.colnms => ct2.colnms
     @fact ct1.rownms => ct2.rownms
     @fact ct1.mat - ct2.mat => roughly(zeros(2, 4), .01)
+    @fact confint(o) => roughly(confint(glm))
+
+    β = ones(10)
+    x = randn(100, 10)
+    y = x*β + randn(100)
+    o = LinReg(x, y)
+    for i in 1:10_000
+        randn!(x)
+        y = x*β + randn(100)
+        updatebatch!(o, x, y)
+    end
+    @fact coef(o) => roughly(ones(10), .01)
 end
 
 end # module
