@@ -1,23 +1,23 @@
 module OnlineStatsTests
 using FactCheck
 
-@time include("common_test.jl")
-@time include("mean_test.jl")
-@time include("var_test.jl")
-# @time include("summary_test.jl")
-# @time include("extrema_test.jl")
-# @time include("moments_test.jl")
-# @time include("quantiles_test.jl")
+include("common_test.jl")
+include("mean_test.jl")
+include("var_test.jl")
+#  include("summary_test.jl")
+#  include("extrema_test.jl")
+#  include("moments_test.jl")
+#  include("quantiles_test.jl")
 
-# @time include("linearmodel_test.jl")
-# @time include("sweep_test.jl")
-# @time include("quantreg_test.jl")
+#  include("linearmodel_test.jl")
+#  include("sweep_test.jl")
+#  include("quantreg_test.jl")
 
-# @time include("distribution_test.jl")
-# @time include("normalmix_test.jl")
+#  include("distribution_test.jl")
+#  include("normalmix_test.jl")
 
-# @time include("covmatrix_test.jl")
-# @time include("analyticalpca_test.jl")
+#  include("covmatrix_test.jl")
+#  include("analyticalpca_test.jl")
 
 include("plotmethods_test.jl")
 

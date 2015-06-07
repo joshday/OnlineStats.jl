@@ -14,6 +14,7 @@ facts("Variance") do
         x = [x1; x2]
 
         o = Variance(x1)
+        @fact OnlineStats.name(o) => "OVar"
         @fact o.μ => roughly(mean(x1))
         @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1), 1e-5)
         @fact o.n => n1
@@ -53,6 +54,30 @@ facts("Variance") do
         @fact var(o1) => roughly(var(x1))
         @fact o.n => n1
         @fact nobs(o) => n1
+
+        x = rand()
+        o = Variance(x)
+        @fact mean(o) => x
+        @fact var(o) => 0.
+        @fact nobs(o) => 1
+        @fact std(o) => 0.
+
+        @fact OnlineStats.if0then1(0.) => 1.
+        @fact OnlineStats.if0then1(x) => x
+        update!(o, rand(100))
+        @fact OnlineStats.standardize(o, x) => (x - mean(o)) / std(o)
+        @fact OnlineStats.unstandardize(o, x) => x * std(o) + mean(o)
+        OnlineStats.standardize!(o, 0.)
+        @fact nobs(o) => 102
+
+        empty!(o)
+        @fact mean(o) => 0.
+        @fact var(o) => 0.
+
+        o2 = Variance(rand(100))
+        o = [o; o2]
+        print(typeof(o))
+#         OnlineStats.standardize!(o, rand(2))
     end
 
     context("Variances") do
@@ -65,6 +90,40 @@ facts("Variance") do
         @fact var(o) => roughly(vec(var(x1, 1)), 1e-5)
         @fact mean(o) => roughly(vec(mean(x1, 1)))
         @fact std(o) => roughly(vec(std(x1, 1)), 1e-5)
+
+        x = rand(10)
+        o = Variances(x)
+        @fact mean(o) => x
+        @fact var(o) => zeros(10)
+        @fact std(o) => zeros(10)
+        @fact OnlineStats.center(o, x) => zeros(10)
+        @fact OnlineStats.uncenter(o, -x) => zeros(10)
+        @fact OnlineStats.center!(o, x) => zeros(10)
+        @fact nobs(o) => 2
+        update!(o, rand(100, 10))
+        @fact OnlineStats.standardize(o, x) => roughly( (x - mean(o)) ./ std(o))
+        @fact OnlineStats.unstandardize(o, x) => roughly( x .* std(o) + mean(o))
+        OnlineStats.standardize!(o, x)
+        @fact nobs(o) => 103
+
+        empty!(o)
+        @fact mean(o) => zeros(10)
+        @fact var(o) => zeros(10)
+        @fact nobs(o) => 0
+
+        x1 = rand(100, 4)
+        x2 = rand(100, 4)
+        x = [x1, x2]
+        o1 = Variances(x1)
+        o2 = Variances(x2)
+        o3 = merge(o1, o2)
+        merge!(o1, o2)
+        @fact mean(o1) => mean(o3)
+        @fact var(o1) => var(o3)
+
+        @fact nobs(o1) => 200
+        @fact mean(o1) => roughly(vec(mean([x1, x2], 1)))
+        @fact std(o1) => roughly(vec(std([x1, x2], 1)), .01)
     end
 
 end # facts

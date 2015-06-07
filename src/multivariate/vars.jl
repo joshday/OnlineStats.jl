@@ -35,9 +35,18 @@ center(o::Variances, y::VecF) = y - mean(o)
 center!(o::Variances, y::VecF) = (update!(o, y); center(o, y))
 uncenter(o::Variances, y::VecF) = y + mean(o)
 
-standardize(o::Variances, y::VecF) = (y - mean(o)) ./ std(o)
-standardize!(o::Variances, y::VecF) = (update!(o, y); standardize(o, y))
-unstandardize(o::Variances, y::VecF) = y .* std(o) + mean(o)
+function standardize!(o::Variances, y::VecF)
+    update!(o, y)
+    ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
+end
+
+function standardize(o::Variances, y::VecF)
+    ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
+end
+
+function unstandardize(o::Variances, y::VecF)
+    nobs(o) < 2 ? y + mean(o) : y .* std(o) + mean(o)
+end
 
 #---------------------------------------------------------------------# update!
 function update!(o::Variances, y::VecF)
@@ -54,15 +63,6 @@ function update!(o::Variances, y::MatF)
         update!(o, vec(y[i, :]))
     end
     return
-end
-
-function standardize!(o::Variances, y::VecF)
-    update!(o, y)
-    ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
-end
-
-function standardize(o::Variances, y::VecF)
-    ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
 end
 
 #------------------------------------------------------------------------# Base

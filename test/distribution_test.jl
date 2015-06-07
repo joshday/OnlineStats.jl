@@ -293,7 +293,7 @@ facts("Distributions") do
         x = randn(100)
         o1 = FitNormal(x)
         o2 = onlinefit(Normal, x)
-        @test o1 => o2
+        @fact o1 => o2
     end
 
 end # facts
