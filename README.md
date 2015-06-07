@@ -3,7 +3,7 @@
 
 # OnlineStats
 
-Online algorithms for statistics.  See [Examples and Implementation Progress](src/README)
+Online algorithms for statistics.  See [Examples and Implementation Progress](src/README.md)
 
 
 ## Types 

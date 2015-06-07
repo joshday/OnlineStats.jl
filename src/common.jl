@@ -49,7 +49,7 @@ function Base.show(io::IO, o::OnlineStat)
     snames = statenames(o)
     svals = state(o)
 
-    println(io, "Online_", name(o))
+    println(io, "Online ", name(o))
     for (i, sname) in enumerate(snames)
         println(io, @sprintf(" * %8s:  %s\n", sname, mystring(svals[i])))
     end
@@ -78,7 +78,7 @@ function getnice(df::DataFrame, s::Symbol)
 end
 
 makenice{T<:Vector}(da::DataArray{T}) = hcat(da...)'
-makenice{T<:Number}(da::DataArray{T}) = DataArrays.array(da)
+makenice{T<:Number}(da::DataArray{T}) = Convert(Array, da)
 
 
 

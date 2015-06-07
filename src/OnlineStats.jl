@@ -18,7 +18,7 @@ import Distributions:
     failprob, scale, location, shape, rate, ncategories, ntrials, dof,
     mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
     entropy, mgf, cf, insupport, pdf, logpdf, loglikelihood, cdf, logcdf, ccdf,
-    logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!
+    logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
 # import PDMats  # Is this needed?
 import DataFrames: DataFrame, names!, pool!
 import DataArrays

@@ -73,7 +73,7 @@ function unpack_vectors(df::DataFrame, indexchar::String = "β")
 end
 
 
-function unpack_distribution(df)
+function unpack_distributions(df)
     typeof(df[1,1]) <: UnivariateDistribution ||
         error("First row does not have UnivariateDistribution")
 
