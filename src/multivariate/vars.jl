@@ -65,6 +65,15 @@ function update!(o::Variances, y::MatF)
     return
 end
 
+function updatebatch!(o::Variances, y::MatF)
+    n2 = size(y, 1)
+    λ = weight(o, n2)
+    smooth!(o.μ, vec(mean(y, 1)), λ)
+    smooth!(o.biasedvar, vec(var(y, 1)) * ((n2 - 1) / n2), λ)
+    o.n += n2
+    return
+end
+
 #------------------------------------------------------------------------# Base
 function Base.empty!(o::Variances)
     p = length(o.μ)

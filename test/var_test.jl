@@ -78,6 +78,12 @@ facts("Variance") do
         o = [o; o2]
         print(typeof(o))
 #         OnlineStats.standardize!(o, rand(2))
+
+        x = rand(100)
+        o = Variance()
+        updatebatch!(o, x)
+        @fact mean(o) => mean(x)
+        @fact var(o) => roughly(var(x))
     end
 
     context("Variances") do
@@ -124,6 +130,12 @@ facts("Variance") do
         @fact nobs(o1) => 200
         @fact mean(o1) => roughly(vec(mean([x1, x2], 1)))
         @fact std(o1) => roughly(vec(std([x1, x2], 1)), .01)
+
+        x = rand(100, 5)
+        o = Variances(5)
+        updatebatch!(o, x)
+        @fact mean(o) => vec(mean(x, 1))
+        @fact var(o) => roughly(vec(var(x, 1)))
     end
 
 end # facts

@@ -55,7 +55,16 @@ function update!(o::Variance, y::Float64)
     return
 end
 
-# Base.copy(o::Variance) = Variance(o.μ, o.biasedvar, o.n, o.weighting)
+function updatebatch!(o::Variance, y::VecF)
+    n2 = length(y)
+    μ = mean(y)
+    δ = μ - o.μ
+    λ = weight(o, n2)
+    o.μ = smooth(o.μ, μ, λ)
+    o.biasedvar = o.biasedvar + var(y) * ((n2 - 1) / n2) + λ * (1 - λ) * δ ^ 2
+    o.n += n2
+end
+
 
 # NOTE:
 function Base.empty!(o::Variance)

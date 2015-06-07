@@ -7,10 +7,10 @@ default(::Type{Weighting}) = EqualWeighting()
 
 #---------------------------------------------------------------------------#
 
-# smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
+smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
 
 # More stable version?
-smooth{T}(avg::T, v::T, λ::Float64) = avg + λ * (v - avg)
+# smooth{T}(avg::T, v::T, λ::Float64) = avg + λ * (v - avg)
 
 # This removes garbage collection time when updating arrays
 function smooth!{T}(avg::Vector{T}, v::Vector{T}, λ::Float64)
@@ -60,8 +60,8 @@ type StochasticWeighting <: Weighting
         new(r, 0, λ)
     end
 end
-@compat function weight(w::StochasticWeighting, unused, n2)
-    w.nb += n2
+@compat function weight(w::StochasticWeighting, unused1, unused2)
+    w.nb += 1
     max(Float64(w.nb) ^ -w.r, w.λ)
 end
 
