@@ -24,7 +24,7 @@ end
 statenames(o::LinReg) = [:β, :nobs]
 state(o::LinReg) = Any[coef(o), nobs(o)]
 
-StatsBase.coef(o::LinReg) = vec(o.s[end, 1:end - 1])
+coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 
 mse(o::LinReg) = o.s[end, end] * o.n / (o.n - size(o.s, 1))
 
@@ -62,9 +62,13 @@ StatsBase.stderr(o::LinReg) = sqrt(diag(vcov(o)))
 
 StatsBase.vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / o.n)
 
-function StatsBase.predict(o::LinReg, x::Matrix)
-    β = coef(o)
-    β[1] + x * β[2:end]
+function StatsBase.predict(o::LinReg, x::Matrix; addintercept = false)
+    if addintercept
+        β = coef(o)
+        β[1] + x * β[2:end]
+    else
+        x * coef(o)
+    end
 end
 
 
