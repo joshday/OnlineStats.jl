@@ -89,6 +89,9 @@ facts("Mean") do
         update!(o1, x2)
         @fact mean(o1) => mean(o3)
         @fact nobs(o1) => nobs(o3)
+
+        o = Means(5, StochasticWeighting(.7))
+        o = Means(zeros(5), 5, 0, StochasticWeighting(.7))
     end
 
 end # facts
