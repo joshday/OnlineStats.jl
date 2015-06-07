@@ -1,6 +1,6 @@
 module PlotMethodsTest
 
-using OnlineStats, FactCheck, Gadfly
+using OnlineStats, FactCheck, Gadfly, Distributions
 
 include(Pkg.dir("OnlineStats", "src", "plotmethods.jl"))
 
