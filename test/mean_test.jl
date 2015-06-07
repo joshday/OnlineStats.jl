@@ -55,6 +55,12 @@ facts("Mean") do
         @fact mean(o) => 0.0
         @fact nobs(o) => 0
         @fact OnlineStats.weight(o, 1) => 1.
+
+        o = Mean()
+        x = rand(100)
+        updatebatch!(o, x)
+        @fact mean(o) => mean(x)
+        @fact nobs(o) => 100
     end
 
     context("Means") do

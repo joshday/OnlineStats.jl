@@ -1,6 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
-type Mean{W<:Weighting} <: OnlineStat
+type Mean{W <: Weighting} <: OnlineStat
     μ::Float64
     n::Int64
     weighting::W
@@ -33,6 +33,12 @@ function update!(o::Mean, y::Float64)
     o.μ = smooth(o.μ, y, weight(o))
     o.n += 1
     return
+end
+
+function updatebatch!(o::Mean, y::VecF)
+    n2 = length(y)
+    o.μ = smooth(o.μ, mean(y), weight(o, n2))
+    o.n += n2
 end
 
 #------------------------------------------------------------------------# Base
