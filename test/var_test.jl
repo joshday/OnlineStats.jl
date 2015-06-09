@@ -13,6 +13,11 @@ facts("Variance") do
         x2 = rand(n2)
         x = [x1; x2]
 
+        @fact Variance(x1).μ => roughly(mean(x1))
+        @fact Variance(x1).biasedvar => roughly(var(x1 * (n1 - 1) / n1))
+        @fact Variance(x1).n => n1
+        @fact Variance(x1).weighting => EqualWeighting()
+
         o = Variance(x1)
         @fact OnlineStats.name(o) => "OVar"
         @fact o.μ => roughly(mean(x1))

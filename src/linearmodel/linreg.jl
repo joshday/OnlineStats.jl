@@ -62,7 +62,7 @@ stderr(o::LinReg) = sqrt(diag(vcov(o)))
 
 vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / o.n)
 
-predict(o::LinReg, x::Matrix; addintercept = false) = x * coef(o)
+predict(o::LinReg, x::Matrix) = x * coef(o)
 
 
 

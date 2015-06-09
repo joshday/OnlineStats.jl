@@ -49,6 +49,7 @@ facts("LinearModel") do
         updatebatch!(o, x, y)
     end
     @fact coef(o) => roughly(ones(10), .01)
+    @fact predict(o, x) => x * coef(o)
 end
 
 end # module

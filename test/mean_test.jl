@@ -22,6 +22,9 @@ facts("Mean") do
         @fact o.n => n
 
         o1 = Mean(x1)
+        @fact Mean(x1).μ => roughly(mean(x1))
+        @fact Mean(x1).n => n1
+        @fact Mean(x1).weighting => EqualWeighting()
         o2 = Mean(x2)
         o3 = merge(o1, o2)
         merge!(o1, o2)

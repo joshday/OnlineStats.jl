@@ -11,7 +11,7 @@ name(o::Variance) = "OVar"
 
 function Variance{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
     o = Variance(wgt)
-    update!(o, y)  # apply the weighting scheme, as opposed to initializing with classic variance
+    update!(o, y)
     o
 end
 
