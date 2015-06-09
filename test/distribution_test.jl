@@ -78,7 +78,7 @@ facts("Distributions") do
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
         ntrials = rand(1:1000)
-        p = rand(1)[1]
+        p = rand()
         x1 = rand(Binomial(ntrials, p), n1)
         x2 = rand(Binomial(ntrials, p), n2)
         x = [x1, x2]

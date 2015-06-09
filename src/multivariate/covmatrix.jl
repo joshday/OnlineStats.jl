@@ -71,5 +71,5 @@ function Base.merge!(c1::CovarianceMatrix, c2::CovarianceMatrix)
     λ = mergeweight(c1, c2)
     c1.A = smooth(c1.A, c2.A, λ)
     c1.B = smooth(c1.B, c2.B, λ)
-    c1.n += n2
+    c1.n += c2.n
 end

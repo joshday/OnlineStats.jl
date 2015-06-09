@@ -24,6 +24,15 @@ facts("CovarianceMatrix") do
     c = cov([x1,x2,x3,x4])
     cobj = OnlineStats.cov(obj)
     @fact c => roughly(cobj, 1e-10)
+    @fact var(obj) - vec(var([x1, x2, x3, x4], 1)) => roughly(zeros(10), 1e-10)
+    @fact std(obj) - vec(std([x1, x2, x3, x4], 1)) => roughly(zeros(10), 1e-10)
+
+    o1 = CovarianceMatrix(x1)
+    o2 = CovarianceMatrix(x2)
+    o3 = merge(o1, o2)
+    merge!(o1, o2)
+    @fact cov(o1) => cov(o3)
+
 end
 
 end # module
