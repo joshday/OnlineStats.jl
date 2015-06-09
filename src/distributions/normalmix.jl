@@ -58,6 +58,9 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
     π ./= sum(π)
     μ = o.s2 ./ o.s1
     σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
+    if any(σ .== 0.)
+        σ = ones(nc)
+    end
 
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += n
@@ -84,6 +87,9 @@ function update!(o::NormalMix, y::Float64)
     π ./= sum(π)
     μ = o.s2 ./ o.s1
     σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
+    if any(σ .== 0.)
+        σ = ones(p)
+    end
 
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += 1

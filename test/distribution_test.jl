@@ -19,6 +19,8 @@ facts("Distributions") do
         x = [x1, x2]
 
         o = OnlineStats.onlinefit(Bernoulli, x1)
+        @fact FitBernoulli(x1).d.p => roughly(Bernoulli(mean(x1)).p)
+        @fact FitBernoulli().d.p => 0.
         @fact o.d.p => roughly(mean(x1))
         @fact o.n => n1
 
@@ -85,8 +87,11 @@ facts("Distributions") do
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
         @fact o.n => n1
+        @fact mean(FitBinomial().d) => 0.
+        @fact mean(FitBinomial(zeros(Int, 10))) => 0.
+        @fact mean(FitBinomial(ones(Int, 10))) => 1.
 
-        OnlineStats.update!(o, x2)
+        @fact OnlineStats.update!(o, x2) => nothing
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x) / (ntrials * (n1 + n2)))
         @fact o.n => n1 + n2

@@ -55,6 +55,9 @@ facts("NormalMix") do
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o) => Any[o.d, nobs(o)]
         o = NormalMix(2, x[rng], StochasticWeighting(.8))
+        @fact components(o) => components(o.d)
+        o = NormalMix(3, 0.)
+        @fact update!(o, randn()) => nothing
     end
 
     context("Online: other") do
