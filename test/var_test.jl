@@ -13,8 +13,8 @@ facts("Variance") do
         x2 = rand(n2)
         x = [x1; x2]
 
-        @fact Variance(x1).μ => roughly(mean(x1))
-        @fact Variance(x1).biasedvar => roughly(var(x1 * (n1 - 1) / n1))
+        @fact Variance(x1).μ => roughly(mean(x1), .01)
+        @fact Variance(x1).biasedvar => roughly(var(x1 * (n1 - 1) / n1), .01)
         @fact Variance(x1).n => n1
         @fact Variance(x1).weighting => EqualWeighting()
 
@@ -104,6 +104,8 @@ facts("Variance") do
         @fact var(o) => roughly(vec(var(x1, 1)), 1e-5)
         @fact mean(o) => roughly(vec(mean(x1, 1)))
         @fact std(o) => roughly(vec(std(x1, 1)), 1e-5)
+        @fact typeof(Variances(rand(10,10))) => Variances{EqualWeighting}
+        @fact typeof(Variances(rand(1))) => Variances{EqualWeighting}
 
         x = rand(10)
         o = Variances(x)

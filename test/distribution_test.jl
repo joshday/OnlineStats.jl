@@ -169,7 +169,17 @@ facts("Distributions") do
         x2 = rand(Gamma(α, β), n2)
         x = [x1, x2]
 
+        o = FitGamma()
+        @fact o.d => Gamma()
+        @fact nobs(o) => 0
+        @fact mean(o) => mean(Gamma())
+
+        o = FitGamma(x1)
+        @fact mean(o) => roughly(mean(x1))
+        @fact FitGamma(x1).d => onlinefit(Gamma, x1).d
+        @fact FitGamma(x1).n => onlinefit(Gamma, x1).n
         o = onlinefit(Gamma, x1)
+        @fact onlinefit(Gamma, x1).d => FitGamma(x1).d
         @fact mean(o.m) => roughly(mean(x1))
         @fact mean(o.mlog) => roughly(mean(log(x1)))
         @fact o.n => n1

@@ -56,6 +56,15 @@ facts("NormalMix") do
         @fact state(o) => Any[o.d, nobs(o)]
         o = NormalMix(2, x[rng], StochasticWeighting(.8))
     end
+
+    context("Online: other") do
+        @fact typeof(NormalMix(3).d) <: MixtureModel => true
+        @fact mean(NormalMix(3)) => 0.
+
+        x = randn(1000)
+        @fact mean(NormalMix(3, x)) => roughly(mean(x))
+        @fact std(NormalMix(3, x)) => roughly(std(x), .001)
+    end
 end
 
 end # module
