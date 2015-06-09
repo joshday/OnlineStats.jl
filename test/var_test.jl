@@ -34,6 +34,7 @@ facts("Variance") do
 
         @fact mean(x) => roughly(mean(o1))
         @fact var(x) => roughly(var(o1), 1e-5)
+        @fact update!(o1, x) => nothing
 
 
         o = Variance()

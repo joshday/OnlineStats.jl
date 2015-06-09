@@ -27,7 +27,8 @@ facts("Mean") do
         merge!(o1, o2)
         @fact o1.n => o3.n
         @fact o1.μ => roughly(o3.μ)
-        @fact mean(x)=> roughly(mean(o1))
+        @fact mean(x) => roughly(mean(o1))
+        @fact update!(o, x1) => nothing
 
 
         # empty constructor, state, Base.mean, nobs, Base.copy

@@ -40,7 +40,8 @@ function standardize!(o::Variance, y::Float64)
     standardize(o, y)
 end
 
-standardize!(os::Vector{Variance}, y::VecF) = map(standardize!, os, y)
+# Searching the repo, looks like this isn't used anywhere
+# standardize!(os::Vector{Variance}, y::VecF) = map(standardize!, os, y)
 
 #---------------------------------------------------------------------# update!
 

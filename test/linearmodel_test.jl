@@ -18,7 +18,8 @@ facts("LinearModel") do
     glm = lm(x, y)
     @fact coef(o) => roughly(coef(glm))
     @fact statenames(o) => [:β, :nobs]
-    @fact state(o) => Any[coef(o); nobs(o)]
+    @fact state(o)[1] => coef(o)
+    @fact state(o)[2] => nobs(o)
     @fact mse(o) => roughly( sum( (y - x * coef(o)) .^ 2 ) / (n - p), 1e-3)
     @fact mse(o) => roughly( sum( (y - predict(o, x)) .^ 2 ) / (n - p), 1e-3)
     @fact stderr(o) => roughly(stderr(glm), 1e-3)
