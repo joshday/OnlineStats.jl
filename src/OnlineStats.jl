@@ -79,6 +79,9 @@ export
     LogRegSGD2,
 
     # functions
+    standardize,
+    standardize!,
+    unstandardize,
     nobs,
     update!,
     updatebatch!,
