@@ -44,10 +44,10 @@ end
 
 
 #------------------------------------------------------------------------# Base
-function Base.show(io::IO, o::FitMultinomial)
-    println(io, "Online ", string(typeof(o)))
-    print(" * ")
-    show(o.d)
-    println()
-    @printf(io, " * %s:  %d\n", :nobs, nobs(o))
-end
+# function Base.show(io::IO, o::FitMultinomial)
+#     println(io, "Online ", string(typeof(o)))
+#     print(" * ")
+#     show(o.d)
+#     println()
+#     @printf(io, " * %s:  %d\n", :nobs, nobs(o))
+# end

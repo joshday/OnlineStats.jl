@@ -47,6 +47,10 @@ facts("Distributions") do
 #                                                                         Beta #
 #------------------------------------------------------------------------------#
     context("Beta") do
+        FitBeta()
+        FitBeta(rand(10))
+        onlinefit(Beta, rand(10), ExponentialWeighting(.01))
+
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
         α, β = rand(1:0.1:10, 2)
@@ -139,6 +143,9 @@ facts("Distributions") do
 #                                                                  Exponential #
 #------------------------------------------------------------------------------#
     context("Exponential") do
+        FitExponential()
+        FitExponential(rand(Exponential(), 10))
+
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
         θ = rand(1:1000, 1)[1]
@@ -206,6 +213,9 @@ facts("Distributions") do
 #                                                                  Multinomial #
 #------------------------------------------------------------------------------#
     context("Multinomial") do
+        FitMultinomial(3)
+        FitMultinomial(rand(Multinomial()))
+
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
         n = rand(1:100, 1)[1]

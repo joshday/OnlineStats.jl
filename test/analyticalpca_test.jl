@@ -32,6 +32,11 @@ facts("AnalyticalPCA") do
     for i in 0:99
         @fact abs(o.values[end - i]) => roughly(abs(pca.prinvars[i + 1]))
     end
+
+    @fact statenames(o) => [:v, :λ, :nobs]
+    @fact state(o)[1] => o.vectors
+    @fact state(o)[2] => o.values
+    @fact state(o)[3] => nobs(o)
 end
 
 end # module
