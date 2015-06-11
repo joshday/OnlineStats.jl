@@ -98,18 +98,3 @@ function cdf(o::MixtureModel{Univariate, Continuous, Normal}, x::Float64)
     end
     return result
 end
-
-
-
-# Testing
-if false
-    trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.5, .5])
-    x = rand(trueModel, 10000)
-
-    @time myfit1 = OnlineStats.emstart(2, x, algorithm = :naive, tol = 1e-10)
-    @time myfit2 = OnlineStats.emstart(2, x, algorithm = :kmeans, tol = 1e-10)
-
-    include("src/plotmethods.jl")
-    Gadfly.plot(myfit, x)
-    Gadfly.plot(myfit, -5, 25)
-end

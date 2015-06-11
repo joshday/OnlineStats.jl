@@ -19,6 +19,11 @@ facts("NormalMix") do
         @fact diff => roughly(zeros(2), .001)
         @fact sort(means(myfit1)) => roughly([0., 10.], atol = .5)
         @fact sort(means(myfit2)) => roughly([0., 10.], atol = .5)
+        @fact_throws OnlineStats.emstart(3, randn(100), algorithm = :blah)
+
+        d = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
+        OnlineStats.em(d, rand(d, 1000), verbose = true)
+        @fact cdf(d, 0.) => roughly(.3 * cdf(Normal(0,1), 0.) + .7 * cdf(Normal(10, 5), 0.))
     end
 
     context("Online: updatebatch!") do

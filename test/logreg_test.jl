@@ -7,6 +7,7 @@ logitinverse(x) = 1. / (1 + exp(-x))
 
 facts("LogReg") do
     context("LogRegSGD") do
+        @fact OnlineStats.inverselogit(.5) => 1 / (1 + exp(-.5))
         o = LogRegSGD(5)
 
         β = [1:5]
@@ -25,6 +26,7 @@ facts("LogReg") do
     end
 
     context("LogRegSGD2") do
+        @fact OnlineStats.inverselogit(.5) => 1 / (1 + exp(-.5))
         o = LogRegSGD2(5)
 
         β = [1:5]
@@ -43,6 +45,7 @@ facts("LogReg") do
     end
 
     context("LogRegMM") do
+        @fact OnlineStats.inverselogit(.5) => 1 / (1 + exp(-.5))
         o = LogRegMM(5)
 
         β = [1:5]
