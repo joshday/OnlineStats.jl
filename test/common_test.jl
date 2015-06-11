@@ -28,6 +28,8 @@ facts("Common") do
         df = tracedata(Mean(), 5, rand(100))
         @fact OnlineStats.getnice(df, :μ) => convert(Array, df[1])
         @fact OnlineStats.makenice(df[1]) => convert(Array, df[1])
+        df = tracedata(QuantileMM(), 5, rand(100))
+        @fact vec(OnlineStats.makenice(df[1])[1,:]) => df[1][1]
     end
 
     context("Weighting") do
@@ -84,6 +86,20 @@ facts("Common") do
         @fact quantile(o, 0) => 0.
         @fact cquantile(o, 1) => 0.
         @fact invlogcdf(o, -1) => 0.
+        @fact rand(o) => 0
+        x = ones(Int, 5)
+        @fact rand!(o, x) => zeros(Int, 5)
+        @fact rand(o, 5) => zeros(Int, 5)
+        @fact rand(o, (10, 10)) => zeros(Int, 10, 10)
+
+        o = FitGamma()
+        @fact scale(o) => 1.
+        @fact shape(o) => 1.
+        @fact rate(o) => 1.
+
+        o = FitMultinomial()
+        @fact ncategories(o) => 2
+        @fact ntrials(o) => 1
     end
 end # facts
 end # module

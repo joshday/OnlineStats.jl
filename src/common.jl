@@ -95,12 +95,12 @@ params(o::DistributionStat) = params(o.d)
 succprob(o::DistributionStat) = succprob(o.d)
 failprob(o::DistributionStat) = failprob(o.d)
 scale(o::DistributionStat) = scale(o.d)
-location(o::DistributionStat) = location(o.d)
+# location(o::DistributionStat) = location(o.d)  # doesn't apply to any distribution yet
 shape(o::DistributionStat) = shape(o.d)
 rate(o::DistributionStat) = rate(o.d)
 ncategories(o::DistributionStat) = ncategories(o.d)
 ntrials(o::DistributionStat) = ntrials(o.d)
-dof(o::DistributionStat) = dof(o.d)
+# dof(o::DistributionStat) = dof(o.d)  # doesn't apply to any distribution yet
 
 mean(o::DistributionStat) = mean(o.d)
 var(o::DistributionStat) = var(o.d)
