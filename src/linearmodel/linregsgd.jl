@@ -31,7 +31,7 @@ LinRegSGD(p::Int, wgt::StochasticWeighting = StochasticWeighting(.7), start = ze
 statenames(o::LinRegSGD) = [:β, :nobs]
 state(o::LinRegSGD) = Any[coef(o), nobs(o)]
 
-StatsBase.coef(o::LinRegSGD) = copy(o.β)
+coef(o::LinRegSGD) = copy(o.β)
 
 
 #---------------------------------------------------------------------# update!
@@ -49,7 +49,7 @@ end
 
 
 #------------------------------------------------------------------------# Base
-function StatsBase.predict(o::LinRegSGD, x::Matrix)
+function predict(o::LinRegSGD, x::Matrix)
     β = coef(o)
     β[1] + x * β[2:end]
 end

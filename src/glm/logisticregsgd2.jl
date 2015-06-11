@@ -41,7 +41,7 @@ end
 statenames(o::LogRegSGD2) = [:β, :nobs]
 state(o::LogRegSGD2) = Any[copy(o.β), nobs(o)]
 
-StatsBase.coef(o::LogRegSGD2) = copy(o.β)
+coef(o::LogRegSGD2) = copy(o.β)
 
 
 

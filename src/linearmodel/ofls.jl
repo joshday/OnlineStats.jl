@@ -150,25 +150,25 @@ function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
 end
 
 
-function StatsBase.coef(o::OnlineFLS)
+function coef(o::OnlineFLS)
 	# TODO
 end
 
-function StatsBase.coeftable(o::OnlineFLS)
+function coeftable(o::OnlineFLS)
 	# TODO
 end
 
-function StatsBase.confint(o::OnlineFLS, level::Float64 = 0.95)
+function confint(o::OnlineFLS, level::Float64 = 0.95)
 	# TODO
 end
 
 # predicts yₜ for a given xₜ
-function StatsBase.predict(o::OnlineFLS, x::VecF)
+function predict(o::OnlineFLS, x::VecF)
 	unstandardize(o.yvar, dot(o.β, standardize(o.xvars, x)))
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function StatsBase.predict(o::OnlineFLS, X::MatF)
+function predict(o::OnlineFLS, X::MatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n

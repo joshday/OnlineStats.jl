@@ -25,6 +25,9 @@ facts("Common") do
         @fact OnlineStats.mystring(x) => string(x)
         @fact OnlineStats.mystring(x[1]) => @sprintf("%f", x[1])
 
+        df = tracedata(Mean(), 5, rand(100))
+        @fact OnlineStats.getnice(df, :μ) => convert(Array, df[1])
+        @fact OnlineStats.makenice(df[1]) => convert(Array, df[1])
     end
 
     context("Weighting") do
@@ -38,6 +41,9 @@ facts("Common") do
         show(o)
         print(o)
         @fact OnlineStats.name(o) => string(typeof(o))
+        print(Mean())
+        print(Variance())
+
     end
 
     context("Show DistributionStat") do
@@ -57,6 +63,18 @@ facts("Common") do
         @fact isplatykurtic(o) => isplatykurtic(o.d)
         @fact ismesokurtic(o) => ismesokurtic(o.d)
         @fact entropy(o) => entropy(o.d)
+
+        o = FitBernoulli()
+        @fact succprob(o) => 0.0
+        @fact failprob(o) => 1.0
+        for i in 0:10
+            @fact mgf(o, i) => 1.0
+            @fact cf(o, i) => 1.0
+        end
+        @fact insupport(o, .5) => false
+        @fact pdf(o, 0) => 1.0
+        @fact logpdf(o, 0) => 0.0
+        @fact loglikelihood(o, zeros(Int, 10)) => 0.0
     end
 end # facts
 end # module

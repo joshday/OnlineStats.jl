@@ -3,7 +3,7 @@
 
 
 
-# solving for a dimension-reduced Y = XV', where X (n x d) is the original data, and Y (n x k) is projected 
+# solving for a dimension-reduced Y = XV', where X (n x d) is the original data, and Y (n x k) is projected
 # V (k x d) is a matrix where the columns are the first k eigenvectors of X'X/n (the covariance of X)
 # e (k x 1) is a vector of eigenvectors of the covariance matrix
 
@@ -61,7 +61,7 @@ state(o::OnlinePCA) = Any[copy(o.U), copy(o.V), copy(o.e), copy(mean(o.xmeans)),
 # used https://github.com/kevinhughes27/pyIPCA/blob/master/pyIPCA/ccipca.py as a reference
 
 
-# TODO: optimize, potentially by using view(X, ...) instead of X[...] 
+# TODO: optimize, potentially by using view(X, ...) instead of X[...]
 
 function update!(o::OnlinePCA, x::VecF)
 
@@ -127,13 +127,13 @@ end
 
 
 # returns a vector z = Vx
-StatsBase.predict(o::OnlinePCA, x::VecF) = o.V * center(o.xmeans, x)
+predict(o::OnlinePCA, x::VecF) = o.V * center(o.xmeans, x)
 
-function StatsBase.predict(o::OnlinePCA, X::MatF)
+function predict(o::OnlinePCA, X::MatF)
 	n = size(X,1)
 	Z = zeros(n, o.k)
 	for i in 1:n
-		row!(Z, i, StatsBase.predict(o, row(X,i)))
+		row!(Z, i, predict(o, row(X,i)))
 	end
 	Z
 end
@@ -163,7 +163,7 @@ end
 
 # function getFirstEig(A::MatF)
 # 	eigvals, eigvecs = eig(A)
-	
+
 # 	# resort eigvals, eigvecs and return the first
 # 	sortIndices = sortperm(eigvals, rev=true)
 # 	λ = eigvals[sortIndices[1]]

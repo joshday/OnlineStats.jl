@@ -18,9 +18,9 @@
 # There are 3 phases... model update, weight matrix extraction, and finally least squares fitting.
 
 
-# Model update: 
+# Model update:
 
-# We are trying to maximize Cov(y, Xw) for some dx1 vector of weights w... 
+# We are trying to maximize Cov(y, Xw) for some dx1 vector of weights w...
 #	this will approximate the loadings for the first latent vector.
 # Taking the derivative of a Lagrange function gives us the solution w = Xᵀy / ‖Xᵀy‖
 # Our online model updates the estimate of v := Xᵀy, and also tracks the decomposition of X using OnlinePCA
@@ -28,7 +28,7 @@
 
 # Note: we replace the update of v as in [1] with a smoothed version, which is correct for the exponential case,
 # and approximately correct for the equal weighted case.
-# proof summary for exponential weighting correctness: 
+# proof summary for exponential weighting correctness:
 #		vₜ = ∑ᵗ [λ(1-λ)ᵗ⁻ⁱyᵢXᵢ]
 #			 = λyₜXₜ + ∑ᵗ⁻¹ [λ(1-λ)ᵗ⁻¹⁻ⁱyᵢXᵢ]
 #			 = λyₜXₜ + (1-λ)vₜ₋₁
@@ -46,7 +46,7 @@
 
 # Regression:
 
-# Now that we have our weight matrix W, we can project X into a reduced dimensional space, 
+# Now that we have our weight matrix W, we can project X into a reduced dimensional space,
 #	and should get more robust regression results.
 #		Z = XW
 #		y = Zβ + e
@@ -185,20 +185,20 @@ function Base.merge!(o1::OnlinePLS, o2::OnlinePLS)
 end
 
 
-function StatsBase.coef(o::OnlinePLS)
+function coef(o::OnlinePLS)
 	# TODO
 end
 
-function StatsBase.coeftable(o::OnlinePLS)
+function coeftable(o::OnlinePLS)
 	# TODO
 end
 
-function StatsBase.confint(o::OnlinePLS, level::Float64 = 0.95)
+function confint(o::OnlinePLS, level::Float64 = 0.95)
 	# TODO
 end
 
 # predicts yₜ for a given xₜ
-function StatsBase.predict(o::OnlinePLS, x::VecF)
+function predict(o::OnlinePLS, x::VecF)
 	# center x
 	# multiply Wx to get a (kx1) vector of latent vars
 	# y = predict(fls,Wx)
@@ -209,7 +209,7 @@ function StatsBase.predict(o::OnlinePLS, x::VecF)
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function StatsBase.predict(o::OnlinePLS, X::MatF)
+function predict(o::OnlinePLS, X::MatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n
