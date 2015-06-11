@@ -27,6 +27,14 @@ function update!(obj::FitBeta, y::Float64)
     v = var(obj.stats)
     α = m * (m * (1 - m) / v - 1)
     β = (1 - m) * (m * (1 - m) / v - 1)
+
+    if α <= 0
+        α = .01
+    end
+    if β <= 0
+        β = .01
+    end
+
     obj.d = Beta(α, β)
     obj.n += 1
 end
