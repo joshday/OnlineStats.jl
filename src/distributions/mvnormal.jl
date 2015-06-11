@@ -7,7 +7,7 @@ type FitMvNormal{W <: Weighting} <: DistributionStat
 end
 
 function onlinefit(::Type{MvNormal}, y::MatF, wgt::Weighting = default(Weighting))
-    o = FitMvNormal(size(y, 1), wgt)
+    o = FitMvNormal(size(y, 2), wgt)
     updatebatch!(o, y)
     o
 end
