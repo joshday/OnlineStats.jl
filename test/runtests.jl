@@ -6,6 +6,7 @@ include("mean_test.jl")
 include("var_test.jl")
 include("summary_test.jl")
 include("extrema_test.jl")
+include("fivenumber_test.jl")
 #  include("moments_test.jl")
 include("quantiles_test.jl")
 

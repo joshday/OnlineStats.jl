@@ -1,42 +1,27 @@
-using OnlineStats
-using Base.Test
-using Distributions
-println("fivenumber_test.jl")
+module FiveNumberTest
+using OnlineStats, FactCheck, Distributions
 
-obj_uniform = FiveNumberSummary(rand(100), r = .7)
-obj_normal = FiveNumberSummary(randn(100), r = .7)
+facts("FiveNumberSummary") do
+    x1 = rand(1_000_000)
 
-for i in 1:10000
-    update!(obj_uniform, rand(100))
-    update!(obj_normal, randn(100))
+    o = FiveNumberSummary(x1)
+
+    @fact maximum(o) => maximum(x1)
+    @fact minimum(o) => minimum(x1)
+    @fact statenames(o) => [:min, :q1, :median, :q3, :max, :nobs]
+    @fact state(o) => [o.extrema.min, o.quantiles.q[1], o.quantiles.q[2],
+                              o.quantiles.q[3], o.extrema.max, nobs(o)]
+
+    for i in 1:10000
+        update!(o, rand(100))
+    end
+
+    @fact nobs(o) => 2_000_000
+
+     for i in 1:10000
+        updatebatch!(o, rand(100))
+    end
+
+    @fact nobs(o) => 3_000_000
 end
-
-@test obj_uniform.n == 100 + 10000*100
-@test obj_uniform.nb == 10001
-
-@test_approx_eq_eps(obj_uniform.min, 0, .001)
-@test_approx_eq_eps(obj_uniform.quantile.est[1], 0.25, .01)
-@test_approx_eq_eps(obj_uniform.quantile.est[2], 0.5, .01)
-@test_approx_eq_eps(obj_uniform.quantile.est[3], 0.75, .01)
-@test_approx_eq_eps(obj_uniform.max, 1, .001)
-
-@test_approx_eq_eps(obj_normal.quantile.est[1], quantile(Normal(), 0.25), .01)
-@test_approx_eq_eps(obj_normal.quantile.est[2], quantile(Normal(), 0.5), .01)
-@test_approx_eq_eps(obj_normal.quantile.est[3], quantile(Normal(), 0.75), .01)
-
-
-y1 = rand(100)
-y2 = rand(100)
-obj1 = FiveNumberSummary(y1)
-obj2 = FiveNumberSummary(y2)
-obj3 = merge(obj1, obj2)
-merge!(obj1, obj2)
-
-@test obj1.n == obj3.n
-@test obj1.nb == obj3.nb
-@test obj1.min == obj3.min
-@test obj1.max == obj3.max
-@test obj1.n == 200
-@test obj1.nb == 2
-@test obj1.max == maximum([y1; y2])
-@test obj1.min == minimum([y1; y2])
+end #module
