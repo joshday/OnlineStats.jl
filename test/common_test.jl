@@ -27,6 +27,11 @@ facts("Common") do
 
     end
 
+    context("Weighting") do
+        @fact OnlineStats.default(Weighting) => EqualWeighting()
+        @fact OnlineStats.smooth(1, 3, .5) => 2
+    end
+
     context("Show OnlineStat") do
         x = rand(100)
         o = Mean(x)
