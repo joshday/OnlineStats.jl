@@ -19,15 +19,12 @@ import Distributions:
     mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
     entropy, mgf, cf, insupport, logcdf, ccdf,
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
-# import PDMats  # Is this needed?
 import DataFrames: DataFrame, names!, pool!
 import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile, maximum, minimum
-import Clustering  # kmeans for starting values of NormalMix
-import StatsBase:
-    nobs, skewness, kurtosis, mode, modes, coef, coeftable, CoefTable, confint,
-    predict, stderr, vcov
+import Clustering
+import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov
 
 
 #-----------------------------------------------------------------------------#
