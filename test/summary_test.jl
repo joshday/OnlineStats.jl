@@ -4,6 +4,11 @@ using OnlineStats
 using FactCheck
 
 facts("Summary") do
+    Summary()
+    Summary(0.)
+    @fact mean(Summary()) => 0.
+    @fact mean(Summary(0.)) => 0.
+
     n1 = rand(1:1_000_000, 1)[1]
     n2 = rand(1:1_000_000, 1)[1]
     x1 = rand(n1)

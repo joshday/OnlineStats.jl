@@ -10,6 +10,8 @@ facts("Quantile Regression") do
     context("QuantRegSGD") do
         x = [ones(100) randn(100, 5)]
         y = vec(sum(x[:, 2:end], 2)) + randn(100)
+        o = QuantRegSGD(x, y)
+        updatebatch!(o, x, y)
 
         o1 = QuantRegSGD(x, y, StochasticWeighting(.9), τ = .7)
         o2 = QuantRegSGD(x, y, StochasticWeighting(.9), τ = .7, start = ones(6))

@@ -4,6 +4,11 @@ using OnlineStats
 using FactCheck
 
 facts("Extrema") do
+    o = Extrema()
+    @fact maximum(o) => -Inf
+    update!(o, 0.)
+    @fact maximum(o) => 0.
+
     # Extrema, update!, merge, merge!, max, min,
     n1, n2 = rand(1:1_000_000, 2)
     n = n1 + n2
