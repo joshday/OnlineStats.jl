@@ -60,20 +60,3 @@ statenames(o::LogRegMM) = [:β, :nobs]
 coef(o::LogRegMM) = copy(o.β)
 predict(o::LogRegMM, X::MatF) = inverselogit(X * o.β)
 
-
-
-####################### Testing
-# β = [-.5:.1:.5]
-# X = [ones(100) randn(100, 10)]
-# y = int(OnlineStats.inverselogit(X * β) .> rand(100))
-
-# o = OnlineStats.LogRegMM(X, y, OnlineStats.StochasticWeighting(.51))
-# df = DataFrame(o)
-
-# for i in 1:9999
-#     X = [ones(100) randn(100, 10)]
-#     y = int(OnlineStats.inverselogit(X * β) .< rand(100))
-
-#     OnlineStats.updatebatch!(o, X, y)
-#     push!(df, o)  # append results to DataFrame
-# end

@@ -13,6 +13,7 @@ include("quantiles_test.jl")
 include("linearmodel_test.jl")
 include("sweep_test.jl")
 include("quantreg_test.jl")
+include("logreg_test.jl")
 
 include("distribution_test.jl")
 include("normalmix_test.jl")

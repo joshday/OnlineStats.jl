@@ -78,6 +78,8 @@ export
 
     # functions
     nobs,
+    coef,
+    predict,
     update!,
     updatebatch!,
     state,
