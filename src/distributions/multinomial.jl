@@ -1,8 +1,8 @@
 #-------------------------------------------------------# Type and Constructors
 type FitMultinomial{W <: Weighting} <: DistributionStat
     d::Multinomial
-    means::Vector{Float64}
-    n::Int64
+    means::VecF
+    n::Int
     weighting::W
 end
 

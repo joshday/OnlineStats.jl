@@ -15,5 +15,10 @@ facts("tracedata()") do
 
     df = tracedata(FitNormal(), 10, randn(100))
     @fact size(OnlineStats.unpack_distributions(df)) => (10, 3)
+
+    x = rand(10,10)
+    @fact OnlineStats.getrows(x, 1) => x[1, :]
+    x = rand(10)
+    @fact OnlineStats.getrows(x, 1) => x[1]
 end
 end #module

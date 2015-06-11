@@ -112,6 +112,8 @@ facts("Distributions") do
 #                                                                    Dirichlet #
 #------------------------------------------------------------------------------#
     context("Dirichlet") do
+        FitDirichlet()
+
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
         αlength = rand(3:20)
@@ -213,8 +215,8 @@ facts("Distributions") do
 #                                                                  Multinomial #
 #------------------------------------------------------------------------------#
     context("Multinomial") do
-        FitMultinomial(3)
-        FitMultinomial(rand(Multinomial()))
+        FitMultinomial()
+        FitMultinomial(rand(Multinomial(5, [.2, .3, .5]), 10))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
