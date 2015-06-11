@@ -75,6 +75,15 @@ facts("Common") do
         @fact pdf(o, 0) => 1.0
         @fact logpdf(o, 0) => 0.0
         @fact loglikelihood(o, zeros(Int, 10)) => 0.0
+        @fact cdf(o, -1) => 0.
+        @fact cdf(o, 0) => 1.
+        @fact cdf(o, .5) => 1.
+        @fact logcdf(o, 0) => 0.
+        @fact ccdf(o, 0) => 0.
+        @fact logccdf(o, -1) => 0.
+        @fact quantile(o, 0) => 0.
+        @fact cquantile(o, 1) => 0.
+        @fact invlogcdf(o, -1) => 0.
     end
 end # facts
 end # module

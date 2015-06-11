@@ -5,6 +5,7 @@ Docile.@document
 
 import Compat: @compat
 import MultivariateStats: fit, PCA
+import Distributions
 import Distributions:
     # Distributions
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
@@ -24,6 +25,7 @@ import DataArrays
 import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile, maximum, minimum
 import Clustering
+import StatsBase
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov
 
 
