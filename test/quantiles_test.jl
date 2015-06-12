@@ -8,7 +8,7 @@ facts("Quantiles") do
         o_normal = QuantileSGD(randn(100), StochasticWeighting(.8), τ = τ)
         @fact statenames(o_normal) => [:quantiles, :τ, :nobs]
 
-        for i in 1:10_000
+        for i in 1:100_000
             update!(o_uniform, rand(100))
             updatebatch!(o_normal, randn(100))
         end
@@ -32,7 +32,7 @@ facts("Quantiles") do
         o_normal = QuantileMM(randn(100), StochasticWeighting(.8), τ = τ)
         @fact statenames(o_normal) => [:quantiles, :τ, :nobs]
 
-        for i in 1:10_000
+        for i in 1:100_000
             update!(o_uniform, rand(100))
             updatebatch!(o_normal, randn(100))
         end
