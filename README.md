@@ -5,6 +5,7 @@
 
 Online algorithms for statistics.  See [Examples and Implementation Progress](src/README.md)
 
+Install with `Pkg.clone("https://github.com/joshday/OnlineStats.jl")`
 
 ## Types 
 
