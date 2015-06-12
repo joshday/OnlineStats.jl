@@ -20,8 +20,8 @@ facts("Quantiles") do
         @fact state(o_normal)[2] => o_normal.τ
         @fact state(o_normal)[3] => nobs(o_normal)
         @fact statenames(o_normal) => [:quantiles, :τ, :nobs]
-        @fact nobs(o_uniform) => 100 + 10000*100
-        @fact nobs(o_normal) => 100 + 10000*100
+        @fact nobs(o_uniform) => 100 + 100000*100
+        @fact nobs(o_normal) => 100 + 100000*100
 
         QuantileSGD(0.)
     end
@@ -44,8 +44,8 @@ facts("Quantiles") do
         @fact state(o_normal)[2] => o_normal.τ
         @fact state(o_normal)[3] => nobs(o_normal)
         @fact statenames(o_normal) => [:quantiles, :τ, :nobs]
-        @fact o_uniform.n => 100 + 10000*100
-        @fact o_normal.n => 100 + 10000*100
+        @fact o_uniform.n => 100 + 100000*100
+        @fact o_normal.n => 100 + 100000*100
 
         QuantileMM(0.)
     end
