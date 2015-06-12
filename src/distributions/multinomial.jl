@@ -6,9 +6,7 @@ type FitMultinomial{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit{T <: Integer}(::Type{Multinomial},
-                                 y::Matrix{T},
-                                 wgt::Weighting = default(Weighting))
+function onlinefit{T <: Integer}(::Type{Multinomial}, y::Matrix{T}, wgt::Weighting = default(Weighting))
     o = FitMultinomial(wgt)
     update!(o, y)
     o

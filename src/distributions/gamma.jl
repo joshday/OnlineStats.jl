@@ -7,9 +7,7 @@ type FitGamma{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Gamma},
-                   y::Vector{Float64},
-                   wgt::Weighting = default(Weighting))
+function onlinefit(::Type{Gamma}, y::VecF, wgt::Weighting = default(Weighting))
     o = FitGamma(wgt)
     update!(o, y)
     o

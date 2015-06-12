@@ -48,9 +48,8 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
     context("Beta") do
         FitBeta()
-        for i in 1:1000
-            FitBeta(rand(10))
-        end
+        FitBeta(rand(10))
+        FitBeta([.1, .9])
         onlinefit(Beta, rand(10), ExponentialWeighting(.01))
 
         n1 = rand(1:1_000_000)

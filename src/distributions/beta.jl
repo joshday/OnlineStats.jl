@@ -7,7 +7,6 @@ type FitBeta{W <: Weighting} <: DistributionStat
 end
 
 function onlinefit(::Type{Beta}, y::VecF, wgt::Weighting = default(Weighting))
-#     warn("FitBeta Uses method of moments, not MLE")
     o = FitBeta(wgt)
     update!(o, y)
     o

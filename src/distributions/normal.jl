@@ -7,9 +7,7 @@ type FitNormal{W <: Weighting} <: DistributionStat
     w::W
 end
 
-function onlinefit(::Type{Normal},
-                   y::Vector{Float64},
-                   wgt::Weighting = default(Weighting))
+function onlinefit(::Type{Normal}, y::VecF, wgt::Weighting = default(Weighting))
     o = FitNormal(wgt)
     update!(o, y)
     o

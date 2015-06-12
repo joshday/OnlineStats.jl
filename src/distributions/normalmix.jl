@@ -9,8 +9,7 @@ type NormalMix <: DistributionStat
 end
 
 
-function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting();
-                   start = emstart(p, y, verbose = false))
+function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting(); start = emstart(p, y, verbose = false))
     o = NormalMix(p, wgt, start = start)
     updatebatch!(o, y)
     o
