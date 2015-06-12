@@ -1,8 +1,8 @@
 #-------------------------------------------------------# Type and Constructors
 type LinReg{W <: Weighting} <: OnlineStat
     xycov::CovarianceMatrix{W}  # Cov([X y])
-    s::MatF                     # "Swept" version of cor(C)
-    n::Int64
+    s::MatF                     # "Swept" version of [X y]' [X y]
+    n::Int
     weighting::W
 end
 
@@ -15,7 +15,6 @@ end
 
 function LinReg(p, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
-    s = cor(c)
     LinReg(c, zeros(p + 1, p + 1), 0, wgt)
 end
 
@@ -24,9 +23,9 @@ end
 statenames(o::LinReg) = [:β, :nobs]
 state(o::LinReg) = Any[coef(o), nobs(o)]
 
-coef(o::LinReg) = vec(o.s[end, 1:end - 1])
-
 mse(o::LinReg) = o.s[end, end] * o.n / (o.n - size(o.s, 1))
+
+coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 
 
 #---------------------------------------------------------------------# update!

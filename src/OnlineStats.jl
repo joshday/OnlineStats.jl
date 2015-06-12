@@ -75,6 +75,7 @@ export
     LogRegMM,
     LogRegSGD,
     LogRegSGD2,
+    SparseReg,
 
     # functions
     nobs,
@@ -144,7 +145,7 @@ include("distributions/normalmix.jl")
 include("linearmodel/sweep.jl")
 include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
-# include("linearmodel/sparsereg.jl")
+include("linearmodel/sparsereg.jl")
 # include("linearmodel/ridge.jl")
 include("linearmodel/ofls.jl")
 include("linearmodel/opca.jl")

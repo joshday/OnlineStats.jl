@@ -1,9 +1,6 @@
 module LinearModelTest
 
-using OnlineStats
-using FactCheck
-using GLM
-using StatsBase
+using OnlineStats, FactCheck, GLM, StatsBase
 
 facts("LinearModel") do
     n = rand(10_000:100_000)
@@ -50,6 +47,35 @@ facts("LinearModel") do
     end
     @fact coef(o) => roughly(ones(10), .01)
     @fact predict(o, x) => x * coef(o)
+end
+
+facts("SparseReg") do
+    n, p = 10000, 200
+    o = OnlineStats.SparseReg(p)
+
+    x = randn(n, p)
+    β = [1:5; zeros(p - 5)]
+    y = x * β + randn(n)
+
+    OnlineStats.updatebatch!(o, x, y); coef(o)
+
+    # ols
+    glm = lm([ones(n) x],y);
+    @fact maxabs(coef(glm) - coef(o)) => roughly(0., 1e-8)
+
+    # ridge
+    for λ in [0.:.1:5.]
+        lambdamat = eye(p) * λ
+        βridge = inv(cor(x) + lambdamat) * vec(cor(x, y))
+        μ = mean(o.c)
+        σ = std(o.c)
+        β₀ = μ[end] - σ[end] * sum(μ[1:end-1] ./ σ[1:end-1] .* βridge)
+        βridge = σ[end] * (βridge ./ σ[1:end-1])
+        βridge = [β₀; βridge]
+
+        @fact maxabs(coef(o, :ridge, 0.) - coef(o)) => roughly(0., 1e-8)
+        @fact maxabs(coef(o, :ridge, λ) - βridge) => roughly(0., 1e-8)
+    end
 end
 
 end # module
