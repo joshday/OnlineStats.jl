@@ -26,6 +26,14 @@ function smooth!{T}(avg::Matrix{T}, v::Matrix{T}, λ::Float64)
     end
 end
 
+# For SGD, Online MM, Online EM, etc. (stochastic approximation methods)
+# Perform the update: avg = avg + λ * grad
+function addgradient!{T}(avg::Vector{T}, grad::Vector{T}, λ::Float64)
+    p = length(avg)
+    for i in 1:p
+        avg[i] = avg[i] + λ * grad[i]
+    end
+end
 
 #---------------------------------------------------------------------------#
 

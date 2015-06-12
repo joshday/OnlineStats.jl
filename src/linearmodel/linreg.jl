@@ -35,10 +35,8 @@ function updatebatch!(o::LinReg, x::MatF, y::VecF)
     updatebatch!(o.xycov, [x y])
     copy!(o.s, o.xycov.A)
     sweep!(o.s, 1:p)
-    o.n += size(x, 1)
+    o.n += n
 end
-
-
 
 
 #------------------------------------------------------------------------# Base

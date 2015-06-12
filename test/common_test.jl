@@ -35,6 +35,15 @@ facts("Common") do
     context("Weighting") do
         @fact OnlineStats.default(Weighting) => EqualWeighting()
         @fact OnlineStats.smooth(1, 3, .5) => 2
+        x = ones(10)
+        @fact OnlineStats.addgradient!(x, ones(10), .5) => nothing
+        @fact x => ones(10) * 1.5
+        w = ExponentialWeighting(10_000)
+        @fact OnlineStats.weight(w, 100, 1) => 1 / 101
+        o = Mean()
+        @fact OnlineStats.adjusted_nobs(1, w) => 1
+        @fact OnlineStats.adjusted_nobs(o) => 0
+        @fact OnlineStats.adjusted_nobs(1, EqualWeighting()) => 1
     end
 
     context("Show OnlineStat") do
@@ -45,7 +54,6 @@ facts("Common") do
         @fact OnlineStats.name(o) => string(typeof(o))
         print(Mean())
         print(Variance())
-
     end
 
     context("Show DistributionStat") do

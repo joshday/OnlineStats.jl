@@ -48,7 +48,9 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
     context("Beta") do
         FitBeta()
-        FitBeta(rand(10))
+        for i in 1:1000
+            FitBeta(rand(10))
+        end
         onlinefit(Beta, rand(10), ExponentialWeighting(.01))
 
         n1 = rand(1:1_000_000)
@@ -130,7 +132,7 @@ facts("Distributions") do
         @fact length(o.d.alpha) => αlength
 
 
-        @fact o.d.alpha => roughly(fit(Dirichlet, x).alpha) "failure ok. fit() is to blame"
+        @fact o.d.alpha => roughly(fit(Dirichlet, x).alpha, .001) "failure ok. fit() is to blame"
         @fact o.n => n1 + n2
 
         @fact state(o) => [o.d, o.n]
