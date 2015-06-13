@@ -3,6 +3,8 @@ module AnalyticalPCATest
 using OnlineStats, FactCheck, MultivariateStats
 
 facts("AnalyticalPCA") do
+    AnalyticalPCA(4)
+
     x1 = rand(1000, 400)
     x2 = rand(1000, 400)
     x3 = rand(1000, 400)
