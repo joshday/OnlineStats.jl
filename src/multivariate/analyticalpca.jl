@@ -36,6 +36,7 @@ function updatebatch!(o::AnalyticalPCA, X::MatF)
     else
         o.values, o.vectors = eig(Symmetric(cov(o.C)))
     end
-    o.n += 1
+    o.n += size(X, 1)
+    return
 end
 
