@@ -1,8 +1,6 @@
 module AnalyticalPCATest
 
-using OnlineStats
-using FactCheck
-using MultivariateStats
+using OnlineStats, FactCheck, MultivariateStats
 
 facts("AnalyticalPCA") do
     o = AnalyticalPCA(4)
@@ -39,6 +37,6 @@ facts("AnalyticalPCA") do
     @fact state(o)[1] => o.vectors
     @fact state(o)[2] => o.values
     @fact state(o)[3] => nobs(o)
-end
+end # facts
 
 end # module

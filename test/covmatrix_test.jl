@@ -1,7 +1,6 @@
 module CovarianceMatrixTest
 
-using OnlineStats
-using FactCheck
+using OnlineStats, FactCheck
 
 facts("CovarianceMatrix") do
     o = CovarianceMatrix(10)
@@ -35,7 +34,6 @@ facts("CovarianceMatrix") do
     o3 = merge(o1, o2)
     merge!(o1, o2)
     @fact cov(o1) => cov(o3)
-
 end
 
 end # module

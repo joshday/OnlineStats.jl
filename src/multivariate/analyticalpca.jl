@@ -24,7 +24,7 @@ end
 
 
 #-----------------------------------------------------------------------# state
-statenames(o::AnalyticalPCA) = [:v, :λ, :nobs]  # decomposition is Av = λv
+statenames(o::AnalyticalPCA) = [:v, :λ, :nobs]  # decomposition is X'X v = λv
 state(o::AnalyticalPCA) = Any[o.vectors, o.values, o.n]
 
 
