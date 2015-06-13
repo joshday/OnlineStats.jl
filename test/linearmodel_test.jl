@@ -2,7 +2,7 @@ module LinearModelTest
 
 using OnlineStats, FactCheck, GLM, StatsBase, Convex
 
-facts("LinearModel") do
+facts("LinReg") do
     n = rand(10_000:100_000)
     p = rand(1:min(n-1, 100))
 

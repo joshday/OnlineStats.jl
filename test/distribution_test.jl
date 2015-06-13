@@ -1,8 +1,6 @@
 module DistributionTest
-using FactCheck
-using OnlineStats
-using Distributions
-using DataFrames
+
+using OnlineStats, FactCheck, Distributions, DataFrames
 
 facts("Distributions") do
 
@@ -11,9 +9,9 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
 
     context("Bernoulli") do
-        FitBernoulli()
-        FitBernoulli(rand(Bernoulli(), 10))
-        onlinefit(Bernoulli, rand(Bernoulli(), 10))
+        o = FitBernoulli()
+        o = FitBernoulli(rand(Bernoulli(), 10))
+        o = onlinefit(Bernoulli, rand(Bernoulli(), 10))
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -51,10 +49,10 @@ facts("Distributions") do
 #                                                                         Beta #
 #------------------------------------------------------------------------------#
     context("Beta") do
-        FitBeta()
-        FitBeta(rand(10))
-        FitBeta([.1, .9])
-        onlinefit(Beta, rand(10), ExponentialWeighting(.01))
+        o = FitBeta()
+        o = FitBeta(rand(10))
+        o = FitBeta([.1, .9])
+        o = onlinefit(Beta, rand(10), ExponentialWeighting(.01))
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -84,9 +82,9 @@ facts("Distributions") do
 #                                                                     Binomial #
 #------------------------------------------------------------------------------#
     context("Binomial") do
-        FitBinomial(n = 10)
-        FitBinomial(rand(Binomial(10, .5), 10), n = 10)
-        onlinefit(Binomial, rand(Binomial(10,.5), 10), n = 10)
+        o = FitBinomial(n = 10)
+        o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
+        o = onlinefit(Binomial, rand(Binomial(10,.5), 10), n = 10)
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -121,7 +119,7 @@ facts("Distributions") do
 #                                                                    Dirichlet #
 #------------------------------------------------------------------------------#
     context("Dirichlet") do
-        FitDirichlet()
+        o = FitDirichlet()
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -154,9 +152,9 @@ facts("Distributions") do
 #                                                                  Exponential #
 #------------------------------------------------------------------------------#
     context("Exponential") do
-        FitExponential()
-        FitExponential(rand(Exponential(), 10))
-        onlinefit(Exponential, rand(Exponential(), 10))
+        o = FitExponential()
+        o = FitExponential(rand(Exponential(), 10))
+        o = onlinefit(Exponential, rand(Exponential(), 10))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
@@ -186,6 +184,10 @@ facts("Distributions") do
 #                                                                        Gamma #
 #------------------------------------------------------------------------------#
     context("Gamma") do
+        o = FitGamma()
+        o = FitGamma(rand(Gamma(), 10))
+        o = onlinefit(Gamma, rand(Gamma(), 10))
+
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
         α, β = rand(1:0.1:100, 2)
@@ -225,36 +227,37 @@ facts("Distributions") do
 #                                                                  Multinomial #
 #------------------------------------------------------------------------------#
     context("Multinomial") do
-        FitMultinomial()
-        FitMultinomial(rand(Multinomial(5, [.2, .3, .5]), 10))
+        o = FitMultinomial()
+        o = FitMultinomial(rand(Multinomial(5, [.2, .3, .5]), 10)')
+        o = onlinefit(Multinomial, rand(Multinomial(5, [.2, .3, .5]), 10)')
 
-        n1 = rand(1:1_000_000, 1)[1]
-        n2 = rand(1:1_000_000, 1)[1]
-        n = rand(1:100, 1)[1]
-        ncat = rand(1:20, 1)[1]
+        n1 = rand(10_000:100_000, 1)[1]
+        n2 = rand(10_000:100_000, 1)[1]
+        n = rand(1:100)
+        ncat = rand(1:20)
         p = rand(ncat)
         p /= sum(p)
-        x1 = rand(Multinomial(n, p), n1)
-        x2 = rand(Multinomial(n, p), n2)
-        x = [x1 x2]
+        x1 = rand(Multinomial(n, p), n1)'
+        x2 = rand(Multinomial(n, p), n2)'
+        x = [x1; x2]
 
         o = onlinefit(Multinomial, x1)
         @fact o.d.n => n
-        @fact o.d.p => roughly(vec(sum(x1, 2) / (n * n1)))
+        @fact o.d.p => roughly(vec(sum(x1, 1) / (n * n1)))
         @fact o.n => n1
         @fact nobs(o) => n1
 
 
         OnlineStats.update!(o, x2)
         @fact o.d.n => n
-        @fact o.d.p => roughly(vec(sum(x, 2) / (n * (n1 + n2))))
+        @fact o.d.p => roughly(vec(sum(x, 1) / (n * (n1 + n2))))
         @fact o.n => n1 + n2
 
         o1 = copy(o)
         @fact state(o) => [o.d, o.n]
         @fact statenames(o) => [:dist, :nobs]
         @fact o1.d.n => n
-        @fact o1.d.p => roughly(vec(sum(x, 2) / (n * (n1 + n2))))
+        @fact o1.d.p => roughly(vec(sum(x, 1) / (n * (n1 + n2))))
         @fact o1.n => n1 + n2
 
         @fact names(DataFrame(o)) => statenames(o)
