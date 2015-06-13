@@ -81,6 +81,9 @@ export
     SparseReg,
 
     # functions
+    standardize,
+    standardize!,
+    unstandardize,
     nobs,
     coef,
     predict,
