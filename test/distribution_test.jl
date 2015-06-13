@@ -156,6 +156,7 @@ facts("Distributions") do
     context("Exponential") do
         FitExponential()
         FitExponential(rand(Exponential(), 10))
+        onlinefit(Exponential, rand(Exponential(), 10))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]

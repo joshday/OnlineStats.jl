@@ -4,6 +4,8 @@ using OnlineStats
 using FactCheck
 
 facts("CovarianceMatrix") do
+    CovarianceMatrix()
+    CovarianceMatrix(rand(100,10))
 
     # create 4 batches
     n1, n2, n3, n4 = rand(1:1_000_000, 4)

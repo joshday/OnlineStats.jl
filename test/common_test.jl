@@ -54,6 +54,7 @@ facts("Common") do
         @fact OnlineStats.name(o) => string(typeof(o))
         print(Mean())
         print(Variance())
+        print(Variance[Variance(), Variance()])
     end
 
     context("Show DistributionStat") do
