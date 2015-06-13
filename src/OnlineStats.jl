@@ -29,7 +29,7 @@ import StatsBase
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov
 
 import MathProgBase: AbstractMathProgSolver
-import Convex
+import Convex, SCS
 
 
 #-----------------------------------------------------------------------------#
