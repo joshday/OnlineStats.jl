@@ -3,7 +3,7 @@
 # This is a flexible type that allows users to get ols, ridge, lasso, and elastic net
 # estimates from the same object.
 
-# NOTE 1: Only sufficient statistics are updated by update!(), since coefficient
+# NOTE 1: Only sufficient statistics are updated by update!() since coefficient
 # calculations are expensive.  Instead, coefficients will be calculated by a call
 # to coef().
 
@@ -13,7 +13,7 @@
 #-------------------------------------------------------# Type and Constructors
 type SparseReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
-    s::MatF                     # "Swept" version of cor(C)
+    s::MatF                 # memory holder for "Swept" version of cor(o.c)
     n::Int
     weighting::W
 end
@@ -36,20 +36,23 @@ end
 statenames(o::SparseReg) = [:β, :nobs]
 state(o::SparseReg) = Any[coef(o), nobs(o)]
 
-mse(o::SparseReg) = o.s[end, end] * o.n / (o.n - size(o.s, 1))
 
-function coef_ols(o::SparseReg)
-    o.s = cor(o.c)
-    sweep!(o.s, 1:size(o.c.A, 1) - 1)
+#-----------------------------------------------------------------------# coef
 
-    μ = mean(o.c)
-    σ = std(o.c)
-    β = vec(o.s[end, 1:end - 1])
+# Assumes mean(y) == μ[end], std(y) == σ[end]
+function scaled_to_original(β, μ, σ)
     β₀ = μ[end] - σ[end] * sum(μ[1:end-1] ./ σ[1:end-1] .* β)
     for i in 1:length(β)
         β[i] = β[i] * σ[end] / σ[i]
     end
     return [β₀; β]
+end
+
+function coef_ols(o::SparseReg)
+    o.s = cor(o.c)
+    sweep!(o.s, 1:size(o.c.A, 1) - 1)
+    β = vec(o.s[end, 1:end - 1])
+    scaled_to_original(β, mean(o.c), std(o.c))
 end
 
 function coef_ridge(o::SparseReg, λ::Float64)
@@ -59,16 +62,21 @@ function coef_ridge(o::SparseReg, λ::Float64)
         o.s[i, i] += λ
     end
     sweep!(o.s, 1:p)
-
-    μ = mean(o.c)
-    σ = std(o.c)
     β = vec(o.s[end, 1:end - 1])
-    β₀ = μ[end] - σ[end] * sum(μ[1:end-1] ./ σ[1:end-1] .* β)
-    for i in 1:length(β)
-        β[i] = β[i] * σ[end] / σ[i]
-    end
-    return [β₀; β]
+    scaled_to_original(β, mean(o.c), std(o.c))
 end
+
+# Take a user-defined penalty (a function supported by Convex.jl)
+# and plug it into a Convex Solver
+function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
+                     solver::AbstractMathProgSolver = Convex.get_default_solver())
+    o.s = cor(o.c)
+    β = Convex.Variable(size(o.c.A, 1) - 1)
+    p = Convex.minimize(.5 * Convex.quad_form(β, o.s[1:end-1, 1:end-1]) - vec(o.s[end, 1:end-1])' * β + λ * penalty(β))
+    Convex.solve!(p, SCS.SCSSolver(verbose = true))
+    scaled_to_original(β.value, mean(o.c), std(o.c))
+end
+
 
 function coef(o::SparseReg, penalty::Symbol = :ols, λ = 0.)
     if penalty == :ols
@@ -103,10 +111,9 @@ if false
 
     OnlineStats.updatebatch!(o, x, y); coef(o)
     glm = lm([ones(n) x],y);
-    path = glmnet(x,y, alpha = 0.)
 
     # manually create β for ridge
-    λ = 1.5
+    λ = 1.
     lambdamat = eye(p) * λ
     βridge = inv(cor(x) + lambdamat) * vec(cor(x, y))
     μ = mean(o.c)
@@ -118,4 +125,7 @@ if false
     maxabs(coef(glm) - coef(o))
     maxabs(coef(o, :ridge, 0.) - coef(o))
     maxabs(coef(o, :ridge, λ) - βridge)
+
+    βridgesolver = OnlineStats.coef_solver(o, λ, x -> .5 * Convex.sum_squares(x))
+    maxabs(coef(o, :ridge, λ) - βridgesolver)
 end
