@@ -11,6 +11,10 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
 
     context("Bernoulli") do
+        FitBernoulli()
+        FitBernoulli(rand(Bernoulli(), 10))
+        onlinefit(Bernoulli, rand(Bernoulli(), 10))
+
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
         p = rand()
@@ -80,6 +84,10 @@ facts("Distributions") do
 #                                                                     Binomial #
 #------------------------------------------------------------------------------#
     context("Binomial") do
+        FitBinomial(n = 10)
+        FitBinomial(rand(Binomial(10, .5), 10), n = 10)
+        onlinefit(Binomial, rand(Binomial(10,.5), 10), n = 10)
+
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
         ntrials = rand(1:1000)

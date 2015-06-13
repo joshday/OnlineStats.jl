@@ -1,6 +1,6 @@
 module LinearModelTest
 
-using OnlineStats, FactCheck, GLM, StatsBase
+using OnlineStats, FactCheck, GLM, StatsBase, Convex
 
 facts("LinearModel") do
     n = rand(10_000:100_000)
@@ -51,13 +51,16 @@ end
 
 facts("SparseReg") do
     n, p = 10000, 200
-    o = OnlineStats.SparseReg(p)
+    o = SparseReg(p)
 
     x = randn(n, p)
     β = [1:5; zeros(p - 5)]
     y = x * β + randn(n)
 
-    OnlineStats.updatebatch!(o, x, y); coef(o)
+    updatebatch!(o, x, y)
+    @fact coef(o) => coef(SparseReg(x, y))
+    @fact statenames(o) => [:β, :nobs]
+    @fact state(o) => Any[coef(o), nobs(o)]
 
     # ols
     glm = lm([ones(n) x],y);
@@ -76,6 +79,11 @@ facts("SparseReg") do
         @fact maxabs(coef(o, :ridge, 0.) - coef(o)) => roughly(0., 1e-8)
         @fact maxabs(coef(o, :ridge, λ) - βridge) => roughly(0., 1e-8)
     end
+
+    diff = maxabs(coef(o, :ridge, .5) -
+                      OnlineStats.coef_solver(o, .5, x-> .5 * sum_squares(x)))
+    @fact diff => roughly(0., .01)
+    @fact_throws coef(o, :asdf, .5)
 end
 
 end # module

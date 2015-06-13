@@ -66,8 +66,11 @@ function coef_ridge(o::SparseReg, λ::Float64)
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
+
+
 # Take a user-defined penalty (a function supported by Convex.jl)
 # and plug it into a Convex Solver
+# objective is to minimize: β' * cor(x) * β - cor(x, y) * β + J(β)
 function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
                      solver::AbstractMathProgSolver = Convex.get_default_solver())
     o.s = cor(o.c)
@@ -78,13 +81,13 @@ function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
 end
 
 
-function coef(o::SparseReg, penalty::Symbol = :ols, λ = 0.)
+function coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.)
     if penalty == :ols
         coef_ols(o::SparseReg)
     elseif penalty == :ridge
         coef_ridge(o::SparseReg, λ)
     else
-        warn(":$penalty is not a valid option.  Choose :ols, :ridge, :lasso, or :elasticnet.")
+        error(":$penalty is not a valid option.  Choose :ols or :ridge")
     end
 end
 
