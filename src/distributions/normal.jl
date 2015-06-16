@@ -19,7 +19,7 @@ FitNormal(wgt::Weighting = default(Weighting)) = FitNormal(Normal(), Variance(wg
 
 #---------------------------------------------------------------------# update!
 function update!(o::FitNormal, y::VecF)
-    update!(o.v, newdata)
+    update!(o.v, y)
     o.n = nobs(o.v)
     o.d = Normal(mean(o.v), sqrt(var(o.v)))
 end
