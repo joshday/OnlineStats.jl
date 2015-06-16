@@ -85,6 +85,8 @@ facts("Distributions") do
         o = FitBinomial(n = 10)
         o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
         o = onlinefit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
+        o = FitBinomial(n = 5, ExponentialWeighting(.001))
+        @fact weighting(o) => ExponentialWeighting(.001)
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -126,6 +128,8 @@ facts("Distributions") do
         αlength = rand(3:20)
         α = rand(.5:.1:20, αlength)
         x1 = rand(Dirichlet(α), n1)'
+        o = FitDirichlet(x1)
+        @fact weighting(o) => EqualWeighting()
         x2 = rand(Dirichlet(α), n2)'
         x = [x1; x2]
 
@@ -155,6 +159,7 @@ facts("Distributions") do
         o = FitExponential()
         o = FitExponential(rand(Exponential(), 10))
         o = onlinefit(Exponential, rand(Exponential(), 10))
+        @fact weighting(o) => EqualWeighting()
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
@@ -307,6 +312,10 @@ facts("Distributions") do
 #                                                                       Normal #
 #------------------------------------------------------------------------------#
     context("Normal") do
+        o = FitNormal()
+        o = FitNormal(randn(10))
+        @fact weighting(o) => EqualWeighting()
+
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
         x1 = randn(n1)
