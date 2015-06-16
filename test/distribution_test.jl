@@ -125,19 +125,19 @@ facts("Distributions") do
         n2 = rand(1:1_000_000)
         αlength = rand(3:20)
         α = rand(.5:.1:20, αlength)
-        x1 = rand(Dirichlet(α), n1)
-        x2 = rand(Dirichlet(α), n2)
-        x = [x1 x2]
+        x1 = rand(Dirichlet(α), n1)'
+        x2 = rand(Dirichlet(α), n2)'
+        x = [x1; x2]
 
         o = onlinefit(Dirichlet, x1)
-        @fact o.meanlogx => vec(mean(log(x1), 2))
+        @fact o.meanlogx => vec(mean(log(x1), 1))
         @fact o.n => n1
 
         updatebatch!(o, x2)
         @fact length(o.d.alpha) => αlength
 
 
-        @fact o.d.alpha => roughly(fit(Dirichlet, x).alpha, .001) "failure ok. fit() is to blame"
+        @fact o.d.alpha => roughly(fit(Dirichlet, x').alpha, .001) "failure ok. fit() is to blame"
         @fact o.n => n1 + n2
 
         @fact state(o) => [o.d, o.n]
