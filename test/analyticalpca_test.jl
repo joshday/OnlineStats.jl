@@ -37,6 +37,8 @@ facts("AnalyticalPCA") do
     @fact state(o)[1] => o.vectors
     @fact state(o)[2] => o.values
     @fact state(o)[3] => nobs(o)
+
+    o = AnalyticalPCA(x1, ExponentialWeighting(.0001), corr = false)
 end # facts
 
 end # module

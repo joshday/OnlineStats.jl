@@ -84,7 +84,7 @@ facts("Distributions") do
     context("Binomial") do
         o = FitBinomial(n = 10)
         o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
-        o = onlinefit(Binomial, rand(Binomial(10,.5), 10), n = 10)
+        o = onlinefit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)

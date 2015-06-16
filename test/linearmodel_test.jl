@@ -65,6 +65,7 @@ facts("SparseReg") do
     # ols
     glm = lm([ones(n) x],y);
     @fact maxabs(coef(glm) - coef(o)) => roughly(0., 1e-8)
+    @fact_throws coef(o, :asdf, .5)
 
     # ridge
     for λ in [0.:.1:5.]
@@ -80,11 +81,10 @@ facts("SparseReg") do
         @fact maxabs(coef(o, :ridge, λ) - βridge) => roughly(0., 1e-8)
     end
 
-#     Convex.set_default_solver(SCS.SCSSolver(verbose = false))
+#     Convex.set_default_solver(SCS.SCSSolver(verbose = 0))
 #     diff = maxabs(coef(o, :ridge, .5) -
 #                       OnlineStats.coef_solver(o, .5, x-> .5 * sum_squares(x)))
 #     @fact diff => roughly(0., .01)
-    @fact_throws coef(o, :asdf, .5)
 end
 
 end # module

@@ -66,19 +66,22 @@ function coef_ridge(o::SparseReg, λ::Float64)
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
-
+# function path_ridge(o::SparseReg)
+#     tmax = sum(coef_ols(o) .^ 2)
+#     [i => coef_ridge(o, i)]
+# end
 
 # Take a user-defined penalty (a function supported by Convex.jl)
 # and plug it into a Convex Solver
 # objective is to minimize: β' * cor(x) * β - cor(x, y) * β + J(β)
-function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
-                     solver::AbstractMathProgSolver = Convex.get_default_solver())
-    o.s = cor(o.c)
-    β = Convex.Variable(size(o.c.A, 1) - 1)
-    p = Convex.minimize(.5 * Convex.quad_form(β, o.s[1:end-1, 1:end-1]) - vec(o.s[end, 1:end-1])' * β + λ * penalty(β))
-    Convex.solve!(p, SCS.SCSSolver(verbose = true))
-    scaled_to_original(β.value, mean(o.c), std(o.c))
-end
+# function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
+#                      solver::AbstractMathProgSolver = Convex.get_default_solver())
+#     o.s = cor(o.c)
+#     β = Convex.Variable(size(o.c.A, 1) - 1)
+#     p = Convex.minimize(.5 * Convex.quad_form(β, o.s[1:end-1, 1:end-1]) - vec(o.s[end, 1:end-1])' * β + λ * penalty(β))
+#     Convex.solve!(p, SCS.SCSSolver(verbose = true))
+#     scaled_to_original(β.value, mean(o.c), std(o.c))
+# end
 
 
 function coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.)
@@ -90,6 +93,9 @@ function coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.)
         error(":$penalty is not a valid option.  Choose :ols or :ridge")
     end
 end
+
+
+
 
 
 #---------------------------------------------------------------------# update!
