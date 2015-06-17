@@ -95,6 +95,7 @@ facts("Common") do
         @fact quantile(o, 0) => 0.
         @fact cquantile(o, 1) => 0.
         @fact invlogcdf(o, -1) => 0.
+        @fact invlogccdf(o, -1) => 0.
         @fact rand(o) => 0
         x = ones(Int, 5)
         @fact rand!(o, x) => zeros(Int, 5)

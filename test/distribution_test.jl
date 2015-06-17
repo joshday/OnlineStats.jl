@@ -86,6 +86,7 @@ facts("Distributions") do
         o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
         o = onlinefit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
+        @fact nobs(o) => 0
         @fact weighting(o) => ExponentialWeighting(.001)
 
         n1 = rand(1:1_000_000)
@@ -97,6 +98,7 @@ facts("Distributions") do
         x = [x1, x2]
 
         o = onlinefit(Binomial, x1, n = ntrials)
+        @fact mean(o) => roughly(mean(x), .01)
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
         @fact o.n => n1
@@ -141,7 +143,7 @@ facts("Distributions") do
         @fact length(o.d.alpha) => αlength
 
 
-        @fact o.d.alpha => roughly(fit(Dirichlet, x').alpha, .001) "failure ok. fit() is to blame"
+        @fact o.d.alpha => roughly(fit(Dirichlet, x').alpha, .01) "failure ok. fit() is to blame"
         @fact o.n => n1 + n2
 
         @fact state(o) => [o.d, o.n]

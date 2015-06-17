@@ -7,6 +7,7 @@ using FactCheck
 
 facts("Variance") do
     context("Variance") do
+        o = Variance()
         o = Variance(rand(100))
 
         n1, n2 = rand(1:1_000_000, 2)
@@ -21,6 +22,7 @@ facts("Variance") do
         @fact Variance(x1).weighting => EqualWeighting()
 
         o = Variance(x1)
+        @fact Variance(x1).μ => roughly(mean(x1))
         @fact OnlineStats.name(o) => "OVar"
         @fact o.μ => roughly(mean(x1))
         @fact o.biasedvar => roughly(var(x1) * ((n1 -1) / n1), 1e-5)
@@ -87,7 +89,6 @@ facts("Variance") do
         o2 = Variance(rand(100))
         o = [o; o2]
         print(typeof(o))
-#         OnlineStats.standardize!(o, rand(2))
 
         x = rand(100)
         o = Variance()
@@ -97,6 +98,10 @@ facts("Variance") do
     end
 
     context("Variances") do
+        o = Variances(5)
+        o = Variances(rand(5))
+        o = Variances(rand(10, 5))
+
         n = rand(1:1_000_000)
         p = rand(2:100)
         x1 = rand(n, p)
