@@ -84,6 +84,7 @@ facts("Distributions") do
     context("Binomial") do
         o = FitBinomial(n = 10)
         o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
+        o = FitBinomial(n = 5, ExponentialWeighting(.001))
         o = onlinefit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) => 0
@@ -99,10 +100,12 @@ facts("Distributions") do
 
         o = onlinefit(Binomial, x1, n = ntrials)
         @fact mean(o) => roughly(mean(x), .01)
+        @fact var(o) => var(o.d)
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
         @fact o.n => n1
         @fact mean(FitBinomial().d) => 0.
+        @fact mean(onlinefit(Binomial, [0])) => 0.
         @fact mean(FitBinomial(zeros(Int, 10))) => 0.
         @fact mean(FitBinomial(ones(Int, 10))) => 1.
 
