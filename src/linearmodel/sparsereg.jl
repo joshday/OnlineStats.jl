@@ -1,7 +1,7 @@
 # Sparse Regression
 
-# This is a flexible type that allows users to get ols, ridge, lasso, and elastic net
-# estimates from the same object.
+# This is a flexible type that allows users to get ols and ridge estimates
+# TODO: lasso and elastic net
 
 # NOTE 1: Only sufficient statistics are updated by update!() since coefficient
 # calculations are expensive.  Instead, coefficients will be calculated by a call
