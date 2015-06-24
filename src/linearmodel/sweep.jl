@@ -50,10 +50,3 @@ function sweep!(A::MatF, S::Vector{Int}, inv::Bool=false)
     end
     return A
 end
-
-
-#---------------------------------------------------------------# online sweep!
-# TODO
-function onlinesweep!(sweptA::MatF, newA::MatF, k::Int)
-    size(sweptA) == size(newA) || error("matrix sizes do not match")
-end

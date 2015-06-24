@@ -9,6 +9,9 @@ facts("Variance") do
     context("Variance") do
         o = Variance()
         o = Variance(rand(100))
+        o = Variance(randn(1000))
+        @fact nobs(o) => 1000
+        @fact show(Variance()) => show(Variance(0., 0., 0, EqualWeighting()))
 
         n1, n2 = rand(1:1_000_000, 2)
         n = n1 + n2

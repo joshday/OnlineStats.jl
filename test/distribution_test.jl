@@ -135,6 +135,7 @@ facts("Distributions") do
         o = onlinefit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)')
         o = onlinefit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', ExponentialWeighting(.01))
         o = onlinefit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', StochasticWeighting(.6))
+        @fact nobs(o) => 10
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)

@@ -6,6 +6,12 @@ using FactCheck
 
 facts("Mean") do
     context("Mean") do
+        o = Mean()
+        o = Mean(rand(10))
+        o = Mean(randn(10))
+        @fact nobs(o) => 10
+        @fact show(Mean()) => show(Mean(0., 0, EqualWeighting()))
+
         # Mean, update!, merge, merge!, Base.mean
         n1, n2 = rand(1:1_000_000, 2)
         n = n1 + n2
