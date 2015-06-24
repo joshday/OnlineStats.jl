@@ -89,6 +89,7 @@ facts("Distributions") do
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) => 0
         @fact weighting(o) => ExponentialWeighting(.001)
+        @fact show(onlinefit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
 
         for i in 1:10
             onlinefit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
