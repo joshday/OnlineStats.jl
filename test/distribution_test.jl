@@ -90,6 +90,10 @@ facts("Distributions") do
         @fact nobs(o) => 0
         @fact weighting(o) => ExponentialWeighting(.001)
 
+        for i in 1:10
+            onlinefit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
+        end
+
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
         ntrials = rand(1:1000)
@@ -163,8 +167,10 @@ facts("Distributions") do
     context("Exponential") do
         o = FitExponential()
         o = FitExponential(rand(Exponential(), 10))
+        o = onlinefit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
         o = onlinefit(Exponential, rand(Exponential(), 10))
         @fact weighting(o) => EqualWeighting()
+        @fact show(onlinefit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
