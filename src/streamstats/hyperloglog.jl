@@ -17,6 +17,8 @@ type HyperLogLog <: OnlineStat
     M::Vector{Uint32}
     mask::Uint32
     altmask::Uint32
+    est::Float64
+    stale::Bool
     n::Int64
     # weighting::W  # NOTE: does it make sense to include a weighting? I'm not sure
 end
@@ -41,7 +43,7 @@ function HyperLogLog(b::Integer)
 
     altmask = ~mask
 
-    HyperLogLog(m, M, mask, altmask, 0)
+    HyperLogLog(m, M, mask, altmask, 0.0, true, 0)
 end
 
 
@@ -55,6 +57,10 @@ name(o::HyperLogLog) = "HyperLogLog"
 #   where S := Σⱼ(2⁻ᴹʲ)
 #   and αₘ is defined below
 function estimatedCardinality(o::HyperLogLog)
+
+    if !o.stale
+        return o.est
+    end
     
     S = 0.0
     for j in 1:o.m
@@ -79,6 +85,9 @@ function estimatedCardinality(o::HyperLogLog)
     else
         E_star = -2^32 * log(1 - E / (2^32))
     end
+
+    o.est = E_star
+    o.stale = false
     E_star
 end 
 
@@ -116,6 +125,8 @@ function update!(o::HyperLogLog, v::Any)
     j = uint32((x & o.mask) + 0x00000001)
     w = x & o.altmask
     o.M[j] = max(o.M[j], ρ(w))
+
+    o.stale = true
     o.n += 1
     return
 end
