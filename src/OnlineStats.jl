@@ -80,6 +80,8 @@ export
     LogRegSGD2,
     SparseReg,
 
+    HyperLogLog,
+
     # functions
     standardize,
     standardize!,
@@ -101,7 +103,8 @@ export
     smooth,
     smooth!,
     weighting,
-    sweep!
+    sweep!,
+    estimatedCardinality
 
 
 #-----------------------------------------------------------------------------#
@@ -166,6 +169,9 @@ include("glm/logisticregmm.jl")
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
+
+# ported from StreamStats
+include("streamstats/hyperloglog.jl")
 
 
 
