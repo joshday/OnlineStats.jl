@@ -3,6 +3,9 @@ module OnlineStats
 import Docile
 Docile.@document
 import Reexport
+Reexport.@reexport using StatsBase
+Reexport.@reexport using Distributions
+
 import Compat: @compat
 import MultivariateStats: fit, PCA
 import Distributions
@@ -36,7 +39,7 @@ import Convex, SCS
 # Exports
 #-----------------------------------------------------------------------------#
 export
-    # abstract types
+    # common types
     OnlineStat,
     ScalarOnlineStat,
     Weighting,
@@ -81,9 +84,6 @@ export
     SparseReg,
 
     # functions
-    standardize,
-    standardize!,
-    unstandardize,
     nobs,
     coef,
     predict,
