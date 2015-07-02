@@ -100,7 +100,7 @@ facts("Distributions") do
         x = [x1, x2]
 
         o = onlinefit(Binomial, x1, n = ntrials)
-        @fact mean(o) => roughly(mean(x), .01)
+        @fact mean(o) => roughly(mean(x), .05)
         @fact var(o) => var(o.d)
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
@@ -149,7 +149,6 @@ facts("Distributions") do
         updatebatch!(o, x2)
         @fact length(o.d.alpha) => αlength
 
-
         @fact o.d.alpha => roughly(fit(Dirichlet, x').alpha, .01) "failure ok. fit() is to blame"
         @fact o.n => n1 + n2
 
@@ -157,6 +156,9 @@ facts("Distributions") do
         @fact statenames(o) => [:dist, :nobs]
         o2 = copy(o)
         @fact state(o2)[2] => state(o)[2]
+
+        o = FitDirichlet(10)
+        update!(o, ones(10) / 10)
     end
 
 #------------------------------------------------------------------------------#
