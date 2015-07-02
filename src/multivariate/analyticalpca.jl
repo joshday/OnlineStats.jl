@@ -1,6 +1,5 @@
 # This is a "slow" analytical update based on CovarianceMatrix
 # At each batch, CovarianceMatrix is updated and then eigenvalue decomposition is done.
-# TODO: Do a top k eigenvalues/vectors algorithm using power method or eigs()
 #-------------------------------------------------------# Type and Constructors
 type AnalyticalPCA{W <: Weighting} <: OnlineStat
     C::CovarianceMatrix{W}
@@ -14,10 +13,10 @@ type AnalyticalPCA{W <: Weighting} <: OnlineStat
 end
 
 
-AnalyticalPCA(p::Int, wgt::Weighting = default(Weighting); corr = true) =
+AnalyticalPCA(p::Int, wgt::Weighting = default(Weighting); corr::Bool = true) =
     AnalyticalPCA(CovarianceMatrix(p, wgt), corr, zeros(p), zeros(p, p), 0)
 
-function AnalyticalPCA(X::MatF, wgt::Weighting = default(Weighting); corr = true)
+function AnalyticalPCA(X::MatF, wgt::Weighting = default(Weighting); corr::Bool = true)
     o = AnalyticalPCA(size(X, 2), wgt, corr = corr)
     updatebatch!(o, X)
     o

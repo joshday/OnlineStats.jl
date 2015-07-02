@@ -5,7 +5,7 @@ using Docile
 @document
 using Reexport
 @reexport using StatsBase
-@reexport using Distributions
+# @reexport using Distributions
 using Compat
 
 import MultivariateStats: fit, PCA
@@ -28,6 +28,7 @@ import Clustering
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov
 import MathProgBase: AbstractMathProgSolver
 import Convex, SCS
+import ArrayViews: view, rowvec_view
 
 
 #-----------------------------------------------------------------------------#
@@ -56,6 +57,7 @@ export
     Means,
     Variances,
     AnalyticalPCA,
+    TopPCA,
 
     NormalMix,
     FitBernoulli,
@@ -117,6 +119,7 @@ include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
 include("multivariate/analyticalpca.jl")
+include("multivariate/toppca.jl")
 
 # Parametric Density
 include("distributions/bernoulli.jl")
