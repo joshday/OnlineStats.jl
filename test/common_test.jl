@@ -26,10 +26,7 @@ facts("Common") do
         @fact OnlineStats.mystring(x[1]) => @sprintf("%f", x[1])
 
         df = tracedata(Mean(), 5, rand(100))
-        @fact OnlineStats.getnice(df, :μ) => convert(Array, df[1])
-        @fact OnlineStats.makenice(df[1]) => convert(Array, df[1])
         df = tracedata(QuantileMM(), 5, rand(100))
-        @fact vec(OnlineStats.makenice(df[1])[1,:]) => df[1][1]
     end
 
     context("Weighting") do

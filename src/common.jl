@@ -56,32 +56,6 @@ function Base.show(io::IO, o::OnlineStat)
 end
 
 
-#------------------------------------------------------------------------# DataFrame
-function DataFrame(o::OnlineStat; addFirstRow::Bool = true)
-    s = state(o)
-    df = DataFrame(map(typeof, s), statenames(o), 0)
-    if addFirstRow
-        push!(df, s)
-    end
-    df
-end
-
-Base.push!(df::DataFrame, o::OnlineStat) = push!(df, state(o))
-
-
-# some nice helper functions to extract stuff from dataframes...
-# this might exist already in dataframes... didn't look too hard
-
-function getnice(df::DataFrame, s::Symbol)
-    data = df[s]
-    makenice(data)
-end
-
-makenice{T<:Vector}(da::DataArray{T}) = hcat(da...)'
-makenice{T<:Number}(da::DataArray{T}) = convert(Array, da)
-
-
-
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
     println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))
