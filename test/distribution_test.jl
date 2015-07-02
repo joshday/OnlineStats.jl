@@ -198,7 +198,10 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
     context("Gamma") do
         o = FitGamma()
-        o = FitGamma(rand(Gamma(), 10))
+        for i in 1:10
+            n = rand(100:1000)
+            FitGamma(rand(Gamma(), n))
+        end
         o = onlinefit(Gamma, rand(Gamma(), 10))
 
         n1 = rand(1:1_000_000, 1)[1]

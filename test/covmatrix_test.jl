@@ -5,6 +5,8 @@ using OnlineStats, FactCheck
 facts("CovarianceMatrix") do
     o = CovarianceMatrix(10)
     o = CovarianceMatrix(rand(100,10))
+    o = CovarianceMatrix(randn(1000, 50))
+    @fact nobs(o) => 1000
 
     # create 4 batches
     n1, n2, n3, n4 = rand(1:1_000_000, 4)
@@ -34,6 +36,7 @@ facts("CovarianceMatrix") do
     o3 = merge(o1, o2)
     merge!(o1, o2)
     @fact cov(o1) => cov(o3)
+    @fact cor(o1) => cor(o3)
 end
 
 end # module
