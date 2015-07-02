@@ -15,7 +15,7 @@ facts("NormalMix") do
         @fact probs(myfit2) => roughly([.5, .5], .05)
         diff = sort(OnlineStats.means(myfit1)) - sort(OnlineStats.means(myfit2))
         @fact diff => roughly(zeros(2), .001)
-        diff = sort(stds(myfit1)) - sort(stds(myfit2))
+        diff = sort(OnlineStats.stds(myfit1)) - sort(OnlineStats.stds(myfit2))
         @fact diff => roughly(zeros(2), .001)
         @fact sort(OnlineStats.means(myfit1)) => roughly([0., 10.], atol = .5)
         @fact sort(OnlineStats.means(myfit2)) => roughly([0., 10.], atol = .5)
@@ -37,7 +37,7 @@ facts("NormalMix") do
             updatebatch!(o, x[rng])
         end
         @fact sort(OnlineStats.means(o)) => roughly([0., 10.], .1)
-        @fact sort(stds(o)) => roughly([1., 5.], .1)
+        @fact sort(OnlineStats.stds(o)) => roughly([1., 5.], .1)
         @fact sort(probs(o)) => roughly([.3, .7], .1)
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o) => Any[o.d, nobs(o)]
@@ -55,7 +55,7 @@ facts("NormalMix") do
             i += 1
         end
         @fact sort(OnlineStats.means(o)) => roughly([0., 10.], 2) "weak test"
-        @fact sort(stds(o)) => roughly([1., 5.], 2) "weak test"
+        @fact sort(OnlineStats.stds(o)) => roughly([1., 5.], 2) "weak test"
         @fact sort(probs(o)) => roughly([.3, .7], .1)
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o) => Any[o.d, nobs(o)]
