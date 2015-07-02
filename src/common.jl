@@ -2,7 +2,7 @@
 
 nobs(o::OnlineStat) = o.n
 
-update!{T<:Real}(o::OnlineStat, y::Vector{T}) = (for yi in y; update!(o, yi); end)
+update!{T<:Real}(o::OnlineStat, y::AbstractVector{T}) = (for yi in y; update!(o, yi); end)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
@@ -14,22 +14,27 @@ end
 
 
 
-row(M::MatF, i::Int) = vec(M[i,:])
-col(M::MatF, i::Int) = M[:,i]
-row!(M::MatF, i::Int, v::VecF) = (M[i,:] = v)
-col!(M::MatF, i::Int, v::VecF) = (M[:,i] = v)
+row(M::AMatF, i::Integer) = rowvec_view(M, i)
+col(M::AMatF, i::Integer) = view(M, :, i)
+row!(M::AMatF, i::Integer, v::AVecF) = (M[i,:] = v)
+col!(M::AMatF, i::Integer, v::AVecF) = (M[:,i] = v)
+
+nrows(M::AbstractArray) = size(M,1)
+ncols(M::AbstractArray) = size(M,2)
 
 
 #------------------------------------------------------------------------# Show
+
+# TODO: use my "fmt" method in Formatting.jl if/when the PR is merged
 # temporary fix for the "how to print" problem... lets come up with something nicer
-mystring(f::Float64) = @sprintf("%f", f)
+mystring(f::FloatingPoint) = @sprintf("%f", f)
 mystring(x) = string(x)
 
 
 name(o::OnlineStat) = string(typeof(o))
 
 
-function Base.print{T<:OnlineStat}(io::IO, v::Vector{T})
+function Base.print{T<:OnlineStat}(io::IO, v::AbstractVector{T})
     print(io, "[")
     print(io, join(v, ", "))
     print(io, "]")

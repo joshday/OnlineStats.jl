@@ -31,6 +31,8 @@ import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vc
 import MathProgBase: AbstractMathProgSolver
 import Convex, SCS
 
+import ArrayViews: view, rowvec_view
+
 
 #-----------------------------------------------------------------------------#
 # Exports
@@ -81,6 +83,11 @@ export
     SparseReg,
 
     HyperLogLog,
+    Adagrad,
+    SquareLoss,
+    L1Reg,
+    L2Reg,
+    LogisticLink,
 
     # functions
     standardize,
@@ -172,6 +179,7 @@ include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
 include("streamstats/hyperloglog.jl")
+include("streamstats/adagrad.jl")
 
 
 
