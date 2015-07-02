@@ -91,11 +91,11 @@ end
 
 #-------------------------------------------------------------------------# cdf
 # NOTE: cdf method for MixtureModel was added to Distributions on 5/7/2015
-# function cdf(o::MixtureModel{Univariate, Continuous, Normal}, x::Float64)
-#     π = probs(o)
-#     result = 0.0
-#     for j in 1:length(π)
-#         result += π[j] * cdf(components(o)[j], x)
-#     end
-#     return result
-# end
+function cdf(o::MixtureModel{Univariate, Continuous, Normal}, x::Float64)
+    π = probs(o)
+    result = 0.0
+    for j in 1:length(π)
+        result += π[j] * cdf(components(o)[j], x)
+    end
+    return result
+end
