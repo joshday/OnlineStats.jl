@@ -1,8 +1,6 @@
 module VarianceTest
 
-using OnlineStats
-using DataFrames
-using FactCheck
+using OnlineStats, FactCheck
 
 
 facts("Variance") do

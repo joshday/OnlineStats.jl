@@ -1,6 +1,6 @@
 module CommonTest
 
-using OnlineStats, FactCheck, Distributions, DataFrames
+using OnlineStats, FactCheck, Distributions
 
 facts("Common") do
     context("Helper Functions") do

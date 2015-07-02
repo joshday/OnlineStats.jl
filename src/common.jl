@@ -55,7 +55,6 @@ function Base.show(io::IO, o::OnlineStat)
     end
 end
 
-
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
     println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))
