@@ -24,9 +24,6 @@ facts("Common") do
         x = rand(10)
         @fact OnlineStats.mystring(x) => string(x)
         @fact OnlineStats.mystring(x[1]) => @sprintf("%f", x[1])
-
-        df = tracedata(Mean(), 5, rand(100))
-        df = tracedata(QuantileMM(), 5, rand(100))
     end
 
     context("Weighting") do
