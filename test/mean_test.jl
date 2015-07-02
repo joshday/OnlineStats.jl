@@ -1,8 +1,6 @@
 module MeanTest
 
-using OnlineStats
-using DataFrames
-using FactCheck
+using OnlineStats, FactCheck
 
 facts("Mean") do
     context("Mean") do

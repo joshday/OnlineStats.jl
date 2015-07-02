@@ -1,6 +1,6 @@
 module DistributionTest
 
-using OnlineStats, FactCheck, Distributions, DataFrames
+using OnlineStats, FactCheck, Distributions
 
 facts("Distributions") do
 
@@ -32,9 +32,7 @@ facts("Distributions") do
 
         @fact state(o) => [o.d, o.n]
         @fact statenames(o) => [:dist, :nobs]
-        @fact typeof(DataFrame(o)) => DataFrame
         o2 = copy(o)
-        @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = n1 + n2)
         @fact mean(o2.d) => roughly(mean(x))
         @fact nobs(o) => n1 + n2
 
@@ -73,8 +71,6 @@ facts("Distributions") do
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o) => [o.d, o.n]
         o2 = copy(o)
-        @fact DataFrame(o2) => DataFrame(o)
-        @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = n1 + n2)
     end
 
 
@@ -122,7 +118,6 @@ facts("Distributions") do
         @fact state(o) => [o.d, o.n]
         o2 = copy(o)
         @fact statenames(o2) => [:dist, :nobs]
-        @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 
@@ -162,8 +157,6 @@ facts("Distributions") do
         @fact statenames(o) => [:dist, :nobs]
         o2 = copy(o)
         @fact state(o2)[2] => state(o)[2]
-        @fact names(DataFrame(o)) => statenames(o)
-        @fact DataFrame(o)[1, end] => nobs(o)
     end
 
 #------------------------------------------------------------------------------#
@@ -197,7 +190,6 @@ facts("Distributions") do
         @fact state(o) => [o.d, o.n]
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o1) => state(o)
-        @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 
@@ -241,7 +233,6 @@ facts("Distributions") do
         o1 = copy(o)
         @fact state(o1) => state(o)
         @fact o.n => n1 + n2
-        @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 #------------------------------------------------------------------------------#
@@ -280,9 +271,6 @@ facts("Distributions") do
         @fact o1.d.n => n
         @fact o1.d.p => roughly(vec(sum(x, 1) / (n * (n1 + n2))))
         @fact o1.n => n1 + n2
-
-        @fact names(DataFrame(o)) => statenames(o)
-        @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 #------------------------------------------------------------------------------#
