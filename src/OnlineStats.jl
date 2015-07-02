@@ -2,7 +2,7 @@ module OnlineStats
 
 import Docile
 Docile.@document
-
+import Reexport
 import Compat: @compat
 import MultivariateStats: fit, PCA
 import Distributions
@@ -92,15 +92,10 @@ export
     state,
     statenames,
     onlinefit,
-    tracedata,
-    unpack_vectors,
     mse,
     em,
     means,
     stds,
-    smooth,
-    smooth!,
-    weighting,
     sweep!
 
 
@@ -110,12 +105,11 @@ export
 
 include("log.jl")
 
-# Abstract Types
+# Common Types
 include("types.jl")
 include("weighting.jl")
 
 # Other
-include("tracedata.jl")
 include("common.jl")
 
 # Summary Statistics
