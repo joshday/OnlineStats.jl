@@ -10,15 +10,15 @@ facts("NormalMix") do
         trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.5, .5])
         x = rand(trueModel, n)
         myfit1 = OnlineStats.emstart(2, x, algorithm = :naive, tol = 1e-10)
-        myfit2 = OnlineStats.emstart(2, x, algorithm = :kmeans, tol = 1e-10)
+        myfit2 = OnlineStats.emstart(2, x, algorithm = :kOnlineStats.means, tol = 1e-10)
         @fact probs(myfit1) => roughly([.5, .5], .05)
         @fact probs(myfit2) => roughly([.5, .5], .05)
-        diff = sort(means(myfit1)) - sort(means(myfit2))
+        diff = sort(OnlineStats.means(myfit1)) - sort(OnlineStats.means(myfit2))
         @fact diff => roughly(zeros(2), .001)
         diff = sort(stds(myfit1)) - sort(stds(myfit2))
         @fact diff => roughly(zeros(2), .001)
-        @fact sort(means(myfit1)) => roughly([0., 10.], atol = .5)
-        @fact sort(means(myfit2)) => roughly([0., 10.], atol = .5)
+        @fact sort(OnlineStats.means(myfit1)) => roughly([0., 10.], atol = .5)
+        @fact sort(OnlineStats.means(myfit2)) => roughly([0., 10.], atol = .5)
         @fact_throws OnlineStats.emstart(3, randn(100), algorithm = :blah)
 
         d = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
@@ -36,7 +36,7 @@ facts("NormalMix") do
             rng += 100
             updatebatch!(o, x[rng])
         end
-        @fact sort(means(o)) => roughly([0., 10.], .1)
+        @fact sort(OnlineStats.means(o)) => roughly([0., 10.], .1)
         @fact sort(stds(o)) => roughly([1., 5.], .1)
         @fact sort(probs(o)) => roughly([.3, .7], .1)
         @fact statenames(o) => [:dist, :nobs]
@@ -54,7 +54,7 @@ facts("NormalMix") do
             update!(o, x[i])
             i += 1
         end
-        @fact sort(means(o)) => roughly([0., 10.], 2) "weak test"
+        @fact sort(OnlineStats.means(o)) => roughly([0., 10.], 2) "weak test"
         @fact sort(stds(o)) => roughly([1., 5.], 2) "weak test"
         @fact sort(probs(o)) => roughly([.3, .7], .1)
         @fact statenames(o) => [:dist, :nobs]

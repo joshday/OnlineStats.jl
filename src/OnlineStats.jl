@@ -145,7 +145,6 @@ include("glm/logisticregsgd.jl")
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
 
-
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")

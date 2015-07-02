@@ -1,5 +1,6 @@
 # This is a "slow" analytical update based on CovarianceMatrix
 # At each batch, CovarianceMatrix is updated and then eigenvalue decomposition is done.
+# TODO: Do a top k eigenvalues/vectors algorithm using power method or eigs()
 #-------------------------------------------------------# Type and Constructors
 type AnalyticalPCA{W <: Weighting} <: OnlineStat
     C::CovarianceMatrix{W}
@@ -39,4 +40,3 @@ function updatebatch!(o::AnalyticalPCA, X::MatF)
     o.n += size(X, 1)
     return
 end
-
