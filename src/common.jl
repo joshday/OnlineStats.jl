@@ -2,7 +2,7 @@
 
 nobs(o::OnlineStat) = o.n
 
-update!{T<:Real}(o::OnlineStat, y::Vector{T}) = (for yi in y; update!(o, yi); end)
+update!{T<:Real}(o::OnlineStat, y::AbstractVector{T}) = (for yi in y; update!(o, yi); end)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
@@ -132,4 +132,3 @@ invlogccdf(o::DistributionStat, x) = invlogccdf(o.d, x)
 rand(o::DistributionStat) = rand(o.d)
 rand(o::DistributionStat, n_or_dims) = rand(o.d, n_or_dims)
 rand!(o::DistributionStat, arr) = rand!(o.d, arr)
-
