@@ -19,7 +19,10 @@
 
 # --------------------------------------------------------------------------
 
-# placeholder loss/reg types and functions. TODO: use EmpiricalRisks.jl or something else
+# placeholder loss/reg types and functions. 
+# TODO: use EmpiricalRisks.jl or something else
+
+# NOTE: I don't think I need the loss/reg values... only gradients
 
 abstract LossFunction
 
@@ -27,33 +30,34 @@ abstract LossFunction
 # f(ε) = ε²/2
 # ∇f(ε) = df(ε)/dxᵢ = -ε * xᵢ
 immutable SquareLoss <: LossFunction end
-f(::SquareLoss, y::Real, ypred::Real) = 0.5 * (y-ypred)^2
+# f(::SquareLoss, y::Real, ypred::Real) = 0.5 * (y-ypred)^2
 ∇f(::SquareLoss, ε::Real, xᵢ::Real) = -ε * xᵢ
 
+# note: this is equivalent to the negative of the logistic log likelihood
 immutable LogisticLoss <: LossFunction end
-f(::LogisticLoss, y::Real, ypred::Real) = log(1 + exp(-y * ypred))
-∇f(::LogisticLoss, ε::Real, xᵢ::Real) = -ε
+# f(::LogisticLoss, y::Real, ypred::Real) = log(1 + exp(-y * ypred))
+∇f(::LogisticLoss, ε::Real, xᵢ::Real) = -ε * xᵢ
 
 # --------------------------------------------------------------------------
 
 abstract RegularizationFunction
 
 immutable NoReg <: RegularizationFunction end
-Ψ(reg::NoReg, β::AVecF) = 0.0
+# Ψ(reg::NoReg, β::AVecF) = 0.0
 ∇Ψ(reg::NoReg, β::AVecF, i::Integer) = 0.0
 
 # Ψ(β) = λ‖β‖₁
 immutable L1Reg <: RegularizationFunction
   λ::Float64
 end
-Ψ(reg::L1Reg, β::AVecF) = reg.λ * sumabs(β)
+# Ψ(reg::L1Reg, β::AVecF) = reg.λ * sumabs(β)
 ∇Ψ(reg::L1Reg, β::AVecF, i::Integer) = reg.λ
 
 # Ψ(β) = 0.5 λ‖β‖₂²
 immutable L2Reg <: RegularizationFunction
   λ::Float64
 end
-Ψ(reg::L2Reg, β::AVecF) = 0.5 * reg.λ * sumabs2(β)
+# Ψ(reg::L2Reg, β::AVecF) = 0.5 * reg.λ * sumabs2(β)
 ∇Ψ(reg::L2Reg, β::AVecF, i::Integer) = reg.λ * β[i]
 
 # --------------------------------------------------------------------------
@@ -78,8 +82,8 @@ type Adagrad <: OnlineStat
   β::VecF
   G::VecF  # Gₜᵢ  = Σ gₛᵢ²   (sum of squared gradients up to time t)
   link::LinkFunction
-  f::LossFunction
-  Ψ::RegularizationFunction
+  loss::LossFunction
+  reg::RegularizationFunction
   n::Int
 end
 
@@ -103,8 +107,8 @@ end
 function update!(o::Adagrad, x::AVecF, y::Real)
   ε = y - predict(o, x)
 
-  for i in eachindex(x)
-    gᵢ = ∇f(o.f, ε, x[i]) + ∇Ψ(o.Ψ, o.β, i)
+  @inbounds for i in eachindex(x)
+    gᵢ = ∇f(o.loss, ε, x[i]) + ∇Ψ(o.reg, o.β, i)
     o.G[i] += gᵢ^2
     if o.G[i] != 0.0
       o.β[i] -= o.η * gᵢ / sqrt(o.G[i])

@@ -85,6 +85,7 @@ export
     HyperLogLog,
     Adagrad,
     SquareLoss,
+    LogisticLoss,
     L1Reg,
     L2Reg,
     LogisticLink,

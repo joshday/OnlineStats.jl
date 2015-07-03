@@ -1,6 +1,9 @@
 module AdagradTest
 using OnlineStats, FactCheck
-using StreamStats
+# using StreamStats
+
+# TODO compare to StreamStats results
+# TODO compare timing to StreamStats and profile
 
 facts("Adagrad") do
     # n = rand(10_000:100_000)
@@ -21,6 +24,18 @@ facts("Adagrad") do
     o = Adagrad(x, y; reg = L2Reg(0.1))
     println(o, ": β=", β)
     @fact coef(o) => roughly(β)
+
+    # logistic
+    z = map(y -> y>0.0 ? 1.0 : 0.0, y)
+    o = Adagrad(x, z; link=LogisticLink(), loss=LogisticLoss())
+    println(o, ": β=", β)
+    @fact coef(o) => roughly(β)
+
+
+    o = Adagrad(x, z; link=LogisticLink(), loss=LogisticLoss(), reg=L1Reg(0.1))
+    println(o, ": β=", β)
+    @fact coef(o) => roughly(β)
+
 
     # # First batch accuracy
     # o = LinReg(x, y)
