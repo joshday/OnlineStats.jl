@@ -1,4 +1,4 @@
-# This keeps track of the top d largest magnitude eigenvalues/vectors
+# This keeps track of the top d principal compoents
 
 #-------------------------------------------------------------# Type and Constructors
 type TopPCA{W <: Weighting} <: OnlineStat
@@ -9,8 +9,8 @@ type TopPCA{W <: Weighting} <: OnlineStat
     # eigen:
     values::VecF
     vectors::MatF  # currently sorted smallest to largest: this is what eig() does
-
     n::Int64
+    function TopPCA(C::CovarianceMatrix{W}, corr::Bool, alg::Symbol, values::VecF)
 end
 
 
@@ -19,7 +19,7 @@ TopPCA(p::Int, d::Int = p, wgt::Weighting = default(Weighting);
     TopPCA(CovarianceMatrix(p, wgt), corr, alg, zeros(p), zeros(p, p), 0)
 
 
-# Weighting is ignored for hte first batch
+# Weighting is ignored for the first batch
 function TopPCA(X::MatF, d::Int = size(X, 2), wgt::Weighting = default(Weighting);
                 corr::Bool = true, alg::Symbol = :eigs)
     # create "empty" TopPCA
