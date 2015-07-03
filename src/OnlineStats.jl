@@ -30,6 +30,8 @@ import MathProgBase: AbstractMathProgSolver
 import Convex, SCS
 import ArrayViews: view, rowvec_view
 
+import ArrayViews: view, rowvec_view
+
 
 #-----------------------------------------------------------------------------#
 # Exports
@@ -80,6 +82,14 @@ export
     LogRegSGD2,
     SparseReg,
 
+    HyperLogLog,
+    Adagrad,
+    SquareLoss,
+    LogisticLoss,
+    L1Reg,
+    L2Reg,
+    LogisticLink,
+
     # functions
     update!,
     updatebatch!,
@@ -88,7 +98,8 @@ export
     onlinefit,
     mse,
     em,
-    sweep!
+    sweep!,
+    estimatedCardinality
 
 
 #-----------------------------------------------------------------------------#
@@ -151,6 +162,10 @@ include("glm/logisticregmm.jl")
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
+
+# ported from StreamStats
+include("streamstats/hyperloglog.jl")
+include("streamstats/adagrad.jl")
 
 
 
