@@ -73,9 +73,18 @@ link(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
 invlink(::LogisticLink, y::Real) = log(y / (1.0 - y))
 
 # --------------------------------------------------------------------------
+
+# if we aren't passed functions of which we understand the properties/convexity, warn the user
+function check_warn(link, loss, reg)
+  ok = typeof(link) in (IdentityLink, LogisticLink)
+  ok = ok && typeof(loss) in (SquareLoss, LogisticLoss)
+  ok = ok && typeof(reg) in (NoReg, L2Reg)
+  if !ok
+    warn("Use at your own risk... Adagrad can be unstable or just plain wrong with non-standard loss/reg functions!")
+  end
+end
+
 # --------------------------------------------------------------------------
-
-
 #-------------------------------------------------------# Type and Constructors
 type Adagrad <: OnlineStat
   η::Float64  # learning rate
@@ -92,7 +101,8 @@ function Adagrad(p::Int;
                  link::LinkFunction = IdentityLink(),
                  loss::LossFunction = SquareLoss(),
                  reg::RegularizationFunction = NoReg())
-    Adagrad(η, zeros(p), zeros(p), link, loss, reg, 0)
+  check_warn(link, loss, reg)
+  Adagrad(η, zeros(p), zeros(p), link, loss, reg, 0)
 end
 
 function Adagrad(X::AMatF, y::AVecF; kwargs...)
