@@ -10,6 +10,8 @@ facts("Common") do
         @fact OnlineStats.col(x, 1) => vec(x[:, 1])
         @fact OnlineStats.row(x, n) => vec(x[n, :])
         @fact OnlineStats.col(x, p) => vec(x[:, p])
+        @fact OnlineStats.nrows(x) => size(x, 1)
+        @fact OnlineStats.ncols(x) => size(x, 2)
 
         OnlineStats.row!(x, 1, ones(p))
         OnlineStats.row!(x, n, ones(p))
