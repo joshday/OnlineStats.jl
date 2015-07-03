@@ -20,7 +20,6 @@ include("normalmix_test.jl")
 
 include("covmatrix_test.jl")
 include("analyticalpca_test.jl")
-include("toppca_test.jl")
 
 include("adagrad_test.jl")
 

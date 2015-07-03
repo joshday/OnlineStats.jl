@@ -12,7 +12,7 @@
 
 ## Multivariate Analysis
 
-- [x] PCA: `AnalyticalPCA`, `OnlinePCA`
+- [x] PCA: `AnalyticalPCA`, `OnlinePCA`, `pca(o::CovarianceMatrix)`
 - [ ] CCA:
 - [ ] Factor Analysis:
 

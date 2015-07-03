@@ -37,6 +37,29 @@ facts("CovarianceMatrix") do
     merge!(o1, o2)
     @fact cov(o1) => cov(o3)
     @fact cor(o1) => cor(o3)
+
+    context("PCA") do
+        n = rand(1000:10_000)
+        d = rand(10:100)
+        x = randn(100, d)
+        o = CovarianceMatrix(x)
+
+        # full PCA - correlation
+        @fact abs(pca(o)[1] - eig(cor(x))[1]) => roughly(zeros(d), .0001)
+        @fact abs(pca(o)[1] - eig(Symmetric(cor(o)))[1]) => roughly(zeros(d), .0001)
+        @fact abs(pca(o)[2]) - abs(eig(cor(x))[2]) => roughly(zeros(d, d), .0001)
+        @fact abs(pca(o)[2] - eig(Symmetric(cor(o)))[2]) => roughly(zeros(d, d), .0001)
+
+        # full PCA - covariance
+        pca(o, length(o.B), false)
+
+        # top d PCA - correlation
+        pca(o, 4)
+
+        # top d PCA - covariance
+        pca(o, 4, false)
+
+    end
 end
 
 end # module
