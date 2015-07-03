@@ -4,6 +4,19 @@ nobs(o::OnlineStat) = o.n
 
 update!{T<:Real}(o::OnlineStat, y::AVec{T}) = (for yi in y; update!(o, yi); end)
 
+getrows(x::Vector, rows) = x[rows]
+getrows(x::Matrix, rows) = x[rows, :]
+function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = true)
+    n = size(args[1],1)
+    i = 1
+    while i <= n
+        rng = i:min(i + b - 1, n)
+        batch_args = map(x -> getrows(x, rng), args)
+        batch ? updatebatch!(o, batch_args...) : update!(o, batch_args...)
+        i += b
+    end
+end
+
 Base.copy(o::OnlineStat) = deepcopy(o)
 
 function Base.merge(o1::OnlineStat, o2::OnlineStat)

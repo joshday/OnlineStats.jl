@@ -29,7 +29,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] F-distribution:
 - [x] Gamma: `FitGamma`
 - [ ] Lognormal:
-- [ ] Poisson
+- [x] Poisson
 - [x] Normal: `FitNormal`
 - [ ] T-distribution:
 - [ ] Weibull:
@@ -39,6 +39,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Dirichlet-Multinomial
 - [x] Multinomial: `FitMultinomial`
 - [x] Multivariate Normal: `FitMvNormal`
+- [ ] Multivariate Normal Mixture:
 - [ ] Multivariate T-distribution
 - [ ] Negative Multinomial
 

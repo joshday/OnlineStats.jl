@@ -24,7 +24,7 @@ facts("Adagrad") do
         # ridge regression
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
-        x[:,2] = x[:,1]  
+        x[:,2] = x[:,1]
         y = x * β
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; reg = L2Reg(0.01))
@@ -35,19 +35,22 @@ facts("Adagrad") do
     if true
     context("Logistic") do
 
+        n, p = 1_000_000, 10
         x = randn(n, p)
-        β = collect(1.:p)
-        y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        β = (collect(1.:p) - 5) / 10
+        y = [rand(Bernoulli(y)) for y in 1 ./ (1 + exp(-x * β))]
+        # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
 
         # logistic
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
+        @time o = OnlineStats.Adagrad(x, y; link=OnlineStats.LogisticLink(), loss=OnlineStats.LogisticLoss())
+        @time o = OnlineStats.LogRegMM(x, y)
         println(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = 0.1)
 
         # logistic l2
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
-        x[:,2] = x[:,1]  
+        x[:,2] = x[:,1]
         y = x * β
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.1))

@@ -17,6 +17,8 @@ facts("Common") do
         OnlineStats.row!(x, n, ones(p))
         @fact OnlineStats.row(x, 1) => OnlineStats.row(x, n)
         @fact OnlineStats.row(x, n) => ones(p)
+        @fact OnlineStats.getrows([1,2,3], 2) => 2
+        @fact OnlineStats.getrows(x, 1) => x[1, :]
 
         OnlineStats.col!(x, 1, ones(n))
         OnlineStats.col!(x, p, ones(n))
@@ -40,6 +42,12 @@ facts("Common") do
         @fact OnlineStats.adjusted_nobs(1, w) => 1
         @fact OnlineStats.adjusted_nobs(o) => 0
         @fact OnlineStats.adjusted_nobs(1, EqualWeighting()) => 1
+    end
+
+    context("onlinefit!") do
+        o = Mean()
+        onlinefit!(o, 5, randn(100), batch = false)
+        onlinefit!(o, 5, randn(100))
     end
 
     context("Show OnlineStat") do

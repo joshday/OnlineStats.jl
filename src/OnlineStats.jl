@@ -91,6 +91,7 @@ export
     # functions
     update!,               # update one observation at a time using Weighting scheme
     updatebatch!,          # update by batch, giving each observation equal weight
+    onlinefit!,            # run through data updating with mini batches
     state,                 # get state of object, typically Any[value, nobs(o)]
     statenames,            # corresponding names to state()
     weighting,             # get the Weighting of an object

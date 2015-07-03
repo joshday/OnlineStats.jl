@@ -34,7 +34,7 @@ function update!(o::QuantRegMM, x::VecF, y::Float64)
     γ = weight(o)
 
     w = o.ϵ + abs(y - x' * o.β)[1]
-    u = y / w + 2 * o.τ - 1
+    u = y / w + 2.0 * o.τ - 1.0
 
     smooth!(o.XtWX, x * (x / w)', γ)
     smooth!(o.Xu, x .* u, γ)
@@ -43,7 +43,7 @@ function update!(o::QuantRegMM, x::VecF, y::Float64)
 end
 
 function update!(o::QuantRegMM, X::MatF, y::VecF)
-    for i in 1:size(X,1)
+    @inbounds for i in 1:size(X,1)
         update!(o, vec(X[i, :]), y[i])
     end
 end

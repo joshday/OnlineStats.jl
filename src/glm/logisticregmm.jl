@@ -43,11 +43,11 @@ end
 
 # Singleton updates may have issue with singularities
 function update!(o::LogRegMM, x::VecF, y)
-    updatebatch!(o, reshape(x, 1, length(x)), [y])
+    updatebatch!(o, x', [y])
 end
 
 function update!(o::LogRegMM, X::MatF, y::Vector{Int})
-    for i in 1:length(y)
+    @inbounds for i in 1:length(y)
         update!(o, vec(x[i, :]), y[i])
     end
 end
@@ -59,4 +59,3 @@ statenames(o::LogRegMM) = [:β, :nobs]
 
 coef(o::LogRegMM) = copy(o.β)
 predict(o::LogRegMM, X::MatF) = inverselogit(X * o.β)
-
