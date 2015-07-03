@@ -81,21 +81,21 @@ end
 name(o::OnlinePLS) = "OPLS"
 
 
-function OnlinePLS(d::Int, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+function OnlinePLS(d::Integer, l::Integer, k::Integer, δ::Real, wgt::Weighting = default(Weighting))
 	OnlinePLS(d, l, k, 0, wgt, Mean(wgt), Means(d, wgt), zeros(d), zeros(d, k), OnlinePCA(d, l, wgt), OnlineFLS(k, δ, wgt))
 end
 
-function OnlinePLS(y::Float64, x::VecF, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+function OnlinePLS(x::AVecF, y::Real, l::Integer, k::Integer, δ::Real, wgt::Weighting = default(Weighting))
 	d = length(x)
 	o = OnlinePLS(d, l, k, δ, wgt)
-	update!(o, y, x)
+	update!(o, x, y)
 	o
 end
 
-function OnlinePLS(y::VecF, X::MatF, l::Int, k::Int, δ::Float64, wgt::Weighting = default(Weighting))
+function OnlinePLS(X::AMatF, y::AVecF, l::Integer, k::Integer, δ::Real, wgt::Weighting = default(Weighting))
 	d = size(X,2)
 	o = OnlinePLS(d, l, k, δ, wgt)
-	update!(o, y, X)
+	update!(o, X, y)
 	o
 end
 
@@ -111,14 +111,14 @@ state(o::OnlinePLS) = Any[copy(o.v1), state(o.pca), copy(o.W), state(o.fls), nob
 
 # NOTE: assumes X mat is (T x p), where T is the number of observations
 # TODO: optimize
-function update!(o::OnlinePLS, y::VecF, X::MatF)
+function update!(o::OnlinePLS, X::AMatF, y::AVecF)
 	@assert length(y) == size(X,1)
-	for i in 1:length(y)
-		update!(o, y[i], row(X,i))
+	@inbounds for i in 1:length(y)
+		update!(o, row(X,i), y[i])
 	end
 end
 
-function update!(o::OnlinePLS, y::Float64, x::VecF)
+function update!(o::OnlinePLS, x::AVecF, y::Real)
 
 	# center x and y
 	y = center!(o.ymean, y)
@@ -136,7 +136,7 @@ function update!(o::OnlinePLS, y::Float64, x::VecF)
 	w = copy(o.v1)
 
 	# do the gram-schmidt process
-	for i in 1:o.k
+	@inbounds for i in 1:o.k
 		if i > 1
 			# multiply Cw
 			nextw = zeros(o.d)
@@ -160,7 +160,7 @@ function update!(o::OnlinePLS, y::Float64, x::VecF)
 
 	# update fls regression
 	update!(o.fls, y, o.W' * x)
-	@LOG o.fls
+	# @LOG o.fls
 
 	o.n += 1
 	return
@@ -193,12 +193,12 @@ function coeftable(o::OnlinePLS)
 	# TODO
 end
 
-function confint(o::OnlinePLS, level::Float64 = 0.95)
+function confint(o::OnlinePLS, level::Real = 0.95)
 	# TODO
 end
 
 # predicts yₜ for a given xₜ
-function predict(o::OnlinePLS, x::VecF)
+function predict(o::OnlinePLS, x::AVecF)
 	# center x
 	# multiply Wx to get a (kx1) vector of latent vars
 	# y = predict(fls,Wx)
@@ -209,11 +209,11 @@ function predict(o::OnlinePLS, x::VecF)
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function predict(o::OnlinePLS, X::MatF)
+function predict(o::OnlinePLS, X::AMatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n
-		pred[i] = predict(o, vec(X[i,:]))
+		pred[i] = predict(o, row(X,i))
 	end
 	pred
 end
