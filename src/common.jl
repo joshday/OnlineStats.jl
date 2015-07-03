@@ -2,7 +2,7 @@
 
 nobs(o::OnlineStat) = o.n
 
-update!{T<:Real}(o::OnlineStat, y::AbstractVector{T}) = (for yi in y; update!(o, yi); end)
+update!{T<:Real}(o::OnlineStat, y::AVec{T}) = (for yi in y; update!(o, yi); end)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 

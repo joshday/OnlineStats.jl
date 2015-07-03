@@ -30,8 +30,6 @@ import MathProgBase: AbstractMathProgSolver
 import Convex, SCS
 import ArrayViews: view, rowvec_view
 
-import ArrayViews: view, rowvec_view
-
 
 #-----------------------------------------------------------------------------#
 # Exports
@@ -45,7 +43,7 @@ export
     ExponentialWeighting,
     StochasticWeighting,
 
-    # concrete types
+    # <: OnlineStat
     Mean,
     Variance,
     Moments,
@@ -59,7 +57,6 @@ export
     Means,
     Variances,
     AnalyticalPCA,
-    TopPCA,
 
     NormalMix,
     FitBernoulli,
@@ -79,7 +76,7 @@ export
     QuantRegMM,
     LogRegMM,
     LogRegSGD,
-    LogRegSGD2,
+    LogRegSGD2,  # Second-order SGD: This is the "winner" compared to the other two
     SparseReg,
 
     HyperLogLog,
@@ -91,15 +88,17 @@ export
     LogisticLink,
 
     # functions
-    update!,
-    updatebatch!,
-    state,
-    statenames,
-    onlinefit,
+    update!,               # update one observation at a time using Weighting scheme
+    updatebatch!,          # update by batch, giving each observation equal weight
+    state,                 # get state of object, typically Any[value, nobs(o)]
+    statenames,            # corresponding names to state()
+    weighting,             # get the Weighting of an object
+    onlinefit,             # higher-level syntax for constructors
     mse,
-    em,
-    sweep!,
-    estimatedCardinality
+    em,                    # Offline EM algorithm for Normal Mixtures
+    sweep!,                # Symmetric sweep operator
+    estimatedCardinality,
+    pca                    # Get top d principal components from CovarianceMatrix
 
 
 #-----------------------------------------------------------------------------#
@@ -130,7 +129,6 @@ include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
 include("multivariate/analyticalpca.jl")
-include("multivariate/toppca.jl")
 
 # Parametric Density
 include("distributions/bernoulli.jl")
