@@ -12,7 +12,7 @@ import MultivariateStats: fit, PCA
 import Distributions:
     # Distributions
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
-    MvNormal, Normal, MixtureModel, FDist, TDist,
+    MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
 
     # Other
     fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
@@ -68,6 +68,7 @@ export
     FitMultinomial,
     FitMvNormal,
     FitNormal,
+    FitPoisson,
 
     OnlineFLS,
     LinReg,
@@ -142,6 +143,7 @@ include("distributions/mvnormal.jl")
 include("distributions/normal.jl")
 include("distributions/offlinenormalmix.jl")
 include("distributions/normalmix.jl")
+include("distributions/poisson.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")

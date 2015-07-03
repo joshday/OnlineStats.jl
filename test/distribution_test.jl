@@ -361,5 +361,21 @@ facts("Distributions") do
         @fact nobs(o1) => nobs(o2)
     end
 
+
+#------------------------------------------------------------------------------#
+#                                                                       Normal #
+#------------------------------------------------------------------------------#
+    context("Poisson") do
+        o = FitPoisson()
+        o = FitPoisson(ExponentialWeighting(10_000))
+
+        x = rand(Poisson(6.0), 1000)
+        update!(o, x)
+        @fact mean(o) - mean(x) => roughly(0.0, 1e-10)
+        @fact nobs(o) - length(x) => 0
+        o2 = onlinefit(Poisson, x)
+        @fact mean(o) - mean(o2) => 0.0
+        @fact nobs(o) - nobs(o2) => 0
+    end
 end # facts
 end # module
