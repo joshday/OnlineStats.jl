@@ -65,12 +65,12 @@ end
 abstract LinkFunction
 
 immutable IdentityLink <: LinkFunction end
-link(::IdentityLink, xβ::Real) = xβ
-invlink(::IdentityLink, y::Real) = y
+link(::IdentityLink, y::Real) = y
+invlink(::IdentityLink, xβ::Real) = xβ
 
 immutable LogisticLink <: LinkFunction end
-link(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
-invlink(::LogisticLink, y::Real) = log(y / (1.0 - y))
+link(::LogisticLink, y::Real) = log(y / (1.0 - y))
+invlink(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
 
 # --------------------------------------------------------------------------
 
@@ -141,8 +141,8 @@ state(o::Adagrad) = Any[copy(o.β), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
 StatsBase.coef(o::Adagrad) = o.β
-StatsBase.predict(o::Adagrad, x::AVecF) = link(o.link, dot(x, o.β))
-StatsBase.predict(o::Adagrad, X::AMatF) = link(o.link, X * o.β)
+StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
+StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
 
 
 # --------------------------------------------------------------------------
