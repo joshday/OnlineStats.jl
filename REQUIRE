@@ -1,12 +1,11 @@
-DataFrames
 Docile
 Distributions
+Reexport
 StatsBase
 GLM
 Compat
 FactCheck
 Clustering
 MultivariateStats
-Gadfly
 Convex
 SCS

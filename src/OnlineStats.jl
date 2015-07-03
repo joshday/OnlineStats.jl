@@ -1,11 +1,14 @@
 module OnlineStats
 
-import Docile
-Docile.@document
+# using things that are rarely used or very clear where functions come from
+using Docile
+@document
+using Reexport
+@reexport using StatsBase
+# @reexport using Distributions
+using Compat
 
-import Compat: @compat
 import MultivariateStats: fit, PCA
-import Distributions
 import Distributions:
     # Distributions
     Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
@@ -20,16 +23,12 @@ import Distributions:
     mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
     entropy, mgf, cf, insupport, logcdf, ccdf,
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
-import DataFrames: DataFrame, names!, pool!
-import DataArrays
-import DataArrays: DataArray
 import Base: copy, merge, merge!, show, quantile, maximum, minimum
 import Clustering
-import StatsBase
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov
-
 import MathProgBase: AbstractMathProgSolver
 import Convex, SCS
+import ArrayViews: view, rowvec_view
 
 import ArrayViews: view, rowvec_view
 
@@ -38,7 +37,7 @@ import ArrayViews: view, rowvec_view
 # Exports
 #-----------------------------------------------------------------------------#
 export
-    # abstract types
+    # common types
     OnlineStat,
     ScalarOnlineStat,
     Weighting,
@@ -60,6 +59,7 @@ export
     Means,
     Variances,
     AnalyticalPCA,
+    TopPCA,
 
     NormalMix,
     FitBernoulli,
@@ -91,26 +91,13 @@ export
     LogisticLink,
 
     # functions
-    standardize,
-    standardize!,
-    unstandardize,
-    nobs,
-    coef,
-    predict,
     update!,
     updatebatch!,
     state,
     statenames,
     onlinefit,
-    tracedata,
-    unpack_vectors,
     mse,
     em,
-    means,
-    stds,
-    smooth,
-    smooth!,
-    weighting,
     sweep!,
     estimatedCardinality
 
@@ -121,12 +108,11 @@ export
 
 include("log.jl")
 
-# Abstract Types
+# Common Types
 include("types.jl")
 include("weighting.jl")
 
 # Other
-include("tracedata.jl")
 include("common.jl")
 
 # Summary Statistics
@@ -144,6 +130,7 @@ include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
 include("multivariate/analyticalpca.jl")
+include("multivariate/toppca.jl")
 
 # Parametric Density
 include("distributions/bernoulli.jl")
@@ -163,7 +150,6 @@ include("linearmodel/sweep.jl")
 include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 include("linearmodel/sparsereg.jl")
-# include("linearmodel/ridge.jl")
 include("linearmodel/ofls.jl")
 include("linearmodel/opca.jl")
 include("linearmodel/opls.jl")
@@ -172,7 +158,6 @@ include("linearmodel/opls.jl")
 include("glm/logisticregsgd.jl")
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
-
 
 # Quantile Regression
 include("quantileregression/quantregsgd.jl")

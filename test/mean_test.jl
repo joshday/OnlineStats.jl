@@ -1,13 +1,15 @@
 module MeanTest
 
-using OnlineStats
-using DataFrames
-using FactCheck
+using OnlineStats, FactCheck
 
 facts("Mean") do
     context("Mean") do
         o = Mean()
         o = Mean(rand(10))
+        for i in 1:10
+            n = rand(100:1000)
+            Mean(randn(n))
+        end
         o = Mean(randn(10))
         @fact nobs(o) => 10
         @fact show(Mean()) => show(Mean(0., 0, EqualWeighting()))

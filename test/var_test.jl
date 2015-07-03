@@ -1,14 +1,16 @@
 module VarianceTest
 
-using OnlineStats
-using DataFrames
-using FactCheck
+using OnlineStats, FactCheck
 
 
 facts("Variance") do
     context("Variance") do
         o = Variance()
         o = Variance(rand(100))
+        for i in 1:10
+            n = rand(10:100)
+            Variance(randn(n))
+        end
         o = Variance(randn(1000))
         @fact nobs(o) => 1000
         @fact show(Variance()) => show(Variance(0., 0., 0, EqualWeighting()))

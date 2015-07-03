@@ -1,6 +1,6 @@
 module DistributionTest
 
-using OnlineStats, FactCheck, Distributions, DataFrames
+using OnlineStats, FactCheck, Distributions
 
 facts("Distributions") do
 
@@ -32,17 +32,15 @@ facts("Distributions") do
 
         @fact state(o) => [o.d, o.n]
         @fact statenames(o) => [:dist, :nobs]
-        @fact typeof(DataFrame(o)) => DataFrame
         o2 = copy(o)
-        @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = n1 + n2)
         @fact mean(o2.d) => roughly(mean(x))
         @fact nobs(o) => n1 + n2
 
         o = onlinefit(Bernoulli, x1, ExponentialWeighting(.01))
-        @fact weighting(o) => ExponentialWeighting(.01)
+        @fact OnlineStats.weighting(o) => ExponentialWeighting(.01)
 
         o = onlinefit(Bernoulli, x1, ExponentialWeighting(1000))
-        @fact weighting(o) => ExponentialWeighting(1000)
+        @fact OnlineStats.weighting(o) => ExponentialWeighting(1000)
     end
 
 #------------------------------------------------------------------------------#
@@ -73,8 +71,6 @@ facts("Distributions") do
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o) => [o.d, o.n]
         o2 = copy(o)
-        @fact DataFrame(o2) => DataFrame(o)
-        @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = n1 + n2)
     end
 
 
@@ -88,7 +84,7 @@ facts("Distributions") do
         o = onlinefit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) => 0
-        @fact weighting(o) => ExponentialWeighting(.001)
+        @fact OnlineStats.weighting(o) => ExponentialWeighting(.001)
         @fact show(onlinefit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
 
         for i in 1:10
@@ -104,7 +100,7 @@ facts("Distributions") do
         x = [x1, x2]
 
         o = onlinefit(Binomial, x1, n = ntrials)
-        @fact mean(o) => roughly(mean(x), .01)
+        @fact mean(o) => roughly(mean(x), .05)
         @fact var(o) => var(o.d)
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
@@ -122,7 +118,6 @@ facts("Distributions") do
         @fact state(o) => [o.d, o.n]
         o2 = copy(o)
         @fact statenames(o2) => [:dist, :nobs]
-        @fact DataFrame(o2) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 
@@ -143,7 +138,7 @@ facts("Distributions") do
         α = rand(.5:.1:20, αlength)
         x1 = rand(Dirichlet(α), n1)'
         o = FitDirichlet(x1)
-        @fact weighting(o) => EqualWeighting()
+        @fact OnlineStats.weighting(o) => EqualWeighting()
         x2 = rand(Dirichlet(α), n2)'
         x = [x1; x2]
 
@@ -154,7 +149,6 @@ facts("Distributions") do
         updatebatch!(o, x2)
         @fact length(o.d.alpha) => αlength
 
-
         @fact o.d.alpha => roughly(fit(Dirichlet, x').alpha, .01) "failure ok. fit() is to blame"
         @fact o.n => n1 + n2
 
@@ -162,8 +156,9 @@ facts("Distributions") do
         @fact statenames(o) => [:dist, :nobs]
         o2 = copy(o)
         @fact state(o2)[2] => state(o)[2]
-        @fact names(DataFrame(o)) => statenames(o)
-        @fact DataFrame(o)[1, end] => nobs(o)
+
+        o = FitDirichlet(10)
+        update!(o, ones(10) / 10)
     end
 
 #------------------------------------------------------------------------------#
@@ -174,7 +169,7 @@ facts("Distributions") do
         o = FitExponential(rand(Exponential(), 10))
         o = onlinefit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
         o = onlinefit(Exponential, rand(Exponential(), 10))
-        @fact weighting(o) => EqualWeighting()
+        @fact OnlineStats.weighting(o) => EqualWeighting()
         @fact show(onlinefit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
 
         n1 = rand(1:1_000_000, 1)[1]
@@ -197,7 +192,6 @@ facts("Distributions") do
         @fact state(o) => [o.d, o.n]
         @fact statenames(o) => [:dist, :nobs]
         @fact state(o1) => state(o)
-        @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 
@@ -206,7 +200,10 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
     context("Gamma") do
         o = FitGamma()
-        o = FitGamma(rand(Gamma(), 10))
+        for i in 1:10
+            n = rand(100:1000)
+            FitGamma(rand(Gamma(), n))
+        end
         o = onlinefit(Gamma, rand(Gamma(), 10))
 
         n1 = rand(1:1_000_000, 1)[1]
@@ -241,7 +238,6 @@ facts("Distributions") do
         o1 = copy(o)
         @fact state(o1) => state(o)
         @fact o.n => n1 + n2
-        @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 #------------------------------------------------------------------------------#
@@ -280,9 +276,6 @@ facts("Distributions") do
         @fact o1.d.n => n
         @fact o1.d.p => roughly(vec(sum(x, 1) / (n * (n1 + n2))))
         @fact o1.n => n1 + n2
-
-        @fact names(DataFrame(o)) => statenames(o)
-        @fact DataFrame(o) => DataFrame(dist = o.d, nobs = o.n)
     end
 
 #------------------------------------------------------------------------------#
@@ -330,7 +323,7 @@ facts("Distributions") do
     context("Normal") do
         o = FitNormal()
         o = FitNormal(randn(10))
-        @fact weighting(o) => EqualWeighting()
+        @fact OnlineStats.weighting(o) => EqualWeighting()
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]

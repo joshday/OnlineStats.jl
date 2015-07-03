@@ -90,6 +90,7 @@ end
 
 
 #-------------------------------------------------------------------------# cdf
+# NOTE: cdf method for MixtureModel was added to Distributions on 5/7/2015
 function cdf(o::MixtureModel{Univariate, Continuous, Normal}, x::Float64)
     π = probs(o)
     result = 0.0

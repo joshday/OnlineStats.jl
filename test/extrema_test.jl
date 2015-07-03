@@ -5,6 +5,9 @@ using FactCheck
 
 facts("Extrema") do
     o = Extrema()
+    o = Extrema(1)
+    o = Extrema(1.0)
+    o = Extrema()
     @fact maximum(o) => -Inf
     update!(o, 0.)
     @fact maximum(o) => 0.

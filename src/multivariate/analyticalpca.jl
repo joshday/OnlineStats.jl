@@ -13,10 +13,10 @@ type AnalyticalPCA{W <: Weighting} <: OnlineStat
 end
 
 
-AnalyticalPCA(p::Int, wgt::Weighting = default(Weighting); corr = true) =
+AnalyticalPCA(p::Int, wgt::Weighting = default(Weighting); corr::Bool = true) =
     AnalyticalPCA(CovarianceMatrix(p, wgt), corr, zeros(p), zeros(p, p), 0)
 
-function AnalyticalPCA(X::MatF, wgt::Weighting = default(Weighting); corr = true)
+function AnalyticalPCA(X::MatF, wgt::Weighting = default(Weighting); corr::Bool = true)
     o = AnalyticalPCA(size(X, 2), wgt, corr = corr)
     updatebatch!(o, X)
     o
@@ -39,4 +39,3 @@ function updatebatch!(o::AnalyticalPCA, X::MatF)
     o.n += size(X, 1)
     return
 end
-

@@ -20,11 +20,8 @@ include("normalmix_test.jl")
 
 include("covmatrix_test.jl")
 include("analyticalpca_test.jl")
-
-include("plotmethods_test.jl")
-include("tracedata_test.jl")
+include("toppca_test.jl")
 
 FactCheck.exitstatus()
 
 end # module
-

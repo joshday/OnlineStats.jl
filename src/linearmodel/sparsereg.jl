@@ -40,6 +40,7 @@ state(o::SparseReg) = Any[coef(o), nobs(o)]
 #-----------------------------------------------------------------------# coef
 
 # Assumes mean(y) == μ[end], std(y) == σ[end]
+# put centered/scaled predictors into original scale
 function scaled_to_original(β, μ, σ)
     β₀ = μ[end] - σ[end] * sum(μ[1:end-1] ./ σ[1:end-1] .* β)
     for i in 1:length(β)
@@ -71,9 +72,9 @@ end
 #     [i => coef_ridge(o, i)]
 # end
 
-# Take a user-defined penalty (a function supported by Convex.jl)
-# and plug it into a Convex Solver
-# objective is to minimize: β' * cor(x) * β - cor(x, y) * β + J(β)
+# # Take a user-defined penalty (a function supported by Convex.jl)
+# # and plug it into a Convex Solver
+# # objective is to minimize: .5 * β' * cor(x) * β - cor(x, y) * β + J(β)
 # function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
 #                      solver::AbstractMathProgSolver = Convex.get_default_solver())
 #     o.s = cor(o.c)

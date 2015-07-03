@@ -60,33 +60,6 @@ function Base.show(io::IO, o::OnlineStat)
     end
 end
 
-
-#------------------------------------------------------------------------# DataFrame
-function DataFrame(o::OnlineStat; addFirstRow::Bool = true)
-    s = state(o)
-    df = DataFrame(map(typeof, s), statenames(o), 0)
-    if addFirstRow
-        push!(df, s)
-    end
-    df
-end
-
-Base.push!(df::DataFrame, o::OnlineStat) = push!(df, state(o))
-
-
-# some nice helper functions to extract stuff from dataframes...
-# this might exist already in dataframes... didn't look too hard
-
-function getnice(df::DataFrame, s::Symbol)
-    data = df[s]
-    makenice(data)
-end
-
-makenice{T<:Vector}(da::DataArray{T}) = hcat(da...)'
-makenice{T<:Number}(da::DataArray{T}) = convert(Array, da)
-
-
-
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
     println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))
@@ -124,7 +97,7 @@ cf(o::DistributionStat, x) = cf(o.d, x)
 insupport(o::DistributionStat, x) = insupport(o.d, x)
 pdf(o::DistributionStat, x) = pdf(o.d, x)
 logpdf(o::DistributionStat, x) = logpdf(o.d, x)
-StatsBase.loglikelihood(o::DistributionStat, x) = Distributions.loglikelihood(o.d, x)
+loglikelihood(o::DistributionStat, x) = Distributions.loglikelihood(o.d, x)
 cdf(o::DistributionStat, x) = cdf(o.d, x)
 logcdf(o::DistributionStat, x) = logcdf(o.d, x)
 ccdf(o::DistributionStat, x) = ccdf(o.d, x)
@@ -137,4 +110,3 @@ invlogccdf(o::DistributionStat, x) = invlogccdf(o.d, x)
 rand(o::DistributionStat) = rand(o.d)
 rand(o::DistributionStat, n_or_dims) = rand(o.d, n_or_dims)
 rand!(o::DistributionStat, arr) = rand!(o.d, arr)
-
