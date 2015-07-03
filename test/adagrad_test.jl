@@ -10,32 +10,50 @@ facts("Adagrad") do
     # p = rand(1:min(n-1, 100))
     n, p = 1_000_000, 10
 
-    x = randn(n, p)
-    β = collect(1.:p)
-    y = x * β + randn(n)*0
+    context("OLS") do
+        x = randn(n, p)
+        β = collect(1.:p)
+        y = x * β + randn(n)*0
 
 
-    # normal lin reg
-    o = Adagrad(x, y)
-    println(o, ": β=", β)
-    @fact coef(o) => roughly(β)
-
-    if false
-        # ridge regression
-        o = Adagrad(x, y; reg = L2Reg(0.1))
+        # normal lin reg
+        o = Adagrad(x, y)
         println(o, ": β=", β)
         @fact coef(o) => roughly(β)
+
+        # ridge regression
+        # repeat same data in first 2 variables
+        # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
+        x[:,2] = x[:,1]  
+        y = x * β
+        β2 = vcat(1.5, 1.5, β[3:end])
+        o = Adagrad(x, y; reg = L2Reg(0.01))
+        println(o, ": β=", β2)
+        @fact coef(o) => roughly(β2, atol = 0.2)
+    end
+
+    if true
+    context("Logistic") do
+
+        x = randn(n, p)
+        β = collect(1.:p)
+        y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
 
         # logistic
-        z = map(y -> y>0.0 ? 1.0 : 0.0, y)
-        o = Adagrad(x, z; link=LogisticLink(), loss=LogisticLoss())
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
         println(o, ": β=", β)
-        @fact coef(o) => roughly(β)
+        @fact coef(o) => roughly(β, atol = 0.1)
 
-
-        o = Adagrad(x, z; link=LogisticLink(), loss=LogisticLoss(), reg=L1Reg(0.1))
-        println(o, ": β=", β)
-        @fact coef(o) => roughly(β)
+        # logistic l2
+        # repeat same data in first 2 variables
+        # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
+        x[:,2] = x[:,1]  
+        y = x * β
+        β2 = vcat(1.5, 1.5, β[3:end])
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.1))
+        println(o, ": β=", β2)
+        @fact coef(o) => roughly(β2, atol = 0.2)
+    end
     end
 
     # # First batch accuracy
