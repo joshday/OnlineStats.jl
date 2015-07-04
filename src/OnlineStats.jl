@@ -79,6 +79,7 @@ export
     LogRegSGD,
     LogRegSGD2,  # Second-order SGD: This is the "winner" compared to the other two
     SparseReg,
+    StepwiseReg,
 
     HyperLogLog,
     Adagrad,
@@ -151,6 +152,7 @@ include("linearmodel/sweep.jl")
 include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 include("linearmodel/sparsereg.jl")
+include("linearmodel/stepwise.jl")
 include("linearmodel/ofls.jl")
 include("linearmodel/opca.jl")
 include("linearmodel/opls.jl")
