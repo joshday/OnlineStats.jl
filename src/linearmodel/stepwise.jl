@@ -102,7 +102,7 @@ function updatebatch!(o::StepwiseReg, x::MatF, y::VecF)
 end
 
 #TESTING
-if true
+if false
     n = 5000
     p = 9
     β = collect(1:p)  # coefs are 1,0,3,0,5,...
