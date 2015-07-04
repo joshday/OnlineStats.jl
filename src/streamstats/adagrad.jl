@@ -65,26 +65,17 @@ end
 abstract LinkFunction
 
 immutable IdentityLink <: LinkFunction end
-link(::IdentityLink, y::Real) = y
-invlink(::IdentityLink, xβ::Real) = xβ
+link(::IdentityLink, xβ::Real) = xβ
+invlink(::IdentityLink, y::Real) = y
 
 immutable LogisticLink <: LinkFunction end
-link(::LogisticLink, y::Real) = log(y / (1.0 - y))
-invlink(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
+link(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
+invlink(::LogisticLink, y::Real) = log(y / (1.0 - y))
 
 # --------------------------------------------------------------------------
-
-# if we aren't passed functions of which we understand the properties/convexity, warn the user
-function check_warn(link, loss, reg)
-  ok = typeof(link) in (IdentityLink, LogisticLink)
-  ok = ok && typeof(loss) in (SquareLoss, LogisticLoss)
-  ok = ok && typeof(reg) in (NoReg, L2Reg)
-  if !ok
-    warn("Use at your own risk... Adagrad can be unstable or just plain wrong with non-standard loss/reg functions!")
-  end
-end
-
 # --------------------------------------------------------------------------
+
+
 #-------------------------------------------------------# Type and Constructors
 type Adagrad <: OnlineStat
   η::Float64  # learning rate
@@ -101,8 +92,7 @@ function Adagrad(p::Int;
                  link::LinkFunction = IdentityLink(),
                  loss::LossFunction = SquareLoss(),
                  reg::RegularizationFunction = NoReg())
-  check_warn(link, loss, reg)
-  Adagrad(η, zeros(p), zeros(p), link, loss, reg, 0)
+    Adagrad(η, zeros(p), zeros(p), link, loss, reg, 0)
 end
 
 function Adagrad(X::AMatF, y::AVecF; kwargs...)
@@ -141,8 +131,8 @@ state(o::Adagrad) = Any[copy(o.β), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
 StatsBase.coef(o::Adagrad) = o.β
-StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
-StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
+StatsBase.predict(o::Adagrad, x::AVecF) = link(o.link, dot(x, o.β))
+StatsBase.predict(o::Adagrad, X::AMatF) = link(o.link, X * o.β)
 
 
 # --------------------------------------------------------------------------

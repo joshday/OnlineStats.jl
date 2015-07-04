@@ -1,5 +1,5 @@
 module AdagradTest
-using OnlineStats, FactCheck
+using OnlineStats, FactCheck, Distributions
 # using StreamStats
 
 # TODO compare to StreamStats results
@@ -13,13 +13,14 @@ facts("Adagrad") do
     context("OLS") do
         x = randn(n, p)
         β = collect(1.:p)
-        y = x * β + randn(n)*0
+        y = x * β + randn(n)*100
 
 
         # normal lin reg
         o = Adagrad(x, y)
         println(o, ": β=", β)
         @fact coef(o) => roughly(β)
+        @fact predict(o, ones(p)) => roughly(1.0 * sum(β))
 
         # ridge regression
         # repeat same data in first 2 variables
@@ -30,20 +31,25 @@ facts("Adagrad") do
         o = Adagrad(x, y; reg = L2Reg(0.01))
         println(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.2)
+
+        # some simple checks of the interface
+        @fact statenames(o) => [:β, :nobs]
+        @fact state(o)[1] => coef(o)
+        @fact state(o)[2] => nobs(o)
+
     end
 
     if true
     context("Logistic") do
 
-        n, p = 1_000_000, 10
         x = randn(n, p)
-        β = (collect(1.:p) - 5) / 10
-        y = [rand(Bernoulli(y)) for y in 1 ./ (1 + exp(-x * β))]
+        β = collect(1.:p)
         # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        probvec = [1 / (1 + exp(-y)) for y in x*β]
+        @compat y = [Float64(rand(Bernoulli(p))) for p in probvec]
 
         # logistic
-        @time o = OnlineStats.Adagrad(x, y; link=OnlineStats.LogisticLink(), loss=OnlineStats.LogisticLoss())
-        @time o = OnlineStats.LogRegMM(x, y)
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
         println(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = 0.1)
 
@@ -51,9 +57,9 @@ facts("Adagrad") do
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
         x[:,2] = x[:,1]
-        y = x * β
+        y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.1))
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
         println(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.2)
     end
