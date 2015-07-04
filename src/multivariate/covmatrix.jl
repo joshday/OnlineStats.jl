@@ -55,20 +55,24 @@ function update!(o::CovarianceMatrix, x::VecF)
     updatebatch!(o, x')
 end
 
+function update!(o::CovarianceMatrix, x::MatF)
+    for i in 1:size(x, 1)
+        updatebatch!(o, x[i, :])
+    end
+end
+
 #-----------------------------------------------------------------------# state
 Base.mean(o::CovarianceMatrix) = return o.B
-
 Base.var(o::CovarianceMatrix) = diag(cov(o::CovarianceMatrix))
-
 Base.std(o::CovarianceMatrix) = sqrt(var(o::CovarianceMatrix))
 
 function Base.cov(o::CovarianceMatrix)
     B = o.B
     p = size(B, 1)
     covmat = o.n / (o.n - 1) * (o.A - BLAS.syrk('L','N',1.0, B))
-    @inbounds for j in 1:p
-        @inbounds for i in 1:j - 1
-            covmat[i, j] = covmat[j, i]
+    for j in 1:p
+        for i in 1:j - 1
+            @inbounds covmat[i, j] = covmat[j, i]
         end
     end
     return covmat

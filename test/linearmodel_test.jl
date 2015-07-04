@@ -62,6 +62,19 @@ facts("Linear Model") do
         @fact state(o::LinRegSGD) => Any[coef(o), nobs(o)]
     end
 
+    context("StepwiseReg") do
+        n = 5000
+        p = 9
+        β = collect(1:p)  # coefs are 1,0,3,0,5,...
+        β .*= β .% 2
+        x = randn(n, p)
+        y = x*β + randn(n)
+
+        o = OnlineStats.StepwiseReg(p)
+        # o = OnlineStats.StepwiseReg(x, y)
+        OnlineStats.onlinefit!(o, 500, x, y, batch = true)
+    end
+
     context("SparseReg") do
         n, p = 10000, 200
         o = SparseReg(p)

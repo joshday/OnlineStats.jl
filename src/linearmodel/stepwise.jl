@@ -1,8 +1,7 @@
 # Online Stepwise Regression
 #
 # With each updated batch, there is the possibility of one variable
-# entering or leaving the model.
-# The choice is based on AIC/Mallow's Cp (TODO: add other criteria)
+# entering or leaving the model based on Mallow's Cp
 
 #-------------------------------------------------------# Type and Constructors
 type StepwiseReg{W <: Weighting} <: OnlineStat
@@ -98,20 +97,5 @@ function updatebatch!(o::StepwiseReg, x::MatF, y::VecF)
         end
     end
 
-    println(o.set)
-end
-
-#TESTING
-if false
-    n = 5000
-    p = 9
-    β = collect(1:p)  # coefs are 1,0,3,0,5,...
-    β .*= β .% 2
-    x = randn(n, p)
-    y = x*β + randn(n)
-
-    o = OnlineStats.StepwiseReg(p)
-    # o = OnlineStats.StepwiseReg(x, y)
-    OnlineStats.onlinefit!(o, 500, x, y, batch = true)
-    println(coef(o))
+    println("Active set: ", o.set)
 end

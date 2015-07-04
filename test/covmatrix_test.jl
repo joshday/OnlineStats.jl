@@ -4,7 +4,9 @@ using OnlineStats, FactCheck
 
 facts("CovarianceMatrix") do
     o = CovarianceMatrix(10)
-    o = CovarianceMatrix(rand(100,10))
+    for i in 1:10
+        o = CovarianceMatrix(rand(100,10))
+    end
     o = CovarianceMatrix(randn(1000, 50))
     @fact nobs(o) => 1000
 
@@ -36,6 +38,9 @@ facts("CovarianceMatrix") do
     o3 = merge(o1, o2)
     merge!(o1, o2)
     @fact cov(o1) => cov(o3)
+    @fact cor(o1) => cor(o3)
+    update!(o1, x1[1, :])
+    update!(o3, vec(x1[1, :]))
     @fact cor(o1) => cor(o3)
 
     context("PCA") do
