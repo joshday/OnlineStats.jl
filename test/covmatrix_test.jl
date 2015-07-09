@@ -4,9 +4,6 @@ using OnlineStats, FactCheck
 
 facts("CovarianceMatrix") do
     o = CovarianceMatrix(10)
-    for i in 1:10
-        o = CovarianceMatrix(rand(100:1000), rand(100:1000))
-    end
     o = CovarianceMatrix(randn(1000, 50))
     @fact nobs(o) => 1000
 
