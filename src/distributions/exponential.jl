@@ -11,7 +11,7 @@ function onlinefit(::Type{Exponential}, y::VecF, wgt::Weighting = default(Weight
     o
 end
 
-FitExponential(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
+FitExponential(y::VecF, wgt::Weighting = default(Weighting)) =
     onlinefit(Exponential, y, wgt)
 
 FitExponential(wgt::Weighting = default(Weighting)) =

@@ -45,7 +45,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 
 ## Linear Models
 - [x] OLS: `LinReg`
-- [ ] Stepwise Regression:
+- [x] Stepwise Regression:
 
 ### Penalized Regression
 - [ ] LASSO:

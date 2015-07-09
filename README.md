@@ -34,7 +34,9 @@ end
 	- update estimate in `o` using data `y` with weighting scheme defined by 	`o.weighting`
 	- Each observation gets equal weight
 - `nobs(o)`
-	- return the number of observations 
+	- return the number of observations
+- `onlinefit!(o, b, args..., batch = true)`
+	- Run through the data `args...` calling `update!(o)`/`updatebatch!()` on minibatches of size `b`
 
 
 

@@ -11,7 +11,7 @@ using Compat
 import MultivariateStats: fit, PCA
 import Distributions:
     # Distributions
-    Bernoulli, Beta, Binomial, Dirichlet, Exponential, Gamma, Multinomial,
+    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, Multinomial,
     MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
 
     # Other
@@ -62,6 +62,7 @@ export
     FitBernoulli,
     FitBeta,
     FitBinomial,
+    FitCauchy,
     FitDirichlet,
     FitExponential,
     FitGamma,
@@ -137,6 +138,7 @@ include("multivariate/analyticalpca.jl")
 include("distributions/bernoulli.jl")
 include("distributions/beta.jl")
 include("distributions/binomial.jl")
+include("distributions/cauchy.jl")
 include("distributions/dirichlet.jl")
 include("distributions/exponential.jl")
 include("distributions/gamma.jl")
