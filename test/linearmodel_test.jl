@@ -70,9 +70,13 @@ facts("Linear Model") do
         x = randn(n, p)
         y = x*β + randn(n)
 
+        # things to add tests for:
         o = OnlineStats.StepwiseReg(p)
-        # o = OnlineStats.StepwiseReg(x, y)
+        o = OnlineStats.StepwiseReg(x, y)
         OnlineStats.onlinefit!(o, 500, x, y, batch = true)
+        state(o)
+        statenames(o)
+        coef(o)
     end
 
     context("SparseReg") do
