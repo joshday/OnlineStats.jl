@@ -1,6 +1,6 @@
 module LinearModelTest
 
-using OnlineStats, FactCheck, GLM, StatsBase, Convex, SCS
+using OnlineStats, FactCheck, GLM, StatsBase
 
 facts("Linear Model") do
     context("LinReg") do
@@ -110,6 +110,8 @@ facts("Linear Model") do
             @fact maxabs(coef(o, :ridge, 0.) - coef(o)) => roughly(0., 1e-8)
             @fact maxabs(coef(o, :ridge, λ) - βridge) => roughly(0., 1e-8)
         end
+
+        update!(o, ones(p), sum(β))
 
     #     Convex.set_default_solver(SCS.SCSSolver(verbose = 0))
     #     diff = maxabs(coef(o, :ridge, .5) -

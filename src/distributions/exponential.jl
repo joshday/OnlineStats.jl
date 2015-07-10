@@ -29,7 +29,3 @@ function update!(o::FitExponential, y::Float64)
     o.d = Exponential(β)
     o.n += 1
 end
-
-
-#------------------------------------------------------------------------# Base
-Base.copy(o::FitExponential) = FitExponential(o.d, o.n, o.weighting)

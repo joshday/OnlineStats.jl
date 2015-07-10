@@ -19,11 +19,10 @@
 ## Density Estimation
 See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl)
 ### Univariate Distributions
-- [x] Univariate Normal Mixture: `NormalMix`
 - [x] Bernoulli: `FitBernoulli`
 - [x] Beta: `FitBeta`
 - [x] Binomial: `FitBinomial`
-- [ ] Cauchy:
+- [x] Cauchy: `FitCauchy`
 - [ ] Chi-square:
 - [x] Exponential: `FitExponential`
 - [ ] F-distribution:
@@ -31,6 +30,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Lognormal:
 - [x] Poisson
 - [x] Normal: `FitNormal`
+- [x] Normal Mixture: `NormalMix`
 - [ ] T-distribution:
 - [ ] Weibull:
 - [ ] Zero-inflated Mixtures
@@ -45,7 +45,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 
 ## Linear Models
 - [x] OLS: `LinReg`
-- [x] Stepwise Regression:
+- [x] Stepwise Regression: 'StepwiseReg'
 
 ### Penalized Regression
 - [ ] LASSO:

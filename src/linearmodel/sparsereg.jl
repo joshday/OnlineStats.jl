@@ -101,11 +101,15 @@ end
 
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::SparseReg, x::MatF, y::VecF)
-    n, p = size(x)
+    n = size(x, 1)
     updatebatch!(o.c, [x y])
     o.n += n
 end
 
+function update!(o::SparseReg, x::VecF, y::Float64)
+    update!(o.c, [x; y])
+    o.n += 1
+end
 
 
 # testing
