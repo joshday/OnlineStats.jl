@@ -1,15 +1,14 @@
 module OnlineStats
 
 # using things that are rarely used or very clear where functions come from
-using Docile
+using Docile.@document
 @document
 using Reexport.@reexport
 @reexport using StatsBase
 using Requires.@require
-using Compat
+using Compat.@compat
 
-import MultivariateStats: PCA
-import Base: copy, merge, merge!, show, quantile, maximum, minimum
+import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import ArrayViews: view, rowvec_view
 
@@ -101,6 +100,7 @@ include("weighting.jl")
 
 # Other
 include("common.jl")
+include("tracefit.jl")
 
 # Summary Statistics
 include("summary/mean.jl")

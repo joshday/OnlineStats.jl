@@ -1,9 +1,10 @@
 Docile
-Distributions
-Reexport
-StatsBase
-GLM
 Compat
+Reexport
+Requires
+StatsBase
+Distributions
+GLM
 FactCheck
 Clustering
 MultivariateStats

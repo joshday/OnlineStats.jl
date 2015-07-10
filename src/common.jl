@@ -5,7 +5,7 @@ update!{T<:Real}(o::OnlineStat, y::AVec{T}) = (for yi in y; update!(o, yi); end)
 
 getrows(x::Vector, rows) = x[rows]
 getrows(x::Matrix, rows) = x[rows, :]
-function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = true)
+function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = false)
     n = size(args[1],1)
     i = 1
     while i <= n

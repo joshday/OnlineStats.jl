@@ -10,7 +10,7 @@ import Distributions:
     # Methods for DistributionStat
     pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
     failprob, scale, location, shape, rate, ncategories, ntrials, dof,
-    mean, var, std, mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
+    mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
     entropy, mgf, cf, insupport, logcdf, ccdf,
     logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
 
