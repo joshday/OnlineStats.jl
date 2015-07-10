@@ -3,6 +3,7 @@ nobs(o::OnlineStat) = o.n
 
 update!{T<:Real}(o::OnlineStat, y::AVec{T}) = (for yi in y; update!(o, yi); end)
 
+
 getrows(x::Vector, rows) = x[rows]
 getrows(x::Matrix, rows) = x[rows, :]
 function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = false)
@@ -15,6 +16,22 @@ function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = false)
         i += b
     end
 end
+# Create a vector of OnlineStats, each element is updated with a batch of size b
+function tracefit!(o::OnlineStat, b::Int64, args...; batch = false)
+    n = size(args[1],1)
+    i = 1
+    s = state(o)
+    result = [copy(o)]
+    while i <= n
+        rng = i:min(i + b - 1, n)
+        batch_args = map(x -> getrows(x, rng), args)
+        batch ? updatebatch!(o, batch_args...) : update!(o, batch_args...)
+        push!(result, copy(o))  #result = vcat(result, state(o)')
+        i += b
+    end
+    result
+end
+
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 

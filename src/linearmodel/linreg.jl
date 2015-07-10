@@ -37,6 +37,12 @@ function updatebatch!(o::LinReg, x::MatF, y::VecF)
     o.n += n
 end
 
+function update!(o::LinReg, x::MatF, y::VecF)
+    for i in 1:length(y)
+        updatebatch!(o, x[i,:], y[i:i])
+    end
+end
+
 
 #------------------------------------------------------------------------# Base
 function coeftable(o::LinReg)
@@ -60,7 +66,3 @@ stderr(o::LinReg) = sqrt(diag(vcov(o)))
 vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / o.n)
 
 predict(o::LinReg, x::Matrix) = x * coef(o)
-
-
-
-

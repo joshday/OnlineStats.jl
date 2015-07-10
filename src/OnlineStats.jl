@@ -91,7 +91,7 @@ export
     update!,               # update one observation at a time using Weighting scheme
     updatebatch!,          # update by batch, giving each observation equal weight
     onlinefit!,            # run through data updating with mini batches
-    tracefit!,             # get matrix, each row is state(o) after updating by mini batches
+    tracefit!,             # return vector, each element is OnlineStat after updating with minibatch
     state,                 # get state of object, typically Any[value, nobs(o)]
     statenames,            # corresponding names to state()
     weighting,             # get the Weighting of an object
@@ -114,7 +114,6 @@ include("weighting.jl")
 
 # Other
 include("common.jl")
-include("tracefit.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
@@ -133,20 +132,20 @@ include("multivariate/vars.jl")
 include("multivariate/analyticalpca.jl")
 
 # Parametric Density
-include(Pkg.dir("OnlineStats", "src", "distributions/common_dist.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/bernoulli.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/beta.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/binomial.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/cauchy.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/dirichlet.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/exponential.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/gamma.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/multinomial.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/mvnormal.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/normal.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/offlinenormalmix.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/normalmix.jl"))
-include(Pkg.dir("OnlineStats", "src", "distributions/poisson.jl"))
+include("distributions/common_dist.jl")
+include("distributions/bernoulli.jl")
+include("distributions/beta.jl")
+include("distributions/binomial.jl")
+include("distributions/cauchy.jl")
+include("distributions/dirichlet.jl")
+include("distributions/exponential.jl")
+include("distributions/gamma.jl")
+include("distributions/multinomial.jl")
+include("distributions/mvnormal.jl")
+include("distributions/normal.jl")
+include("distributions/offlinenormalmix.jl")
+include("distributions/normalmix.jl")
+include("distributions/poisson.jl")
 
 
 # Linear Model
