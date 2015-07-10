@@ -56,7 +56,7 @@ facts("Adagrad") do
         # logistic
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), η=1.0)
         println(o, ": β=", β)
-        @fact coef(o) => roughly(β, atol = 0.1)
+        @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1)
 
         # logistic l2
         # repeat same data in first 2 variables
@@ -67,24 +67,24 @@ facts("Adagrad") do
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001), η=1.0)
         println(o, ": β=", β2)
-        @fact coef(o) => roughly(β2, atol = 0.2)
+        @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
     end
 
-if false
-using OnlineStats
-n, p = 1_000_000, 10;
-x = randn(n, p);
-β = collect(1.:p);
-y = x * β + randn(n)*10;
-@time Adagrad(x,y)
-@time Adagrad(x,y)
-@profile Adagrad(x,y)
+# if false
+# using OnlineStats
+# n, p = 1_000_000, 10;
+# x = randn(n, p);
+# β = collect(1.:p);
+# y = x * β + randn(n)*10;
+# @time Adagrad(x,y)
+# @time Adagrad(x,y)
+# @profile Adagrad(x,y)
 
-@time LinReg(x,y)
-@time LinReg(x,y)
-@profile LinReg(x,y)
-end
+# @time LinReg(x,y)
+# @time LinReg(x,y)
+# @profile LinReg(x,y)
+# end
 
     # # First batch accuracy
     # o = LinReg(x, y)

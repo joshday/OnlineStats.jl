@@ -33,8 +33,6 @@ immutable SquareLoss <: LossFunction end
 # f(::SquareLoss, y::Float64, ypred::Float64) = 0.5 * (y-ypred)^2
 @inline ∇f(::SquareLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
 
-df2(ε, xi) = -ε * xi
-
 # note: this is equivalent to the negative of the logistic log likelihood
 immutable LogisticLoss <: LossFunction end
 # f(::LogisticLoss, y::Float64, ypred::Float64) = log(1 + exp(-y * ypred))
@@ -43,8 +41,6 @@ immutable LogisticLoss <: LossFunction end
 # --------------------------------------------------------------------------
 
 abstract RegularizationFunction
-
-@inline noreg(β,i) = 0.0
 
 immutable NoReg <: RegularizationFunction end
 # Ψ(reg::NoReg, β::VecF) = 0.0
@@ -90,13 +86,13 @@ end
 
 # --------------------------------------------------------------------------
 #-------------------------------------------------------# Type and Constructors
-type Adagrad <: OnlineStat
+type Adagrad{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction} <: OnlineStat
   η::Float64  # learning rate
   β::VecF
   G::VecF  # Gₜᵢ  = Σ gₛᵢ²   (sum of squared gradients up to time t)
-  link::LinkFunction
-  loss::LossFunction
-  reg::RegularizationFunction
+  link::LINK
+  loss::LOSS
+  reg::REG
   n::Int
 end
 
@@ -122,28 +118,12 @@ end
 function update!(o::Adagrad, x::AVecF, y::Float64)
   ε = y - predict(o, x)
 
-  G = o.G
-  β = o.β
-  η = o.η
-
   @inbounds for i in eachindex(x)
-    xi = x[i]
-    # df = ∇f(o.loss, ε, x[i])
-    df = df2(ε, x[i])
-    # dpsi = ∇Ψ(o.reg, o.β, i)
-    dpsi = noreg(β, i)
-    gᵢ = df + dpsi
-    # gᵢ = ∇f(o.loss, ε, x[i]) + ∇Ψ(o.reg, o.β, i)
-
-    Gi = G[i] + gᵢ^2
-    if Gi != 0.0
-      β[i] -= η * gᵢ / sqrt(Gi)
+    gᵢ = ∇f(o.loss, ε, x[i]) + ∇Ψ(o.reg, o.β, i)
+    o.G[i] += gᵢ^2
+    if o.G[i] != 0.0
+      o.β[i] -= o.η * gᵢ / sqrt(o.G[i])
     end
-    G[i] = Gi
-    # o.G[i] += gᵢ^2
-    # if o.G[i] != 0.0
-    #   o.β[i] -= o.η * gᵢ / sqrt(o.G[i])
-    # end
   end
 
   o.n += 1
@@ -158,16 +138,12 @@ end
 
 
 #-----------------------------------------------------------------------# state
+
 state(o::Adagrad) = Any[copy(o.β), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
 StatsBase.coef(o::Adagrad) = o.β
-# StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
-# StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
-StatsBase.predict(o::Adagrad, x::AVecF) = dot(x, o.β)
-StatsBase.predict(o::Adagrad, X::AMatF) = X * o.β
+StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
+StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
 
-
-# --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
