@@ -1,7 +1,7 @@
 module AdagradTest
 using OnlineStats, FactCheck
 using Distributions
-# using StreamStats
+import StreamStats
 
 # TODO compare to StreamStats results
 # TODO compare timing to StreamStats and profile
@@ -71,20 +71,33 @@ facts("Adagrad") do
     end
     end
 
-# if false
-# using OnlineStats
-# n, p = 1_000_000, 10;
-# x = randn(n, p);
-# β = collect(1.:p);
-# y = x * β + randn(n)*10;
-# @time Adagrad(x,y)
-# @time Adagrad(x,y)
-# @profile Adagrad(x,y)
+# # if false
 
-# @time LinReg(x,y)
-# @time LinReg(x,y)
-# @profile LinReg(x,y)
-# end
+# using OnlineStats
+# import StreamStats
+# const n = 1_000_000;
+# const p = 10;
+# const x = randn(n, p);
+# const xbias = hcat(ones(n), x);
+# const β = collect(1.:p);
+# const y = x * β + randn(n)*10;
+# ols_ss = StreamStats.ApproxOLS(p)
+# do_ss_ols(x, y) = (ols = StreamStats.ApproxOLS(p); for i in 1:n; StreamStats.update!(ols, vec(x[i,:]), y[i]); end; ols)
+# do_os_ols(x, y) = (ols = Adagrad(p+1); for i in 1:n; update!(ols, vec(x[i,:]), y[i]); end; ols)
+# StreamStats.state(do_ss_ols(x, y))'
+# coef(do_os_ols(xbias,y))'
+# #warmup complete
+# @time do_ss_ols(x,y)
+# @time do_os_ols(xbias,y)
+
+# # @time Adagrad(x,y)
+# # @time Adagrad(x,y)
+# # @profile Adagrad(x,y)
+
+# # @time LinReg(x,y)
+# # @time LinReg(x,y)
+# # @profile LinReg(x,y)
+# # end
 
     # # First batch accuracy
     # o = LinReg(x, y)
