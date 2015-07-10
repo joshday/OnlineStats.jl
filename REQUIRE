@@ -1,12 +1,13 @@
 Docile
 Compat
 Reexport
-Requires
+FactCheck
+
 StatsBase
 Distributions
-GLM
-FactCheck
 Clustering
+
 MultivariateStats
+GLM
 Convex
 SCS

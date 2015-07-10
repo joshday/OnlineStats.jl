@@ -8,6 +8,22 @@ using Reexport.@reexport
 using Requires.@require
 using Compat.@compat
 
+
+import Clustering  # Used in offline em algorithm for normal mixture
+import Distributions:
+    # Distributions
+    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, Multinomial,
+    MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
+
+    # Other
+    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
+
+    # Methods for DistributionStat
+    pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
+    failprob, scale, location, shape, rate, ncategories, ntrials, dof,
+    mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
+    entropy, mgf, cf, insupport, logcdf, ccdf,
+    logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import ArrayViews: view, rowvec_view
@@ -21,7 +37,6 @@ import ArrayViews: view, rowvec_view
 export
     # common types
     OnlineStat,
-    ScalarOnlineStat,
     Weighting,
     EqualWeighting,
     ExponentialWeighting,
@@ -78,6 +93,7 @@ export
     update!,               # update one observation at a time using Weighting scheme
     updatebatch!,          # update by batch, giving each observation equal weight
     onlinefit!,            # run through data updating with mini batches
+    tracefit!,             # get matrix, each row is state(o) after updating by mini batches
     state,                 # get state of object, typically Any[value, nobs(o)]
     statenames,            # corresponding names to state()
     weighting,             # get the Weighting of an object
@@ -119,22 +135,21 @@ include("multivariate/vars.jl")
 include("multivariate/analyticalpca.jl")
 
 # Parametric Density
-@require Distributions begin
-    include(Pkg.dir("OnlineStats", "src", "distributions/common_dist.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/bernoulli.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/beta.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/binomial.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/cauchy.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/dirichlet.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/exponential.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/gamma.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/multinomial.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/mvnormal.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/normal.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/offlinenormalmix.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/normalmix.jl"))
-    include(Pkg.dir("OnlineStats", "src", "distributions/poisson.jl"))
-end
+include(Pkg.dir("OnlineStats", "src", "distributions/common_dist.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/bernoulli.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/beta.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/binomial.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/cauchy.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/dirichlet.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/exponential.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/gamma.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/multinomial.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/mvnormal.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/normal.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/offlinenormalmix.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/normalmix.jl"))
+include(Pkg.dir("OnlineStats", "src", "distributions/poisson.jl"))
+
 
 # Linear Model
 include("linearmodel/sweep.jl")

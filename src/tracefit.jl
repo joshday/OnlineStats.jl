@@ -1,6 +1,3 @@
-getrows(x::Vector, rows) = x[rows]
-getrows(x::Matrix, rows) = x[rows, :]
-
 function tracefit!(o::OnlineStat, b::Int64, args...; batch = false)
 
     # Create DataFrame
@@ -17,5 +14,5 @@ function tracefit!(o::OnlineStat, b::Int64, args...; batch = false)
         i += b
     end
 
-    df
+    result
 end

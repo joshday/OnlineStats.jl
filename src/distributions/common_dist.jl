@@ -1,19 +1,3 @@
-import Clustering  # Used in offline em algorithm for normal mixture
-import Distributions:
-    # Distributions
-    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, Multinomial,
-    MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
-
-    # Other
-    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
-
-    # Methods for DistributionStat
-    pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
-    failprob, scale, location, shape, rate, ncategories, ntrials, dof,
-    mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
-    entropy, mgf, cf, insupport, logcdf, ccdf,
-    logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
-
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
     println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))

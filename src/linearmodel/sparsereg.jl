@@ -111,7 +111,7 @@ function update!(o::SparseReg, x::VecF, y::Float64)
     o.n += 1
 end
 
-update!(o::SparseReg, x::MatF, y::VecF) = (update!(o.c, [x;y]); o.n += length(y))
+update!(o::SparseReg, x::MatF, y::VecF) = (update!(o.c, [x y]); o.n += length(y))
 
 
 # testing
