@@ -30,39 +30,35 @@ abstract LossFunction
 # f(ε) = ε²/2
 # ∇f(ε) = df(ε)/dxᵢ = -ε * xᵢ
 immutable SquareLoss <: LossFunction end
-# f(::SquareLoss, y::Float64, ypred::Float64) = 0.5 * (y-ypred)^2
-@inline ∇f(::SquareLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
-
-df2(ε, xi) = -ε * xi
+# f(::SquareLoss, y::Real, ypred::Real) = 0.5 * (y-ypred)^2
+∇f(::SquareLoss, ε::Real, xᵢ::Real) = -ε * xᵢ
 
 # note: this is equivalent to the negative of the logistic log likelihood
 immutable LogisticLoss <: LossFunction end
-# f(::LogisticLoss, y::Float64, ypred::Float64) = log(1 + exp(-y * ypred))
-@inline ∇f(::LogisticLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
+# f(::LogisticLoss, y::Real, ypred::Real) = log(1 + exp(-y * ypred))
+∇f(::LogisticLoss, ε::Real, xᵢ::Real) = -ε * xᵢ
 
 # --------------------------------------------------------------------------
 
 abstract RegularizationFunction
 
-@inline noreg(β,i) = 0.0
-
 immutable NoReg <: RegularizationFunction end
-# Ψ(reg::NoReg, β::VecF) = 0.0
-@inline ∇Ψ(reg::NoReg, β::VecF, i::Int) = 0.0
+# Ψ(reg::NoReg, β::AVecF) = 0.0
+∇Ψ(reg::NoReg, β::AVecF, i::Integer) = 0.0
 
 # Ψ(β) = λ‖β‖₁
 immutable L1Reg <: RegularizationFunction
   λ::Float64
 end
-# Ψ(reg::L1Reg, β::VecF) = reg.λ * sumabs(β)
-@inline ∇Ψ(reg::L1Reg, β::VecF, i::Int) = reg.λ
+# Ψ(reg::L1Reg, β::AVecF) = reg.λ * sumabs(β)
+∇Ψ(reg::L1Reg, β::AVecF, i::Integer) = reg.λ
 
 # Ψ(β) = 0.5 λ‖β‖₂²
 immutable L2Reg <: RegularizationFunction
   λ::Float64
 end
-# Ψ(reg::L2Reg, β::VecF) = 0.5 * reg.λ * sumabs2(β)
-@inline ∇Ψ(reg::L2Reg, β::VecF, i::Int) = reg.λ * β[i]
+# Ψ(reg::L2Reg, β::AVecF) = 0.5 * reg.λ * sumabs2(β)
+∇Ψ(reg::L2Reg, β::AVecF, i::Integer) = reg.λ * β[i]
 
 # --------------------------------------------------------------------------
 
@@ -118,32 +114,15 @@ end
 
 #---------------------------------------------------------------------# update!
 
-
-function update!(o::Adagrad, x::AVecF, y::Float64)
+function update!(o::Adagrad, x::AVecF, y::Real)
   ε = y - predict(o, x)
 
-  G = o.G
-  β = o.β
-  η = o.η
-
   @inbounds for i in eachindex(x)
-    xi = x[i]
-    # df = ∇f(o.loss, ε, x[i])
-    df = df2(ε, x[i])
-    # dpsi = ∇Ψ(o.reg, o.β, i)
-    dpsi = noreg(β, i)
-    gᵢ = df + dpsi
-    # gᵢ = ∇f(o.loss, ε, x[i]) + ∇Ψ(o.reg, o.β, i)
-
-    Gi = G[i] + gᵢ^2
-    if Gi != 0.0
-      β[i] -= η * gᵢ / sqrt(Gi)
+    gᵢ = ∇f(o.loss, ε, x[i]) + ∇Ψ(o.reg, o.β, i)
+    o.G[i] += gᵢ^2
+    if o.G[i] != 0.0
+      o.β[i] -= o.η * gᵢ / sqrt(o.G[i])
     end
-    G[i] = Gi
-    # o.G[i] += gᵢ^2
-    # if o.G[i] != 0.0
-    #   o.β[i] -= o.η * gᵢ / sqrt(o.G[i])
-    # end
   end
 
   o.n += 1
@@ -162,10 +141,8 @@ state(o::Adagrad) = Any[copy(o.β), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
 StatsBase.coef(o::Adagrad) = o.β
-# StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
-# StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
-StatsBase.predict(o::Adagrad, x::AVecF) = dot(x, o.β)
-StatsBase.predict(o::Adagrad, X::AMatF) = X * o.β
+StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
+StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
 
 
 # --------------------------------------------------------------------------

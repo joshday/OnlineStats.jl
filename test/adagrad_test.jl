@@ -1,9 +1,15 @@
 module AdagradTest
 using OnlineStats, FactCheck
+using Distributions
 # using StreamStats
 
 # TODO compare to StreamStats results
 # TODO compare timing to StreamStats and profile
+
+function convertLogisticY(xβ)
+    prob = OnlineStats.invlink(LogisticLink(), xβ)
+    Float64(rand(Bernoulli(prob)))
+end
 
 facts("Adagrad") do
     # n = rand(10_000:100_000)
@@ -44,10 +50,11 @@ facts("Adagrad") do
 
         x = randn(n, p)
         β = collect(1.:p)
-        y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        y = map(convertLogisticY, x * β)
 
         # logistic
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), η=1.0)
         println(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = 0.1)
 
@@ -55,13 +62,29 @@ facts("Adagrad") do
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
         x[:,2] = x[:,1]  
-        y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        y = map(convertLogisticY, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001), η=1.0)
         println(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.2)
     end
     end
+
+if false
+using OnlineStats
+n, p = 1_000_000, 10;
+x = randn(n, p);
+β = collect(1.:p);
+y = x * β + randn(n)*10;
+@time Adagrad(x,y)
+@time Adagrad(x,y)
+@profile Adagrad(x,y)
+
+@time LinReg(x,y)
+@time LinReg(x,y)
+@profile LinReg(x,y)
+end
 
     # # First batch accuracy
     # o = LinReg(x, y)
