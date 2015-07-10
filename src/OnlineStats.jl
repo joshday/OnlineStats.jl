@@ -1,11 +1,9 @@
 module OnlineStats
 
-# using things that are rarely used or very clear where functions come from
 using Docile.@document
 @document
 using Reexport.@reexport
 @reexport using StatsBase
-using Requires.@require
 using Compat.@compat
 
 
