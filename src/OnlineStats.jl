@@ -10,7 +10,7 @@ using Compat.@compat
 import Clustering  # Used in offline em algorithm for normal mixture
 import Distributions:
     # Distributions
-    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, Multinomial,
+    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal, Multinomial,
     MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
 
     # Other
@@ -63,6 +63,7 @@ export
     FitDirichlet,
     FitExponential,
     FitGamma,
+    FitLogNormal,
     FitMultinomial,
     FitMvNormal,
     FitNormal,
@@ -140,6 +141,7 @@ include("distributions/cauchy.jl")
 include("distributions/dirichlet.jl")
 include("distributions/exponential.jl")
 include("distributions/gamma.jl")
+include("distributions/lognormal.jl")
 include("distributions/multinomial.jl")
 include("distributions/mvnormal.jl")
 include("distributions/normal.jl")

@@ -27,7 +27,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [x] Exponential: `FitExponential`
 - [ ] F-distribution:
 - [x] Gamma: `FitGamma`
-- [ ] Lognormal:
+- [x] Lognormal:
 - [x] Poisson
 - [x] Normal: `FitNormal`
 - [x] Normal Mixture: `NormalMix`
