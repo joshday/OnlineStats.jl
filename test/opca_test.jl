@@ -11,8 +11,8 @@ const ewgt = OnlineStats.ExponentialWeighting(500)
 facts("OnlinePCA") do
 	x = randn(10_000, 100)
 	oc = OnlineStats.CovarianceMatrix(x)
-	top5pca = pca(oc, 5, false)
-	opca = OnlineStats.OnlinePCA(x', 5)
+	top5pca = OnlineStats.pca(oc, 5, false)
+	opca = OnlineStats.OnlinePCA(x, 5)
 end
 
 #-----------------------------------------------------------------------
