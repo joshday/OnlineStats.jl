@@ -1,12 +1,8 @@
 module AdagradTest
-<<<<<<< HEAD
-using OnlineStats, FactCheck, Distributions
-# using StreamStats
-=======
 using OnlineStats, FactCheck
 using Distributions
 import StreamStats
->>>>>>> tom
+
 
 # TODO compare to StreamStats results
 # TODO compare timing to StreamStats and profile
@@ -52,16 +48,9 @@ facts("Adagrad") do
 
     if true
     context("Logistic") do
-
         x = randn(n, p)
         β = collect(1.:p)
-        # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
-<<<<<<< HEAD
-        probvec = [1 / (1 + exp(-y)) for y in x*β]
-        @compat y = [Float64(rand(Bernoulli(p))) for p in probvec]
-=======
         y = map(convertLogisticY, x * β)
->>>>>>> tom
 
         # logistic
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), η=1.0)
@@ -71,18 +60,10 @@ facts("Adagrad") do
         # logistic l2
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
-<<<<<<< HEAD
         x[:,2] = x[:,1]
-        y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
-        β2 = vcat(1.5, 1.5, β[3:end])
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
-=======
-        x[:,2] = x[:,1]  
-        # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
         y = map(convertLogisticY, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001), η=1.0)
->>>>>>> tom
         println(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end

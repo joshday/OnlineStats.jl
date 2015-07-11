@@ -4,7 +4,7 @@ using Docile.@document
 @document
 using Reexport.@reexport
 @reexport using StatsBase
-using Compat.@compat
+using Compat
 
 
 import Clustering  # Used in offline em algorithm for normal mixture
