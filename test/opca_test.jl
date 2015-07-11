@@ -9,10 +9,13 @@ using FactCheck
 const ewgt = OnlineStats.ExponentialWeighting(500)
 
 facts("OnlinePCA") do
-	x = randn(10_000, 100)
-	oc = OnlineStats.CovarianceMatrix(x)
-	top5pca = OnlineStats.pca(oc, 5, false)
-	opca = OnlineStats.OnlinePCA(x, 5)
+	O = OnlineStats
+	x = 10 * randn(100_000, 100)
+	oc = O.CovarianceMatrix(x)
+	top5pca = O.pca(oc, 5, false)[1]
+	opca = O.OnlinePCA(x, 5, O.StochasticWeighting(.51))
+	e = opca.e
+	@fact sort(top5pca) - sort(e) => roughly(zeros(5), 10)
 end
 
 #-----------------------------------------------------------------------

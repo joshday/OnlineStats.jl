@@ -30,9 +30,9 @@ function pca(o::CovarianceMatrix, nev::Int = length(o.B), corr::Bool = true; key
         end
     else
         if corr
-            eigs(cor(o), nev = nev, which = :LR, keyargs...)
+            eigs(cor(o), nev = nev, keyargs...)
         else
-            eigs(cor(o), nev = nev, which = :LR, keyargs...)
+            eigs(cov(o), nev = nev, keyargs...)
         end
     end
 end
