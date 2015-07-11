@@ -1,9 +1,20 @@
 module AdagradTest
+<<<<<<< HEAD
 using OnlineStats, FactCheck, Distributions
 # using StreamStats
+=======
+using OnlineStats, FactCheck
+using Distributions
+import StreamStats
+>>>>>>> tom
 
 # TODO compare to StreamStats results
 # TODO compare timing to StreamStats and profile
+
+function convertLogisticY(xβ)
+    prob = OnlineStats.invlink(LogisticLink(), xβ)
+    Float64(rand(Bernoulli(prob)))
+end
 
 facts("Adagrad") do
     # n = rand(10_000:100_000)
@@ -45,25 +56,65 @@ facts("Adagrad") do
         x = randn(n, p)
         β = collect(1.:p)
         # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+<<<<<<< HEAD
         probvec = [1 / (1 + exp(-y)) for y in x*β]
         @compat y = [Float64(rand(Bernoulli(p))) for p in probvec]
+=======
+        y = map(convertLogisticY, x * β)
+>>>>>>> tom
 
         # logistic
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), η=1.0)
         println(o, ": β=", β)
-        @fact coef(o) => roughly(β, atol = 0.1)
+        @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1)
 
         # logistic l2
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
+<<<<<<< HEAD
         x[:,2] = x[:,1]
         y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
+=======
+        x[:,2] = x[:,1]  
+        # y = map(y -> y>0.0 ? 1.0 : 0.0, x * β)
+        y = map(convertLogisticY, x * β)
+        β2 = vcat(1.5, 1.5, β[3:end])
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001), η=1.0)
+>>>>>>> tom
         println(o, ": β=", β2)
-        @fact coef(o) => roughly(β2, atol = 0.2)
+        @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
     end
+
+# # if false
+
+# using OnlineStats
+# import StreamStats
+# const n = 1_000_000;
+# const p = 10;
+# const x = randn(n, p);
+# const xbias = hcat(ones(n), x);
+# const β = collect(1.:p);
+# const y = x * β + randn(n)*10;
+# ols_ss = StreamStats.ApproxOLS(p)
+# do_ss_ols(x, y) = (ols = StreamStats.ApproxOLS(p); for i in 1:n; StreamStats.update!(ols, vec(x[i,:]), y[i]); end; ols)
+# do_os_ols(x, y) = (ols = Adagrad(p+1); for i in 1:n; update!(ols, vec(x[i,:]), y[i]); end; ols)
+# StreamStats.state(do_ss_ols(x, y))'
+# coef(do_os_ols(xbias,y))'
+# #warmup complete
+# @time do_ss_ols(x,y)
+# @time do_os_ols(xbias,y)
+
+# # @time Adagrad(x,y)
+# # @time Adagrad(x,y)
+# # @profile Adagrad(x,y)
+
+# # @time LinReg(x,y)
+# # @time LinReg(x,y)
+# # @profile LinReg(x,y)
+# # end
 
     # # First batch accuracy
     # o = LinReg(x, y)

@@ -30,35 +30,35 @@ abstract LossFunction
 # f(ε) = ε²/2
 # ∇f(ε) = df(ε)/dxᵢ = -ε * xᵢ
 immutable SquareLoss <: LossFunction end
-# f(::SquareLoss, y::Real, ypred::Real) = 0.5 * (y-ypred)^2
-∇f(::SquareLoss, ε::Real, xᵢ::Real) = -ε * xᵢ
+# f(::SquareLoss, y::Float64, ypred::Float64) = 0.5 * (y-ypred)^2
+@inline ∇f(::SquareLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
 
 # note: this is equivalent to the negative of the logistic log likelihood
 immutable LogisticLoss <: LossFunction end
-# f(::LogisticLoss, y::Real, ypred::Real) = log(1 + exp(-y * ypred))
-∇f(::LogisticLoss, ε::Real, xᵢ::Real) = -ε * xᵢ
+# f(::LogisticLoss, y::Float64, ypred::Float64) = log(1 + exp(-y * ypred))
+@inline ∇f(::LogisticLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
 
 # --------------------------------------------------------------------------
 
 abstract RegularizationFunction
 
 immutable NoReg <: RegularizationFunction end
-# Ψ(reg::NoReg, β::AVecF) = 0.0
-∇Ψ(reg::NoReg, β::AVecF, i::Integer) = 0.0
+# Ψ(reg::NoReg, β::VecF) = 0.0
+@inline ∇Ψ(reg::NoReg, β::VecF, i::Int) = 0.0
 
 # Ψ(β) = λ‖β‖₁
 immutable L1Reg <: RegularizationFunction
   λ::Float64
 end
-# Ψ(reg::L1Reg, β::AVecF) = reg.λ * sumabs(β)
-∇Ψ(reg::L1Reg, β::AVecF, i::Integer) = reg.λ
+# Ψ(reg::L1Reg, β::VecF) = reg.λ * sumabs(β)
+@inline ∇Ψ(reg::L1Reg, β::VecF, i::Int) = reg.λ
 
 # Ψ(β) = 0.5 λ‖β‖₂²
 immutable L2Reg <: RegularizationFunction
   λ::Float64
 end
-# Ψ(reg::L2Reg, β::AVecF) = 0.5 * reg.λ * sumabs2(β)
-∇Ψ(reg::L2Reg, β::AVecF, i::Integer) = reg.λ * β[i]
+# Ψ(reg::L2Reg, β::VecF) = 0.5 * reg.λ * sumabs2(β)
+@inline ∇Ψ(reg::L2Reg, β::VecF, i::Int) = reg.λ * β[i]
 
 # --------------------------------------------------------------------------
 
@@ -77,13 +77,13 @@ invlink(::LogisticLink, y::Real) = log(y / (1.0 - y))
 
 
 #-------------------------------------------------------# Type and Constructors
-type Adagrad <: OnlineStat
+type Adagrad{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction} <: OnlineStat
   η::Float64  # learning rate
   β::VecF
   G::VecF  # Gₜᵢ  = Σ gₛᵢ²   (sum of squared gradients up to time t)
-  link::LinkFunction
-  loss::LossFunction
-  reg::RegularizationFunction
+  link::LINK
+  loss::LOSS
+  reg::REG
   n::Int
 end
 
@@ -104,7 +104,8 @@ end
 
 #---------------------------------------------------------------------# update!
 
-function update!(o::Adagrad, x::AVecF, y::Real)
+
+function update!(o::Adagrad, x::AVecF, y::Float64)
   ε = y - predict(o, x)
 
   @inbounds for i in eachindex(x)
@@ -127,6 +128,7 @@ end
 
 
 #-----------------------------------------------------------------------# state
+
 state(o::Adagrad) = Any[copy(o.β), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
@@ -134,7 +136,4 @@ StatsBase.coef(o::Adagrad) = o.β
 StatsBase.predict(o::Adagrad, x::AVecF) = link(o.link, dot(x, o.β))
 StatsBase.predict(o::Adagrad, X::AMatF) = link(o.link, X * o.β)
 
-
-# --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
