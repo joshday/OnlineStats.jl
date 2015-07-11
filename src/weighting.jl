@@ -18,12 +18,6 @@ function smooth!(avg::AbstractVector, v::AbstractVector, λ::Float64)
         avg[i] = smooth(avg[i], v[i], λ)
     end
 end
-# old implementation
-# function smooth!{T}(avg::Vector{T}, v::Vector{T}, λ::Float64)
-#     for i in 1:length(avg)
-#         avg[i] = smooth(avg[i], v[i], λ)
-#     end
-# end
 
 function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
     n, p = size(avg)
