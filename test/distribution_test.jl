@@ -7,7 +7,6 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
 #                                                                    Bernoulli #
 #------------------------------------------------------------------------------#
-
     context("Bernoulli") do
         o = FitBernoulli()
         o = FitBernoulli(rand(Bernoulli(), 10))

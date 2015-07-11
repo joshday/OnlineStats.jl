@@ -38,7 +38,7 @@ function coef(o::StepwiseReg)
 end
 
 #---------------------------------------------------------------------# update!
-# not optimized
+# not optimized, but functional
 function updatebatch!(o::StepwiseReg, x::MatF, y::VecF)
     n, p = size(x)
     o.n += n

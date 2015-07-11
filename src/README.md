@@ -27,8 +27,8 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [x] Exponential: `FitExponential`
 - [ ] F-distribution:
 - [x] Gamma: `FitGamma`
-- [x] Lognormal:
-- [x] Poisson
+- [x] Lognormal: `FitLogNormal`
+- [x] Poisson: `FitPoisson`
 - [x] Normal: `FitNormal`
 - [x] Normal Mixture: `NormalMix`
 - [ ] T-distribution:
@@ -44,12 +44,12 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Negative Multinomial
 
 ## Linear Models
-- [x] OLS: `LinReg`
+- [x] OLS: `LinReg`, `SparseReg`
 - [x] Stepwise Regression: 'StepwiseReg'
 
 ### Penalized Regression
 - [ ] LASSO:
-- [ ] Ridge:
+- [x] Ridge: `SparseReg`
 - [ ] Elastic Net:
 
 ### Quantile Regression
