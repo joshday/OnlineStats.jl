@@ -25,7 +25,7 @@ Means(p::Int, wgt::Weighting = default(Weighting)) = Means(zeros(p), p, 0, wgt)
 statenames(o::Means) = [:μ, :nobs]
 state(o::Means) = Any[mean(o), nobs(o)]
 
-Base.mean(o::Means) = o.μ
+Base.mean(o::Means) = copy(o.μ)
 
 
 center(o::Means, y::AVecF) = y - mean(o)
@@ -34,20 +34,21 @@ uncenter(o::Means, y::AVecF) = y + mean(o)
 
 #---------------------------------------------------------------------# update!
 function update!(o::Means, y::AVecF)
-    o.μ = smooth(o.μ, y, weight(o))
+    smooth!(o.μ, y * 1.0, weight(o))  # "* 1.0" used to convert y to VecF
     o.n += 1
     return
 end
 
-function update!(o::Means, y::AMatF)
+function update!(o::Means, y::MatF)
     for i in 1:size(y,1)
-        update!(o, vec(y[i, :]))
+        update!(o, rowvec_view(y, i))
     end
 end
 
 function updatebatch!(o::Means, y::AMatF)
-    smooth!(o.μ, vec(mean(y, 1)), weight(o, size(y, 1)))
-    o.n += size(y, 1)
+    n2 = size(y, 1)
+    smooth!(o.μ, vec(mean(y, 1)), weight(o, n2))
+    o.n += n2
     return
 end
 
