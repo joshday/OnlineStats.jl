@@ -56,7 +56,7 @@ function update!(o::Variance, y::Float64)
     return
 end
 
-function updatebatch!(o::Variance, y::VecF)
+function updatebatch!(o::Variance, y::AVecF)
     n2 = length(y)
     μ = mean(y)
     δ = μ - o.μ
@@ -82,6 +82,3 @@ function Base.merge!(o1::Variance, o2::Variance)
     o1.n += nobs(o2)
     o1
 end
-
-
-
