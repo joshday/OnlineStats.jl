@@ -21,19 +21,11 @@ CovarianceMatrix(p::Int, wgt::Weighting = default(Weighting)) =
 statenames(o::CovarianceMatrix) = [:μ, :Σ, :nobs]
 state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
 
-function pca(o::CovarianceMatrix, nev::Int = length(o.B), corr::Bool = true; keyargs...)
-    if nev == length(o.B)
-        if corr
-            eig(Symmetric(cor(o)))
-        else
-            eig(Symmetric(cov(o)))
-        end
+function pca(o::CovarianceMatrix, corr::Bool = true; keyargs...)
+    if corr
+        MultivariateStats.pcacov(cor(o), mean(o); keyargs...)
     else
-        if corr
-            eigs(cor(o), nev = nev, keyargs...)
-        else
-            eigs(cov(o), nev = nev, keyargs...)
-        end
+        MultivariateStats.pcacov(cov(o), mean(o); keyargs...)
     end
 end
 

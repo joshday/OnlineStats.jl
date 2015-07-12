@@ -1,6 +1,6 @@
 module CovarianceMatrixTest
 
-using FactCheck, StatsBase
+using FactCheck, StatsBase, MultivariateStats
 import OnlineStats
 
 facts("CovarianceMatrix") do
@@ -54,25 +54,28 @@ facts("CovarianceMatrix") do
     @fact cor(o1) - cor(o3) => roughly(zeros(10, 10))
 
     context("PCA") do
-        n = rand(1000:10_000)
+        # This error sometimes occurs if maxoutdim = d
+        # ERROR: ArgumentError("principal variance cannot exceed total variance.")
+        n = rand(10_000)
         d = rand(10:100)
         x = randn(100, d)
         o = OnlineStats.CovarianceMatrix(x)
 
         # full PCA - correlation
-        @fact abs(OnlineStats.pca(o)[1] - eig(cor(x))[1]) => roughly(zeros(d), .0001)
-        @fact abs(OnlineStats.pca(o)[1] - eig(Symmetric(cor(o)))[1]) => roughly(zeros(d), .0001)
-        @fact abs(OnlineStats.pca(o)[2]) - abs(eig(cor(x))[2]) => roughly(zeros(d, d), .0001)
-        @fact abs(OnlineStats.pca(o)[2] - eig(Symmetric(cor(o)))[2]) => roughly(zeros(d, d), .0001)
+        oPCA = OnlineStats.pca(o, maxoutdim = d-1)
+        PCA = pcacov(cor(x), vec(mean(x, 1)), maxoutdim = d-1)
+        @fact principalvars(oPCA) => roughly(principalvars(PCA))
+        @fact mean(oPCA) => roughly(mean(PCA))
+        @fact abs(projection(oPCA)) => roughly(abs(projection(PCA)))
 
         # full PCA - covariance
-        OnlineStats.pca(o, length(o.B), false)
+        OnlineStats.pca(o, false)
 
         # top d PCA - correlation
-        OnlineStats.pca(o, 4)
+        OnlineStats.pca(o, true, maxoutdim = 4)
 
         # top d PCA - covariance
-        OnlineStats.pca(o, 4, false)
+        OnlineStats.pca(o, false, maxoutdim = 4)
 
     end
 end
