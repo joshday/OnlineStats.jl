@@ -31,8 +31,9 @@ coef(o::QuantRegSGD) = copy(o.β)
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::QuantRegSGD, X::MatF, y::VecF)
     n = length(y)
-    γ = weight(o)
-    o.β -= γ * vec(mean(((y .< X * o.β) - o.τ) .* X, 1))
+#     γ = weight(o)
+#     o.β -= γ * vec(mean(((y .< X * o.β) - o.τ) .* X, 1))
+    addgradient!(o.β, -vec(mean(((y .< X * o.β) - o.τ) .* X, 1)), weight(o))
     o.n += n
 end
 

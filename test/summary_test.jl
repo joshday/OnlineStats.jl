@@ -6,6 +6,7 @@ using FactCheck
 facts("Summary") do
     Summary()
     Summary(0.)
+    Summary(zeros(10))
     @fact mean(Summary()) => 0.
     @fact mean(Summary(0.)) => 0.
 

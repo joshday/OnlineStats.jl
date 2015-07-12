@@ -1,6 +1,6 @@
 module CommonTest
 
-using OnlineStats, FactCheck, Distributions, DataFrames
+using OnlineStats, FactCheck, Distributions
 
 facts("Common") do
     context("Helper Functions") do
@@ -10,11 +10,15 @@ facts("Common") do
         @fact OnlineStats.col(x, 1) => vec(x[:, 1])
         @fact OnlineStats.row(x, n) => vec(x[n, :])
         @fact OnlineStats.col(x, p) => vec(x[:, p])
+        @fact OnlineStats.nrows(x) => size(x, 1)
+        @fact OnlineStats.ncols(x) => size(x, 2)
 
         OnlineStats.row!(x, 1, ones(p))
         OnlineStats.row!(x, n, ones(p))
         @fact OnlineStats.row(x, 1) => OnlineStats.row(x, n)
         @fact OnlineStats.row(x, n) => ones(p)
+        @fact OnlineStats.getrows([1,2,3], 2) => 2
+        @fact OnlineStats.getrows(x, 1) => x[1, :]
 
         OnlineStats.col!(x, 1, ones(n))
         OnlineStats.col!(x, p, ones(n))
@@ -24,17 +28,26 @@ facts("Common") do
         x = rand(10)
         @fact OnlineStats.mystring(x) => string(x)
         @fact OnlineStats.mystring(x[1]) => @sprintf("%f", x[1])
-
-        df = tracedata(Mean(), 5, rand(100))
-        @fact OnlineStats.getnice(df, :μ) => convert(Array, df[1])
-        @fact OnlineStats.makenice(df[1]) => convert(Array, df[1])
-        df = tracedata(QuantileMM(), 5, rand(100))
-        @fact vec(OnlineStats.makenice(df[1])[1,:]) => df[1][1]
     end
 
     context("Weighting") do
         @fact OnlineStats.default(Weighting) => EqualWeighting()
         @fact OnlineStats.smooth(1, 3, .5) => 2
+        x = ones(10)
+        @fact OnlineStats.addgradient!(x, ones(10), .5) => nothing
+        @fact x => ones(10) * 1.5
+        w = ExponentialWeighting(10_000)
+        @fact OnlineStats.weight(w, 100, 1) => 1 / 101
+        o = Mean()
+        @fact OnlineStats.adjusted_nobs(1, w) => 1
+        @fact OnlineStats.adjusted_nobs(o) => 0
+        @fact OnlineStats.adjusted_nobs(1, EqualWeighting()) => 1
+    end
+
+    context("onlinefit!") do
+        o = Mean()
+        onlinefit!(o, 5, randn(100), batch = false)
+        onlinefit!(o, 5, randn(100))
     end
 
     context("Show OnlineStat") do
@@ -45,7 +58,7 @@ facts("Common") do
         @fact OnlineStats.name(o) => string(typeof(o))
         print(Mean())
         print(Variance())
-
+        print(Variance[Variance(), Variance()])
     end
 
     context("Show DistributionStat") do
@@ -86,6 +99,7 @@ facts("Common") do
         @fact quantile(o, 0) => 0.
         @fact cquantile(o, 1) => 0.
         @fact invlogcdf(o, -1) => 0.
+        @fact invlogccdf(o, -1) => 0.
         @fact rand(o) => 0
         x = ones(Int, 5)
         @fact rand!(o, x) => zeros(Int, 5)

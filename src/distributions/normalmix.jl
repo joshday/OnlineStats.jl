@@ -1,16 +1,15 @@
 #-------------------------------------------------------# Type and Constructors
 type NormalMix <: DistributionStat
     d::MixtureModel{Univariate, Continuous, Normal}    # MixtureModel
-    s1::VecF             # sum of weights
-    s2::VecF             # sum of (weights .* y)
-    s3::VecF             # sum of (weights .* y .* y)
+    s1::VecF             # mean of weights
+    s2::VecF             # mean of (weights .* y)
+    s3::VecF             # mean of (weights .* y .* y)
     n::Int64                        # number of observations
     weighting::StochasticWeighting
 end
 
 
-function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting();
-                   start = emstart(p, y, verbose = false))
+function NormalMix(p::Int, y::VecF, wgt::StochasticWeighting = StochasticWeighting(); start = emstart(p, y, verbose = false))
     o = NormalMix(p, wgt, start = start)
     updatebatch!(o, y)
     o
@@ -58,7 +57,7 @@ function updatebatch!(o::NormalMix, y::Vector{Float64})
     π ./= sum(π)
     μ = o.s2 ./ o.s1
     σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
-    if any(σ .== 0.)
+    if any(σ .== 0.) # reset standard deviations if one goes to 0
         σ = ones(nc)
     end
 
@@ -97,6 +96,12 @@ function update!(o::NormalMix, y::Float64)
 end
 
 
-
-
-
+function quantile(o::NormalMix, τ::Real; start = mean(o), maxit = 20, tol = .001)
+    0 < τ < 1 || error("τ must be in (0, 1)")
+    θ = start
+    for i in 1:maxit
+        θ += (τ - cdf(o, θ)) ./ pdf(o, θ)
+        abs(cdf(o, θ) - τ) < tol && break
+    end
+    return θ
+end

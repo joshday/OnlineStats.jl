@@ -7,25 +7,33 @@ default(::Type{Weighting}) = EqualWeighting()
 
 #---------------------------------------------------------------------------#
 
-smooth{T}(avg::T, v::T, λ::Float64) = λ * v + (1 - λ) * avg
+smooth(avg, v, λ::Float64) = λ * v + (1 - λ) * avg
 
 # More stable version?
 # smooth{T}(avg::T, v::T, λ::Float64) = avg + λ * (v - avg)
 
 # This removes garbage collection time when updating arrays
-function smooth!{T}(avg::Vector{T}, v::Vector{T}, λ::Float64)
+function smooth!(avg::AbstractVector, v::AbstractVector, λ::Float64)
     for i in 1:length(avg)
         avg[i] = smooth(avg[i], v[i], λ)
     end
 end
 
-function smooth!{T}(avg::Matrix{T}, v::Matrix{T}, λ::Float64)
+function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
     n, p = size(avg)
     for j in 1:p, i in 1:n
         avg[i,j] = smooth(avg[i, j], v[i, j], λ)
     end
 end
 
+# For SGD, Online MM, Online EM, etc. (stochastic approximation methods)
+# Perform the update: avg = avg + λ * grad
+function addgradient!(avg::AbstractVector, grad::AbstractVector, λ::Float64)
+    p = length(avg)
+    for i in 1:p
+        avg[i] = avg[i] + λ * grad[i]
+    end
+end
 
 #---------------------------------------------------------------------------#
 
@@ -84,4 +92,3 @@ end
 adjusted_nobs(o::OnlineStat) = adjusted_nobs(nobs(o), weighting(o))
 adjusted_nobs(n::Int, w::EqualWeighting) = n
 adjusted_nobs(n::Int, w::ExponentialWeighting) = min(n, 2 / w.λ - 1) # minimum of n and effective lookback window
-

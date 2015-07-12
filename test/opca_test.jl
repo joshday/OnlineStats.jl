@@ -3,12 +3,20 @@ module OPCATEST
 
 import OnlineStats
 
-using FactCheck
-FactCheck.clear_results()  # TODO: remove
-
-
+using FactCheck, MultivariateStats
+# FactCheck.clear_results()  # TODO: remove
 
 const ewgt = OnlineStats.ExponentialWeighting(500)
+
+facts("OnlinePCA") do
+	O = OnlineStats
+	x = 10 * randn(100_000, 100)
+	oc = O.CovarianceMatrix(x)
+	top5pca = O.pca(oc, false, maxoutdim = 5)
+	opca = O.OnlinePCA(x, 5, O.StochasticWeighting(.51))
+	e = opca.e
+	@fact principalvars(top5pca) - sort(e) => roughly(zeros(5), 10) "top 5 eigenvalues"
+end
 
 #-----------------------------------------------------------------------
 
@@ -45,7 +53,11 @@ end
 
 function dopca(X, k)
 	pca = OnlineStats.OnlinePCA(X, k, ewgt)
-	OnlineStats.tracedata(pca, 1, X)
+
+	# I'm removing any remains of DataFrames...
+	# It looks like this function isn't called anywhere.  Hopefully this doesn't mess
+	# with your testing.
+	# OnlineStats.tracedata(pca, 1, X)
 end
 
 
@@ -72,7 +84,7 @@ end
 
 
 function testpls(; n = 1000, d = 50, l = 20, k = 10, δ = 0.99, σx = 0.3, σpc = 1.0, σy = 1.0)
-	
+
 	V, Z, X, yV, y = getsampledata_pls(n, d, k, σx, σpc, σy)
 	pls = OnlineStats.OnlinePLS(y, X, l, k, δ, ewgt)
 
@@ -139,4 +151,3 @@ end
 
 
 end
-

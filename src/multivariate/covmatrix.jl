@@ -7,7 +7,7 @@ type CovarianceMatrix{W <: Weighting} <: OnlineStat
 end
 
 # (p by p) covariance matrix from an (n by p) data matrix
-function CovarianceMatrix{T <: Real}(x::Matrix{T}, wgt::Weighting = default(Weighting))
+function CovarianceMatrix{T <: Real}(x::AbstractMatrix{T}, wgt::Weighting = default(Weighting))
     o = CovarianceMatrix(size(x, 2), wgt)
     updatebatch!(o, x)
     o
@@ -19,29 +19,38 @@ CovarianceMatrix(p::Int, wgt::Weighting = default(Weighting)) =
 
 #-----------------------------------------------------------------------# state
 statenames(o::CovarianceMatrix) = [:μ, :Σ, :nobs]
-
 state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
 
-
-#---------------------------------------------------------------------# update!
-function updatebatch!(o::CovarianceMatrix, x::MatF)
-    n2 = size(x, 1)
-    λ = weight(o, n2)
-    o.n += n2
-
-    # Update B
-    smooth!(o.B, vec(mean(x,1)), λ)
-    # Update A
-    BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1 - λ, o.A)
-    return
+function pca(o::CovarianceMatrix, corr::Bool = true; keyargs...)
+    if corr
+        MultivariateStats.pcacov(cor(o), mean(o); keyargs...)
+    else
+        MultivariateStats.pcacov(cov(o), mean(o); keyargs...)
+    end
 end
 
 
+#---------------------------------------------------------------------# update!
+function updatebatch!(o::CovarianceMatrix, x::AMatF)
+    n2 = size(x, 1)
+    λ = weight(o, n2)
+    o.n += n2
+    smooth!(o.B, vec(mean(x, 1)), λ)  # update B
+    BLAS.syrk!('L', 'T', λ / n2, x, 1.0 - λ, o.A)  # update A
+    return
+end
+
+update!(o::CovarianceMatrix, x::AVecF) = updatebatch!(o, x')
+
+function update!(o::CovarianceMatrix, x::AMatF)
+    for i in 1:size(x, 1)
+        updatebatch!(o, x[i, :])
+    end
+end
+
 #-----------------------------------------------------------------------# state
 Base.mean(o::CovarianceMatrix) = return o.B
-
 Base.var(o::CovarianceMatrix) = diag(cov(o::CovarianceMatrix))
-
 Base.std(o::CovarianceMatrix) = sqrt(var(o::CovarianceMatrix))
 
 function Base.cov(o::CovarianceMatrix)
@@ -50,7 +59,7 @@ function Base.cov(o::CovarianceMatrix)
     covmat = o.n / (o.n - 1) * (o.A - BLAS.syrk('L','N',1.0, B))
     for j in 1:p
         for i in 1:j - 1
-            covmat[i, j] = covmat[j, i]
+            @inbounds covmat[i, j] = covmat[j, i]
         end
     end
     return covmat

@@ -5,10 +5,7 @@ type FitBinomial{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit{T <: Integer}(::Type{Binomial},
-                                 y::Vector{T},
-                                 wgt::Weighting = default(Weighting);
-                                 n = 1) # n = number of independent Bernoulli trials
+function onlinefit{T <: Integer}(::Type{Binomial}, y::Vector{T}, wgt::Weighting = default(Weighting); n = 1)
     o = FitBinomial(wgt, n = n)
     update!(o, y)
     o

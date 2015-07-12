@@ -4,6 +4,7 @@ os:
   - osx
 julia:
   - release
+  - nightly
 notifications:
   email: true
 script:
@@ -11,3 +12,4 @@ script:
   - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("OnlineStats"); Pkg.test("OnlineStats"; coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("OnlineStats")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
+  - julia -e 'cd(Pkg.dir("OnlineStats")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'

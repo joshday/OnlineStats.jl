@@ -6,9 +6,7 @@ type FitBernoulli{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit{T <: Integer}(::Type{Bernoulli},
-                                 y::Vector{T},
-                                 wgt::Weighting = default(Weighting))
+function onlinefit{T <: Integer}(::Type{Bernoulli}, y::Vector{T}, wgt::Weighting = default(Weighting))
     o = FitBernoulli(wgt)
     update!(o, y)
     o

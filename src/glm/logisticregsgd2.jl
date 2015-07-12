@@ -43,24 +43,3 @@ state(o::LogRegSGD2) = Any[copy(o.β), nobs(o)]
 
 coef(o::LogRegSGD2) = copy(o.β)
 predict(o::LogRegSGD2, X::MatF) = inverselogit(X * o.β)
-
-
-
-
-
-####################### Testing
-β = [-.5:.1:.5]
-X = [ones(100) randn(100, 10)]
-y = int(OnlineStats.inverselogit(X * β) .> rand(100))
-
-o = OnlineStats.LogRegSGD2(X, y, OnlineStats.StochasticWeighting(.7))
-df = DataFrame(o)
-
-for i in 1:9999
-    X = [ones(100) randn(100, 10)]
-    y = int(OnlineStats.inverselogit(X * β) .< rand(100))
-
-    OnlineStats.updatebatch!(o, X, y)
-    push!(df, o)  # append results to DataFrame
-end
-coef(o)

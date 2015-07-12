@@ -1,107 +1,68 @@
-# Online algorithms implementation progress
+# Online Algorithms Implementation Progress
 
-Click links to example.
+## Summary Statistics
 
-## Summary statistics
+- [x] Mean: `Mean`, `Means`
+- [x] Variance: `Variance`, `Variances`
+- [x] Covariance Matrix: `CovarianceMatrix`
+- [x] Skewness, Kurtosis: `Moments`
+- [x] Maximum/Minimum: `Extrema`
+- [x] Quantiles: `QuantileMM`, `QuantileSGD`
+- [x] Five Number Summary: `FiveNumberSummary`
 
-[Comparison of `QuantileSGD` and `QuantileMM`](../doc/quantilecompare.md)
+## Multivariate Analysis
 
-| Item                 | Associated Type(s)
-|----------------------|------------------
-|  Sample Mean         |  `Mean`, `Means`, [`Summary`](../doc/Summary.md)       
-|  Sample Variance     |  `Variance`, `Variances`, [`Summary`](../doc/Summary.md)   
-|  Skewness (and m3)   |  [`Moments`](../doc/Moments.md)       
-|  Kurtosis (and m4)   |  [`Moments`](../doc/Moments.md)        
-|  Covariance Matrix   | [`CovarianceMatrix`](../doc/CovarianceMatrix.md)
-|  Maximum/Minimum     |  [`Summary`](../doc/Summary.md)  , [`FiveNumberSummary`](../doc/FiveNumberSummary.md), `Extrema`
-|  Sample Quantiles    | [`QuantileSGD`](../doc/QuantileSGD.md), [`QuantileMM`](../doc/QuantileMM.md) 
-|  5-Number Summary    | [`FiveNumberSummary`](../doc/FiveNumberSummary.md)   
-|  Box Plot            |[`Gadfly.plot(obj::FiveNumberSummary)`](../doc/FiveNumberSummary.md)  
+- [x] PCA: `AnalyticalPCA`, `OnlinePCA`, `pca(o::CovarianceMatrix)`
+- [ ] CCA:
+- [ ] Factor Analysis:
 
-## Density estimation
+## Density Estimation
+See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl)
+### Univariate Distributions
+- [x] Bernoulli: `FitBernoulli`
+- [x] Beta: `FitBeta`
+- [x] Binomial: `FitBinomial`
+- [x] Cauchy: `FitCauchy`
+- [ ] Chi-square:
+- [x] Exponential: `FitExponential`
+- [ ] F-distribution:
+- [x] Gamma: `FitGamma`
+- [x] Lognormal: `FitLogNormal`
+- [x] Poisson: `FitPoisson`
+- [x] Normal: `FitNormal`
+- [x] Normal Mixture: `NormalMix`
+- [ ] T-distribution:
+- [ ] Weibull:
+- [ ] Zero-inflated Mixtures
 
-| Item                             | Associated Type(s)
-|----------------------------------|------------------
-| Gaussian mixture                 | `NormalMix`
-| Average Shifted Histograms (ASH) | `AverageShiftedHistograms.update!` in [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl).  See also [Univariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update.md), [Bivariate example](https://github.com/joshday/AverageShiftedHistograms.jl/blob/master/doc/examples/update2.md)
+### Multivariate Distributions
+- [ ] Dirichlet-Multinomial
+- [x] Multinomial: `FitMultinomial`
+- [x] Multivariate Normal: `FitMvNormal`
+- [ ] Multivariate Normal Mixture:
+- [ ] Multivariate T-distribution
+- [ ] Negative Multinomial
 
-## Univariate distributions
+## Linear Models
+- [x] OLS: `LinReg`, `SparseReg`
+- [x] Stepwise Regression: 'StepwiseReg'
 
-`OnlineFit____` objects can be created via `onlinefit(Dist, x)`
+### Penalized Regression
+- [ ] LASSO:
+- [x] Ridge: `SparseReg`
+- [ ] Elastic Net:
 
-| Item                 | Associated Type(s)
-|----------------------|------------------
-| Bernoulli            | `OnlineFitBernoulli`
-| Beta                 | `OnlineFitBeta`
-| Binomial             | `OnlineFitBinomial`
-| Cauchy               | 
-| Chi-square           | 
-| Exponential          | `OnlineFitExponential`
-| F-distribution       | 
-| Gamma                | `OnlineFitGamma`
-| Inverse Gamma        | 
-| Lognormal            | 
-| Normal               | `OnlineFitNormal`
-| T-distribution       | 
-| Weibull              | 
+### Quantile Regression
+- [x] Linear Quantile Regression: `QuantRegMM`, `QuantRegSGD`
+- [ ] Composite Linear Quantile Regression:
 
-## Multivariate distributions
+### Variance Component Model
+- [ ] Variance Component Model
+- [ ] Linear Mixed Model
 
-| Item                 | Associated Type(s)
-|----------------------|------------------
-| Multinomial          | `OnlineFitMultinomial`
-| Multivariate Normal  | `OnlineFitMvNormal`
-| Multivariate Normal with missing data | 
-| Multivariate t-distribution           |
-| Dirichlet-Multinomial                 |
-| Negative Multinomial                  |
-
-## Linear regression
-
-| Item                 | Associated Type(s)
-|----------------------|------------------
-| Cholesky             | 
-| Sweep                | [`LinReg`](../doc/LinReg.md)
-| Missing Data         |
-| Stepwise regression  |
-
-## Generalized linear model (GLM)
-
-| Item                 | Associated Type(s)
-|----------------------|------------------
-| Logistic Regression  | `LogRegMM`, `LogRegSGD`, `LogRegSN`
-| Probit Regression    | 
-| Poisson Regression   |  
-| Multinomial Logistic Regression |
-| Cox Model            |
-
-## Quantile regression
-
-
-| Item                                 | Associated Type(s)
-|--------------------------------------|------------------
-| Linear Quantile Regression           | [`QuantRegSGD`](../doc/QuantRegSGD.md), [`QuantRegMM`](../doc/QuantRegMM.md)
-| Composite Linear Quantile Regresison |
-
-## Variance component model
-
-| Item                     | Associated Type(s)
-|--------------------------|------------------
-| Variance Component Model |
-| Linear Mixed Model       |
-
-## Penalized estimation
-
-| Item        | Associated Type(s)
-|-------------|------------------
-| LASSO       |
-| Ridge       |
-| Elastic Net |
-
-## Multivariate statistics
-
-| Item             | Associated Type(s)
-|------------------|------------------
-| PCA              |
-| CCA              |
-| Factor Analysis  |
+## Generalized Linear Models (GLM)
+- [ ] Cox Model
+- [x] Logistic Regression: `LogRegMM`, `LogRegSGD`, `LogRegSGD2`
+- [ ] Multinomial Logistic Regression
+- [ ] Poisson Regression
+- [ ] Probit Regression

@@ -1,10 +1,10 @@
 module AnalyticalPCATest
 
-using OnlineStats
-using FactCheck
-using MultivariateStats
+using OnlineStats, FactCheck, MultivariateStats
 
 facts("AnalyticalPCA") do
+    o = AnalyticalPCA(4)
+
     x1 = rand(1000, 400)
     x2 = rand(1000, 400)
     x3 = rand(1000, 400)
@@ -37,6 +37,8 @@ facts("AnalyticalPCA") do
     @fact state(o)[1] => o.vectors
     @fact state(o)[2] => o.values
     @fact state(o)[3] => nobs(o)
-end
+
+    o = AnalyticalPCA(x1, ExponentialWeighting(.0001), corr = false)
+end # facts
 
 end # module

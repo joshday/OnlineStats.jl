@@ -36,7 +36,7 @@ type OnlineFLS <: OnlineStat
 
 	yhat::Float64  #most recent estimate of y
 
-	function OnlineFLS(p::Int, δ::Float64, wgt::Weighting = default(Weighting))
+	function OnlineFLS(p::Int, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
 
 		# calculate the covariance matrix Vω from the smoothing parameter δ
 		@assert δ > 0. && δ <= 1.
@@ -57,17 +57,17 @@ type OnlineFLS <: OnlineStat
 end
 
 
-function OnlineFLS(y::Float64, x::VecF, δ::Float64, wgt::Weighting = default(Weighting))
+function OnlineFLS(x::AVecF, y::Real, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
 	p = length(x)
 	o = OnlineFLS(p, δ, wgt)
-	update!(o, y, x)
+	update!(o, x, y)
 	o
 end
 
-function OnlineFLS(y::VecF, X::MatF, δ::Float64, wgt::Weighting = default(Weighting))
+function OnlineFLS(X::AMatF, y::AVecF, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
 	p = size(X,2)
 	o = OnlineFLS(p, δ, wgt)
-	update!(o, y, X)
+	update!(o, X, y)
 	o
 end
 
@@ -87,14 +87,14 @@ Base.beta(o::OnlineFLS) = o.β
 
 # NOTE: assumes X mat is (T x p), where T is the number of observations
 # TODO: optimize
-function update!(o::OnlineFLS, y::VecF, X::MatF)
+function update!(o::OnlineFLS, X::AMatF, y::AVecF)
 	@assert length(y) == size(X,1)
 	for i in length(y)
-		update!(o, y[i], vec(X[i,:]))
+		update!(o, row(X,i), y[i])
 	end
 end
 
-function update!(o::OnlineFLS, y::Float64, x::VecF)
+function update!(o::OnlineFLS, x::AVecF, y::Real)
 
 	# standardize y and x
 	y = standardize!(o.yvar, y)
@@ -127,7 +127,6 @@ function update!(o::OnlineFLS, y::Float64, x::VecF)
 
 	o.n += 1
 	return
-
 end
 
 # NOTE: keeps consistent p... just resets state
@@ -158,17 +157,17 @@ function coeftable(o::OnlineFLS)
 	# TODO
 end
 
-function confint(o::OnlineFLS, level::Float64 = 0.95)
+function confint(o::OnlineFLS, level::Real = 0.95)
 	# TODO
 end
 
 # predicts yₜ for a given xₜ
-function predict(o::OnlineFLS, x::VecF)
+function predict(o::OnlineFLS, x::AVecF)
 	unstandardize(o.yvar, dot(o.β, standardize(o.xvars, x)))
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function predict(o::OnlineFLS, X::MatF)
+function predict(o::OnlineFLS, X::AMatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n

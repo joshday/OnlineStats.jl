@@ -4,7 +4,7 @@ Symmetric sweep of matrix A.  Only the lower triangular part is read and swept.
 :sweep!
 
 
-function sweep!(A::Matrix{Float64}, k::Int, inv::Bool=false)
+function sweep!(A::MatF, k::Int, inv::Bool=false)
     n = size(A, 1)
     # pivot element
     p = 1.0 / A[k, k]
@@ -36,7 +36,7 @@ function sweep!(A::Matrix{Float64}, k::Int, inv::Bool=false)
 end
 
 
-function sweep!(A::Matrix{Float64}, I::Range{Int}=1:size(A, 1), inv::Bool=false)
+function sweep!(A::MatF, I::Range{Int}=1:size(A, 1), inv::Bool=false)
     for k in I
         sweep!(A, k, inv)
     end
@@ -44,11 +44,9 @@ function sweep!(A::Matrix{Float64}, I::Range{Int}=1:size(A, 1), inv::Bool=false)
 end
 
 
-function sweep!(A::Matrix{Float64}, S::Vector{Int}, inv::Bool=false)
+function sweep!(A::MatF, S::Vector{Int}, inv::Bool=false)
     for k in S
         sweep!(A, k, inv)
     end
     return A
 end
-
-

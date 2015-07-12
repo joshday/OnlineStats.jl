@@ -5,15 +5,13 @@ type FitExponential{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Exponential},
-                   y::Vector{Float64},
-                   wgt::Weighting = default(Weighting))
+function onlinefit(::Type{Exponential}, y::VecF, wgt::Weighting = default(Weighting))
     o = FitExponential(wgt)
     update!(o, y)
     o
 end
 
-FitExponential(y::Vector{Float64}, wgt::Weighting = default(Weighting)) =
+FitExponential(y::VecF, wgt::Weighting = default(Weighting)) =
     onlinefit(Exponential, y, wgt)
 
 FitExponential(wgt::Weighting = default(Weighting)) =
@@ -31,7 +29,3 @@ function update!(o::FitExponential, y::Float64)
     o.d = Exponential(β)
     o.n += 1
 end
-
-
-#------------------------------------------------------------------------# Base
-Base.copy(o::FitExponential) = FitExponential(o.d, o.n, o.weighting)

@@ -1,13 +1,14 @@
 module OnlineStatsTests
-using FactCheck
+
+import FactCheck
 
 include("common_test.jl")
 include("mean_test.jl")
 include("var_test.jl")
 include("summary_test.jl")
 include("extrema_test.jl")
+include("moments_test.jl")
 include("fivenumber_test.jl")
-#  include("moments_test.jl")
 include("quantiles_test.jl")
 
 include("linearmodel_test.jl")
@@ -20,10 +21,10 @@ include("normalmix_test.jl")
 
 include("covmatrix_test.jl")
 include("analyticalpca_test.jl")
+include("opca_test.jl")
 
-include("plotmethods_test.jl")
-include("tracedata_test.jl")
+# include("adagrad_test.jl")
 
 FactCheck.exitstatus()
-end # module
 
+end # module

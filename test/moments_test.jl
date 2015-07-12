@@ -1,44 +1,22 @@
-using OnlineStats
-using Base.Test
-using StatsBase
-println("* moments_test.jl")
+module MomentsTest
+using OnlineStats, Distributions, FactCheck
 
-n1, n2 = rand(1:1_000_000, 2)
-n = n1 + n2
-x1 = rand(n1)
-x2 = rand(n2)
-x = [x1, x2]
+facts("Moments") do
+    d = Uniform()
+    y = rand(100000)
+    o = Moments()
+    update!(o, y)
+    o2 = Moments(y)
+    @fact nobs(o) => nobs(o2)
+    @fact nobs(o) => 100000
 
-obj = Moments(x1)
-@test state(obj) == DataFrames.DataFrame(
-    variable = [:μ, :σ², :skewness, :kurtosis],
-    value = [mean(obj), var(obj), skewness(obj), kurtosis(obj)],
-    nobs = nobs(obj))
+    state(o)
+    @fact statenames(o) => [:μ, :σ², :skewness, :kurtosis, :nobs]
+    @fact mean(o) => roughly(mean(o), .001)
+    @fact var(o) => roughly(var(y), .001)
+    @fact std(o) => roughly(std(y), .001)
+    @fact skewness(o) => roughly(skewness(y), .05)
+    @fact kurtosis(o) => roughly(kurtosis(y), .05)
+end
 
-@test mean(obj) == mean(x1)
-@test_approx_eq var(obj)  var(x1)
-@test_approx_eq_eps(skewness(obj), skewness(x1) * (obj.n / (obj.n - 1)), .1)
-@test_approx_eq_eps(kurtosis(obj), kurtosis(x1), .1)
-@test obj.n == n1
-
-update!(obj, x2)
-@test_approx_eq mean(obj)  mean(x)
-@test_approx_eq var(obj)  var(x)
-@test_approx_eq_eps(skewness(obj), skewness(x) * (obj.n / (obj.n - 1)), .1)
-@test_approx_eq_eps(kurtosis(obj), kurtosis(x), .1)
-@test obj.n == n
-
-obj1 = Moments(x1)
-obj2 = Moments(x2)
-obj3 = merge(obj1, obj2)
-merge!(obj1, obj2)
-@test obj1.n == obj3.n
-@test obj1.n == length(x)
-@test_approx_eq mean(obj1) mean(obj3)
-@test_approx_eq var(obj1) var(obj3)
-
-@test_approx_eq_eps(mean(x), mean(obj1), .1)
-@test_approx_eq_eps(var(x), var(obj1), .1)
-
-# clean up
-x1 = x2 = x = 0
+end

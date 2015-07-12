@@ -1,13 +1,12 @@
 #-------------------------------------------------------# Type and Constructors
 type LinReg{W <: Weighting} <: OnlineStat
-    xycov::CovarianceMatrix{W}  # Cov([X y])
-    s::MatF                     # "Swept" version of cor(C)
-    n::Int64
+    c::CovarianceMatrix{W}  # Cov([X y])
+    s::MatF                     # "Swept" version of [X y]' [X y]
     weighting::W
 end
 
 function LinReg(x::MatF, y::VecF, wgt::Weighting = default(Weighting))
-    n, p = size(x)
+    p = size(x, 2)
     o = LinReg(p, wgt)
     updatebatch!(o, x, y)
     o
@@ -15,8 +14,7 @@ end
 
 function LinReg(p, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
-    s = cor(c)
-    LinReg(c, zeros(p + 1, p + 1), 0, wgt)
+    LinReg(c, zeros(p + 1, p + 1), wgt)
 end
 
 
@@ -24,21 +22,34 @@ end
 statenames(o::LinReg) = [:β, :nobs]
 state(o::LinReg) = Any[coef(o), nobs(o)]
 
-coef(o::LinReg) = vec(o.s[end, 1:end - 1])
+nobs(o::LinReg) = nobs(o.c)
 
-mse(o::LinReg) = o.s[end, end] * o.n / (o.n - size(o.s, 1))
+mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
+
+coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::LinReg, x::MatF, y::VecF)
-    n, p = size(x)
-    updatebatch!(o.xycov, [x y])
-    copy!(o.s, o.xycov.A)
+function updatebatch!(o::LinReg, x::AMatF, y::AVecF)
+    p = size(x, 2)
+    updatebatch!(o.c, [x y])
+    copy!(o.s, o.c.A)
     sweep!(o.s, 1:p)
-    o.n += size(x, 1)
 end
 
+function update!(o::LinReg, x::AVecF, y)
+    update!(o.c, [x; y])
+    copy!(o.s, o.c.A)
+    sweep!(o.s, 1:size(o.s, 1))
+end
 
+function update!(o::LinReg, x::AMatF, y::AVecF)
+    for i in 1:length(y)
+        update!(o.c, [x; y])
+    end
+    copy!(o.s, o.c.A)
+    sweep!(o.s, 1:size(o.s, 1))
+end
 
 
 #------------------------------------------------------------------------# Base
@@ -47,23 +58,19 @@ function coeftable(o::LinReg)
     p = length(β)
     se = stderr(o)
     ts = β ./ se
-    CoefTable([β se ts ccdf(FDist(1, o.n - p), abs2(ts))],
+    CoefTable([β se ts ccdf(FDist(1, nobs(o) - p), abs2(ts))],
               ["Estimate","Std.Error","t value", "Pr(>|t|)"],
               ["x$i" for i = 1:p], 4)
 end
 
 function confint{T <: Real}(o::LinReg, level::T = 0.95)
     β = coef(o)
-    mult = stderr(o) * quantile(TDist(o.n - length(β)), (1. - level) / 2.)
+    mult = stderr(o) * quantile(TDist(nobs(o) - length(β)), (1. - level) / 2.)
     hcat(β, β) + mult * [1. -1.]
 end
 
 stderr(o::LinReg) = sqrt(diag(vcov(o)))
 
-vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / o.n)
+vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / nobs(o))
 
 predict(o::LinReg, x::Matrix) = x * coef(o)
-
-
-
-
