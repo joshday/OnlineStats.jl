@@ -41,7 +41,7 @@ facts("CovarianceMatrix") do
     @fact cor(o1) => cor(o3)
     update!(o1, x1[1, :])
     update!(o3, vec(x1[1, :]))
-    @fact cor(o1) => cor(o3)
+    @fact cor(o1) - cor(o3) => roughly(zeros(10, 10))
 
     context("PCA") do
         n = rand(1000:10_000)

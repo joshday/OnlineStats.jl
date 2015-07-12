@@ -29,7 +29,7 @@ coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::LinReg, x::MatF, y::VecF)
+function updatebatch!(o::LinReg, x::AMatF, y::AVecF)
     n, p = size(x)
     updatebatch!(o.xycov, [x y])
     copy!(o.s, o.xycov.A)
@@ -37,9 +37,9 @@ function updatebatch!(o::LinReg, x::MatF, y::VecF)
     o.n += n
 end
 
-function update!(o::LinReg, x::MatF, y::VecF)
+function update!(o::LinReg, x::AMatF, y::AVecF)
     for i in 1:length(y)
-        updatebatch!(o, x[i,:], y[i:i])
+        updatebatch!(o, view(x, i, :), view(y, i))
     end
 end
 

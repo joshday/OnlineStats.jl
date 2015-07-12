@@ -7,7 +7,7 @@ type CovarianceMatrix{W <: Weighting} <: OnlineStat
 end
 
 # (p by p) covariance matrix from an (n by p) data matrix
-function CovarianceMatrix{T <: Real}(x::Matrix{T}, wgt::Weighting = default(Weighting))
+function CovarianceMatrix{T <: Real}(x::AbstractMatrix{T}, wgt::Weighting = default(Weighting))
     o = CovarianceMatrix(size(x, 2), wgt)
     updatebatch!(o, x)
     o
@@ -39,25 +39,26 @@ end
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::CovarianceMatrix, x::MatF)
+function updatebatch!(o::CovarianceMatrix, x::AMatF)
     n2 = size(x, 1)
     λ = weight(o, n2)
     o.n += n2
-
-    # Update B
-    smooth!(o.B, vec(mean(x,1)), λ)
-    # Update A
-    BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1 - λ, o.A)
+    smooth!(o.B, vec(mean(x,1)), λ)  # update B
+    BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1.0 - λ, o.A)  # update A
     return
 end
 
-function update!(o::CovarianceMatrix, x::VecF)
-    updatebatch!(o, x')
+function update!(o::CovarianceMatrix, x::AVecF)
+    o.n += 1
+    λ = weight(o)
+    smooth!(o.B, x, weight(o))
+    scale!(o.A, 1.0 - λ)
+    BLAS.syr!('L', λ, x, o.A)
 end
 
-function update!(o::CovarianceMatrix, x::MatF)
+function update!(o::CovarianceMatrix, x::AMatF)
     for i in 1:size(x, 1)
-        updatebatch!(o, x[i, :])
+        update!(o, rowvec_view(x, i))
     end
 end
 
