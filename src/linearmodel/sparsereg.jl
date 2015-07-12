@@ -14,12 +14,11 @@
 type SparseReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
     s::MatF                 # memory holder for "Swept" version of cor(o.c)
-    n::Int
     weighting::W
 end
 
-function SparseReg(x::MatF, y::VecF, wgt::Weighting = default(Weighting))
-    n, p = size(x)
+function SparseReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
+    p = size(x, 2)
     o = SparseReg(p, wgt)
     updatebatch!(o, x, y)
     o
@@ -28,13 +27,14 @@ end
 function SparseReg(p, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     s = zeros(p + 1, p + 1)
-    SparseReg(c, zeros(p + 1, p + 1), 0, wgt)
+    SparseReg(c, zeros(p + 1, p + 1), wgt)
 end
 
 
 #-----------------------------------------------------------------------# state
 statenames(o::SparseReg) = [:β, :nobs]
 state(o::SparseReg) = Any[coef(o), nobs(o)]
+nobs(o::SparseReg) = nobs(o.c)
 
 
 #-----------------------------------------------------------------------# coef
@@ -85,7 +85,7 @@ end
 # end
 
 
-function coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.)
+function coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0)
     if penalty == :ols
         coef_ols(o::SparseReg)
     elseif penalty == :ridge
@@ -100,18 +100,11 @@ end
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::SparseReg, x::MatF, y::VecF)
-    n = size(x, 1)
-    updatebatch!(o.c, [x y])
-    o.n += n
-end
+updatebatch!(o::SparseReg, x::AMatF, y::AVecF) = updatebatch!(o.c, [x y])
 
-function update!(o::SparseReg, x::VecF, y::Float64)
-    update!(o.c, [x; y])
-    o.n += 1
-end
+update!(o::SparseReg, x::AVecF, y) = update!(o.c, [x; y])
+update!(o::SparseReg, x::AMatF, y::AVecF) = update!(o.c, [x y])
 
-update!(o::SparseReg, x::MatF, y::VecF) = (update!(o.c, [x y]); o.n += length(y))
 
 
 # testing
@@ -129,7 +122,7 @@ if false
     glm = lm([ones(n) x],y);
 
     # manually create β for ridge
-    λ = 1.
+    λ = 1.0
     lambdamat = eye(p) * λ
     βridge = inv(cor(x) + lambdamat) * vec(cor(x, y))
     μ = mean(o.c)

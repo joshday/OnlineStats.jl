@@ -43,22 +43,16 @@ function updatebatch!(o::CovarianceMatrix, x::AMatF)
     n2 = size(x, 1)
     λ = weight(o, n2)
     o.n += n2
-    smooth!(o.B, vec(mean(x,1)), λ)  # update B
-    BLAS.syrk!('L', 'T', λ, x / sqrt(n2), 1.0 - λ, o.A)  # update A
+    smooth!(o.B, vec(mean(x, 1)), λ)  # update B
+    BLAS.syrk!('L', 'T', λ / n2, x, 1.0 - λ, o.A)  # update A
     return
 end
 
-function update!(o::CovarianceMatrix, x::AVecF)
-    o.n += 1
-    λ = weight(o)
-    smooth!(o.B, x, weight(o))
-    scale!(o.A, 1.0 - λ)
-    BLAS.syr!('L', λ, x, o.A)
-end
+update!(o::CovarianceMatrix, x::AVecF) = updatebatch!(o, x')
 
 function update!(o::CovarianceMatrix, x::AMatF)
     for i in 1:size(x, 1)
-        update!(o, rowvec_view(x, i))
+        updatebatch!(o, x[i, :])
     end
 end
 
