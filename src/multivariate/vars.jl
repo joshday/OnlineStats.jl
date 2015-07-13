@@ -7,13 +7,13 @@ type Variances{W<:Weighting} <: OnlineStat
 end
 
 
-function Variances(y::MatF, wgt::Weighting = default(Weighting))
+function Variances(y::AMatF, wgt::Weighting = default(Weighting))
     o = Variances(size(y, 2), wgt)
     update!(o, y)
     o
 end
 
-function Variances(y::VecF, wgt::Weighting = default(Weighting))
+function Variances(y::AVecF, wgt::Weighting = default(Weighting))
     o = Variances(length(y), wgt)
     update!(o, y)
     o
@@ -49,7 +49,7 @@ function unstandardize(o::Variances, y::VecF)
 end
 
 #---------------------------------------------------------------------# update!
-function update!(o::Variances, y::VecF)
+function update!(o::Variances, y::AVecF)
     λ = weight(o)
     μ = copy(o.μ)
     smooth!(o.μ, y, λ)
@@ -58,14 +58,14 @@ function update!(o::Variances, y::VecF)
     return
 end
 
-function update!(o::Variances, y::MatF)
+function update!(o::Variances, y::AMatF)
     for i in 1:size(y, 1)
         update!(o, vec(y[i, :]))
     end
     return
 end
 
-function updatebatch!(o::Variances, y::MatF)
+function updatebatch!(o::Variances, y::AMatF)
     n2 = size(y, 1)
     λ = weight(o, n2)
     smooth!(o.μ, vec(mean(y, 1)), λ)
@@ -90,6 +90,3 @@ function Base.merge!(o1::Variances, o2::Variances)
     o1.n += nobs(o2)
     o1
 end
-
-
-

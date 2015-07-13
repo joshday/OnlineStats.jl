@@ -3,16 +3,19 @@ module OPCATEST
 
 import OnlineStats
 
-using FactCheck
+using FactCheck, MultivariateStats
 # FactCheck.clear_results()  # TODO: remove
 
 const ewgt = OnlineStats.ExponentialWeighting(500)
 
 facts("OnlinePCA") do
-	x = randn(10_000, 100)
-	oc = OnlineStats.CovarianceMatrix(x)
-	top5pca = pca(oc, 5, false)
-	opca = OnlineStats.OnlinePCA(x', 5)
+	O = OnlineStats
+	x = 10 * randn(100_000, 100)
+	oc = O.CovarianceMatrix(x)
+	top5pca = O.pca(oc, false, maxoutdim = 5)
+	opca = O.OnlinePCA(x, 5, O.StochasticWeighting(.51))
+	e = opca.e
+	@fact principalvars(top5pca) - sort(e) => roughly(zeros(5), 10) "top 5 eigenvalues"
 end
 
 #-----------------------------------------------------------------------
