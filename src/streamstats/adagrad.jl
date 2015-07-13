@@ -65,12 +65,12 @@ end
 abstract LinkFunction
 
 immutable IdentityLink <: LinkFunction end
-link(::IdentityLink, xβ::Real) = xβ
-invlink(::IdentityLink, y::Real) = y
+@inline link(::IdentityLink, y::Real) = y
+@inline invlink(::IdentityLink, xβ::Real) = xβ
 
 immutable LogisticLink <: LinkFunction end
-link(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
-invlink(::LogisticLink, y::Real) = log(y / (1.0 - y))
+@inline link(::LogisticLink, y::Real) = log(y / (1.0 - y))
+@inline invlink(::LogisticLink, xβ::Real) = 1.0 / (1.0 + exp(-xβ))
 
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
@@ -88,7 +88,7 @@ type Adagrad{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction
 end
 
 function Adagrad(p::Int; 
-                 η::Float64 = 0.1,
+                 η::Float64 = 1.0,
                  link::LinkFunction = IdentityLink(),
                  loss::LossFunction = SquareLoss(),
                  reg::RegularizationFunction = NoReg())
@@ -133,7 +133,7 @@ state(o::Adagrad) = Any[copy(o.β), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
 StatsBase.coef(o::Adagrad) = o.β
-StatsBase.predict(o::Adagrad, x::AVecF) = link(o.link, dot(x, o.β))
-StatsBase.predict(o::Adagrad, X::AMatF) = link(o.link, X * o.β)
+StatsBase.predict(o::Adagrad, x::AVecF) = invlink(o.link, dot(x, o.β))
+StatsBase.predict(o::Adagrad, X::AMatF) = invlink(o.link, X * o.β)
 
 # --------------------------------------------------------------------------

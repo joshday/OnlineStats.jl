@@ -16,18 +16,20 @@ facts("Adagrad") do
     # n = rand(10_000:100_000)
     # p = rand(1:min(n-1, 100))
     n, p = 1_000_000, 10
+    atol = 0.1
+    rtol = 0.05
 
     context("OLS") do
         x = randn(n, p)
         β = collect(1.:p)
-        y = x * β + randn(n)*100
+        y = x * β + randn(n)*10
 
 
         # normal lin reg
         o = Adagrad(x, y)
         println(o, ": β=", β)
-        @fact coef(o) => roughly(β)
-        @fact predict(o, ones(p)) => roughly(1.0 * sum(β))
+        @fact coef(o) => roughly(β, atol = atol, rtol = rtol)
+        @fact predict(o, ones(p)) => roughly(1.0 * sum(β), atol = atol, rtol = rtol)
 
         # ridge regression
         # repeat same data in first 2 variables
@@ -37,7 +39,7 @@ facts("Adagrad") do
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; reg = L2Reg(0.01))
         println(o, ": β=", β2)
-        @fact coef(o) => roughly(β2, atol = 0.2)
+        @fact coef(o) => roughly(β2, atol = atol, rtol = rtol)
 
         # some simple checks of the interface
         @fact statenames(o) => [:β, :nobs]
@@ -53,7 +55,7 @@ facts("Adagrad") do
         y = map(convertLogisticY, x * β)
 
         # logistic
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), η=1.0)
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
         println(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1)
 
@@ -63,7 +65,7 @@ facts("Adagrad") do
         x[:,2] = x[:,1]
         y = map(convertLogisticY, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
-        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001), η=1.0)
+        o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
         println(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
