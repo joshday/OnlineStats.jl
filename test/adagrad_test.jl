@@ -3,6 +3,9 @@ using OnlineStats, FactCheck
 using Distributions
 import StreamStats
 
+const n = 1_000_000
+const p = 10
+const λ = 0.0001
 
 # TODO compare to StreamStats results
 # TODO compare timing to StreamStats and profile
@@ -12,10 +15,58 @@ function convertLogisticY(xβ)
     Float64(rand(Bernoulli(prob)))
 end
 
+
+function do_ss_ols(x, y)
+    ols = StreamStats.ApproxOLS(p, 1.0)
+    for i in 1:n
+        StreamStats.update!(ols, vec(x[i,:]), y[i])
+    end
+    ols
+end
+
+function do_os_ols(x, y)
+    ols = Adagrad(p+1)
+    for i in 1:n
+        update!(ols, vec(x[i,:]), y[i])
+    end
+    ols
+end
+
+function do_os_ols_bias(x, y)
+    ols = Adagrad(p+1)
+    for i in 1:n
+        xb = BiasVector(vec(x[i,:]))
+        update!(ols, xb, y[i])
+    end
+    ols
+end
+
+
+function do_ss_approx_ridge(x,y)
+    ols = StreamStats.ApproxRidge(p, λ, 1.0)
+    for i in 1:n
+        StreamStats.update!(ols, vec(x[i,:]), y[i])
+    end
+    ols
+end
+function do_ss_approx_logit(x,y)
+    ols = StreamStats.ApproxLogit(p, 1.0)
+    for i in 1:n
+        StreamStats.update!(ols, vec(x[i,:]), y[i])
+    end
+    ols
+end
+function do_ss_approx_l2_logit(x,y)
+    ols = StreamStats.ApproxL2Logit(p, λ, 1.0)
+    for i in 1:n
+        StreamStats.update!(ols, vec(x[i,:]), y[i])
+    end
+    ols
+end
+
+
 facts("Adagrad") do
-    # n = rand(10_000:100_000)
-    # p = rand(1:min(n-1, 100))
-    n, p = 1_000_000, 10
+
     atol = 0.1
     rtol = 0.05
 
@@ -48,7 +99,6 @@ facts("Adagrad") do
 
     end
 
-    if true
     context("Logistic") do
         x = randn(n, p)
         β = collect(1.:p)
@@ -69,73 +119,98 @@ facts("Adagrad") do
         println(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
+
+    context("Vs StreamStats") do
+        x = randn(n, p)
+        xbias = hcat(x, ones(n))
+        β = collect(1.:p)
+        y = x * β + randn(n)*10
+
+        # warmup and validity
+        ols_ss = do_ss_ols(x, y)
+        β_streamstats = vcat(ols_ss.β, ols_ss.β₀)
+        β_onlinestats = coef(do_os_ols(xbias, y))
+        β_os_withbias = coef(do_os_ols_bias(x, y))
+
+        @fact β_streamstats => roughly(β_onlinestats)
+        @fact β_os_withbias => roughly(β_onlinestats)
+
+        # test speed
+        e_ss = @elapsed do_ss_ols(x,y)
+        e_os = @elapsed do_os_ols(xbias,y)
+        e_os_bias = @elapsed do_os_ols_bias(x,y)
+
+        @fact e_os / e_ss => less_than(1.05)
+        @fact e_os_bias / e_ss => less_than(1.05)
+
+
+        # test other algos
+        ss = do_ss_approx_ridge(x,y)
+        β_ss_ridge = vcat(ss.β, ss.β₀)
+        @fact β_ss_ridge => roughly(coef(Adagrad(xbias,y; reg=L2Reg(λ))), rtol = 0.02)
+
+        y = map(convertLogisticY, x * β)
+        ss = do_ss_approx_logit(x, y)
+        β_ss_logit = vcat(ss.β, ss.β₀)
+        @fact β_ss_logit => roughly(coef(Adagrad(xbias,y; link=LogisticLink(), loss=LogisticLoss())), rtol = 0.02)
+
+        ss = do_ss_approx_l2_logit(x, y)
+        β_ss_l2_logit = vcat(ss.β, ss.β₀)
+        @fact β_ss_l2_logit => roughly(coef(Adagrad(xbias,y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(λ))), rtol = 0.02)
     end
 
-# # if false
+end
 
-# using OnlineStats
-# import StreamStats
+
+
+
+# # # if false
+# if true
+# # using OnlineStats
+# # import StreamStats
 # const n = 1_000_000;
 # const p = 10;
 # const x = randn(n, p);
 # const xbias = hcat(ones(n), x);
 # const β = collect(1.:p);
 # const y = x * β + randn(n)*10;
-# ols_ss = StreamStats.ApproxOLS(p)
 # do_ss_ols(x, y) = (ols = StreamStats.ApproxOLS(p); for i in 1:n; StreamStats.update!(ols, vec(x[i,:]), y[i]); end; ols)
 # do_os_ols(x, y) = (ols = Adagrad(p+1); for i in 1:n; update!(ols, vec(x[i,:]), y[i]); end; ols)
-# StreamStats.state(do_ss_ols(x, y))'
-# coef(do_os_ols(xbias,y))'
-# #warmup complete
-# @time do_ss_ols(x,y)
-# @time do_os_ols(xbias,y)
 
-# # @time Adagrad(x,y)
-# # @time Adagrad(x,y)
-# # @profile Adagrad(x,y)
+# # StreamStats.state(do_ss_ols(x, y))'
+# # ols_ss = StreamStats.ApproxOLS(p)
+# # coef(do_os_ols(xbias,y))'
 
-# # @time LinReg(x,y)
-# # @time LinReg(x,y)
-# # @profile LinReg(x,y)
-# # end
+# # #warmup complete
+# # @time do_ss_ols(x,y)
+# # @time do_os_ols(xbias,y)
 
-    # # First batch accuracy
-    # o = LinReg(x, y)
-    # glm = lm(x, y)
-    # @fact coef(o) => roughly(coef(glm))
-    # @fact statenames(o) => [:β, :nobs]
-    # @fact state(o)[1] => coef(o)
-    # @fact state(o)[2] => nobs(o)
-    # @fact mse(o) => roughly( sum( (y - x * coef(o)) .^ 2 ) / (n - p), 1e-3)
-    # @fact mse(o) => roughly( sum( (y - predict(o, x)) .^ 2 ) / (n - p), 1e-3)
-    # @fact stderr(o) => roughly(stderr(glm), 1e-3)
-    # @fact maxabs(vcov(o) - vcov(glm)) => roughly(0, 1e-5)
+# include("/home/tom/.julia/v0.4/OnlineStats.jl/src/multivariate/bias.jl")
+# function do_os_ols_bias(x, y)
+#     ols = Adagrad(p+1)
+#     for i in 1:n
+#         vx = vec(x[i,:])
+#         xb = XXX.BiasVector(vx)
+#         update!(ols, xb, y[i])
+#     end
+#     ols
+# end
+# # do_os_ols_bias(x, y)
+# # @time do_os_ols_bias(x,y)
+# # # @profile do_os_ols_bias(x,y)
 
-    # x = rand(10_000, 2)
-    # β = ones(2)
-    # y = x*β + randn(10_000)
-    # o = LinReg(x, y)
-    # glm = lm(x, y)
+# function do_os_ols_bias2(x, y)
+#     ols = Adagrad(p+1)
+#     for i in 1:n
+#         vx = vec(x[i,:])
+#         xb = XXX.BiasVector2(vx)
+#         update!(ols, xb, y[i])
+#     end
+#     ols
+# end
+# do_os_ols_bias(x, y)
+# @time do_os_ols_bias(x,y)
+# @profile do_os_ols_bias(x,y)
 
-    # ct1 = coeftable(o)
-    # ct2 = coeftable(glm)
-    # @fact ct1.pvalcol => ct2.pvalcol
-    # @fact ct1.colnms => ct2.colnms
-    # @fact ct1.rownms => ct2.rownms
-    # @fact ct1.mat - ct2.mat => roughly(zeros(2, 4), .01)
-    # @fact confint(o) => roughly(confint(glm))
-
-    # β = ones(10)
-    # x = randn(100, 10)
-    # y = x*β + randn(100)
-    # o = LinReg(x, y)
-    # for i in 1:10_000
-    #     randn!(x)
-    #     y = x*β + randn(100)
-    #     updatebatch!(o, x, y)
-    # end
-    # @fact coef(o) => roughly(ones(10), .01)
-    # @fact predict(o, x) => x * coef(o)
-end
 
 end # module

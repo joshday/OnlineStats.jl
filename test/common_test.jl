@@ -64,7 +64,7 @@ facts("Common") do
     context("Show DistributionStat") do
         x1 = randn(100)
         o = onlinefit(Normal, x1)
-        show(o)
+        show(o); println()
 
         @fact params(o) => params(o.d)
         @fact mean(o) => mean(o.d)
@@ -114,6 +114,35 @@ facts("Common") do
         o = FitMultinomial()
         @fact ncategories(o) => 2
         @fact ntrials(o) => 1
+    end
+
+    context("Bias") do
+        x = rand(10)
+        bv = BiasVector(x)
+        @fact length(bv) => length(x) + 1
+        @fact size(bv) => (length(x)+1,)
+        @fact bv[1] => x[1]
+        @fact bv[10] => x[10]
+        @fact bv[11] => 1.0
+        bv[4] = 100.0
+        @fact x[4] => 100.0
+        # @fact x[10:11] => vcat(x[10],1.0)  #doesnt work
+        @fact_throws (x[11] = 0.0)
+        @fact_throws x[12]
+        @fact_throws x[0]
+
+        x = rand(10,10)
+        bm = BiasMatrix(x)
+        @fact length(bm) => length(x) + size(x,1)
+        @fact size(bm) => (size(x,1),size(x,2)+1)
+        @fact bm[1,1] => x[1,1]
+        @fact bm[10,1] => x[10,1]
+        @fact bm[1,11] => 1.0
+        bm[4,6] = 100.0
+        @fact x[4,6] => 100.0
+        # @fact x[10,10:11] => hcat(x[10,10], 1.0)  #doesnt work
+        @fact_throws (x[10,11] = 0.0)
+
     end
 end # facts
 end # module

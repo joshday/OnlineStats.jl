@@ -174,6 +174,9 @@ include("quantileregression/quantregmm.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 
+export BiasVector, BiasMatrix
+include("multivariate/bias.jl")
+
 
 
 end # module
