@@ -7,6 +7,7 @@ This documentation is a work in progress.
 
 ### Weighting Schemes
 The following schemes are supported for weighting new data:
+
 - `EqualWeighting()`
 - `ExponentialWeighting(λ)`, `ExponentialWeighting(n)`
 - `StochasticWeighting(r)`
