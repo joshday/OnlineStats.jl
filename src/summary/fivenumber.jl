@@ -5,7 +5,7 @@ type FiveNumberSummary <: OnlineStat
     n::Int64
 end
 
-function FiveNumberSummary(y::Vector, wgt::Weighting = StochasticWeighting();
+function FiveNumberSummary(y::AVecF, wgt::Weighting = StochasticWeighting();
                            start = zeros(3))
     o = FiveNumberSummary(wgt, start = start)
     update!(o, y)
@@ -22,8 +22,8 @@ end
 statenames(o::FiveNumberSummary) = [:min, :q1, :median, :q3, :max, :nobs]
 state(o::FiveNumberSummary) = [minimum(o); copy(o.quantiles.q); maximum(o); nobs(o)]
 
-minimum(o::FiveNumberSummary) = minimum(o.extrema)
-maximum(o::FiveNumberSummary) = maximum(o.extrema)
+Base.minimum(o::FiveNumberSummary) = minimum(o.extrema)
+Base.maximum(o::FiveNumberSummary) = maximum(o.extrema)
 
 
 
@@ -35,13 +35,13 @@ function update!(o::FiveNumberSummary, y::Float64)
     return
 end
 
-function update!(o::FiveNumberSummary, y::VecF)
+function update!(o::FiveNumberSummary, y::AVecF)
     for yi in y
         update!(o, yi)
     end
 end
 
-function updatebatch!(o::FiveNumberSummary, y::VecF)
+function updatebatch!(o::FiveNumberSummary, y::AVecF)
     updatebatch!(o.extrema, y)
     updatebatch!(o.quantiles, y)
     o.n += length(y)

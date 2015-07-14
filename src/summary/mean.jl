@@ -2,11 +2,11 @@
 #-------------------------------------------------------# Type and Constructors
 type Mean{W <: Weighting} <: OnlineStat
     μ::Float64
-    n::Int64
+    n::Int
     weighting::W
 end
 
-function Mean{T<:Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
+function Mean{T<:Real}(y::AVec{T}, wgt::Weighting = default(Weighting))
     o = Mean(wgt)
     update!(o, y)
     o
@@ -35,7 +35,7 @@ function update!(o::Mean, y::Float64)
     return
 end
 
-function updatebatch!(o::Mean, y::VecF)
+function updatebatch!(o::Mean, y::AVecF)
     n2 = length(y)
     o.μ = smooth(o.μ, mean(y), weight(o, n2))
     o.n += n2

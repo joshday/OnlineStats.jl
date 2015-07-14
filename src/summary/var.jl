@@ -9,7 +9,7 @@ end
 
 name(o::Variance) = "OVar"
 
-function Variance{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
+function Variance{T <: Real}(y::AVec{T}, wgt::Weighting = default(Weighting))
     o = Variance(wgt)
     update!(o, y)
     o

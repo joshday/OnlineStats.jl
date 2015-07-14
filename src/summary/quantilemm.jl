@@ -17,7 +17,7 @@ type QuantileMM <: OnlineStat
     end
 end
 
-function QuantileMM(y::VecF,
+function QuantileMM(y::AVecF,
                     wgt::StochasticWeighting = StochasticWeighting();
                     τ::VecF = [.25, .5, .75],
                     start::VecF = quantile(y, τ))
@@ -60,7 +60,7 @@ function update!(o::QuantileMM, y::Float64)
 end
 
 
-function updatebatch!(o::QuantileMM, y::VecF)
+function updatebatch!(o::QuantileMM, y::AVecF)
     γ = weight(o)
     n = length(y)
     @compat o.o = smooth(o.o, Float64(n), γ)
