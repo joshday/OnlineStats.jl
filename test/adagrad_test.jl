@@ -64,6 +64,14 @@ function do_ss_approx_l2_logit(x,y)
     ols
 end
 
+function do_os_ols_l2_logit(x, y)
+    ols = Adagrad(p+1; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(λ))
+    for i in 1:n
+        update!(ols, vec(x[i,:]), y[i])
+    end
+    ols
+end
+
 
 facts("Adagrad") do
 
@@ -157,6 +165,12 @@ facts("Adagrad") do
         ss = do_ss_approx_l2_logit(x, y)
         β_ss_l2_logit = vcat(ss.β, ss.β₀)
         @fact β_ss_l2_logit => roughly(coef(Adagrad(xbias,y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(λ))), rtol = 0.02)
+
+
+        # test speed
+        e_ss_l2logit = @elapsed do_ss_approx_l2_logit(x,y)
+        e_os_l2logit = @elapsed do_os_ols_l2_logit(xbias,y)
+        @fact e_os_l2logit / e_ss_l2logit => less_than(1.1)
     end
 
 end
