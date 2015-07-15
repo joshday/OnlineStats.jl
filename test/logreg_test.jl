@@ -14,7 +14,7 @@ facts("LogReg") do
 
         β = collect(1:5)
         x = randn(100, 5)
-        @compat y = Int(logitinverse(x*β) .< rand(100))
+        @compat y = floor(Int, logitinverse(x*β) .< rand(100))
 
         updatebatch!(o, x, y)
         o = LogRegSGD(x, y)
