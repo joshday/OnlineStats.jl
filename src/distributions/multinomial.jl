@@ -25,11 +25,11 @@ function update!{T <: Integer}(o::FitMultinomial, x::Vector{T})
     λ = weight(o)
 
     if !isempty(o.means)
-        @compat smooth!(o.means, Float64(x), λ)
+        @compat smooth!(o.means, VecF(x), λ)
         n = o.d.n
     else
         o.means = zeros(p)
-        @compat smooth!(o.means, Float64(x), λ)
+        @compat smooth!(o.means, VecF(x), λ)
         n = sum(x)
     end
 
