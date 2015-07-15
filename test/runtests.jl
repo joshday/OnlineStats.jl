@@ -23,7 +23,8 @@ include("covmatrix_test.jl")
 include("analyticalpca_test.jl")
 include("opca_test.jl")
 
-# include("adagrad_test.jl")
+include("ofls_test.jl")
+include("adagrad_test.jl")
 
 FactCheck.exitstatus()
 

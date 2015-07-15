@@ -19,7 +19,7 @@ function Variances(y::AVecF, wgt::Weighting = default(Weighting))
     o
 end
 
-Variances(p::Int, wgt::Weighting = default(Weighting)) =
+Variances(p::Integer, wgt::Weighting = default(Weighting)) =
     Variances(zeros(p), zeros(p), 0, wgt)
 
 
@@ -31,20 +31,20 @@ Base.mean(o::Variances) = copy(o.μ)
 Base.var(o::Variances) = (n = nobs(o); (n < 2 ? zeros(length(o.μ)) : o.biasedvar * n / (n - 1)))
 Base.std(o::Variances) = sqrt(var(o))
 
-center(o::Variances, y::VecF) = y - mean(o)
-center!(o::Variances, y::VecF) = (update!(o, y); center(o, y))
-uncenter(o::Variances, y::VecF) = y + mean(o)
+center(o::Variances, y::AVecF) = y - mean(o)
+center!(o::Variances, y::AVecF) = (update!(o, y); center(o, y))
+uncenter(o::Variances, y::AVecF) = y + mean(o)
 
-function standardize!(o::Variances, y::VecF)
+function standardize!(o::Variances, y::AVecF)
     update!(o, y)
     ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
 end
 
-function standardize(o::Variances, y::VecF)
+function standardize(o::Variances, y::AVecF)
     ynew = (y - mean(o)) ./ (any(var(o) .== 0) ? 1 : std(o))
 end
 
-function unstandardize(o::Variances, y::VecF)
+function unstandardize(o::Variances, y::AVecF)
     nobs(o) < 2 ? y + mean(o) : y .* std(o) + mean(o)
 end
 

@@ -7,13 +7,13 @@ type CovarianceMatrix{W <: Weighting} <: OnlineStat
 end
 
 # (p by p) covariance matrix from an (n by p) data matrix
-function CovarianceMatrix{T <: Real}(x::AbstractMatrix{T}, wgt::Weighting = default(Weighting))
-    o = CovarianceMatrix(size(x, 2), wgt)
+function CovarianceMatrix{T <: Real}(x::AMat{T}, wgt::Weighting = default(Weighting))
+    o = CovarianceMatrix(ncols(x), wgt)
     updatebatch!(o, x)
     o
 end
 
-CovarianceMatrix(p::Int, wgt::Weighting = default(Weighting)) =
+CovarianceMatrix(p::Integer, wgt::Weighting = default(Weighting)) =
     CovarianceMatrix(zeros(p, p), zeros(p), 0, wgt)
 
 

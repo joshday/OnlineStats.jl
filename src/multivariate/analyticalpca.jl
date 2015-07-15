@@ -13,29 +13,29 @@ type AnalyticalPCA{W <: Weighting} <: OnlineStat
 end
 
 
-AnalyticalPCA(p::Int, wgt::Weighting = default(Weighting); corr::Bool = true) =
+AnalyticalPCA(p::Integer, wgt::Weighting = default(Weighting); corr::Bool = true) =
     AnalyticalPCA(CovarianceMatrix(p, wgt), corr, zeros(p), zeros(p, p), 0)
 
-function AnalyticalPCA(X::MatF, wgt::Weighting = default(Weighting); corr::Bool = true)
-    o = AnalyticalPCA(size(X, 2), wgt, corr = corr)
-    updatebatch!(o, X)
+function AnalyticalPCA(x::AMatF, wgt::Weighting = default(Weighting); corr::Bool = true)
+    o = AnalyticalPCA(size(x, 2), wgt, corr = corr)
+    updatebatch!(o, x)
     o
 end
 
 
 #-----------------------------------------------------------------------# state
-statenames(o::AnalyticalPCA) = [:v, :λ, :nobs]  # decomposition is X'X v = λv
+statenames(o::AnalyticalPCA) = [:v, :λ, :nobs]  # decomposition is x'x v = λv
 state(o::AnalyticalPCA) = Any[o.vectors, o.values, o.n]
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::AnalyticalPCA, X::MatF)
-    updatebatch!(o.C, X)
+function updatebatch!(o::AnalyticalPCA, x::AMatF)
+    updatebatch!(o.C, x)
     if o.corr
         o.values, o.vectors = eig(Symmetric(cor(o.C)))
     else
         o.values, o.vectors = eig(Symmetric(cov(o.C)))
     end
-    o.n += size(X, 1)
+    o.n += size(x, 1)
     return
 end

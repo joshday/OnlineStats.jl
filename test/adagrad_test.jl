@@ -147,9 +147,8 @@ facts("Adagrad") do
         e_ss = @elapsed do_ss_ols(x,y)
         e_os = @elapsed do_os_ols(xbias,y)
         e_os_bias = @elapsed do_os_ols_bias(x,y)
-
-        @fact e_os / e_ss => less_than(1.05)
-        @fact e_os_bias / e_ss => less_than(1.05)
+        @fact e_os / e_ss => less_than(1.1)
+        @fact e_os_bias / e_ss => less_than(1.1)
 
 
         # test other algos
@@ -170,7 +169,7 @@ facts("Adagrad") do
         # test speed
         e_ss_l2logit = @elapsed do_ss_approx_l2_logit(x,y)
         e_os_l2logit = @elapsed do_os_ols_l2_logit(xbias,y)
-        @fact e_os_l2logit / e_ss_l2logit => less_than(1.1)
+        @fact e_os_l2logit / e_ss_l2logit => less_than(1.2)
     end
 
 end
