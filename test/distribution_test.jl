@@ -84,7 +84,7 @@ facts("Distributions") do
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) => 0
         @fact OnlineStats.weighting(o) => ExponentialWeighting(.001)
-        @fact show(onlinefit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
+        # @fact show(onlinefit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
 
         for i in 1:10
             onlinefit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
@@ -185,7 +185,7 @@ facts("Distributions") do
         o = onlinefit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
         o = onlinefit(Exponential, rand(Exponential(), 10))
         @fact OnlineStats.weighting(o) => EqualWeighting()
-        @fact show(onlinefit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
+        # @fact show(onlinefit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
