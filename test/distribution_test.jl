@@ -96,7 +96,7 @@ facts("Distributions") do
         p = rand()
         x1 = rand(Binomial(ntrials, p), n1)
         x2 = rand(Binomial(ntrials, p), n2)
-        x = [x1, x2]
+        x = [x1; x2]
 
         o = onlinefit(Binomial, x1, n = ntrials)
         @fact mean(o) => roughly(mean(x), .05)
@@ -226,7 +226,7 @@ facts("Distributions") do
         α, β = rand(1:0.1:100, 2)
         x1 = rand(Gamma(α, β), n1)
         x2 = rand(Gamma(α, β), n2)
-        x = [x1, x2]
+        x = [x1; x2]
 
         o = FitGamma()
         @fact o.d => Gamma()

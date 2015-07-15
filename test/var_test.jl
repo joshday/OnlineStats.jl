@@ -141,7 +141,7 @@ facts("Variance") do
 
         x1 = rand(100, 4)
         x2 = rand(100, 4)
-        x = [x1, x2]
+        x = [x1; x2]
         o1 = Variances(x1)
         o2 = Variances(x2)
         o3 = merge(o1, o2)

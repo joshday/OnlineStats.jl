@@ -12,7 +12,7 @@ end
 function emstart(p::Int, y::VecF;
                  algorithm::Symbol = :kmeans, verbose = false, tol = 1e-6, maxit = 100)
     if algorithm == :naive
-        μ = quantile(y, [1:p] / (p + 1))
+        μ = quantile(y, collect(1:p) / (p + 1))
         σ = fill(std(y) / sqrt(p), p)
         π = ones(p) / p
     elseif algorithm == :kmeans

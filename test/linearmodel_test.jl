@@ -8,7 +8,7 @@ facts("Linear Model") do
         p = rand(1:min(n-1, 100))
 
         x = randn(n, p)
-        β = [1:p]
+        β = collect(1:p)
         y = x * β + randn(n)
 
         # First batch accuracy
@@ -98,7 +98,7 @@ facts("Linear Model") do
         @fact_throws coef(o, :asdf, .5)
 
         # ridge
-        for λ in [0.:.1:5.]
+        for λ in 0.:.1:5.
             lambdamat = eye(p) * λ
             βridge = inv(cor(x) + lambdamat) * vec(cor(x, y))
             μ = mean(o.c)

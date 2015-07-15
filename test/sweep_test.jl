@@ -13,8 +13,8 @@ facts("sweep!()") do
         B = copy(A)
         sweep!(A, 1:p-1)
         sweep!(A, 1:p-1, true)
-        sweep!(A, [1:p-1])
-        sweep!(A, [1:p-1], true)
+        sweep!(A, collect(1:p-1))
+        sweep!(A, collect(1:p-1), true)
 
 
         @fact A => roughly(B)
@@ -29,6 +29,3 @@ facts("sweep!()") do
 end
 
 end  # module
-
-
-
