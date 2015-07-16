@@ -1,6 +1,7 @@
 module AdagradTest
 using OnlineStats, FactCheck
 using Distributions
+using Compat
 import StreamStats
 
 const n = 1_000_000
@@ -12,7 +13,7 @@ const λ = 0.0001
 
 function convertLogisticY(xβ)
     prob = OnlineStats.invlink(LogisticLink(), xβ)
-    Float64(rand(Bernoulli(prob)))
+    @compat Float64(rand(Bernoulli(prob)))
 end
 
 
@@ -86,7 +87,7 @@ facts("Adagrad") do
 
         # normal lin reg
         o = Adagrad(x, y)
-        println(o, ": β=", β)
+        OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = atol, rtol = rtol)
         @fact predict(o, ones(p)) => roughly(1.0 * sum(β), atol = atol, rtol = rtol)
 
@@ -97,7 +98,7 @@ facts("Adagrad") do
         y = x * β
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; reg = L2Reg(0.01))
-        println(o, ": β=", β2)
+        OnlineStats.DEBUG(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = atol, rtol = rtol)
 
         # some simple checks of the interface
@@ -114,7 +115,7 @@ facts("Adagrad") do
 
         # logistic
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
-        println(o, ": β=", β)
+        OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1)
 
         # logistic l2
@@ -124,7 +125,7 @@ facts("Adagrad") do
         y = map(convertLogisticY, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
-        println(o, ": β=", β2)
+        OnlineStats.DEBUG(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
 

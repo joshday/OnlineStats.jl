@@ -77,13 +77,13 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::VecF;
 
         if verbose
             tolerance = num / denom
-           println("iteration: $iters, tolerance: $tolerance")
+           DEBUG("iteration: $iters, tolerance: $tolerance")
         end
     end
     if verbose
-        println("iterations    = $iters")
-        println("tolerance     = $tolerance")
-        println("loglikelihood = $loglik")
+        DEBUG("iterations    = $iters")
+        DEBUG("tolerance     = $tolerance")
+        DEBUG("loglikelihood = $loglik")
     end
     return o
 end

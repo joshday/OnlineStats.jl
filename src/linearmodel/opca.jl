@@ -68,7 +68,7 @@ function update!(o::OnlinePCA, x::AVecF)
 	x = center!(o.xmeans, x)
 	λ = weight(o)
 
-	for i in 1:min(o.k, o.n)
+	@inbounds for i in 1:min(o.k, o.n)
 
 		if o.e[i] == 0. # this should be more robust than checking i == o.n
 

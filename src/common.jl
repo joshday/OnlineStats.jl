@@ -1,13 +1,19 @@
 #-----------------------------------------# generic: nobs, update!, copy, merge
 
-doc"The number of observations"
+"The number of observations"
 nobs(o::OnlineStat) = o.n
 
-doc"Update an OnlineStat one data point at a time"
-function update!{T<:Real}(o::OnlineStat, y::AVec{T})
-    for yi in y
-        update!(o, yi)
+"Update an OnlineStat one data point at a time"
+function update!{T<:Real}(o::OnlineStat, x::AVec{T})
+    for xi in x
+        update!(o, xi)
     end
+end
+
+function update!{T<:Real}(o::OnlineStat, x::AMat{T})
+  for i in 1:nrows(x)
+      update!(o, row(x,i))
+  end
 end
 
 function update!{T<:Real}(o::OnlineStat, x::AMat{T}, y::AVec{T})
@@ -15,6 +21,7 @@ function update!{T<:Real}(o::OnlineStat, x::AMat{T}, y::AVec{T})
         update!(o, row(x,i), y[i])
     end
 end
+
 
 
 # getrows(x::Vector, rows) = x[rows]
@@ -61,16 +68,26 @@ function Base.merge(o1::OnlineStat, o2::OnlineStat)
     o1copy
 end
 
+function Base.(==){T<:OnlineStat}(o1::T, o2::T)
+    @compat for field in fieldnames(o1)
+        getfield(o1, field) == getfield(o2, field) || return false
+    end
+    true
+end
 
 
-row(M::AMatF, i::Integer) = rowvec_view(M, i)
-col(M::AMatF, i::Integer) = view(M, :, i)
-row!(M::AMatF, i::Integer, v::AVecF) = (M[i,:] = v)
-col!(M::AMatF, i::Integer, v::AVecF) = (M[:,i] = v)
+row(x::AMat, i::Integer) = rowvec_view(x, i)
+col(x::AMat, i::Integer) = view(x, :, i)
+row!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[i,:] = v)
+col!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[:,i] = v)
+row(x::AVec, i::Integer) = x[i]
 
 rows(x::AVec, rs::AVec{Int}) = view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = view(x, rs, :)
 cols(x::AMat, cs::AVec{Int}) = view(x, :, cs)
+
+rows(x::AbstractArray, i::Integer) = row(x,i)
+cols(x::AbstractArray, i::Integer) = col(x,i)
 
 nrows(M::AbstractArray) = size(M,1)
 ncols(M::AbstractArray) = size(M,2)

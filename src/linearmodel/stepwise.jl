@@ -97,5 +97,5 @@ function updatebatch!(o::StepwiseReg, x::AMatF, y::AVecF)
         end
     end
 
-    println("Active set: ", o.set)
+    DEBUG("Active set: ", o.set)
 end

@@ -13,7 +13,8 @@ facts("Variance") do
         end
         o = Variance(randn(1000))
         @fact nobs(o) => 1000
-        @fact show(Variance()) => show(Variance(0., 0., 0, EqualWeighting()))
+        # @fact show(Variance()) => show(Variance(0., 0., 0, EqualWeighting()))
+        @fact Variance() => Variance(0., 0., 0, EqualWeighting())
 
         n1, n2 = rand(1:1_000_000, 2)
         n = n1 + n2
@@ -93,7 +94,7 @@ facts("Variance") do
 
         o2 = Variance(rand(100))
         o = [o; o2]
-        print(typeof(o))
+        OnlineStats.DEBUG(typeof(o))
 
         x = rand(100)
         o = Variance()

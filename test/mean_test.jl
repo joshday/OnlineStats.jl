@@ -12,7 +12,8 @@ facts("Mean") do
         end
         o = Mean(randn(10))
         @fact nobs(o) => 10
-        @fact show(Mean()) => show(Mean(0., 0, EqualWeighting()))
+        # @fact show(Mean()) => show(Mean(0., 0, EqualWeighting()))
+        @fact Mean() => Mean(0., 0, EqualWeighting())
 
         # Mean, update!, merge, merge!, Base.mean
         n1, n2 = rand(1:1_000_000, 2)

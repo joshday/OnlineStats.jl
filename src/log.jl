@@ -35,7 +35,8 @@ function backtracestring()
   "[]"
 end
 
-
+import Dates
+NOW() = Dates.now()
 
 
 # --------------------------------------------------------

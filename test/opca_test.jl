@@ -133,20 +133,20 @@ function opca_test()
 
 		# ***
 
-		sev = OnlineStats.log_severity()
-		OnlineStats.log_severity!(OnlineStats.ErrorSeverity)  # turn off most logging
+		# sev = OnlineStats.log_severity()
+		# OnlineStats.log_severity!(OnlineStats.ErrorSeverity)  # turn off most logging
 
 
 		dopca_checks()
 		dopls_checks()
 
 
-		# put logging back the way it was
-		OnlineStats.log_severity!(sev)
+		# # put logging back the way it was
+		# OnlineStats.log_severity!(sev)
 
 	end
 
-	FactCheck.exitstatus()
+	# FactCheck.exitstatus()
 end
 
 
