@@ -1,6 +1,7 @@
 module AdagradTest
 using OnlineStats, FactCheck
 using Distributions
+using Compat
 import StreamStats
 
 const n = 1_000_000
@@ -12,7 +13,7 @@ const λ = 0.0001
 
 function convertLogisticY(xβ)
     prob = OnlineStats.invlink(LogisticLink(), xβ)
-    Float64(rand(Bernoulli(prob)))
+    @compat Float64(rand(Bernoulli(prob)))
 end
 
 
