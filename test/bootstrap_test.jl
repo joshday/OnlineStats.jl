@@ -33,7 +33,6 @@ facts("Bootstrap") do
         update!(o2, randn(1000) + 3)
 
         d = o - o2
-        @fact typeof(d) => OnlineStats.FrozenBootstrap
         mean(d)
         var(d)
         std(d)

@@ -144,6 +144,4 @@ if false
     std(o2)
     var(o2)
     confint(o2)
-
-    @fact typeof(o1 - o2) => OnlineStats.FrozenBootstrap
 end
