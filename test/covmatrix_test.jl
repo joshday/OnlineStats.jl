@@ -40,8 +40,8 @@ facts("CovarianceMatrix") do
     c = cov(vcat(x1,x2,x3,x4))
     cobj = OnlineStats.cov(obj)
     @fact c => roughly(cobj, 1e-10)
-    @fact var(obj) - vec(var([x1, x2, x3, x4], 1)) => roughly(zeros(10), 1e-10)
-    @fact std(obj) - vec(std([x1, x2, x3, x4], 1)) => roughly(zeros(10), 1e-10)
+    @fact var(obj) - vec(var(vcat(x1, x2, x3, x4), 1)) => roughly(zeros(10), 1e-10)
+    @fact std(obj) - vec(std(vcat(x1, x2, x3, x4), 1)) => roughly(zeros(10), 1e-10)
 
     o1 = OnlineStats.CovarianceMatrix(x1)
     o2 = OnlineStats.CovarianceMatrix(x2)
