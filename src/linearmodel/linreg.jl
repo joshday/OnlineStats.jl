@@ -24,7 +24,7 @@ state(o::LinReg) = Any[coef(o), nobs(o)]
 
 nobs(o::LinReg) = nobs(o.c)
 
-StatsBase.mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
+mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
 
 StatsBase.coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 

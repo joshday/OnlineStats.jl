@@ -17,8 +17,8 @@ facts("Common") do
         OnlineStats.row!(x, n, ones(p))
         @fact OnlineStats.row(x, 1) => OnlineStats.row(x, n)
         @fact OnlineStats.row(x, n) => ones(p)
-        @fact rows([1,2,3], 2)[1,1] => 2
-        @fact rows(x, 1) => x[1, :]
+        @fact OnlineStats.rows([1,2,3], 2)[1,1] => 2
+        @fact OnlineStats.rows(x, 1) => x[1, :]
 
         OnlineStats.col!(x, 1, ones(n))
         OnlineStats.col!(x, p, ones(n))
@@ -46,8 +46,8 @@ facts("Common") do
 
     context("onlinefit!") do
         o = Mean()
-        @fact onlinefit!(o, 5, randn(100), batch = false) => anything
-        @fact onlinefit!(o, 5, randn(100)) => anything
+        @fact onlinefit!(o, 5, randn(100), batch = false) => nothing
+        @fact onlinefit!(o, 5, randn(100)) => nothing
     end
 
     context("Show OnlineStat") do
