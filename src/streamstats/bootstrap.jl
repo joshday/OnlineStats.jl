@@ -15,13 +15,13 @@ function BernoulliBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000)
     return BernoulliBootstrap(replicates, cached_state, 0, true)
 end
 
-function update!(b::BernoulliBootstrap, args...)
+function update!(b::BernoulliBootstrap, x::Real)
     b.n += 1
 
     for replicate in b.replicates
         if rand() > 0.5
-            update!(replicate, args...)
-            update!(replicate, args...)
+            update!(replicate, x)
+            update!(replicate, x)
         end
     end
     b.cache_is_dirty = true
@@ -42,12 +42,12 @@ function PoissonBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000)
     return PoissonBootstrap(replicates, cached_state, 0, true)
 end
 
-function update!(b::PoissonBootstrap, args::Any...)
+function update!(b::PoissonBootstrap, x::Real)
     b.n += 1
     for replicate in b.replicates
         repetitions = rand(Poisson(1))
         for repetition in 1:repetitions
-            update!(replicate, args...)
+            update!(replicate, x)
         end
     end
     b.cache_is_dirty = true
