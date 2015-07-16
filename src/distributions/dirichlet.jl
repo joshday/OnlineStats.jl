@@ -6,23 +6,23 @@ type FitDirichlet{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Dirichlet}, y::MatF, wgt::Weighting = default(Weighting))
-    o = FitDirichlet(size(y, 2), wgt)
+function onlinefit(::Type{Dirichlet}, y::AMatF, wgt::Weighting = default(Weighting))
+    o = FitDirichlet(ncols(y), wgt)
     updatebatch!(o, y)
     o
 end
 
-FitDirichlet(y::MatF, wgt::Weighting = default(Weighting)) =
+FitDirichlet(y::AMatF, wgt::Weighting = default(Weighting)) =
     onlinefit(Dirichlet, y, wgt)
 
-FitDirichlet(d::Int = 2, wgt::Weighting = default(Weighting)) =
+FitDirichlet(d::Integer = 2, wgt::Weighting = default(Weighting)) =
     FitDirichlet(Dirichlet(ones(d)), zeros(d), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
 # Since MLE is via Newton's method, it's much faster to do batch updates
-function updatebatch!(o::FitDirichlet, y::MatF)
-    n2 = size(y, 1)
+function updatebatch!(o::FitDirichlet, y::AMatF)
+    n2 = nrows(y)
     λ = weight(o, n2)
     o.meanlogx = smooth(o.meanlogx, vec(mean(log(y), 1)), λ)
 
@@ -35,11 +35,11 @@ function updatebatch!(o::FitDirichlet, y::MatF)
     return
 end
 
-update!(o::FitDirichlet, y::VecF) = updatebatch!(o, y')
+update!(o::FitDirichlet, y::AVecF) = updatebatch!(o, y')
 
-function update!(o::FitDirichlet, y::Matrix{Float64})
-    for i in 1:size(y, 1)
-        updatebatch!(o, y[:, i])
-    end
-end
+# function update!(o::FitDirichlet, y::Matrix{Float64})
+#     for i in 1:size(y, 1)
+#         updatebatch!(o, y[:, i])
+#     end
+# end
 

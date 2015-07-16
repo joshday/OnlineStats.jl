@@ -41,11 +41,11 @@ function update!(o::LinRegSGD, x::AVecF, y::Float64)
     o.n += 1
 end
 
-function update!(o::LinRegSGD, x::AMatF, y::AVecF)
-    for i in 1:size(x,1)
-        update!(o, vec(x[i, :]), y[i])
-    end
-end
+# function update!(o::LinRegSGD, x::AMatF, y::AVecF)
+#     for i in 1:size(x,1)
+#         update!(o, vec(x[i, :]), y[i])
+#     end
+# end
 
 
 #------------------------------------------------------------------------# Base

@@ -19,7 +19,7 @@ function StepwiseReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
     o
 end
 
-function StepwiseReg(p::Int, wgt::Weighting = default(Weighting))
+function StepwiseReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     StepwiseReg(c, zeros(p + 1, p + 1), Int[], 0, wgt)
 end
@@ -42,7 +42,7 @@ end
 function updatebatch!(o::StepwiseReg, x::AMatF, y::AVecF)
     n, p = size(x)
     o.n += n
-    updatebatch!(o.C, [x y])
+    updatebatch!(o.C, hcat(x, y))
     copy!(o.s, o.C.A)
 
     # get estimate of variance

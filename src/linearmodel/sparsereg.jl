@@ -24,7 +24,7 @@ function SparseReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
     o
 end
 
-function SparseReg(p, wgt::Weighting = default(Weighting))
+function SparseReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     s = zeros(p + 1, p + 1)
     SparseReg(c, zeros(p + 1, p + 1), wgt)
@@ -100,10 +100,10 @@ end
 
 
 #---------------------------------------------------------------------# update!
-updatebatch!(o::SparseReg, x::AMatF, y::AVecF) = updatebatch!(o.c, [x y])
+updatebatch!(o::SparseReg, x::AMatF, y::AVecF) = updatebatch!(o.c, hcat(x, y))
 
-update!(o::SparseReg, x::AVecF, y) = update!(o.c, [x; y])
-update!(o::SparseReg, x::AMatF, y::AVecF) = update!(o.c, [x y])
+update!(o::SparseReg, x::AVecF, y::Float64) = update!(o.c, vcat(x, y))
+update!(o::SparseReg, x::AMatF, y::AVecF) = update!(o.c, hcat(x, y))
 
 
 

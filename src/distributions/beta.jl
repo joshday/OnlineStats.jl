@@ -6,13 +6,13 @@ type FitBeta{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Beta}, y::VecF, wgt::Weighting = default(Weighting))
+function onlinefit(::Type{Beta}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitBeta(wgt)
     update!(o, y)
     o
 end
 
-FitBeta{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting)) =
+FitBeta{T <: Real}(y::AVec{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Beta, y, wgt)
 
 FitBeta(wgt::Weighting = default(Weighting)) =
@@ -20,7 +20,7 @@ FitBeta(wgt::Weighting = default(Weighting)) =
 
 
 #---------------------------------------------------------------------# update!
-function update!(obj::FitBeta, y::Float64)
+function update!(obj::FitBeta, y::Real)
     update!(obj.stats, y)  # Weighting is applied to updating Variance
     m = mean(obj.stats)
     v = var(obj.stats)

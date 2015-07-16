@@ -5,7 +5,7 @@ type FitPoisson{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit{T <: Integer}(::Type{Poisson}, y::Vector{T}, wgt::Weighting = default(Weighting))
+function onlinefit{T <: Integer}(::Type{Poisson}, y::AVec{T}, wgt::Weighting = default(Weighting))
     o = FitPoisson(wgt)
     update!(o, y)
     o
