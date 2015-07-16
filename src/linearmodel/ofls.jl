@@ -36,7 +36,7 @@ type OnlineFLS <: OnlineStat
 
 	yhat::Float64  #most recent estimate of y
 
-	function OnlineFLS(p::Int, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
+	function OnlineFLS(p::Integer, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
 
 		# calculate the covariance matrix Vω from the smoothing parameter δ
 		@assert δ > 0. && δ <= 1.
@@ -150,21 +150,21 @@ function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
 end
 
 
-function coeftable(o::OnlineFLS)
+function StatsBase.coeftable(o::OnlineFLS)
 	error("not implemented")
 end
 
-function confint(o::OnlineFLS, level::Real = 0.95)
+function StatsBase.confint(o::OnlineFLS, level::Real = 0.95)
 	error("not implemented")
 end
 
 # predicts yₜ for a given xₜ
-function predict(o::OnlineFLS, x::AVecF)
+function StatsBase.predict(o::OnlineFLS, x::AVecF)
 	unstandardize(o.yvar, dot(o.β, standardize(o.xvars, x)))
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function predict(o::OnlineFLS, x::AMatF)
+function StatsBase.predict(o::OnlineFLS, x::AMatF)
 	n = size(x,1)
 	pred = zeros(n)
 	for i in 1:n

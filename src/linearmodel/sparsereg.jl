@@ -85,7 +85,7 @@ end
 # end
 
 
-function coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0)
+function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0)
     if penalty == :ols
         coef_ols(o::SparseReg)
     elseif penalty == :ridge

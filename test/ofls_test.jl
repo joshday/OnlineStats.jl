@@ -39,7 +39,7 @@ end
 
 
 sev = OnlineStats.log_severity()
-OnlineStats.log_severity(OnlineStats.ERROR)  # turn off most logging
+OnlineStats.log_severity!(OnlineStats.ErrorSeverity)  # turn off most logging
 
 
 facts("Test OnlineFLS") do
@@ -81,6 +81,6 @@ facts("Test OnlineFLS") do
 end
 
 # put logging back the way it was
-OnlineStats.log_severity(sev)
+OnlineStats.log_severity!(sev)
 
 end # module

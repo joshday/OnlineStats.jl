@@ -9,21 +9,21 @@ type LogRegSGD{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function LogRegSGD(p::Int, wgt::Weighting = StochasticWeighting();
+function LogRegSGD(p::Integer, wgt::Weighting = StochasticWeighting();
                    start::VecF = zeros(p))
     LogRegSGD(start, 0, wgt)
 end
 
-function LogRegSGD(X::MatF, y::Vector, wgt::Weighting = StochasticWeighting();
+function LogRegSGD(X::AMatF, y::AVec, wgt::Weighting = StochasticWeighting();
                    start::VecF = zeros(size(X, 2)), batch::Bool = true)
-    o = LogRegSGD(size(X, 2), wgt, start = start)
+    o = LogRegSGD(ncols(X), wgt, start = start)
     batch ? updatebatch!(o, X, y) : update!(o, X, y)
     o
 end
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::LogRegSGD, X::Matrix, y::Vector)
+function updatebatch!(o::LogRegSGD, X::AMatF, y::AVec)
     n = length(y)
     all([y[i] in [0, 1] for i in 1:n]) || error("y values must be 0 or 1")
 
@@ -40,7 +40,7 @@ statenames(o::LogRegSGD) = [:β, :nobs]
 state(o::LogRegSGD) = Any[copy(o.β), nobs(o)]
 
 coef(o::LogRegSGD) = copy(o.β)
-predict(o::LogRegSGD, X::MatF) = inverselogit(X * o.β)
+predict(o::LogRegSGD, X::AMatF) = inverselogit(X * o.β)
 
 
 

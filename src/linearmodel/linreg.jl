@@ -5,14 +5,14 @@ type LinReg{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function LinReg(x::MatF, y::VecF, wgt::Weighting = default(Weighting))
+function LinReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
     p = size(x, 2)
     o = LinReg(p, wgt)
     updatebatch!(o, x, y)
     o
 end
 
-function LinReg(p, wgt::Weighting = default(Weighting))
+function LinReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     LinReg(c, zeros(p + 1, p + 1), wgt)
 end
@@ -24,23 +24,23 @@ state(o::LinReg) = Any[coef(o), nobs(o)]
 
 nobs(o::LinReg) = nobs(o.c)
 
-mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
+StatsBase.mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
 
-coef(o::LinReg) = vec(o.s[end, 1:end - 1])
+StatsBase.coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 
 
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::LinReg, x::AMatF, y::AVecF)
-    p = size(x, 2)
+    p = ncols(x)
     updatebatch!(o.c, [x y])
     copy!(o.s, o.c.A)
     sweep!(o.s, 1:p)
 end
 
-function update!(o::LinReg, x::AVecF, y)
+function update!(o::LinReg, x::AVecF, y::Float64)
     update!(o.c, [x; y])
     copy!(o.s, o.c.A)
-    sweep!(o.s, 1:size(o.s, 1))
+    sweep!(o.s, 1:nrows(o.s))
 end
 
 function update!(o::LinReg, x::AMatF, y::AVecF)
@@ -48,12 +48,12 @@ function update!(o::LinReg, x::AMatF, y::AVecF)
         update!(o.c, [x; y])
     end
     copy!(o.s, o.c.A)
-    sweep!(o.s, 1:size(o.s, 1))
+    sweep!(o.s, 1:nrows(o.s))
 end
 
 
 #------------------------------------------------------------------------# Base
-function coeftable(o::LinReg)
+function StatsBase.coeftable(o::LinReg)
     β = coef(o)
     p = length(β)
     se = stderr(o)
@@ -63,14 +63,14 @@ function coeftable(o::LinReg)
               ["x$i" for i = 1:p], 4)
 end
 
-function confint{T <: Real}(o::LinReg, level::T = 0.95)
+function StatsBase.confint(o::LinReg, level::Real = 0.95)
     β = coef(o)
     mult = stderr(o) * quantile(TDist(nobs(o) - length(β)), (1. - level) / 2.)
     hcat(β, β) + mult * [1. -1.]
 end
 
-stderr(o::LinReg) = sqrt(diag(vcov(o)))
+StatsBase.stderr(o::LinReg) = sqrt(diag(vcov(o)))
 
-vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / nobs(o))
+StatsBase.vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / nobs(o))
 
-predict(o::LinReg, x::Matrix) = x * coef(o)
+StatsBase.predict(o::LinReg, x::AMat) = x * coef(o)

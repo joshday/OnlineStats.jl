@@ -1,6 +1,7 @@
 module OnlineStatsTests
 
 import FactCheck
+FactCheck.clear_results()
 
 include("common_test.jl")
 include("mean_test.jl")

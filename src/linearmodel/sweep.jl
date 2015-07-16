@@ -36,15 +36,15 @@ function sweep!(A::MatF, k::Int, inv::Bool=false)
 end
 
 
-function sweep!(A::MatF, I::Range{Int}=1:size(A, 1), inv::Bool=false)
-    for k in I
-        sweep!(A, k, inv)
-    end
-    return A
-end
+# function sweep!(A::MatF, I::Range{Int}=1:nrows(A), inv::Bool=false)
+#     for k in I
+#         sweep!(A, k, inv)
+#     end
+#     return A
+# end
 
 
-function sweep!(A::MatF, S::Vector{Int}, inv::Bool=false)
+function sweep!(A::MatF, S::AVec{Int}, inv::Bool=false)
     for k in S
         sweep!(A, k, inv)
     end
