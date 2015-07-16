@@ -120,7 +120,7 @@ function α(m::Uint32)
 end
 
 
-function update!(o::HyperLogLog, v::Any)
+function update!(o::HyperLogLog, v::Real)
     x = hash32(v)
     j = uint32((x & o.mask) + 0x00000001)
     w = x & o.altmask
@@ -131,7 +131,7 @@ function update!(o::HyperLogLog, v::Any)
     return
 end
 
-function update!(o::HyperLogLog, V::AbstractVector)
+function update!{T<:Real}(o::HyperLogLog, V::AbstractVector{T})
     for v in V
         update!(o, v)
     end

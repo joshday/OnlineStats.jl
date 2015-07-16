@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/joshday/OnlineStats.jl.svg)](https://travis-ci.org/joshday/OnlineStats.jl)
 [![Coverage Status](https://coveralls.io/repos/joshday/OnlineStats.jl/badge.svg?branch=josh)](https://coveralls.io/r/joshday/OnlineStats.jl?branch=josh)
+[![Documentation Status](https://readthedocs.org/projects/onlinestatsjl/badge/?version=latest)](https://readthedocs.org/projects/onlinestatsjl/?badge=latest)
 
 # OnlineStats
 
