@@ -41,6 +41,7 @@ export
     ExponentialWeighting,
     StochasticWeighting,
     BernoulliBootstrap,
+    PoissonBootstrap,
 
     # <: OnlineStat
     Mean,

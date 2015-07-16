@@ -9,26 +9,70 @@ type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     cache_is_dirty::Bool
 end
 
-function BernoulliBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000, α::Real = 0.05)
+function BernoulliBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000)
     replicates = S[copy(stat) for i in 1:R]
     cached_state = Array(Float64, R)
     return BernoulliBootstrap(replicates, cached_state, 0, true)
 end
 
-function update!(stat::BernoulliBootstrap, args...)
-    stat.n += 1
+function update!(b::BernoulliBootstrap, args...)
+    b.n += 1
 
-    for replicate in stat.replicates
+    for replicate in b.replicates
         if rand() > 0.5
             update!(replicate, args...)
             update!(replicate, args...)
         end
     end
-    stat.cache_is_dirty = true
+    b.cache_is_dirty = true
     return
 end
 
+#-------------------------------------------------------------# PoissonBootstrap
+type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
+    replicates::Vector{S}           # replicates of base stat
+    cached_state::Vector{Float64}  # cache of replicate states
+    n::Int                          # number of observations
+    cache_is_dirty::Bool
+end
+
+function PoissonBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000)
+    replicates = S[copy(stat) for i in 1:R]
+    cached_state = Array(Float64, R)
+    return PoissonBootstrap(replicates, cached_state, 0, true)
+end
+
+function update!(b::PoissonBootstrap, args::Any...)
+    b.n += 1
+    for replicate in b.replicates
+        repetitions = rand(Poisson(1))
+        for repetition in 1:repetitions
+            update!(replicate, args...)
+        end
+    end
+    b.cache_is_dirty = true
+    return
+end
+
+
+#--------------------------------------------------------------# FrozenBootstrap
+# Frozen bootstrap object are generated when two bootstrap distributions
+# are combined, e.g., if they are differenced.
+immutable FrozenBootstrap <: Bootstrap
+    cached_state::Vector{Float64}  # cache of replicate states
+    n::Int                          # number of observations
+end
+
+cached_state(b::FrozenBootstrap) = copy(b.cached_state)
+
 #-----------------------------------------------------------------------# Common
+function show(io::IO, b::Bootstrap)
+    println(io, typeof(b))
+    println(io, "Online Bootstrap of ", typeof(b.replicates[1]))
+    println(io, "*  nreplicates = ", length(b.replicates))
+    println(io, "*         nobs = ", nobs(b))
+end
+
 # update cached_state' states if necessary and return their values
 function cached_state(b::Bootstrap)
     if b.cache_is_dirty
@@ -48,6 +92,15 @@ state(b::Bootstrap) = [length(b.replicates), nobs(b)]
 statenames(b::Bootstrap) = [:replicates, :nobs]
 
 replicates(b::Bootstrap) = copy(b.replicates)
+
+# Assumes a and b are independent.
+function Base.(:-)(a::Bootstrap, b::Bootstrap)
+    return FrozenBootstrap(
+        cached_state(a) - cached_state(b),
+        nobs(a) + nobs(b)
+    )
+end
+
 
 
 function confint(b::Bootstrap, coverageprob = 0.95, method=:quantile)
@@ -70,14 +123,27 @@ end
 
 
 
+
+
 ## TESTING
-if true
+if false
     o = OnlineStats.Mean()
-    o = OnlineStats.BernoulliBootstrap(o, 1000, .05)
+    o = OnlineStats.BernoulliBootstrap(o, 1000)
     OnlineStats.update!(o, rand(10000))
     OnlineStats.cached_state(o)
     mean(o)
     std(o)
     var(o)
     confint(o)
+
+    o2 = OnlineStats.Mean()
+    o2 = OnlineStats.PoissonBootstrap(o2, 1000)
+    OnlineStats.update!(o2, rand(10000))
+    OnlineStats.cached_state(o2)
+    mean(o2)
+    std(o2)
+    var(o2)
+    confint(o2)
+
+    @fact typeof(o1 - o2) => OnlineStats.FrozenBootstrap
 end
