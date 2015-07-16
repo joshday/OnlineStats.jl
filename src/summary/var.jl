@@ -9,13 +9,13 @@ end
 
 name(o::Variance) = "OVar"
 
-function Variance{T <: Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
+function Variance{T <: Real}(y::AVec{T}, wgt::Weighting = default(Weighting))
     o = Variance(wgt)
     update!(o, y)
     o
 end
 
-Variance(y::Float64, wgt::Weighting = default(Weighting)) = Variance([y], wgt)
+Variance(y::Real, wgt::Weighting = default(Weighting)) = Variance([y], wgt)
 Variance(wgt::Weighting = default(Weighting)) = Variance(0., 0., 0, wgt)
 
 
@@ -30,12 +30,13 @@ Base.std(o::Variance) = sqrt(var(o))
 
 #-----------------------------------------------------------------------# standardize
 
-if0then1(x::Float64) = (x == 0. ? 1. : x)
+if0then1{T<:Real}(x::T) = (x == zero(T) ? one(T) : x)
+@vectorize_1arg Real if0then1
 
-standardize(o::Variance, y::Float64) = (y - mean(o)) / if0then1(std(o))
-unstandardize(o::Variance, y::Float64) = y * std(o) + mean(o)
+standardize(o::Variance, y::Real) = (y - mean(o)) / if0then1(std(o))
+unstandardize(o::Variance, y::Real) = y * std(o) + mean(o)
 
-function standardize!(o::Variance, y::Float64)
+function standardize!(o::Variance, y::Real)
     update!(o, y)
     standardize(o, y)
 end
@@ -46,7 +47,7 @@ end
 #---------------------------------------------------------------------# update!
 
 
-function update!(o::Variance, y::Float64)
+function update!(o::Variance, y::Real)
     λ = weight(o)
     μ = mean(o)
 

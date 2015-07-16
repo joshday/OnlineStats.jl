@@ -178,6 +178,9 @@ include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
 
+export BiasVector, BiasMatrix
+include("multivariate/bias.jl")
+
 
 
 end # module

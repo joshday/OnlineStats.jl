@@ -5,9 +5,9 @@ type Extrema <: OnlineStat
     n::Int64
 end
 
-Extrema{T <: Real}(y::Vector{T}) = Extrema(maximum(y), minimum(y), length(y))
+Extrema{T <: Real}(y::AVec{T}) = Extrema(maximum(y), minimum(y), length(y))
 
-Extrema{T <: Real}(y::T) = Extrema([y])
+Extrema(y::Real) = Extrema([y])
 
 Extrema() = Extrema(-Inf, Inf, 0)
 
@@ -16,8 +16,8 @@ Extrema() = Extrema(-Inf, Inf, 0)
 statenames(o::Extrema) = [:max, :min, :nobs]
 state(o::Extrema) = Any[maximum(o), minimum(o), nobs(o)]
 
-maximum(o::Extrema) = o.max
-minimum(o::Extrema) = o.min
+Base.maximum(o::Extrema) = o.max
+Base.minimum(o::Extrema) = o.min
 
 
 #--------------------------------------------------------------------# update!
@@ -27,7 +27,7 @@ function update!(o::Extrema, y::Float64)
     o.n += 1
 end
 
-function updatebatch!(o::Extrema, y::VecF)
+function updatebatch!(o::Extrema, y::AVecF)
     o.max = max(o.max, maximum(y))
     o.min = min(o.min, minimum(y))
     o.n += length(y)

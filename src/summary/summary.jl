@@ -7,7 +7,7 @@ type Summary{W <: Weighting} <: OnlineStat
 end
 
 
-function Summary{T<:Real}(y::Vector{T}, wgt::Weighting = default(Weighting))
+function Summary{T<:Real}(y::AVec{T}, wgt::Weighting = default(Weighting))
     o = Summary(wgt)
     update!(o, y)
     o

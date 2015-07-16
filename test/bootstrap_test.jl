@@ -12,7 +12,12 @@ facts("Bootstrap") do
         std(o)
         var(o)
         confint(o)
+        confint(o, .95, :normal)
+        @fact_throws confint(o, .95, :fakemethod)
         replicates(o)
+        show(o)
+        state(o)
+        statenames(o)
     end
 
     context("PoissonBootstrap") do

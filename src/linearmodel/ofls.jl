@@ -27,7 +27,7 @@ type OnlineFLS <: OnlineStat
 	# weighting::W  # weighting scheme for Variances... algo convergence is dictated by Vω
 
 	n::Int
-	β::VecF 		# the current estimate in: yₜ = Xₜβₜ + εₜ
+	β::VecF 		# the current estimate in: yₜ = xₜβₜ + εₜ
 
 	# these are needed to update β
 	R::MatF     # pxp matrix
@@ -64,10 +64,10 @@ function OnlineFLS(x::AVecF, y::Real, δ::Real = 0.0001, wgt::Weighting = defaul
 	o
 end
 
-function OnlineFLS(X::AMatF, y::AVecF, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
-	p = size(X,2)
+function OnlineFLS(x::AMatF, y::AVecF, δ::Real = 0.0001, wgt::Weighting = default(Weighting))
+	p = size(x,2)
 	o = OnlineFLS(p, δ, wgt)
-	update!(o, X, y)
+	update!(o, x, y)
 	o
 end
 
@@ -77,20 +77,21 @@ end
 
 # state vars: [normalizedBeta, rawBeta, Variance(y), Variance(x), std(ε), mostRecentEstimateOfY, nobs]
 statenames(o::OnlineFLS) = [:βn, :β, :yvar, :xvars, :σε, :yhat, :nobs]
-state(o::OnlineFLS) = Any[copy(o.β), o.β * std(o.yvar) ./ map(if0then1, std(o.xvars)), copy(o.yvar), copy(o.xvars), std(o.Vε), o.yhat, nobs(o)]
+state(o::OnlineFLS) = Any[copy(o.β), o.β * std(o.yvar) ./ if0then1(std(o.xvars)), copy(o.yvar), copy(o.xvars), std(o.Vε), o.yhat, nobs(o)]
 
 βn(o::OnlineFLS) = o.β
-Base.beta(o::OnlineFLS) = o.β
+Base.beta(o::OnlineFLS) = coef(o)
+StatsBase.coef(o::OnlineFLS) = (o.β * std(o.yvar)) ./ if0then1(std(o.xvars))
 
 #---------------------------------------------------------------------# update!
 
 
-# NOTE: assumes X mat is (T x p), where T is the number of observations
+# NOTE: assumes x mat is (T x p), where T is the number of observations
 # TODO: optimize
-function update!(o::OnlineFLS, X::AMatF, y::AVecF)
-	@assert length(y) == size(X,1)
+function update!(o::OnlineFLS, x::AMatF, y::AVecF)
+	@assert length(y) == size(x,1)
 	for i in length(y)
-		update!(o, row(X,i), y[i])
+		update!(o, row(x,i), y[i])
 	end
 end
 
@@ -145,20 +146,16 @@ function Base.empty!(o::OnlineFLS)
 end
 
 function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
-	error("Merging undefined for FLS")
+	error("not implemented")
 end
 
-
-function coef(o::OnlineFLS)
-	# TODO
-end
 
 function coeftable(o::OnlineFLS)
-	# TODO
+	error("not implemented")
 end
 
 function confint(o::OnlineFLS, level::Real = 0.95)
-	# TODO
+	error("not implemented")
 end
 
 # predicts yₜ for a given xₜ
@@ -167,11 +164,11 @@ function predict(o::OnlineFLS, x::AVecF)
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function predict(o::OnlineFLS, X::AMatF)
-	n = size(X,1)
+function predict(o::OnlineFLS, x::AMatF)
+	n = size(x,1)
 	pred = zeros(n)
 	for i in 1:n
-		pred[i] = predict(o, row(X,i))
+		pred[i] = predict(o, row(x,i))
 	end
 	pred
 end

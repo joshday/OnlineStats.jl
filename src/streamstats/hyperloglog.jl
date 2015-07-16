@@ -131,7 +131,7 @@ function update!(o::HyperLogLog, v::Real)
     return
 end
 
-function update!{T<:Real}(o::HyperLogLog, V::AbstractVector{T})
+function update!{T<:Real}(o::HyperLogLog, V::AVec{T})
     for v in V
         update!(o, v)
     end

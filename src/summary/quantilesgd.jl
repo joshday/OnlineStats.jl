@@ -6,7 +6,7 @@ type QuantileSGD <: OnlineStat
     weighting::StochasticWeighting
 end
 
-function QuantileSGD(y::VecF,
+function QuantileSGD(y::AVecF,
                      wgt::StochasticWeighting = StochasticWeighting();
                      τ::VecF = [.25, .5, .75],
                      start::VecF = quantile(y, τ))
@@ -44,7 +44,7 @@ function update!(o::QuantileSGD, y::Float64)
     return
 end
 
-function updatebatch!(o::QuantileSGD, y::VecF)
+function updatebatch!(o::QuantileSGD, y::AVecF)
     o.n += length(y)
     γ = weight(o)
     for i in 1:length(o.q)

@@ -1,14 +1,16 @@
 
+module OFLSTest
 
+using OnlineStats
 using FactCheck
-FactCheck.clear_results()  # TODO: remove
+
+# using Qwt
 
 
 function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
 	
 	# generate independent series and errors
-	dX = σx * randn(n,p)				# independent vars  (nxp)
-	# cumsum!(X, X)
+	dx = σx * randn(n,p)				# independent vars  (nxp)
 	ε = σy * randn(n)		# errors
 
 	# create a time varying βₜ = βₜ₋₁ + ωₜ
@@ -17,83 +19,68 @@ function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
 	cumsum!(β, β)   			# now do the cumulative sum with β₀ as the starting vector
 
 	# now create the dependent series
-	dy = vec(sum(dX .* β, 2)) + ε   # dependent
+	dy = vec(sum(dx .* β, 2)) + ε   # dependent
 
-	n, p, dy, dX, ε, β
+	n, p, dy, dx, ε, β
 end
 
-function dofls(p, y, X)
-	fls = OnlineStats.OnlineFLS(p, 0.0001, OnlineStats.ExponentialWeighting(200))
-	OnlineStats.tracedata(fls, 1, y, X)
-end
-
-function dofls_checks()
-	context("fls_checks") do
-		σx = 2.0
-		n, p, y, X, ε, β = getsampledata(σx = σx)
-		df = dofls(p, y, X)
-		@fact size(df,1) => n
-
-		context("check final σx") do
-			for sxi in df[:xvars][end]
-				@fact std(sxi) => roughly(σx, rtol=0.2)
-				# @fact abs(std(sxi)/σx-1)  => less_than(0.2)
-			end
-		end
-
-		r2 = 1 - var(y-OnlineStats.getnice(df,:yhat)) / var(y)
-		@fact r2 => greater_than(0.8)
-
-		βhat = OnlineStats.getnice(df, :β)[end,:]
-		context("check β") do
-			for i in 1:p
-				@fact β[end,i] => roughly(βhat[i], rtol=0.3)
-			end
-		end
-
-		# endsz = 20
-		# rng = n-endsz+1:n
-		# @fact sumabs2(y[rng] - OnlineStats.getnice(df,:yhat)[rng]) / endsz => less_than(0.1 * mean(abs(y[rng])))
+function dofls(p, x, y)
+	fls = OnlineFLS(p, 0.0001, OnlineStats.ExponentialWeighting(500))
+	βhat = Any[]
+	yhat = Float64[]
+	for i in 1:length(y)
+		xrow = OnlineStats.row(x,i)
+		update!(fls, xrow, y[i])
+		push!(βhat, coef(fls))
+		push!(yhat, predict(fls, xrow))
 	end
+	fls, βhat, yhat
 end
 
 
-function ofls_test()
+sev = OnlineStats.log_severity()
+OnlineStats.log_severity(OnlineStats.ERROR)  # turn off most logging
 
-	facts("Test OnlineFLS") do
 
-		n, p, y, X, ε, β = getsampledata()
+facts("Test OnlineFLS") do
 
-		@fact size(y) => (n,)
-		@fact size(X) => (n,p)
-		@fact size(β) => (n,p)
+	n, p, y, x, ε, β = getsampledata()
 
-		# ***
+	@fact size(y) => (n,)
+	@fact size(x) => (n,p)
+	@fact size(β) => (n,p)
+	@fact dofls(p, x, y) => anything  # just make sure there's no errors
 
-		sev = OnlineStats.log_severity()
-		OnlineStats.log_severity(OnlineStats.ERROR)  # turn off most logging
 
-		df = dofls(p,y,X)
-		@fact df => anything
-		@fact dofls(p, y, X) => anything  # just make sure there's no errors
+	σx = 2.0
+	n, p, y, x, ε, β = getsampledata(σx = σx)
+	fls, βhat, yhat = dofls(p, x, y)
 
-		if !FactCheck.exitstatus()
-			dofls_checks()
-		end
+	@fact size(βhat,1) => n
+	@fact size(yhat,1) => n
+	@fact std(fls.xvars) => roughly(fill(σx,p), atol = 0.2)
 
-		# # this doesn't really belong here as is:
-		# # lets do the OFLS fit
-		# fls = OnlineStats.OnlineFLS(p, 0.0001, OnlineStats.ExponentialWeighting(200))
-		# df = tracedata(fls, 1, y, X)
+	r2 = 1 - var(y-yhat) / var(y)
+	@fact r2 => greater_than(0.9)
+	@fact vec(β[n,:]) => roughly(βhat[end], atol = 0.5)
 
-		# # do a plot of y vs yhat (need to change this to match your plotting package...
-		# # I have a custom plotting package that is not currently open source, but may be eventually)
-		# plot([y OnlineStats.getnice(df, :yhat)])
 
-		# put logging back the way it was
-		OnlineStats.log_severity(sev)
+	# # # do a plot of y vs yhat (need to change this to match your plotting package...
+	# # # I have a custom plotting package that is not currently open source, but may be eventually)
+	# plt1 = plot([y yhat], show=false, labels=["y","yhat"])
+	# plt2 = subplot(β, show=false, labels=["β$i" for i in 1:p])
+	# for i in 1:p
+	# 	βhatᵢ = Float64[x[i] for x in βhat]
+	# 	oplot(plt2.plots[i], βhatᵢ, label="βhat$i")
+	# end
+	# global window
+	# window = vsplitter(plt1,plt2)
+ 	# moveToLastScreen(window)
+ 	# showwidget(window)
 
-	end
-
-	FactCheck.exitstatus()
 end
+
+# put logging back the way it was
+OnlineStats.log_severity(sev)
+
+end # module

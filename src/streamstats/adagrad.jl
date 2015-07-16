@@ -108,7 +108,7 @@ end
 function update!(o::Adagrad, x::AVecF, y::Float64)
   ε = y - predict(o, x)
 
-  @inbounds for i in eachindex(x)
+  @inbounds for i in 1:length(x)
     gᵢ = ∇f(o.loss, ε, x[i]) + ∇Ψ(o.reg, o.β, i)
     o.G[i] += gᵢ^2
     if o.G[i] != 0.0
