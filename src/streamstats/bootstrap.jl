@@ -120,28 +120,3 @@ function confint(b::Bootstrap, coverageprob = 0.95, method=:quantile)
         end
     end
 end
-
-
-
-
-
-## TESTING
-if false
-    o = OnlineStats.Mean()
-    o = OnlineStats.BernoulliBootstrap(o, 1000)
-    OnlineStats.update!(o, rand(10000))
-    OnlineStats.cached_state(o)
-    mean(o)
-    std(o)
-    var(o)
-    confint(o)
-
-    o2 = OnlineStats.Mean()
-    o2 = OnlineStats.PoissonBootstrap(o2, 1000)
-    OnlineStats.update!(o2, rand(10000))
-    OnlineStats.cached_state(o2)
-    mean(o2)
-    std(o2)
-    var(o2)
-    confint(o2)
-end
