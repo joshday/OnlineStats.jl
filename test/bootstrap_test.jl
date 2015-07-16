@@ -12,7 +12,9 @@ facts("Bootstrap") do
         std(o)
         var(o)
         confint(o)
+        replicates(o)
     end
+
     context("PoissonBootstrap") do
         o = OnlineStats.Mean()
         o = OnlineStats.PoissonBootstrap(o, 1000)
@@ -22,7 +24,9 @@ facts("Bootstrap") do
         std(o)
         var(o)
         confint(o)
+        replicates(o)
     end
+
     context("FrozenBootstrap") do
         o = OnlineStats.Mean()
         o = OnlineStats.BernoulliBootstrap(o, 1000)
@@ -37,6 +41,7 @@ facts("Bootstrap") do
         var(d)
         std(d)
         confint(d)
+        replicates(o)
     end
 end
 

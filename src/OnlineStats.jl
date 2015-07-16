@@ -103,7 +103,8 @@ export
     em,                    # Offline EM algorithm for Normal Mixtures
     sweep!,                # Symmetric sweep operator
     estimatedCardinality,
-    pca                    # Get top d principal components from CovarianceMatrix
+    pca,                   # Get top d principal components from CovarianceMatrix
+    replicates             # Get vector of replicates from <: Bootstrap
 
 
 #-----------------------------------------------------------------------------#
