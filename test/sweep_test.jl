@@ -13,15 +13,16 @@ facts("sweep!()") do
         B = copy(A)
         sweep!(A, 1:p-1)
         sweep!(A, 1:p-1, true)
-        sweep!(A, [1:p-1])
-        sweep!(A, [1:p-1], true)
+        sweep!(A, 1:p-1)
+        sweep!(A, 1:p-1, true)
 
 
         @fact A => roughly(B)
 
         x = randn(n , p)
         y = vec(sum(x, 2)) + randn(n)
-        A = [x y]' * [x y]
+        xy = hcat(x, y)
+        A = xy' * xy
         sweep!(A, 1:p)
         β = vec(A[end, 1:p])
         @fact β => roughly(vec(inv(x'x) * x'y))

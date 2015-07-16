@@ -142,7 +142,7 @@ facts("Variance") do
 
         x1 = rand(100, 4)
         x2 = rand(100, 4)
-        x = [x1, x2]
+        x = vcat(x1, x2)
         o1 = Variances(x1)
         o2 = Variances(x2)
         o3 = merge(o1, o2)
@@ -151,8 +151,8 @@ facts("Variance") do
         @fact var(o1) => var(o3)
 
         @fact nobs(o1) => 200
-        @fact mean(o1) => roughly(vec(mean([x1, x2], 1)))
-        @fact std(o1) => roughly(vec(std([x1, x2], 1)), .01)
+        @fact mean(o1) => roughly(vec(mean(vcat(x1, x2), 1)))
+        @fact std(o1) => roughly(vec(std(vcat(x1, x2), 1)), .01)
 
         x = rand(100, 5)
         o = Variances(5)

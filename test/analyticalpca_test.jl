@@ -21,7 +21,7 @@ facts("AnalyticalPCA") do
     updatebatch!(o, x2)
     updatebatch!(o, x3)
 
-    pca = pcacov(cor([x1, x2, x3]), vec(mean([x1, x2, x3], 1)))
+    pca = pcacov(cor(vcat(x1, x2, x3)), vec(mean(vcat(x1, x2, x3), 1)))
 
     # Check top 100 eigenvectors
     for i in 0:99

@@ -35,7 +35,11 @@ function backtracestring()
   "[]"
 end
 
-import Dates
+if VERSION < v"0.4-"
+    import Dates
+else
+    import Base.Dates
+end
 NOW() = Dates.now()
 
 

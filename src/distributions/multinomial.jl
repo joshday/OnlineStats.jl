@@ -6,13 +6,13 @@ type FitMultinomial{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit{T <: Integer}(::Type{Multinomial}, y::Matrix{T}, wgt::Weighting = default(Weighting))
+function onlinefit{T <: Integer}(::Type{Multinomial}, y::AMat{T}, wgt::Weighting = default(Weighting))
     o = FitMultinomial(wgt)
     update!(o, y)
     o
 end
 
-FitMultinomial{T <: Integer}(y::Matrix{T}, wgt::Weighting = default(Weighting)) =
+FitMultinomial{T <: Integer}(y::AMat{T}, wgt::Weighting = default(Weighting)) =
     onlinefit(Multinomial, y, wgt)
 
 FitMultinomial(wgt::Weighting = default(Weighting)) =
@@ -20,16 +20,16 @@ FitMultinomial(wgt::Weighting = default(Weighting)) =
 
 
 #---------------------------------------------------------------------# update!
-function update!{T <: Integer}(o::FitMultinomial, x::Vector{T})
+function update!{T <: Integer}(o::FitMultinomial, x::AVec{T})
     p = length(x)
     λ = weight(o)
 
     if !isempty(o.means)
-        smooth!(o.means, float64(x), λ)
+        smooth!(o.means, @compat([Float64(y) for y in x]), λ)
         n = o.d.n
     else
         o.means = zeros(p)
-        smooth!(o.means, float64(x), λ)
+        smooth!(o.means, @compat([Float64(y) for y in x]), λ)
         n = sum(x)
     end
 
@@ -37,8 +37,8 @@ function update!{T <: Integer}(o::FitMultinomial, x::Vector{T})
     o.d = Multinomial(n, o.means / sum(o.means))
 end
 
-function update!(o::FitMultinomial, x::Matrix)
-    for i in 1:size(x, 1)
-        update!(o, vec(x[i, :]))
-    end
-end
+# function update!(o::FitMultinomial, x::Matrix)
+#     for i in 1:size(x, 1)
+#         update!(o, vec(x[i, :]))
+#     end
+# end

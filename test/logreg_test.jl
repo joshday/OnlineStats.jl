@@ -7,14 +7,14 @@ logitinverse(x) = 1. / (1 + exp(-x))
 
 facts("LogReg") do
     context("LogRegSGD") do
-        for x in [-10:.1:10]
+        for x in -10:.1:10
             @fact OnlineStats.inverselogit(x) => 1 / (1 + exp(-x))
         end
         o = LogRegSGD(5)
 
-        β = [1:5]
+        β = collect(1:5)
         x = randn(100, 5)
-        y = int(logitinverse(x*β) .< rand(100))
+        y = round(Int, logitinverse(x*β) .< rand(100))
 
         updatebatch!(o, x, y)
         o = LogRegSGD(x, y)
@@ -31,9 +31,9 @@ facts("LogReg") do
         @fact OnlineStats.inverselogit(.5) => 1 / (1 + exp(-.5))
         o = LogRegSGD2(5)
 
-        β = [1:5]
+        β = collect(1:5)
         x = randn(100, 5)
-        y = int(logitinverse(x*β) .< rand(100))
+        y = round(Int, logitinverse(x*β) .< rand(100))
 
         updatebatch!(o, x, y)
         o = LogRegSGD2(x, y)
@@ -50,9 +50,9 @@ facts("LogReg") do
         @fact OnlineStats.inverselogit(.5) => 1 / (1 + exp(-.5))
         o = LogRegMM(5)
 
-        β = [1:5]
+        β = collect(1:5)
         x = randn(100, 5)
-        y = int(logitinverse(x*β) .< rand(100))
+        y = round(Int, logitinverse(x*β) .< rand(100))
 
         updatebatch!(o, x, y)
         o = LogRegMM(x, y)

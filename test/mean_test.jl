@@ -20,7 +20,7 @@ facts("Mean") do
         n = n1 + n2
         x1 = rand(n1)
         x2 = rand(n2)
-        x = [x1, x2]
+        x = vcat(x1, x2)
 
         o = Mean(x1)
         @fact o.μ => roughly(mean(x1))

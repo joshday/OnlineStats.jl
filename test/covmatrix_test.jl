@@ -37,7 +37,7 @@ facts("CovarianceMatrix") do
     OnlineStats.updatebatch!(obj, x4)
 
     # Check that covariance matrix is approximately equal to truth
-    c = cov([x1,x2,x3,x4])
+    c = cov(vcat(x1,x2,x3,x4))
     cobj = OnlineStats.cov(obj)
     @fact c => roughly(cobj, 1e-10)
     @fact var(obj) - vec(var([x1, x2, x3, x4], 1)) => roughly(zeros(10), 1e-10)
