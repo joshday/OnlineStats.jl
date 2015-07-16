@@ -1,15 +1,23 @@
-# Summary Statistics
+# Analytical
 
-The following summary statistics are available:
+### Mean
+- `Mean` and `Means`
 
-### Analytical
-- Mean
-- Variance (and standard deviation)
-- Covariance Matrix
-- Skewness
-- Kurtosis
-- Extrema
+### Variance (and standard deviation)
+- `Variance` and `Variances`
 
+### Covariance Matrix
+- `CovarianceMatrix`
 
-### Approximate
-- Quantiles
+### Skewness and Kurtosis
+- `Moments`
+
+### Maximum and Minimum
+- `Extrema`
+
+# Approximate
+
+### Quantiles
+
+- `QuantileMM`
+- `QuantileSGD`
