@@ -24,6 +24,7 @@ include("analyticalpca_test.jl")
 include("opca_test.jl")
 
 # include("adagrad_test.jl")
+include("bootstrap_test.jl")
 
 FactCheck.exitstatus()
 

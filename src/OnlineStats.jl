@@ -40,6 +40,7 @@ export
     EqualWeighting,
     ExponentialWeighting,
     StochasticWeighting,
+    BernoulliBootstrap,
 
     # <: OnlineStat
     Mean,
@@ -173,6 +174,7 @@ include("quantileregression/quantregmm.jl")
 # ported from StreamStats
 include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
+include("streamstats/bootstrap.jl")
 
 
 

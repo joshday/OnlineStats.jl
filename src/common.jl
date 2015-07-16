@@ -32,7 +32,7 @@ function tracefit!(o::OnlineStat, b::Int64, args...; batch = false)
         rng = i:min(i + b - 1, n)
         batch_args = map(x -> getrows(x, rng), args)
         batch ? updatebatch!(o, batch_args...) : update!(o, batch_args...)
-        push!(result, copy(o))  #result = vcat(result, state(o)')
+        push!(result, copy(o))
         i += b
     end
     result
