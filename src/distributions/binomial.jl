@@ -5,13 +5,13 @@ type FitBinomial{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit{T <: Integer}(::Type{Binomial}, y::Vector{T}, wgt::Weighting = default(Weighting); n = 1)
+function onlinefit{T <: Integer}(::Type{Binomial}, y::AVec{T}, wgt::Weighting = default(Weighting); n = 1)
     o = FitBinomial(wgt, n = n)
     update!(o, y)
     o
 end
 
-FitBinomial{T <: Integer}(y::Vector{T}, wgt::Weighting = default(Weighting); n = 1) =
+FitBinomial{T <: Integer}(y::AVec{T}, wgt::Weighting = default(Weighting); n = 1) =
     onlinefit(Binomial, y, wgt, n = n)
 
 FitBinomial(wgt::Weighting = default(Weighting); n = 1) =

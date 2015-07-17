@@ -5,13 +5,13 @@ type FitExponential{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Exponential}, y::VecF, wgt::Weighting = default(Weighting))
+function onlinefit(::Type{Exponential}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitExponential(wgt)
     update!(o, y)
     o
 end
 
-FitExponential(y::VecF, wgt::Weighting = default(Weighting)) =
+FitExponential(y::AVecF, wgt::Weighting = default(Weighting)) =
     onlinefit(Exponential, y, wgt)
 
 FitExponential(wgt::Weighting = default(Weighting)) =
@@ -19,7 +19,7 @@ FitExponential(wgt::Weighting = default(Weighting)) =
 
 
 #---------------------------------------------------------------------# update!
-function update!(o::FitExponential, y::Float64)
+function update!(o::FitExponential, y::Real)
     λ = weight(o)
     if o.n > 0
         β = smooth(o.d.β, y, λ)

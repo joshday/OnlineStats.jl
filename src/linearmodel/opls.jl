@@ -109,14 +109,14 @@ state(o::OnlinePLS) = Any[copy(o.v1), state(o.pca), copy(o.W), state(o.fls), nob
 #---------------------------------------------------------------------# update!
 
 
-# NOTE: assumes X mat is (T x p), where T is the number of observations
-# TODO: optimize
-function update!(o::OnlinePLS, X::AMatF, y::AVecF)
-	@assert length(y) == size(X,1)
-	@inbounds for i in 1:length(y)
-		update!(o, row(X,i), y[i])
-	end
-end
+# # NOTE: assumes X mat is (T x p), where T is the number of observations
+# # TODO: optimize
+# function update!(o::OnlinePLS, X::AMatF, y::AVecF)
+# 	@assert length(y) == size(X,1)
+# 	@inbounds for i in 1:length(y)
+# 		update!(o, row(X,i), y[i])
+# 	end
+# end
 
 function update!(o::OnlinePLS, x::AVecF, y::Real)
 
@@ -169,7 +169,6 @@ end
 
 
 function Base.empty!(o::OnlinePLS)
-	# TODO
 	o.n = 0
 	empty!(o.ymean)
 	empty!(o.xmeans)
@@ -185,20 +184,20 @@ function Base.merge!(o1::OnlinePLS, o2::OnlinePLS)
 end
 
 
-function coef(o::OnlinePLS)
-	# TODO
+function StatsBase.coef(o::OnlinePLS)
+	error("not implemented")
 end
 
-function coeftable(o::OnlinePLS)
-	# TODO
+function StatsBase.coeftable(o::OnlinePLS)
+	error("not implemented")
 end
 
-function confint(o::OnlinePLS, level::Real = 0.95)
-	# TODO
+function StatsBase.confint(o::OnlinePLS, level::Real = 0.95)
+	error("not implemented")
 end
 
 # predicts yₜ for a given xₜ
-function predict(o::OnlinePLS, x::AVecF)
+function StatsBase.predict(o::OnlinePLS, x::AVecF)
 	# center x
 	# multiply Wx to get a (kx1) vector of latent vars
 	# y = predict(fls,Wx)
@@ -209,7 +208,7 @@ function predict(o::OnlinePLS, x::AVecF)
 end
 
 # NOTE: uses most recent estimate of βₜ to predict the whole matrix
-function predict(o::OnlinePLS, X::AMatF)
+function StatsBase.predict(o::OnlinePLS, X::AMatF)
 	n = size(X,1)
 	pred = zeros(n)
 	for i in 1:n

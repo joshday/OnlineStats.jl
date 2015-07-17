@@ -12,14 +12,14 @@ type StepwiseReg{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function StepwiseReg(x::MatF, y::VecF, wgt::Weighting = default(Weighting))
+function StepwiseReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
     n, p = size(x)
     o = StepwiseReg(p, wgt)
     updatebatch!(o, x, y)
     o
 end
 
-function StepwiseReg(p::Int, wgt::Weighting = default(Weighting))
+function StepwiseReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     StepwiseReg(c, zeros(p + 1, p + 1), Int[], 0, wgt)
 end
@@ -29,7 +29,7 @@ end
 statenames(o::StepwiseReg) = [:β, :nobs]
 state(o::StepwiseReg) = Any[coef(o), nobs(o)]
 
-function coef(o::StepwiseReg)
+function StatsBase.coef(o::StepwiseReg)
     β = vec(o.s[end, 1:end - 1])
     for i in setdiff(1:length(β), o.set)
         β[i] = 0.
@@ -39,10 +39,10 @@ end
 
 #---------------------------------------------------------------------# update!
 # not optimized, but functional
-function updatebatch!(o::StepwiseReg, x::MatF, y::VecF)
+function updatebatch!(o::StepwiseReg, x::AMatF, y::AVecF)
     n, p = size(x)
     o.n += n
-    updatebatch!(o.C, [x y])
+    updatebatch!(o.C, hcat(x, y))
     copy!(o.s, o.C.A)
 
     # get estimate of variance
@@ -97,5 +97,5 @@ function updatebatch!(o::StepwiseReg, x::MatF, y::VecF)
         end
     end
 
-    println("Active set: ", o.set)
+    DEBUG("Active set: ", o.set)
 end

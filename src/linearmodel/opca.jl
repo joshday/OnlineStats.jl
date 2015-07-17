@@ -68,7 +68,7 @@ function update!(o::OnlinePCA, x::AVecF)
 	x = center!(o.xmeans, x)
 	λ = weight(o)
 
-	for i in 1:min(o.k, o.n)
+	@inbounds for i in 1:min(o.k, o.n)
 
 		if o.e[i] == 0. # this should be more robust than checking i == o.n
 
@@ -101,11 +101,11 @@ function update!(o::OnlinePCA, x::AVecF)
 end
 
 
-function update!(o::OnlinePCA, X::AMatF)
-	for i in 1:nrows(X)
-		update!(o, row(X,i))
-	end
-end
+# function update!(o::OnlinePCA, X::AMatF)
+# 	for i in 1:nrows(X)
+# 		update!(o, row(X,i))
+# 	end
+# end
 
 
 
@@ -115,6 +115,7 @@ function Base.empty!(o::OnlinePCA)
 	o.e = zeros(o.k)
 	o.n = 0
 	o.xmeans = Means(o.d, o.weighting)
+	nothing
 end
 
 function Base.merge!(o1::OnlinePCA, o2::OnlinePCA)
@@ -123,9 +124,9 @@ end
 
 
 # returns a vector z = Vx
-predict(o::OnlinePCA, x::AVecF) = o.V * center(o.xmeans, x)
+StatsBase.predict(o::OnlinePCA, x::AVecF) = o.V * center(o.xmeans, x)
 
-function predict(o::OnlinePCA, X::AMatF)
+function StatsBase.predict(o::OnlinePCA, X::AMatF)
 	n = size(X,1)
 	Z = zeros(n, o.k)
 	for i in 1:n

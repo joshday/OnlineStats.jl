@@ -6,13 +6,13 @@ type FitMvNormal{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{MvNormal}, y::MatF, wgt::Weighting = default(Weighting))
-    o = FitMvNormal(size(y, 2), wgt)
+function onlinefit(::Type{MvNormal}, y::AMatF, wgt::Weighting = default(Weighting))
+    o = FitMvNormal(ncols(y), wgt)
     updatebatch!(o, y)
     o
 end
 
-FitMvNormal(y::MatF, wgt::Weighting = default(Weighting)) =
+FitMvNormal(y::AMatF, wgt::Weighting = default(Weighting)) =
     onlinefit(MvNormal, y, wgt)
 
 FitMvNormal(p::Int, wgt::Weighting = default(Weighting)) =
@@ -20,10 +20,10 @@ FitMvNormal(p::Int, wgt::Weighting = default(Weighting)) =
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::FitMvNormal, y::MatF)
+function updatebatch!(o::FitMvNormal, y::AMatF)
     updatebatch!(o.c, y)
     o.n = nobs(o.c)
     o.d = MvNormal(mean(o.c), cov(o.c))
 end
 
-update!(o::FitMvNormal, y::VecF) = updatebatch!(o, y')
+update!(o::FitMvNormal, y::AVecF) = updatebatch!(o, y')

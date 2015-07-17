@@ -6,17 +6,17 @@ type QuantRegSGD{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function QuantRegSGD(p::Int, wgt::Weighting = StochasticWeighting();
+function QuantRegSGD(p::Integer, wgt::Weighting = StochasticWeighting();
                      τ::Float64 = .5, start = zeros(p))
     @assert τ > 0 && τ < 1
     QuantRegSGD(start, τ, 0, wgt)
 end
 
-function QuantRegSGD(X::MatF, y::VecF, wgt::Weighting = StochasticWeighting();
-                     τ::Float64 = .5, start = zeros(size(X, 2)))
-    n, p = size(X)
+function QuantRegSGD(x::AMatF, y::AVecF, wgt::Weighting = StochasticWeighting();
+                     τ::Float64 = .5, start = zeros(ncols(x)))
+    n, p = size(x)
     o = QuantRegSGD(p, wgt, τ = τ, start = start)
-    update!(o, X, y)
+    update!(o, x, y)
     o
 end
 
@@ -29,22 +29,22 @@ coef(o::QuantRegSGD) = copy(o.β)
 
 
 #---------------------------------------------------------------------# update!
-function updatebatch!(o::QuantRegSGD, X::MatF, y::VecF)
+function updatebatch!(o::QuantRegSGD, x::AMatF, y::AVecF)
     n = length(y)
 #     γ = weight(o)
-#     o.β -= γ * vec(mean(((y .< X * o.β) - o.τ) .* X, 1))
-    addgradient!(o.β, -vec(mean(((y .< X * o.β) - o.τ) .* X, 1)), weight(o))
+#     o.β -= γ * vec(mean(((y .< x * o.β) - o.τ) .* x, 1))
+    addgradient!(o.β, -vec(mean(((y .< x * o.β) - o.τ) .* x, 1)), weight(o))
     o.n += n
 end
 
-function update!(o::QuantRegSGD, x::VecF, y::Float64)
+function update!(o::QuantRegSGD, x::AVecF, y::Float64)
     γ = weight(o)
     o.β -= γ * ((y < (x' * o.β)[1]) - o.τ) * x
     o.n += 1
 end
 
-function update!(o::QuantRegSGD, x::MatF, y::VecF)
-    for i in 1:length(y)
-        update!(o, vec(x[i, :]), y[i])
-    end
-end
+# function update!(o::QuantRegSGD, x::AMatF, y::AVecF)
+#     for i in 1:length(y)
+#         update!(o, vec(x[i, :]), y[i])
+#     end
+# end

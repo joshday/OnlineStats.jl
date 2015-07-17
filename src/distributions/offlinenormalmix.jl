@@ -9,7 +9,7 @@ end
 
 
 #---------------------------------------------------------------------# emstart
-function emstart(p::Int, y::VecF;
+function emstart(p::Integer, y::AVecF;
                  algorithm::Symbol = :kmeans, verbose = false, tol = 1e-6, maxit = 100)
     if algorithm == :naive
         μ = quantile(y, collect(1:p) / (p + 1))
@@ -30,26 +30,26 @@ end
 
 
 #--------------------------------------------------------------------------# em
-function em(o::MixtureModel{Univariate, Continuous, Normal}, y::VecF;
+function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
             tol::Float64 = 1e-6,
             maxit::Int = 100,
             verbose::Bool = false)
 
-    n::Int = length(y)
-    nj::Int = length(o.components)  # number of components
+    n = length(y)
+    nj = length(o.components)  # number of components
     π::VecF = probs(o)
     μ::VecF = means(o)
     σ::VecF = stds(o)
 
-    w::MatF = zeros(n, nj)
-    wy::MatF = zeros(n, nj)
-    s1::VecF = zeros(nj)
-    s2::VecF = zeros(nj)
-    s3::VecF = zeros(nj)
+    w = zeros(n, nj)
+    wy = zeros(n, nj)
+    s1 = zeros(nj)
+    s2 = zeros(nj)
+    s3 = zeros(nj)
 
-    tolerance::Float64 = 1.0
-    loglik::Float64 = sum(logpdf(o, y))
-    iters::Int64 = 0
+    tolerance = 1.0
+    loglik = sum(logpdf(o, y))
+    iters = 0
 
     for i in 1:maxit
         iters += 1
@@ -77,13 +77,13 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::VecF;
 
         if verbose
             tolerance = num / denom
-           println("iteration: $iters, tolerance: $tolerance")
+           LOG("iteration: $iters, tolerance: $tolerance")
         end
     end
     if verbose
-        println("iterations    = $iters")
-        println("tolerance     = $tolerance")
-        println("loglikelihood = $loglik")
+        LOG("iterations    = $iters")
+        LOG("tolerance     = $tolerance")
+        LOG("loglikelihood = $loglik")
     end
     return o
 end

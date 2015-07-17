@@ -8,6 +8,7 @@ using Compat
 
 
 import Clustering  # Used in offline em algorithm for normal mixture
+import Distributions
 import Distributions:
     # Distributions
     Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal, Multinomial,

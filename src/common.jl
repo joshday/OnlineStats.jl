@@ -1,14 +1,35 @@
 #-----------------------------------------# generic: nobs, update!, copy, merge
+
+"The number of observations"
 nobs(o::OnlineStat) = o.n
 
-update!{T<:Real}(o::OnlineStat, y::AVec{T}) = (for yi in y; update!(o, yi); end)
+"Update an OnlineStat one data point at a time"
+function update!{T<:Real}(o::OnlineStat, x::AVec{T})
+    for xi in x
+        update!(o, xi)
+    end
+end
+
+function update!{T<:Real}(o::OnlineStat, x::AMat{T})
+  for i in 1:nrows(x)
+      update!(o, row(x,i))
+  end
+end
+
+function update!{T<:Real}(o::OnlineStat, x::AMat{T}, y::AVec{T})
+    @inbounds for i in 1:length(y)
+        update!(o, row(x,i), y[i])
+    end
+end
 
 
-getrows(x::Vector, rows) = x[rows]
-getrows(x::Matrix, rows) = x[rows, :]
+
+# getrows(x::Vector, rows) = x[rows]
+# getrows(x::Matrix, rows) = x[rows, :]
+
 # Fit the data using batch size b
 # defaults to update!() for batch = false)
-function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = false)
+function onlinefit!(o::OnlineStat, b::Integer, args...; batch::Bool = false)
     if !batch
         update!(o, args...)
     else
@@ -16,21 +37,21 @@ function onlinefit!(o::OnlineStat, b::Int, args...; batch::Bool = false)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            batch_args = map(x -> getrows(x, rng), args)
+            batch_args = map(x -> rows(x,rng), args)
             updatebatch!(o, batch_args...)
             i += b
         end
     end
 end
 # Create a vector of OnlineStats, each element is updated with a batch of size b
-function tracefit!(o::OnlineStat, b::Int64, args...; batch = false)
-    n = size(args[1],1)
+function tracefit!(o::OnlineStat, b::Integer, args...; batch::Bool = false)
+    n = nrows(args[1])
     i = 1
     s = state(o)
     result = [copy(o)]
     while i <= n
         rng = i:min(i + b - 1, n)
-        batch_args = map(x -> getrows(x, rng), args)
+        batch_args = map(x -> rows(x, rng), args)
         batch ? updatebatch!(o, batch_args...) : update!(o, batch_args...)
         push!(result, copy(o))
         i += b
@@ -47,12 +68,26 @@ function Base.merge(o1::OnlineStat, o2::OnlineStat)
     o1copy
 end
 
+function =={T<:OnlineStat}(o1::T, o2::T)
+    @compat for field in fieldnames(o1)
+        getfield(o1, field) == getfield(o2, field) || return false
+    end
+    true
+end
 
 
-row(M::AMatF, i::Integer) = rowvec_view(M, i)
-col(M::AMatF, i::Integer) = view(M, :, i)
-row!(M::AMatF, i::Integer, v::AVecF) = (M[i,:] = v)
-col!(M::AMatF, i::Integer, v::AVecF) = (M[:,i] = v)
+row(x::AMat, i::Integer) = rowvec_view(x, i)
+col(x::AMat, i::Integer) = view(x, :, i)
+row!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[i,:] = v)
+col!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[:,i] = v)
+row(x::AVec, i::Integer) = x[i]
+
+rows(x::AVec, rs::AVec{Int}) = view(x, rs)
+rows(x::AMat, rs::AVec{Int}) = view(x, rs, :)
+cols(x::AMat, cs::AVec{Int}) = view(x, :, cs)
+
+rows(x::AbstractArray, i::Integer) = row(x,i)
+cols(x::AbstractArray, i::Integer) = col(x,i)
 
 nrows(M::AbstractArray) = size(M,1)
 ncols(M::AbstractArray) = size(M,2)
@@ -69,7 +104,7 @@ mystring(x) = string(x)
 name(o::OnlineStat) = string(typeof(o))
 
 
-function Base.print{T<:OnlineStat}(io::IO, v::AbstractVector{T})
+function Base.print{T<:OnlineStat}(io::IO, v::AVec{T})
     print(io, "[")
     print(io, join(v, ", "))
     print(io, "]")
