@@ -16,7 +16,6 @@ facts("Summary") do
     x2 = rand(n2)
     x = vcat(x1, x2)
 
-
     o = Summary(x1)
     @fact o.var.μ => roughly(mean(x1))
     @fact o.var.biasedvar => roughly(var(x1) * (n1 - 1) / n1)
