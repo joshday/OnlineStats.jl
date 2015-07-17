@@ -5,7 +5,7 @@ using OnlineStats, FactCheck, StatsBase
 facts("Bootstrap") do
     context("BernoulliBootstrap") do
         o = OnlineStats.Mean()
-        o = OnlineStats.BernoulliBootstrap(o, 1000)
+        o = OnlineStats.BernoulliBootstrap(o, mean, 1000)
         OnlineStats.update!(o, rand(10000))
         OnlineStats.cached_state(o)
         mean(o)
@@ -22,7 +22,7 @@ facts("Bootstrap") do
 
     context("PoissonBootstrap") do
         o = OnlineStats.Mean()
-        o = OnlineStats.PoissonBootstrap(o, 1000)
+        o = OnlineStats.PoissonBootstrap(o, mean, 1000)
         OnlineStats.update!(o, rand(10000))
         OnlineStats.cached_state(o)
         mean(o)
@@ -34,10 +34,10 @@ facts("Bootstrap") do
 
     context("FrozenBootstrap") do
         o = OnlineStats.Mean()
-        o = OnlineStats.BernoulliBootstrap(o, 1000)
+        o = OnlineStats.BernoulliBootstrap(o, mean, 1000)
 
         o2 = OnlineStats.Mean()
-        o2 = OnlineStats.BernoulliBootstrap(o2, 1000)
+        o2 = OnlineStats.BernoulliBootstrap(o2, mean, 1000)
         update!(o, randn(1000))
         update!(o2, randn(1000) + 3)
 

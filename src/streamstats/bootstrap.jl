@@ -5,14 +5,15 @@ abstract Bootstrap <: OnlineStat
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
+    f::Function                      # function to generate state. Ex: mean, var, std
     n::Int                           # number of observations
     cache_is_dirty::Bool
 end
 
-function BernoulliBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000)
+function BernoulliBootstrap{S <: OnlineStat}(stat::S, f::Function, R::Int = 1_000)
     replicates = S[copy(stat) for i in 1:R]
     cached_state = Array(Float64, R)
-    return BernoulliBootstrap(replicates, cached_state, 0, true)
+    return BernoulliBootstrap(replicates, cached_state, f, 0, true)
 end
 
 function update!(b::BernoulliBootstrap, x::Real)
@@ -32,14 +33,15 @@ end
 type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
+    f::Function
     n::Int                          # number of observations
     cache_is_dirty::Bool
 end
 
-function PoissonBootstrap{S <: OnlineStat}(stat::S, R::Int = 1_000)
+function PoissonBootstrap{S <: OnlineStat}(stat::S, f::Function, R::Int = 1_000)
     replicates = S[copy(stat) for i in 1:R]
     cached_state = Array(Float64, R)
-    return PoissonBootstrap(replicates, cached_state, 0, true)
+    return PoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
 function update!(b::PoissonBootstrap, x::Real)
@@ -68,7 +70,7 @@ cached_state(b::FrozenBootstrap) = copy(b.cached_state)
 #-----------------------------------------------------------------------# Common
 function show(io::IO, b::Bootstrap)
     println(io, typeof(b))
-    println(io, "Online Bootstrap of ", typeof(b.replicates[1]))
+    println(io, "Online Bootstrap of ", typeof(b.replicates[1]), " using function: ", b.f, "()")
     println(io, "*  nreplicates = ", length(b.replicates))
     println(io, "*         nobs = ", nobs(b))
 end
@@ -77,7 +79,7 @@ end
 function cached_state(b::Bootstrap)
     if b.cache_is_dirty
         for (i, replicate) in enumerate(b.replicates)
-            b.cached_state[i] = state(replicate)[1]  # assumes the statistic of interest is state(o)[1]
+            b.cached_state[i] = b.f(replicate)
         end
         b.cache_is_dirty = false
     end
@@ -95,10 +97,7 @@ replicates(b::Bootstrap) = copy(b.replicates)
 
 # Assumes a and b are independent.
 function Base.(:-)(a::Bootstrap, b::Bootstrap)
-    return FrozenBootstrap(
-        cached_state(a) - cached_state(b),
-        nobs(a) + nobs(b)
-    )
+    return FrozenBootstrap(cached_state(a) - cached_state(b), nobs(a) + nobs(b))
 end
 
 
