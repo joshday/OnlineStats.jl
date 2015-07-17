@@ -3,7 +3,8 @@ using FactCheck, Distributions
 
 facts("Quantiles") do
     context("QuantileSGD") do
-        τ = collect(1:0.5:9)/10
+
+        τ = collect(1:0.5:9) / 10
         o_uniform = QuantileSGD(rand(100), StochasticWeighting(.6), τ = τ)
         o_normal = QuantileSGD(randn(100), StochasticWeighting(.6), τ = τ)
         @fact statenames(o_normal) => [:quantiles, :τ, :nobs]
@@ -28,7 +29,7 @@ facts("Quantiles") do
     end
 
      context("QuantileMM") do
-        τ = collect(1:0.5:9)/10
+        τ = collect(1:0.5:9) / 10
         o_uniform = QuantileMM(rand(100), StochasticWeighting(.6), τ = τ)
         o_normal = QuantileMM(randn(100), StochasticWeighting(.6), τ = τ)
         @fact statenames(o_normal) => [:quantiles, :τ, :nobs]

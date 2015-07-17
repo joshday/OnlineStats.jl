@@ -16,7 +16,7 @@ function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
 	# create a time varying βₜ = βₜ₋₁ + ωₜ
 	β = σβ * randn(n,p)
 	β[1,:] = 10*rand(p)      # β₀ is random uniforms
-	cumsum!(β, β)   			# now do the cumulative sum with β₀ as the starting vector
+	cumsum!(β, β, 1)   			# now do the cumulative sum with β₀ as the starting vector
 
 	# now create the dependent series
 	dy = vec(sum(dx .* β, 2)) + ε   # dependent
@@ -38,8 +38,8 @@ function dofls(p, x, y)
 end
 
 
-sev = OnlineStats.log_severity()
-OnlineStats.log_severity(OnlineStats.ERROR)  # turn off most logging
+# sev = OnlineStats.log_severity()
+# OnlineStats.log_severity!(OnlineStats.ErrorSeverity)  # turn off most logging
 
 
 facts("Test OnlineFLS") do
@@ -80,7 +80,7 @@ facts("Test OnlineFLS") do
 
 end
 
-# put logging back the way it was
-OnlineStats.log_severity(sev)
+# # put logging back the way it was
+# OnlineStats.log_severity!(sev)
 
 end # module

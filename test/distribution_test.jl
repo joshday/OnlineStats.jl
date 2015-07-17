@@ -17,7 +17,7 @@ facts("Distributions") do
         p = rand()
         x1 = rand(Bernoulli(p), n1)
         x2 = rand(Bernoulli(p), n2)
-        x = [x1, x2]
+        x = vcat(x1, x2)
 
         o = OnlineStats.onlinefit(Bernoulli, x1)
         @fact FitBernoulli(x1).d.p => roughly(Bernoulli(mean(x1)).p)
@@ -56,7 +56,7 @@ facts("Distributions") do
         α, β = rand(1:0.1:10, 2)
         x1 = rand(Beta(α, β), n1)
         x2 = rand(Beta(α, β), n2)
-        x = [x1, x2]
+        x = vcat(x1, x2)
 
         o = onlinefit(Beta, x1)
         @fact mean(o.d) => roughly(mean(x1))
@@ -85,6 +85,7 @@ facts("Distributions") do
         @fact nobs(o) => 0
         @fact OnlineStats.weighting(o) => ExponentialWeighting(.001)
         # @fact show(onlinefit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
+        @fact onlinefit(Binomial, [4], n=10) => FitBinomial(Binomial(10, .4), 1, EqualWeighting())
 
         for i in 1:10
             onlinefit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
@@ -96,7 +97,8 @@ facts("Distributions") do
         p = rand()
         x1 = rand(Binomial(ntrials, p), n1)
         x2 = rand(Binomial(ntrials, p), n2)
-        x = [x1; x2]
+        x = vcat(x1, x2)
+
 
         o = onlinefit(Binomial, x1, n = ntrials)
         @fact mean(o) => roughly(mean(x), .05)
@@ -155,7 +157,7 @@ facts("Distributions") do
         o = FitDirichlet(x1)
         @fact OnlineStats.weighting(o) => EqualWeighting()
         x2 = rand(Dirichlet(α), n2)'
-        x = [x1; x2]
+        x = vcat(x1, x2)
 
         o = onlinefit(Dirichlet, x1)
         @fact o.meanlogx => vec(mean(log(x1), 1))
@@ -186,13 +188,17 @@ facts("Distributions") do
         o = onlinefit(Exponential, rand(Exponential(), 10))
         @fact OnlineStats.weighting(o) => EqualWeighting()
         # @fact show(onlinefit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
+        # OnlineStats.log_severity!(OnlineStats.DebugSeverity)
+        # OnlineStats.@DEBUG onlinefit(Exponential, [.5]) FitExponential(Exponential(.5), 1, EqualWeighting())
+        @fact onlinefit(Exponential, [.5]) => FitExponential(Exponential(.5), 1, EqualWeighting())
+        @fact onlinefit(Exponential, [.5]) => not(FitExponential(Exponential(1.5), 1, EqualWeighting()))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
         θ = rand(1:1000, 1)[1]
         x1 = rand(Exponential(θ), n1)
         x2 = rand(Exponential(θ), n2)
-        x = [x1, x2]
+        x = vcat(x1, x2)
 
         o = onlinefit(Exponential, x1)
         @fact o.d.β => roughly(mean(x1))
@@ -226,7 +232,7 @@ facts("Distributions") do
         α, β = rand(1:0.1:100, 2)
         x1 = rand(Gamma(α, β), n1)
         x2 = rand(Gamma(α, β), n2)
-        x = [x1; x2]
+        x = vcat(x1, x2)
 
         o = FitGamma()
         @fact o.d => Gamma()
@@ -282,7 +288,7 @@ facts("Distributions") do
         p /= sum(p)
         x1 = rand(Multinomial(n, p), n1)'
         x2 = rand(Multinomial(n, p), n2)'
-        x = [x1; x2]
+        x = vcat(x1, x2)
 
         o = onlinefit(Multinomial, x1)
         @fact o.d.n => n
@@ -313,7 +319,7 @@ facts("Distributions") do
         d = rand(3:10)
         x1 = rand(MvNormal(zeros(d), eye(d)), n1)'
         x2 = rand(MvNormal(zeros(d), eye(d)), n2)'
-        x = [x1;  x2]
+        x = vcat(x1, x2)
 
         o = onlinefit(MvNormal, x1)
         FitMvNormal(x1)
@@ -355,7 +361,7 @@ facts("Distributions") do
         n2 = rand(1:1_000_000, 1)[1]
         x1 = randn(n1)
         x2 = randn(n2)
-        x = [x1, x2]
+        x = vcat(x1, x2)
 
         o = onlinefit(Normal, x1)
         @fact mean(o.v) => roughly(mean(x1))

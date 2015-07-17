@@ -87,7 +87,7 @@ facts("Adagrad") do
 
         # normal lin reg
         o = Adagrad(x, y)
-        println(o, ": β=", β)
+        OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = atol, rtol = rtol)
         @fact predict(o, ones(p)) => roughly(1.0 * sum(β), atol = atol, rtol = rtol)
 
@@ -98,7 +98,7 @@ facts("Adagrad") do
         y = x * β
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; reg = L2Reg(0.01))
-        println(o, ": β=", β2)
+        OnlineStats.DEBUG(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = atol, rtol = rtol)
 
         # some simple checks of the interface
@@ -115,7 +115,7 @@ facts("Adagrad") do
 
         # logistic
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss())
-        println(o, ": β=", β)
+        OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1)
 
         # logistic l2
@@ -125,7 +125,7 @@ facts("Adagrad") do
         y = map(convertLogisticY, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
         o = Adagrad(x, y; link=LogisticLink(), loss=LogisticLoss(), reg=L2Reg(0.00001))
-        println(o, ": β=", β2)
+        OnlineStats.DEBUG(o, ": β=", β2)
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
 
@@ -148,8 +148,8 @@ facts("Adagrad") do
         e_ss = @elapsed do_ss_ols(x,y)
         e_os = @elapsed do_os_ols(xbias,y)
         e_os_bias = @elapsed do_os_ols_bias(x,y)
-        @fact e_os / e_ss => less_than(1.1)
-        @fact e_os_bias / e_ss => less_than(1.1)
+        @fact e_os / e_ss => less_than(1.2)
+        @fact e_os_bias / e_ss => less_than(1.2)
 
 
         # test other algos
@@ -170,7 +170,7 @@ facts("Adagrad") do
         # test speed
         e_ss_l2logit = @elapsed do_ss_approx_l2_logit(x,y)
         e_os_l2logit = @elapsed do_os_ols_l2_logit(xbias,y)
-        @fact e_os_l2logit / e_ss_l2logit => less_than(1.2)
+        @fact e_os_l2logit / e_ss_l2logit => less_than(1.3)
     end
 
 end

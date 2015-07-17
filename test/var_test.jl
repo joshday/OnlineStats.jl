@@ -13,7 +13,8 @@ facts("Variance") do
         end
         o = Variance(randn(1000))
         @fact nobs(o) => 1000
-        @fact show(Variance()) => show(Variance(0., 0., 0, EqualWeighting()))
+        # @fact show(Variance()) => show(Variance(0., 0., 0, EqualWeighting()))
+        @fact Variance() => Variance(0., 0., 0, EqualWeighting())
 
         n1, n2 = rand(1:1_000_000, 2)
         n = n1 + n2
@@ -93,7 +94,7 @@ facts("Variance") do
 
         o2 = Variance(rand(100))
         o = [o; o2]
-        print(typeof(o))
+        OnlineStats.DEBUG(typeof(o))
 
         x = rand(100)
         o = Variance()
@@ -141,7 +142,8 @@ facts("Variance") do
 
         x1 = rand(100, 4)
         x2 = rand(100, 4)
-        x = [x1; x2]
+        x = vcat(x1, x2)
+
         o1 = Variances(x1)
         o2 = Variances(x2)
         o3 = merge(o1, o2)
@@ -150,8 +152,8 @@ facts("Variance") do
         @fact var(o1) => var(o3)
 
         @fact nobs(o1) => 200
-        @fact mean(o1) => roughly(vec(mean([x1, x2], 1)))
-        @fact std(o1) => roughly(vec(std([x1, x2], 1)), .01)
+        @fact mean(o1) => roughly(vec(mean(vcat(x1, x2), 1)))
+        @fact std(o1) => roughly(vec(std(vcat(x1, x2), 1)), .01)
 
         x = rand(100, 5)
         o = Variances(5)

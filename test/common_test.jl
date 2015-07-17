@@ -17,8 +17,8 @@ facts("Common") do
         OnlineStats.row!(x, n, ones(p))
         @fact OnlineStats.row(x, 1) => OnlineStats.row(x, n)
         @fact OnlineStats.row(x, n) => ones(p)
-        @fact OnlineStats.getrows([1,2,3], 2) => 2
-        @fact OnlineStats.getrows(x, 1) => x[1, :]
+        @fact OnlineStats.rows([1,2,3], 2) => 2
+        @fact OnlineStats.rows(x, 1) => vec(x[1, :])
 
         OnlineStats.col!(x, 1, ones(n))
         OnlineStats.col!(x, p, ones(n))
@@ -46,25 +46,26 @@ facts("Common") do
 
     context("onlinefit!") do
         o = Mean()
-        onlinefit!(o, 5, randn(100), batch = false)
-        onlinefit!(o, 5, randn(100))
+        @fact onlinefit!(o, 5, randn(100), batch = false) => nothing
+        @fact onlinefit!(o, 5, randn(100)) => nothing
     end
 
     context("Show OnlineStat") do
         x = rand(100)
         o = Mean(x)
-        show(o)
-        print(o)
+        # show(o)
+        OnlineStats.DEBUG(o)
         @fact OnlineStats.name(o) => string(typeof(o))
-        print(Mean())
-        print(Variance())
-        print(Variance[Variance(), Variance()])
+        OnlineStats.DEBUG(Mean())
+        OnlineStats.DEBUG(Variance())
+        OnlineStats.DEBUG(Variance[Variance(), Variance()])
     end
 
     context("Show DistributionStat") do
         x1 = randn(100)
         o = onlinefit(Normal, x1)
-        show(o); println()
+        # show(o); println()
+        OnlineStats.DEBUG("Normal fit: ", o)
 
         @fact params(o) => params(o.d)
         @fact mean(o) => mean(o.d)

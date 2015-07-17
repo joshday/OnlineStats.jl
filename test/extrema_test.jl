@@ -17,7 +17,7 @@ facts("Extrema") do
     n = n1 + n2
     x1 = rand(n1)
     x2 = rand(n2)
-    x = [x1, x2]
+    x = vcat(x1, x2)
     obj = Extrema(x1)
     @fact obj.max => maximum(x1)
     @fact obj.min => minimum(x1)
