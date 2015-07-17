@@ -15,7 +15,7 @@ facts("OnlinePCA") do
 	top5pca = O.pca(oc, false, maxoutdim = 5)
 	opca = O.OnlinePCA(x, 5, O.StochasticWeighting(.51))
 	e = opca.e
-	@fact principalvars(top5pca) - sort(e) => roughly(zeros(5), 10) "top 5 eigenvalues"
+	@fact principalvars(top5pca) - sort(e) => roughly(zeros(5), 15) "top 5 eigenvalues"
 end
 
 #-----------------------------------------------------------------------
