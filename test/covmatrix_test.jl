@@ -63,8 +63,8 @@ facts("CovarianceMatrix") do
         o = CovarianceMatrix(x)
 
         # full PCA - correlation
-        oPCA = pca(o, maxoutdim = d-1)
-        PCA = pcacov(cor(x), vec(mean(x, 1)), maxoutdim = d-1)
+        oPCA = pca(o, maxoutdim = d-9)
+        PCA = pcacov(cor(x), vec(mean(x, 1)), maxoutdim = d-9)
         @fact principalvars(oPCA) => roughly(principalvars(PCA))
         @fact mean(oPCA) => roughly(mean(PCA))
         @fact abs(projection(oPCA)) => roughly(abs(projection(PCA)))

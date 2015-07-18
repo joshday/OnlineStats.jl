@@ -1,7 +1,18 @@
 abstract Bootstrap <: OnlineStat
 
+"Double-or-nothing online bootstrap"
+:BernoulliBootstrap
+
+"Poisson-weighted online bootstrap"
+:PoissonBootstrap
+
+"Get the replicates of the `OnlineStat` objects used in the bootstrap"
+:replicates
+
+"return the value of interest for each of the `OnlineStat` replicates"
+:cached_state
+
 #-----------------------------------------------------------# BernoulliBootstrap
-## Double-or-nothing online bootstrap
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
@@ -58,8 +69,7 @@ end
 
 
 #--------------------------------------------------------------# FrozenBootstrap
-# Frozen bootstrap object are generated when two bootstrap distributions
-# are combined, e.g., if they are differenced.
+"Frozen bootstrap object are generated when two bootstrap distributions are combined, e.g., if they are differenced."
 immutable FrozenBootstrap <: Bootstrap
     cached_state::Vector{Float64}  # cache of replicate states
     n::Int                          # number of observations
@@ -68,7 +78,7 @@ end
 cached_state(b::FrozenBootstrap) = copy(b.cached_state)
 
 #-----------------------------------------------------------------------# Common
-function show(io::IO, b::Bootstrap)
+function Base.show(io::IO, b::Bootstrap)
     println(io, typeof(b))
     println(io, "Online Bootstrap of ", typeof(b.replicates[1]), " using function: ", b.f, "()")
     println(io, "*  nreplicates = ", length(b.replicates))
@@ -86,9 +96,9 @@ function cached_state(b::Bootstrap)
     return b.cached_state
 end
 
-mean(b::Bootstrap) = mean(cached_state(b))
-std(b::Bootstrap) = std(cached_state(b))
-var(b::Bootstrap) = var(cached_state(b))
+Base.mean(b::Bootstrap) = mean(cached_state(b))
+Base.std(b::Bootstrap) = std(cached_state(b))
+Base.var(b::Bootstrap) = var(cached_state(b))
 
 state(b::Bootstrap) = [length(b.replicates), nobs(b)]
 statenames(b::Bootstrap) = [:replicates, :nobs]
@@ -102,7 +112,7 @@ end
 
 
 
-function confint(b::Bootstrap, coverageprob = 0.95, method=:quantile)
+function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method=:quantile)
     states = cached_state(b)
     # If any NaN, return NaN, NaN
     if any(isnan, states)
