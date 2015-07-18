@@ -6,14 +6,14 @@ type FitDirichlet{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Dirichlet}, y::AMatF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Dirichlet}, y::AMatF, wgt::Weighting = default(Weighting))
     o = FitDirichlet(ncols(y), wgt)
     updatebatch!(o, y)
     o
 end
 
 FitDirichlet(y::AMatF, wgt::Weighting = default(Weighting)) =
-    onlinefit(Dirichlet, y, wgt)
+    distributionfit(Dirichlet, y, wgt)
 
 FitDirichlet(d::Integer = 2, wgt::Weighting = default(Weighting)) =
     FitDirichlet(Dirichlet(ones(d)), zeros(d), 0, wgt)

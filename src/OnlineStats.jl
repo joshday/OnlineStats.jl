@@ -97,12 +97,12 @@ export
     # functions
     update!,               # update one observation at a time using Weighting scheme
     updatebatch!,          # update by batch, giving each observation equal weight
+    distributionfit,       # easy constructor syntax for FitDist types
     onlinefit!,            # run through data updating with mini batches
     tracefit!,             # return vector, each element is OnlineStat after updating with minibatch
     state,                 # get state of object, typically Any[value, nobs(o)]
     statenames,            # corresponding names to state()
     weighting,             # get the Weighting of an object
-    onlinefit,             # higher-level syntax for constructors
     em,                    # Offline EM algorithm for Normal Mixtures
     sweep!,                # Symmetric sweep operator
     estimatedCardinality,

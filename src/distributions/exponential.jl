@@ -5,14 +5,14 @@ type FitExponential{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Exponential}, y::AVecF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Exponential}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitExponential(wgt)
     update!(o, y)
     o
 end
 
 FitExponential(y::AVecF, wgt::Weighting = default(Weighting)) =
-    onlinefit(Exponential, y, wgt)
+    distributionfit(Exponential, y, wgt)
 
 FitExponential(wgt::Weighting = default(Weighting)) =
     FitExponential(Exponential(), 0, wgt)

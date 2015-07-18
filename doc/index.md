@@ -23,10 +23,10 @@ The following schemes are supported for weighting new data:
     - update observations one at a time with respect to the weighting scheme
 - `updatebatch!(o, data...)`
     - treat a batch of data as "equally-weighted information".  The weighting scheme
-- `onlinefit!(o, b, data...; batch = false)`
+- `distributionfit!(o, b, data...; batch = false)`
     - update `o` with batches of size `b`.  `batch = false` defaults to `update!(o, data...)`
 - `tracefit!(o, b, data...; batch = false)`
-    - Run through data as in `onlinefit` and return a vector `OnlineStat[o1, o2,...]` where each element
+    - Run through data as in `distributionfit` and return a vector `OnlineStat[o1, o2,...]` where each element
     has been updated with a batch of size `b`.
 - `nobs(o)`
     - number of observations

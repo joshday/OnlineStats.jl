@@ -44,7 +44,7 @@ facts("Common") do
         @fact OnlineStats.adjusted_nobs(1, EqualWeighting()) => 1
     end
 
-    context("onlinefit!") do
+    context("onlinefit!()") do
         o = Mean()
         @fact onlinefit!(o, 5, randn(100), batch = false) => nothing
         @fact onlinefit!(o, 5, randn(100)) => nothing
@@ -63,7 +63,7 @@ facts("Common") do
 
     context("Show DistributionStat") do
         x1 = randn(100)
-        o = onlinefit(Normal, x1)
+        o = distributionfit(Normal, x1)
         # show(o); println()
         OnlineStats.DEBUG("Normal fit: ", o)
 

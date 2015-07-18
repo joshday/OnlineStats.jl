@@ -57,7 +57,7 @@ end
 """
 `tracefit!(o, b, data...; batch = false)`
 
-Run through data as in `onlinefit!`.  Return a vector of OnlineStats where each
+Run through data as in `distributionfit!`.  Return a vector of OnlineStats where each
 element has been updated with a batch of size `b`.
 """
 function tracefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)

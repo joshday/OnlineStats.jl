@@ -18,7 +18,7 @@ function FitCauchy(y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); s
     o
 end
 
-function onlinefit(::Type{Cauchy}, y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); start = zeros(3))
+function distributionfit(::Type{Cauchy}, y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); start = zeros(3))
     FitCauchy(y, wgt, start = start)
 end
 

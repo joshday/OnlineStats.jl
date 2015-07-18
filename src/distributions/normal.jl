@@ -6,13 +6,13 @@ type FitNormal{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Normal}, y::AVecF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Normal}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitNormal(wgt)
     update!(o, y)
     o
 end
 
-FitNormal(y::AVecF, wgt::Weighting = default(Weighting)) = onlinefit(Normal, y, wgt)
+FitNormal(y::AVecF, wgt::Weighting = default(Weighting)) = distributionfit(Normal, y, wgt)
 
 FitNormal(wgt::Weighting = default(Weighting)) = FitNormal(Normal(), Variance(wgt), 0, wgt)
 

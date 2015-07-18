@@ -6,14 +6,14 @@ type FitBeta{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Beta}, y::AVecF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Beta}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitBeta(wgt)
     update!(o, y)
     o
 end
 
 FitBeta{T <: Real}(y::AVec{T}, wgt::Weighting = default(Weighting)) =
-    onlinefit(Beta, y, wgt)
+    distributionfit(Beta, y, wgt)
 
 FitBeta(wgt::Weighting = default(Weighting)) =
     FitBeta(Beta(), Variance(wgt), 0, wgt)

@@ -7,14 +7,14 @@ type FitGamma{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{Gamma}, y::AVecF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Gamma}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitGamma(wgt)
     update!(o, y)
     o
 end
 
 FitGamma(y::AVecF, wgt::Weighting = default(Weighting)) =
-    onlinefit(Gamma, y, wgt)
+    distributionfit(Gamma, y, wgt)
 
 FitGamma(wgt::Weighting = default(Weighting)) =
     FitGamma(Gamma(), Mean(wgt), Mean(wgt), 0, wgt)

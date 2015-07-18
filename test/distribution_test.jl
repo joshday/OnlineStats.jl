@@ -10,7 +10,7 @@ facts("Distributions") do
     context("Bernoulli") do
         o = FitBernoulli()
         o = FitBernoulli(rand(Bernoulli(), 10))
-        o = onlinefit(Bernoulli, rand(Bernoulli(), 10))
+        o = distributionfit(Bernoulli, rand(Bernoulli(), 10))
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -19,7 +19,7 @@ facts("Distributions") do
         x2 = rand(Bernoulli(p), n2)
         x = vcat(x1, x2)
 
-        o = OnlineStats.onlinefit(Bernoulli, x1)
+        o = OnlineStats.distributionfit(Bernoulli, x1)
         @fact FitBernoulli(x1).d.p => roughly(Bernoulli(mean(x1)).p)
         @fact FitBernoulli().d.p => 0.
         @fact o.d.p => roughly(mean(x1))
@@ -35,10 +35,10 @@ facts("Distributions") do
         @fact mean(o2.d) => roughly(mean(x))
         @fact nobs(o) => n1 + n2
 
-        o = onlinefit(Bernoulli, x1, ExponentialWeighting(.01))
+        o = distributionfit(Bernoulli, x1, ExponentialWeighting(.01))
         @fact OnlineStats.weighting(o) => ExponentialWeighting(.01)
 
-        o = onlinefit(Bernoulli, x1, ExponentialWeighting(1000))
+        o = distributionfit(Bernoulli, x1, ExponentialWeighting(1000))
         @fact OnlineStats.weighting(o) => ExponentialWeighting(1000)
     end
 
@@ -49,7 +49,7 @@ facts("Distributions") do
         o = FitBeta()
         o = FitBeta(rand(10))
         o = FitBeta([.1, .9])
-        o = onlinefit(Beta, rand(10), ExponentialWeighting(.01))
+        o = distributionfit(Beta, rand(10), ExponentialWeighting(.01))
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -58,7 +58,7 @@ facts("Distributions") do
         x2 = rand(Beta(α, β), n2)
         x = vcat(x1, x2)
 
-        o = onlinefit(Beta, x1)
+        o = distributionfit(Beta, x1)
         @fact mean(o.d) => roughly(mean(x1))
         @fact var(o.d) => roughly(var(x1))
         @fact o.n => n1
@@ -80,15 +80,15 @@ facts("Distributions") do
         o = FitBinomial(n = 10)
         o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
-        o = onlinefit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
+        o = distributionfit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) => 0
         @fact OnlineStats.weighting(o) => ExponentialWeighting(.001)
-        # @fact show(onlinefit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
-        @fact onlinefit(Binomial, [4], n=10) => FitBinomial(Binomial(10, .4), 1, EqualWeighting())
+        # @fact show(distributionfit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
+        @fact distributionfit(Binomial, [4], n=10) => FitBinomial(Binomial(10, .4), 1, EqualWeighting())
 
         for i in 1:10
-            onlinefit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
+            distributionfit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
         end
 
         n1 = rand(5:1_000_000)
@@ -100,14 +100,14 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
 
-        o = onlinefit(Binomial, x1, n = ntrials)
+        o = distributionfit(Binomial, x1, n = ntrials)
         @fact mean(o) - mean(x)=> roughly(0.0, .05) "This has failed before...not sure of the cause"
         @fact var(o) => var(o.d)
         @fact o.d.n => ntrials
         @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
         @fact o.n => n1
         @fact mean(FitBinomial().d) => 0.
-        @fact mean(onlinefit(Binomial, [0])) => 0.
+        @fact mean(distributionfit(Binomial, [0])) => 0.
         @fact mean(FitBinomial(zeros(Int, 10))) => 0.
         @fact mean(FitBinomial(ones(Int, 10))) => 1.
 
@@ -129,7 +129,7 @@ facts("Distributions") do
     context("Cauchy") do
         o = FitCauchy()
         o = FitCauchy(rand(Cauchy(), 1000))
-        o = onlinefit(Cauchy, rand(Cauchy(), 1000))
+        o = distributionfit(Cauchy, rand(Cauchy(), 1000))
 
         @fact nobs(o) => 1000
         update!(o, rand(Cauchy(), 1000))
@@ -144,9 +144,9 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
     context("Dirichlet") do
         o = FitDirichlet()
-        o = onlinefit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)')
-        o = onlinefit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', ExponentialWeighting(.01))
-        o = onlinefit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', StochasticWeighting(.6))
+        o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)')
+        o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', ExponentialWeighting(.01))
+        o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', StochasticWeighting(.6))
         @fact nobs(o) => 10
 
         n1 = rand(1:1_000_000)
@@ -159,7 +159,7 @@ facts("Distributions") do
         x2 = rand(Dirichlet(α), n2)'
         x = vcat(x1, x2)
 
-        o = onlinefit(Dirichlet, x1)
+        o = distributionfit(Dirichlet, x1)
         @fact o.meanlogx => vec(mean(log(x1), 1))
         @fact o.n => n1
 
@@ -184,14 +184,14 @@ facts("Distributions") do
     context("Exponential") do
         o = FitExponential()
         o = FitExponential(rand(Exponential(), 10))
-        o = onlinefit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
-        o = onlinefit(Exponential, rand(Exponential(), 10))
+        o = distributionfit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
+        o = distributionfit(Exponential, rand(Exponential(), 10))
         @fact OnlineStats.weighting(o) => EqualWeighting()
-        # @fact show(onlinefit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
+        # @fact show(distributionfit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
         # OnlineStats.log_severity!(OnlineStats.DebugSeverity)
-        # OnlineStats.@DEBUG onlinefit(Exponential, [.5]) FitExponential(Exponential(.5), 1, EqualWeighting())
-        @fact onlinefit(Exponential, [.5]) => FitExponential(Exponential(.5), 1, EqualWeighting())
-        @fact onlinefit(Exponential, [.5]) => not(FitExponential(Exponential(1.5), 1, EqualWeighting()))
+        # OnlineStats.@DEBUG distributionfit(Exponential, [.5]) FitExponential(Exponential(.5), 1, EqualWeighting())
+        @fact distributionfit(Exponential, [.5]) => FitExponential(Exponential(.5), 1, EqualWeighting())
+        @fact distributionfit(Exponential, [.5]) => not(FitExponential(Exponential(1.5), 1, EqualWeighting()))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
@@ -200,7 +200,7 @@ facts("Distributions") do
         x2 = rand(Exponential(θ), n2)
         x = vcat(x1, x2)
 
-        o = onlinefit(Exponential, x1)
+        o = distributionfit(Exponential, x1)
         @fact o.d.β => roughly(mean(x1))
         @fact o.n => n1
         @fact nobs(o) => n1
@@ -225,7 +225,7 @@ facts("Distributions") do
             n = rand(100:1000)
             FitGamma(rand(Gamma(), n))
         end
-        o = onlinefit(Gamma, rand(Gamma(), 10))
+        o = distributionfit(Gamma, rand(Gamma(), 10))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
@@ -241,10 +241,10 @@ facts("Distributions") do
 
         o = FitGamma(x1)
         @fact mean(o) => roughly(mean(x1))
-        @fact FitGamma(x1).d => onlinefit(Gamma, x1).d
-        @fact FitGamma(x1).n => onlinefit(Gamma, x1).n
-        o = onlinefit(Gamma, x1)
-        @fact onlinefit(Gamma, x1).d => FitGamma(x1).d
+        @fact FitGamma(x1).d => distributionfit(Gamma, x1).d
+        @fact FitGamma(x1).n => distributionfit(Gamma, x1).n
+        o = distributionfit(Gamma, x1)
+        @fact distributionfit(Gamma, x1).d => FitGamma(x1).d
         @fact mean(o.m) => roughly(mean(x1))
         @fact mean(o.mlog) => roughly(mean(log(x1)))
         @fact o.n => n1
@@ -268,7 +268,7 @@ facts("Distributions") do
         o = FitLogNormal()
         y = rand(LogNormal(10, 5), 10_000)
         update!(o, y)
-        o = onlinefit(LogNormal, y)
+        o = distributionfit(LogNormal, y)
         o = FitLogNormal(y)
     end
 
@@ -278,7 +278,7 @@ facts("Distributions") do
     context("Multinomial") do
         o = FitMultinomial()
         o = FitMultinomial(rand(Multinomial(5, [.2, .3, .5]), 10)')
-        o = onlinefit(Multinomial, rand(Multinomial(5, [.2, .3, .5]), 10)')
+        o = distributionfit(Multinomial, rand(Multinomial(5, [.2, .3, .5]), 10)')
 
         n1 = rand(10_000:100_000, 1)[1]
         n2 = rand(10_000:100_000, 1)[1]
@@ -290,7 +290,7 @@ facts("Distributions") do
         x2 = rand(Multinomial(n, p), n2)'
         x = vcat(x1, x2)
 
-        o = onlinefit(Multinomial, x1)
+        o = distributionfit(Multinomial, x1)
         @fact o.d.n => n
         @fact o.d.p => roughly(vec(sum(x1, 1) / (n * n1)))
         @fact o.n => n1
@@ -321,7 +321,7 @@ facts("Distributions") do
         x2 = rand(MvNormal(zeros(d), eye(d)), n2)'
         x = vcat(x1, x2)
 
-        o = onlinefit(MvNormal, x1)
+        o = distributionfit(MvNormal, x1)
         FitMvNormal(x1)
         FitMvNormal(d)
         @fact o.d.μ => roughly(vec(mean(x1, 1)))
@@ -363,7 +363,7 @@ facts("Distributions") do
         x2 = randn(n2)
         x = vcat(x1, x2)
 
-        o = onlinefit(Normal, x1)
+        o = distributionfit(Normal, x1)
         @fact mean(o.v) => roughly(mean(x1))
         @fact mean(o.d) => roughly(mean(o.v))
         @fact var(o.v) => roughly(var(x1))
@@ -388,7 +388,7 @@ facts("Distributions") do
 
         x = randn(100)
         o1 = FitNormal(x)
-        o2 = onlinefit(Normal, x)
+        o2 = distributionfit(Normal, x)
         @fact o1.d => o2.d
         @fact nobs(o1) => nobs(o2)
     end
@@ -405,7 +405,7 @@ facts("Distributions") do
         update!(o, x)
         @fact mean(o) - mean(x) => roughly(0.0, 1e-10)
         @fact nobs(o) - length(x) => 0
-        o2 = onlinefit(Poisson, x)
+        o2 = distributionfit(Poisson, x)
         @fact mean(o) - mean(o2) => 0.0
         @fact nobs(o) - nobs(o2) => 0
     end

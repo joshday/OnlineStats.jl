@@ -6,14 +6,14 @@ type FitMvNormal{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
-function onlinefit(::Type{MvNormal}, y::AMatF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{MvNormal}, y::AMatF, wgt::Weighting = default(Weighting))
     o = FitMvNormal(ncols(y), wgt)
     updatebatch!(o, y)
     o
 end
 
 FitMvNormal(y::AMatF, wgt::Weighting = default(Weighting)) =
-    onlinefit(MvNormal, y, wgt)
+    distributionfit(MvNormal, y, wgt)
 
 FitMvNormal(p::Int, wgt::Weighting = default(Weighting)) =
     FitMvNormal(MvNormal(zeros(p), eye(p)), CovarianceMatrix(p, wgt), 0, wgt)

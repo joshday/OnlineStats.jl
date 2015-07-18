@@ -36,10 +36,10 @@ end
 	- Each observation gets equal weight
 - `nobs(o)`
 	- return the number of observations
-- `onlinefit!(o, b, args..., batch = true)`
+- `distributionfit!(o, b, args..., batch = true)`
 	- Run through the data `args...` calling `update!(o)`/`updatebatch!()` on minibatches of size `b`
 - `tracefit!(o, b, args..., batch = false)`
-	- Run through the data as in `onlinefit!` and return a vector of `typeof(o)`.  Each element
+	- Run through the data as in `distributionfit!` and return a vector of `typeof(o)`.  Each element
 	is a copy of `o` after being updated by the next batch.
 
 
