@@ -1,10 +1,11 @@
-"""
-`distributionfit(Dist, y)`
-
-Create an OnlineStat object for parametric density estimation of the distribution `Dist`
-using data `y`
-"""
-function distributionfit end
+# This breaks the v0.3 build
+# """
+# `distributionfit(Dist, y)`
+#
+# Create an OnlineStat object for parametric density estimation of the distribution `Dist`
+# using data `y`
+# """
+# function distributionfit end
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
     println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))
