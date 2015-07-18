@@ -1,7 +1,9 @@
 module OnlineStats
 
-using Docile.@document
-@document
+if VERSION < v"0.4.0-dev"
+    using Docile
+end
+
 using Reexport.@reexport
 @reexport using StatsBase
 using Compat

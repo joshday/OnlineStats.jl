@@ -1,16 +1,11 @@
 abstract Bootstrap <: OnlineStat
 
-"Double-or-nothing online bootstrap"
-:BernoulliBootstrap
-
-"Poisson-weighted online bootstrap"
-:PoissonBootstrap
-
+# Document functions
 "Get the replicates of the `OnlineStat` objects used in the bootstrap"
-:replicates
+function replicates end
 
 "return the value of interest for each of the `OnlineStat` replicates"
-:cached_state
+function cached_state end
 
 #-----------------------------------------------------------# BernoulliBootstrap
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
@@ -21,9 +16,16 @@ type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     cache_is_dirty::Bool
 end
 
-function BernoulliBootstrap{S <: OnlineStat}(stat::S, f::Function, R::Int = 1_000)
-    replicates = S[copy(stat) for i in 1:R]
-    cached_state = Array(Float64, R)
+@doc doc"""
+`BernoulliBootstrap(o, f, r)`
+
+Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for parameter `f(o)`
+
+Example: `BernoulliBootstrap(Mean(), mean, 1000)`
+""" ->
+function BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
+    replicates = OnlineStat[copy(o) for i in 1:r]
+    cached_state = Array(Float64, r)
     return BernoulliBootstrap(replicates, cached_state, f, 0, true)
 end
 
@@ -41,6 +43,13 @@ function update!(b::BernoulliBootstrap, x::Real)
 end
 
 #-------------------------------------------------------------# PoissonBootstrap
+@doc doc"""
+`PoissonBootstrap(o, f, r)`
+
+Create a poisson bootstrap using `r` replicates of OnlineStat `o` for parameter `f(o)`
+
+Example: `PoissonBootstrap(Mean(), mean, 1000)`
+""" ->
 type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
@@ -49,9 +58,9 @@ type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
     cache_is_dirty::Bool
 end
 
-function PoissonBootstrap{S <: OnlineStat}(stat::S, f::Function, R::Int = 1_000)
-    replicates = S[copy(stat) for i in 1:R]
-    cached_state = Array(Float64, R)
+function PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
+    replicates = OnlineStat[copy(o) for i in 1:r]
+    cached_state = Array(Float64, r)
     return PoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
