@@ -26,12 +26,13 @@ function update!{T<:Real}(o::OnlineStat, x::AMat{T}, y::AVec{T})
     end
 end
 
-"""
-`updatebatch!(o, data...)`
-
-Update an OnlineStat with a batch of data.  The batch is treated as an equal piece of information.
-"""
-function updatebatch! end
+# This breaks v0.3
+# """
+# `updatebatch!(o, data...)`
+#
+# Update an OnlineStat with a batch of data.  The batch is treated as an equal piece of information.
+# """
+# function updatebatch! end
 
 """
 `onlinefit!(o, b, data...; batch = false)`
