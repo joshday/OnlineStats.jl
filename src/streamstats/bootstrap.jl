@@ -1,12 +1,5 @@
 abstract Bootstrap <: OnlineStat
 
-# Document functions
-"Get the replicates of the `OnlineStat` objects used in the bootstrap"
-function replicates end
-
-"return the value of interest for each of the `OnlineStat` replicates"
-function cached_state end
-
 #-----------------------------------------------------------# BernoulliBootstrap
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}            # replicates of base stat
@@ -16,13 +9,13 @@ type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     cache_is_dirty::Bool
 end
 
-@doc doc"""
+"""
 `BernoulliBootstrap(o, f, r)`
 
 Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for parameter `f(o)`
 
 Example: `BernoulliBootstrap(Mean(), mean, 1000)`
-""" ->
+"""
 function BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
     replicates = OnlineStat[copy(o) for i in 1:r]
     cached_state = Array(Float64, r)
@@ -43,13 +36,13 @@ function update!(b::BernoulliBootstrap, x::Real)
 end
 
 #-------------------------------------------------------------# PoissonBootstrap
-@doc doc"""
+"""
 `PoissonBootstrap(o, f, r)`
 
 Create a poisson bootstrap using `r` replicates of OnlineStat `o` for parameter `f(o)`
 
 Example: `PoissonBootstrap(Mean(), mean, 1000)`
-""" ->
+"""
 type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
@@ -84,6 +77,7 @@ immutable FrozenBootstrap <: Bootstrap
     n::Int                          # number of observations
 end
 
+"return the value of interest for each of the `OnlineStat` replicates"
 cached_state(b::FrozenBootstrap) = copy(b.cached_state)
 
 #-----------------------------------------------------------------------# Common
@@ -112,6 +106,7 @@ Base.var(b::Bootstrap) = var(cached_state(b))
 state(b::Bootstrap) = [length(b.replicates), nobs(b)]
 statenames(b::Bootstrap) = [:replicates, :nobs]
 
+"Get the replicates of the `OnlineStat` objects used in the bootstrap"
 replicates(b::Bootstrap) = copy(b.replicates)
 
 # Assumes a and b are independent.

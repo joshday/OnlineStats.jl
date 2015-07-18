@@ -3,7 +3,11 @@
 "The number of observations"
 nobs(o::OnlineStat) = o.n
 
-"Update an OnlineStat one data point at a time"
+"""
+`update!(o, data...)`
+
+Update an OnlineStat one data point at a time
+"""
 function update!{T<:Real}(o::OnlineStat, x::AVec{T})
     for xi in x
         update!(o, xi)
@@ -22,37 +26,49 @@ function update!{T<:Real}(o::OnlineStat, x::AMat{T}, y::AVec{T})
     end
 end
 
+"""
+`updatebatch!(o, data...)`
 
+Update an OnlineStat with a batch of data.  The batch is treated as an equal piece of information.
+"""
+function updatebatch! end
 
-# getrows(x::Vector, rows) = x[rows]
-# getrows(x::Matrix, rows) = x[rows, :]
+"""
+`onlinefit!(o, b, data...; batch = false)`
 
-# Fit the data using batch size b
-# defaults to update!() for batch = false)
-function onlinefit!(o::OnlineStat, b::Integer, args...; batch::Bool = false)
+Update the OnlineStat `o` with `data` using batches of size `b`.  If `batch = false`,
+this calls `update!(o, data...)`.  If `batch = true`, it calls `updatebatch!` for each batch.
+"""
+function onlinefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)
     if !batch
-        update!(o, args...)
+        update!(o, data...)
     else
-        n = size(args[1],1)
+        n = size(data[1],1)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            batch_args = map(x -> rows(x,rng), args)
-            updatebatch!(o, batch_args...)
+            batch_data = map(x -> rows(x,rng), data)
+            updatebatch!(o, batch_data...)
             i += b
         end
     end
 end
-# Create a vector of OnlineStats, each element is updated with a batch of size b
-function tracefit!(o::OnlineStat, b::Integer, args...; batch::Bool = false)
+
+"""
+`tracefit!(o, b, data...; batch = false)`
+
+Run through data as in `onlinefit!`.  Return a vector of OnlineStats where each
+element has been updated with a batch of size `b`.
+"""
+function tracefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)
     n = nrows(args[1])
     i = 1
     s = state(o)
     result = [copy(o)]
     while i <= n
         rng = i:min(i + b - 1, n)
-        batch_args = map(x -> rows(x, rng), args)
-        batch ? updatebatch!(o, batch_args...) : update!(o, batch_args...)
+        batch_data = map(x -> rows(x, rng), data)
+        batch ? updatebatch!(o, batch_data...) : update!(o, batch_data...)
         push!(result, copy(o))
         i += b
     end
