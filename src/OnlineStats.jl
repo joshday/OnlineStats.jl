@@ -55,6 +55,7 @@ export
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
+    Diff,
 
     CovarianceMatrix,
     Means,
@@ -132,6 +133,7 @@ include("summary/moments.jl")
 include("summary/quantilesgd.jl")
 include("summary/quantilemm.jl")
 include("summary/fivenumber.jl")
+include("summary/diff.jl")
 
 # Multivariate
 include("multivariate/covmatrix.jl")

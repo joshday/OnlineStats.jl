@@ -55,4 +55,35 @@ facts("Summary") do
     @fact minimum(o) => minimum(x)
 end
 
+facts("Diff") do
+    o = Diff()
+    @fact diff(o) => 0.0
+    @fact state(o) => Any[0.0, 0.0, 0]
+    @fact statenames(o) => [:diff, :last, :nobs]
+
+    @fact update!(o, 10) => nothing
+    @fact typeof(last(o)) => Float64
+    @fact last(o) => 10.0
+    @fact diff(o) => 0.0
+
+    @fact update!(o, convert(Float32, 11.0)) => nothing
+    @fact last(o) => 11.0
+    @fact diff(o) => 1.0
+
+    o = Diff(1)
+    @fact typeof(last(o)) => Int
+    @fact diff(o) => 0
+    @fact last(o) => 1
+    @fact nobs(o) => 1
+    @fact update!(o, 0.1:0.2:0.9) => nothing
+    @fact diff(o) => 0
+    @fact last(o) => 1
+    @fact nobs(o) => 6
+    @fact update!(o, 0.1:0.5:2.7) => nothing
+    @fact diff(o) => 1
+    @fact last(o) => 3
+    @fact nobs(o) => 12
+
+end
+
 end # module
