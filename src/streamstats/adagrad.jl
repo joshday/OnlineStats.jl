@@ -43,7 +43,7 @@ immutable QuantileLoss <: LossFunction
     τ::Float64
     QuantileLoss(τ = 0.5) = new(τ)
 end
-@inline ∇f(loss::QuantileLoss, ϵ::Float64, xᵢ::Float64) = ((ϵ < 0) - loss.τ) * xᵢ
+@inline ∇f(loss::QuantileLoss, ϵ::Float64, xᵢ::Float64) = (Float64(ϵ < 0) - loss.τ) * xᵢ
 
 
 # --------------------------------------------------------------------------
