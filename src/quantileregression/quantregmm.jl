@@ -1,4 +1,7 @@
 #-------------------------------------------------------# Type and Constructors
+"""
+Quantile regression using an online MM algorithm.
+"""
 type QuantRegMM{W <: Weighting} <: OnlineStat
     β::VecF
     τ::Float64        # Desired conditional quantile

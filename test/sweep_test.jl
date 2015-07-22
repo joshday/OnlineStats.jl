@@ -6,7 +6,7 @@ using FactCheck
 facts("sweep!()") do
     for rep in 1:5
         n = rand(2:10_000)
-        p = rand(1:1000)
+        p = rand(1:min(n-1, 1000))
         A = rand(n, p)
 
         A = A' * A
@@ -15,7 +15,7 @@ facts("sweep!()") do
         sweep!(A, 1:p-1, true)
 
 
-        @fact A => roughly(B)
+        @fact A => roughly(B, 1e-10)
 
         x = randn(n , p)
         y = vec(sum(x, 2)) + randn(n)
