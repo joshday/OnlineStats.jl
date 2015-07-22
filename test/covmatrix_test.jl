@@ -70,13 +70,13 @@ facts("CovarianceMatrix") do
         @fact abs(projection(oPCA)) => roughly(abs(projection(PCA)))
 
         # full PCA - covariance
-        pca(o, false)
+        @fact pca(o, false, maxoutdim = d-2) => anything
 
         # top d PCA - correlation
-        pca(o, true, maxoutdim = 4)
+        @fact pca(o, true, maxoutdim = 4) => anything
 
         # top d PCA - covariance
-        pca(o, false, maxoutdim = 4)
+        @fact pca(o, false, maxoutdim = 4) => anything
 
     end
 end

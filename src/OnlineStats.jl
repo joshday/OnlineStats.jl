@@ -55,11 +55,13 @@ export
     QuantileMM,
     QuantileSGD,
     FiveNumberSummary,
+    Diff,
 
     CovarianceMatrix,
     Means,
     Variances,
     AnalyticalPCA,
+    Diffs,
 
     NormalMix,
     FitBernoulli,
@@ -132,12 +134,14 @@ include("summary/moments.jl")
 include("summary/quantilesgd.jl")
 include("summary/quantilemm.jl")
 include("summary/fivenumber.jl")
+include("summary/diff.jl")
 
 # Multivariate
 include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
 include("multivariate/analyticalpca.jl")
+include("multivariate/diffs.jl")
 
 # Parametric Density
 include("distributions/common_dist.jl")
