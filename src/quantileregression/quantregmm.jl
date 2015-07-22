@@ -42,12 +42,6 @@ function update!(o::QuantRegMM, x::AVecF, y::Float64)
     o.n += 1
 end
 
-# function update!(o::QuantRegMM, x::AMatF, y::AVecF)
-#     @inbounds for i in 1:size(x,1)
-#         update!(o, vec(x[i, :]), y[i])
-#     end
-# end
-
 function updatebatch!(o::QuantRegMM, x::AMatF, y::AVecF)
     n = size(x, 1)
     γ = weight(o)
@@ -55,7 +49,9 @@ function updatebatch!(o::QuantRegMM, x::AMatF, y::AVecF)
     w = 1 ./ (o.ϵ + abs(y - x * o.β))
     u = y .* w + 2 * o.τ - 1
 
-    smooth!(o.XtWX, x' * scale(w, x), γ)
+    wx = scale!(w, copy(x))
+
+    smooth!(o.XtWX, x' * wx, γ)
     smooth!(o.Xu, x' * u, γ)
 
     o.β = o.XtWX \ o.Xu
