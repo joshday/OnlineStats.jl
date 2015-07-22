@@ -129,6 +129,23 @@ facts("Adagrad") do
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
 
+    context("Quantile Loss") do
+        x = randn(n, p)
+        β = collect(1.:p)
+        y = x * β + randn(n)
+
+        o = Adagrad(x, y; loss = QuantileLoss())
+        @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1)
+
+        o = Adagrad(hcat(ones(n), x), y; loss = QuantileLoss(.8))
+        @fact coef(o) => roughly(vcat(quantile(Normal(), .8), β), atol = 0.5, rtol = 0.1)
+
+        ϵdist = Normal(0, 5)
+        y = x * β + rand(ϵdist, n)
+        o = Adagrad(hcat(ones(n), x), y; loss = QuantileLoss(.8))
+        @fact coef(o) => roughly(vcat(quantile(ϵdist, .8), β), atol = 0.5, rtol = 0.1)
+    end
+
     # context("Vs StreamStats") do
     #     x = randn(n, p)
     #     xbias = hcat(x, ones(n))

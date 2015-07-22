@@ -1,6 +1,6 @@
 
 
-# First attempt at a generalized Adagrad framework.  
+# First attempt at a generalized Adagrad framework.
 # TODO: I expect to be able to also combine Adagrad with Regularized Dual Averaging (RDA) as an alternative algorithm
 # with better sparsity in resulting parameters for weakly convex regularization functions
 
@@ -11,7 +11,7 @@
 
 # Problem: argmin{βₜ} (Σ f(xₛ,yₛ,βₛ) + λ Ψ(βₜ))
 # Online algorithm to solve for optimal estimate βₜ of parameter vector given some loss function f and
-# regularization function Ψ, with all online estimates of βₛ, s <= t 
+# regularization function Ψ, with all online estimates of βₛ, s <= t
 
 # TODO: add weighting?  might not be possible until we include RDA
 
@@ -19,7 +19,7 @@
 
 # --------------------------------------------------------------------------
 
-# placeholder loss/reg types and functions. 
+# placeholder loss/reg types and functions.
 # TODO: use EmpiricalRisks.jl or something else
 
 # NOTE: I don't think I need the loss/reg values... only gradients
@@ -37,6 +37,14 @@ immutable SquareLoss <: LossFunction end
 immutable LogisticLoss <: LossFunction end
 # f(::LogisticLoss, y::Float64, ypred::Float64) = log(1 + exp(-y * ypred))
 @inline ∇f(::LogisticLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
+
+# Quantile Regression using Adagrad
+immutable QuantileLoss <: LossFunction
+    τ::Float64
+    QuantileLoss(τ = 0.5) = new(τ)
+end
+@inline ∇f(loss::QuantileLoss, ϵ::Float64, xᵢ::Float64) = ((ϵ < 0) - loss.τ) * xᵢ
+
 
 # --------------------------------------------------------------------------
 
@@ -87,7 +95,7 @@ type Adagrad{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction
   n::Int
 end
 
-function Adagrad(p::Int; 
+function Adagrad(p::Int;
                  η::Float64 = 1.0,
                  link::LinkFunction = IdentityLink(),
                  loss::LossFunction = SquareLoss(),

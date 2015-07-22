@@ -92,6 +92,7 @@ export
     Adagrad,
     SquareLoss,
     LogisticLoss,
+    QuantileLoss,
     L1Reg,
     L2Reg,
     LogisticLink,
