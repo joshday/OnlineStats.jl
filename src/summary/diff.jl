@@ -33,9 +33,9 @@ function update!{T<:Integer}(o::Diff{T}, x::Real)
     return
 end
 
-function Base.empty!(o::Diff)
-    o.diff = 0.0
-    o.lastval = 0.0
+function Base.empty!{T<:Real}(o::Diff{T})
+    o.diff = zero(T)
+    o.lastval = zero(T)
     o.n = 0
     return
 end

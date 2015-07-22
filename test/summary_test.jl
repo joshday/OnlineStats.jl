@@ -86,4 +86,39 @@ facts("Diff") do
 
 end
 
+facts("Diffs") do
+    p = 2
+    o = Diffs(p)
+    @fact diff(o) => zeros(p)
+    @fact state(o) => Any[zeros(p), zeros(p), 0]
+    @fact statenames(o) => [:diff, :last, :nobs]
+
+    @fact update!(o, 10:11.) => nothing
+    @fact typeof(last(o)) => Vector{Float64}
+    @fact typeof(diff(o)) => Vector{Float64}
+    @fact last(o) => Float64[10.0, 11.0]
+    @fact diff(o) => zeros(p)
+
+    @fact update!(o, 11:2:13.1) => nothing
+    @fact last(o) => roughly(Float64[11.0, 13.0])
+    @fact diff(o) => roughly(Float64[1.0, 2.0])
+
+    o = Diffs(ones(Int,p))
+    @fact typeof(last(o)) => Vector{Int}
+    @fact typeof(diff(o)) => Vector{Int}
+    @fact diff(o) => Int[0,0]
+    @fact last(o) => Int[1,1]
+    @fact nobs(o) => 1
+    @fact update!(o, Int[10,20]) => nothing
+    @fact diff(o) => Int[9,19]
+    @fact last(o) => Int[10,20]
+    @fact nobs(o) => 2
+    @fact update!(o, vcat(2*ones(Int,p)', 5*ones(Int,p)')) => nothing
+    @fact diff(o) => Int[3,3]
+    @fact last(o) => Int[5,5]
+    @fact nobs(o) => 4
+
+end
+
+
 end # module
