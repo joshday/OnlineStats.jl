@@ -5,8 +5,8 @@ using FactCheck
 
 facts("sweep!()") do
     for rep in 1:5
-        n = rand(1:10_000, 1)[1]
-        p = rand(1:min(n-1, 1000), 1)[1]
+        n = rand(2:10_000)
+        p = rand(1:1000)
         A = rand(n, p)
 
         A = A' * A
