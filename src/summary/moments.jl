@@ -2,6 +2,10 @@
 # This implementation uses noncentral moments.
 
 #-------------------------------------------------------# Type and Constructors
+"""
+First four univariate noncentral moments.  Mean, variance, skewness, and kurtosis
+can be derived from this type.
+"""
 type Moments{W <: Weighting} <: OnlineStat
     m1::Float64
     m2::Float64
