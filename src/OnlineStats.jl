@@ -29,6 +29,7 @@ import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean,
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
+import Reactive: Input
 
 # import MathProgBase: AbstractMathProgSolver
 # import Convex, SCS
@@ -188,10 +189,18 @@ include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/sgd.jl")
 
-export BiasVector, BiasMatrix
+export
+    BiasVector,
+    BiasMatrix
 include("multivariate/bias.jl")
 
-export @stream
+export 
+    @stream,
+    RealInput,
+    FloatInput,
+    IntInput,
+    VecInput,
+    RegressionInput
 include("react.jl")
 
 end # module

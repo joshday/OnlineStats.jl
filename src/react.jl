@@ -1,9 +1,20 @@
 
+
+# some helper methods to create Input types
+RealInput{T<:Real}(::Type{T}) = Input(zero(T))
+FloatInput() = RealInput(Float64)
+IntInput() = RealInput(Int)
+VecInput{T<:Real}(::Type{T}) = Input{AVec{T}}(zeros(T,0))
+VecInput() = VecInput(Float64)
+RegressionInput{T<:Real}(::Type{T}) = Input{@compat Tuple{AVec{T},T}}((zeros(T,0),zero(T)))
+RegressionInput() = RegressionInput(Float64)
+
+
 function liftexpr(lhs, rhs, f = :nop)
   gs = gensym()
   fgs = f == :nop ? gs : :($f($gs))
   quote
-    lift($gs -> (update!($rhs, $fgs); $rhs), $lhs; init = $rhs)
+    lift($gs -> (update!($rhs, $fgs...); $rhs), $lhs; init = $rhs)
   end
 end
 
@@ -38,5 +49,6 @@ end
 # returns a Reactive.Input{inputType} object which you should push! the inputs to
 macro stream(expr::Expr)
   expr = applyPipe(expr)
+  # println(expr)
   esc(expr)
 end
