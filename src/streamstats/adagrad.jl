@@ -41,7 +41,10 @@ immutable LogisticLoss <: LossFunction end
 # Quantile Regression using Adagrad
 immutable QuantileLoss <: LossFunction
     τ::Float64
-    QuantileLoss(τ = 0.5) = new(τ)
+    function QuantileLoss(τ::Real = 0.5)
+        zero(τ) < τ < one(τ) || error("τ must be in (0, 1)")
+        new(@compat Float64(τ))
+    end
 end
 @inline ∇f(loss::QuantileLoss, ϵ::Float64, xᵢ::Float64) = (@compat Float64(ϵ < 0) - loss.τ) * xᵢ
 
