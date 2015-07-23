@@ -23,6 +23,11 @@ facts("SGD") do
         @fact coef(o) - β => roughly(zeros(p), atol = atol, rtol = rtol)
         @fact predict(o, ones(p)) => roughly(1.0 * sum(β), atol = atol, rtol = rtol)
 
+        # updatebatch!
+        o = OnlineStats.SGD(p)
+        OnlineStats.onlinefit!(o, 500, x, y; batch = true)
+        @fact coef(o) - β => roughly(zeros(p), atol = atol, rtol = rtol)
+
         # ridge regression
         # repeat same data in first 2 variables
         # it should give 1.5 for β₁ and β₂ after reg (even though actual betas are 1 and 2)
@@ -47,10 +52,10 @@ facts("SGD") do
         OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) - β => roughly(zeros(p), atol = 0.5, rtol = 0.1)
 
-        # # batch version needs to be profiled and optimized.  It's way too slow.
-        # o = SGD(p, OnlineStats.StochasticWeighting(.51); link=OnlineStats.LogisticLink(), loss=OnlineStats.LogisticLoss())
-        # OnlineStats.onlinefit!(o, 100, x, y; batch = true)
-        # @fact coef(o) - β => roughly(zeros(p), atol = 0.5, rtol = 0.1) "batch version"
+        # updatebatch!
+        o = SGD(p, OnlineStats.StochasticWeighting(.51); link=OnlineStats.LogisticLink(), loss=OnlineStats.LogisticLoss())
+        OnlineStats.onlinefit!(o, 100, x, y; batch = true)
+        @fact coef(o) - β => roughly(zeros(p), atol = 0.5, rtol = 0.1) "batch version"
 
         # logistic l2
         # repeat same data in first 2 variables
@@ -74,6 +79,11 @@ facts("SGD") do
 
         o = SGD(hcat(ones(n), x), y; loss = QuantileLoss(.8))
         @fact coef(o) => roughly(vcat(quantile(Normal(), .8), β), atol = 0.5, rtol = 0.1)
+
+        # updatebatch!
+        o = OnlineStats.SGD(p, OnlineStats.StochasticWeighting(.3, .01); loss=OnlineStats.QuantileLoss())
+        OnlineStats.onlinefit!(o, 10, x, y; batch = true)
+        @fact coef(o) => roughly(β, atol = 0.5, rtol = 0.1) "batch version"
 
         ϵdist = Normal(0, 5)
         y = x * β + rand(ϵdist, n)

@@ -15,8 +15,9 @@ end
 function SGD(p::Integer, wgt::StochasticWeighting = StochasticWeighting();
              link::LinkFunction = IdentityLink(),
              loss::LossFunction = SquareLoss(),
-             reg::RegularizationFunction = NoReg())
-    SGD(zeros(p), link, loss, reg, wgt, 0)
+             reg::RegularizationFunction = NoReg(),
+             start::VecF = zeros(p))
+    SGD(start, link, loss, reg, wgt, 0)
 end
 
 function SGD(X::AMatF, y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); kwargs...)
@@ -40,20 +41,25 @@ function update!(o::SGD, x::AVecF, y::Float64)
     nothing
 end
 
+
+@inline function _update_average_gradient!(o::SGD, x::AVecF, y::Float64, w::Float64)
+    ε = y - predict(o, x)
+    n2inv = @compat Float64(1 / length(x))
+    for j in 1:length(x)
+        g = ∇f(o.loss, ε, x[j]) + ∇Ψ(o.reg, o.β, j)
+        o.β[j] -= w * g * n2inv
+    end
+    o.n += 1
+    nothing
+end
+
 function updatebatch!(o::SGD, x::AMatF, y::AVecF)
     n2 = length(y)
     λ = weight(o)
-    for j = 1:size(x, 2)
-        g = 0
-        for i = 1:n2
-            ε = y[i] - predict(o, row(x, i))
-            g += ∇f(o.loss, ε, x[i, j]) + ∇Ψ(o.reg, o.β, j)
-        end
-        g /= n2
-        o.β[j] -= λ * g
+
+    for i in 1:n2
+        _update_average_gradient!(o, row(x, i), y[i], λ)
     end
-    o.n += n2
-    nothing
 end
 
 
