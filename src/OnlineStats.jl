@@ -60,7 +60,7 @@ export
     CovarianceMatrix,
     Means,
     Variances,
-    AnalyticalPCA,
+    # AnalyticalPCA,
     Diffs,
 
     NormalMix,
@@ -142,7 +142,7 @@ include("summary/diff.jl")
 include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
-include("multivariate/analyticalpca.jl")
+# include("multivariate/analyticalpca.jl")
 include("multivariate/diffs.jl")
 
 # Parametric Density
