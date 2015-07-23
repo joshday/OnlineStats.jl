@@ -1,4 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
+"Track the means of a data matrix, similar to `mean(x, 1)`"
 type Means{W <: Weighting} <: OnlineStat
     μ::VecF
     p::Int  # length of μ

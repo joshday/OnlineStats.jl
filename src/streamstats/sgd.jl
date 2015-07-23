@@ -3,6 +3,18 @@
 # Link and Loss functions are defined in SGD.julia
 
 #--------------------------------------------------------# Type and Constructors
+"""
+`SGD(x, y, wgt; link, loss, reg, start)`
+
+Generic type for stochastic gradient descent algorithms.
+
+Keyword arguments are:
+
+- `link`: link function (`IdentityLink()`, `LogisticLink()`)
+- `loss`: loss function (`SquareLoss()`, `LogisticLoss()`, `QuantileLoss(τ)`)
+- `reg`: regularizer/penalty (`NoReg`, `L1Reg`, `L2Reg`)
+- `start`: starting value (defaults to zeros)
+"""
 type SGD{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction} <: OnlineStat
     β::VecF
     link::LINK

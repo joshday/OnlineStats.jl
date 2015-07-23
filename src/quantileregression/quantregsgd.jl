@@ -1,4 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
+"deprecated type.  Use `SGD(x, y; loss = QuantileLoss(τ)`)"
 type QuantRegSGD{W <: Weighting} <: OnlineStat
     β::VecF           # Coefficients
     τ::Float64        # Desired conditional quantile

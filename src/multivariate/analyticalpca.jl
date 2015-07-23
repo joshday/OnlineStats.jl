@@ -1,6 +1,7 @@
 # This is a "slow" analytical update based on CovarianceMatrix
 # At each batch, CovarianceMatrix is updated and then eigenvalue decomposition is done.
 #-------------------------------------------------------# Type and Constructors
+"deprecated type for PCA.  Use pca(o::CovarianceMatrix) instead."
 type AnalyticalPCA{W <: Weighting} <: OnlineStat
     C::CovarianceMatrix{W}
     corr::Bool  # Use correlation instead of covariance?
