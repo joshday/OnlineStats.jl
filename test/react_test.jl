@@ -1,15 +1,15 @@
 module ReactTest
 
-using OnlineStats, FactCheck
+using OnlineStats, FactCheck, Reactive
 
-include("/home/tom/.julia/v0.4/OnlineStats/src/react.jl")
+# include("/home/tom/.julia/v0.4/OnlineStats/src/react.jl")
 
 
 facts("React") do 
   input = Input(0.0)
   d = Diff()
   m = Mean()
-  l = osr.@stream diff(input |> d) |> m
+  l = @stream diff(input |> d) |> m
 
   for x in [5., 8., 3.]
     push!(input, x)

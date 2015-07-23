@@ -191,6 +191,7 @@ include("streamstats/sgd.jl")
 export BiasVector, BiasMatrix
 include("multivariate/bias.jl")
 
-
+export @stream
+include("react.jl")
 
 end # module
