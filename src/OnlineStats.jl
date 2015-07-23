@@ -28,6 +28,7 @@ import Distributions:
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
+import EmpiricalRisks
 import ArrayViews: view, rowvec_view
 
 # import MathProgBase: AbstractMathProgSolver
@@ -89,6 +90,7 @@ export
     StepwiseReg,
 
     HyperLogLog,
+    SGD,
     Adagrad,
     SquareLoss,
     LogisticLoss,
@@ -185,6 +187,7 @@ include("quantileregression/quantregmm.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
+include("streamstats/sgd.jl")
 
 export BiasVector, BiasMatrix
 include("multivariate/bias.jl")

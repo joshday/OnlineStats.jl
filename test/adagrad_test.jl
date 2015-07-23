@@ -129,7 +129,7 @@ facts("Adagrad") do
         @fact coef(o) => roughly(β2, atol = 0.8, rtol = 0.2)
     end
 
-    context("Quantile Loss") do
+    context("Quantile Regression") do
         x = randn(n, p)
         β = collect(1.:p)
         y = x * β + randn(n)
