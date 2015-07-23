@@ -1,4 +1,7 @@
 #-------------------------------------------------------# Type and Constructors
+"""
+Analytical estimate of covariance matrix.
+"""
 type CovarianceMatrix{W <: Weighting} <: OnlineStat
     A::MatF           # X' * X / n
     B::VecF           # X * 1' / n (column means)
@@ -21,6 +24,14 @@ CovarianceMatrix(p::Integer, wgt::Weighting = default(Weighting)) =
 statenames(o::CovarianceMatrix) = [:μ, :Σ, :nobs]
 state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
 
+"""
+`pca(o, corr = true, keywargs...)`
+
+Perform principal components analysis of the data provided to the `CovarianceMatrix`
+object `o` using the correlation matrix (`corr = true`) or covariance matrix.
+
+The keyword argument `maxoutdim` defines the number of components to return.
+"""
 function pca(o::CovarianceMatrix, corr::Bool = true; keyargs...)
     if corr
         MultivariateStats.pcacov(cor(o), mean(o); keyargs...)

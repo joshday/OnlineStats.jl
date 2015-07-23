@@ -1,5 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
+"Univariate mean."
 type Mean{W <: Weighting} <: OnlineStat
     μ::Float64
     n::Int

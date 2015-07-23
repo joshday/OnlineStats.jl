@@ -1,7 +1,11 @@
 #-------------------------------------------------------# Type and Constructors
+"""
+Univariate five-number summary.  Maximum and minimum are exact and .25, .5, .75
+quantiles are approximate using on online MM algorithm.
+"""
 type FiveNumberSummary <: OnlineStat
     extrema::Extrema
-    quantiles::QuantileSGD
+    quantiles::QuantileMM
     n::Int64
 end
 
@@ -14,7 +18,7 @@ end
 
 function FiveNumberSummary(wgt::Weighting = StochasticWeighting();
                            start = zeros(3))
-    FiveNumberSummary(Extrema(), QuantileSGD(wgt, start = start), 0)
+    FiveNumberSummary(Extrema(), QuantileMM(wgt, start = start), 0)
 end
 
 
@@ -47,4 +51,3 @@ function updatebatch!(o::FiveNumberSummary, y::AVecF)
     o.n += length(y)
     return
 end
-

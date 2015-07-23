@@ -1,5 +1,6 @@
 
 #-------------------------------------------------------# Type and Constructors
+"Univariate variance."
 type Variance{W<:Weighting} <: OnlineStat
     μ::Float64
     biasedvar::Float64    # BIASED variance (makes for easier update)

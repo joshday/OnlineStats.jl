@@ -1,9 +1,6 @@
 """
-Symmetric sweep of matrix A.  Only the lower triangular part is read and swept.
+Symmetric sweep of symmetric matrix A.  Only the lower triangle is read and swept.
 """
-:sweep!
-
-
 function sweep!(A::MatF, k::Int, inv::Bool=false)
     n = size(A, 1)
     # pivot element

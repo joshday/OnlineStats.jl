@@ -1,4 +1,5 @@
 #-------------------------------------------------------# Type and Constructors
+"Track the means of a data matrix, similar to `var(x, 1)`"
 type Variances{W<:Weighting} <: OnlineStat
     μ::VecF
     biasedvar::VecF    # BIASED variance (makes for easier update)

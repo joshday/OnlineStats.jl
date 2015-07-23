@@ -1,4 +1,7 @@
 #------------------------------------------------------# Type and Constructors
+"""
+Univariate summary statistics:  Mean, variance, maximum, and minimum.
+"""
 type Summary{W <: Weighting} <: OnlineStat
     var::Variance{W}  # mean and variance
     extrema::Extrema  # max and min

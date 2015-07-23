@@ -80,7 +80,7 @@ export
 
     OnlineFLS,
     LinReg,
-    LinRegSGD,
+    # LinRegSGD,
     QuantRegSGD,
     QuantRegMM,
     LogRegMM,
@@ -166,7 +166,7 @@ include("distributions/poisson.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-include("linearmodel/linregsgd.jl")
+# include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 include("linearmodel/sparsereg.jl")
 include("linearmodel/stepwise.jl")

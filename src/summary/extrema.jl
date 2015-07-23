@@ -1,4 +1,7 @@
 #------------------------------------------------------# Type and Constructors
+"""
+Univariate maximum and minimum.
+"""
 type Extrema <: OnlineStat
     max::Float64
     min::Float64

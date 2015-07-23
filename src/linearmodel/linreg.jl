@@ -1,4 +1,9 @@
 #-------------------------------------------------------# Type and Constructors
+"""
+`LinReg(x, y)`
+
+Analytical linear regression via the sweep operator.
+"""
 type LinReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
     s::MatF                     # "Swept" version of [X y]' [X y]
@@ -24,6 +29,7 @@ state(o::LinReg) = Any[coef(o), nobs(o)]
 
 nobs(o::LinReg) = nobs(o.c)
 
+"Estimate of the error variance"
 mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
 
 StatsBase.coef(o::LinReg) = vec(o.s[end, 1:end - 1])

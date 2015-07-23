@@ -1,4 +1,7 @@
 #-------------------------------------------------------# Type and Constructors
+"""
+Approximate quantiles using an online MM algorithm.
+"""
 type QuantileMM <: OnlineStat
     q::VecF              # Quantile qimates
     τ::VecF                # tau values
