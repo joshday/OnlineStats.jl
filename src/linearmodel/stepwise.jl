@@ -4,6 +4,12 @@
 # entering or leaving the model based on Mallow's Cp
 
 #-------------------------------------------------------# Type and Constructors
+"""
+Online stepwise regression.
+
+At each update, there is the possible of one variable entering or leaving the model.
+Performs best using `updatebatch!()` with large batches.
+"""
 type StepwiseReg{W <: Weighting} <: OnlineStat
     C::CovarianceMatrix{W}  # Cov([X y])
     s::MatF                 # "Swept" version of [X y]' [X y] / n

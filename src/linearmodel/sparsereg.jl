@@ -11,6 +11,14 @@
 # an intercept.
 
 #-------------------------------------------------------# Type and Constructors
+"""
+Experimental: Online Sparse Regression
+
+From this type, you can get analytical parameter estimates for OLS, ridge regression,
+lasso (TODO), elastic-net (TODO).
+
+You can also specify your own (Convex.jl supported) penalty with coef_solver (TODO)
+"""
 type SparseReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
     s::MatF                 # memory holder for "Swept" version of cor(o.c)

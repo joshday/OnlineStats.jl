@@ -6,6 +6,11 @@ type FitBernoulli{W <: Weighting} <: DistributionStat
     weighting::W
 end
 
+"""
+`distributionfit(Dist, y, wgt)`
+
+Track parametric estimates of distribution `Dist` using data `y` and weighting `wgt`.
+"""
 function distributionfit{T <: Integer}(::Type{Bernoulli}, y::AVec{T}, wgt::Weighting = default(Weighting))
     o = FitBernoulli(wgt)
     update!(o, y)
