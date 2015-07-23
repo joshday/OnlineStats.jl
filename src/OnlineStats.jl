@@ -28,7 +28,6 @@ import Distributions:
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
-import EmpiricalRisks
 import ArrayViews: view, rowvec_view
 
 # import MathProgBase: AbstractMathProgSolver
