@@ -75,6 +75,29 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
 end
 
 
+# Special update for linear regression lasso
+# If something gets set to zero it stays zero forever...this is the only way I've
+# been able to generate a sparse solution
+positive_or_zero(x::Float64) = x > 0 ? x : 0.0
+function update!(o::SGD{IdentityLink, SquareLoss, L1Reg}, x::AVecF, y::Float64)
+    ϵ = y - predict(o, x)
+    γ = weight(o)
+    for j in 1:length(x)
+        βval = o.β[j]
+        if nobs(o) > 10 && βval == 0
+            o.β[j] = 0.0
+        else
+            u = abs(βval) * (sign(βval) .!= -1)  # positive or zero
+            v = abs(βval) * (sign(βval) .== -1)  # negative
+            u = positive_or_zero(u - γ * (o.reg.λ - ϵ * x[j]))
+            v = positive_or_zero(v - γ * (o.reg.λ + ϵ * x[j]))
+            o.β[j] = u - v
+        end
+    end
+    o.n += 1
+    nothing
+end
+
 #-----------------------------------------------------------------------# state
 
 state(o::SGD) = Any[copy(o.β), nobs(o)]

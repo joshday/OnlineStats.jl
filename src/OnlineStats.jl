@@ -47,7 +47,7 @@ export
     BernoulliBootstrap,
     PoissonBootstrap,
 
-    # <: OnlineStat
+    # OnlineStats
     Mean,
     Variance,
     Moments,
@@ -61,7 +61,6 @@ export
     CovarianceMatrix,
     Means,
     Variances,
-    # AnalyticalPCA,
     Diffs,
 
     NormalMix,
@@ -80,8 +79,6 @@ export
 
     OnlineFLS,
     LinReg,
-    # LinRegSGD,
-    QuantRegSGD,
     QuantRegMM,
     LogRegMM,
     LogRegSGD,
@@ -95,6 +92,7 @@ export
     SquareLoss,
     LogisticLoss,
     QuantileLoss,
+    AbsoluteLoss,
     L1Reg,
     L2Reg,
     LogisticLink,
@@ -143,7 +141,6 @@ include("summary/diff.jl")
 include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
-# include("multivariate/analyticalpca.jl")
 include("multivariate/diffs.jl")
 
 # Parametric Density
@@ -166,7 +163,6 @@ include("distributions/poisson.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-# include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 include("linearmodel/sparsereg.jl")
 include("linearmodel/stepwise.jl")
@@ -180,7 +176,6 @@ include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
 
 # Quantile Regression
-include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
@@ -194,7 +189,7 @@ export
     BiasMatrix
 include("multivariate/bias.jl")
 
-export 
+export
     @stream,
     update_get!
     # RealInput,

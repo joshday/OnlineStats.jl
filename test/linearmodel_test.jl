@@ -50,18 +50,6 @@ facts("Linear Model") do
         @fact predict(o, x) => x * coef(o)
     end
 
-    # context("LinRegSGD") do
-    #     o = LinRegSGD(10)
-    #     β = ones(10)
-    #     x = randn(100, 10)
-    #     y = x * β + randn(100)
-    #     for i in 1:10  # hack to get Coverage.jl to show this as covered
-    #         o = LinRegSGD(x, y)
-    #     end
-    #     @fact statenames(o) => [:β, :nobs]
-    #     @fact state(o::LinRegSGD) => Any[coef(o), nobs(o)]
-    # end
-
     context("StepwiseReg") do
         n = 5000
         p = 9

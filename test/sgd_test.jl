@@ -39,6 +39,12 @@ facts("SGD") do
         @fact coef(o)[1] => roughly(1.5, atol = atol, rtol = rtol)
         @fact coef(o)[2] => roughly(1.5, atol = atol, rtol = rtol)
 
+        # lasso
+        β = collect(1.:p)
+        β[10:end] = 0.0
+        y = x*β + randn(n)
+        @time o = OnlineStats.SGD(x, y; reg = OnlineStats.L1Reg(0.01))
+
         @fact statenames(o) => [:β, :nobs]
         @fact state(o)[1] => coef(o)
         @fact state(o)[2] => nobs(o)
