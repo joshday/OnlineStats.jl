@@ -12,7 +12,7 @@
 
 ## Multivariate Analysis
 
-- [x] PCA: `AnalyticalPCA`, `OnlinePCA`, `pca(o::CovarianceMatrix)`
+- [x] PCA: `OnlinePCA`, `pca(o::CovarianceMatrix)`
 - [ ] CCA:
 - [ ] Factor Analysis:
 
@@ -49,11 +49,11 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 
 ### Penalized Regression
 - [ ] LASSO:
-- [x] Ridge: `SparseReg`
+- [x] Ridge: `SparseReg`, `Adagrad`, `SGD`
 - [ ] Elastic Net:
 
 ### Quantile Regression
-- [x] Linear Quantile Regression: `QuantRegMM`, `QuantRegSGD`
+- [x] Linear Quantile Regression: `QuantRegMM`, `Adagrad`
 - [ ] Composite Linear Quantile Regression:
 
 ### Variance Component Model
