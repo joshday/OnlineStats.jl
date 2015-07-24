@@ -1,6 +1,6 @@
 module ReactTest
 
-using OnlineStats, FactCheck
+using OnlineStats, FactCheck, Compat
 import OnlineStats: row
 
 
@@ -100,8 +100,8 @@ facts("React") do
       outval = f(row(x,i), y[i]) 
 
       if i == length(y)
-        @fact typeof(outval) => Tuple{Float64, Float64}
-        @fact abs(outval[2] - outval[1]) => roughly(0.0, atol = 0.5)
+        @fact typeof(outval) => @compat Tuple{Float64, Float64}
+        @fact abs(outval[2] - outval[1]) => roughly(0.0, atol = 1.0)
         # @fact abs(outval[3] - outval[1]) => roughly(0.0, atol = 0.1)
         println("outval: ", outval)
       end
