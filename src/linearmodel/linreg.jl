@@ -79,4 +79,5 @@ StatsBase.stderr(o::LinReg) = sqrt(diag(vcov(o)))
 
 StatsBase.vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / nobs(o))
 
+StatsBase.predict(o::LinReg, x::AVec) = dot(x, coef(o))
 StatsBase.predict(o::LinReg, x::AMat) = x * coef(o)

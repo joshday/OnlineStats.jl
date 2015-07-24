@@ -29,7 +29,7 @@ import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean,
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
-import Reactive: Input
+# import Reactive: Input
 
 # import MathProgBase: AbstractMathProgSolver
 # import Convex, SCS
@@ -196,11 +196,12 @@ include("multivariate/bias.jl")
 
 export 
     @stream,
-    RealInput,
-    FloatInput,
-    IntInput,
-    VecInput,
-    RegressionInput
+    update_get!
+    # RealInput,
+    # FloatInput,
+    # IntInput,
+    # VecInput,
+    # RegressionInput
 include("react.jl")
 
 end # module
