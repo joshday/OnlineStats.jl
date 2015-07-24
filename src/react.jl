@@ -157,12 +157,12 @@ Some features:
   - update univariate and multivariate OnlineStats, with chaining:
 
         myMean = Mean()
-        f = @stream mean($1 |> myMean)
+        f = @stream mean(\$1 |> myMean)
         runningMean = map(f, 0.:10)
         # should create the series: runningMean == 0.0 : 0.5 : 5.0
 
         myRegression = Adagrad(10)
-        f = @stream ($1,$2) |> myRegression
+        f = @stream (\$1,\$2) |> myRegression
         # now call f(x,y) to update the regression
   
   - apply arbitrary functions and control flow:
@@ -170,10 +170,10 @@ Some features:
         myMean1 = Mean()
         myMean2 = Mean()
         f = @stream begin
-          if $1 > 0.0
-            return log(mean($2 |> myMean1)) - 1.0
+          if \$1 > 0.0
+            return log(mean(\$2 |> myMean1)) - 1.0
           end
-          mean($2 |> myMean2)
+          mean(\$2 |> myMean2)
         end
 
   - mapping pipelines allow you to update many OnlineStats with the same expression, 
@@ -182,7 +182,7 @@ Some features:
       This example:
         reg1 = Adagrad(p)
         reg2 = SGD(p)
-        f = @stream ($1,$2) |> (reg1, reg2) |> $2 - predict(_, $1)
+        f = @stream (\$1,\$2) |> (reg1, reg2) |> \$2 - predict(_, \$1)
 
       is equivalent to creating:
         f(x,y) -> begin

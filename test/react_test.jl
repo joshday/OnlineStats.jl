@@ -108,11 +108,11 @@ facts("React") do
     end
 
     @fact nobs(reg1) => n
-    @fact coef(reg1) => roughly(β, atol = 0.5)
+    @fact coef(reg1) => roughly(β, atol = 1.0)
     println(reg1)
 
     @fact nobs(reg2) => n
-    @fact coef(reg2) => roughly(β, atol = 0.5)
+    @fact coef(reg2) => roughly(β, atol = 1.0)
     println(reg2)
 
     # @fact nobs(reg3) => n
