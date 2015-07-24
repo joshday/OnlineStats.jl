@@ -38,7 +38,7 @@ immutable LogisticLoss <: LossFunction end
 # f(::LogisticLoss, y::Float64, ypred::Float64) = log(1 + exp(-y * ypred))
 @inline ∇f(::LogisticLoss, ε::Float64, xᵢ::Float64) = -ε * xᵢ
 
-# Quantile Regression using Adagrad
+# Quantile Regression
 immutable QuantileLoss <: LossFunction
     τ::Float64
     function QuantileLoss(τ::Real = 0.5)
@@ -48,6 +48,9 @@ immutable QuantileLoss <: LossFunction
 end
 @inline ∇f(loss::QuantileLoss, ϵ::Float64, xᵢ::Float64) = (@compat Float64(ϵ < 0) - loss.τ) * xᵢ
 
+
+immutable AbsoluteLoss <: LossFunction end
+@inline ∇f(::AbsoluteLoss, ϵ::Float64, xᵢ::Float64) = (@compat Float64(ϵ < 0) - 0.5) * xᵢ
 
 # --------------------------------------------------------------------------
 

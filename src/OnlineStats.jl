@@ -95,6 +95,7 @@ export
     SquareLoss,
     LogisticLoss,
     QuantileLoss,
+    AbsoluteLoss,
     L1Reg,
     L2Reg,
     LogisticLink,
@@ -194,7 +195,7 @@ export
     BiasMatrix
 include("multivariate/bias.jl")
 
-export 
+export
     @stream,
     RealInput,
     FloatInput,
