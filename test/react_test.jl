@@ -128,50 +128,75 @@ function handlePipeExpr(lhs, rhs)
 
   # if we got here, it's a normal pipe operation
   gs = gensym()
+  lhs = buildStreamExpr(lhs)[1]
   quote
-    $gs = $(buildStreamExpr(lhs))
+    $gs = $lhs
     update_get!($rhs, $gs)
   end
 end
 
 
-replaceUnderscore(sym::Symbol, gs::Symbol) = (sym == :_ ? gs : sym)
+replaceUnderscore(sym, gs::Symbol) = (sym == :_ ? gs : sym)
 function replaceUnderscore(expr::Expr, gs::Symbol)
   println("!!UNDER!! ", expr, " ::: ", gs)
   expr.args = map(ex->replaceUnderscore(ex,gs), expr.args)
-  buildStreamExpr(expr)
+  buildStreamExpr(expr)[1]
 end
 
 # create a new expression which replaces any symbol "_" in the rhs with a gensym of the lhs
 function handleCurryingExpr(lhs, rhs)
-  gs = gensym()
-  quote
-    $gs = $(buildStreamExpr(lhs))
-    $(replaceUnderscore(rhs, gs))
+
+  # first we process the lhs, and figure out whether there is a "mapping pipeline"
+  lhs, ismapped = buildStreamExpr(lhs)
+
+  if ismapped
+
+    # special handling if the lhs is a "mapping pipeline"
+    # for every gensym in the return tuple, inject the rhs but replacing the underscore with that element's gensym
+    dump(lhs)
+    lhs_return_tuple = lhs.args[end]
+    for (i,lhsgs) in enumerate(lhs_return_tuple.args)
+      lhs_return_tuple.args[i] = replaceUnderscore(rhs, lhsgs)
+    end
+
+    # we've now injected this expression into the return tuple of the lhs...
+    # return that, plus tell the next curry to continue mapping
+    return lhs, ismapped
+  
+  else
+
+    # not mapped, so return a new expr
+    gs = gensym()
+    rhs =  replaceUnderscore(rhs, gs)
+    blk = quote
+      $gs = $lhs
+      $rhs
+    end
+    return blk, false
   end
 end
 
 
-buildStreamExpr(sym::Symbol) = sym
+buildStreamExpr(sym::Symbol) = sym, false
 
-function buildStreamExpr(expr::Expr, )
+function buildStreamExpr(expr::Expr)
   head = expr.head
   if head == :block || head == :tuple
 
     # map build to each arg in the block
-    expr.args = map(buildStreamExpr, expr.args)
-    return expr
+    expr.args = map(ex -> buildStreamExpr(ex)[1], expr.args)
+    return expr, false
   
   elseif head == :line
     
     # keep this as-is
-    return expr
+    return expr, false
 
   elseif head == :$
 
     # if it's an integer i, replace with INPUT[i]
     isa(expr.args[1], Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
-    return :(INPUT[$(expr.args[1])])
+    return :(INPUT[$(expr.args[1])]), false
 
   elseif head == :(=)
 
@@ -179,8 +204,8 @@ function buildStreamExpr(expr::Expr, )
     # recursively call this on the rhs
     println("!!! = !!! ", expr)
     @assert isa(expr.args[1], Symbol)
-    expr.args[2] = buildStreamExpr(expr.args[2])
-    return expr
+    expr.args[2] = buildStreamExpr(expr.args[2])[1]
+    return expr, false
 
   elseif head == :call
 
@@ -191,8 +216,10 @@ function buildStreamExpr(expr::Expr, )
 
       # pipe symbol could be streaming or currying
       lhs, rhs = expr.args[2:3]
-      if isa(rhs, Symbol) || (isa(rhs, Expr) && rhs.head == :tuple)
-        return handlePipeExpr(lhs, rhs)
+      if isa(rhs, Symbol)
+        return handlePipeExpr(lhs, rhs), false
+      elseif isa(rhs, Expr) && rhs.head == :tuple
+        return handlePipeExpr(lhs, rhs), true
       elseif isa(rhs, Expr)
         return handleCurryingExpr(lhs, rhs)
       else
@@ -202,8 +229,9 @@ function buildStreamExpr(expr::Expr, )
     else
 
       # normal expression... recursively call this on the arguments
-      expr.args[2:end] = map(buildStreamExpr, expr.args[2:end])
-      return expr
+      # expr.args[2:end] = map(buildStreamExpr, expr.args[2:end])
+      expr.args = map(ex -> buildStreamExpr(ex)[1], expr.args)
+      return expr, false
 
     end
   else
@@ -215,7 +243,7 @@ end
 # or have it as the first argument to a function call.
 # returns a Reactive.Input{inputType} object which you should push! the inputs to
 macro stream(expr::Expr)
-  fbody = buildStreamExpr(expr)
+  fbody, _ = buildStreamExpr(expr)
   # println(expr)
   println(expr)
 
