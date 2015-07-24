@@ -34,7 +34,7 @@ include("ofls_test.jl")
 include("adagrad_test.jl")
 include("sgd_test.jl")
 
-include("react_test.jl")
+# include("react_test.jl")
 
 # put logging back the way it was
 OnlineStats.log_severity!(sev)
