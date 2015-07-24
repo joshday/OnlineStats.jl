@@ -98,20 +98,55 @@ end
 #   return liftexpr(lhs, rhs, f)
 # end
 
-handlePipeExpr(lhs, rhs) = :(update_get!($rhs, $lhs...))
+update_get!(o::OnlineStat, args...) = (update!(o, args...); o)
+update_get!(o::OnlineStat, t::Tuple) = update_get!(o, t...)
+
+function handlePipeExpr(lhs, rhs)
+
+  println("!!PIPE!! ", lhs, " ::: ", rhs)
+  if isa(rhs, Expr) && rhs.head == :tuple
+
+    # special handling... apply this pipe to each element in the tuple, and return a tuple of the gensyms
+    blk = Expr(:block)
+    gensyms = Symbol[]
+    for rhsitem in rhs.args
+      # create a pipe expression "gensym() = lhs |> rhsitem" and add it to the block
+      gs = gensym()
+      push!(gensyms, gs)
+      pipeexpr = handlePipeExpr(lhs, rhsitem)
+      push!(blk.args, :($gs = $pipeexpr))
+    end
+
+    # now the final item in the block returns the tuple of gensyms
+    gsexpr = Expr(:tuple)
+    gsexpr.args = gensyms
+    push!(blk.args, gsexpr)
+
+    # finally done... return the block
+    return blk
+  end
+
+  # if we got here, it's a normal pipe operation
+  gs = gensym()
+  quote
+    $gs = $(buildStreamExpr(lhs))
+    update_get!($rhs, $gs)
+  end
+end
 
 
 replaceUnderscore(sym::Symbol, gs::Symbol) = (sym == :_ ? gs : sym)
 function replaceUnderscore(expr::Expr, gs::Symbol)
-  expr.args = map(x->replaceUnderscore(x,gs), expr.args)
-  expr
+  println("!!UNDER!! ", expr, " ::: ", gs)
+  expr.args = map(ex->replaceUnderscore(ex,gs), expr.args)
+  buildStreamExpr(expr)
 end
 
 # create a new expression which replaces any symbol "_" in the rhs with a gensym of the lhs
 function handleCurryingExpr(lhs, rhs)
   gs = gensym()
   quote
-    $gs = $lhs
+    $gs = $(buildStreamExpr(lhs))
     $(replaceUnderscore(rhs, gs))
   end
 end
@@ -121,7 +156,7 @@ buildStreamExpr(sym::Symbol) = sym
 
 function buildStreamExpr(expr::Expr, )
   head = expr.head
-  if head == :block
+  if head == :block || head == :tuple
 
     # map build to each arg in the block
     expr.args = map(buildStreamExpr, expr.args)
@@ -132,12 +167,19 @@ function buildStreamExpr(expr::Expr, )
     # keep this as-is
     return expr
 
+  elseif head == :$
+
+    # if it's an integer i, replace with INPUT[i]
+    isa(expr.args[1], Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
+    return :(INPUT[$(expr.args[1])])
+
   elseif head == :(=)
 
     # local variable... make sure we have a symbol on the lhs, then
     # recursively call this on the rhs
+    println("!!! = !!! ", expr)
     @assert isa(expr.args[1], Symbol)
-    expr.args[2:end] = map(buildStreamExpr, expr.args[2:end])
+    expr.args[2] = buildStreamExpr(expr.args[2])
     return expr
 
   elseif head == :call
@@ -149,9 +191,9 @@ function buildStreamExpr(expr::Expr, )
 
       # pipe symbol could be streaming or currying
       lhs, rhs = expr.args[2:3]
-      if isa(rhs, Expr)
+      if isa(rhs, Symbol) || (isa(rhs, Expr) && rhs.head == :tuple)
         return handlePipeExpr(lhs, rhs)
-      elseif isa(rhs, Symbol)
+      elseif isa(rhs, Expr)
         return handleCurryingExpr(lhs, rhs)
       else
         error("Unexpected rhs in buildStreamExpr pipe: $expr")
@@ -176,7 +218,10 @@ macro stream(expr::Expr)
   fbody = buildStreamExpr(expr)
   # println(expr)
   println(expr)
-  esc(expr)
+
+  esc(quote
+    (INPUT...) -> $fbody
+  end)
 end
 
 
@@ -203,18 +248,25 @@ end
 # reg5 = ???
 # swarm = Swarm([reg1, ... , reg5])
 
-# the following block:
-@stream begin
+@testit begin
   diff(log($1) |> d) |> window
   sx = lags(window) |> varx |> standardize(_)
   sy = future(window) |> vary |> standardize(_)
   (sx, sy) |> (reg1, reg2, reg3, reg4, reg5) |> (sy - predict(_, sx)) |> swarm
 end
 
-# # should be roughly equivalent to calling this on each new data point:
-# function updateprice(price::Float64)
-#   
-#   update_get!(window, diff(update_get!(d, log(price))))
+
+# the following block:
+str = @stream begin
+  diff(log($1) |> d) |> window
+  sx = lags(window) |> varx |> standardize(_)
+  sy = future(window) |> vary |> standardize(_)
+  (sx, sy) |> (reg1, reg2, reg3, reg4, reg5) |> (sy - predict(_, sx)) |> swarm
+end
+
+# # should be roughly equivalent to returning an anonymous function:
+# (INPUT...) -> begin
+#   update_get!(window, diff(update_get!(d, log(INPUT[1]))))
 #   sx = standardize(update_get!(varx, lags(window)))
 #   sy = standardize(update_get!(vary, future(window)))
 #   tmp1 = sy - predict(update_get!(reg1, sx, sy), sx)
@@ -222,7 +274,7 @@ end
 #   tmp3 = sy - predict(update_get!(reg3, sx, sy), sx)
 #   tmp4 = sy - predict(update_get!(reg4, sx, sy), sx)
 #   tmp5 = sy - predict(update_get!(reg5, sx, sy), sx)
-#   update!(swarm, (tmp1, tmp2, tmp3, tmp4, tmp5))
+#   update!(swarm, tmp1, tmp2, tmp3, tmp4, tmp5)
 # end
 
 
