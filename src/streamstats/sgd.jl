@@ -1,6 +1,6 @@
 # generalized SGD framework
 
-# Link and Loss functions are defined in SGD.julia
+# Link and Loss functions are defined in adagrad.jl
 
 #--------------------------------------------------------# Type and Constructors
 """
@@ -17,6 +17,7 @@ Keyword arguments are:
 """
 type SGD{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction} <: OnlineStat
     β::VecF
+    η::Float64  # Constant step size
     link::LINK
     loss::LOSS
     reg::REG
@@ -25,11 +26,12 @@ type SGD{LINK<:LinkFunction, LOSS<:LossFunction, REG<:RegularizationFunction} <:
 end
 
 function SGD(p::Integer, wgt::StochasticWeighting = StochasticWeighting();
+             η::Float64 = 1.0,
              link::LinkFunction = IdentityLink(),
              loss::LossFunction = SquareLoss(),
              reg::RegularizationFunction = NoReg(),
              start::VecF = zeros(p))
-    SGD(start, link, loss, reg, wgt, 0)
+    SGD(start, η, link, loss, reg, wgt, 0)
 end
 
 function SGD(X::AMatF, y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); kwargs...)
@@ -43,7 +45,7 @@ end
 function update!(o::SGD, x::AVecF, y::Float64)
     ε = y - predict(o, x)
 
-    λ = weight(o)
+    λ = weight(o) * o.η
     for j in 1:length(x)
         g = ∇f(o.loss, ε, x[j]) + ∇Ψ(o.reg, o.β, j)
         o.β[j] -= λ * g
@@ -67,7 +69,7 @@ end
 
 function updatebatch!(o::SGD, x::AMatF, y::AVecF)
     n2 = length(y)
-    λ = weight(o)
+    λ = weight(o) * o.η
 
     for i in 1:n2
         _update_average_gradient!(o, row(x, i), y[i], λ)
@@ -81,7 +83,7 @@ end
 positive_or_zero(x::Float64) = x > 0 ? x : 0.0
 function update!(o::SGD{IdentityLink, SquareLoss, L1Reg}, x::AVecF, y::Float64)
     ϵ = y - predict(o, x)
-    γ = weight(o)
+    γ = weight(o) * o.η
     for j in 1:length(x)
         βval = o.β[j]
         if nobs(o) > 10 && βval == 0

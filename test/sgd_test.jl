@@ -43,7 +43,7 @@ facts("SGD") do
         β = collect(1.:p)
         β[10:end] = 0.0
         y = x*β + randn(n)
-        @time o = OnlineStats.SGD(x, y; reg = OnlineStats.L1Reg(0.01))
+        o = OnlineStats.SGD(x, y; reg = OnlineStats.L1Reg(0.01))
 
         @fact statenames(o) => [:β, :nobs]
         @fact state(o)[1] => coef(o)
