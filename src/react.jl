@@ -37,6 +37,17 @@ function handlePipeExpr(lhs, rhs)
   end
 end
 
+getMaxArg(s) = 0
+function getMaxArg(expr::Expr)
+  if expr.head == :$
+    inputnum = expr.args[1]
+    isa(inputnum, Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
+    return inputnum
+  else
+    return maximum(map(getMaxArg, expr.args))
+  end
+end
+
 
 replaceUnderscore(sym, gs::Symbol) = (sym == :_ ? gs : sym)
 function replaceUnderscore(expr::Expr, gs::Symbol)
@@ -78,6 +89,11 @@ function handleCurryingExpr(lhs, rhs)
   end
 end
 
+type StreamParamInfo
+  numInputs::Int
+end
+const STREAMPARAMS = StreamParamInfo(1)
+
 
 buildStreamExpr(x) = x, false
 
@@ -96,9 +112,16 @@ function buildStreamExpr(expr::Expr)
 
   elseif head == :$
 
-    # if it's an integer i, replace with INPUT[i]
-    isa(expr.args[1], Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
-    return :(INPUT[$(expr.args[1])]), false
+    # if it's an integer i, replace with INPUT[i], (or INPUT for the 1-arg case)
+    inputnum = expr.args[1]
+    isa(inputnum, Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
+    @assert inputnum <= STREAMPARAMS.numInputs
+    return symbol(string("INPUT", inputnum)), false
+    # if STREAMPARAMS.numInputs > 1
+    #   return :(INPUT[$inputnum]), false
+    # else
+    #   return :INPUT, false
+    # end
 
   elseif head == :(=)
 
@@ -193,17 +216,36 @@ Some features:
     
 """
 macro stream(expr::Expr)
+
+  # figure out the biggest $i arg
+  STREAMPARAMS.numInputs = getMaxArg(expr)
+  # println("GOT: ", STREAMPARAMS.numInputs)
+  if STREAMPARAMS.numInputs > 10
+    error("too many inputs in stream: maxInputs=$(STREAMPARAMS.numInputs)  expr: $expr")
+  end
+
+  # generate a unique function name, and spell out the args: ##streamed##1232(INPUT1, INPUT2)
+  fname = gensym("streamed")
+  # println(fname)
+  fargs = [symbol(string("INPUT",i)) for i in 1:STREAMPARAMS.numInputs]
+  # println(fargs)
+
+  # now create the function body
   # print("Before: "); dump(expr, 20)
-  fbody, _ = buildStreamExpr(expr)
+  fbody,_ = buildStreamExpr(expr)
   # print("After : "); dump(fbody, 20)
+  # println(fbody)
 
-  println(fbody)
 
-  esc(quote
-    (INPUT...) -> $fbody
+  blk = esc(quote
+    function $fname($(fargs...))
+      $fbody
+    end
+    $fname
   end)
+  println(blk)
+  blk
 end
-
 
 
 # -------------------------------------------------------------------------------

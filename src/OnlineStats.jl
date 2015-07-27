@@ -192,11 +192,6 @@ include("multivariate/bias.jl")
 export
     @stream,
     update_get!
-    # RealInput,
-    # FloatInput,
-    # IntInput,
-    # VecInput,
-    # RegressionInput
 include("react.jl")
 
 end # module
