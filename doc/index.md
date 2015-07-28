@@ -9,7 +9,7 @@ This documentation is a work in progress.
 When creating an OnlineStat, one can optionally specify the weighting to be used (with the exception of `Adagrad`).  Updating a statistic or model involves one of two forms:
 
 - weighted average: `λ * some_update + (1 - λ) * current_value`
-- gradient-based:  current_value -= λ * estimated_gradient
+- gradient-based:  `current_value -= λ * estimated_gradient`
 
 The following schemes are supported for determining weights:
 
