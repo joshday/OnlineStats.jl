@@ -4,6 +4,27 @@ using OnlineStats, FactCheck, Compat
 import OnlineStats: row
 
 
+function oneargtest_base(R)
+  d = Diff()
+  mn = Mean()
+  m = 0.0
+  @elapsed for r in R
+    update!(d, r)
+    update!(mn, abs(diff(d)))
+    m = mean(mn)
+  end
+end
+
+function oneargtest(R)
+  d = Diff()
+  mn = Mean()
+  m = 0.0
+  f = @stream mean(abs(diff($1 |> d)) |> mn)
+  f(0.0)
+  empty!(d); empty!(mn)
+  @elapsed for r in R; f(r); end
+end
+
 
 # NOTE: see embedded comments.  lhs = left hand side, rhs = right hand side... referring to the side of the pipe "|>" operator
 
@@ -41,6 +62,20 @@ facts("React") do
     @fact diff(d) => -5.
     @fact last(d) => 3.
     @fact mean(m) => roughly(-1.0, atol = 1e-5)
+  end
+
+
+  context("1 Arg Stream") do
+
+    # warmup
+    oneargtest(rand(1))
+
+    # compare speeds of the stream macro vs the equivalent function for 1 argument
+    R = rand(10_000_000)
+    e = oneargtest(R)
+    ebase = oneargtest(R)
+
+    @fact e => less_than(ebase * 1.1)
   end
 
   context("Regression") do
@@ -104,6 +139,8 @@ facts("React") do
         @fact abs(outval[2] - outval[1]) => roughly(0.0, atol = 1.0)
         # @fact abs(outval[3] - outval[1]) => roughly(0.0, atol = 0.1)
         println("outval: ", outval)
+
+        println(@code_typed f(row(x,i),y[i]))
       end
     end
 
