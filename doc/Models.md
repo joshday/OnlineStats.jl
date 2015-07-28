@@ -26,6 +26,7 @@ Analytical sample means, similar to `mean(x, 1)`
 First four non-central moments.
 
 methods:  
+
 - `mean`
 - `var`
 - `skewness`
