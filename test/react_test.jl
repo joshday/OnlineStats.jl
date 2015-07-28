@@ -75,7 +75,7 @@ facts("React") do
     e = oneargtest(R)
     ebase = oneargtest(R)
 
-    @fact e => less_than(ebase * 1.1)
+    @fact e => less_than(ebase * 1.2)
   end
 
   context("Regression") do
