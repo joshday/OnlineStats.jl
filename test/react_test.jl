@@ -71,7 +71,7 @@ facts("React") do
     oneargtest(rand(1))
 
     # compare speeds of the stream macro vs the equivalent function for 1 argument
-    R = rand(1_000_000)
+    R = rand(10_000_000)
     e = oneargtest(R)
     ebase = oneargtest(R)
 
@@ -139,6 +139,8 @@ facts("React") do
         @fact abs(outval[2] - outval[1]) => roughly(0.0, atol = 1.0)
         # @fact abs(outval[3] - outval[1]) => roughly(0.0, atol = 0.1)
         println("outval: ", outval)
+
+        println(@code_typed f(row(x,i),y[i]))
       end
     end
 

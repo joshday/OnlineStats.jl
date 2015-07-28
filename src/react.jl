@@ -31,10 +31,19 @@ function handlePipeExpr(lhs, rhs)
   # if we got here, it's a normal pipe operation
   gs = gensym()
   lhs = buildStreamExpr(lhs)[1]
-  quote
-    $gs = $lhs
-    update_get!($rhs, $gs)
+
+  # if lhs is a tuple, splat the arguments directly into the call to update_get!
+  if isa(lhs, Expr) && lhs.head == :tuple
+    return :(update_get!($rhs, $(lhs.args...)))
   end
+  
+  # must be a single argument
+  return :(update_get!($rhs, $lhs))
+
+  # quote
+  #   $gs = $lhs
+  #   update_get!($rhs, $gs)
+  # end
 end
 
 getMaxArg(s) = 0
@@ -208,7 +217,7 @@ Some features:
         f = @stream (\$1,\$2) |> (reg1, reg2) |> \$2 - predict(_, \$1)
 
       is equivalent to creating:
-        f(x,y) -> begin
+        function f(x,y)
           tmp1 = update_get!(reg1, x, y)
           tmp2 = update_get!(reg2, x, y)
           (y - predict(tmp1, x)), y - predict(tmp2, x)))
