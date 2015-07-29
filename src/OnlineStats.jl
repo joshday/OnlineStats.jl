@@ -179,6 +179,7 @@ include("glm/logisticregmm.jl")
 include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
+include("streamstats/stochasticgradientmodels.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")

@@ -12,7 +12,7 @@ const λ = 0.0001
 # TODO compare timing to StreamStats and profile
 
 function convertLogisticY(xβ)
-    prob = OnlineStats.invlink(LogisticLink(), xβ)
+    prob = OnlineStats.invlink(OnlineStats.LogisticLink(), xβ)
     @compat Float64(rand(Bernoulli(prob)))
 end
 
