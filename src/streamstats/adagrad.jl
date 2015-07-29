@@ -141,6 +141,30 @@ function update!(o::Adagrad, X::AMatF, y::AVecF)
 end
 
 
+function updatebatch!(o::Adagrad, x::AMatF, y::AVecF)
+    n, p = size(x)
+    g = zeros(p)  # This will be the average gradient for all n new observations
+
+    for i in 1:n  # for each observation, add the gradient
+        xi = row(x, i)
+        yi = y[i]
+        ϵ = yi - predict(o, xi)
+        for j in 1:p  # for each dimension, add gradient
+            g[j] += ∇f(o.loss, ϵ, xi[j]) + ∇Ψ(o.reg, o.β, j)
+        end
+    end
+    for j in 1:p
+        o.G[j] += (g[j] / n) ^ 2  # divide by n to get average gradient
+        if o.G[j] != 0.0
+            o.β[j] -= o.η * g[j] / sqrt(o.G[j])
+        end
+    end
+    nothing
+end
+
+
+
+
 #-----------------------------------------------------------------------# state
 
 state(o::Adagrad) = Any[copy(o.β), nobs(o)]
