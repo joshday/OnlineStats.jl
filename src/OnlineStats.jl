@@ -89,13 +89,16 @@ export
     HyperLogLog,
     SGD,
     Adagrad,
-    SquareLoss,
-    LogisticLoss,
-    QuantileLoss,
-    AbsoluteLoss,
-    L1Reg,
-    L2Reg,
-    LogisticLink,
+    L2Regression,
+    L1Regression,
+    LogisticRegression,
+    PoissonRegression,
+    SVMLike,
+    QuantileRegression,
+    HuberRegression,
+    L1Penalty,
+    L2Penalty,
+    NoPenalty,
 
     # functions
     update!,               # update one observation at a time using Weighting scheme

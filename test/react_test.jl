@@ -41,9 +41,9 @@ facts("React") do
 
     println("d: ", d)
     println("m: ", m)
-    @fact diff(d) => -5.
-    @fact last(d) => 3.
-    @fact mean(m) => roughly(-0.666666, atol = 1e-5)
+    @fact diff(d) --> -5.
+    @fact last(d) --> 3.
+    @fact mean(m) --> roughly(-0.666666, atol = 1e-5)
   end
 
   context("DiffMean2") do
@@ -59,9 +59,9 @@ facts("React") do
 
     println("d: ", d)
     println("m: ", m)
-    @fact diff(d) => -5.
-    @fact last(d) => 3.
-    @fact mean(m) => roughly(-1.0, atol = 1e-5)
+    @fact diff(d) --> -5.
+    @fact last(d) --> 3.
+    @fact mean(m) --> roughly(-1.0, atol = 1e-5)
   end
 
 
@@ -75,7 +75,7 @@ facts("React") do
     e = oneargtest(R)
     ebase = oneargtest(R)
 
-    @fact e => less_than(ebase * 1.1)
+    @fact e --> less_than(ebase * 1.1)
   end
 
   context("Regression") do
@@ -94,8 +94,8 @@ facts("React") do
     for i in 1:length(y)
       f(row(x,i), y[i])
     end
-    @fact nobs(reg) => n
-    @fact coef(reg) => roughly(β, atol = 0.4)
+    @fact nobs(reg) --> n
+    @fact coef(reg) --> roughly(β, atol = 0.4)
     println(reg)
 
     @time update!(reg, x, y)
@@ -135,25 +135,25 @@ facts("React") do
       outval = f(row(x,i), y[i]) 
 
       if i == length(y)
-        @fact typeof(outval) => @compat Tuple{Float64, Float64}
-        @fact abs(outval[2] - outval[1]) => roughly(0.0, atol = 1.0)
-        # @fact abs(outval[3] - outval[1]) => roughly(0.0, atol = 0.1)
+        @fact typeof(outval) --> @compat Tuple{Float64, Float64}
+        @fact abs(outval[2] - outval[1]) --> roughly(0.0, atol = 1.0)
+        # @fact abs(outval[3] - outval[1]) --> roughly(0.0, atol = 0.1)
         println("outval: ", outval)
 
         println(@code_typed f(row(x,i),y[i]))
       end
     end
 
-    @fact nobs(reg1) => n
-    @fact coef(reg1) => roughly(β, atol = 1.0)
+    @fact nobs(reg1) --> n
+    @fact coef(reg1) --> roughly(β, atol = 1.0)
     println(reg1)
 
-    @fact nobs(reg2) => n
-    @fact coef(reg2) => roughly(β, atol = 1.0)
+    @fact nobs(reg2) --> n
+    @fact coef(reg2) --> roughly(β, atol = 1.0)
     println(reg2)
 
-    # @fact nobs(reg3) => n
-    # @fact coef(reg3) => roughly(β, atol = 0.4)
+    # @fact nobs(reg3) --> n
+    # @fact coef(reg3) --> roughly(β, atol = 0.4)
     # println(reg3)
 
     @time begin
@@ -176,7 +176,7 @@ end
 # # some notes on possible syntax:
 #   # pipe operator "|>" defines an implicit call to: update_get!(rhs, lhs...) = (update!(rhs, lhs...); rhs)
 #   # pipe operator with AVec/tuple as rhs implies you call update_get! for each member of rhs
-#   # arrow operator "=>" defines currying: "lhs => f(_)" implies "f(lhs)", "(lhs1, lhs2) => f(_)" implies "(f(lhs1), f(lhs2))"
+#   # arrow operator "-->" defines currying: "lhs --> f(_)" implies "f(lhs)", "(lhs1, lhs2) --> f(_)" implies "(f(lhs1), f(lhs2))"
         # NOTE: maybe we can always use the pipe operator "|>"?? 
         #       If rhs is a Symbol, assume it's the update_get!() version, otherwise assume currying
 #   # equal "=" tags that node with a symbol (instead of using a gensym)

@@ -20,7 +20,7 @@ facts("HyperLogLog") do
   OnlineStats.DEBUG(o)
   OnlineStats.DEBUG("cardinality should be 10")
   OnlineStats.DEBUG("estimate: $(estimatedCardinality(o))")
-  @fact estimatedCardinality(o) => roughly(10, atol=0.5)
+  @fact estimatedCardinality(o) --> roughly(10, atol=0.5)
 
 end
 

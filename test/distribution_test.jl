@@ -20,26 +20,26 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = OnlineStats.distributionfit(Bernoulli, x1)
-        @fact FitBernoulli(x1).d.p => roughly(Bernoulli(mean(x1)).p)
-        @fact FitBernoulli().d.p => 0.
-        @fact o.d.p => roughly(mean(x1))
-        @fact o.n => n1
+        @fact FitBernoulli(x1).d.p --> roughly(Bernoulli(mean(x1)).p)
+        @fact FitBernoulli().d.p --> 0.
+        @fact o.d.p --> roughly(mean(x1))
+        @fact o.n --> n1
 
         OnlineStats.update!(o, x2)
-        @fact o.d.p => roughly(mean(x))
-        @fact o.n => n1 + n2
+        @fact o.d.p --> roughly(mean(x))
+        @fact o.n --> n1 + n2
 
-        @fact state(o) => [o.d, o.n]
-        @fact statenames(o) => [:dist, :nobs]
+        @fact state(o) --> [o.d, o.n]
+        @fact statenames(o) --> [:dist, :nobs]
         o2 = copy(o)
-        @fact mean(o2.d) => roughly(mean(x))
-        @fact nobs(o) => n1 + n2
+        @fact mean(o2.d) --> roughly(mean(x))
+        @fact nobs(o) --> n1 + n2
 
         o = distributionfit(Bernoulli, x1, ExponentialWeighting(.01))
-        @fact OnlineStats.weighting(o) => ExponentialWeighting(.01)
+        @fact OnlineStats.weighting(o) --> ExponentialWeighting(.01)
 
         o = distributionfit(Bernoulli, x1, ExponentialWeighting(1000))
-        @fact OnlineStats.weighting(o) => ExponentialWeighting(1000)
+        @fact OnlineStats.weighting(o) --> ExponentialWeighting(1000)
     end
 
 #------------------------------------------------------------------------------#
@@ -59,16 +59,16 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = distributionfit(Beta, x1)
-        @fact mean(o.d) => roughly(mean(x1))
-        @fact var(o.d) => roughly(var(x1))
-        @fact o.n => n1
+        @fact mean(o.d) --> roughly(mean(x1))
+        @fact var(o.d) --> roughly(var(x1))
+        @fact o.n --> n1
 
         OnlineStats.update!(o, x2)
-        @fact mean(o.d) => roughly(mean(x))
-        @fact var(o.d) => roughly(var(x))
-        @fact o.n => n1 + n2
-        @fact statenames(o) => [:dist, :nobs]
-        @fact state(o) => [o.d, o.n]
+        @fact mean(o.d) --> roughly(mean(x))
+        @fact var(o.d) --> roughly(var(x))
+        @fact o.n --> n1 + n2
+        @fact statenames(o) --> [:dist, :nobs]
+        @fact state(o) --> [o.d, o.n]
         o2 = copy(o)
     end
 
@@ -82,10 +82,10 @@ facts("Distributions") do
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         o = distributionfit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
-        @fact nobs(o) => 0
-        @fact OnlineStats.weighting(o) => ExponentialWeighting(.001)
-        # @fact show(distributionfit(Binomial, [4], n=10)) => show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
-        @fact distributionfit(Binomial, [4], n=10) => FitBinomial(Binomial(10, .4), 1, EqualWeighting())
+        @fact nobs(o) --> 0
+        @fact OnlineStats.weighting(o) --> ExponentialWeighting(.001)
+        # @fact show(distributionfit(Binomial, [4], n=10)) --> show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
+        @fact distributionfit(Binomial, [4], n=10) --> FitBinomial(Binomial(10, .4), 1, EqualWeighting())
 
         for i in 1:10
             distributionfit(Binomial,  rand(Binomial(11, rand()), rand(10:100)), n=11)
@@ -101,24 +101,24 @@ facts("Distributions") do
 
 
         o = distributionfit(Binomial, x1, n = ntrials)
-        @fact mean(o) - mean(x)=> roughly(0.0, .2) "This has failed before...not sure of the cause"
-        @fact var(o) => var(o.d)
-        @fact o.d.n => ntrials
-        @fact o.d.p => roughly(sum(x1) / (ntrials * n1))
-        @fact o.n => n1
-        @fact mean(FitBinomial().d) => 0.
-        @fact mean(distributionfit(Binomial, [0])) => 0.
-        @fact mean(FitBinomial(zeros(Int, 10))) => 0.
-        @fact mean(FitBinomial(ones(Int, 10))) => 1.
+        @fact mean(o) - mean(x)--> roughly(0.0, .2) "This has failed before...not sure of the cause"
+        @fact var(o) --> var(o.d)
+        @fact o.d.n --> ntrials
+        @fact o.d.p --> roughly(sum(x1) / (ntrials * n1))
+        @fact o.n --> n1
+        @fact mean(FitBinomial().d) --> 0.
+        @fact mean(distributionfit(Binomial, [0])) --> 0.
+        @fact mean(FitBinomial(zeros(Int, 10))) --> 0.
+        @fact mean(FitBinomial(ones(Int, 10))) --> 1.
 
-        @fact OnlineStats.update!(o, x2) => nothing
-        @fact o.d.n => ntrials
-        @fact o.d.p => roughly(sum(x) / (ntrials * (n1 + n2)))
-        @fact o.n => n1 + n2
+        @fact OnlineStats.update!(o, x2) --> nothing
+        @fact o.d.n --> ntrials
+        @fact o.d.p --> roughly(sum(x) / (ntrials * (n1 + n2)))
+        @fact o.n --> n1 + n2
 
-        @fact state(o) => [o.d, o.n]
+        @fact state(o) --> [o.d, o.n]
         o2 = copy(o)
-        @fact statenames(o2) => [:dist, :nobs]
+        @fact statenames(o2) --> [:dist, :nobs]
     end
 
 
@@ -131,11 +131,11 @@ facts("Distributions") do
         o = FitCauchy(rand(Cauchy(), 1000))
         o = distributionfit(Cauchy, rand(Cauchy(), 1000))
 
-        @fact nobs(o) => 1000
+        @fact nobs(o) --> 1000
         update!(o, rand(Cauchy(), 1000))
-        @fact nobs(o) => 2000
+        @fact nobs(o) --> 2000
 
-        @fact median(o) => roughly(0.0, 1.0)
+        @fact median(o) --> roughly(0.0, 1.0)
     end
 
 
@@ -147,7 +147,7 @@ facts("Distributions") do
         o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)')
         o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', ExponentialWeighting(.01))
         o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', StochasticWeighting(.6))
-        @fact nobs(o) => 10
+        @fact nobs(o) --> 10
 
         n1 = rand(1:1_000_000)
         n2 = rand(1:1_000_000)
@@ -155,24 +155,24 @@ facts("Distributions") do
         α = rand(.5:.1:20, αlength)
         x1 = rand(Dirichlet(α), n1)'
         o = FitDirichlet(x1)
-        @fact OnlineStats.weighting(o) => EqualWeighting()
+        @fact OnlineStats.weighting(o) --> EqualWeighting()
         x2 = rand(Dirichlet(α), n2)'
         x = vcat(x1, x2)
 
         o = distributionfit(Dirichlet, x1)
-        @fact o.meanlogx => vec(mean(log(x1), 1))
-        @fact o.n => n1
+        @fact o.meanlogx --> vec(mean(log(x1), 1))
+        @fact o.n --> n1
 
         updatebatch!(o, x2)
-        @fact length(o.d.alpha) => αlength
+        @fact length(o.d.alpha) --> αlength
 
-        @pending o.d.alpha => roughly(fit(Dirichlet, x').alpha, .01) "failure ok. fit() is to blame"
-        @fact o.n => n1 + n2
+        @pending o.d.alpha --> roughly(fit(Dirichlet, x').alpha, .01) "failure ok. fit() is to blame"
+        @fact o.n --> n1 + n2
 
-        @fact state(o) => [o.d, o.n]
-        @fact statenames(o) => [:dist, :nobs]
+        @fact state(o) --> [o.d, o.n]
+        @fact statenames(o) --> [:dist, :nobs]
         o2 = copy(o)
-        @fact state(o2)[2] => state(o)[2]
+        @fact state(o2)[2] --> state(o)[2]
 
         o = FitDirichlet(10)
         update!(o, ones(10) / 10)
@@ -186,12 +186,12 @@ facts("Distributions") do
         o = FitExponential(rand(Exponential(), 10))
         o = distributionfit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
         o = distributionfit(Exponential, rand(Exponential(), 10))
-        @fact OnlineStats.weighting(o) => EqualWeighting()
-        # @fact show(distributionfit(Exponential, [.5])) => show(FitExponential(Exponential(.5), 1, EqualWeighting()))
+        @fact OnlineStats.weighting(o) --> EqualWeighting()
+        # @fact show(distributionfit(Exponential, [.5])) --> show(FitExponential(Exponential(.5), 1, EqualWeighting()))
         # OnlineStats.log_severity!(OnlineStats.DebugSeverity)
         # OnlineStats.@DEBUG distributionfit(Exponential, [.5]) FitExponential(Exponential(.5), 1, EqualWeighting())
-        @fact distributionfit(Exponential, [.5]) => FitExponential(Exponential(.5), 1, EqualWeighting())
-        @fact distributionfit(Exponential, [.5]) => not(FitExponential(Exponential(1.5), 1, EqualWeighting()))
+        @fact distributionfit(Exponential, [.5]) --> FitExponential(Exponential(.5), 1, EqualWeighting())
+        @fact distributionfit(Exponential, [.5]) --> not(FitExponential(Exponential(1.5), 1, EqualWeighting()))
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
@@ -201,18 +201,18 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = distributionfit(Exponential, x1)
-        @fact o.d.β => roughly(mean(x1))
-        @fact o.n => n1
-        @fact nobs(o) => n1
+        @fact o.d.β --> roughly(mean(x1))
+        @fact o.n --> n1
+        @fact nobs(o) --> n1
 
         OnlineStats.update!(o, x2)
-        @fact o.d.β => roughly(mean(x))
-        @fact o.n => n1 + n2
+        @fact o.d.β --> roughly(mean(x))
+        @fact o.n --> n1 + n2
 
         o1 = copy(o)
-        @fact state(o) => [o.d, o.n]
-        @fact statenames(o) => [:dist, :nobs]
-        @fact state(o1) => state(o)
+        @fact state(o) --> [o.d, o.n]
+        @fact statenames(o) --> [:dist, :nobs]
+        @fact state(o1) --> state(o)
     end
 
 
@@ -235,30 +235,30 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = FitGamma()
-        @fact o.d => Gamma()
-        @fact nobs(o) => 0
-        @fact mean(o) => mean(Gamma())
+        @fact o.d --> Gamma()
+        @fact nobs(o) --> 0
+        @fact mean(o) --> mean(Gamma())
 
         o = FitGamma(x1)
-        @fact mean(o) => roughly(mean(x1))
-        @fact FitGamma(x1).d => distributionfit(Gamma, x1).d
-        @fact FitGamma(x1).n => distributionfit(Gamma, x1).n
+        @fact mean(o) --> roughly(mean(x1))
+        @fact FitGamma(x1).d --> distributionfit(Gamma, x1).d
+        @fact FitGamma(x1).n --> distributionfit(Gamma, x1).n
         o = distributionfit(Gamma, x1)
-        @fact distributionfit(Gamma, x1).d => FitGamma(x1).d
-        @fact mean(o.m) => roughly(mean(x1))
-        @fact mean(o.mlog) => roughly(mean(log(x1)))
-        @fact o.n => n1
+        @fact distributionfit(Gamma, x1).d --> FitGamma(x1).d
+        @fact mean(o.m) --> roughly(mean(x1))
+        @fact mean(o.mlog) --> roughly(mean(log(x1)))
+        @fact o.n --> n1
 
         OnlineStats.update!(o, x2)
-        @fact state(o) => [o.d, o.n]
-        @fact statenames(o) => [:dist, :nobs]
-        @fact mean(o.m) => roughly(mean(x))
-        @fact mean(o.mlog) => roughly(mean(log(x)))
-        @fact o.n => n1 + n2
+        @fact state(o) --> [o.d, o.n]
+        @fact statenames(o) --> [:dist, :nobs]
+        @fact mean(o.m) --> roughly(mean(x))
+        @fact mean(o.mlog) --> roughly(mean(log(x)))
+        @fact o.n --> n1 + n2
 
         o1 = copy(o)
-        @fact state(o1) => state(o)
-        @fact o.n => n1 + n2
+        @fact state(o1) --> state(o)
+        @fact o.n --> n1 + n2
     end
 
 #------------------------------------------------------------------------------#
@@ -291,23 +291,23 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = distributionfit(Multinomial, x1)
-        @fact o.d.n => n
-        @fact o.d.p => roughly(vec(sum(x1, 1) / (n * n1)))
-        @fact o.n => n1
-        @fact nobs(o) => n1
+        @fact o.d.n --> n
+        @fact o.d.p --> roughly(vec(sum(x1, 1) / (n * n1)))
+        @fact o.n --> n1
+        @fact nobs(o) --> n1
 
 
         OnlineStats.update!(o, x2)
-        @fact o.d.n => n
-        @fact o.d.p => roughly(vec(sum(x, 1) / (n * (n1 + n2))))
-        @fact o.n => n1 + n2
+        @fact o.d.n --> n
+        @fact o.d.p --> roughly(vec(sum(x, 1) / (n * (n1 + n2))))
+        @fact o.n --> n1 + n2
 
         o1 = copy(o)
-        @fact state(o) => [o.d, o.n]
-        @fact statenames(o) => [:dist, :nobs]
-        @fact o1.d.n => n
-        @fact o1.d.p => roughly(vec(sum(x, 1) / (n * (n1 + n2))))
-        @fact o1.n => n1 + n2
+        @fact state(o) --> [o.d, o.n]
+        @fact statenames(o) --> [:dist, :nobs]
+        @fact o1.d.n --> n
+        @fact o1.d.p --> roughly(vec(sum(x, 1) / (n * (n1 + n2))))
+        @fact o1.n --> n1 + n2
     end
 
 #------------------------------------------------------------------------------#
@@ -324,28 +324,28 @@ facts("Distributions") do
         o = distributionfit(MvNormal, x1)
         FitMvNormal(x1)
         FitMvNormal(d)
-        @fact o.d.μ => roughly(vec(mean(x1, 1)))
-        @fact mean(o.c) => roughly(vec(mean(x1, 1)))
-        @fact cov(o.c) => roughly(cov(x1))
-        @fact cov(o.c) => roughly(o.d.Σ.mat)
-        @fact o.n => n1
+        @fact o.d.μ --> roughly(vec(mean(x1, 1)))
+        @fact mean(o.c) --> roughly(vec(mean(x1, 1)))
+        @fact cov(o.c) --> roughly(cov(x1))
+        @fact cov(o.c) --> roughly(o.d.Σ.mat)
+        @fact o.n --> n1
 
         OnlineStats.updatebatch!(o, x2)
-        @fact o.d.μ => roughly(vec(mean(x, 1)))
-        @fact mean(o.c) => roughly(vec(mean(x, 1)))
-        @fact cov(o.c) => roughly(cov(x))
-        @fact o.n => n1 + n2
+        @fact o.d.μ --> roughly(vec(mean(x, 1)))
+        @fact mean(o.c) --> roughly(vec(mean(x, 1)))
+        @fact cov(o.c) --> roughly(cov(x))
+        @fact o.n --> n1 + n2
 
         o1 = copy(o)
-        @fact o1.d.μ => roughly(vec(mean(x, 1)))
-        @fact mean(o1.c) => roughly(vec(mean(x, 1)))
-        @fact cov(o1.c) => roughly(cov(x))
-        @fact o1.n => n1 + n2
-        @fact state(o) => [o.d, o.n]
+        @fact o1.d.μ --> roughly(vec(mean(x, 1)))
+        @fact mean(o1.c) --> roughly(vec(mean(x, 1)))
+        @fact cov(o1.c) --> roughly(cov(x))
+        @fact o1.n --> n1 + n2
+        @fact state(o) --> [o.d, o.n]
 
         o = FitMvNormal(2)
         update!(o, randn(2))
-        @fact nobs(o) => 1
+        @fact nobs(o) --> 1
     end
 
 
@@ -355,7 +355,7 @@ facts("Distributions") do
     context("Normal") do
         o = FitNormal()
         o = FitNormal(randn(10))
-        @fact OnlineStats.weighting(o) => EqualWeighting()
+        @fact OnlineStats.weighting(o) --> EqualWeighting()
 
         n1 = rand(1:1_000_000, 1)[1]
         n2 = rand(1:1_000_000, 1)[1]
@@ -364,33 +364,33 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = distributionfit(Normal, x1)
-        @fact mean(o.v) => roughly(mean(x1))
-        @fact mean(o.d) => roughly(mean(o.v))
-        @fact var(o.v) => roughly(var(x1))
-        @fact o.n => n1
+        @fact mean(o.v) --> roughly(mean(x1))
+        @fact mean(o.d) --> roughly(mean(o.v))
+        @fact var(o.v) --> roughly(var(x1))
+        @fact o.n --> n1
 
         update!(o, x2)
-        @fact o.d.σ => roughly(std(x))
-        @fact o.d.μ => roughly(mean(x))
-        @fact mean(o.v) => roughly(mean(x))
-        @fact var(o.v) => roughly(var(x))
-        @fact o.n => n1 + n2
+        @fact o.d.σ --> roughly(std(x))
+        @fact o.d.μ --> roughly(mean(x))
+        @fact mean(o.v) --> roughly(mean(x))
+        @fact var(o.v) --> roughly(var(x))
+        @fact o.n --> n1 + n2
 
         o1 = copy(o)
-        @fact statenames(o) => [:dist, :nobs]
-        @fact state(o) => [o.d, o.n]
-        @fact state(o1) => state(o)
-        @fact o1.d.σ => roughly(std(x))
-        @fact o1.d.μ => roughly(mean(x))
-        @fact mean(o1.v) => roughly(mean(x))
-        @fact var(o1.v) => roughly(var(x))
-        @fact o1.n => n1 + n2
+        @fact statenames(o) --> [:dist, :nobs]
+        @fact state(o) --> [o.d, o.n]
+        @fact state(o1) --> state(o)
+        @fact o1.d.σ --> roughly(std(x))
+        @fact o1.d.μ --> roughly(mean(x))
+        @fact mean(o1.v) --> roughly(mean(x))
+        @fact var(o1.v) --> roughly(var(x))
+        @fact o1.n --> n1 + n2
 
         x = randn(100)
         o1 = FitNormal(x)
         o2 = distributionfit(Normal, x)
-        @fact o1.d => o2.d
-        @fact nobs(o1) => nobs(o2)
+        @fact o1.d --> o2.d
+        @fact nobs(o1) --> nobs(o2)
     end
 
 
@@ -403,11 +403,11 @@ facts("Distributions") do
 
         x = rand(Poisson(6.0), 1000)
         update!(o, x)
-        @fact mean(o) - mean(x) => roughly(0.0, 1e-10)
-        @fact nobs(o) - length(x) => 0
+        @fact mean(o) - mean(x) --> roughly(0.0, 1e-10)
+        @fact nobs(o) - length(x) --> 0
         o2 = distributionfit(Poisson, x)
-        @fact mean(o) - mean(o2) => 0.0
-        @fact nobs(o) - nobs(o2) => 0
+        @fact mean(o) - mean(o2) --> 0.0
+        @fact nobs(o) - nobs(o2) --> 0
     end
 end # facts
 end # module
