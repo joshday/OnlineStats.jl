@@ -14,13 +14,13 @@ abstract SGModel # Stochastic Gradient Model
 
 immutable L2Regression <: SGModel end
 @inline predict(::L2Regression, x::AVecF, β::VecF) = dot(x, β)
-@inline predict(::L2Regression, x::AMatF, β::VecF) = x * β
+@inline predict(::L2Regression, X::AMatF, β::VecF) = X * β
 @inline ∇f(::L2Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 
 immutable L1Regression <: SGModel end
 @inline predict(::L1Regression, x::AVecF, β::VecF) = dot(x, β)
-@inline predict(::L1Regression, x::AMatF, β::VecF) = x * β
+@inline predict(::L1Regression, X::AMatF, β::VecF) = X * β
 @inline ∇f(::L1Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 
 
@@ -30,11 +30,13 @@ immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0
 @inline ∇f(::LogisticRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 
-# NOTE: Very sensitive to choice of η
+# NOTE: Super unstable with L2 loss.
+# Instead, this uses an L1 loss, which is NOT the same as maximizing the likelihood.
+# This seems to work for now, but I need to figure out the right way to do this
 immutable PoissonRegression <: SGModel end
 @inline predict(::PoissonRegression, x::AVecF, β::VecF) = exp(dot(x, β))
-@inline predict(::PoissonRegression, X::AMatF, β::VecF) = exp(x*β)
-@inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -yᵢ * xᵢ + ŷᵢ * xᵢ
+@inline predict(::PoissonRegression, X::AMatF, β::VecF) = exp(X*β)
+@inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 
 
 immutable QuantileRegression <: SGModel
@@ -45,14 +47,14 @@ immutable QuantileRegression <: SGModel
     end
 end
 @inline predict(::QuantileRegression, x::AVecF, β::VecF) = dot(x, β)
-@inline predict(::QuantileRegression, x::AMatF, β::VecF) = x * β
+@inline predict(::QuantileRegression, X::AMatF, β::VecF) = X * β
 @inline ∇f(model::QuantileRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = ((ϵᵢ < 0) - model.τ) * xᵢ
 
 
 # Note: Perceptron if NoPenalty, SVM if L2Penalty
 immutable SVMLike <: SGModel end  # SVM needs y in {-1, 1}
 @inline predict(::SVMLike, x::AVecF, β::VecF) = dot(x, β)
-@inline predict(::SVMLike, x::AMatF, β::VecF) = x * β
+@inline predict(::SVMLike, X::AMatF, β::VecF) = X * β
 @inline ∇f(::SVMLike, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ * xᵢ : 0.0
 
 
@@ -64,7 +66,7 @@ immutable HuberRegression <: SGModel
     end
 end
 @inline predict(::HuberRegression, x::AVecF, β::VecF) = dot(x, β)
-@inline predict(::HuberRegression, x::AMatF, β::VecF) = x * β
+@inline predict(::HuberRegression, X::AMatF, β::VecF) = X * β
 @inline function ∇f(mod::HuberRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64)
     ifelse(abs(ϵᵢ) <= mod.δ,
         -ϵᵢ * xᵢ,

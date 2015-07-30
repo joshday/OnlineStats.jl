@@ -40,6 +40,26 @@ function update!(o::SGD, x::AVecF, y::Float64)
     nothing
 end
 
+function updatebatch!(o::SGD, x::AMatF, y::AVecF)
+    n, p = size(x)
+    g = zeros(p)  # This will be the average gradient for all n new observations
+    λ = weight(o) * o.η
+
+    for i in 1:n  # for each observation, add the gradient
+        xi = row(x, i)
+        yi = y[i]
+        yhat = predict(o, xi)
+        ϵ = yi - yhat
+        for j in 1:p  # for each dimension, add gradient
+            g[j] += ∇f(o.model, ϵ, xi[j], yi, yhat) + ∇j(o.penalty, o.β, j)
+        end
+    end
+    for j in 1:p
+        o.β[j] -= λ * g[j] / n
+    end
+    nothing
+end
+
 #------------------------------------------------------------------------# state
 state(o::SGD) = Any[copy(o.β), nobs(o)]
 statenames(o::SGD) = [:β, :nobs]
