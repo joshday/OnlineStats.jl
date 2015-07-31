@@ -88,8 +88,14 @@ facts("Adagrad") do
         # normal lin reg
         o = Adagrad(x, y)
         OnlineStats.DEBUG(o, ": β=", β)
-        @fact coef(o) --> roughly(β, atol = atol, rtol = rtol)
+        @fact coef(o) --> roughly(β, atol = atol, rtol = rtol) "update! coef(o)"
         @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = atol, rtol = rtol)
+
+        # updatebatch!
+        o = Adagrad(p)
+        onlinefit!(o, 2, x, y, batch = true)
+        onlinefit!(o, 2, x, y, batch = true)
+        @fact coef(o) --> roughly(β, .2) "updatebatch! coef(o)"
 
         # ridge regression
         # repeat same data in first 2 variables
@@ -115,7 +121,7 @@ facts("Adagrad") do
         o = Adagrad(x, y, model = L1Regression())
         OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) --> roughly(β, atol = atol, rtol = rtol)
-        @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = .1, rtol = .1)
+        @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = .5)
     end
 
     context("LogisticRegression") do

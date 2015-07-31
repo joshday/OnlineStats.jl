@@ -1,5 +1,3 @@
-# Try out new structure in loss.jl
-
 #--------------------------------------------------------# Type and Constructors
 type SGD{M <: SGModel, P <: Penalty} <: OnlineStat
     β::VecF                         # coefficients

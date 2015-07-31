@@ -88,6 +88,7 @@ export
 
     HyperLogLog,
     SGD,
+    Momentum,
     Adagrad,
     L2Regression,
     L1Regression,
@@ -187,6 +188,7 @@ include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/sgd.jl")
+include("streamstats/momentum.jl")
 
 export
     BiasVector,
