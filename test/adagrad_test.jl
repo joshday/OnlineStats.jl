@@ -121,7 +121,7 @@ facts("Adagrad") do
         o = Adagrad(x, y, model = L1Regression())
         OnlineStats.DEBUG(o, ": β=", β)
         @fact coef(o) --> roughly(β, atol = atol, rtol = rtol)
-        @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = .5)
+        @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = .9)
     end
 
     context("LogisticRegression") do
