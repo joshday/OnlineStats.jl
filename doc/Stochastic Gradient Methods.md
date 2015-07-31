@@ -15,7 +15,7 @@ and loss function to be used.  Options are:
 
 
 
-### `SGD`
+# `SGD`
 
 Examples:
 ```julia
@@ -23,7 +23,7 @@ o = SGD(x, y, model = L1Regression())
 o = SGD(x, y, model = QuantileRegression(0.5))
 ```
 
-### `Momentum`
+# `Momentum`
 
 Examples:
 ```julia
@@ -31,7 +31,7 @@ o = Momentum(x, y, model = L2Regression())
 o = Momentum(x, y, model = LogisticRegression())
 ```
 
-### `Adagrad`
+# `Adagrad`
 
 Examples:
 ```julia
