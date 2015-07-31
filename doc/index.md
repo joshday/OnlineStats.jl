@@ -19,7 +19,7 @@ The following schemes are supported for determining weights:
     - Use equal weighting until the step size reaches λ, then hold constant.
 - `ExponentialWeighting(n::Int64)`
     - Use equal weighting until step sizes reaches `1/n`, then hold constant
-- `StochasticWeighting(r)`
+- `StochasticWeighting(r::Float64)`
     - Use weight `number_of_updates ^ -r` where `r` is greater than .5 and less than or equal to 1.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.
 
 

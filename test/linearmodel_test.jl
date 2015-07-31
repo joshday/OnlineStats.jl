@@ -35,7 +35,7 @@ facts("Linear Model") do
         @fact ct1.colnms --> ct2.colnms
         @fact ct1.rownms --> ct2.rownms
         @fact ct1.mat - ct2.mat --> roughly(zeros(2, 4), .01)
-        @fact confint(o) --> roughly(confint(glm))
+        @fact confint(o) --> roughly(confint(glm), .001)
 
         β = ones(10)
         x = randn(100, 10)

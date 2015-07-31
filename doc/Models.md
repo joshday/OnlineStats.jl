@@ -3,7 +3,7 @@
 
 
 ## Adagrad
-Stochastic adaptive gradient descent for a given model.
+Stochastic adaptive gradient descent for a given model.  See Stochastic Gradient Methods.
 
 ## CovarianceMatrix
 Analytical covariance matrix.
@@ -30,7 +30,7 @@ Analytical sample means, similar to `mean(x, 1)`.
 First four non-central moments.  Tracks mean, variance, skewness, and kurtosis.
 
 ## Momentum
-Stochastic gradient descent with momentum for a given model.
+Stochastic gradient descent with momentum for a given model.  See Stochastic Gradient Methods.
 
 ## NormalMix
 Univariate normal mixture via an online MM algorithm.
@@ -39,7 +39,7 @@ Univariate normal mixture via an online MM algorithm.
 `pca(o)` where `type(o)` = `CovarianceMatrix`
 
 ## SGD
-Stochastic gradient descent for a given model.
+Stochastic gradient descent for a given model.  See Stochastic Gradient Methods.
 
 ## SparseReg
 Sparse regression.  A type to experiment with regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, etc.

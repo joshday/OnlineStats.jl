@@ -11,34 +11,37 @@
 
 abstract SGModel # Stochastic Gradient Model
 
-
+"Minimize `vecnorm(y - Xβ, 2)` with respect to `β`"
 immutable L2Regression <: SGModel end
 @inline predict(::L2Regression, x::AVecF, β::VecF) = dot(x, β)
 @inline predict(::L2Regression, X::AMatF, β::VecF) = X * β
 @inline ∇f(::L2Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 
+"Minimize `vecnorm(y - Xβ, 1)` with respect to `β`"
 immutable L1Regression <: SGModel end
 @inline predict(::L1Regression, x::AVecF, β::VecF) = dot(x, β)
 @inline predict(::L1Regression, X::AMatF, β::VecF) = X * β
 @inline ∇f(::L1Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 
 
+"Minimize the negative loglikelihood of a logistic regression model"
 immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0, 1}
 @inline predict(::LogisticRegression, x::AVecF, β::VecF) = 1.0 / (1.0 + exp(-dot(x, β)))
 @inline predict(::LogisticRegression, X::AMatF, β::VecF) = 1.0 ./ (1.0 + exp(-X * β))
 @inline ∇f(::LogisticRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 
-# NOTE: Super unstable with L2 loss.
+# NOTE: Likelihood based version (L2 loss) is super unstable.
 # Instead, this uses an L1 loss, which is NOT the same as maximizing the likelihood.
 # This seems to work for now, but I need to figure out the right way to do this
+"Poisson regression via an L1 loss function (since likelihood-based updates are unstable)"
 immutable PoissonRegression <: SGModel end
 @inline predict(::PoissonRegression, x::AVecF, β::VecF) = exp(dot(x, β))
 @inline predict(::PoissonRegression, X::AMatF, β::VecF) = exp(X*β)
 @inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 
-
+"Minimize the quantile loss function for the given `τ`"
 immutable QuantileRegression <: SGModel
     τ::Float64
     function QuantileRegression(τ::Real = 0.5)
@@ -52,12 +55,14 @@ end
 
 
 # Note: Perceptron if NoPenalty, SVM if L2Penalty
+"`penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty` is a support vector machine"
 immutable SVMLike <: SGModel end  # SVM needs y in {-1, 1}
 @inline predict(::SVMLike, x::AVecF, β::VecF) = dot(x, β)
 @inline predict(::SVMLike, X::AMatF, β::VecF) = X * β
 @inline ∇f(::SVMLike, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ * xᵢ : 0.0
 
 
+"Robust regression using Huber loss"
 immutable HuberRegression <: SGModel
     δ::Float64
     function HuberRegression(δ::Real = 1.0)
