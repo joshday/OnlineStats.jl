@@ -2,64 +2,64 @@
 *In alphabetical order*
 
 
-## `Adagrad`
+## Adagrad
 Stochastic adaptive gradient descent for a given model.
 
-## `CovarianceMatrix`
+## CovarianceMatrix
 Analytical covariance matrix.
 
-## `Diff`
+## Diff
 Track the last value and last difference.
 
-## `Diffs`
+## Diffs
 Track the last value and last difference for several variables.
 
-## `FiveNumberSummary`  
+## FiveNumberSummary  
 Univariate five number summary using exact maximum/minimum and approximate .25, .5, and .75 quantiles.
 
-## `LinReg`
+## LinReg
 Analytical linear regression.
 
-## `Mean`
+## Mean
 Analytical sample mean.
 
-## `Means`
+## Means
 Analytical sample means, similar to `mean(x, 1)`.
 
-## `Moments`
+## Moments
 First four non-central moments.  Tracks mean, variance, skewness, and kurtosis.
 
-## `Momentum`
+## Momentum
 Stochastic gradient descent with momentum for a given model.
 
-## `NormalMix`
+## NormalMix
 Univariate normal mixture via an online MM algorithm.
 
 ## Principal Components Analysis
 `pca(o)` where `type(o)` = `CovarianceMatrix`
 
-## `SGD`
+## SGD
 Stochastic gradient descent for a given model.
 
-## `SparseReg`
+## SparseReg
 Sparse regression.  A type to experiment with regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, etc.
 
-## `StepwiseReg`
+## StepwiseReg
 Stepwise regression.  With each update, there is the possibility of a variable entering or leaving the model.
 
-## `Summary`
+## Summary
 Summary statistics: mean, variance, maximum, and minimum.
 
-## `QuantileMM`
+## QuantileMM
 Approximate quantiles using an online MM algorithm.
 
-## `QuantRegMM`
+## QuantRegMM
 Approximate quantile regression using an online MM algorithm.
 
-## `Variance`
+## Variance
 Analytical sample variance.
 
-## `Variances`
+## Variances
 Analytical sample variances, similar to `var(x, 1)`.
 
 

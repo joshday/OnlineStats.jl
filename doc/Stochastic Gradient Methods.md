@@ -3,14 +3,11 @@ The stochastic gradient types take a model argument to specify the link function
 and loss function to be used.  Options are:
 
 - `L1Regression`
-    - Minimize $\sum |y_i - \mathbf{x}_i^T\mathbf{\beta}|$
 - `L2Regression`
 - `LogisticRegression`
-    - $y \in \{0, 1\}$
 - `PoissonRegression`
 - `QuantileRegression`
 - `SVMLike` (Perceptron and SVM)
-    - $y \in \{-1, 1\}$
 - `HuberRegression`
 
 
