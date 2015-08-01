@@ -1,19 +1,22 @@
 #--------------------------------------------------------# Type and Constructors
 type SGD{M <: SGModel, P <: Penalty} <: OnlineStat
+    β0::Float64                     # intercept
     β::VecF                         # coefficients
+    intercept::Bool                 # intercept in model?
     η::Float64                      # constant part of learning rate
     model::M                        # <: SGModel
-    penalty::P
-    weighting::StochasticWeighting
-    n::Int
+    penalty::P                      # <: Penalty
+    weighting::StochasticWeighting  # weighting scheme
+    n::Int                          # number of observations
 end
 
 function SGD(p::Integer, wgt::StochasticWeighting = StochasticWeighting();
+             intercept::Bool = true,
              η::Float64 = 1.0,
              model::SGModel = L2Regression(),
              penalty::Penalty = NoPenalty(),
-             start::VecF = zeros(p))
-    SGD(start, η, model, penalty, wgt, 0)
+             start::VecF = zeros(p + intercept))
+    SGD(start[1] * intercept, start[1 + intercept:end], intercept, η, model, penalty, wgt, 0)
 end
 
 function SGD(X::AMatF, y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); kwargs...)
@@ -29,6 +32,13 @@ function update!(o::SGD, x::AVecF, y::Float64)
     ε = y - yhat
 
     λ = weight(o) * o.η
+
+    #intercept
+    if o.intercept
+        o.β0 -= λ * ∇f(o.model, ε, 1.0, y, yhat)
+    end
+
+    #everything else
     @inbounds for j in 1:length(x)
         g = ∇f(o.model, ε, x[j], y, yhat) + ∇j(o.penalty, o.β, j)
         o.β[j] -= λ * g
@@ -38,8 +48,10 @@ function update!(o::SGD, x::AVecF, y::Float64)
     nothing
 end
 
+
 function updatebatch!(o::SGD, x::AMatF, y::AVecF)
     n, p = size(x)
+    g0 = 0.0      # average gradient for intercept
     g = zeros(p)  # This will be the average gradient for all n new observations
     λ = weight(o) * o.η
 
@@ -48,10 +60,20 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
         yi = y[i]
         yhat = predict(o, xi)
         ϵ = yi - yhat
-        for j in 1:p  # for each dimension, add gradient
+
+        #intercept
+        if o.intercept
+            g0 += λ * ∇f(o.model, ϵ, 1.0, yi, yhat)
+        end
+
+        # everything else
+        for j in 1:p
             g[j] += ∇f(o.model, ϵ, xi[j], yi, yhat) + ∇j(o.penalty, o.β, j)
         end
     end
+
+    # update coefficients
+    o.β0 -= λ * g0 / n
     for j in 1:p
         o.β[j] -= λ * g[j] / n
     end
@@ -59,12 +81,12 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
 end
 
 #------------------------------------------------------------------------# state
-state(o::SGD) = Any[copy(o.β), nobs(o)]
+state(o::SGD) = Any[coef(o), nobs(o)]
 statenames(o::SGD) = [:β, :nobs]
 
-StatsBase.coef(o::SGD) = o.β
-StatsBase.predict(o::SGD, x::AVecF) = predict(o.model, x, o.β)
-StatsBase.predict(o::SGD, X::AMatF) = predict(o.model, X, o.β)
+StatsBase.coef(o::SGD) = vcat(o.β0, o.β)
+StatsBase.predict(o::SGD, x::AVecF) = predict(o.model, x, o.β, o.β0)
+StatsBase.predict(o::SGD, X::AMatF) = predict(o.model, X, o.β, o.β0)
 
 
 

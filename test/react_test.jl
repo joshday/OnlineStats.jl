@@ -75,7 +75,9 @@ facts("React") do
     e = oneargtest(R)
     ebase = oneargtest(R)
 
-    @fact e --> less_than(ebase * 1.2) "This fails on my machine quite a bit"
+    # This is just testing the speed against 2 runs of the same function?
+    # Changing this to pending
+    @pending e --> less_than(ebase * 1.2) "This fails a lot for me"
   end
 
   context("Regression") do
@@ -95,7 +97,7 @@ facts("React") do
       f(row(x,i), y[i])
     end
     @fact nobs(reg) --> n
-    @fact coef(reg) --> roughly(β, atol = 0.4)
+    @fact coef(reg)[2:end] --> roughly(β, atol = 0.4)
     println(reg)
 
     @time update!(reg, x, y)
@@ -145,11 +147,11 @@ facts("React") do
     end
 
     @fact nobs(reg1) --> n
-    @fact coef(reg1) --> roughly(β, atol = 1.0)
+    @fact coef(reg1)[2:end] --> roughly(β, atol = 1.0)
     println(reg1)
 
     @fact nobs(reg2) --> n
-    @fact coef(reg2) --> roughly(β, atol = 1.0)
+    @fact coef(reg2)[2:end] --> roughly(β, atol = 1.0)
     println(reg2)
 
     # @fact nobs(reg3) --> n

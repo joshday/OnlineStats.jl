@@ -82,20 +82,27 @@ facts("Adagrad") do
     context("L2Regression") do
         x = randn(n, p)
         β = collect(1.:p)
-        y = x * β + randn(n)*10
+        βtrue = vcat(0.0, β)
+        y = x * β + randn(n)
+
+        # No intercept
+        o = Adagrad(x, y, intercept = false)
+        @fact coef(o) --> roughly(βtrue, atol = atol, rtol = rtol) "NO INTERCEPT"
 
 
         # normal lin reg
         o = Adagrad(x, y)
         OnlineStats.DEBUG(o, ": β=", β)
-        @fact coef(o) --> roughly(β, atol = atol, rtol = rtol) "update! coef(o)"
+        @fact coef(o)[2:end] --> roughly(β, atol = atol, rtol = rtol) "update! coef(o)"
         @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = atol, rtol = rtol)
 
         # updatebatch!
+        # This converges slower because there's less gradients to divide by (hence the weak test), but
+        # I do have a QuantileRegression examples where batch updates are a big improvement.
         o = Adagrad(p)
         onlinefit!(o, 2, x, y, batch = true)
         onlinefit!(o, 2, x, y, batch = true)
-        @fact coef(o) --> roughly(β, .2) "updatebatch! coef(o)"
+        @fact coef(o)[2:end] --> roughly(β, .5) "updatebatch! coef(o)"
 
         # ridge regression
         # repeat same data in first 2 variables
@@ -103,9 +110,10 @@ facts("Adagrad") do
         x[:,2] = x[:,1]
         y = x * β
         β2 = vcat(1.5, 1.5, β[3:end])
+        β2true = vcat(0.0, β2)
         o = Adagrad(x, y; penalty = L2Penalty(0.01))
         OnlineStats.DEBUG(o, ": β=", β2)
-        @fact coef(o) --> roughly(β2, atol = atol, rtol = rtol)
+        @fact coef(o)[2:end] --> roughly(β2, atol = atol, rtol = rtol)
 
         # some simple checks of the interface
         @fact statenames(o) --> [:β, :nobs]
@@ -116,23 +124,25 @@ facts("Adagrad") do
     context("L1Regression") do
         x = randn(n, p)
         β = collect(1.:p)
-        y = x * β + randn(n)*10
+        βtrue = vcat(2.0, β)
+        y = 2.0 + x * β + randn(n)
 
         o = Adagrad(x, y, model = L1Regression())
         OnlineStats.DEBUG(o, ": β=", β)
-        @fact coef(o) --> roughly(β, atol = atol, rtol = rtol)
-        @fact predict(o, ones(p)) --> roughly(1.0 * sum(β), atol = .9)
+        @fact coef(o) --> roughly(βtrue, atol = atol, rtol = rtol)
+        @fact predict(o, ones(p)) --> roughly(1.0 * sum(β) + 2.0, atol = .9)
     end
 
     context("LogisticRegression") do
         x = randn(n, p)
         β = collect(1.:p)
+        βtrue = vcat(0.0, β)
         y = map(convertLogisticY, x * β)
 
         # logistic
         o = Adagrad(x, y; model=LogisticRegression())
         OnlineStats.DEBUG(o, ": β=", β)
-        @fact coef(o) --> roughly(β, atol = 0.5, rtol = 0.1)
+        @fact coef(o) --> roughly(βtrue, atol = 0.5, rtol = 0.1)
 
         # logistic l2
         # repeat same data in first 2 variables
@@ -140,35 +150,36 @@ facts("Adagrad") do
         x[:,2] = x[:,1]
         y = map(convertLogisticY, x * β)
         β2 = vcat(1.5, 1.5, β[3:end])
+        β2true = vcat(0.0, β2)
         o = Adagrad(x, y; model=LogisticRegression(), penalty=L2Penalty(0.00001))
         OnlineStats.DEBUG(o, ": β=", β2)
-        @fact coef(o) --> roughly(β2, atol = 0.8, rtol = 0.2)
+        @fact coef(o) --> roughly(β2true, atol = 0.8, rtol = 0.2)
     end
 
     context("PoissonRegression") do
         x = randn(n, p)
         β = collect(1.:p) / p
+        βtrue = vcat(0.0, β)
         y = @compat Float64[rand(Poisson(i)) for i in exp(x*β)]
 
         o = OnlineStats.Adagrad(x, y, model = OnlineStats.PoissonRegression(), η = .001)
-        @pending coef(o) --> roughly(β, atol = 0.8, rtol = 0.2)
+        @fact coef(o) --> roughly(βtrue, atol = 0.8, rtol = 0.2)
     end
 
     context("QuantileRegression") do
         x = randn(n, p)
         β = collect(1.:p)
+        βtrue = vcat(quantile(Normal(), .8), β)
         y = x * β + randn(n)
 
         o = Adagrad(x, y; model = QuantileRegression(.8))
-        @fact coef(o) --> roughly(β, atol = 0.5, rtol = 0.1)
-
-        o = Adagrad(hcat(ones(n), x), y; model = QuantileRegression(.8))
-        @fact coef(o) --> roughly(vcat(quantile(Normal(), .8), β), atol = 0.5, rtol = 0.1)
+        @fact coef(o) --> roughly(βtrue, atol = 0.5, rtol = 0.1)
 
         ϵdist = Normal(0, 5)
+        βtrue = vcat(quantile(ϵdist, .8), β)
         y = x * β + rand(ϵdist, n)
-        o = Adagrad(hcat(ones(n), x), y; model = QuantileRegression(.8))
-        @fact coef(o) --> roughly(vcat(quantile(ϵdist, .8), β), atol = 0.5, rtol = 0.1)
+        o = Adagrad(x, y; model = QuantileRegression(.8))
+        @fact coef(o) --> roughly(βtrue, atol = 0.5, rtol = 0.1)
     end
 
     context("SVMLike") do
@@ -178,19 +189,18 @@ facts("Adagrad") do
         y = 2y - 1
 
         o = Adagrad(x, y; model = SVMLike())
-        yhat = (predict(o, x) .> 0)
-        y = y .> 0
-        misclass = mean(yhat .!= y)
+        misclass = mean(sign(predict(o, x)) .!= y)
         @fact misclass --> less_than(.2) "Check that less than 20% are misclassified"
     end
 
     context("HuberRegression") do
         x = randn(n, p)
         β = collect(1.:p)
+        βtrue = vcat(0.0, β)
         y = x * β + randn(n)
 
         o = Adagrad(x, y; model = HuberRegression(2))
-        @fact coef(o) --> roughly(β, atol = 0.5, rtol = 0.1)
+        @fact coef(o) --> roughly(βtrue, atol = 0.5, rtol = 0.1)
     end
 
 

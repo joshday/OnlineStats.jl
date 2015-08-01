@@ -26,8 +26,11 @@
 
 #-------------------------------------------------------# Type and Constructors
 type Adagrad{M <: SGModel, P <: Penalty} <: OnlineStat
+    β0::Float64
     β::VecF
+    intercept::Bool
     η::Float64  # learning rate
+    G0::Float64
     G::VecF  # Gₜᵢ  = Σ gₛᵢ²   (sum of squared gradients up to time t)
     model::M
     penalty::P
@@ -35,11 +38,12 @@ type Adagrad{M <: SGModel, P <: Penalty} <: OnlineStat
 end
 
 function Adagrad(p::Int;
+                 intercept::Bool = true,
                  η::Float64 = 1.0,
                  model::SGModel = L2Regression(),
                  penalty::Penalty = NoPenalty(),
-                 start::VecF = zeros(p))
-    Adagrad(start, η, zeros(p), model, penalty, 0)
+                 start::VecF = zeros(p + intercept))
+    Adagrad(start[1] * intercept, start[1+intercept:end], intercept, η, 0.0, zeros(p), model, penalty, 0)
 end
 
 function Adagrad(X::AMatF, y::AVecF; kwargs...)
@@ -53,6 +57,14 @@ end
 function update!(o::Adagrad, x::AVecF, y::Float64)
     yhat = predict(o, x)
     ε = y - yhat
+
+    if o.intercept
+        g = ∇f(o.model, ε, 1.0, y, yhat)
+        o.G0 += g^2
+        if o.G0 != 0.0
+            o.β0 -= o.η * g / sqrt(o.G0)
+        end
+    end
 
   @inbounds for j in 1:length(x)
     g = ∇f(o.model, ε, x[j], y, yhat) + ∇j(o.penalty, o.β, j)
@@ -76,14 +88,23 @@ end
 function updatebatch!(o::Adagrad, x::AMatF, y::AVecF)
     n, p = size(x)
     g = zeros(p)  # This will be the average gradient for all n new observations
+    g0 = 0.0
 
     for i in 1:n  # for each observation, add the gradient
         xi = row(x, i)
         yi = y[i]
         yhat = predict(o, xi)
         ϵ = yi - yhat
+        g0 += ∇f(o.model, ϵ, 1.0, yi, yhat)
         for j in 1:p  # for each dimension, add gradient
             g[j] += ∇f(o.model, ϵ, xi[j], yi, yhat) + ∇j(o.penalty, o.β, j)
+        end
+    end
+
+    if o.intercept
+        o.G0 += (g0 / n) ^ 2
+        if o.G0 != 0.0
+            o.β0 -= o.η * g0 / sqrt(o.G0)
         end
     end
     for j in 1:p
@@ -100,12 +121,12 @@ end
 
 #-----------------------------------------------------------------------# state
 
-state(o::Adagrad) = Any[copy(o.β), nobs(o)]
+state(o::Adagrad) = Any[coef(o), nobs(o)]
 statenames(o::Adagrad) = [:β, :nobs]
 
-StatsBase.coef(o::Adagrad) = o.β
-StatsBase.predict(o::Adagrad, x::AVecF) = predict(o.model, x, o.β)
-StatsBase.predict(o::Adagrad, X::AMatF) = predict(o.model, X, o.β)
+StatsBase.coef(o::Adagrad) = vcat(o.β0, o.β)
+StatsBase.predict(o::Adagrad, x::AVecF) = predict(o.model, x, o.β, o.β0)
+StatsBase.predict(o::Adagrad, X::AMatF) = predict(o.model, X, o.β, o.β0)
 
 
 # --------------------------------------------------------------------------

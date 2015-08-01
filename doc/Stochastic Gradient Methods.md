@@ -11,7 +11,7 @@ argument | description
 `start` (keyword)   | starting value for β.  Defaults to zeros.
 
 
-The model argument to specifies both the link function and loss function to be used.  Options are:
+The model argument specifies both the link function and loss function to be used.  Options are:
 
 - `L1Regression()`
     - Linear model using absolute loss.  This minimizes `vecnorm(y - X*β, 1)` with respect to β.
@@ -34,22 +34,29 @@ The model argument to specifies both the link function and loss function to be u
 
 Examples:
 ```julia
-# Absolute loss with ridge penalty
+# 1) Absolute loss with ridge penalty
+# 2) Quantile regression (same as absolute loss if τ = 0.5)
+# 3) Ordinary least squares with "slow" decay rate
+# 4) Logistic regression with "fast" decay rate
+# 5) Support vector machine
+# 6) Robust regression with Huber loss
+
+# 1
 o = SGD(x, y, model = L1Regression(), penalty = L2Penalty(.1))
 
-# quantile regression (same as absolute loss if τ = 0.5) with
+# 2
 o = SGD(x, y, StochasticWeighting(.7), model = QuantileRegression(0.5))
 
-# Ordinary least squares with "slow" decay rate
+# 3
 o = Momentum(x, y, StochasticWeighting(.51), model = L2Regression())
 
-# logistic regression with "fast" decay rate
+# 4
 o = Momentum(x, y, StochasticWeighting(.9), model = LogisticRegression())
 
-# SVM
+# 5
 o = Adagrad(x, y, model = SVMLike(), penalty = L2Penalty(.1))
 
-# Robust regression with Huber loss
+# 6
 o = Adagrad(x, y, StochasticWeighting(.7), model = HuberRegression(2.0))
 ```
 
