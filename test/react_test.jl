@@ -86,7 +86,7 @@ facts("React") do
     β = collect(1.:p);
     y = x * β + randn(n)*10;
 
-    reg = Adagrad(p)
+    reg = Adagrad(p, intercept = false)
 
     # note here... the update! method of Adagrad takes an x and y arg, so there
     # should be a 2-item tuple on the left hand side of the pipe
@@ -97,7 +97,7 @@ facts("React") do
       f(row(x,i), y[i])
     end
     @fact nobs(reg) --> n
-    @fact coef(reg)[2:end] --> roughly(β, atol = 0.4)
+    @fact coef(reg) --> roughly(β, atol = 0.4)
     println(reg)
 
     @time update!(reg, x, y)
@@ -113,8 +113,8 @@ facts("React") do
     β = collect(1.:p);
     y = x * β + randn(n)*10;
 
-    reg1 = Adagrad(p)
-    reg2 = SGD(p)
+    reg1 = Adagrad(p, intercept = false)
+    reg2 = SGD(p, intercept = false)
     # reg3 = LinReg(p)
 
     # there are a few things to note here:
@@ -147,11 +147,11 @@ facts("React") do
     end
 
     @fact nobs(reg1) --> n
-    @fact coef(reg1)[2:end] --> roughly(β, atol = 1.0)
+    @fact coef(reg1) --> roughly(β, atol = 1.0)
     println(reg1)
 
     @fact nobs(reg2) --> n
-    @fact coef(reg2)[2:end] --> roughly(β, atol = 1.0)
+    @fact coef(reg2) --> roughly(β, atol = 1.0)
     println(reg2)
 
     # @fact nobs(reg3) --> n

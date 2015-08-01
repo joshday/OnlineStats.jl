@@ -1,3 +1,11 @@
+
+# StochasticGradientStat methods
+state(o::StochasticGradientStat) = Any[coef(o), nobs(o)]
+statenames(o::StochasticGradientStat) = [:β, :nobs]
+StatsBase.coef(o::StochasticGradientStat) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
+StatsBase.predict(o::StochasticGradientStat, x::AVecF) = predict(o.model, x, o.β, o.β0)
+StatsBase.predict(o::StochasticGradientStat, X::AMatF) = predict(o.model, X, o.β, o.β0)
+
 # Need structure to accomodate the following model types:
 #  L1 Regression
 #  L2 Regression

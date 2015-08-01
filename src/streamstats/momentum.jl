@@ -1,5 +1,5 @@
 #--------------------------------------------------------# Type and Constructors
-type Momentum{M <: SGModel, P <: Penalty} <: OnlineStat
+type Momentum{M <: SGModel, P <: Penalty} <: StochasticGradientStat
     β0::Float64                     # intercept
     β::VecF                         # coefficients
     intercept::Bool                 # intercept in model?
@@ -89,9 +89,9 @@ end
 
 
 #------------------------------------------------------------------------# state
-state(o::Momentum) = Any[copy(o.β), nobs(o)]
-statenames(o::Momentum) = [:β, :nobs]
-
-StatsBase.coef(o::Momentum) = vcat(o.β0, o.β)
-StatsBase.predict(o::Momentum, x::AVecF) = predict(o.model, x, o.β, o.β0)
-StatsBase.predict(o::Momentum, X::AMatF) = predict(o.model, X, o.β, o.β0)
+# state(o::Momentum) = Any[copy(o.β), nobs(o)]
+# statenames(o::Momentum) = [:β, :nobs]
+#
+# StatsBase.coef(o::Momentum) = vcat(o.β0, o.β)
+# StatsBase.predict(o::Momentum, x::AVecF) = predict(o.model, x, o.β, o.β0)
+# StatsBase.predict(o::Momentum, X::AMatF) = predict(o.model, X, o.β, o.β0)

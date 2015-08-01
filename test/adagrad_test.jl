@@ -87,7 +87,7 @@ facts("Adagrad") do
 
         # No intercept
         o = Adagrad(x, y, intercept = false)
-        @fact coef(o) --> roughly(βtrue, atol = atol, rtol = rtol) "NO INTERCEPT"
+        @fact coef(o) --> roughly(β, atol = atol, rtol = rtol) "NO INTERCEPT"
 
 
         # normal lin reg

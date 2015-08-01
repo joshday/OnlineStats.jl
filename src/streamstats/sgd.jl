@@ -1,5 +1,5 @@
 #--------------------------------------------------------# Type and Constructors
-type SGD{M <: SGModel, P <: Penalty} <: OnlineStat
+type SGD{M <: SGModel, P <: Penalty} <: StochasticGradientStat
     β0::Float64                     # intercept
     β::VecF                         # coefficients
     intercept::Bool                 # intercept in model?
@@ -81,12 +81,12 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
 end
 
 #------------------------------------------------------------------------# state
-state(o::SGD) = Any[coef(o), nobs(o)]
-statenames(o::SGD) = [:β, :nobs]
-
-StatsBase.coef(o::SGD) = vcat(o.β0, o.β)
-StatsBase.predict(o::SGD, x::AVecF) = predict(o.model, x, o.β, o.β0)
-StatsBase.predict(o::SGD, X::AMatF) = predict(o.model, X, o.β, o.β0)
+# state(o::SGD) = Any[coef(o), nobs(o)]
+# statenames(o::SGD) = [:β, :nobs]
+#
+# StatsBase.coef(o::SGD) = vcat(o.β0, o.β)
+# StatsBase.predict(o::SGD, x::AVecF) = predict(o.model, x, o.β, o.β0)
+# StatsBase.predict(o::SGD, X::AMatF) = predict(o.model, X, o.β, o.β0)
 
 
 

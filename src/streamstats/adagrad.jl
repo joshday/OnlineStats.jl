@@ -25,7 +25,7 @@
 
 
 #-------------------------------------------------------# Type and Constructors
-type Adagrad{M <: SGModel, P <: Penalty} <: OnlineStat
+type Adagrad{M <: SGModel, P <: Penalty} <: StochasticGradientStat
     β0::Float64
     β::VecF
     intercept::Bool
@@ -121,12 +121,12 @@ end
 
 #-----------------------------------------------------------------------# state
 
-state(o::Adagrad) = Any[coef(o), nobs(o)]
-statenames(o::Adagrad) = [:β, :nobs]
-
-StatsBase.coef(o::Adagrad) = vcat(o.β0, o.β)
-StatsBase.predict(o::Adagrad, x::AVecF) = predict(o.model, x, o.β, o.β0)
-StatsBase.predict(o::Adagrad, X::AMatF) = predict(o.model, X, o.β, o.β0)
+# state(o::Adagrad) = Any[coef(o), nobs(o)]
+# statenames(o::Adagrad) = [:β, :nobs]
+#
+# StatsBase.coef(o::Adagrad) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
+# StatsBase.predict(o::Adagrad, x::AVecF) = predict(o.model, x, o.β, o.β0)
+# StatsBase.predict(o::Adagrad, X::AMatF) = predict(o.model, X, o.β, o.β0)
 
 
 # --------------------------------------------------------------------------
