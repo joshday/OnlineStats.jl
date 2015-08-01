@@ -1,14 +1,15 @@
 # Available Models using Stochastic Gradient Descent and Variants
-The interface is standard across the stochastic gradient types (SGD, Momentum, and Adagrad).  Each takes arguments:
+The interface is standard across the `StochasticGradientStat` types (SGD, Momentum, and Adagrad).  Each takes arguments:
 
 argument | description
 ---------|------------
 `x` | matrix of predictors
 `y` | response vector
 `wgt` (optional) | Weighting scheme. Defaults to `StochasticWeighting(.51)`
-`model` (keyword)   | One of the models below.  Defaults to `L2Regression()`
-`penalty` (keyword) | `NoPenalty` (default), `L1Penalty`, or `L2Penalty`
-`start` (keyword)   | starting value for β.  Defaults to zeros.
+`intercept` (keyword) | Should an intercept be included?  Defaults to `true`
+`model` (keyword)     | One of the models below.  Defaults to `L2Regression()`
+`penalty` (keyword)   | `NoPenalty` (default), `L1Penalty`, or `L2Penalty`
+`start` (keyword)     | starting value for β.  Defaults to zeros.
 
 
 The model argument specifies both the link function and loss function to be used.  Options are:
@@ -28,7 +29,15 @@ The model argument specifies both the link function and loss function to be used
 - `HuberRegression(δ)`
     - Robust regression using Huber loss.
 
+# Common Interface
+Here `o` is a `StochasticGradientStat`
 
+method | details
+---------|------------
+`state(o)`                | return coefficients and number of observations
+`statenames(o)`           | names corresponding to `state`: `[:β, :nobs]`
+`StatsBase.coef(o)`       | return coefficients
+`StatsBase.predict(o, x)` | `x` can be vector or matrix
 
 ## SGD
 
@@ -36,8 +45,8 @@ Examples:
 ```julia
 # 1) Absolute loss with ridge penalty
 # 2) Quantile regression (same as absolute loss if τ = 0.5)
-# 3) Ordinary least squares with "slow" decay rate
-# 4) Logistic regression with "fast" decay rate
+# 3) Ordinary least squares with "slow" decay rate (fast learner)
+# 4) Logistic regression with "fast" decay rate (slow learner)
 # 5) Support vector machine
 # 6) Robust regression with Huber loss
 
