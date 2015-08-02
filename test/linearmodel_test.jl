@@ -48,6 +48,23 @@ facts("Linear Model") do
         end
         @fact coef(o) --> roughly(ones(10), .01)
         @fact predict(o, x) --> x * coef(o)
+        @fact predict(o, ones(10)) --> dot(ones(10), coef(o))
+
+        # update! vs updatebatch!
+        o1 = OnlineStats.LinReg(10)
+        o2 = OnlineStats.LinReg(10)
+
+        x = randn(10000, 10)
+        y = x*β + randn(10000)
+        OnlineStats.updatebatch!(o1, x, y)
+        OnlineStats.update!(o2, x, y)
+        @fact coef(o1) --> roughly(coef(o2), .1)
+
+        o1 = OnlineStats.LinReg(10)
+        o2 = OnlineStats.LinReg(10)
+        OnlineStats.update!(o1, vec(x[1,:]), y[1])
+        OnlineStats.update!(o2, x[1,:], collect(y[1]))
+        @fact mean(o1.c) --> roughly(mean(o2.c))
     end
 
     context("StepwiseReg") do

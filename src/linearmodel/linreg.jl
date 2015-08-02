@@ -38,23 +38,25 @@ StatsBase.coef(o::LinReg) = vec(o.s[end, 1:end - 1])
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::LinReg, x::AMatF, y::AVecF)
     p = ncols(x)
-    updatebatch!(o.c, [x y])
+    updatebatch!(o.c, hcat(x, y))
     copy!(o.s, o.c.A)
     sweep!(o.s, 1:p)
+    nothing
 end
 
 function update!(o::LinReg, x::AVecF, y::Float64)
-    update!(o.c, [x; y])
+    update!(o.c, vcat(x, y))
     copy!(o.s, o.c.A)
     sweep!(o.s, 1:nrows(o.s))
+    nothing
 end
 
+# special update to avoid sweeping at each row update
 function update!(o::LinReg, x::AMatF, y::AVecF)
-    for i in 1:length(y)
-        update!(o.c, [x; y])
-    end
+    update!(o.c, hcat(x, y))
     copy!(o.s, o.c.A)
     sweep!(o.s, 1:nrows(o.s))
+    nothing
 end
 
 
