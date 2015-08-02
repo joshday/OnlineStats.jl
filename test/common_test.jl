@@ -1,6 +1,6 @@
 module CommonTest
 
-using OnlineStats, FactCheck, Distributions
+using OnlineStats, FactCheck, Distributions, ArrayViews
 
 facts("Common") do
     context("Helper Functions") do
@@ -24,10 +24,13 @@ facts("Common") do
         OnlineStats.col!(x, p, ones(n))
         @fact OnlineStats.col(x, 1) --> OnlineStats.col(x, p)
         @fact OnlineStats.col(x, p) --> ones(n)
+        @fact OnlineStats.cols(x, 1) --> OnlineStats.col(x, 1)
+        @fact OnlineStats.cols(x, 1:2) --> view(x, :, 1:2)
 
         x = rand(10)
         @fact OnlineStats.mystring(x) --> string(x)
         @fact OnlineStats.mystring(x[1]) --> @sprintf("%f", x[1])
+        @fact OnlineStats.row(x, 1) --> x[1]
     end
 
     context("Weighting") do
@@ -48,24 +51,27 @@ facts("Common") do
         o = Mean()
         @fact onlinefit!(o, 5, randn(100), batch = false) --> nothing
         @fact onlinefit!(o, 5, randn(100)) --> nothing
+
+        o = Mean()
+        ovec = tracefit!(o, 5, randn(100))
+        @fact nobs(ovec[end]) --> 100
     end
 
-    context("Show OnlineStat") do
+    context("Show and print methods") do
+        print_with_color(:blue, "Output here is messy for the sake of getting coverage for show and print\n")
         x = rand(100)
         o = Mean(x)
-        # show(o)
-        OnlineStats.DEBUG(o)
+        show(o); print(o); print([o, o]);
         @fact OnlineStats.name(o) --> string(typeof(o))
-        OnlineStats.DEBUG(Mean())
-        OnlineStats.DEBUG(Variance())
-        OnlineStats.DEBUG(Variance[Variance(), Variance()])
+
+        x1 = randn(100)
+        o = distributionfit(Normal, x1)
+        show(o);
     end
 
     context("Show DistributionStat") do
         x1 = randn(100)
         o = distributionfit(Normal, x1)
-        # show(o); println()
-        OnlineStats.DEBUG("Normal fit: ", o)
 
         @fact params(o) --> params(o.d)
         @fact mean(o) --> mean(o.d)

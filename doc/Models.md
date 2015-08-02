@@ -33,7 +33,7 @@ First four non-central moments.  Tracks mean, variance, skewness, and kurtosis.
 Stochastic gradient descent with momentum for a given model.  See Stochastic Gradient Methods.
 
 ## NormalMix
-Univariate normal mixture via an online MM algorithm.
+Univariate normal mixture via an online EM algorithm.
 
 ## Principal Components Analysis
 `pca(o)` where `type(o)` = `CovarianceMatrix`

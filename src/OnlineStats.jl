@@ -9,7 +9,6 @@ using Reexport.@reexport
 using Compat
 
 
-import Clustering  # Used in offline em algorithm for normal mixture
 import Distributions
 import Distributions:
     # Distributions

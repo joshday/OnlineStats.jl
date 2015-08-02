@@ -50,22 +50,16 @@ Examples:
 # 5) Support vector machine
 # 6) Robust regression with Huber loss
 
-# 1
 o = SGD(x, y, model = L1Regression(), penalty = L2Penalty(.1))
 
-# 2
 o = SGD(x, y, StochasticWeighting(.7), model = QuantileRegression(0.5))
 
-# 3
 o = Momentum(x, y, StochasticWeighting(.51), model = L2Regression())
 
-# 4
 o = Momentum(x, y, StochasticWeighting(.9), model = LogisticRegression())
 
-# 5
 o = Adagrad(x, y, model = SVMLike(), penalty = L2Penalty(.1))
 
-# 6
 o = Adagrad(x, y, StochasticWeighting(.7), model = HuberRegression(2.0))
 ```
 
