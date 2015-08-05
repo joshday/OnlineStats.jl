@@ -12,7 +12,7 @@ end
 """
 `BernoulliBootstrap(o, f, r)`
 
-Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for parameter `f(o)`
+Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
 
 Example: `BernoulliBootstrap(Mean(), mean, 1000)`
 """
@@ -39,7 +39,7 @@ end
 """
 `PoissonBootstrap(o, f, r)`
 
-Create a poisson bootstrap using `r` replicates of OnlineStat `o` for parameter `f(o)`
+Create a poisson bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
 
 Example: `PoissonBootstrap(Mean(), mean, 1000)`
 """
