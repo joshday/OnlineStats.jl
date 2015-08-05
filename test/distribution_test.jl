@@ -84,7 +84,6 @@ facts("Distributions") do
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) --> 0
         @fact OnlineStats.weighting(o) --> ExponentialWeighting(.001)
-        # @fact show(distributionfit(Binomial, [4], n=10)) --> show(FitBinomial(Binomial(10, .4), 1, EqualWeighting()))
         @fact distributionfit(Binomial, [4], n=10) --> FitBinomial(Binomial(10, .4), 1, EqualWeighting())
 
         for i in 1:10
@@ -187,9 +186,6 @@ facts("Distributions") do
         o = distributionfit(Exponential, rand(Exponential(5.5), 10), ExponentialWeighting(.01))
         o = distributionfit(Exponential, rand(Exponential(), 10))
         @fact OnlineStats.weighting(o) --> EqualWeighting()
-        # @fact show(distributionfit(Exponential, [.5])) --> show(FitExponential(Exponential(.5), 1, EqualWeighting()))
-        # OnlineStats.log_severity!(OnlineStats.DebugSeverity)
-        # OnlineStats.@DEBUG distributionfit(Exponential, [.5]) FitExponential(Exponential(.5), 1, EqualWeighting())
         @fact distributionfit(Exponential, [.5]) --> FitExponential(Exponential(.5), 1, EqualWeighting())
         @fact distributionfit(Exponential, [.5]) --> not(FitExponential(Exponential(1.5), 1, EqualWeighting()))
 
@@ -201,12 +197,12 @@ facts("Distributions") do
         x = vcat(x1, x2)
 
         o = distributionfit(Exponential, x1)
-        @fact o.d.β --> roughly(mean(x1))
+        @fact o.d.θ --> roughly(mean(x1))
         @fact o.n --> n1
         @fact nobs(o) --> n1
 
         OnlineStats.update!(o, x2)
-        @fact o.d.β --> roughly(mean(x))
+        @fact o.d.θ --> roughly(mean(x))
         @fact o.n --> n1 + n2
 
         o1 = copy(o)

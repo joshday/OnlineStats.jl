@@ -47,7 +47,7 @@ end
 function update!(o::LinReg, x::AVecF, y::Float64)
     update!(o.c, vcat(x, y))
     copy!(o.s, o.c.A)
-    sweep!(o.s, 1:nrows(o.s))
+    sweep!(o.s, 1:nrows(o.s) - 1)
     nothing
 end
 
@@ -55,7 +55,7 @@ end
 function update!(o::LinReg, x::AMatF, y::AVecF)
     update!(o.c, hcat(x, y))
     copy!(o.s, o.c.A)
-    sweep!(o.s, 1:nrows(o.s))
+    sweep!(o.s, 1:nrows(o.s) - 1)
     nothing
 end
 

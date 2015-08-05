@@ -12,8 +12,9 @@ StatsBase.predict(o::StochasticGradientStat, X::AMatF) = predict(o.model, X, o.Î
 #  Logistic Regression
 #  Poisson Regression
 #  Quantile Regression
-#  SVM (hinge and smoothed-hinge loss?)
+#  SVM
 #  Huber loss regression
+#  Others?
 
 # âˆ‡f takes some unused arguments to accomodate each loss function
 

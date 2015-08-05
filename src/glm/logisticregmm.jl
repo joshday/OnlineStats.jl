@@ -26,7 +26,6 @@ end
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::LogRegMM, x::AMatF, y::AVec)
     n = length(y)
-    all([y[i] in [0, 1] for i in 1:n]) || error("y values must be 0 or 1")
 
     γ = weight(o)
 
