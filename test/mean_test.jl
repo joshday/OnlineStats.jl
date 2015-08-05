@@ -62,7 +62,7 @@ facts("Mean") do
 
         @fact OnlineStats.center(o, mean(o)) --> roughly(0.0, 1e-10)
         @fact OnlineStats.uncenter(o, -mean(o)) --> roughly(0.0, 1e-10)
-        @fact OnlineStats.center!(o, mean(o)) --> roughly(0.0, e-10)
+        @fact OnlineStats.center!(o, mean(o)) --> roughly(0.0, 1e-10)
 
         empty!(o)
         @fact mean(o) --> 0.0
