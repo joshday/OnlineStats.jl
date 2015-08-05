@@ -60,9 +60,9 @@ facts("Mean") do
         @fact mean(o2) --> x1[1]
         @fact nobs(o2) --> 1
 
-        @fact OnlineStats.center(o, mean(o)) --> roughly(0.0)
-        @fact OnlineStats.uncenter(o, -mean(o)) --> roughly(0.0)
-        @fact OnlineStats.center!(o, mean(o)) --> roughly(0.0)
+        @fact OnlineStats.center(o, mean(o)) --> roughly(0.0, 1e-10)
+        @fact OnlineStats.uncenter(o, -mean(o)) --> roughly(0.0, 1e-10)
+        @fact OnlineStats.center!(o, mean(o)) --> roughly(0.01, e-10)
 
         empty!(o)
         @fact mean(o) --> 0.0
