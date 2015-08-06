@@ -1,6 +1,3 @@
-inverselogit(x) = 1 / (1 + exp(-x))
-@vectorize_1arg Real inverselogit
-
 #-------------------------------------------------------# Type and Constructors
 type LogRegMM{W <: Weighting} <: OnlineStat
     β::VecF

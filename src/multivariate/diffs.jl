@@ -28,8 +28,7 @@ end
 function Base.empty!{T<:Real}(o::Diffs{T})
     p = length(o.diffs)
     o.diffs = zeros(T, p)
-    o.lastval = zeros(T, p)
+    o.lastvals = zeros(T, p)
     o.n = 0
     return
 end
-

@@ -118,6 +118,8 @@ facts("Diffs") do
     @fact last(o) --> Int[5,5]
     @fact nobs(o) --> 4
 
+    o = Diffs(randn(100,10))
+    empty!(o)
 end
 
 

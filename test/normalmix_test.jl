@@ -63,8 +63,10 @@ facts("NormalMix") do
         @fact mean(NormalMix(3)) --> 0.
 
         x = randn(1000)
-        @fact mean(NormalMix(3, x)) --> roughly(mean(x))
-        @fact std(NormalMix(3, x)) --> roughly(std(x), .001)
+        o = NormalMix(3, x)
+        @fact mean(o) --> roughly(mean(x))
+        @fact std(o) --> roughly(std(x), .001)
+        @fact quantile(o, 0.5) --> roughly(quantile(x, .5), .1)
     end
 end
 
