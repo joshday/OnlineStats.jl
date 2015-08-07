@@ -2,7 +2,7 @@
 """
 Keep enough history for the given lag indices.  Intended for time-series.
 Given lag list [0, 2, 10] for series {yₜ}, we care about storing/indexing [yₜ, yₜ₋₂, yₜ₋₁₀]
-Note that we must keep all data points from (t - i₁) --> (t - iₙ), so data storage scales 
+Note that we must keep all data points from (t) --> (t - iₙ), so data storage scales 
 with the largest lag.
 """
 type Window{T <: Real, VECI <: AVec{Int}} <: OnlineStat
@@ -16,62 +16,60 @@ function Window{T<:Real}(::Type{T}, lagIndices::AVec{Int})
     Window(CircularBuffer(T, maximum(lagIndices)+1), lagIndices, 0)
 end
 
+# replicates a typical circular buffer
+Window{T<:Real}(::Type{T}, sz::Int) = Window(T, sz-1:-1:0)
+
+# ------------------------------
+
 statenames(o::Window) = [:lags, :nobs]
 state(o::Window) = Any[lags(o), nobs(o)]
 
-lags{T,V}(o::Window{T,V}) = T[]
+lags{T}(o::Window{T}) = T[x for x in o]
+Base.convert(::Type{Array}, o::Window) = lags(o)
 
-function update!{T<:FloatingPoint}(o::Window{T}, x::Real)
-    v = convert(T, x)
-    o.diff = (o.n == 0 ? zero(T) : v - last(o))
-    o.lastval = v
-    o.n += 1
-    return
-end
-
-function update!{T<:Integer}(o::Window{T}, x::Real)
-    v = round(T, x)
-    o.diff = (o.n == 0 ? zero(T) : v - last(o))
-    o.lastval = v
+function update!{T<:Real}(o::Window{T}, x::Real)
+    push!(o.buf, convert(T, x))
     o.n += 1
     return
 end
 
 function Base.empty!{T<:Real}(o::Window{T})
-    o.diff = zero(T)
-    o.lastval = zero(T)
+    o.buf = CircularBuffer(T, maximum(o.lagIndices)+1)
     o.n = 0
     return
 end
 
+# ------------------------------
+
+_bufferIndex(o::Window, i::Int) = length(o.buf) - o.lagIndices[i]
+bufferIndex(o::Window, i::Int) = (i < 1 || i > length(o)) ? error("Idx $i out of range. ", o) : _bufferIndex(o, i)
 
 
-#----------------------
-# TODO: merge above and below properly!
+Base.getindex(o::Window, i::Int) = o.buf[bufferIndex(o, i)]
+Base.unsafe_getindex(o::Window, i::Int) = o.buf[_bufferIndex(o, i)]
 
-function bufferIndex(window::RollingWindow, i::Int)
-  if i < 1 || i > length(window)
-    error("RollingWindow out of range. window=$window i=$i")
-  end
-  length(window.cb) - window.lags[i]
+function Base.setindex!{T}(o::Window, data::T, i::Int)
+  o.buf[bufferIndex(o, i)] = data
+  nothing
 end
-
-Base.getindex(window::RollingWindow, i::Int) = window.cb[bufferIndex(window, i)]
-function Base.setindex!{T}(window::RollingWindow, data::T, i::Int)
-  window.cb[bufferIndex(window, i)] = data
+function Base.unsafe_setindex!{T}(o::Window, data::T, i::Int)
+  o.buf[_bufferIndex(o, i)] = data
   nothing
 end
 
+# iteration
+Base.start(o::Window) = 1
+Base.done(o::Window, state::Int) = state > length(o)
+Base.next(o::Window, state::Int) = (o[state], state+1)
 
 # note: length is 0 until the underlying buffer is full
-Base.length(window::RollingWindow) = (isfull(window) ? capacity(window) : 0)
-Base.size(window::RollingWindow) = (length(window),)
+Base.length(o::Window) = (isfull(o) ? capacity(o) : 0)
+Base.size(o::Window) = (length(o),)
 
-capacity(window::RollingWindow) = length(window.lags)
-isfull(window::RollingWindow) = isfull(window.cb)
-toarray{T}(window::RollingWindow{T}) = window[1:length(window)]
+QuickStructs.capacity(o::Window) = length(o.lagIndices)
+QuickStructs.isfull(o::Window) = isfull(o.buf)
 
-Base.push!{T}(window::RollingWindow{T}, data::T) = push!(window.cb, data)
-Base.append!{T}(window::RollingWindow{T}, datavec::AbstractVector{T}) = append!(window.cb, datavec)
+# Base.push!{T}(o::Window{T}, data::T) = push!(o.buf, data)
+# Base.append!{T}(o::Window{T}, datavec::AbstractVector{T}) = append!(o.buf, datavec)
 
 
