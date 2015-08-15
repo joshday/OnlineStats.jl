@@ -141,8 +141,8 @@ function Base.show(io::IO, o::OnlineStat)
     snames = statenames(o)
     svals = state(o)
 
-    println(io, "Online ", name(o))
+    print(io, "OnlineStat: ", name(o))
     for (i, sname) in enumerate(snames)
-        println(io, @sprintf(" * %8s:  %s\n", sname, mystring(svals[i])))
+        print(io, @sprintf("\n * %8s:  %s", sname, mystring(svals[i])))
     end
 end
