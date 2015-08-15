@@ -9,38 +9,4 @@ Online algorithms for statistics.  See [Implementation Progress](src/README.md)
 
 Install with `Pkg.clone("https://github.com/joshday/OnlineStats.jl")`
 
-## [Documentation](http://onlinestatsjl.readthedocs.org/en/latest/)
-
-## Types
-
-A simplified `OnlineStats` type structure:
-
-```julia
-
-type OnlineStatistic{W <: Weighting}
-	estimate         # current estimate
-	sufficient_stat  # values needed to update estimate
-	n                # Number of observations used
-	weighting::W     # How should new observations be weighted
-end
-```
-
-## Common Interace
-
-- `state(o)`
-	- return vector of current estimates
-- `statenames(o)`
-	- return corresponding names to `state(o)`
-- `update!(o, y)`
-	- update estimate in `o` using data `y` with weighting scheme defined by `o.weighting`
-	- Observations are weighted in order of appearance
-- `updatebatch!(o, y)`
-	- update estimate in `o` using data `y` with weighting scheme defined by 	`o.weighting`
-	- Each observation gets equal weight
-- `nobs(o)`
-	- return the number of observations
-- `onlinefit!(o, b, args..., batch = true)`
-	- Run through the data `args...` calling `update!(o)`/`updatebatch!()` on minibatches of size `b`
-- `tracefit!(o, b, args..., batch = false)`
-	- Run through the data as in `distributionfit!` and return a vector of `typeof(o)`.  Each element
-	is a copy of `o` after being updated by the next batch.
+### [Documentation](http://onlinestatsjl.readthedocs.org/en/latest/)
