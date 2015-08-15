@@ -22,10 +22,10 @@ FitExponential(wgt::Weighting = default(Weighting)) =
 function update!(o::FitExponential, y::Real)
     λ = weight(o)
     if o.n > 0
-        β = smooth(o.d.β, y, λ)
+        θ = smooth(o.d.θ, y, λ)
     else
-        β = smooth(0., y, λ)
+        θ = smooth(0., y, λ)
     end
-    o.d = Exponential(β)
+    o.d = Exponential(θ)
     o.n += 1
 end

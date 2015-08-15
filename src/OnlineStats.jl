@@ -9,7 +9,6 @@ using Reexport.@reexport
 using Compat
 
 
-import Clustering  # Used in offline em algorithm for normal mixture
 import Distributions
 import Distributions:
     # Distributions
@@ -89,14 +88,18 @@ export
 
     HyperLogLog,
     SGD,
+    Momentum,
     Adagrad,
-    SquareLoss,
-    LogisticLoss,
-    QuantileLoss,
-    AbsoluteLoss,
-    L1Reg,
-    L2Reg,
-    LogisticLink,
+    L2Regression,
+    L1Regression,
+    LogisticRegression,
+    PoissonRegression,
+    SVMLike,
+    QuantileRegression,
+    HuberRegression,
+    L1Penalty,
+    L2Penalty,
+    NoPenalty,
 
     # functions
     update!,               # update one observation at a time using Weighting scheme
@@ -172,7 +175,6 @@ include("linearmodel/opca.jl")
 include("linearmodel/opls.jl")
 
 # GLM
-include("glm/logisticregsgd.jl")
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
 
@@ -180,10 +182,12 @@ include("glm/logisticregmm.jl")
 include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
+include("streamstats/stochasticgradientmodels.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/sgd.jl")
+include("streamstats/momentum.jl")
 
 export
     BiasVector,

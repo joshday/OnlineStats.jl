@@ -25,7 +25,7 @@ statenames(o::CovarianceMatrix) = [:μ, :Σ, :nobs]
 state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
 
 """
-`pca(o, corr = true, keywargs...)`
+`pca(o, corr = true; keywargs...)`
 
 Perform principal components analysis of the data provided to the `CovarianceMatrix`
 object `o` using the correlation matrix (`corr = true`) or covariance matrix.

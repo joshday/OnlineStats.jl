@@ -85,7 +85,7 @@ function Base.merge(o1::OnlineStat, o2::OnlineStat)
     o1copy
 end
 
-function =={T<:OnlineStat}(o1::T, o2::T)
+function Base.(:(==)){T<:OnlineStat}(o1::T, o2::T)
     @compat for field in fieldnames(o1)
         getfield(o1, field) == getfield(o2, field) || return false
     end

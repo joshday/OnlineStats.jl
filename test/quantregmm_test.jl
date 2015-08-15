@@ -22,16 +22,16 @@ facts("Quantile Regression") do
             update!(o2, x, y)
         end
 
-        @fact coef(o1)[1] => roughly(quantile(Normal(), .7), .1)
-        @fact coef(o2)[1] => roughly(quantile(Normal(), .7), .1)
+        @fact coef(o1)[1] --> roughly(quantile(Normal(), .7), .1)
+        @fact coef(o2)[1] --> roughly(quantile(Normal(), .7), .1)
 
         for i in 2:6
-            @fact coef(o1)[i] => roughly(1, .1)
-            @fact coef(o2)[i] => roughly(1, .1)
+            @fact coef(o1)[i] --> roughly(1, .1)
+            @fact coef(o2)[i] --> roughly(1, .1)
         end
 
-        @fact statenames(o1) => [:β, :τ, :nobs]
-        @fact state(o1) => Any[copy(o1.β), o1.τ, nobs(o1)]
+        @fact statenames(o1) --> [:β, :τ, :nobs]
+        @fact state(o1) --> Any[copy(o1.β), o1.τ, nobs(o1)]
     end
 end
 

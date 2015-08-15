@@ -15,7 +15,7 @@ facts("OnlinePCA") do
 	top5pca = O.pca(oc, false, maxoutdim = 5)
 	opca = O.OnlinePCA(x, 5, O.StochasticWeighting(.51))
 	e = opca.e
-	@pending principalvars(top5pca) - sort(e) => roughly(zeros(5), 10) "top 5 eigenvalues...this fails in a big way sometimes"
+	@pending principalvars(top5pca) - sort(e) --> roughly(zeros(5), 10) "top 5 eigenvalues...this fails in a big way sometimes"
 end
 
 #-----------------------------------------------------------------------
@@ -76,7 +76,7 @@ function testpca(; n = 1000, d = 50, k = 10, σx = 0.3, σpc = 1.0)
 	err = (V - b .* pca.V) ./ V
 
 	# check this error is small
-	@fact norm(err) => roughly(0.0, atol=1e-10)  "testpca($σx, $k)"
+	@fact norm(err) --> roughly(0.0, atol=1e-10)  "testpca($σx, $k)"
 
 	n, d, k, σx, σpc, V, Z, X, pca, b, err
 end

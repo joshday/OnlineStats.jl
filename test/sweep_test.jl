@@ -15,7 +15,7 @@ facts("sweep!()") do
         sweep!(A, 1:p-1, true)
 
 
-        @fact A => roughly(B, 1e-10)
+        @fact A --> roughly(B, 1e-10)
 
         x = randn(n , p)
         y = vec(sum(x, 2)) + randn(n)
@@ -23,7 +23,7 @@ facts("sweep!()") do
         A = xy' * xy
         sweep!(A, 1:p)
         β = vec(A[end, 1:p])
-        @fact β => roughly(vec(inv(x'x) * x'y))
+        @fact β --> roughly(vec(inv(x'x) * x'y))
     end
 end
 

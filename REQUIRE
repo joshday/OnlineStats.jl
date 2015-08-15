@@ -5,11 +5,8 @@ FactCheck
 
 StatsBase
 Distributions
-Clustering
 
 MultivariateStats
 GLM
-Convex
-SCS
 Dates
 Reactive

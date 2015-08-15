@@ -1,6 +1,3 @@
-inverselogit(x) = 1 / (1 + exp(-x))
-@vectorize_1arg Real inverselogit
-
 #-------------------------------------------------------# Type and Constructors
 type LogRegMM{W <: Weighting} <: OnlineStat
     β::VecF
@@ -26,7 +23,6 @@ end
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::LogRegMM, x::AMatF, y::AVec)
     n = length(y)
-    all([y[i] in [0, 1] for i in 1:n]) || error("y values must be 0 or 1")
 
     γ = weight(o)
 
