@@ -23,6 +23,7 @@ statenames(o::Mean) = [:μ, :nobs]
 state(o::Mean) = Any[mean(o), nobs(o)]
 
 Base.mean(o::Mean) = o.μ
+Base.sum(o::Mean) = o.μ * o.n
 
 center(o::Mean, y::Float64) = y - mean(o)
 center!(o::Mean, y::Float64) = (update!(o, y); center(o, y))

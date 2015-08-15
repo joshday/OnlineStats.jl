@@ -31,9 +31,29 @@ function handlePipeExpr(lhs, rhs)
   # if we got here, it's a normal pipe operation
   gs = gensym()
   lhs = buildStreamExpr(lhs)[1]
-  quote
-    $gs = $lhs
-    update_get!($rhs, $gs)
+
+  # if lhs is a tuple, splat the arguments directly into the call to update_get!
+  if isa(lhs, Expr) && lhs.head == :tuple
+    return :(update_get!($rhs, $(lhs.args...)))
+  end
+  
+  # must be a single argument
+  return :(update_get!($rhs, $lhs))
+
+  # quote
+  #   $gs = $lhs
+  #   update_get!($rhs, $gs)
+  # end
+end
+
+getMaxArg(s) = 0
+function getMaxArg(expr::Expr)
+  if expr.head == :$
+    inputnum = expr.args[1]
+    isa(inputnum, Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
+    return inputnum
+  else
+    return maximum(map(getMaxArg, expr.args))
   end
 end
 
@@ -78,6 +98,11 @@ function handleCurryingExpr(lhs, rhs)
   end
 end
 
+type StreamParamInfo
+  numInputs::Int
+end
+const STREAMPARAMS = StreamParamInfo(1)
+
 
 buildStreamExpr(x) = x, false
 
@@ -96,9 +121,16 @@ function buildStreamExpr(expr::Expr)
 
   elseif head == :$
 
-    # if it's an integer i, replace with INPUT[i]
-    isa(expr.args[1], Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
-    return :(INPUT[$(expr.args[1])]), false
+    # if it's an integer i, replace with INPUT[i], (or INPUT for the 1-arg case)
+    inputnum = expr.args[1]
+    isa(inputnum, Int) || error("Cannot use dollar sign in stream macro unless referring to input (i.e. \$2 refers to the 2nd input): $expr")
+    @assert inputnum <= STREAMPARAMS.numInputs
+    return symbol(string("INPUT", inputnum)), false
+    # if STREAMPARAMS.numInputs > 1
+    #   return :(INPUT[$inputnum]), false
+    # else
+    #   return :INPUT, false
+    # end
 
   elseif head == :(=)
 
@@ -185,7 +217,7 @@ Some features:
         f = @stream (\$1,\$2) |> (reg1, reg2) |> \$2 - predict(_, \$1)
 
       is equivalent to creating:
-        f(x,y) -> begin
+        function f(x,y)
           tmp1 = update_get!(reg1, x, y)
           tmp2 = update_get!(reg2, x, y)
           (y - predict(tmp1, x)), y - predict(tmp2, x)))
@@ -193,17 +225,36 @@ Some features:
     
 """
 macro stream(expr::Expr)
+
+  # figure out the biggest $i arg
+  STREAMPARAMS.numInputs = getMaxArg(expr)
+  # println("GOT: ", STREAMPARAMS.numInputs)
+  if STREAMPARAMS.numInputs > 10
+    error("too many inputs in stream: maxInputs=$(STREAMPARAMS.numInputs)  expr: $expr")
+  end
+
+  # generate a unique function name, and spell out the args: ##streamed##1232(INPUT1, INPUT2)
+  fname = gensym("streamed")
+  # println(fname)
+  fargs = [symbol(string("INPUT",i)) for i in 1:STREAMPARAMS.numInputs]
+  # println(fargs)
+
+  # now create the function body
   # print("Before: "); dump(expr, 20)
-  fbody, _ = buildStreamExpr(expr)
+  fbody,_ = buildStreamExpr(expr)
   # print("After : "); dump(fbody, 20)
+  # println(fbody)
 
-  println(fbody)
 
-  esc(quote
-    (INPUT...) -> $fbody
+  blk = esc(quote
+    function $fname($(fargs...))
+      $fbody
+    end
+    $fname
   end)
+  println(blk)
+  blk
 end
-
 
 
 # -------------------------------------------------------------------------------

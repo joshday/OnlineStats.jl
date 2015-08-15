@@ -3,6 +3,8 @@ abstract OnlineStat
 
 abstract DistributionStat <: OnlineStat
 
+abstract StochasticGradientStat <: OnlineStat
+
 
 
 typealias VecF Vector{Float64}

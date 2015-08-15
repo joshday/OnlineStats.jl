@@ -85,7 +85,7 @@ function Base.merge(o1::OnlineStat, o2::OnlineStat)
     o1copy
 end
 
-function =={T<:OnlineStat}(o1::T, o2::T)
+function Base.(:(==)){T<:OnlineStat}(o1::T, o2::T)
     @compat for field in fieldnames(o1)
         getfield(o1, field) == getfield(o2, field) || return false
     end
@@ -141,8 +141,8 @@ function Base.show(io::IO, o::OnlineStat)
     snames = statenames(o)
     svals = state(o)
 
-    println(io, "Online ", name(o))
+    print(io, "OnlineStat: ", name(o))
     for (i, sname) in enumerate(snames)
-        println(io, @sprintf(" * %8s:  %s\n", sname, mystring(svals[i])))
+        print(io, @sprintf("\n * %8s:  %s", sname, mystring(svals[i])))
     end
 end

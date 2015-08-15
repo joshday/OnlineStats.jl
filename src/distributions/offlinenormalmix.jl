@@ -10,19 +10,13 @@ end
 
 #---------------------------------------------------------------------# emstart
 function emstart(p::Integer, y::AVecF;
-                 algorithm::Symbol = :kmeans, verbose = false, tol = 1e-6, maxit = 100)
+                 algorithm::Symbol = :naive, verbose = false, tol = 1e-6, maxit = 100)
     if algorithm == :naive
         μ = quantile(y, collect(1:p) / (p + 1))
         σ = fill(std(y) / sqrt(p), p)
         π = ones(p) / p
-    elseif algorithm == :kmeans
-        clust = Clustering.kmeans(y', p)
-        μ = vec(clust.centers)
-        σ = fill(std(y) / sqrt(p), p)
-#         π = clust.counts / sum(clust.counts)
-        π = ones(p) / p
     else
-        error("$algorithm is not recognized.  Choose :kmeans or :naive")
+        error("$algorithm is not recognized.  Currently, the only option is :naive")
     end
     m = MixtureModel(map((u,v) -> Normal(u, v), μ, σ), π)
     m = em(m, y, tol = tol, maxit = maxit, verbose = verbose)

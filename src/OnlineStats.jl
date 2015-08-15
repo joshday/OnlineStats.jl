@@ -9,7 +9,6 @@ using Reexport.@reexport
 using Compat
 
 
-import Clustering  # Used in offline em algorithm for normal mixture
 import Distributions
 import Distributions:
     # Distributions
@@ -34,6 +33,7 @@ import ArrayViews: view, rowvec_view
 # import MathProgBase: AbstractMathProgSolver
 # import Convex, SCS
 
+
 #-----------------------------------------------------------------------------#
 # Exports
 #-----------------------------------------------------------------------------#
@@ -47,7 +47,7 @@ export
     BernoulliBootstrap,
     PoissonBootstrap,
 
-    # <: OnlineStat
+    # OnlineStats
     Mean,
     Variance,
     Moments,
@@ -61,7 +61,6 @@ export
     CovarianceMatrix,
     Means,
     Variances,
-    # AnalyticalPCA,
     Diffs,
 
     NormalMix,
@@ -80,8 +79,6 @@ export
 
     OnlineFLS,
     LinReg,
-    # LinRegSGD,
-    QuantRegSGD,
     QuantRegMM,
     LogRegMM,
     LogRegSGD,
@@ -91,13 +88,18 @@ export
 
     HyperLogLog,
     SGD,
+    Momentum,
     Adagrad,
-    SquareLoss,
-    LogisticLoss,
-    QuantileLoss,
-    L1Reg,
-    L2Reg,
-    LogisticLink,
+    L2Regression,
+    L1Regression,
+    LogisticRegression,
+    PoissonRegression,
+    SVMLike,
+    QuantileRegression,
+    HuberRegression,
+    L1Penalty,
+    L2Penalty,
+    NoPenalty,
 
     # functions
     update!,               # update one observation at a time using Weighting scheme
@@ -143,7 +145,6 @@ include("summary/diff.jl")
 include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
 include("multivariate/vars.jl")
-# include("multivariate/analyticalpca.jl")
 include("multivariate/diffs.jl")
 
 # Parametric Density
@@ -166,7 +167,6 @@ include("distributions/poisson.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
-# include("linearmodel/linregsgd.jl")
 include("linearmodel/linreg.jl")
 include("linearmodel/sparsereg.jl")
 include("linearmodel/stepwise.jl")
@@ -175,33 +175,37 @@ include("linearmodel/opca.jl")
 include("linearmodel/opls.jl")
 
 # GLM
-include("glm/logisticregsgd.jl")
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
 
 # Quantile Regression
-include("quantileregression/quantregsgd.jl")
 include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
+include("streamstats/stochasticgradientmodels.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/sgd.jl")
+include("streamstats/momentum.jl")
 
 export
     BiasVector,
     BiasMatrix
 include("multivariate/bias.jl")
 
-export 
+export
     @stream,
     update_get!
-    # RealInput,
-    # FloatInput,
-    # IntInput,
-    # VecInput,
-    # RegressionInput
 include("react.jl")
+
+# using QuickStructs
+# export
+#     Window,
+#     lags,
+#     isfull,
+#     capacity
+# include("window.jl")
+
 
 end # module

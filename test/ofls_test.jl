@@ -46,23 +46,23 @@ facts("Test OnlineFLS") do
 
 	n, p, y, x, ε, β = getsampledata()
 
-	@fact size(y) => (n,)
-	@fact size(x) => (n,p)
-	@fact size(β) => (n,p)
-	@fact dofls(p, x, y) => anything  # just make sure there's no errors
+	@fact size(y) --> (n,)
+	@fact size(x) --> (n,p)
+	@fact size(β) --> (n,p)
+	@fact dofls(p, x, y) --> anything  # just make sure there's no errors
 
 
 	σx = 2.0
 	n, p, y, x, ε, β = getsampledata(σx = σx)
 	fls, βhat, yhat = dofls(p, x, y)
 
-	@fact size(βhat,1) => n
-	@fact size(yhat,1) => n
-	@fact std(fls.xvars) => roughly(fill(σx,p), atol = 0.2)
+	@fact size(βhat,1) --> n
+	@fact size(yhat,1) --> n
+	@fact std(fls.xvars) --> roughly(fill(σx,p), atol = 0.2)
 
 	r2 = 1 - var(y-yhat) / var(y)
-	@fact r2 => greater_than(0.9)
-	@fact vec(β[n,:]) => roughly(βhat[end], atol = 0.5)
+	@fact r2 --> greater_than(0.9)
+	@fact vec(β[n,:]) --> roughly(βhat[end], atol = 0.5)
 
 
 	# # # do a plot of y vs yhat (need to change this to match your plotting package...

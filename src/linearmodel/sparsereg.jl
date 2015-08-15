@@ -75,10 +75,6 @@ function coef_ridge(o::SparseReg, λ::Float64)
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
-# function path_ridge(o::SparseReg)
-#     tmax = sum(coef_ols(o) .^ 2)
-#     [i => coef_ridge(o, i)]
-# end
 
 # # Take a user-defined penalty (a function supported by Convex.jl)
 # # and plug it into a Convex Solver
