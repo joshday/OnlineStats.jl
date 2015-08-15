@@ -199,13 +199,13 @@ export
     update_get!
 include("react.jl")
 
-using QuickStructs
-export
-    Window,
-    lags,
-    isfull,
-    capacity
-include("window.jl")
+# using QuickStructs
+# export
+#     Window,
+#     lags,
+#     isfull,
+#     capacity
+# include("window.jl")
 
 
 end # module
