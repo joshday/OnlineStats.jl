@@ -63,6 +63,8 @@ facts("Common") do
         o = Mean(x)
         show(o); print(o); print([o, o]);
         @fact OnlineStats.name(o) --> string(typeof(o))
+        b = BernoulliBootstrap(o, mean)
+        show(b)
 
         x1 = randn(100)
         o = distributionfit(Normal, x1)
