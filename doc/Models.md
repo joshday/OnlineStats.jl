@@ -1,7 +1,3 @@
-# Available Statistics/Models
-*In alphabetical order*
-
-
 ## Adagrad
 Stochastic adaptive gradient descent for a given model.  See the Stochastic Gradient Methods topic.
 

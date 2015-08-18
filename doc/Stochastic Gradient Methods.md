@@ -10,6 +10,7 @@ argument | description
 `model` (keyword)     | One of the models below.  Defaults to `L2Regression()`
 `penalty` (keyword)   | `NoPenalty` (default), `L1Penalty`, or `L2Penalty`
 `start` (keyword)     | starting value for β.  Defaults to zeros.
+`η` (keyword)         | constant multiplied to gradient
 
 
 The model argument specifies both the link function and loss function to be used.  Options are:
@@ -39,9 +40,9 @@ method | details
 `StatsBase.coef(o)`       | return coefficients
 `StatsBase.predict(o, x)` | `x` can be vector or matrix
 
-## SGD
+## Examples
 
-Examples:
+
 ```julia
 # 1) Absolute loss with ridge penalty
 # 2) Quantile regression (same as absolute loss if τ = 0.5)
@@ -62,9 +63,3 @@ o = Adagrad(x, y, model = SVMLike(), penalty = L2Penalty(.1))
 
 o = Adagrad(x, y, StochasticWeighting(.7), model = HuberRegression(2.0))
 ```
-
-## Momentum
-`SGD` can be replaced with `Momentum` in the above examples
-
-## Adagrad
-`SGD` can be replaced with `Adagrad` in the above examples
