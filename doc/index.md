@@ -1,15 +1,12 @@
 # Overview
 
-This documentation is a work in progress.
-
-
 `OnlineStats` is a Julia package which fits statistical models for online or streaming data.
 
 ### Weighting Schemes
-When creating an OnlineStat, one can optionally specify the weighting to be used (with the exception of `Adagrad`).  Updating a statistic or model involves one of two forms:
+When creating an OnlineStat, one can optionally specify the weighting to be used (with the exception of `Adagrad`, which aims to remove the necessity of choosing hyperparameters).  Updating a statistic or model involves one of two forms:
 
-- weighted average: `λ * some_update + (1 - λ) * current_value`
-- gradient-based:  `current_value -= λ * estimated_gradient`
+- weighted average: `λ * newval + (1 - λ) * θ`, or equivalently `θ + λ * (newval - θ)`
+- gradient-based:  `θ - λ * gradient`
 
 The following schemes are supported for determining weights:
 
@@ -34,9 +31,9 @@ The following schemes are supported for determining weights:
 - `update!(o, data...)`
     - update observations one at a time with respect to the weighting scheme
 - `updatebatch!(o, data...)`
-    - treat a batch of data as an equal piece of information.  The weighting scheme is applied uniformly to all data in the batch.
+    - treat a batch of data as an equal piece of information.  A gradient-based update uses the entire batch to estimate the gradient and one step is taken.  
 - `onlinefit!(o, b, data...; batch = false)`
-    - update `o` with batches of size `b`.  `batch = false` defaults to `update!(o, data...)`
+    - update `o` with batches of size `b`.  `batch = false` simply calls `update!(o, data...)`
 - `tracefit!(o, b, data...; batch = false)`
     - Run through data as in `onlinefit` and return a vector `OnlineStat[o1, o2,...]` where each element
     has been updated with a batch of size `b`.

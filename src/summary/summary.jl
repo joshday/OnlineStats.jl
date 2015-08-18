@@ -26,6 +26,7 @@ state(o::Summary) = Any[mean(o), var(o), maximum(o), minimum(o), nobs(o)]
 
 Base.mean(o::Summary) = mean(o.var)
 Base.var(o::Summary) = var(o.var)
+Base.std(o::Summary) = std(o.var)
 Base.maximum(o::Summary) = maximum(o.extrema)
 Base.minimum(o::Summary) = minimum(o.extrema)
 

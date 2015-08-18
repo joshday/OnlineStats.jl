@@ -3,7 +3,7 @@
 Approximate quantiles using an online MM algorithm.
 """
 type QuantileMM <: OnlineStat
-    q::VecF              # Quantile qimates
+    q::VecF              # Quantile estimates
     τ::VecF                # tau values
 
     s::VecF                # sufficients stats for MM (s, t, and o)

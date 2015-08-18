@@ -57,7 +57,7 @@ function updatebatch!(o::NormalMix, y::AVecF)
     π ./= sum(π)
     μ = o.s2 ./ o.s1
     σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
-    if any(σ .== 0.) # reset standard deviations if one goes to 0
+    if any(σ .<= 0.) # reset standard deviations if one goes to 0
         σ = ones(nc)
     end
 

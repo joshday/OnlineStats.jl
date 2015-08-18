@@ -1,14 +1,38 @@
+In the given examples, `y` is typically an n by 1 `Vector{Float64}` and `x` is usually an n by p `Matrix{Float64}`.  
+
+Each type has it's own `state` and `statenames` methods.
+
 ## Adagrad
-Stochastic adaptive gradient descent for a given model.  See the Stochastic Gradient Methods topic.
+Stochastic adaptive gradient descent for a given model.  See the Stochastic Gradient Methods topic.  Adagrad does not use a weighting scheme as weights are adaptively chosen.
+
+```julia
+o = Adagrad(x, y, model = L1Regression(), penalty = L2Penalty())
+coef(o)
+predict(o, x)
+```
 
 ## Bootstrap
-Statistical bootstrap for estimating variance of an OnlineStat.
+Statistical bootstrap for estimating the variance of an OnlineStat.
 
 - BernoulliBootstrap
 - PoissonBootstrap
 
+```julia
+o = Mean()
+boot = BernoulliBootstrap(o, mean, 1000)
+update!(boot, x)
+```
+
 ## CovarianceMatrix
 Analytical covariance matrix.
+
+```julia
+o = CovarianceMatrix(x)
+mean(o)  # vec(mean(x, 1))
+cov(o)   # cov(x)
+cor(o)   # cor(x)
+pca(o)   # MultivariateStats.fit(PCA, x)
+```
 
 ## Diff
 Track the last value and last difference.
@@ -19,53 +43,157 @@ Track the last value and last difference for several variables.
 ## FiveNumberSummary  
 Univariate five number summary using exact maximum/minimum and approximate .25, .5, and .75 quantiles.
 
+```julia
+o = FiveNumberSummary(x)
+minimum(o)
+maximum(o)
+state(o)
+```
+
 ## HyperLogLog
 Experimental implementation of hyperloglog algorithm.
 
 ## LinReg
 Analytical linear regression.
 
+```julia
+o = LinReg(x, y)
+update!(x2, y2)
+
+coef(o)
+coeftable(o)
+stderr(o)
+vcov(o)
+predict(o, x)
+```
+
 ## Mean
 Analytical sample mean.
+
+```julia
+o = Mean(x)
+mean(o)
+```
 
 ## Means
 Analytical sample means, similar to `mean(x, 1)`.
 
+```julia
+o = Means(x)
+mean(o)  # vec(mean(x, 1))
+```
+
 ## Moments
 First four non-central moments.  Tracks mean, variance, skewness, and kurtosis.
+
+```julia
+o = Moments(x)
+mean(o)
+var(o)
+std(o)
+skewness(o)
+kurtosis(o)
+```
 
 ## Momentum
 Stochastic gradient descent with momentum for a given model.  See the Stochastic Gradient Methods topic.
 
+```julia
+o = Momentum(x, y)
+coef(o)
+predict(o, x)
+```
+
 ## NormalMix
 Univariate normal mixture via an online EM algorithm.
 
+```julia
+o = NormalMix(4, y, StochasticWeighting(.6))
+mean(o)
+var(o)
+std(o)
+quantile(o, .8)
+```
+
 ## Principal Components Analysis (no dedicated type)
-Use `pca(o)` where `o` has type `CovarianceMatrix`.
+Use `pca(o::CovarianceMatrix)`.
 
 ## SGD
 Stochastic gradient descent for a given model.  See the Stochastic Gradient Methods topic.
 
+```julia
+o = SGD(x, y, model = L2Regression())
+coef(o)
+predict(o, x)
+```
+
 ## SparseReg
-Sparse regression.  A type to experiment with regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, etc.
+Experimental sparse regression.  A type to experiment with analytical regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, etc.
+
+```julia
+o = SparseReg(x, y)
+coef(o, :ols)
+coef(o, :ridge)
+```
 
 ## StepwiseReg
-Stepwise regression.  With each update, there is the possibility of a variable entering or leaving the model.
+Experimental stepwise regression.  With each update, there is the possibility of a variable entering or leaving the model.
+
+```julia
+o = StepwiseReg(size(x, 2))
+onlinefit!(o, batchsize, x, y)
+coef(o)
+```
 
 ## Summary
 Summary statistics: mean, variance, maximum, and minimum.
 
+```julia
+o = Summary(x)
+mean(o)
+var(o)
+std(o)
+maximum(o)
+minimum(o)
+```
+
 ## QuantileMM
 Approximate quantiles using an online MM algorithm.
+
+```julia
+o = QuantileMM(y, [.25, .5, .75], StochasticWeighting(.51))
+statenames(o)
+state(o)
+```
 
 ## QuantRegMM
 Approximate quantile regression using an online MM algorithm.
 
+```julia
+o = QuantRegMM(size(x, 2), τ = .7)
+onlinefit!(o, batchsize, x, y)
+coef(o)
+```
+
 ## Variance
 Analytical sample variance.
 
+```julia
+o = Variance(y)
+mean(o)
+var(o)
+std(o)
+```
+
 ## Variances
 Analytical sample variances, similar to `var(x, 1)`.
+
+```julia
+o = Variances(x)
+mean(o)  # vec(mean(x, 1))
+var(o)   # vec(var(x, 1))
+std(o)   # vec(std(x, 1))
+```
 
 
 ## Fitting a Parametric Distribution
