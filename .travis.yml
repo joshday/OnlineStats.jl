@@ -9,7 +9,6 @@ notifications:
   email: true
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.checkout("StreamStats")'
   - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("OnlineStats"); Pkg.test("OnlineStats"; coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("OnlineStats")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
