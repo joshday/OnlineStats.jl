@@ -33,6 +33,7 @@ import ArrayViews: view, rowvec_view
 # import MathProgBase: AbstractMathProgSolver
 # import Convex, SCS
 
+
 #-----------------------------------------------------------------------------#
 # Exports
 #-----------------------------------------------------------------------------#
@@ -197,5 +198,14 @@ export
     @stream,
     update_get!
 include("react.jl")
+
+# using QuickStructs
+# export
+#     Window,
+#     lags,
+#     isfull,
+#     capacity
+# include("window.jl")
+
 
 end # module

@@ -73,11 +73,9 @@ facts("React") do
     # compare speeds of the stream macro vs the equivalent function for 1 argument
     R = rand(10_000_000)
     e = oneargtest(R)
-    ebase = oneargtest(R)
+    ebase = oneargtest_base(R)
 
-    # This is just testing the speed against 2 runs of the same function?
-    # Changing this to pending
-    @pending e --> less_than(ebase * 1.2) "This fails a lot for me"
+    @pending e => less_than(ebase * 1.2)
   end
 
   context("Regression") do
