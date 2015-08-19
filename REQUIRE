@@ -10,3 +10,6 @@ MultivariateStats
 GLM
 Dates
 Reactive
+Convex
+SCS
+StreamStats
