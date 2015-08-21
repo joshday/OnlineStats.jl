@@ -71,7 +71,7 @@ predict(o, x)
 Analytical sample mean.
 
 ```julia
-o = Mean(x)
+o = Mean(y)
 mean(o)
 ```
 
@@ -87,7 +87,7 @@ mean(o)  # vec(mean(x, 1))
 First four non-central moments.  Tracks mean, variance, skewness, and kurtosis.
 
 ```julia
-o = Moments(x)
+o = Moments(y)
 mean(o)
 var(o)
 std(o)
@@ -149,7 +149,7 @@ coef(o)
 Summary statistics: mean, variance, maximum, and minimum.
 
 ```julia
-o = Summary(x)
+o = Summary(y)
 mean(o)
 var(o)
 std(o)

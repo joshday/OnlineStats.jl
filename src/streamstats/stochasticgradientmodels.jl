@@ -100,7 +100,7 @@ immutable NoPenalty <: Penalty end
 immutable L1Penalty <: Penalty
   λ::Float64
 end
-@inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ * sign(β[i])
+@inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ #* sign(β[i])
 
 # J(β) = λ * sumabs2(β)
 # LASSO models need a special update which effectively doubles the number of parameters

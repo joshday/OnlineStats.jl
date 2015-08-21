@@ -48,12 +48,12 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [x] Stepwise Regression: 'StepwiseReg'
 
 ### Penalized Regression
-- [ ] LASSO:
+- [x] LASSO: `SGD` (experimental)
 - [x] Ridge: `SparseReg`, `Adagrad`, `SGD`
 - [ ] Elastic Net:
 
 ### Quantile Regression
-- [x] Linear Quantile Regression: `QuantRegMM`, `Adagrad`
+- [x] Linear Quantile Regression: `QuantRegMM`, `SGD`, `Adagrad`
 - [ ] Composite Linear Quantile Regression:
 
 ### Variance Component Model
@@ -62,7 +62,7 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 
 ## Generalized Linear Models (GLM)
 - [ ] Cox Model
-- [x] Logistic Regression: `LogRegMM`, `LogRegSGD`, `LogRegSGD2`
+- [x] Logistic Regression: `LogRegMM`, `SGD`, `Adagrad`
 - [ ] Multinomial Logistic Regression
-- [ ] Poisson Regression
+- [x] Poisson Regression: `SGD`, `Adagrad`
 - [ ] Probit Regression

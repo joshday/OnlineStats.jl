@@ -8,7 +8,7 @@ argument | description
 `wgt` (optional) | Weighting scheme. Defaults to `StochasticWeighting(.51)`
 `intercept` (keyword) | Should an intercept be included?  Defaults to `true`
 `model` (keyword)     | One of the models below.  Defaults to `L2Regression()`
-`penalty` (keyword)   | `NoPenalty` (default), `L1Penalty`, or `L2Penalty`
+`penalty` (keyword)   | `NoPenalty` (default), `L1Penalty` (experimental), or `L2Penalty`
 `start` (keyword)     | starting value for β.  Defaults to zeros.
 `η` (keyword)         | constant multiplied to gradient
 
@@ -29,6 +29,14 @@ The model argument specifies both the link function and loss function to be used
     - Fits Perceptron (with `penalty = NoPenalty`) or Support Vector Machine (with `penalty = L2Penalty(λ)`)
 - `HuberRegression(δ)`
     - Robust regression using Huber loss.
+
+# Penalties
+
+Penalties on the size of the coefficients can be used to prevent overfitting and help
+generate a sparse solution.  Models are fit without a penalty by default.  
+Optional penalties are `L1Penalty(λ)` (LASSO) and `L2Penalty(λ)` (Ridge).  
+**`L1Penalty` is experimental and currently only supported on `SGD`**.  
+
 
 # Common Interface
 Here `o` is a `StochasticGradientStat`

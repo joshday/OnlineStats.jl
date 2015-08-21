@@ -7,6 +7,6 @@
 
 Online algorithms for statistics.  See [Implementation Progress](src/README.md)
 
-Install with `Pkg.clone("https://github.com/joshday/OnlineStats.jl")`
+Install with `Pkg.add("OnlineStats")`
 
 ### [Documentation](http://onlinestatsjl.readthedocs.org/en/latest/)
