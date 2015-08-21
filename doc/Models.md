@@ -199,7 +199,7 @@ std(o)   # vec(std(x, 1))
 ## Fitting a Parametric Distribution
 
 Estimating the parameters of a distribution in an online setting can be done using
-`distributionfit(Dist, y, args...)` where `Dist` is one of the following:
+`distributionfit!(Dist, y, args...)` where `Dist` is one of the following:
 
 - `Bernoulli`
 - `Beta`
