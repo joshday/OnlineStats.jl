@@ -108,37 +108,3 @@ updatebatch!(o::SparseReg, x::AMatF, y::AVecF) = updatebatch!(o.c, hcat(x, y))
 
 update!(o::SparseReg, x::AVecF, y::Float64) = update!(o.c, vcat(x, y))
 update!(o::SparseReg, x::AMatF, y::AVecF) = update!(o.c, hcat(x, y))
-
-
-
-# testing
-if false
-    using StatsBase
-    using GLM
-    n, p = 10000, 200
-    o = OnlineStats.SparseReg(p)
-
-    x = randn(n, p)
-    β = [1:5; zeros(p - 5)]
-    y = x * β + randn(n)
-
-    OnlineStats.updatebatch!(o, x, y); coef(o)
-    glm = lm([ones(n) x],y);
-
-    # manually create β for ridge
-    λ = 1.0
-    lambdamat = eye(p) * λ
-    βridge = inv(cor(x) + lambdamat) * vec(cor(x, y))
-    μ = mean(o.c)
-    σ = std(o.c)
-    β₀ = μ[end] - σ[end] * sum(μ[1:end-1] ./ σ[1:end-1] .* βridge)
-    βridge = σ[end] * (βridge ./ σ[1:end-1])
-    βridge = [β₀; βridge]
-
-    maxabs(coef(glm) - coef(o))
-    maxabs(coef(o, :ridge, 0.) - coef(o))
-    maxabs(coef(o, :ridge, λ) - βridge)
-
-    βridgesolver = OnlineStats.coef_solver(o, λ, x -> .5 * Convex.sum_squares(x))
-    maxabs(coef(o, :ridge, λ) - βridgesolver)
-end
