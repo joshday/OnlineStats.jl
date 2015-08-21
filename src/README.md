@@ -44,11 +44,13 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Negative Multinomial
 
 ## Linear Models
-- [x] OLS: `LinReg`, `SparseReg`
-- [x] Stepwise Regression: 'StepwiseReg'
+- [x] OLS: `LinReg`, `SparseReg`, `SGD`, `Adagrad`
+- [x] L1 Loss Regression: `SGD`, `Adagrad`
+- [x] Huber Loss Regression: `SGD`, `Adagrad`
+- [x] Stepwise Regression: `StepwiseReg` (experimental)
 
 ### Penalized Regression
-- [x] LASSO: `SGD` (experimental)
+- [x] LASSO: `SGD` (SGD with LASSO is experimental)
 - [x] Ridge: `SparseReg`, `Adagrad`, `SGD`
 - [ ] Elastic Net:
 
@@ -66,3 +68,6 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Multinomial Logistic Regression
 - [x] Poisson Regression: `SGD`, `Adagrad`
 - [ ] Probit Regression
+
+## Other
+- [x] Support Vector Machine: `SGD`, `Adagrad`
