@@ -1,12 +1,10 @@
+julia 0.3
 Docile
 Compat
 Reexport
 FactCheck
-
 StatsBase
 Distributions
-
 MultivariateStats
 GLM
 Dates
-Reactive
