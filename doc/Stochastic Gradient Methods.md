@@ -30,8 +30,8 @@ The model argument specifies both the link function and loss function to be used
 - `HuberRegression(δ)`
     - Robust regression using Huber loss.
 
-# Penalties
-Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty') by default.  
+# Penalties/Regularization
+Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.  
 Optional penalties are `L1Penalty(λ)` (LASSO) and `L2Penalty(λ)` (Ridge).  
 
 - `NoPenalty()`

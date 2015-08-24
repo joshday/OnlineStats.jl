@@ -80,6 +80,7 @@ facts("SGD") do
     end
 
     context("LASSO update") do
+        # Need more and better tests
         y = x*β + randn(n)
         o = OnlineStats.SGD(x, y, penalty = OnlineStats.L1Penalty(.01))
         o2 = OnlineStats.SGD(x, y)
