@@ -92,13 +92,26 @@ function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
     end
 
     # everything else
-    @inbounds for j in 1:length(x)
-        βval = o.β[j]
-        u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
-        v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
-        u = max(u - γ * (o.penalty.λ + ∇f(o.model, ε, x[j], y, yhat)), 0.0)
-        v = max(v - γ * (o.penalty.λ - ∇f(o.model, ε, x[j], y, yhat)), 0.0)
-        o.β[j] = u - v
+    if nobs(o) <= o.penalty.burnin
+        @inbounds for j in 1:length(x)
+            βval = o.β[j]
+            u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
+            v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
+            u = max(u - γ * (o.penalty.λ + ∇f(o.model, ε, x[j], y, yhat)), 0.0)
+            v = max(v - γ * (o.penalty.λ - ∇f(o.model, ε, x[j], y, yhat)), 0.0)
+            o.β[j] = u - v
+        end
+    else
+        @inbounds for j in 1:length(x)
+            βval = o.β[j]
+            if βval != 0
+                u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
+                v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
+                u = max(u - γ * (o.penalty.λ + ∇f(o.model, ε, x[j], y, yhat)), 0.0)
+                v = max(v - γ * (o.penalty.λ - ∇f(o.model, ε, x[j], y, yhat)), 0.0)
+                o.β[j] = u - v
+            end
+        end
     end
 
     o.n += 1

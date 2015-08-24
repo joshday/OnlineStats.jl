@@ -96,16 +96,43 @@ abstract Penalty
 immutable NoPenalty <: Penalty end
 @inline ∇j(::NoPenalty, β::VecF, i::Int) = 0.0
 
-# J(β) = λ * sumabs(β)
-immutable L1Penalty <: Penalty
-  λ::Float64
-end
-@inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ #* sign(β[i])
-
 # J(β) = λ * sumabs2(β)
 # LASSO models need a special update which effectively doubles the number of parameters
 # Doubling parameters however gives the benefit of a sparse solution
 immutable L2Penalty <: Penalty
-  λ::Float64
+    λ::Float64
+    function L2Penalty(λ::Real)
+        @assert λ >= 0
+        @compat new(Float64(λ))
+    end
 end
 @inline ∇j(reg::L2Penalty, β::VecF, i::Int) = reg.λ * β[i]
+
+
+# J(β) = λ * sumabs(β)
+immutable L1Penalty <: Penalty
+    λ::Float64
+    burnin::Int64  # Number of observations to see before setting things to 0
+    function L1Penalty(λ::Real, burnin::Integer)
+        @assert λ >= 0
+        @assert burnin >= 0
+        @compat new(Float64(λ), Int64(burnin))
+    end
+    function L1Penalty(λ::Real)
+        @assert λ >= 0
+        @compat new(Float64(λ), 100)
+    end
+end
+@inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ * sign(β[i])
+
+# J(β) = λ * (α * sumabs2(β) + (1 - α) * sumabs(β))
+immutable ElasticNetPenalty <: Penalty
+    λ::Float64
+    α::Float64
+    function ElasticNetPenalty(λ::Real, α::Real)
+        @assert 0 <= α <= 1
+        @assert λ >= 0
+        @compat new(Float64(λ), Float64(α))
+    end
+end
+@inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])

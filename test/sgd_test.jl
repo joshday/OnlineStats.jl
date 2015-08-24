@@ -79,6 +79,14 @@ facts("SGD") do
         @fact predict(o, x) --> x * o.β + o.β0
     end
 
+    context("LASSO update") do
+        y = x*β + randn(n)
+        o = OnlineStats.SGD(x, y, penalty = OnlineStats.L1Penalty(.01))
+        o2 = OnlineStats.SGD(x, y)
+        for i in 2:p
+            @fact coef(o)[p] --> less_than(coef(o2)[p])
+        end
+    end
 end
 
 
