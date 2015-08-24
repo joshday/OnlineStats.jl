@@ -32,7 +32,7 @@ The model argument specifies both the link function and loss function to be used
 
 # Penalties/Regularization
 Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.  
-Optional penalties are `L1Penalty(λ)` (LASSO) and `L2Penalty(λ)` (Ridge).  
+Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).  
 
 - `NoPenalty()`
     - No regularization is used.
