@@ -126,13 +126,13 @@ end
 @inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ * sign(β[i])
 
 # J(β) = λ * (α * sumabs2(β) + (1 - α) * sumabs(β))
-immutable ElasticNetPenalty <: Penalty
-    λ::Float64
-    α::Float64
-    function ElasticNetPenalty(λ::Real, α::Real)
-        @assert 0 <= α <= 1
-        @assert λ >= 0
-        @compat new(Float64(λ), Float64(α))
-    end
-end
-@inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])
+# immutable ElasticNetPenalty <: Penalty
+#     λ::Float64
+#     α::Float64
+#     function ElasticNetPenalty(λ::Real, α::Real)
+#         @assert 0 <= α <= 1
+#         @assert λ >= 0
+#         @compat new(Float64(λ), Float64(α))
+#     end
+# end
+# @inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])

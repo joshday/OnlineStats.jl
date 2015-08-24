@@ -45,14 +45,13 @@ Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(�
 
 
 # Common Interface
-Here `o` is a `StochasticGradientStat`
 
 method | details
 ---------|------------
 `state(o)`                | return coefficients and number of observations
 `statenames(o)`           | names corresponding to `state`: `[:β, :nobs]`
-`StatsBase.coef(o)`       | return coefficients
-`StatsBase.predict(o, x)` | `x` can be vector or matrix
+`coef(o)`       | return coefficients
+`predict(o, x)` | `x` can be vector or matrix
 
 ## Examples
 
@@ -63,7 +62,7 @@ method | details
 # 3) Ordinary least squares with "slow" decay rate (fast learner)
 # 4) Logistic regression with "fast" decay rate (slow learner)
 # 5) Support vector machine
-# 6) Robust regression with Huber loss
+# 6) Robust regression with Huber loss and Lasso penalty
 
 o = SGD(x, y, model = L1Regression(), penalty = L2Penalty(.1))
 
@@ -75,5 +74,5 @@ o = Momentum(x, y, StochasticWeighting(.9), model = LogisticRegression())
 
 o = Adagrad(x, y, model = SVMLike(), penalty = L2Penalty(.1))
 
-o = Adagrad(x, y, StochasticWeighting(.7), model = HuberRegression(2.0))
+o = Adagrad(x, y, StochasticWeighting(.7), model = HuberRegression(2.0), penalty = L1Penalty(.01))
 ```
