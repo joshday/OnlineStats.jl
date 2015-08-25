@@ -70,13 +70,13 @@ facts("CovarianceMatrix") do
         @fact abs(projection(oPCA)) --> roughly(abs(projection(PCA)))
 
         # full PCA - covariance
-        @fact pca(o, false, maxoutdim = d-2) --> anything
+        @fact typeof(pca(o, false, maxoutdim = d-2)) <: MultivariateStats.PCA --> true
 
         # top d PCA - correlation
-        @fact pca(o, true, maxoutdim = 4) --> anything
+        @fact typeof(pca(o, true, maxoutdim = 4)) <: MultivariateStats.PCA --> true
 
         # top d PCA - covariance
-        @fact pca(o, false, maxoutdim = 4) --> anything
+        @fact typeof(pca(o, false, maxoutdim = 4)) <: MultivariateStats.PCA --> true
 
     end
 end

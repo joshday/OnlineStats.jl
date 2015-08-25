@@ -8,7 +8,7 @@ using FactCheck
 
 
 function getsampledata(; n = 1000, p = 10, σx = 0.3, σy = 1.0, σβ = 0.01)
-	
+
 	# generate independent series and errors
 	dx = σx * randn(n,p)				# independent vars  (nxp)
 	ε = σy * randn(n)		# errors
@@ -49,7 +49,7 @@ facts("Test OnlineFLS") do
 	@fact size(y) --> (n,)
 	@fact size(x) --> (n,p)
 	@fact size(β) --> (n,p)
-	@fact dofls(p, x, y) --> anything  # just make sure there's no errors
+	dofls(p, x, y)  # just make sure there's no errors
 
 
 	σx = 2.0
@@ -58,7 +58,7 @@ facts("Test OnlineFLS") do
 
 	@fact size(βhat,1) --> n
 	@fact size(yhat,1) --> n
-	@fact std(fls.xvars) --> roughly(fill(σx,p), atol = 0.2)
+	@fact std(fls.xvars) --> roughly(fill(σx,p), atol = 0.5)
 
 	r2 = 1 - var(y-yhat) / var(y)
 	@fact r2 --> greater_than(0.9)

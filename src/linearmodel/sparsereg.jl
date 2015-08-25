@@ -123,7 +123,7 @@ function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0;
     elseif penalty == :lasso
         coef_lasso(o, λ; keyargs...)
     else
-        error(":$penalty is not a valid option.  Choose :ols or :ridge")
+        error(":$penalty is not a valid option.  Choose :ols, :ridge, or :lasso")
     end
 end
 
