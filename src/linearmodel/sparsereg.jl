@@ -12,12 +12,9 @@
 
 #-------------------------------------------------------# Type and Constructors
 """
-Experimental: Online Sparse Regression
+Online Sparse Regression
 
-From this type, you can get analytical parameter estimates for OLS, ridge regression,
-lasso (TODO), elastic-net (TODO).
-
-You can also specify your own (Convex.jl supported) penalty with coef_solver (TODO)
+Analytical parameter estimates for ordinary least squares and ridge regression.
 """
 type SparseReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
@@ -65,13 +62,42 @@ function coef_ols(o::SparseReg)
 end
 
 function coef_ridge(o::SparseReg, λ::Float64)
-    p = size(o.c.A, 1) - 1
+    p = length(o.c.B) - 1
     o.s = cor(o.c)
     for i in 1:p
         o.s[i, i] += λ
     end
     sweep!(o.s, 1:p)
     β = vec(o.s[end, 1:end - 1])
+    scaled_to_original(β, mean(o.c), std(o.c))
+end
+
+@inline _ℓ(β, xtx, xty, λ) = dot(β, xtx * β) + dot(β, xty) + λ * sumabs(β)
+
+# Proximal gradient algorithm
+function coef_lasso(o::SparseReg, λ::Float64;
+        maxiter::Integer = 10, tolerance::Real = 1e-4, verbose::Bool = true)
+    p = length(o.c.B) - 1
+    o.s = cor(o.c)
+    β = zeros(p)
+    tol = Inf
+    iters = 0
+
+    xtx = o.s[1:p, 1:p]
+    xty = o.s[1:p, end]
+
+    for i in 1:maxiter
+        iters += 1
+        βold = copy(β)
+        β = β + xty - xtx * β
+        for j in 1:p
+            β[j] = sign(β[j]) * max(abs(β[j]) - λ, 0.0)
+        end
+        tol = abs(_ℓ(βold, xtx, xty, λ) - _ℓ(β, xtx, xty, λ)) / (abs(_ℓ(β, xtx, xty, λ)) + 1)
+        tol < tolerance && break
+    end
+
+    verbose && println("tolerance: ", tol); println("iterations: ", iters)
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
@@ -89,11 +115,13 @@ end
 # end
 
 
-function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0)
+function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0; keyargs...)
     if penalty == :ols
-        coef_ols(o::SparseReg)
+        coef_ols(o)
     elseif penalty == :ridge
-        coef_ridge(o::SparseReg, λ)
+        coef_ridge(o, λ)
+    elseif penalty == :lasso
+        coef_lasso(o, λ; keyargs...)
     else
         error(":$penalty is not a valid option.  Choose :ols or :ridge")
     end
