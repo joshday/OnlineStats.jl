@@ -41,6 +41,7 @@ Update the OnlineStat `o` with `data` using batches of size `b`.  If `batch = fa
 this calls `update!(o, data...)`.  If `batch = true`, it calls `updatebatch!` for each batch.
 """
 function onlinefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)
+    b = Int(b)
     if !batch
         update!(o, data...)
     else
@@ -62,6 +63,7 @@ Run through data as in `distributionfit!`.  Return a vector of OnlineStats where
 element has been updated with a batch of size `b`.
 """
 function tracefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)
+    b = Int(b)
     n = nrows(data[1])
     i = 1
     s = state(o)

@@ -31,9 +31,9 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
 
     n = length(y)
     nj = length(o.components)  # number of components
-    π::VecF = probs(o)
-    μ::VecF = means(o)
-    σ::VecF = stds(o)
+    π = probs(o)
+    μ = means(o)
+    σ = stds(o)
 
     w = zeros(n, nj)
     wy = zeros(n, nj)
@@ -65,12 +65,12 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
         # Check tolerance
         loglik_old = loglik
         loglik = loglikelihood(o, y)
-        num = abs(loglik - loglik_old)
+        numerator = abs(loglik - loglik_old)
         denom = (abs(loglik_old) + 1)
-        num > tol * denom  || break
+        numerator > tol * denom  || break
 
         if verbose
-            tolerance = num / denom
+            tolerance = numerator / denom
            LOG("iteration: $iters, tolerance: $tolerance")
         end
     end
@@ -81,15 +81,3 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
     end
     return o
 end
-
-
-#-------------------------------------------------------------------------# cdf
-# NOTE: cdf/pdf method for MixtureModel was added to Distributions on 5/7/2015
-# function cdf(o::MixtureModel{Univariate, Continuous, Normal}, x::Float64)
-#     π = probs(o)
-#     result = 0.0
-#     for j in 1:length(π)
-#         result += π[j] * cdf(components(o)[j], x)
-#     end
-#     return result
-# end

@@ -45,10 +45,13 @@ immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0
 # Instead, this uses an L1 loss, which is NOT the same as maximizing the likelihood.
 # This seems to work for now, but I need to figure out the right way to do this
 "Poisson regression via an L1 loss function (since likelihood-based updates are unstable)"
-immutable PoissonRegression <: SGModel end
+immutable PoissonRegression <: SGModel
+    stable::Bool
+    PoissonRegression(stable = true) = new(stable)
+end
 @inline predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
 @inline predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
-@inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
+@inline ∇f(m::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = m.stable ? -sign(ϵᵢ) * xᵢ : -ϵᵢ * xᵢ
 
 "Minimize the quantile loss function for the given `τ`"
 immutable QuantileRegression <: SGModel

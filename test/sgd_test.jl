@@ -48,7 +48,7 @@ facts("SGD") do
 
     context("PoissonRegression") do
         y = @compat Float64[rand(Poisson(i)) for i in exp(x*β)]
-        o = OnlineStats.SGD(x, y, model = OnlineStats.PoissonRegression())
+        o = OnlineStats.SGD(x, y, model = OnlineStats.PoissonRegression(), η = .00001)
         @fact predict(o, x) --> exp(x * o.β + o.β0)
     end
 

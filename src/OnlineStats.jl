@@ -4,7 +4,7 @@ if VERSION < v"0.4.0-dev"
     using Docile
 end
 
-using Reexport.@reexport
+using Reexport
 @reexport using StatsBase
 using Compat
 
@@ -28,10 +28,6 @@ import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean,
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
-# import Reactive: Input
-
-# import MathProgBase: AbstractMathProgSolver
-# import Convex, SCS
 
 
 #-----------------------------------------------------------------------------#
@@ -81,7 +77,6 @@ export
     LinReg,
     QuantRegMM,
     LogRegMM,
-    LogRegSGD,
     LogRegSGD2,  # Second-order SGD: This is the "winner" compared to the other two
     SparseReg,
     StepwiseReg,

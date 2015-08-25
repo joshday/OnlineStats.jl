@@ -41,7 +41,7 @@ function updatebatch!(o::NormalMix, y::AVecF)
     π = probs(o)
     γ = weight(o)
 
-    w::MatF = zeros(n, nc)
+    w = zeros(n, nc)
     for j = 1:nc, i = 1:n
         @inbounds w[i, j] = π[j] * pdf(components(o)[j], y[i])
     end
@@ -71,7 +71,7 @@ function update!(o::NormalMix, y::Float64)
     γ = weight(o)
     p = length(o.s1)
 
-    w::VecF = zeros(p)
+    w = zeros(p)
     for j in 1:p
         w[j] = pdf(o.d.components[j], y)
     end
@@ -96,7 +96,7 @@ function update!(o::NormalMix, y::Float64)
 end
 
 
-function quantile(o::NormalMix, τ::Real; start = mean(o), maxit = 20, tol = .001)
+function Base.quantile(o::NormalMix, τ::Real; start = mean(o), maxit = 20, tol = .001)
     0 < τ < 1 || error("τ must be in (0, 1)")
     θ = start
     for i in 1:maxit
