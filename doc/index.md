@@ -1,28 +1,8 @@
 # Overview
 
-`OnlineStats` is a Julia package which fits statistical models for online or streaming data.
+`OnlineStats` is a Julia package which provides online algorithms for statistical models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory.
 
-### Weighting Schemes
-When creating an OnlineStat, one can optionally specify the weighting to be used (with the exception of `Adagrad`, which aims to remove the necessity of choosing hyperparameters).  Updating a statistic or model involves one of two forms:
-
-- weighted average: `λ * newval + (1 - λ) * θ`, or equivalently `θ + λ * (newval - θ)`
-- gradient-based:  `θ - λ * gradient`
-
-The following schemes are supported for determining weights:
-
-- `EqualWeighting()`
-    - each piece of data is weighted equally.
-- `ExponentialWeighting(λ::Float64)`
-    - Use equal weighting until the step size reaches λ, then hold constant.
-- `ExponentialWeighting(n::Int64)`
-    - Use equal weighting until step sizes reaches `1/n`, then hold constant
-- `StochasticWeighting(r::Float64)`
-    - Use weight `number_of_updates ^ -r` where `r` is greater than .5 and less than or equal to 1.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.
-
-
-
-
-### Common Interface
+# Common Interface
 
 - `state(o)`
     - state of the estimate as a vector
@@ -39,3 +19,19 @@ The following schemes are supported for determining weights:
     has been updated with a batch of size `b`.
 - `nobs(o)`
     - number of observations
+
+
+# Weighting Schemes
+When creating an OnlineStat, one can specify the weighting to be used (with the exception of `Adagrad`, which aims to remove the necessity of choosing hyperparameters).  Updating a statistic or model involves one of two forms:
+
+- weighted average: `γ * update + (1 - γ) * θ` or equivalently `θ + γ * (update - θ)`
+- stochastic gradient-based:  `θ - γ * gradient`
+
+The following schemes are supported for determining weights:
+
+- `EqualWeighting()`
+    - each piece of data is weighted equally.
+- `ExponentialWeighting(λ::Float64)`, `ExponentialWeighting(n::Int64)`
+    - Use equal weighting until the step size reaches `λ = 1/n`, then hold constant.
+- `StochasticWeighting(r::Float64)`
+    - Use weight `number_of_updates ^ -r` where `r` is greater than .5 and less than or equal to 1.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.
