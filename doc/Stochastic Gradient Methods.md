@@ -21,7 +21,7 @@ The model argument specifies both the link function and loss function to be used
     - Ordinary least squares.  This minimizes `vecnorm(y - X*β, 2)` with respect to β.
 - `LogisticRegression()`
     - Maximizes the logistic regression loglikelihood.
-- `PoissonRegression()`
+- `PoissonRegression()` (Experimental)
     - Maximizes the poisson regression loglikelihood.  Due to instability in the SGD updates, we recommend using Adagrad.
 - `QuantileRegression(τ)`
     - Predict the conditional τ-th quantile of `y` given `X`

@@ -55,7 +55,7 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
     g = zeros(p)  # This will be the average gradient for all n new observations
     γ = weight(o) * o.η
 
-    for i in 1:n  # for each observation, add the gradient
+    @inbounds for i in 1:n  # for each observation, add the gradient
         xi = row(x, i)
         yi = y[i]
         yhat = predict(o, xi)
@@ -67,7 +67,7 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
         end
 
         # everything else
-        for j in 1:p
+        @inbounds for j in 1:p
             g[j] += ∇f(o.model, ϵ, xi[j], yi, yhat) + ∇j(o.penalty, o.β, j)
         end
     end
@@ -115,5 +115,46 @@ function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
     end
 
     o.n += 1
+    nothing
+end
+
+function updatebatch!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AMatF, y::AVecF)
+    γ = weight(o) * o.η
+
+    for i in 1:length(y)
+        xi = row(x, i)
+        yi = y[i]
+        yhat = predict(o, xi)
+        ϵ = yi - yhat
+
+        # intercept (not penalized)
+        if o.intercept
+            o.β0 -= γ * ∇f(o.model, ϵ, 1.0, yi, yhat)
+        end
+
+        # everything else
+        if nobs(o) <= o.penalty.burnin
+            @inbounds for j in 1:length(xi)
+                βval = o.β[j]
+                u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
+                v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
+                u = max(u - γ * (o.penalty.λ + ∇f(o.model, ϵ, xi[j], yi, yhat)), 0.0)
+                v = max(v - γ * (o.penalty.λ - ∇f(o.model, ϵ, xi[j], yi, yhat)), 0.0)
+                o.β[j] = u - v
+            end
+        else
+            @inbounds for j in 1:length(xi)
+                βval = o.β[j]
+                if βval != 0
+                    u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
+                    v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
+                    u = max(u - γ * (o.penalty.λ + ∇f(o.model, ϵ, xi[j], yi, yhat)), 0.0)
+                    v = max(v - γ * (o.penalty.λ - ∇f(o.model, ϵ, xi[j], yi, yhat)), 0.0)
+                    o.β[j] = u - v
+                end
+            end
+        end
+        o.n += 1
+    end
     nothing
 end

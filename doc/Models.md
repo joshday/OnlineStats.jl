@@ -128,12 +128,12 @@ predict(o, x)
 ```
 
 ## SparseReg
-Experimental sparse regression.  A type to experiment with analytical regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, etc.
+Analytical regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, user-specified penalties.
 
 ```julia
 o = SparseReg(x, y)
 coef(o, :ols)
-coef(o, :ridge)
+coef(o, :ridge, λ)
 ```
 
 ## StepwiseReg

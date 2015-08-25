@@ -44,14 +44,14 @@ immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0
 # NOTE: Likelihood based version (L2 loss) is super unstable.
 # Instead, this uses an L1 loss, which is NOT the same as maximizing the likelihood.
 # This seems to work for now, but I need to figure out the right way to do this
-"Poisson regression via an L1 loss function (since likelihood-based updates are unstable)"
+"(Experimental) Poisson regression"
 immutable PoissonRegression <: SGModel
     stable::Bool
     PoissonRegression(stable = true) = new(stable)
 end
 @inline predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
 @inline predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
-@inline ∇f(m::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = m.stable ? -sign(ϵᵢ) * xᵢ : -ϵᵢ * xᵢ
+@inline ∇f(m::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = m.stable ? -sign(ϵᵢ) * xᵢ : -(ϵᵢ / ŷᵢ) * xᵢ
 
 "Minimize the quantile loss function for the given `τ`"
 immutable QuantileRegression <: SGModel
@@ -67,7 +67,7 @@ end
 
 
 # Note: Perceptron if NoPenalty, SVM if L2Penalty
-"`penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty` is a support vector machine"
+"`penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty(λ)` is a support vector machine"
 immutable SVMLike <: SGModel end  # SVM needs y in {-1, 1}
 @inline predict(::SVMLike, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
 @inline predict(::SVMLike, X::AMatF, β::VecF, β0::Float64) = X * β + β0
