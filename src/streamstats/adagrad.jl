@@ -1,29 +1,3 @@
-
-
-# First attempt at a generalized Adagrad framework.
-# TODO: I expect to be able to also combine Adagrad with Regularized Dual Averaging (RDA) as an alternative algorithm
-# with better sparsity in resulting parameters for weakly convex regularization functions
-
-# As a first pass we can limit loss and regularization functions to pre-defined ones that fix strict criteria.
-# Any loss/reg function should be allowed to be swapped in, but we'll default to showing a big fat warning about
-# how the results could be gibberish.
-
-
-# Problem: argmin{βₜ} (Σ f(xₛ,yₛ,βₛ) + λ Ψ(βₜ))
-# Online algorithm to solve for optimal estimate βₜ of parameter vector given some loss function f and
-# regularization function Ψ, with all online estimates of βₛ, s <= t
-
-# TODO: add weighting?  might not be possible until we include RDA
-
-# NOTE: if you want a bias term, add a 1 to your x input
-
-# --------------------------------------------------------------------------
-
-# old Loss/Link function stuff is commented out in the bottom of the file
-
-# --------------------------------------------------------------------------
-
-
 #-------------------------------------------------------# Type and Constructors
 type Adagrad{M <: SGModel, P <: Penalty} <: StochasticGradientStat
     β0::Float64

@@ -48,7 +48,7 @@ immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0
 immutable PoissonRegression <: SGModel end
 @inline predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
 @inline predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
-@inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
+@inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 "Minimize the quantile loss function for the given `τ`"
 immutable QuantileRegression <: SGModel
