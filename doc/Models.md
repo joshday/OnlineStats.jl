@@ -2,7 +2,7 @@ In the given examples, `y` is typically an n by 1 `Vector{Float64}` and `x` is u
 
 Each type has it's own `state` and `statenames` methods.
 
-## Adagrad
+# Adagrad
 Stochastic adaptive gradient descent for a given model.  See the Stochastic Gradient Methods topic.  Adagrad does not use a weighting scheme as weights are adaptively chosen.
 
 ```julia
@@ -11,9 +11,8 @@ coef(o)
 predict(o, x)
 ```
 
-## Bootstrap
+# Bootstrap
 Statistical bootstrap for estimating the variance of an OnlineStat.
-
 - BernoulliBootstrap
 - PoissonBootstrap
 
@@ -23,7 +22,7 @@ boot = BernoulliBootstrap(o, mean, 1000)
 update!(boot, x)
 ```
 
-## CovarianceMatrix
+# CovarianceMatrix
 Analytical covariance matrix.
 
 ```julia
@@ -34,13 +33,13 @@ cor(o)   # cor(x)
 pca(o)   # MultivariateStats.fit(PCA, x)
 ```
 
-## Diff
+# Diff
 Track the last value and last difference.
 
-## Diffs
+# Diffs
 Track the last value and last difference for several variables.
 
-## FiveNumberSummary  
+# FiveNumberSummary
 Univariate five number summary using exact maximum/minimum and approximate .25, .5, and .75 quantiles.
 
 ```julia
@@ -50,10 +49,10 @@ maximum(o)
 state(o)
 ```
 
-## HyperLogLog
+# HyperLogLog
 Experimental implementation of hyperloglog algorithm.
 
-## LinReg
+# LinReg
 Analytical linear regression.
 
 ```julia
@@ -67,7 +66,7 @@ vcov(o)
 predict(o, x)
 ```
 
-## Mean
+# Mean
 Analytical sample mean.
 
 ```julia
@@ -75,7 +74,7 @@ o = Mean(y)
 mean(o)
 ```
 
-## Means
+# Means
 Analytical sample means, similar to `mean(x, 1)`.
 
 ```julia
@@ -83,7 +82,7 @@ o = Means(x)
 mean(o)  # vec(mean(x, 1))
 ```
 
-## Moments
+# Moments
 First four non-central moments.  Tracks mean, variance, skewness, and kurtosis.
 
 ```julia
@@ -95,7 +94,7 @@ skewness(o)
 kurtosis(o)
 ```
 
-## Momentum
+# Momentum
 Stochastic gradient descent with momentum for a given model.  See the Stochastic Gradient Methods topic.
 
 ```julia
@@ -104,7 +103,7 @@ coef(o)
 predict(o, x)
 ```
 
-## NormalMix
+# NormalMix
 Univariate normal mixture via an online EM algorithm.
 
 ```julia
@@ -115,10 +114,10 @@ std(o)
 quantile(o, .8)
 ```
 
-## Principal Components Analysis (no dedicated type)
+# Principal Components Analysis (no dedicated type)
 Use `pca(o::CovarianceMatrix)`.
 
-## SGD
+# SGD
 Stochastic gradient descent for a given model.  See the Stochastic Gradient Methods topic.
 
 ```julia
@@ -127,16 +126,17 @@ coef(o)
 predict(o, x)
 ```
 
-## SparseReg
-Analytical regularized regression.  Currently only OLS and Ridge is supported.  TODO: Lasso, elastic net, user-specified penalties.
+# SparseReg
+Analytical regularized regression.  Currently supports OLS, Ridge, and Lasso.  TODO: elastic net and user-specified penalties.
 
 ```julia
 o = SparseReg(x, y)
-coef(o, :ols)
+coef(o)
 coef(o, :ridge, λ)
+coef(o, :lasso, λ)
 ```
 
-## StepwiseReg
+# StepwiseReg
 Experimental stepwise regression.  With each update, there is the possibility of a variable entering or leaving the model.
 
 ```julia
@@ -145,7 +145,7 @@ onlinefit!(o, batchsize, x, y)
 coef(o)
 ```
 
-## Summary
+# Summary
 Summary statistics: mean, variance, maximum, and minimum.
 
 ```julia
@@ -157,7 +157,7 @@ maximum(o)
 minimum(o)
 ```
 
-## QuantileMM
+# QuantileMM
 Approximate quantiles using an online MM algorithm.
 
 ```julia
@@ -166,7 +166,7 @@ statenames(o)
 state(o)
 ```
 
-## QuantRegMM
+# QuantRegMM
 Approximate quantile regression using an online MM algorithm.
 
 ```julia
@@ -175,7 +175,7 @@ onlinefit!(o, batchsize, x, y)
 coef(o)
 ```
 
-## Variance
+# Variance
 Analytical sample variance.
 
 ```julia
@@ -185,7 +185,7 @@ var(o)
 std(o)
 ```
 
-## Variances
+# Variances
 Analytical sample variances, similar to `var(x, 1)`.
 
 ```julia
@@ -195,12 +195,8 @@ var(o)   # vec(var(x, 1))
 std(o)   # vec(std(x, 1))
 ```
 
-
-## Fitting a Parametric Distribution
-
-Estimating the parameters of a distribution in an online setting can be done using
-`distributionfit!(Dist, y, args...)` where `Dist` is one of the following:
-
+# Fitting a Parametric Distribution
+Estimating the parameters of a distribution in an online setting can be done using `distributionfit!(Dist, y, args...)` where `Dist` is one of the following:
 - `Bernoulli`
 - `Beta`
 - `Binomial`
@@ -214,5 +210,4 @@ Estimating the parameters of a distribution in an online setting can be done usi
 - `Normal`
 - `Poisson`
 
-To ensure a consistent interface for OnlineStats, fitting a multivariate distribution
-requires observations to be in rows.  This differs from Distributions.
+To ensure a consistent interface for OnlineStats, fitting a multivariate distribution requires observations to be in rows.  This differs from Distributions.

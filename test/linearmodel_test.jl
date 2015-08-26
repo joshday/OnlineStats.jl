@@ -97,6 +97,12 @@ facts("Linear Model") do
         @fact statenames(o) --> [:β, :nobs]
         @fact state(o) --> Any[coef(o), nobs(o)]
 
+        βols = coef(o)
+        βlasso = coef(o, :lasso, 1.0, verbose = false)
+        for i in 2:p
+            @fact abs(βlasso[i]) --> less_than(abs(βols[i]))
+        end
+
         # ols
         glm = lm([ones(n) x],y);
         @fact maxabs(coef(glm) - coef(o)) --> roughly(0., 1e-8)
@@ -117,6 +123,7 @@ facts("Linear Model") do
         end
 
         update!(o, ones(p), sum(β))
+        update!(o, randn(n, p), x*β + randn(n))
 
     #     Convex.set_default_solver(SCS.SCSSolver(verbose = 0))
     #     diff = maxabs(coef(o, :ridge, .5) -

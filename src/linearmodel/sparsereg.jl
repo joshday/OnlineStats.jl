@@ -75,6 +75,7 @@ end
 @inline _ℓ(β, xtx, xty, λ) = dot(β, xtx * β) + dot(β, xty) + λ * sumabs(β)
 
 # Proximal gradient algorithm
+# Needs to be optimized by FISTA
 function coef_lasso(o::SparseReg, λ::Float64;
         maxiters::Integer = 10, tolerance::Real = 1e-4, verbose::Bool = true)
     p = length(o.c.B) - 1
@@ -89,15 +90,16 @@ function coef_lasso(o::SparseReg, λ::Float64;
     for i in 1:maxiters
         iters += 1
         βold = copy(β)
-        β = β + xty - xtx * β
+        β = β + xty - xtx * β  # β + x'(y - x*β)
         for j in 1:p
-            β[j] = sign(β[j]) * max(abs(β[j]) - λ, 0.0)
+            β[j] = sign(β[j]) * max(abs(β[j]) - λ, 0.0)  # soft-thresholding step
         end
         tol = abs(_ℓ(βold, xtx, xty, λ) - _ℓ(β, xtx, xty, λ)) / (abs(_ℓ(β, xtx, xty, λ)) + 1.0)
         tol < tolerance && break
     end
 
-    verbose && println("tolerance: ", tol); println("iterations: ", iters)
+    verbose && println("tolerance:  ", tol)
+    verbose && println("iterations: ", iters)
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
