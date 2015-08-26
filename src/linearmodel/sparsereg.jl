@@ -76,7 +76,7 @@ end
 
 # Proximal gradient algorithm
 function coef_lasso(o::SparseReg, λ::Float64;
-        maxiter::Integer = 10, tolerance::Real = 1e-4, verbose::Bool = true)
+        maxiters::Integer = 10, tolerance::Real = 1e-4, verbose::Bool = true)
     p = length(o.c.B) - 1
     o.s = cor(o.c)
     β = zeros(p)
@@ -86,14 +86,14 @@ function coef_lasso(o::SparseReg, λ::Float64;
     xtx = o.s[1:p, 1:p]
     xty = o.s[1:p, end]
 
-    for i in 1:maxiter
+    for i in 1:maxiters
         iters += 1
         βold = copy(β)
         β = β + xty - xtx * β
         for j in 1:p
             β[j] = sign(β[j]) * max(abs(β[j]) - λ, 0.0)
         end
-        tol = abs(_ℓ(βold, xtx, xty, λ) - _ℓ(β, xtx, xty, λ)) / (abs(_ℓ(β, xtx, xty, λ)) + 1)
+        tol = abs(_ℓ(βold, xtx, xty, λ) - _ℓ(β, xtx, xty, λ)) / (abs(_ℓ(β, xtx, xty, λ)) + 1.0)
         tol < tolerance && break
     end
 

@@ -1,60 +1,58 @@
 # Available Models using Stochastic Gradient Descent and Variants
 The interface is standard across the `StochasticGradientStat` types (SGD, Momentum, and Adagrad).  Each takes arguments:
 
-argument | description
----------|------------
-`x` | matrix of predictors
-`y` | response vector
-`wgt` (optional) | Weighting scheme. Defaults to `StochasticWeighting(.51)`
+argument              | description
+--------------------- | ------------------------------------------------------------------------------------------
+`x`                   | matrix of predictors
+`y`                   | response vector
+`wgt` (optional)      | Weighting scheme. Defaults to `StochasticWeighting(.51)`
 `intercept` (keyword) | Should an intercept be included?  Defaults to `true`
 `model` (keyword)     | One of the models below.  Defaults to `L2Regression()`
 `penalty` (keyword)   | `NoPenalty()` (default), `L1Penalty(λ [, burnin = 100])` (experimental), or `L2Penalty(λ)`
 `start` (keyword)     | starting value for β.  Defaults to zeros.
 `η` (keyword)         | constant multiplied to gradient
 
-
 The model argument specifies both the link function and loss function to be used.  Options are:
-
 - `L1Regression()`
-    - Linear model using absolute loss.  This minimizes `vecnorm(y - X*β, 1)` with respect to β.
+  - Linear model using absolute loss.  This minimizes `vecnorm(y - X*β, 1)` with respect to β.
+
 - `L2Regression()`
-    - Ordinary least squares.  This minimizes `vecnorm(y - X*β, 2)` with respect to β.
+  - Ordinary least squares.  This minimizes `vecnorm(y - X*β, 2)` with respect to β.
+
 - `LogisticRegression()`
-    - Maximizes the logistic regression loglikelihood.
-- `PoissonRegression()` (Experimental)
-    - Maximizes the poisson regression loglikelihood.  Due to instability in the SGD updates, we recommend using Adagrad.
+  - Maximizes the logistic regression loglikelihood.
+
 - `QuantileRegression(τ)`
-    - Predict the conditional τ-th quantile of `y` given `X`
+  - Predict the conditional τ-th quantile of `y` given `X`
+
 - `SVMLike()`
-    - Fits Perceptron (with `penalty = NoPenalty`) or Support Vector Machine (with `penalty = L2Penalty(λ)`)
+  - Fits Perceptron (with `penalty = NoPenalty`) or Support Vector Machine (with `penalty = L2Penalty(λ)`)
+
 - `HuberRegression(δ)`
-    - Robust regression using Huber loss.
+  - Robust regression using Huber loss.
 
 # Penalties/Regularization
-Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.  
-Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).  
-
+Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.<br>Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).  
 - `NoPenalty()`
-    - No regularization is used.
+  - No regularization is used.
+
 - `L2Penalty(λ)`  
-    - AKA "Ridge" term:  `loss(β) + sumabs2(β)`
+  - AKA "Ridge" term:  `loss(β) + sumabs2(β)`
+
 - `L1Penalty(λ [, burnin = 100])` (currently only for `SGD`)
-    - AKA "Lasso" term: `loss(β) + sumabs(β)`
-    - Lasso regularization is a great tool for variable selection, as it sets "small" coefficients to 0.  In general, stochastic gradient methods do not succeed at generating a sparse solution.  To fix this, `SGD` will not update a coefficient that has been set to 0 after seeing `burnin` observations.
-
-
+  - AKA "Lasso" term: `loss(β) + sumabs(β)`
+  - Lasso regularization is a great tool for variable selection, as it sets "small" coefficients to 0.  In general, stochastic gradient methods do not succeed at generating a sparse solution.  To fix this, `SGD` will not update a coefficient that has been set to 0 after seeing `burnin` observations.
 
 # Common Interface
 
-method | details
----------|------------
-`state(o)`                | return coefficients and number of observations
-`statenames(o)`           | names corresponding to `state`: `[:β, :nobs]`
+method          | details
+--------------- | ----------------------------------------------
+`state(o)`      | return coefficients and number of observations
+`statenames(o)` | names corresponding to `state`: `[:β, :nobs]`
 `coef(o)`       | return coefficients
 `predict(o, x)` | `x` can be vector or matrix
 
 ## Examples
-
 
 ```julia
 # 1) Absolute loss with ridge penalty
