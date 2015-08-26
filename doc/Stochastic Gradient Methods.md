@@ -1,18 +1,19 @@
 # Available Models using Stochastic Gradient Descent and Variants
 The interface is standard across the `StochasticGradientStat` types (SGD, Momentum, and Adagrad).  Each takes arguments:
 
-argument              | description
---------------------- | ------------------------------------------------------------------------------------------
-`x`                   | matrix of predictors
-`y`                   | response vector
-`wgt` (optional)      | Weighting scheme. Defaults to `StochasticWeighting(.51)`
-`intercept` (keyword) | Should an intercept be included?  Defaults to `true`
-`model` (keyword)     | One of the models below.  Defaults to `L2Regression()`
-`penalty` (keyword)   | `NoPenalty()` (default), `L1Penalty(λ [, burnin = 100])` (experimental), or `L2Penalty(λ)`
-`start` (keyword)     | starting value for β.  Defaults to zeros.
-`η` (keyword)         | constant multiplied to gradient
+| argument              | description                                                                                |
+|:----------------------|:-------------------------------------------------------------------------------------------|
+| `x`                   | matrix of predictors                                                                       |
+| `y`                   | response vector                                                                            |
+| `wgt` (optional)      | Weighting scheme. Defaults to `StochasticWeighting(.51)`                                   |
+| `intercept` (keyword) | Should an intercept be included?  Defaults to `true`                                       |
+| `model` (keyword)     | One of the models below.  Defaults to `L2Regression()`                                     |
+| `penalty` (keyword)   | `NoPenalty()` (default), `L1Penalty(λ [, burnin = 100])` (experimental), or `L2Penalty(λ)` |
+| `start` (keyword)     | starting value for β.  Defaults to zeros.                                                  |
+| `η` (keyword)         | constant multiplied to gradient                                                            |
 
 The model argument specifies both the link function and loss function to be used.  Options are:
+
 - `L1Regression()`
   - Linear model using absolute loss.  This minimizes `vecnorm(y - X*β, 1)` with respect to β.
 
@@ -32,7 +33,8 @@ The model argument specifies both the link function and loss function to be used
   - Robust regression using Huber loss.
 
 # Penalties/Regularization
-Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.<br>Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).  
+Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.<br>Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).
+
 - `NoPenalty()`
   - No regularization is used.
 
@@ -45,12 +47,12 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 
 # Common Interface
 
-method          | details
---------------- | ----------------------------------------------
-`state(o)`      | return coefficients and number of observations
-`statenames(o)` | names corresponding to `state`: `[:β, :nobs]`
-`coef(o)`       | return coefficients
-`predict(o, x)` | `x` can be vector or matrix
+| method          | details                                        |
+|:----------------|:-----------------------------------------------|
+| `state(o)`      | return coefficients and number of observations |
+| `statenames(o)` | names corresponding to `state`: `[:β, :nobs]`  |
+| `coef(o)`       | return coefficients                            |
+| `predict(o, x)` | `x` can be vector or matrix                    |
 
 ## Examples
 

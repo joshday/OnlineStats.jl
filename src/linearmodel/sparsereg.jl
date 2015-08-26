@@ -14,7 +14,8 @@
 """
 Online Sparse Regression
 
-Analytical parameter estimates for ordinary least squares and ridge regression.
+Analytical parameter estimates for ordinary least squares, ridge regression, and
+the LASSO.
 """
 type SparseReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
