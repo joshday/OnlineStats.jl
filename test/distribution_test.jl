@@ -127,12 +127,12 @@ facts("Distributions") do
 #------------------------------------------------------------------------------#
     context("Cauchy") do
         o = FitCauchy()
-        o = FitCauchy(rand(Cauchy(), 1000))
-        o = distributionfit(Cauchy, rand(Cauchy(), 1000))
+        o = FitCauchy(rand(Cauchy(), 10000))
+        o = distributionfit(Cauchy, rand(Cauchy(), 10000))
 
-        @fact nobs(o) --> 1000
-        update!(o, rand(Cauchy(), 1000))
-        @fact nobs(o) --> 2000
+        @fact nobs(o) --> 10_000
+        update!(o, rand(Cauchy(), 10000))
+        @fact nobs(o) --> 20000
 
         @fact median(o) --> roughly(0.0, 1.0)
     end
