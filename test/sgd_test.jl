@@ -88,6 +88,12 @@ facts("SGD") do
             @fact coef(o)[p] --> less_than(coef(o2)[p])
         end
         updatebatch!(o, x, y)
+
+        o = OnlineStats.SGD(p, penalty = L1Penalty(.1))
+        updatebatch!(o, x, y)
+        @fact_throws L1Penalty(-100)
+        @fact_throws(L1Penalty(.1, -1))
+        L1Penalty(.1, 200)
     end
 end
 

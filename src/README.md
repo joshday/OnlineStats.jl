@@ -48,9 +48,9 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [x] Stepwise Regression: `StepwiseReg` (experimental)
 
 ### Penalized Regression
-- [x] LASSO: `SGD` (SGD with LASSO is experimental)
+- [x] LASSO: `SparseReg`, `SGD` (SGD with LASSO is experimental)
 - [x] Ridge: `SparseReg`, `Adagrad`, `SGD`
-- [ ] Elastic Net:
+- [x] Elastic Net: `SparseReg`
 
 ### Quantile Regression
 - [x] Linear Quantile Regression: `QuantRegMM`, `SGD`, `Adagrad`
