@@ -125,6 +125,15 @@ facts("Linear Model") do
         update!(o, ones(p), sum(β))
         update!(o, randn(n, p), x*β + randn(n))
 
+        # coef methods
+        coef(o)
+        coef(o, :ridge, .1)
+        coef(o, :lasso, .1, verbose = false)
+        coef(o, :elasticnet, .1, .1, verbose = false)
+
+        @fact coef(o, :elasticnet, .1, 0.0, verbose = false) --> roughly(coef(o, :ridge, .1, verbose = false), .1)
+        @fact coef(o, :elasticnet, .1, 1.0, verbose = false) --> roughly(coef(o, :lasso, .1, verbose = false), .1)
+
     #     Convex.set_default_solver(SCS.SCSSolver(verbose = 0))
     #     diff = maxabs(coef(o, :ridge, .5) -
     #                       OnlineStats.coef_solver(o, .5, x-> .5 * sum_squares(x)))

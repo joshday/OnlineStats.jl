@@ -14,17 +14,11 @@ function NormalMix(p::Integer, y::AVecF, wgt::StochasticWeighting = StochasticWe
     updatebatch!(o, y)
     o
 end
-function NormalMix(p::Integer, y::Real, wgt::StochasticWeighting = StochasticWeighting();
-                   start = MixtureModel(map((u,v) -> Normal(u, v), zeros(p), ones(p))))
-    o = NormalMix(p, wgt, start = start)
-    update!(o, y)
-    o
-end
+
 function NormalMix(p::Integer, wgt::StochasticWeighting = StochasticWeighting();
                    start = MixtureModel(map((u,v) -> Normal(u, v), zeros(p), ones(p))))
     NormalMix(start, zeros(p), zeros(p), zeros(p), 0, wgt)
 end
-
 
 #------------------------------------------------------------------------# state
 means(o::NormalMix) = means(o.d)

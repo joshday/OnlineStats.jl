@@ -127,13 +127,17 @@ predict(o, x)
 ```
 
 # SparseReg
-Analytical regularized regression.  Currently supports OLS, Ridge, and Lasso.  TODO: elastic net and user-specified penalties.
+Analytical regularized regression.  Currently supports ordinary least squares, ridge
+regression, LASSO, and elastic net.
 
 ```julia
 o = SparseReg(x, y)
 coef(o)
 coef(o, :ridge, λ)
 coef(o, :lasso, λ)
+coef(o, :elasticnet, λ, α)
+coef(o, :elasticnet, λ, 0.0)  # Ridge
+coef(o, :elasticnet, λ, 1.0)  # LASSO
 ```
 
 # StepwiseReg
@@ -197,6 +201,7 @@ std(o)   # vec(std(x, 1))
 
 # Fitting a Parametric Distribution
 Estimating the parameters of a distribution in an online setting can be done using `distributionfit!(Dist, y, args...)` where `Dist` is one of the following:
+
 - `Bernoulli`
 - `Beta`
 - `Binomial`

@@ -73,12 +73,31 @@ function coef_ridge(o::SparseReg, λ::Float64)
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
+
+# These functions should be passed as arguments to coef_prox
+# J(β) = vecnorm(β, 1)
+function prox_lasso!(β::AVecF, λ::Float64, α::Float64 = 0.0)
+    for j in 1:length(β)
+        β[j] = sign(β[j]) * max(abs(β[j]) - λ, 0.0)  # soft-thresholding step
+    end
+end
+
+# J(β) = (α * vecnorm(β,1) + (1 - α) * .5 * vecnorm(β, 2))
+function prox_elasticnet!(β::AVecF, λ::Float64, α::Float64)
+    prox_lasso!(β, λ * α)
+    for j in 1:length(β)
+        β[j] = β[j] / (1.0 + λ * (1.0 - α))
+    end
+end
+
+
+
+
 @inline _ℓ(β, xtx, xty, λ) = dot(β, xtx * β) + dot(β, xty) + λ * sumabs(β)
 
-# Proximal gradient algorithm
-# Needs to be optimized by FISTA
-function coef_lasso(o::SparseReg, λ::Float64;
-        maxiters::Integer = 10, tolerance::Real = 1e-4, verbose::Bool = true)
+# Proximal gradient descent
+function coef_prox(o::SparseReg, prox!::Function, λ::Float64, α::Float64 = 0.0;
+        maxiters::Integer = 10, tolerance::Float64 = 1e-4, verbose::Bool = true, step::Float64 = 1.0)
     p = length(o.c.B) - 1
     o.s = cor(o.c)
     β = zeros(p)
@@ -91,10 +110,8 @@ function coef_lasso(o::SparseReg, λ::Float64;
     for i in 1:maxiters
         iters += 1
         βold = copy(β)
-        β = β + xty - xtx * β  # β + x'(y - x*β)
-        for j in 1:p
-            β[j] = sign(β[j]) * max(abs(β[j]) - λ, 0.0)  # soft-thresholding step
-        end
+        β = β + step * (xty - xtx * β)  # β + x'(y - x*β)
+        prox!(β, λ, α)
         tol = abs(_ℓ(βold, xtx, xty, λ) - _ℓ(β, xtx, xty, λ)) / (abs(_ℓ(β, xtx, xty, λ)) + 1.0)
         tol < tolerance && break
     end
@@ -104,29 +121,17 @@ function coef_lasso(o::SparseReg, λ::Float64;
     scaled_to_original(β, mean(o.c), std(o.c))
 end
 
-
-# # Take a user-defined penalty (a function supported by Convex.jl)
-# # and plug it into a Convex Solver
-# # objective is to minimize: .5 * β' * cor(x) * β - cor(x, y) * β + J(β)
-# function coef_solver(o::SparseReg, λ::Float64, penalty::Function,
-#                      solver::AbstractMathProgSolver = Convex.get_default_solver())
-#     o.s = cor(o.c)
-#     β = Convex.Variable(size(o.c.A, 1) - 1)
-#     p = Convex.minimize(.5 * Convex.quad_form(β, o.s[1:end-1, 1:end-1]) - vec(o.s[end, 1:end-1])' * β + λ * penalty(β))
-#     Convex.solve!(p, SCS.SCSSolver(verbose = true))
-#     scaled_to_original(β.value, mean(o.c), std(o.c))
-# end
-
-
-function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0; keyargs...)
+function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0, α = 0.0; keyargs...)
     if penalty == :ols
         coef_ols(o)
     elseif penalty == :ridge
         coef_ridge(o, λ)
     elseif penalty == :lasso
-        coef_lasso(o, λ; keyargs...)
+        coef_prox(o, prox_lasso!, λ; keyargs...)
+    elseif penalty == :elasticnet
+        coef_prox(o, prox_elasticnet!, λ, α; keyargs...)
     else
-        error(":$penalty is not a valid option.  Choose :ols, :ridge, or :lasso")
+        error(":$penalty unrecognized.  Choose :ols, :ridge, :lasso, or :elasticnet")
     end
 end
 
