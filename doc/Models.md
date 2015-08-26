@@ -1,3 +1,30 @@
+<!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Adagrad](#adagrad)
+- [Bootstrap](#bootstrap)
+- [CovarianceMatrix](#covariancematrix)
+- [Diff](#diff)
+- [Diffs](#diffs)
+- [FiveNumberSummary](#fivenumbersummary)
+- [HyperLogLog](#hyperloglog)
+- [LinReg](#linreg)
+- [Mean](#mean)
+- [Means](#means)
+- [Moments](#moments)
+- [Momentum](#momentum)
+- [NormalMix](#normalmix)
+- [Principal Components Analysis (no dedicated type)](#principal-components-analysis-no-dedicated-type)
+- [SGD](#sgd)
+- [SparseReg](#sparsereg)
+- [StepwiseReg](#stepwisereg)
+- [Summary](#summary)
+- [QuantileMM](#quantilemm)
+- [QuantRegMM](#quantregmm)
+- [Variance](#variance)
+- [Variances](#variances)
+- [Fitting a Parametric Distribution](#fitting-a-parametric-distribution)
+<!-- /TOC -->
+
 In the given examples, `y` is typically an n by 1 `Vector{Float64}` and `x` is usually an n by p `Matrix{Float64}`.  
 
 Each type has it's own `state` and `statenames` methods.
@@ -13,6 +40,7 @@ predict(o, x)
 
 # Bootstrap
 Statistical bootstrap for estimating the variance of an OnlineStat.
+
 - BernoulliBootstrap
 - PoissonBootstrap
 
@@ -57,7 +85,7 @@ Analytical linear regression.
 
 ```julia
 o = LinReg(x, y)
-update!(x2, y2)
+updatebatch!(x2, y2)
 
 coef(o)
 coeftable(o)
