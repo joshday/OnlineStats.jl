@@ -15,35 +15,35 @@ The interface is standard across the `StochasticGradientStat` types (SGD, Moment
 The model argument specifies both the link function and loss function to be used.  Options are:
 
 - `L1Regression()`
-  - Linear model using absolute loss.  This minimizes `vecnorm(y - X*β, 1)` with respect to β.
+    - Linear model using absolute loss.  This minimizes `vecnorm(y - X*β, 1)` with respect to β.
 
 - `L2Regression()`
-  - Ordinary least squares.  This minimizes `vecnorm(y - X*β, 2)` with respect to β.
+    - Ordinary least squares.  This minimizes `vecnorm(y - X*β, 2)` with respect to β.
 
 - `LogisticRegression()`
-  - Maximizes the logistic regression loglikelihood.
+    - Maximizes the logistic regression loglikelihood.
 
 - `QuantileRegression(τ)`
-  - Predict the conditional τ-th quantile of `y` given `X`
+    - Predict the conditional τ-th quantile of `y` given `X`
 
 - `SVMLike()`
-  - Fits Perceptron (with `penalty = NoPenalty`) or Support Vector Machine (with `penalty = L2Penalty(λ)`)
+    - Fits Perceptron (with `penalty = NoPenalty`) or Support Vector Machine (with `penalty = L2Penalty(λ)`)
 
 - `HuberRegression(δ)`
-  - Robust regression using Huber loss.
+    - Robust regression using Huber loss.
 
 # Penalties/Regularization
 Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.<br>Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).
 
 - `NoPenalty()`
-  - No regularization is used.
+    - No regularization is used.
 
 - `L2Penalty(λ)`  
-  - AKA "Ridge" term:  `loss(β) + sumabs2(β)`
+    - AKA "Ridge" term:  `loss(β) + sumabs2(β)`
 
 - `L1Penalty(λ [, burnin = 100])` (currently only for `SGD`)
-  - AKA "Lasso" term: `loss(β) + sumabs(β)`
-  - Lasso regularization is a great tool for variable selection, as it sets "small" coefficients to 0.  In general, stochastic gradient methods do not succeed at generating a sparse solution.  To fix this, `SGD` will not update a coefficient that has been set to 0 after seeing `burnin` observations.
+    - AKA "Lasso" term: `loss(β) + sumabs(β)`
+    - Lasso regularization is a great tool for variable selection, as it sets "small" coefficients to 0.  In general, stochastic gradient methods do not succeed at generating a sparse solution.  To fix this, `SGD` will not update a coefficient that has been set to 0 after seeing `burnin` observations.
 
 # Common Interface
 
