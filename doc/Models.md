@@ -143,7 +143,8 @@ quantile(o, .8)
 ```
 
 # Principal Components Analysis (no dedicated type)
-Use `pca(o::CovarianceMatrix)`.
+Use `pca(o::CovarianceMatrix, maxoutdim = k)`.  The keyword argument `maxoutdim` specifies
+the top `k` components to return.
 
 # SGD
 Stochastic gradient descent for a given model.  See the Stochastic Gradient Methods topic.
@@ -228,7 +229,7 @@ std(o)   # vec(std(x, 1))
 ```
 
 # Fitting a Parametric Distribution
-Estimating the parameters of a distribution in an online setting can be done using `distributionfit!(Dist, y, args...)` where `Dist` is one of the following:
+Estimating the parameters of a distribution in an online setting can be done using ```distributionfit!(Dist, y, args...)``` where `Dist` is one of the following:
 
 - `Bernoulli`
 - `Beta`
@@ -243,4 +244,4 @@ Estimating the parameters of a distribution in an online setting can be done usi
 - `Normal`
 - `Poisson`
 
-To ensure a consistent interface for OnlineStats, fitting a multivariate distribution requires observations to be in rows.  This differs from Distributions.
+To ensure a consistent interface for OnlineStats, fitting a multivariate distribution requires observations to be in rows.  This differs from fitting multivariate distributions in the Distributions package.
