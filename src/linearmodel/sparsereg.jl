@@ -53,7 +53,7 @@ function scaled_to_original!(β, μ, σ)
 end
 
 # OLS
-function StatsBase.coef(o::SparseReg)
+function StatsBase.coef(o::SparseReg, penalty::NoPenalty = NoPenalty())
     o.s = cor(o.c)
     sweep!(o.s, 1:size(o.c.A, 1) - 1)
     β = vec(o.s[end, 1:end - 1])
@@ -76,14 +76,14 @@ end
 # LASSO and Elastic Net
 function StatsBase.coef(o::SparseReg, penalty::Penalty;
         maxiters::Integer = 50,
-        tolerance::Float64 = 1e-4,
+        tolerance::Float64 = 1e-6,
         verbose::Bool = true,
         step::Float64 = 1.0
         )
     p = length(o.c.B) - 1  # Number of predictors (not including intercept)
     o.s = cor(o.c)  # cor(hcat(x, y))
     β = zeros(p)
-    tol = Inf
+    tol = 0.0
     iters = 0
 
     xtx = o.s[1:p, 1:p]  # x'x
@@ -92,14 +92,26 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
     for i in 1:maxiters
         iters += 1
         βold = copy(β)
-        β = β + step * (xty - xtx * β)  # β + x'(y - x*β)
-        prox!(β, penalty)
+        gradient = (xty - xtx * β)
+        β = β + step * gradient  # β + step * x'(y - x * β)
+        prox!(β, penalty, step)
+
+        # Try step halving a few times if objective isn't decreased
+        k = 1
+        old_objective = ℓ(βold, xtx, xty, penalty)
+        while ℓ(β, xtx, xty, penalty) > old_objective
+            s = 0.5 ^ k * step
+            β = βold + s * gradient
+            prox!(β, penalty, s)
+            k += 1
+            k > 5 && break  # This will try step halving 5 times
+        end
 
         tol = βtol(β, βold, xtx, xty, penalty)
         tol < tolerance && break
     end
 
-    tol < tolerance || warn("Algorithm did not achieve convergence.  Try changing step.")
+    tol < tolerance || warn("Algorithm did not achieve convergence")
     verbose && println("tolerance:  ", tol)
     verbose && println("iterations: ", iters)
     scaled_to_original!(β, mean(o.c), std(o.c))
@@ -108,32 +120,35 @@ end
 
 
 # J(β) = vecnorm(β, 1)
-function prox!(β::VecF, penalty::L1Penalty)
+function prox!(β::VecF, penalty::L1Penalty, step::Float64)
     for j in 1:length(β)
-        β[j] = sign(β[j]) * max(abs(β[j]) - penalty.λ, 0.0)  # soft-thresholding step
+        β[j] = sign(β[j]) * max(abs(β[j]) - step * penalty.λ, 0.0)  # soft-thresholding step
     end
 end
-function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::L1Penalty)
-    θ = β - βold
-    u = dot(θ, xtx * θ) + dot(θ, xty) + penalty.λ * (sumabs(β) - sumabs(βold))
-    v = dot(β, xtx * β) + dot(β, xty) + penalty.λ * sumabs(β)
-    u / (abs(v) + 1.0)
+
+function ℓ(β::VecF, xtx::MatF, xty::VecF, penalty::L1Penalty)
+    dot(β, xtx * β) - 2.0 * dot(β, xty) + penalty.λ * sumabs(β)
 end
 
 
 # J(β) = (α * vecnorm(β,1) + (1 - α) * .5 * vecnorm(β, 2))
-function prox!(β::AVecF, penalty::ElasticNetPenalty)
+function prox!(β::AVecF, penalty::ElasticNetPenalty, step::Float64)
     for j in 1:length(β)
-        β[j] = sign(β[j]) * max(abs(β[j]) - penalty.λ * penalty.α, 0.0)  # Lasso prox
-        β[j] = β[j] / (1.0 + penalty.λ * (1.0 - penalty.α))              # Ridge prox
+        β[j] = sign(β[j]) * max(abs(β[j]) - step * penalty.λ * penalty.α, 0.0)  # Lasso prox
+        β[j] = β[j] / (1.0 + step * penalty.λ * (1.0 - penalty.α))              # Ridge prox
     end
 end
-function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::ElasticNetPenalty)
-    θ = β - βold
+
+function ℓ(β::VecF, xtx::MatF, xty::VecF, penalty::ElasticNetPenalty)
     λ, α = penalty.λ, penalty.α
-    u = dot(θ, xtx * θ) + dot(θ, xty) + λ * (α * (sumabs(β) - sumabs(βold)) + (1 - α) * (sumabs2(β) - sumabs2(βold)))
-    v = dot(β, xtx * β) + dot(β, xty) + λ * sumabs(β)
-    u / (abs(v) + 1.0)
+    dot(β, xtx * β) - 2.0 * dot(β, xty) + λ * (α * sumabs(β) + (1 - α) * .5 * sumabs2(β))
+end
+
+# criteria for convergence
+function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::Penalty)
+    v = ℓ(β, xtx, xty, penalty)
+    u = ℓ(βold, xtx, xty, penalty)
+    abs(u - v) / (abs(v) + 1.0)
 end
 
 
