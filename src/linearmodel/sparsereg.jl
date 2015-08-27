@@ -104,7 +104,7 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
             β = βold + s * gradient
             prox!(β, penalty, s)
             k += 1
-            k > 5 && break  # This will try step halving 5 times
+            k > 5 && break  # This will try step halving 6 times
         end
 
         tol = βtol(β, βold, xtx, xty, penalty)
@@ -118,19 +118,20 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
 end
 
 
-
+# lasso penalty
 # J(β) = vecnorm(β, 1)
 function prox!(β::VecF, penalty::L1Penalty, step::Float64)
     for j in 1:length(β)
         β[j] = sign(β[j]) * max(abs(β[j]) - step * penalty.λ, 0.0)  # soft-thresholding step
     end
 end
-
+# lasso objective function
 function ℓ(β::VecF, xtx::MatF, xty::VecF, penalty::L1Penalty)
     dot(β, xtx * β) - 2.0 * dot(β, xty) + penalty.λ * sumabs(β)
 end
 
 
+# elastic net penalty
 # J(β) = (α * vecnorm(β,1) + (1 - α) * .5 * vecnorm(β, 2))
 function prox!(β::AVecF, penalty::ElasticNetPenalty, step::Float64)
     for j in 1:length(β)
@@ -138,77 +139,19 @@ function prox!(β::AVecF, penalty::ElasticNetPenalty, step::Float64)
         β[j] = β[j] / (1.0 + step * penalty.λ * (1.0 - penalty.α))              # Ridge prox
     end
 end
-
+# elastic net objective function
 function ℓ(β::VecF, xtx::MatF, xty::VecF, penalty::ElasticNetPenalty)
     λ, α = penalty.λ, penalty.α
     dot(β, xtx * β) - 2.0 * dot(β, xty) + λ * (α * sumabs(β) + (1 - α) * .5 * sumabs2(β))
 end
 
-# criteria for convergence
+
+# convergence criteria for lasso/elasticnet
 function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::Penalty)
     v = ℓ(β, xtx, xty, penalty)
     u = ℓ(βold, xtx, xty, penalty)
     abs(u - v) / (abs(v) + 1.0)
 end
-
-
-
-
-
-
-# @inline _ℓ(β, xtx, xty, λ) = dot(β, xtx * β) + dot(β, xty) + λ * sumabs(β)
-#
-# # Proximal gradient descent
-# function coef_prox(o::SparseReg, prox!::Function, λ::Float64, α::Float64 = 0.0;
-#         maxiters::Integer = 50,
-#         tolerance::Float64 = 1e-4,
-#         verbose::Bool = true,
-#         step::Float64 = 1.0
-#         )
-#     p = length(o.c.B) - 1  # Number of predictors (not including intercept)
-#     o.s = cor(o.c)  # cor(hcat(x, y))
-#     β = zeros(p)
-#     tol = Inf
-#     iters = 0
-#
-#     xtx = o.s[1:p, 1:p]  # x'x
-#     xty = o.s[1:p, end]  # x'y
-#
-#     for i in 1:maxiters
-#         iters += 1
-#         βold = copy(β)
-#         β = β + step * (xty - xtx * β)  # β + x'(y - x*β)
-#         prox!(β, λ, α)
-#         # step-halving if objective not decreased
-#         θ = β - βold
-#         while θ'xtx * θ + θ'xty + λ*vecnro
-#         end
-#
-#         tol = abs(_ℓ(βold, xtx, xty, λ) - _ℓ(β, xtx, xty, λ)) / (abs(_ℓ(β, xtx, xty, λ)) + 1.0)
-#         tol < tolerance && break
-#     end
-#
-#     tol < tolerance || warn("Algorithm did not achieve convergence.  Try changing step.")
-#     verbose && println("tolerance:  ", tol)
-#     verbose && println("iterations: ", iters)
-#     scaled_to_original!(β, mean(o.c), std(o.c))
-# end
-
-# function StatsBase.coef(o::SparseReg, penalty::Symbol = :ols, λ::Float64 = 0.0, α = 0.0; keyargs...)
-#     if penalty == :ols
-#         coef_ols(o)
-#     elseif penalty == :ridge
-#         coef_ridge(o, λ)
-#     elseif penalty == :lasso
-#         coef_prox(o, prox_lasso!, λ; keyargs...)
-#     elseif penalty == :elasticnet
-#         coef_prox(o, prox_elasticnet!, λ, α; keyargs...)
-#     else
-#         error(":$penalty unrecognized.  Choose :ols, :ridge, :lasso, or :elasticnet")
-#     end
-# end
-
-
 
 
 
