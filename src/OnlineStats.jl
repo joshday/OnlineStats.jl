@@ -94,6 +94,7 @@ export
     HuberRegression,
     L1Penalty,
     L2Penalty,
+    ElasticNetPenalty,
     NoPenalty,
 
     # functions

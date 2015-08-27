@@ -156,17 +156,17 @@ predict(o, x)
 ```
 
 # SparseReg
-Analytical regularized regression.  Currently supports ordinary least squares, ridge
-regression, LASSO, and elastic net.
+Analytical regularized regression.  Currently supports least squares, ridge
+regression, LASSO, and elastic net.  
 
 ```julia
 o = SparseReg(x, y)
-coef(o)
-coef(o, :ridge, λ)
-coef(o, :lasso, λ)
-coef(o, :elasticnet, λ, α)
-coef(o, :elasticnet, λ, 0.0)  # Ridge
-coef(o, :elasticnet, λ, 1.0)  # LASSO
+coef(o)                             # Least squres
+coef(o, L2Penalty(λ))               # Ridge
+coef(o, L1Penalty(λ))               # LASSO
+coef(o, ElasticNetPenalty(λ, α))    # α * lasso_penalty + (1 - α) * ridge_penalty
+coef(o, ElasticNetPenalty(λ, 0.0))  # Ridge
+coef(o, ElasticNetPenalty(λ, 1.0))  # LASSO
 ```
 
 # StepwiseReg

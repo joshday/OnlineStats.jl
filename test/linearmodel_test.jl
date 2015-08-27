@@ -98,7 +98,7 @@ facts("Linear Model") do
         @fact state(o) --> Any[coef(o), nobs(o)]
 
         βols = coef(o)
-        βlasso = coef(o, :lasso, 1.0, verbose = false)
+        βlasso = coef(o, L1Penalty(1.0), verbose = false)
         for i in 2:p
             @fact abs(βlasso[i]) --> less_than(abs(βols[i]))
         end
@@ -118,8 +118,8 @@ facts("Linear Model") do
             βridge = σ[end] * (βridge ./ σ[1:end-1])
             βridge = [β₀; βridge]
 
-            @fact maxabs(coef(o, :ridge, 0.) - coef(o)) --> roughly(0., 1e-8)
-            @fact maxabs(coef(o, :ridge, λ) - βridge) --> roughly(0., 1e-8)
+            @fact maxabs(coef(o, L2Penalty(0.0)) - coef(o)) --> roughly(0., 1e-8)
+            @fact maxabs(coef(o, L2Penalty(λ)) - βridge) --> roughly(0., 1e-8)
         end
 
         update!(o, ones(p), sum(β))
@@ -127,17 +127,12 @@ facts("Linear Model") do
 
         # coef methods
         coef(o)
-        coef(o, :ridge, .1)
-        coef(o, :lasso, .1, verbose = false)
-        coef(o, :elasticnet, .1, .1, verbose = false)
+        coef(o, L2Penalty(.1))
+        coef(o, L1Penalty(.1), verbose = false)
+        coef(o, ElasticNetPenalty(.1, .5), verbose = false)
 
-        @fact coef(o, :elasticnet, .1, 0.0, verbose = false) --> roughly(coef(o, :ridge, .1, verbose = false), .1)
-        @fact coef(o, :elasticnet, .1, 1.0, verbose = false) --> roughly(coef(o, :lasso, .1, verbose = false), .1)
-
-    #     Convex.set_default_solver(SCS.SCSSolver(verbose = 0))
-    #     diff = maxabs(coef(o, :ridge, .5) -
-    #                       OnlineStats.coef_solver(o, .5, x-> .5 * sum_squares(x)))
-    #     @fact diff --> roughly(0., .01)
+        @fact coef(o, ElasticNetPenalty(.1, 0.0), verbose = false) --> roughly(coef(o, L2Penalty(.1)), .1)
+        @fact coef(o, ElasticNetPenalty(.1, 1.0), verbose = false) --> roughly(coef(o, L1Penalty(.1), verbose = false), .1)
     end
 end
 end # module

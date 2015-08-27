@@ -41,9 +41,7 @@ immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0
 @inline ∇f(::LogisticRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 
-# NOTE: Likelihood based version (L2 loss) is super unstable.
-# Instead, this uses an L1 loss, which is NOT the same as maximizing the likelihood.
-# This seems to work for now, but I need to figure out the right way to do this
+# NOTE: Both versions stable = true/false are unstable
 "(Experimental) Poisson regression"
 immutable PoissonRegression <: SGModel
     stable::Bool
@@ -129,13 +127,13 @@ end
 @inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ * sign(β[i])
 
 # J(β) = λ * (α * sumabs2(β) + (1 - α) * sumabs(β))
-# immutable ElasticNetPenalty <: Penalty
-#     λ::Float64
-#     α::Float64
-#     function ElasticNetPenalty(λ::Real, α::Real)
-#         @assert 0 <= α <= 1
-#         @assert λ >= 0
-#         @compat new(Float64(λ), Float64(α))
-#     end
-# end
-# @inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])
+immutable ElasticNetPenalty <: Penalty
+    λ::Float64
+    α::Float64
+    function ElasticNetPenalty(λ::Real, α::Real)
+        @assert 0 <= α <= 1
+        @assert λ >= 0
+        @compat new(Float64(λ), Float64(α))
+    end
+end
+@inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])
