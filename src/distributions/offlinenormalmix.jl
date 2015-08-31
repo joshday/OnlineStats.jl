@@ -60,6 +60,9 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
         π ./= sum(π)
         μ = s2 ./ s1
         σ = (s3 - (s2 .* s2 ./ s1)) ./ s1
+        if any(σ .<= 0)
+            σ = ones(nj)
+        end
         o = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
 
         # Check tolerance

@@ -16,7 +16,7 @@ function NormalMix(p::Integer, y::AVecF, wgt::StochasticWeighting = StochasticWe
 end
 
 function NormalMix(p::Integer, wgt::StochasticWeighting = StochasticWeighting();
-                   start = MixtureModel(map((u,v) -> Normal(u, v), zeros(p), ones(p))))
+                   start = MixtureModel(map((u,v) -> Normal(u, v), randn(p), ones(p))))
     NormalMix(start, zeros(p), zeros(p), zeros(p), 0, wgt)
 end
 
@@ -51,9 +51,9 @@ function updatebatch!(o::NormalMix, y::AVecF)
     π ./= sum(π)
     μ = o.s2 ./ o.s1
     σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
-    # if any(σ .<= 0.) # reset standard deviations if one goes to 0
-    #     σ = ones(nc)
-    # end
+    if any(σ .<= 0.) # reset standard deviations if one goes to 0
+        σ = ones(nc)
+    end
 
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += n
@@ -80,9 +80,9 @@ function update!(o::NormalMix, y::Float64)
     π ./= sum(π)
     μ = o.s2 ./ o.s1
     σ = (o.s3 - (o.s2 .* o.s2 ./ o.s1)) ./ o.s1
-    # if any(σ .== 0.)
-    #     σ = ones(p)
-    # end
+    if any(σ .<= 0.)
+        σ = ones(p)
+    end
 
     o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += 1
