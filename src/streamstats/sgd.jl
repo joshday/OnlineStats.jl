@@ -81,7 +81,7 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
 end
 
 #----------------------------------------------------# special update! for lasso
-function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
+function update!(o::SGD{L2Regression, L1Penalty}, x::AVecF, y::Float64)
     yhat = predict(o, x)
     ε = y - yhat
     γ = weight(o) * o.η
@@ -97,8 +97,9 @@ function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
             βval = o.β[j]
             u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
             v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
-            u = max(u - γ * (o.penalty.λ + ∇f(o.model, ε, x[j], y, yhat)), 0.0)
-            v = max(v - γ * (o.penalty.λ - ∇f(o.model, ε, x[j], y, yhat)), 0.0)
+            g = ∇f(o.model, ε, x[j], y, yhat)
+            u = max(u - γ * (o.penalty.λ + g), 0.0)
+            v = max(v - γ * (o.penalty.λ - g), 0.0)
             o.β[j] = u - v
         end
     else
@@ -107,8 +108,9 @@ function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
             if βval != 0
                 u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient or 0.0
                 v = abs(βval) * (sign(βval) == -1)  # negative coefficient or 0.0
-                u = max(u - γ * (o.penalty.λ + ∇f(o.model, ε, x[j], y, yhat)), 0.0)
-                v = max(v - γ * (o.penalty.λ - ∇f(o.model, ε, x[j], y, yhat)), 0.0)
+                g = ∇f(o.model, ε, x[j], y, yhat)
+                u = max(u - γ * (o.penalty.λ + g), 0.0)
+                v = max(v - γ * (o.penalty.λ - g), 0.0)
                 o.β[j] = u - v
             end
         end
@@ -118,7 +120,7 @@ function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
     nothing
 end
 
-function updatebatch!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AMatF, y::AVecF)
+function updatebatch!(o::SGD{L2Regression, L1Penalty}, x::AMatF, y::AVecF)
     γ = weight(o) * o.η
 
     for i in 1:length(y)

@@ -204,6 +204,9 @@ facts("Adagrad") do
     end
 
     context("Lasso update") do
+        x = randn(n, p)
+        β = collect(1.:p)
+        y = x * β + randn(n)
         o = Adagrad(x,y, penalty = L1Penalty(.1))
     end
 

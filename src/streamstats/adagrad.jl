@@ -92,7 +92,7 @@ end
 
 
 #----------------------------------------------------# special update! for lasso
-function update!{M <: SGModel}(o::Adagrad{M, L1Penalty}, x::AVecF, y::Float64)
+function update!(o::Adagrad{L2Regression, L1Penalty}, x::AVecF, y::Float64)
     yhat = predict(o, x)
     ε = y - yhat
 
