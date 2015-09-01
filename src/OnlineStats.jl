@@ -185,6 +185,7 @@ include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/sgd.jl")
 include("streamstats/momentum.jl")
+include("streamstats/rda.jl")
 
 export
     BiasVector,

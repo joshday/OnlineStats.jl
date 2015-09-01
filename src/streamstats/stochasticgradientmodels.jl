@@ -34,7 +34,7 @@ immutable L1Regression <: SGModel end
 @inline ∇f(::L1Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 
 
-"Minimize the negative loglikelihood of a logistic regression model"
+"Minimize the negative loglikelihood of a logistic regression model.  For data in {0, 1}. "
 immutable LogisticRegression <: SGModel end  # Logistic regression needs y in {0, 1}
 @inline predict(::LogisticRegression, x::AVecF, β::VecF, β0::Float64) = 1.0 / (1.0 + exp(-dot(x, β) - β0))
 @inline predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) = 1.0 ./ (1.0 + exp(-X * β - β0))
@@ -65,7 +65,7 @@ end
 
 
 # Note: Perceptron if NoPenalty, SVM if L2Penalty
-"`penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty(λ)` is a support vector machine"
+"For data in {-1, 1}.  `penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty(λ)` is a support vector machine"
 immutable SVMLike <: SGModel end  # SVM needs y in {-1, 1}
 @inline predict(::SVMLike, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
 @inline predict(::SVMLike, X::AMatF, β::VecF, β0::Float64) = X * β + β0
@@ -124,7 +124,7 @@ immutable L1Penalty <: Penalty
         @compat new(Float64(λ), 100)
     end
 end
-@inline ∇j(reg::L1Penalty, β::VecF, i::Int) = reg.λ * sign(β[i])
+@inline ∇j(reg::L1Penalty, β::VecF, i::Int) = 0.0 #reg.λ * sign(β[i])
 
 # J(β) = λ * (α * sumabs2(β) + (1 - α) * sumabs(β))
 immutable ElasticNetPenalty <: Penalty
@@ -136,4 +136,4 @@ immutable ElasticNetPenalty <: Penalty
         @compat new(Float64(λ), Float64(α))
     end
 end
-@inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])
+@inline ∇j(reg::ElasticNetPenalty, β::VecF, i::Int) = 0.0 #reg.λ * (reg.α * sign(β[i]) + (1 - reg.α) * β[i])

@@ -81,7 +81,7 @@ function updatebatch!(o::SGD, x::AMatF, y::AVecF)
 end
 
 #----------------------------------------------------# special update! for lasso
-function update!(o::SGD{L2Regression, L1Penalty}, x::AVecF, y::Float64)
+function update!{M <: SGModel}(o::SGD{M, L1Penalty}, x::AVecF, y::Float64)
     yhat = predict(o, x)
     ε = y - yhat
     γ = weight(o) * o.η
