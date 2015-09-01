@@ -2,18 +2,19 @@
 # Regularized Dual Averaging
 # http://www.jmlr.org/papers/volume11/xiao10a/xiao10a.pdf
 # h(β) = .5 * β'β
+# β_t from the paper is sqrt(nobs(o)) / η here
 
 #--------------------------------------------------------# Type and Constructors
 type RDA{M <: SGModel, P <: Penalty} <: StochasticGradientStat
-    β0::Float64
-    β::VecF
-    intercept::Bool # include intercept?
-    g::VecF        # average gradient
-    model::M
-    penalty::P
-    weighting::StochasticWeighting
-    η::Float64
-    n::Int
+    β0::Float64                     # intercept
+    β::VecF                         # coefficients
+    intercept::Bool                 # include intercept?
+    g::VecF                         # average gradient
+    model::M                        # <: SGModel
+    penalty::P                      # <: Penalty
+    weighting::StochasticWeighting  # Weighting for intercept
+    η::Float64                      # β_t = sqrt(nobs(o)) / o.η
+    n::Int                          # nobs
 end
 
 function RDA(p::Int, wgt::StochasticWeighting = StochasticWeighting();
@@ -36,14 +37,13 @@ function update!(o::RDA, x::AVecF, y::Float64)
     yhat = predict(o, x)
     ε = y - yhat
 
-
-
-    #intercept
+    # update intercept
     if o.intercept
         γ = weight(o)  # only used for intercept
         o.β0 -= γ * ∇f(o.model, ε, 1.0, y, yhat)
     end
 
+    # update the average gradient
     t = nobs(o) / (nobs(o) + 1)
     for j in 1:length(x)
         o.g[j] = t * o.g[j] + (1 - t) * ∇f(o.model, ε, x[j], y, yhat)
@@ -54,9 +54,8 @@ function update!(o::RDA, x::AVecF, y::Float64)
 end
 
 
-
-
 # These functions do the argmin step:
+# TODO: go through the math again, although they all seem to work
 function rda_update!{M <: SGModel}(o::RDA{M, NoPenalty})
     for j in 1:length(o.β)
         o.β[j] = -sqrt(nobs(o)) * o.η * o.g[j]
@@ -79,14 +78,15 @@ function rda_update!{M <: SGModel}(o::RDA{M, L2Penalty})
     end
 end
 
+# TODO: Elastic Net
 
 
 
 
-n, p = 1_000_000, 10
-x = randn(n, p)
-β = vcat(1.:p)
-y = x * β + randn(n)
-
-o = OnlineStats.RDA(x, y, penalty = OnlineStats.L1Penalty(.1))
-println(coef(o))
+# n, p = 1_000_000, 10
+# x = randn(n, p)
+# β = vcat(1.:p)
+# y = x * β + randn(n)
+#
+# o = OnlineStats.RDA(x, y, penalty = OnlineStats.L1Penalty(.1))
+# println(coef(o))
