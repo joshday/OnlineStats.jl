@@ -4,8 +4,6 @@ if VERSION < v"0.4.0-dev"
     using Docile
 end
 
-using Reexport
-@reexport using StatsBase
 using Compat
 
 
@@ -29,6 +27,9 @@ import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vc
 import MultivariateStats
 import ArrayViews: view, rowvec_view
 
+
+using Reexport
+@reexport using StatsBase
 
 #-----------------------------------------------------------------------------#
 # Exports
