@@ -5,7 +5,7 @@ type Adagrad{M <: SGModel, P <: Penalty} <: StochasticGradientStat
     intercept::Bool
     η::Float64  # learning rate
     G0::Float64
-    G::VecF  # Gₜᵢ  = Σ gₛᵢ²   (sum of squared gradients up to time t)
+    G::VecF  # Gᵢ  = Σ gᵢ²   (sum of squared gradients up to time t)
     model::M
     penalty::P
     n::Int
@@ -87,5 +87,54 @@ function updatebatch!(o::Adagrad, x::AMatF, y::AVecF)
             o.β[j] -= o.η * g[j] / sqrt(o.G[j])
         end
     end
+    nothing
+end
+
+
+#----------------------------------------------------# special update! for lasso
+function update!{M <: SGModel}(o::Adagrad{M, L1Penalty}, x::AVecF, y::Float64)
+    yhat = predict(o, x)
+    ε = y - yhat
+
+    # intercept (not penalized)
+    if o.intercept
+        g = ∇f(o.model, ε, 1.0, y, yhat)
+        o.G0 += g^2
+        if o.G0 != 0.0
+            o.β0 -= o.η * g / sqrt(o.G0)
+        end
+    end
+
+    # everything else
+    if nobs(o) <= o.penalty.burnin
+        @inbounds for j in 1:length(x)
+            g = ∇f(o.model, ε, x[j], y, yhat)
+            o.G[j] += g^2
+            γ = o.η / sqrt(o.G[j])
+            βval = o.β[j]
+            u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient
+            v = abs(βval) * (sign(βval) == -1)  # negative coefficient
+            u = max(u - γ * (o.penalty.λ + g), 0.0)
+            v = max(v - γ * (o.penalty.λ - g), 0.0)
+            o.β[j] = u - v
+        end
+    else
+        @inbounds for j in 1:length(x)
+            βval = o.β[j]
+            if βval != 0
+                g = ∇f(o.model, ε, x[j], y, yhat)
+                o.G[j] += g^2
+                γ = o.η / sqrt(o.G[j])
+                βval = o.β[j]
+                u = abs(βval) * (sign(βval) != -1)  # positive/zero coefficient
+                v = abs(βval) * (sign(βval) == -1)  # negative coefficient
+                u = max(u - γ * (o.penalty.λ + g), 0.0)
+                v = max(v - γ * (o.penalty.λ - g), 0.0)
+                o.β[j] = u - v
+            end
+        end
+    end
+
+    o.n += 1
     nothing
 end

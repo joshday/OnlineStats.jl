@@ -203,6 +203,10 @@ facts("Adagrad") do
         @fact coef(o) --> roughly(βtrue, atol = 0.5, rtol = 0.1)
     end
 
+    context("Lasso update") do
+        o = Adagrad(x,y, penalty = L1Penalty(.1))
+    end
+
 
     # context("Vs StreamStats") do
     #     x = randn(n, p)
