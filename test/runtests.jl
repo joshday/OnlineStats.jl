@@ -33,6 +33,7 @@ include("ofls_test.jl")
 include("adagrad_test.jl")
 include("sgd_test.jl")
 include("momentum_test.jl")
+include("rda_test.jl")
 
 include("react_test.jl")
 

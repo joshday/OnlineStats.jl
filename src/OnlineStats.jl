@@ -86,6 +86,7 @@ export
     SGD,
     Momentum,
     Adagrad,
+    RDA,
     L2Regression,
     L1Regression,
     LogisticRegression,
