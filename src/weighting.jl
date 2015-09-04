@@ -64,7 +64,7 @@ type StochasticWeighting <: Weighting
     function StochasticWeighting(r::Float64 = .51, λ::Float64 = 0.)
         @assert r > .0 && r <= 1
         @assert λ >= 0. && λ <= 1.
-        r <= .5 && warn("r <= .5 is only valid for using Polyak/Ruppert Averaging")
+        # r <= .5 && warn("r <= .5 is only valid for using Polyak/Ruppert Averaging")
         new(r, 0, λ)
     end
 end

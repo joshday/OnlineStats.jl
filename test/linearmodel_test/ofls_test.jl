@@ -58,11 +58,11 @@ facts("Test OnlineFLS") do
 
 	@fact size(βhat,1) --> n
 	@fact size(yhat,1) --> n
-	@fact std(fls.xvars) --> roughly(fill(σx,p), atol = 0.5)
+	@fact std(fls.xvars) --> roughly(fill(σx,p), atol = 0.7)
 
 	r2 = 1 - var(y-yhat) / var(y)
 	@fact r2 --> greater_than(0.9)
-	@fact vec(β[n,:]) --> roughly(βhat[end], atol = 0.5)
+	@fact vec(β[n,:]) --> roughly(βhat[end], atol = 0.7)
 
 
 	# # # do a plot of y vs yhat (need to change this to match your plotting package...

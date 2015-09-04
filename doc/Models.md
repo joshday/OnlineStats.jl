@@ -1,6 +1,5 @@
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-- [Adagrad](#adagrad)
 - [Bootstrap](#bootstrap)
 - [CovarianceMatrix](#covariancematrix)
 - [Diff](#diff)
@@ -11,10 +10,9 @@
 - [Mean](#mean)
 - [Means](#means)
 - [Moments](#moments)
-- [Momentum](#momentum)
 - [NormalMix](#normalmix)
 - [Principal Components Analysis (no dedicated type)](#principal-components-analysis-no-dedicated-type)
-- [SGD](#sgd)
+- [SGModel](#sgmodel)
 - [SparseReg](#sparsereg)
 - [StepwiseReg](#stepwisereg)
 - [Summary](#summary)
@@ -28,15 +26,6 @@
 In the given examples, `y` is typically an n by 1 `Vector{Float64}` and `x` is usually an n by p `Matrix{Float64}`.  
 
 Each type has it's own `state` and `statenames` methods.
-
-# Adagrad
-Stochastic adaptive gradient descent for a given model.  See the Stochastic Gradient Methods topic.  Adagrad does not use a weighting scheme as weights are adaptively chosen.
-
-```julia
-o = Adagrad(x, y, model = L1Regression(), penalty = L2Penalty())
-coef(o)
-predict(o, x)
-```
 
 # Bootstrap
 Statistical bootstrap for estimating the variance of an OnlineStat.
@@ -122,15 +111,6 @@ skewness(o)
 kurtosis(o)
 ```
 
-# Momentum
-Stochastic gradient descent with momentum for a given model.  See the Stochastic Gradient Methods topic.
-
-```julia
-o = Momentum(x, y)
-coef(o)
-predict(o, x)
-```
-
 # NormalMix
 Univariate normal mixture via an online EM algorithm.
 
@@ -146,11 +126,13 @@ quantile(o, .8)
 Use `pca(o::CovarianceMatrix, maxoutdim = k)`.  The keyword argument `maxoutdim` specifies
 the top `k` components to return.
 
-# SGD
-Stochastic gradient descent for a given model.  See the Stochastic Gradient Methods topic.
+# SGModel
+See the [Stochastic Gradient Methods](Stochastic Gradient Methods.md) topic.
+This is a powerful type that fits a variety of models using a variety of
+online algorithms.  There are also several regularization options.
 
 ```julia
-o = SGD(x, y, model = L2Regression())
+o = SGModel(x, y, model = L2Regression(), algorithm = RDA(), penalty = L1Penalty(.1))
 coef(o)
 predict(o, x)
 ```

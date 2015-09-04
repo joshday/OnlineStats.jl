@@ -59,7 +59,6 @@ facts("NormalMix") do
 
     context("Online: other") do
         @fact typeof(NormalMix(3).d) <: MixtureModel --> true
-        @fact mean(NormalMix(3)) --> 0.
 
         x = randn(1000)
         o = NormalMix(3, x)

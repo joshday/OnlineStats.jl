@@ -1,16 +1,15 @@
-# Available Models using Stochastic Gradient Descent and Variants
-The interface is standard across the `StochasticGradientStat` types (SGD, Momentum, and Adagrad).  Each takes arguments:
+# Stochastic Gradient Models (`SGModel`)
 
-| argument              | description                                                                                |
-|:----------------------|:-------------------------------------------------------------------------------------------|
-| `x`                   | matrix of predictors                                                                       |
-| `y`                   | response vector                                                                            |
-| `wgt` (optional)      | Weighting scheme. Defaults to `StochasticWeighting(.51)`                                   |
-| `intercept` (keyword) | Should an intercept be included?  Defaults to `true`                                       |
-| `model` (keyword)     | One of the models below.  Defaults to `L2Regression()`                                     |
-| `penalty` (keyword)   | `NoPenalty()` (default), `L1Penalty(λ [, burnin = 100])` (experimental), or `L2Penalty(λ)` |
-| `start` (keyword)     | starting value for β.  Defaults to zeros.                                                  |
-| `η` (keyword)         | constant multiplied to gradient                                                            |
+| argument | description          |
+|:---------|:---------------------|
+| `x`      | matrix of predictors |
+| `y`      | response vector      |
+
+| keyword argument | description                                                      |
+|:-----------------|:-----------------------------------------------------------------|
+| `model`          | one of the ModelDefinition types below, default `L2Regression()` |
+| `penalty`        | type of regularization, default: `NoPenalty()`                   |
+| `algorithm`      | online algorithm used, default: `SGD()`                          |
 
 The model argument specifies both the link function and loss function to be used.  Options are:
 
@@ -33,21 +32,45 @@ The model argument specifies both the link function and loss function to be used
     - Robust regression using Huber loss.
 
 # Penalties/Regularization
-Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.<br>Optional penalties are `L1Penalty(λ [, burnin = 100])` (LASSO) and `L2Penalty(λ)` (Ridge).
+Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.
 
 - `NoPenalty()`
     - No regularization is used.
 
 - `L2Penalty(λ)`  
-    - AKA "Ridge" term:  `loss(β) + sumabs2(β)`
+    - AKA "Ridge" term:  `loss(β) + λ * sumabs2(β)`
 
-- `L1Penalty(λ [, burnin = 100])` (currently only for `SGD`)
-    - AKA "Lasso" term: `loss(β) + sumabs(β)`
-    - Lasso regularization is a great tool for variable selection, as it sets "small" coefficients to 0.  In general, stochastic gradient methods do not succeed at generating a sparse solution.  To fix this, `SGD` will not update a coefficient that has been set to 0 after seeing `burnin` observations.
+- `L1Penalty(λ)`
+    - AKA "LASSO" term: `loss(β) + λ * sumabs(β)`
+    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/Proxgrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` algorithm
 
-# Common Interface
+- `ElasticNetPenalty(λ, α)`
+    - `loss(β) + λ * (α * sumabs(β)` + (1 - α) * sumabs2(β))
+    - That is, elastic net is a weighted average between ridge and lasso.  This is the
+    same parameterization that the popular R package [glmnet](http://www.inside-r.org/packages/cran/glmnet/docs/glmnet) uses.
+    - As for `L1Penalty`, do generate a sparse solution, `RDA` must be the algorithm used.
 
-| method          | details                                        |
+# Algorithms
+
+- `SGD(η = 1.0, r = .5)`  
+    - Stochastic (sub)gradient descent using weights `γ = η * nobs ^ -r`
+    - `η` is a constant step size (> 0)
+    - `r` is a learning rate parameter (between 0 and 1).  Theoretically, unless
+    doing Polyak-Juditsky averaging, this shouldn't be less than 0.5.  A smaller `r`
+    puts more value on new observations.
+
+- `Proxgrad(η = 1.0)`
+    - Proximal Gradient Method w/ ADAGRAD
+    - `η` is a constant step size (> 0)
+    - This is similar to SGD, but weights are automatically determined by ADAGRAD.
+
+- `RDA(η = 1.0)`
+    - Regularized Dual Averaging w/ ADAGRAD
+    - `η` is a constant step size
+
+# Methods
+
+| method          | description                                    |
 |:----------------|:-----------------------------------------------|
 | `state(o)`      | return coefficients and number of observations |
 | `statenames(o)` | names corresponding to `state`: `[:β, :nobs]`  |
@@ -57,22 +80,8 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 ## Examples
 
 ```julia
-# 1) Absolute loss with ridge penalty
-# 2) Quantile regression (same as absolute loss if τ = 0.5)
-# 3) Ordinary least squares with "slow" decay rate (fast learner)
-# 4) Logistic regression with "fast" decay rate (slow learner)
-# 5) Support vector machine
-# 6) Robust regression with Huber loss and Lasso penalty
-
-o = SGD(x, y, model = L1Regression(), penalty = L2Penalty(.1))
-
-o = SGD(x, y, StochasticWeighting(.7), model = QuantileRegression(0.5))
-
-o = Momentum(x, y, StochasticWeighting(.51), model = L2Regression())
-
-o = Momentum(x, y, StochasticWeighting(.9), model = LogisticRegression())
-
-o = Adagrad(x, y, model = SVMLike(), penalty = L2Penalty(.1))
-
-o = Adagrad(x, y, StochasticWeighting(.7), model = HuberRegression(2.0), penalty = L1Penalty(.01))
+o = SGModel(x,y)
+o = SGModel(x,y, penalty = L1Penalty(.1))
+o = SGModel(x, y, algorithm = RDA(), penalty = ElasticNetPenalty(.1, .5))
+o = SGModel(x, y, model = QuantileRegression(.7), algorithm = Proxgrad())
 ```

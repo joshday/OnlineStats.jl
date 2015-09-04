@@ -61,19 +61,19 @@ function estimatedCardinality(o::HyperLogLog)
     if !o.stale
         return o.est
     end
-    
+
     S = 0.0
     for j in 1:o.m
         S += 1 / (2^o.M[j])  # !!!!!!!!!! Is this correct? should it be (2 ^ (-o.M[j]))??
     end
     # Z = 1 / S
-    E = α(o.m) * uint(o.m)^2 / S
+    E = α(o.m) * UInt(o.m)^2 / S
 
     # note: I'm honestly not sure what this does
     if E <= 5//2 * o.m
         V = 0
         for j in 1:o.m
-            V += int(o.M[j] == 0x00000000)
+            V += Int(o.M[j] == 0x00000000)
         end
         if V != 0
             E_star = o.m * log(o.m / V)
@@ -89,7 +89,7 @@ function estimatedCardinality(o::HyperLogLog)
     o.est = E_star
     o.stale = false
     E_star
-end 
+end
 
 
 statenames(o::HyperLogLog) = [:estimatedCardinality, :nobs]
@@ -100,12 +100,12 @@ state(o::HyperLogLog) = Any[estimatedCardinality(o), nobs(o)]
 #---------------------------------------------------------------------# update!
 
 if VERSION < v"0.4.0-"
-    hash32(d::Any) = uint32(hash(d))
+    hash32(d::Any) = Uint32(hash(d))
 else
     hash32(d::Any) = hash(d) % Uint32
 end
 
-ρ(s::Uint32) = uint32(uint32(leading_zeros(s)) + 0x00000001)
+ρ(s::Uint32) = Uint32(Uint32(leading_zeros(s)) + 0x00000001)
 
 function α(m::Uint32)
     if m == 0x00000010
@@ -114,7 +114,7 @@ function α(m::Uint32)
         return 0.697
     elseif m == 0x00000040
         return 0.709
-    else # if m >= uint32(128)
+    else # if m >= Uint32(128)
         return 0.7213 / (1 + 1.079 / m)
     end
 end
@@ -122,7 +122,7 @@ end
 
 function update!(o::HyperLogLog, v::Real)
     x = hash32(v)
-    j = uint32((x & o.mask) + 0x00000001)
+    j = Uint32((x & o.mask) + 0x00000001)
     w = x & o.altmask
     o.M[j] = max(o.M[j], ρ(w))
 
