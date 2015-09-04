@@ -7,31 +7,35 @@ FactCheck.clear_results()
 sev = OnlineStats.log_severity()
 OnlineStats.log_severity!(OnlineStats.ErrorSeverity)  # turn off most logging
 
+include("distributions_test/distribution_test.jl")
+include("distributions_test/normalmix_test.jl")
+
+include("linearmodel_test/linearmodel_test.jl")
+include("linearmodel_test/sweep_test.jl")
+include("linearmodel_test/quantregmm_test.jl")
+include("linearmodel_test/logreg_test.jl")
+include("linearmodel_test/opca_test.jl")
+include("linearmodel_test/ofls_test.jl")
+
+include("summary_test/mean_test.jl")
+include("summary_test/var_test.jl")
+include("summary_test/summary_test.jl")
+include("summary_test/extrema_test.jl")
+include("summary_test/moments_test.jl")
+include("summary_test/fivenumber_test.jl")
+include("summary_test/quantiles_test.jl")
+
+include("multivariate_test/covmatrix_test.jl")
+
+include("streamstats_test/bootstrap_test.jl")
+include("streamstats_test/hyperloglog_test.jl")
+
+include("stochasticgradientmodels_test/sgd_test.jl")
+
 include("common_test.jl")
-include("mean_test.jl")
-include("var_test.jl")
-include("summary_test.jl")
-include("extrema_test.jl")
-include("moments_test.jl")
-include("fivenumber_test.jl")
-include("quantiles_test.jl")
-
-include("linearmodel_test.jl")
-include("sweep_test.jl")
-include("quantregmm_test.jl")
-include("logreg_test.jl")
-
-include("distribution_test.jl")
-include("normalmix_test.jl")
-
-include("covmatrix_test.jl")
-include("opca_test.jl")
-
-
-include("bootstrap_test.jl")
-include("ofls_test.jl")
-
 include("react_test.jl")
+
+
 
 # put logging back the way it was
 OnlineStats.log_severity!(sev)

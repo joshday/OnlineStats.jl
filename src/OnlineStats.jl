@@ -51,7 +51,7 @@ export
     # linearmodel
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
     # stochasticgradientmodels
-    Penalty, L1Penalty, L2Penalty, ElasticNetPenalty,
+    Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty,
     SGModel,
     SGD, Proxgrad, RDA,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike, HuberRegression,
