@@ -37,67 +37,24 @@ using Reexport
 export
     # common types
     OnlineStat,
-    Weighting,
-    EqualWeighting,
-    ExponentialWeighting,
-    StochasticWeighting,
-    BernoulliBootstrap,
-    PoissonBootstrap,
-
-    # OnlineStats
-    Mean,
-    Variance,
-    Moments,
-    Extrema,
-    Summary,
-    QuantileMM,
-    QuantileSGD,
-    FiveNumberSummary,
-    Diff,
-
-    CovarianceMatrix,
-    Means,
-    Variances,
-    Diffs,
-
-    NormalMix,
-    FitBernoulli,
-    FitBeta,
-    FitBinomial,
-    FitCauchy,
-    FitDirichlet,
-    FitExponential,
-    FitGamma,
-    FitLogNormal,
-    FitMultinomial,
-    FitMvNormal,
-    FitNormal,
-    FitPoisson,
-
-    OnlineFLS,
-    LinReg,
-    QuantRegMM,
-    LogRegMM,
-    LogRegSGD2,  # Second-order SGD: This is the "winner" compared to the other two
-    SparseReg,
-    StepwiseReg,
-
-    HyperLogLog,
-    SGD,
-    Momentum,
-    Adagrad,
-    RDA,
-    L2Regression,
-    L1Regression,
-    LogisticRegression,
-    PoissonRegression,
-    SVMLike,
-    QuantileRegression,
-    HuberRegression,
-    L1Penalty,
-    L2Penalty,
-    ElasticNetPenalty,
-    NoPenalty,
+    # weighting
+    Weighting, EqualWeighting, ExponentialWeighting, StochasticWeighting,
+    # ported from streamstats
+    BernoulliBootstrap, PoissonBootstrap, HyperLogLog,
+    # summary
+    Mean, Variance, Moments, Extrema, Summary, QuantileMM, QuantileSGD, FiveNumberSummary, Diff,
+    # multivariate
+    CovarianceMatrix, Means, Variances, Diffs,
+    # DistributionStat
+    NormalMix, FitBernoulli, FitBeta, FitBinomial, FitCauchy, FitDirichlet, FitExponential,
+    FitGamma, FitLogNormal, FitMultinomial, FitMvNormal, FitNormal, FitPoisson,
+    # linearmodel
+    OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
+    # stochasticgradientmodels
+    Penalty, L1Penalty, L2Penalty, ElasticNetPenalty,
+    SGModel,
+    SGD, Proxgrad, RDA,
+    L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike, HuberRegression,
 
     # functions
     update!,               # update one observation at a time using Weighting scheme
@@ -127,6 +84,12 @@ include("weighting.jl")
 
 # Other
 include("common.jl")
+
+# SGModel
+include("stochasticgradientmodels/sgmodel.jl")
+include("stochasticgradientmodels/penalty.jl")
+include("stochasticgradientmodels/sgalgorithm.jl")
+include("stochasticgradientmodels/modeldefinition.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
@@ -162,7 +125,6 @@ include("distributions/offlinenormalmix.jl")
 include("distributions/normalmix.jl")
 include("distributions/poisson.jl")
 
-
 # Linear Model
 include("linearmodel/sweep.jl")
 include("linearmodel/linreg.jl")
@@ -180,13 +142,8 @@ include("glm/logisticregmm.jl")
 include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
-include("streamstats/stochasticgradientmodels.jl")
 include("streamstats/hyperloglog.jl")
-include("streamstats/adagrad.jl")
 include("streamstats/bootstrap.jl")
-include("streamstats/sgd.jl")
-include("streamstats/momentum.jl")
-include("streamstats/rda.jl")
 
 export
     BiasVector,

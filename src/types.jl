@@ -2,8 +2,11 @@
 abstract OnlineStat
 
 abstract DistributionStat <: OnlineStat
-
 abstract StochasticGradientStat <: OnlineStat
+
+abstract Penalty
+abstract ModelDefinition
+abstract SGAlgorithm
 
 
 

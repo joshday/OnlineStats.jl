@@ -6,7 +6,6 @@
 #
 # NOTE 2: X and y are centered/scale, so it is not possible to fit a model without
 # an intercept.
-include("../streamstats/stochasticgradientmodels.jl")  # Get penalty types
 #-------------------------------------------------------# Type and Constructors
 """
 Online Sparse Regression
