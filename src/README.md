@@ -42,18 +42,18 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Negative Multinomial
 
 ## Linear Models
-- [x] OLS: `LinReg`, `SparseReg`, `SGD`, `Adagrad`
-- [x] L1 Loss Regression: `SGD`, `Adagrad`
-- [x] Huber Loss Regression: `SGD`, `Adagrad`
+- [x] OLS: `LinReg`, `SparseReg`, `SGModel`
+- [x] L1 Loss Regression: `SGModel`
+- [x] Huber Loss Regression: `SGModel`
 - [x] Stepwise Regression: `StepwiseReg` (experimental)
 
 ### Penalized Regression
-- [x] LASSO: `SparseReg`, `SGD` (SGD with LASSO is experimental)
-- [x] Ridge: `SparseReg`, `Adagrad`, `SGD`
+- [x] LASSO: `SparseReg`, `SGModel`
+- [x] Ridge: `SparseReg`, `SGModel`
 - [x] Elastic Net: `SparseReg`
 
 ### Quantile Regression
-- [x] Linear Quantile Regression: `QuantRegMM`, `SGD`, `Adagrad`
+- [x] Linear Quantile Regression: `QuantRegMM`, `SGModel`
 - [ ] Composite Linear Quantile Regression:
 
 ### Variance Component Model
@@ -62,10 +62,10 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 
 ## Generalized Linear Models (GLM)
 - [ ] Cox Model
-- [x] Logistic Regression: `LogRegMM`, `SGD`, `Adagrad`
+- [x] Logistic Regression: `LogRegMM`, `SGModel`
 - [ ] Multinomial Logistic Regression
-- [x] Poisson Regression: `SGD`, `Adagrad`
+- [x] Poisson Regression: `SGModel`
 - [ ] Probit Regression
 
 ## Other
-- [x] Support Vector Machine: `SGD`, `Adagrad`
+- [x] Support Vector Machine: `SGModel`
