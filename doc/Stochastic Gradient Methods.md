@@ -50,6 +50,24 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     same parameterization that the popular R package [glmnet](http://www.inside-r.org/packages/cran/glmnet/docs/glmnet) uses.
     - As for `L1Penalty`, do generate a sparse solution, `RDA` must be the algorithm used.
 
+# Algorithms
+
+- `SGD(η = 1.0, r = .5)`  
+    - Stochastic (sub)gradient descent using weights `γ = η * nobs ^ -r`
+    - `η` is a constant step size (> 0)
+    - `r` is a learning rate parameter (between 0 and 1).  Theoretically, unless
+    doing Polyak-Juditsky averaging, this shouldn't be less than 0.5.  A smaller `r`
+    puts more value on new observations.
+
+- `Proxgrad(η = 1.0)`
+    - Proximal Gradient Method w/ ADAGRAD
+    - `η` is a constant step size (> 0)
+    - This is similar to SGD, but weights are automatically determined by ADAGRAD.
+
+- `RDA(η = 1.0)`
+    - Regularized Dual Averaging w/ ADAGRAD
+    - `η` is a constant step size
+
 # Methods
 
 | method          | description                                    |
