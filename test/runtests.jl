@@ -31,6 +31,8 @@ include("streamstats_test/bootstrap_test.jl")
 include("streamstats_test/hyperloglog_test.jl")
 
 include("stochasticgradientmodels_test/sgd_test.jl")
+include("stochasticgradientmodels_test/proxgrad_test.jl")
+include("stochasticgradientmodels_test/rda_test.jl")
 
 include("common_test.jl")
 include("react_test.jl")
