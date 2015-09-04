@@ -1,9 +1,4 @@
-# Stochastic Gradient Models
-
-
-
-# Available Models using Stochastic Gradient Descent and Variants
-The interface is standard across the `StochasticGradientStat` types (SGD, Momentum, and Adagrad).  Each takes arguments:
+# Stochastic Gradient Models (`SGModel`)
 
 | argument | description          |
 |:---------|:---------------------|
