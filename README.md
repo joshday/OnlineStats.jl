@@ -6,7 +6,7 @@
 
 # OnlineStats
 
-Online algorithms for statistics.  See [Implementation Progress](src/README.md)
+**Online algorithms for statistics.**
 
 Install with `Pkg.add("OnlineStats")`
 
