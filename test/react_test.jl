@@ -128,7 +128,7 @@ facts("React") do
     #   tmp2 = update_get!(reg2, x, y)
     #   (y - predict(tmp1, x)), y - predict(tmp2, x)))
     # end
-    # f = @stream ($1,$2) |> (reg1, reg2) |> $2 - predict(_, $1)
+    f = @stream ($1,$2) |> (reg1, reg2) |> $2 - predict(_, $1)
     # # dump(f.code)
 
     for i in 1:length(y)
