@@ -3,7 +3,7 @@
 immutable NoPenalty <: Penalty end
 
 
-# Ridge
+"An L2 (ridge) penalty on the coefficients"
 immutable L2Penalty <: Penalty
     λ::Float64
     function L2Penalty(λ::Real)
@@ -13,7 +13,7 @@ immutable L2Penalty <: Penalty
 end
 
 
-# Lasso
+"An L1 (LASSO) penalty on the coefficients"
 immutable L1Penalty <: Penalty
     λ::Float64
     function L1Penalty(λ::Real)
@@ -23,7 +23,7 @@ immutable L1Penalty <: Penalty
 end
 
 
-# Elastic Net
+"A weighted average of L1 and L2 penalties on the coefficients"
 immutable ElasticNetPenalty <: Penalty
     λ::Float64
     α::Float64

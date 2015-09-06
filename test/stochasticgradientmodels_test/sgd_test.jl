@@ -26,6 +26,8 @@ facts("SGD") do
         o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty())
         predict(o, x)
         @fact length(coef(o)) --> p + 1
+        state(o)
+        @fact statenames(o) --> [:β, :nobs]
 
         o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false)
         @fact length(coef(o)) --> p
