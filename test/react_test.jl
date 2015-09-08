@@ -152,9 +152,9 @@ facts("React") do
     @fact coef(reg2) --> roughly(β, atol = 1.0)
     println(reg2)
 
-    @fact nobs(reg3) --> n
-    @fact coef(reg3) --> roughly(β, atol = 0.4)
-    println(reg3)
+    # @fact nobs(reg3) --> n
+    # @fact coef(reg3) --> roughly(β, atol = 0.4)
+    # println(reg3)
 
     @time begin
       update!(reg1, x, y)
