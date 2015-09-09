@@ -40,10 +40,10 @@ Base.show(io::IO, p::ElasticNetPenalty) = println(io, "  > Penalty:     ElasticN
 
 
 "Smoothly Clipped Absolute Devation penalty on the coefficients"
-immutable SCADPenalty <: Penalty 
+immutable SCADPenalty <: Penalty
     λ::Float64
     a::Float64
-    function SCADPenalty(λ::Real, a::Real)
+    function SCADPenalty(λ::Real, a::Real = 3.7)  # 3.7 is what Fan and Li use
         @assert λ >= 0
         @assert a > 2
         @compat new(Float64(λ), Float64(a))

@@ -34,6 +34,13 @@ end
 @inline add∇j(x::Float64, p::L2Penalty, β::VecF, i::Int) = x + p.λ * β[i]
 @inline add∇j(x::Float64, p::L1Penalty, β::VecF, i::Int) = x + p.λ * sign(β[i])
 @inline add∇j(x::Float64, p::ElasticNetPenalty, β::VecF, i::Int) = x + p.λ * (p.α * sign(β[i]) + (1 - p.α) * β[i])
+@inline function add∇j(x::Float64, p::SCADPenalty, β::VecF, i::Int)
+    if abs(β[i]) < p.λ
+        x + sign(β[i]) * p.λ
+    else
+        x + max(p.a * p.λ - abs(β[i]), 0.0) / (p.a - 1.0)
+    end
+end
 
 #---------------------------------------------------------------------# Proxgrad
 # θ_t = argmin(η * g'θ + η * J(θ) + B_ψ(θ, θ_t))  where  ψ = .5 * θ' * H * θ
