@@ -36,6 +36,7 @@ end
 StatsBase.coef(o::SGModel) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
 StatsBase.predict(o::SGModel, x::AVecF) = predict(o.model, x, o.β, o.β0)
 StatsBase.predict(o::SGModel, X::AMatF) = predict(o.model, X, o.β, o.β0)
+classify(o::SGModel, X::AMatF) = classify(o.model, X, o.β, o.β0)
 
 statenames(o::SGModel) = [:β, :nobs]
 state(o::SGModel) = Any[coef(o), nobs(o)]
