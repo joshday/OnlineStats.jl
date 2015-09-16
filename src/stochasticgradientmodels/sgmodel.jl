@@ -46,6 +46,7 @@ function Base.show(io::IO, o::SGModel)
     println(io, "  > Algorithm:   ", typeof(o.algorithm))
     println(io, "  > Model:       ", typeof(o.model))
     println(io, "  > Intercept:   ", o.intercept ? "Yes" : "No")
+    println(io, "  > nobs:        ", o.n)
     show(io, o.penalty)
     println(io, "  > β: ", StatsBase.coef(o))
 end
