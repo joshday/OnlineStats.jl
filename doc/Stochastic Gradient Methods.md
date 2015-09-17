@@ -22,6 +22,10 @@ The model argument specifies both the link function and loss function to be used
 - `LogisticRegression()`
     - Maximizes the logistic regression loglikelihood.
 
+- `PoissonRegression`
+    - Maximizes the poisson regression loglikelihood.
+    - This is unstable with SGD.  It is recommended you use Proxgrad or RDA.
+
 - `QuantileRegression(τ)`
     - Predict the conditional τ-th quantile of `y` given `X`
 
