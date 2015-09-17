@@ -54,7 +54,8 @@ export
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty,
     SGModel,
     SGD, Proxgrad, RDA,
-    L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike, HuberRegression,
+    L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike,
+    HuberRegression, PoissonRegression,
 
     # functions
     update!,               # update one observation at a time using Weighting scheme

@@ -8,7 +8,9 @@ type LogRegMM{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function LogRegMM(p::Integer, wgt::Weighting = StochasticWeighting(); start = zeros(p))
+function LogRegMM(p::Integer, wgt::Weighting = StochasticWeighting();
+        start = zeros(p)
+    )
     LogRegMM(start, zeros(p), zeros(p, p), zeros(p), 0, wgt)
 end
 

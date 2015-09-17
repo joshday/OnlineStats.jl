@@ -13,12 +13,18 @@ immutable L1Regression <: ModelDefinition end
 @inline ∇f(::L1Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 
 
-"Minimize the negative loglikelihood of a logistic regression model.  For data in {0, 1}. "
+"Maximize the loglikelihood of a logistic regression model.  For data in {0.0, 1.0}. "
 immutable LogisticRegression <: ModelDefinition end  # Logistic regression needs y in {0, 1}
 @inline StatsBase.predict(::LogisticRegression, x::AVecF, β::VecF, β0::Float64) = 1.0 / (1.0 + exp(-dot(x, β) - β0))
 @inline StatsBase.predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) = 1.0 ./ (1.0 + exp(-X * β - β0))
 @inline ∇f(::LogisticRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
+
+"Maximize the loglikelihood of a poisson regresison model.  "
+immutable PoissonRegression <: ModelDefinition end
+@inline StatsBase.predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
+@inline StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
+@inline ∇f(::PoissonRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 "Minimize the quantile loss function for the given `τ`"
 immutable QuantileRegression <: ModelDefinition
@@ -33,7 +39,7 @@ end
 @inline ∇f(model::QuantileRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = ((ϵᵢ < 0) - model.τ) * xᵢ
 
 
-"`penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty(λ)` is a support vector machine.  For data in {-1, 1}.  "
+"`penalty = NoPenalty` is a Perceptron.  `penalty = L2Penalty(λ)` is a support vector machine.  For data in {-1.0, 1.0}.  "
 immutable SVMLike <: ModelDefinition end  # SVM needs y in {-1, 1}
 @inline StatsBase.predict(::SVMLike, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
 @inline StatsBase.predict(::SVMLike, X::AMatF, β::VecF, β0::Float64) = X * β + β0
