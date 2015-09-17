@@ -79,42 +79,41 @@ facts("React") do
   end
 
   context("Regression") do
-    # n, p = 1_000_000, 5;
-    # x = randn(n, p);
-    # β = collect(1.:p);
-    # y = x * β + randn(n)*10;
+    n, p = 1_000_000, 5;
+    x = randn(n, p);
+    β = collect(1.:p);
+    y = x * β + randn(n)*10;
 
-    # Commenting out for now while restructuring stochastic graident models
-    # reg = Adagrad(p, intercept = false)
-    #
-    # # note here... the update! method of Adagrad takes an x and y arg, so there
-    # # should be a 2-item tuple on the left hand side of the pipe
-    # # $1 refers to the first arg (x) and $2 refers to the second (y)
-    # f = @stream ($1,$2) |> reg
-    #
-    # for i in 1:length(y)
-    #   f(row(x,i), y[i])
-    # end
-    # @fact nobs(reg) --> n
-    # @fact coef(reg) --> roughly(β, atol = 0.4)
-    # println(reg)
-    #
-    # @time update!(reg, x, y)
-    # @time for i in 1:length(y)
-    #   f(row(x,i), y[i])
-    # end
+    reg = SGModel(p, intercept = false, algorithm = Proxgrad())
+
+    # note here... the update! method of SGModel takes an x and y arg, so there
+    # should be a 2-item tuple on the left hand side of the pipe
+    # $1 refers to the first arg (x) and $2 refers to the second (y)
+    f = @stream ($1,$2) |> reg
+
+    for i in 1:length(y)
+      f(row(x,i), y[i])
+    end
+    @fact nobs(reg) --> n
+    @fact coef(reg) --> roughly(β, atol = 0.4)
+    println(reg)
+
+    @time update!(reg, x, y)
+    @time for i in 1:length(y)
+      f(row(x,i), y[i])
+    end
   end
 
 
   context("Mapping pipe and currying") do
-    # n, p = 1_000_000, 5;
-    # x = randn(n, p);
-    # β = collect(1.:p);
-    # y = x * β + randn(n)*10;
+    n, p = 1_000_000, 5;
+    x = randn(n, p);
+    β = collect(1.:p);
+    y = x * β + randn(n)*10;
 
-    # reg1 = Adagrad(p, intercept = false)
-    # reg2 = SGD(p, intercept = false)
-    # reg3 = LinReg(p)
+    reg1 = SGModel(p, intercept = false, algorithm = Proxgrad())
+    reg2 = SGModel(p, intercept = false, algorithm = SGD())
+    reg3 = LinReg(p)
 
     # there are a few things to note here:
     #   1) when there is a tuple on the rhs of the pipe, it will return a block... one expression per rhs item
@@ -129,41 +128,41 @@ facts("React") do
     #   tmp2 = update_get!(reg2, x, y)
     #   (y - predict(tmp1, x)), y - predict(tmp2, x)))
     # end
-    # f = @stream ($1,$2) |> (reg1, reg2) |> $2 - predict(_, $1)
+    f = @stream ($1,$2) |> (reg1, reg2) |> $2 - predict(_, $1)
     # # dump(f.code)
-    #
-    # for i in 1:length(y)
-    #   outval = f(row(x,i), y[i])
-    #
-    #   if i == length(y)
-    #     @fact typeof(outval) --> @compat Tuple{Float64, Float64}
-    #     @fact abs(outval[2] - outval[1]) --> roughly(0.0, atol = 1.0)
-    #     # @fact abs(outval[3] - outval[1]) --> roughly(0.0, atol = 0.1)
-    #     println("outval: ", outval)
-    #
-    #     println(@code_typed f(row(x,i),y[i]))
-    #   end
-    # end
-    #
-    # @fact nobs(reg1) --> n
-    # @fact coef(reg1) --> roughly(β, atol = 1.0)
-    # println(reg1)
-    #
-    # @fact nobs(reg2) --> n
-    # @fact coef(reg2) --> roughly(β, atol = 1.0)
-    # println(reg2)
+
+    for i in 1:length(y)
+      outval = f(row(x,i), y[i])
+
+      if i == length(y)
+        @fact typeof(outval) --> @compat Tuple{Float64, Float64}
+        @fact abs(outval[2] - outval[1]) --> roughly(0.0, atol = 1.0)
+        # @fact abs(outval[3] - outval[1]) --> roughly(0.0, atol = 0.1)
+        println("outval: ", outval)
+
+        println(@code_typed f(row(x,i),y[i]))
+      end
+    end
+
+    @fact nobs(reg1) --> n
+    @fact coef(reg1) --> roughly(β, atol = 1.0)
+    println(reg1)
+
+    @fact nobs(reg2) --> n
+    @fact coef(reg2) --> roughly(β, atol = 1.0)
+    println(reg2)
 
     # @fact nobs(reg3) --> n
     # @fact coef(reg3) --> roughly(β, atol = 0.4)
     # println(reg3)
 
-    # @time begin
-    #   update!(reg1, x, y)
-    #   update!(reg2, x, y)
-    # end
-    # @time for i in 1:length(y)
-    #   f(row(x,i), y[i])
-    # end
+    @time begin
+      update!(reg1, x, y)
+      update!(reg2, x, y)
+    end
+    @time for i in 1:length(y)
+      f(row(x,i), y[i])
+    end
 
   end
 

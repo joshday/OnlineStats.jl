@@ -36,6 +36,7 @@ end
 StatsBase.coef(o::SGModel) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
 StatsBase.predict(o::SGModel, x::AVecF) = predict(o.model, x, o.β, o.β0)
 StatsBase.predict(o::SGModel, X::AMatF) = predict(o.model, X, o.β, o.β0)
+classify(o::SGModel, X::AMatF) = classify(o.model, X, o.β, o.β0)
 
 statenames(o::SGModel) = [:β, :nobs]
 state(o::SGModel) = Any[coef(o), nobs(o)]
@@ -45,6 +46,7 @@ function Base.show(io::IO, o::SGModel)
     println(io, "  > Algorithm:   ", typeof(o.algorithm))
     println(io, "  > Model:       ", typeof(o.model))
     println(io, "  > Intercept:   ", o.intercept ? "Yes" : "No")
+    println(io, "  > nobs:        ", o.n)
     show(io, o.penalty)
     println(io, "  > β: ", StatsBase.coef(o))
 end

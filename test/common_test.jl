@@ -3,6 +3,25 @@ module CommonTest
 using OnlineStats, FactCheck, Distributions, ArrayViews
 
 facts("Common") do
+    context("Show and print methods") do
+        print_with_color(:blue, "Output here is messy for the sake of getting coverage for show and print\n")
+        x = rand(100)
+        o = Mean(x)
+        show(o); print(o); print([o, o]);
+        @fact OnlineStats.name(o) --> string(typeof(o))
+        b = BernoulliBootstrap(o, mean)
+        show(b)
+
+        x1 = randn(100)
+        o = distributionfit(Normal, x1)
+        show(o);
+        show(NoPenalty())
+        show(L1Penalty(.1))
+        show(L2Penalty(.1))
+        show(ElasticNetPenalty(.1, .5))
+        show(SGModel(10))
+    end
+
     context("Helper Functions") do
         n, p = rand(20:100, 2)
         x = rand(n, p)
@@ -55,20 +74,6 @@ facts("Common") do
         o = Mean()
         ovec = tracefit!(o, 5, randn(100))
         @fact nobs(ovec[end]) --> 100
-    end
-
-    context("Show and print methods") do
-        print_with_color(:blue, "Output here is messy for the sake of getting coverage for show and print\n")
-        x = rand(100)
-        o = Mean(x)
-        show(o); print(o); print([o, o]);
-        @fact OnlineStats.name(o) --> string(typeof(o))
-        b = BernoulliBootstrap(o, mean)
-        show(b)
-
-        x1 = randn(100)
-        o = distributionfit(Normal, x1)
-        show(o);
     end
 
     context("Show DistributionStat") do

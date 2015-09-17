@@ -3,6 +3,7 @@ alg(o) = o.algorithm
 pen(o) = o.penalty
 
 #--------------------------------------------------------------------------# SGD
+"Stochastic (Sub)Gradient Descent"
 immutable SGD <: SGAlgorithm   # step size is γ = η * nobs ^ -r
     η::Float64
     r::Float64
@@ -33,10 +34,17 @@ end
 @inline add∇j(x::Float64, p::L2Penalty, β::VecF, i::Int) = x + p.λ * β[i]
 @inline add∇j(x::Float64, p::L1Penalty, β::VecF, i::Int) = x + p.λ * sign(β[i])
 @inline add∇j(x::Float64, p::ElasticNetPenalty, β::VecF, i::Int) = x + p.λ * (p.α * sign(β[i]) + (1 - p.α) * β[i])
+@inline function add∇j(x::Float64, p::SCADPenalty, β::VecF, i::Int)
+    if abs(β[i]) < p.λ
+        x + sign(β[i]) * p.λ
+    else
+        x + max(p.a * p.λ - abs(β[i]), 0.0) / (p.a - 1.0)
+    end
+end
 
 #---------------------------------------------------------------------# Proxgrad
-# Proximal Gradient with Adagrad
 # θ_t = argmin(η * g'θ + η * J(θ) + B_ψ(θ, θ_t))  where  ψ = .5 * θ' * H * θ
+"Proximal Gradient Method with ADAGRAD weights"
 type Proxgrad <: SGAlgorithm
     G0::Float64     # sum of squared gradients for intercept
     G::VecF         # sum of squared gradients for everything else
@@ -100,7 +108,7 @@ end
 
 
 #--------------------------------------------------------------------------# RDA
-# Regularized Dual Averaging with Adagrad
+"Regularized Dual Averaging with ADAGRAD weights"
 type RDA <: SGAlgorithm
     G0::Float64     # sum of squared gradients for intercept
     G::VecF         # sum of squared gradients for everything else

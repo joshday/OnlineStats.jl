@@ -1,9 +1,10 @@
 #----------------------------------------------------------------------# Penalty
-# None
+"No penalty on the coefficients"
 immutable NoPenalty <: Penalty end
+Base.show(io::IO, p::NoPenalty) = println(io, "  > Penalty:     NoPenalty")
 
 
-# Ridge
+"An L2 (ridge) penalty on the coefficients"
 immutable L2Penalty <: Penalty
     λ::Float64
     function L2Penalty(λ::Real)
@@ -11,9 +12,10 @@ immutable L2Penalty <: Penalty
         @compat new(Float64(λ))
     end
 end
+Base.show(io::IO, p::L2Penalty) = println(io, "  > Penalty:     L2Penalty, λ = ", p.λ)
 
 
-# Lasso
+"An L1 (LASSO) penalty on the coefficients"
 immutable L1Penalty <: Penalty
     λ::Float64
     function L1Penalty(λ::Real)
@@ -21,9 +23,10 @@ immutable L1Penalty <: Penalty
         new(@compat Float64(λ))
     end
 end
+Base.show(io::IO, p::L1Penalty) = println(io, "  > Penalty:     L1Penalty, λ = ", p.λ)
 
 
-# Elastic Net
+"A weighted average of L1 and L2 penalties on the coefficients"
 immutable ElasticNetPenalty <: Penalty
     λ::Float64
     α::Float64
@@ -33,9 +36,17 @@ immutable ElasticNetPenalty <: Penalty
         @compat new(Float64(λ), Float64(α))
     end
 end
-
-
-Base.show(io::IO, p::NoPenalty) = println(io, "  > Penalty:     NoPenalty")
-Base.show(io::IO, p::L2Penalty) = println(io, "  > Penalty:     L2Penalty, λ = ", p.λ)
-Base.show(io::IO, p::L1Penalty) = println(io, "  > Penalty:     L1Penalty, λ = ", p.λ)
 Base.show(io::IO, p::ElasticNetPenalty) = println(io, "  > Penalty:     ElasticNetPenalty, λ = ", p.λ, ", α = ", p.α)
+
+
+"Smoothly Clipped Absolute Devation penalty on the coefficients"
+immutable SCADPenalty <: Penalty
+    λ::Float64
+    a::Float64
+    function SCADPenalty(λ::Real, a::Real = 3.7)  # 3.7 is what Fan and Li use
+        @assert λ >= 0
+        @assert a > 2
+        @compat new(Float64(λ), Float64(a))
+    end
+end
+Base.show(io::IO, p::SCADPenalty) = println(io, "  > Penalty:     SCADPenalty, λ = ", p.λ, ", a = ", p.a)

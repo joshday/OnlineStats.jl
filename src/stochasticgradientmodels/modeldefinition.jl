@@ -17,6 +17,7 @@ immutable L1Regression <: ModelDefinition end
 immutable LogisticRegression <: ModelDefinition end  # Logistic regression needs y in {0, 1}
 @inline StatsBase.predict(::LogisticRegression, x::AVecF, β::VecF, β0::Float64) = 1.0 / (1.0 + exp(-dot(x, β) - β0))
 @inline StatsBase.predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) = 1.0 ./ (1.0 + exp(-X * β - β0))
+classify(m::LogisticRegression, X::AMatF, β::VecF, β0::Float64) = convert(Vector{Int}, X*β + β0 .> 0)
 @inline ∇f(::LogisticRegression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ * xᵢ
 
 
@@ -43,6 +44,7 @@ end
 immutable SVMLike <: ModelDefinition end  # SVM needs y in {-1, 1}
 @inline StatsBase.predict(::SVMLike, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
 @inline StatsBase.predict(::SVMLike, X::AMatF, β::VecF, β0::Float64) = X * β + β0
+classify(m::SVMLike, X::AMatF, β::VecF, β0::Float64) = 2 * (predict(m, X, β, β0) .> 0) - 1
 @inline ∇f(::SVMLike, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ * xᵢ : 0.0
 
 

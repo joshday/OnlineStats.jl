@@ -1,3 +1,6 @@
+[![OnlineStats](http://pkg.julialang.org/badges/OnlineStats_0.3.svg)](http://pkg.julialang.org/?pkg=OnlineStats&ver=0.3)
+[![OnlineStats](http://pkg.julialang.org/badges/OnlineStats_0.4.svg)](http://pkg.julialang.org/?pkg=OnlineStats&ver=0.4)
+
 [![Build Status](https://travis-ci.org/joshday/OnlineStats.jl.svg)](https://travis-ci.org/joshday/OnlineStats.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/x2t1ey2sgbmow1a4/branch/master?svg=true)](https://ci.appveyor.com/project/joshday/onlinestats-jl/branch/master)
 [![Coverage Status](https://coveralls.io/repos/joshday/OnlineStats.jl/badge.svg?branch=josh)](https://coveralls.io/r/joshday/OnlineStats.jl?branch=josh)
@@ -6,7 +9,7 @@
 
 # OnlineStats
 
-Online algorithms for statistics.  See [Implementation Progress](src/README.md)
+**Online algorithms for statistics.**
 
 Install with `Pkg.add("OnlineStats")`
 

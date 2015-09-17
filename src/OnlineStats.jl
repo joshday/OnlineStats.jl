@@ -143,7 +143,7 @@ include("glm/logisticregmm.jl")
 include("quantileregression/quantregmm.jl")
 
 # ported from StreamStats
-# include("streamstats/hyperloglog.jl")
+include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
 
 export

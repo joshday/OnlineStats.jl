@@ -49,10 +49,10 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/Proxgrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` algorithm
 
 - `ElasticNetPenalty(λ, α)`
-    - `loss(β) + λ * (α * sumabs(β)` + (1 - α) * sumabs2(β))
+    - `loss(β) + λ * (α * sumabs(β) + (1 - α) * sumabs2(β))`
     - That is, elastic net is a weighted average between ridge and lasso.  This is the
     same parameterization that the popular R package [glmnet](http://www.inside-r.org/packages/cran/glmnet/docs/glmnet) uses.
-    - As for `L1Penalty`, do generate a sparse solution, `RDA` must be the algorithm used.
+    - As for `L1Penalty`, to generate a sparse solution, `RDA` must be the algorithm used.
 
 # Algorithms
 

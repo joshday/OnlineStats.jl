@@ -2,3 +2,5 @@
 
 #coveralls files
 *.cov
+
+*.ipynb
