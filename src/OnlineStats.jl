@@ -9,9 +9,10 @@ using Compat
 
 import Distributions
 import Distributions:
-    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal, Multinomial,
-    MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
-    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution
+    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal,
+    Multinomial, MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
+    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
+    probs, components, logpdf, pdf, cdf, skewness, kurtosis
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
@@ -20,6 +21,7 @@ import ArrayViews: view, rowvec_view
 
 using Reexport
 @reexport using StatsBase
+
 
 #-----------------------------------------------------------------------------#
 # Exports

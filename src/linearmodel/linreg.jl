@@ -66,7 +66,7 @@ function StatsBase.coeftable(o::LinReg)
     p = length(β)
     se = stderr(o)
     ts = β ./ se
-    CoefTable([β se ts ccdf(FDist(1, nobs(o) - p), abs2(ts))],
+    CoefTable([β se ts Distributions.ccdf(FDist(1, nobs(o) - p), abs2(ts))],
               ["Estimate","Std.Error","t value", "Pr(>|t|)"],
               ["x$i" for i = 1:p], 4)
 end
