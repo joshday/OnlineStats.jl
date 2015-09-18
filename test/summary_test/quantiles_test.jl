@@ -52,4 +52,12 @@ facts("Quantiles") do
 
         QuantileMM(0.)
     end
+
+    context("QuantileSort") do
+        o = QuantileSort()
+        o = QuantileSort(rand(100_000))
+        statenames(o)
+        state(o)
+        quantile(o, 50)
+    end
 end
