@@ -7,6 +7,7 @@ facts("Common") do
         print_with_color(:blue, "Output here is messy for the sake of getting coverage for show and print\n")
         x = rand(100)
         o = Mean(x)
+        value(o)
         show(o); print(o); print([o, o]);
         @fact OnlineStats.name(o) --> string(typeof(o))
         b = BernoulliBootstrap(o, mean)

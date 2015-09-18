@@ -17,7 +17,7 @@ Mean(wgt::Weighting = default(Weighting)) = Mean(0., 0, wgt)
 
 
 #-----------------------------------------------------------------------# state
-
+value(o::Mean) = mean(o)
 statenames(o::Mean) = [:μ, :nobs]
 state(o::Mean) = Any[mean(o), nobs(o)]
 

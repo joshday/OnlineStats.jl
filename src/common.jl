@@ -3,6 +3,15 @@
 "The number of observations"
 nobs(o::OnlineStat) = o.n
 
+"Value of the parameter of interest"
+value(o::OnlineStat) = "not implemented"
+
+"Current state of the model"
+state(o::OnlineStat) = Any[value(o), nobs(o)]
+
+"Corresponding names to `state`"
+statenames(o::OnlineStat) = [:value, :nobs]
+
 """
 `update!(o, data...)`
 
