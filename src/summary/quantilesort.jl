@@ -1,10 +1,7 @@
-#-------------------------------------------------------# Type and Constructors
 """
-QuantileSort takes the means of order statistics for samples of size 101.
-The idea is that the 51st order statistic is unbiased(?) for the median since it
-has half of the values above it and half of the values below it.
+QuantileSort
 
-This needs some theoretical justification.
+Experimental biased quantiles
 """
 type QuantileSort <: OnlineStat
     vals::VecF
@@ -31,6 +28,8 @@ function update!(o::QuantileSort, y::Float64)
 end
 
 #-----------------------------------------------------------------------# state
-statenames(o::QuantileSort) = [:quantiles, :nobs]
+statenames(o::QuantileSort) = [:median, :nobs]
 state(o::QuantileSort) = Any[mean(o.means)[50], nobs(o)]
+
+"Get quantile `q/100`"
 Base.quantile(o::QuantileSort, q::Int) = mean(o.means)[q + 1]
