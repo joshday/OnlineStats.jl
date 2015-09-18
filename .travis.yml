@@ -5,7 +5,6 @@ os:
 julia:
   - release
   - 0.4
-  - nightly
 notifications:
   email: true
 script:
