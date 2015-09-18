@@ -42,7 +42,7 @@ export
     # ported from streamstats
     BernoulliBootstrap, PoissonBootstrap, HyperLogLog,
     # summary
-    Mean, Variance, Moments, Extrema, Summary, QuantileMM, QuantileSGD, FiveNumberSummary, Diff,
+    Mean, Variance, Moments, Extrema, Summary, QuantileMM, QuantileSGD, FiveNumberSummary, Diff, QuantileSort,
     # multivariate
     CovarianceMatrix, Means, Variances, Diffs,
     # DistributionStat
@@ -106,6 +106,7 @@ include("summary/diff.jl")
 # Multivariate
 include("multivariate/covmatrix.jl")
 include("multivariate/means.jl")
+include("summary/quantilesort.jl")
 include("multivariate/vars.jl")
 include("multivariate/diffs.jl")
 

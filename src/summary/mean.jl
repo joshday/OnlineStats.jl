@@ -1,4 +1,3 @@
-
 #-------------------------------------------------------# Type and Constructors
 "Univariate mean."
 type Mean{W <: Weighting} <: OnlineStat
@@ -31,8 +30,8 @@ uncenter(o::Mean, y::Float64) = y + mean(o)
 
 #---------------------------------------------------------------------# update!
 
-function update!(o::Mean, y::Float64)
-    o.μ = smooth(o.μ, y, weight(o))
+function update!(o::Mean, y::Float64, γ::Float64 = weight(o))
+    o.μ = smooth(o.μ, y, γ)
     o.n += 1
     return
 end
@@ -41,6 +40,7 @@ function updatebatch!(o::Mean, y::AVecF)
     n2 = length(y)
     o.μ = smooth(o.μ, mean(y), weight(o, n2))
     o.n += n2
+    return
 end
 
 #------------------------------------------------------------------------# Base
