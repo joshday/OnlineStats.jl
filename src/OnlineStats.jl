@@ -63,7 +63,6 @@ export
     distributionfit,       # easy constructor syntax for FitDist types
     onlinefit!,            # run through data updating with mini batches
     tracefit!,             # return vector, each element is OnlineStat after updating with minibatch
-    value,                 # value of the parameter estimate
     state,                 # get state of object, typically Any[value, nobs(o)]
     statenames,            # corresponding names to state()
     weighting,             # get the Weighting of an object
