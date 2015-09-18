@@ -9,19 +9,9 @@ using Compat
 
 import Distributions
 import Distributions:
-    # Distributions
     Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal, Multinomial,
     MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
-
-    # Other
-    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
-
-    # Methods for DistributionStat
-    pdf, cdf, logpdf, loglikelihood, probs, components, params, succprob,
-    failprob, scale, location, shape, rate, ncategories, ntrials, dof,
-    mode, modes, skewness, kurtosis, isplatykurtic, ismesokurtic,
-    entropy, mgf, cf, insupport, logcdf, ccdf,
-    logccdf, quantile, cquantile, invlogcdf, invlogccdf, rand, rand!, median
+    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
