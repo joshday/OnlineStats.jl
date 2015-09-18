@@ -16,6 +16,13 @@ function logisticdata(n, p)
     (β, x, y)
 end
 
+function poissondata(n, p)
+    x = randn(n, p)
+    β = (collect(1:p) - .5*p) / p
+    y = @compat Float64[rand(Poisson(exp(η))) for η in x*β]
+    (β, x, y)
+end
+
 facts("RDA") do
     n, p = 100_000, 20
     β, x, y = linearmodeldata(n, p)
@@ -126,6 +133,28 @@ facts("RDA") do
     end
     context("ElasticNetPenalty") do
         o = SGModel(x, y, model = LogisticRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = RDA())
+        predict(o, x)
+    end
+
+
+
+    β, x, y = poissondata(n, p)
+    ########################################################## PoissonRegression
+    print_with_color(:blue, " * PoissonRegression * \n")
+    context("NoPenalty") do
+        o = SGModel(x, y, model = PoissonRegression(), penalty = NoPenalty(), algorithm = RDA())
+        predict(o, x)
+    end
+    context("L1Penalty") do
+        o = SGModel(x, y, model = PoissonRegression(), penalty = L1Penalty(.1), algorithm = RDA())
+        predict(o, x)
+    end
+    context("L2Penalty") do
+        o = SGModel(x, y, model = PoissonRegression(), penalty = L2Penalty(.1), algorithm = RDA())
+        predict(o, x)
+    end
+    context("ElasticNetPenalty") do
+        o = SGModel(x, y, model = PoissonRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = RDA())
         predict(o, x)
     end
 
