@@ -28,6 +28,7 @@ end
 
 #----------------------------------------------------------------------# update!
 function update!(o::ShermanMorrisonInverse, u::AVecF)
+    # This looks hacky, but avoids A LOT of memory allocation
     p = length(u)
     γ = weight(o)
     δ = 1.0 / (1.0 - γ)
