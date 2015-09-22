@@ -10,7 +10,8 @@ end
 
 Diff() = Diff(0.0, 0.0, 0)
 Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), 0)
-Diff{T<:Real}(x::Union(T,AVec{T})) = (o = Diff(T); update!(o, x); o)
+Diff{T<:Real}(x::T) = (o = Diff(T); update!(o, x); o)
+Diff{T<:Real}(x::AVec{T}) = (o = Diff(T); update!(o, x); o)
 
 statenames(o::Diff) = [:diff, :last, :nobs]
 state(o::Diff) = Any[diff(o), last(o), nobs(o)]
@@ -39,4 +40,3 @@ function Base.empty!{T<:Real}(o::Diff{T})
     o.n = 0
     return
 end
-

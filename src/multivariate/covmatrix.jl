@@ -30,7 +30,7 @@ state(o::CovarianceMatrix) = Any[mean(o), cov(o), o.n]
 Perform principal components analysis of the data provided to the `CovarianceMatrix`
 object `o` using the correlation matrix (`corr = true`) or covariance matrix.
 
-The keyword argument `maxoutdim` defines the number of components to return.
+The keyword argument `maxoutdim` specifies the number of components to return.
 """
 function pca(o::CovarianceMatrix, corr::Bool = true; keyargs...)
     if corr
