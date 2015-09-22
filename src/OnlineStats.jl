@@ -119,6 +119,9 @@ include("distributions/offlinenormalmix.jl")
 include("distributions/normalmix.jl")
 include("distributions/poisson.jl")
 
+# Matrix
+include("matrix/sherman_morrison.jl")
+
 # Linear Model
 include("linearmodel/sweep.jl")
 include("linearmodel/linreg.jl")
