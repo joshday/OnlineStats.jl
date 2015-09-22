@@ -40,6 +40,8 @@ export
     # DistributionStat
     NormalMix, FitBernoulli, FitBeta, FitBinomial, FitCauchy, FitDirichlet, FitExponential,
     FitGamma, FitLogNormal, FitMultinomial, FitMvNormal, FitNormal, FitPoisson,
+    # matrix
+    ShermanMorrisonInverse,
     # linearmodel
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
     # stochasticgradientmodels

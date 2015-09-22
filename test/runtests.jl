@@ -10,6 +10,8 @@ OnlineStats.log_severity!(OnlineStats.ErrorSeverity)  # turn off most logging
 include("distributions_test/distribution_test.jl")
 include("distributions_test/normalmix_test.jl")
 
+include("matrix_test/matrix_test.jl")
+
 include("linearmodel_test/linearmodel_test.jl")
 include("linearmodel_test/sweep_test.jl")
 include("linearmodel_test/quantregmm_test.jl")
