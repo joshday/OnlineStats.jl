@@ -32,17 +32,33 @@ This plots the coefficients of a stochastic gradient descent model
 function traceplot{O <: OnlineStat}(v::Vector{O}, f::Function)
     mat = vecvec_to_mat(Vector[f(vi) for vi in v])
     nvec = Int[nobs(vi) for vi in v]
-    plt = Plots.plot(nvec, mat)
+    plt = Plots.plot(nvec, mat, xlab = "nobs", ylab = "Function: " * string(f))
 end
 
+
+# """
+# Update a Plot and an OnlineStat.
+#
+# `update_plot!(p, o, f, args...)`
+#
+# Update Plot `p` with OnlineStat `o` by calling `f(o)` after updating `o` with `data...`
+# """
+# function update_plot!(p::Plots.Plot, o::OnlineStat, data...)
+#     update!(o, data...)
+#     Plots.plot!(p, nobs(o), coef(o))
+# end
 
 
 
 # TEST
-# n, p = 1_000_000, 5
-# x = randn(n, p)
-# β = vcat(1:p) - p/2
-# y = x*β + randn(n)
-# o = OnlineStats.SGModel(p)
-# v = OnlineStats.tracefit!(o, 1000, x, y)
-# OnlineStats.traceplot(v, coef)
+if false
+    n, p = 5_000, 5
+    x = randn(n, p)
+    β = vcat(1:p) - p/2
+    y = x*β + randn(n)
+    o = OnlineStats.SGModel(p)
+    v = OnlineStats.tracefit!(o, 1000, x, y)
+    p = OnlineStats.traceplot(v, coef)
+
+    OnlineStats.update_plot!(p, o, x, y)
+end

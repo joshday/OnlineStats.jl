@@ -1,6 +1,6 @@
 module PlotTest
 
-using OnlineStats, StatsBase, Plots
+using OnlineStats, StatsBase, Plots, FactCheck
 
 facts("Plotting") do
     context("traceplot") do
