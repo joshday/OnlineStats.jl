@@ -10,7 +10,7 @@ type SGModelCV <: OnlineStat
     o_h::SGModel    # high
     decay::Float64  # decay rate for λ
     function SGModelCV(o::SGModel; decay = .7)
-        @assert decay > 0
+        @assert 0 < decay <= 1
         new(o, copy(o), copy(o), decay)
     end
 end
@@ -21,10 +21,8 @@ function updateλ!{A <: SGAlgorithm, M <: ModelDefinition}(
         o::SGModel{A, M, NoPenalty},
         o_l::SGModel{A, M, NoPenalty},
         o_h::SGModel{A, M, NoPenalty},
-        x::AVecF, y::Float64)
+        x::AVecF, y::Float64, decay::Float64)
     update!(o, x, y)
-    update!(o_l, x, y)
-    update!(o_h, x, y)
 end
 
 # L2Penalty and L1Penalty
