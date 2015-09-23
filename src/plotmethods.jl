@@ -36,20 +36,6 @@ function traceplot{O <: OnlineStat}(v::Vector{O}, f::Function)
 end
 
 
-# """
-# Update a Plot and an OnlineStat.
-#
-# `update_plot!(p, o, f, args...)`
-#
-# Update Plot `p` with OnlineStat `o` by calling `f(o)` after updating `o` with `data...`
-# """
-# function update_plot!(p::Plots.Plot, o::OnlineStat, data...)
-#     update!(o, data...)
-#     Plots.plot!(p, nobs(o), coef(o))
-# end
-
-
-
 # TEST
 if false
     n, p = 5_000, 5

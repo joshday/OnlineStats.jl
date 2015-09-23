@@ -1,8 +1,10 @@
 #----------------------------------------------------------------------# Penalty
+Base.copy(p::Penalty) = deepcopy(p)
+penalty(o::SGModel) = copy(o.penalty)
+
 "No penalty on the coefficients"
 immutable NoPenalty <: Penalty end
 Base.show(io::IO, p::NoPenalty) = println(io, "  > Penalty:     NoPenalty")
-
 
 "An L2 (ridge) penalty on the coefficients"
 type L2Penalty <: Penalty

@@ -71,6 +71,7 @@ include("log.jl")
 # Common Types
 include("types.jl")
 include("weighting.jl")
+include("plotmethods.jl")
 
 # Other
 include("common.jl")
@@ -80,6 +81,7 @@ include("stochasticgradientmodels/sgmodel.jl")
 include("stochasticgradientmodels/penalty.jl")
 include("stochasticgradientmodels/sgalgorithm.jl")
 include("stochasticgradientmodels/modeldefinition.jl")
+include("stochasticgradientmodels/crossvalidate.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
@@ -140,8 +142,6 @@ include("quantileregression/quantregmm.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
 
-# plot methods
-include("plotmethods.jl")
 
 export
     BiasVector,
