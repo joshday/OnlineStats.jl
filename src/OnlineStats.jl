@@ -124,7 +124,7 @@ include("distributions/poisson.jl")
 
 # Matrix
 include("matrix/sherman_morrison.jl")
-include("matrix/cholesky.jl")
+# include("matrix/cholesky.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
