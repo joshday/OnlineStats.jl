@@ -36,6 +36,9 @@ function traceplot{O <: OnlineStat}(v::Vector{O}, f::Function)
 end
 
 
+
+
+
 # TEST
 if false
     n, p = 5_000, 5
@@ -45,6 +48,4 @@ if false
     o = OnlineStats.SGModel(p)
     v = OnlineStats.tracefit!(o, 1000, x, y)
     p = OnlineStats.traceplot(v, coef)
-
-    OnlineStats.update_plot!(p, o, x, y)
 end

@@ -1,15 +1,22 @@
 #--------------------------------------------------------# Type and Constructors
 """
-Fit an SGModel using an automated tuning procedure.
+Automatically tune the penalty parameter for an SGModel
 
+`SGModelTune(o::SGModel; decay = .7)`
 
+Each call to `update!(o::SGModelTune, x, y)` updates the penalty parameter λ by
+choosing the parameter which provides the best prediction on `y`:
+
+- `λ - 1 / nobs(o) ^ decay`
+- `λ`
+- `λ + 1 / nobs(o) ^ decay`
 """
-type SGModelCV <: OnlineStat
+type SGModelTune <: StochasticGradientStat
     o::SGModel
     o_l::SGModel    # low
     o_h::SGModel    # high
     decay::Float64  # decay rate for λ
-    function SGModelCV(o::SGModel; decay = .7)
+    function SGModelTune(o::SGModel; decay = .7)
         @assert 0 < decay <= 1
         new(o, copy(o), copy(o), decay)
     end
@@ -56,20 +63,20 @@ function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64,
     end
 end
 
-function update!(o::SGModelCV, x::AVecF, y::Float64)
+function update!(o::SGModelTune, x::AVecF, y::Float64)
     updateλ!(o.o, o.o_l, o.o_h, x, y, o.decay)
 end
 
 
 #------------------------------------------------------------------------# state
-statenames(o::SGModelCV) = [:β, :penalty, :nobs]
-state(o::SGModelCV) = Any[coef(o), copy(o.o.penalty), nobs(o)]
-whatisλ(o::SGModelCV) = o.o.penalty.λ
+statenames(o::SGModelTune) = [:β, :penalty, :nobs]
+state(o::SGModelTune) = Any[coef(o), copy(o.o.penalty), nobs(o)]
+whatisλ(o::SGModelTune) = o.o.penalty.λ
 
-StatsBase.coef(o::SGModelCV) = coef(o.o)
-StatsBase.nobs(o::SGModelCV) = nobs(o.o)
+StatsBase.coef(o::SGModelTune) = coef(o.o)
+StatsBase.nobs(o::SGModelTune) = nobs(o.o)
 
-function Base.show(io::IO, o::SGModelCV)
+function Base.show(io::IO, o::SGModelTune)
     println(io, "Cross-Validated SGModel:")
     show(o.o)
 end
@@ -88,7 +95,7 @@ if false
     β,x,y = linearmodeldata(n,p)
 
     o = OnlineStats.SGModel(p, penalty = OnlineStats.L2Penalty(.1), algorithm = OnlineStats.RDA())
-    ocv = OnlineStats.SGModelCV(o, decay = .9)
+    ocv = OnlineStats.SGModelTune(o, decay = .9)
     v = OnlineStats.tracefit!(ocv, 100, x, y)
     OnlineStats.traceplot(v, x -> vcat(OnlineStats.whatisλ(x)))
 end

@@ -40,7 +40,7 @@ export
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
     # stochasticgradientmodels
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty,
-    SGModel, SGModelCV,
+    SGModel, SGModelTune,
     SGD, Proxgrad, RDA,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike,
     HuberRegression, PoissonRegression,
@@ -81,7 +81,7 @@ include("stochasticgradientmodels/sgmodel.jl")
 include("stochasticgradientmodels/penalty.jl")
 include("stochasticgradientmodels/sgalgorithm.jl")
 include("stochasticgradientmodels/modeldefinition.jl")
-include("stochasticgradientmodels/crossvalidate.jl")
+include("stochasticgradientmodels/sgmodeltune.jl")
 
 # Summary Statistics
 include("summary/mean.jl")

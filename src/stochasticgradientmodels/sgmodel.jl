@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------# SGModel
-type SGModel{A <: SGAlgorithm, M <: ModelDefinition, P <: Penalty} <: OnlineStats.OnlineStat
+type SGModel{A <: SGAlgorithm, M <: ModelDefinition, P <: Penalty} <: StochasticGradientStat
     β0::Float64
     β::VecF
     intercept::Bool
