@@ -116,7 +116,7 @@ ncols(M::AbstractArray) = size(M,2)
 
 # TODO: use my "fmt" method in Formatting.jl if/when the PR is merged
 # temporary fix for the "how to print" problem... lets come up with something nicer
-mystring(f::FloatingPoint) = @sprintf("%f", f)
+mystring(f::AbstractFloat) = @sprintf("%f", f)
 mystring(x) = string(x)
 
 

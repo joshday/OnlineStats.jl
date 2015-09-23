@@ -32,7 +32,7 @@ function HyperLogLog(b::Integer)
 
     m = 0x00000001 << b
 
-    M = zeros(Uint32, m)
+    M = zeros(UInt32, m)
 
     mask = 0x00000000
     for i in 1:(b - 1)
@@ -105,16 +105,16 @@ else
     hash32(d::Any) = hash(d) % @compat UInt32
 end
 
-ρ(s::Uint32) = Uint32(Uint32(leading_zeros(s)) + 0x00000001)
+ρ(s::UInt32) = UInt32(UInt32(leading_zeros(s)) + 0x00000001)
 
-function α(m::Uint32)
+function α(m::UInt32)
     if m == 0x00000010
         return 0.673
     elseif m == 0x00000020
         return 0.697
     elseif m == 0x00000040
         return 0.709
-    else # if m >= Uint32(128)
+    else # if m >= UInt32(128)
         return 0.7213 / (1 + 1.079 / m)
     end
 end

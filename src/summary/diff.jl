@@ -18,7 +18,7 @@ state(o::Diff) = Any[diff(o), last(o), nobs(o)]
 Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
 
-function update!{T<:FloatingPoint}(o::Diff{T}, x::Real)
+function update!{T<:AbstractFloat}(o::Diff{T}, x::Real)
     v = convert(T, x)
     o.diff = (o.n == 0 ? zero(T) : v - last(o))
     o.lastval = v
