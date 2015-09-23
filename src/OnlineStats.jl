@@ -1,8 +1,8 @@
 module OnlineStats
 
-if VERSION < v"0.4.0-dev"
-    using Docile
-end
+VERSION < v"0.4.0-dev" && using Docile
+VERSION >= v"0.4.0-dev" && import Plots
+
 
 using Compat
 
@@ -17,7 +17,6 @@ import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean,
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
-import Plots
 
 
 using Reexport
@@ -66,7 +65,7 @@ export
     estimatedCardinality,
     pca,                    # Get top d principal components from CovarianceMatrix
     replicates,             # Get vector of replicates from <: Bootstrap
-    traceplot               # plot the history from Vector{OnlineStat} and 
+    traceplot               # plot the history from Vector{OnlineStat} and
 
 
 #-----------------------------------------------------------------------------#
@@ -148,7 +147,7 @@ include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
 
 # plot methods
-include("plotmethods.jl")
+VERSION >= v"0.4.0-dev" && include("plotmethods.jl")
 
 export
     BiasVector,
