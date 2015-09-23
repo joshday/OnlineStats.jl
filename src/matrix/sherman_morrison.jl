@@ -32,26 +32,22 @@ function update!(o::ShermanMorrisonInverse, u::AVecF)
     p = length(u)
     γ = weight(o)
     δ = 1.0 / (1.0 - γ)
-    for j in 1:p  # o.v = o.A * u
-        o.v[j] = dot(row(o.A, j), u)
+
+    # v = A * u
+    fill!(o.v, 0.0)
+    for j in 1:p, i in 1:p
+        o.v[i] += o.A[i, j] * u[j]
     end
-    for j in 1:p, i in 1:p # o.A *= δ
-        o.A[i, j] *= δ
+
+    # update A
+    γ2 = γ / (δ + γ * dot(o.v, u))
+    for j in 1:p, i in 1:p
+        o.A[i, j] = o.A[i, j] * δ - γ2 * o.v[i] * o.v[j]
     end
-    denom = δ + γ * dot(o.v, u)
-    BLAS.syr!('L', -γ / denom, o.v, o.A)
     o.n += 1
-    for j in 2:p, i in 1:j
-        o.A[i,j] = o.A[j, i]
-    end
 end
 
 #------------------------------------------------------------------------# state
 statenames(o::ShermanMorrisonInverse) = [:Ainv, :nobs]
 state(o::ShermanMorrisonInverse) = Any[copy(o.A), nobs(o)]
 Base.inv(o::ShermanMorrisonInverse) = o.A
-
-# function Base.show(io::IO, o::ShermanMorrisonInverse)
-#     println(io, "ShermanMorrisonInverse")
-#     println(io, o.A)
-# end
