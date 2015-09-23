@@ -17,6 +17,7 @@ import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean,
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
+import Plots
 
 
 using Reexport
@@ -41,7 +42,7 @@ export
     NormalMix, FitBernoulli, FitBeta, FitBinomial, FitCauchy, FitDirichlet, FitExponential,
     FitGamma, FitLogNormal, FitMultinomial, FitMvNormal, FitNormal, FitPoisson,
     # matrix
-    ShermanMorrisonInverse,
+    ShermanMorrisonInverse, OnlineCholesky,
     # linearmodel
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
     # stochasticgradientmodels
@@ -52,19 +53,20 @@ export
     HuberRegression, PoissonRegression,
 
     # functions
-    update!,               # update one observation at a time using Weighting scheme
-    updatebatch!,          # update by batch, giving each observation equal weight
-    distributionfit,       # easy constructor syntax for FitDist types
-    onlinefit!,            # run through data updating with mini batches
-    tracefit!,             # return vector, each element is OnlineStat after updating with minibatch
-    state,                 # get state of object, typically Any[value, nobs(o)]
-    statenames,            # corresponding names to state()
-    weighting,             # get the Weighting of an object
-    em,                    # Offline EM algorithm for Normal Mixtures
-    sweep!,                # Symmetric sweep operator
+    update!,                # update one observation at a time using Weighting scheme
+    updatebatch!,           # update by batch, giving each observation equal weight
+    distributionfit,        # easy constructor syntax for FitDist types
+    onlinefit!,             # run through data updating with mini batches
+    tracefit!,              # return vector, each element is OnlineStat after updating with minibatch
+    state,                  # get state of object, typically Any[value, nobs(o)]
+    statenames,             # corresponding names to state()
+    weighting,              # get the Weighting of an object
+    em,                     # Offline EM algorithm for Normal Mixtures
+    sweep!,                 # Symmetric sweep operator
     estimatedCardinality,
-    pca,                   # Get top d principal components from CovarianceMatrix
-    replicates             # Get vector of replicates from <: Bootstrap
+    pca,                    # Get top d principal components from CovarianceMatrix
+    replicates,             # Get vector of replicates from <: Bootstrap
+    traceplot               # plot the history from Vector{OnlineStat} and 
 
 
 #-----------------------------------------------------------------------------#
@@ -123,6 +125,7 @@ include("distributions/poisson.jl")
 
 # Matrix
 include("matrix/sherman_morrison.jl")
+include("matrix/cholesky.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
@@ -143,6 +146,9 @@ include("quantileregression/quantregmm.jl")
 # ported from StreamStats
 include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
+
+# plot methods
+include("plotmethods.jl")
 
 export
     BiasVector,
