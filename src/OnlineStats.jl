@@ -1,12 +1,5 @@
 module OnlineStats
 
-VERSION < v"0.4.0-dev" && using Docile
-VERSION >= v"0.4.0-dev" && import Plots
-
-
-using Compat
-
-
 import Distributions
 import Distributions:
     Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal,
@@ -17,8 +10,9 @@ import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean,
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
+import Plots
 
-
+using Compat
 using Reexport
 @reexport using StatsBase
 
@@ -124,7 +118,7 @@ include("distributions/poisson.jl")
 
 # Matrix
 include("matrix/sherman_morrison.jl")
-# include("matrix/cholesky.jl")
+include("matrix/cholesky.jl")
 
 # Linear Model
 include("linearmodel/sweep.jl")
@@ -147,7 +141,7 @@ include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
 
 # plot methods
-VERSION >= v"0.4.0-dev" && include("plotmethods.jl")
+include("plotmethods.jl")
 
 export
     BiasVector,

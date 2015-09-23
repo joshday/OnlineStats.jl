@@ -10,10 +10,7 @@ facts("Plotting") do
         y = x*β + randn(n)
         o = OnlineStats.SGModel(p)
         v = OnlineStats.tracefit!(o, 1000, x, y)
-        
-        if VERSION >= v"0.4.0-dev"
-            OnlineStats.traceplot(v, coef)
-        end
+        OnlineStats.traceplot(v, coef)
     end
 end
 end #module

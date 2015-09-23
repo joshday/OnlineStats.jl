@@ -1,3 +1,5 @@
+import Plots
+
 "Convert a Vector of equal-length Vectors to a Matrix"
 function vecvec_to_mat(x::Vector{Vector})
     n = length(x)

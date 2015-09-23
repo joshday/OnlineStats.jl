@@ -10,5 +10,8 @@ facts("Matrix Updates") do
         state(o)
         inv(o)
     end
+
+    context("Cholesky") do
+    end
 end
 end # module
