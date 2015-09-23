@@ -30,7 +30,7 @@ include("summary_test/quantiles_test.jl")
 include("multivariate_test/covmatrix_test.jl")
 
 include("streamstats_test/bootstrap_test.jl")
-# include("streamstats_test/hyperloglog_test.jl")
+include("streamstats_test/hyperloglog_test.jl")
 
 include("stochasticgradientmodels_test/sgd_test.jl")
 include("stochasticgradientmodels_test/proxgrad_test.jl")
