@@ -98,7 +98,7 @@ Use `pca(o::CovarianceMatrix, maxoutdim = k)`.  The keyword argument `maxoutdim`
 the top `k` components to return.
 
 # SGModel
-See the [Stochastic Gradient Methods](Stochastic Gradient Methods.md) topic.
+See the [Stochastic Gradient Methods](SGModel.md) topic.
 This is a powerful type that fits a variety of models using a variety of
 online algorithms.  There are also several regularization options.
 
