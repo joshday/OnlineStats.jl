@@ -1,6 +1,5 @@
 #----------------------------------------------------------------------# Penalty
 Base.copy(p::Penalty) = deepcopy(p)
-penalty(o::SGModel) = copy(o.penalty)
 
 "No penalty on the coefficients"
 immutable NoPenalty <: Penalty end
