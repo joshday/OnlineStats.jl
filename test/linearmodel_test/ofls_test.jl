@@ -1,8 +1,7 @@
 
 module OFLSTest
 
-using OnlineStats
-using FactCheck
+using OnlineStats, FactCheck, StatsBase
 
 # using Qwt
 
@@ -64,6 +63,14 @@ facts("Test OnlineFLS") do
 	@fact r2 --> greater_than(0.9)
 	@fact vec(β[n,:]) --> roughly(βhat[end], atol = 0.7)
 
+	o = OnlineFLS(x, y)
+	o = OnlineFLS(vec(x[1,:]), y[1])
+	statenames(o)
+	state(o)
+	predict(o, x)
+	predict(o, vec(x[1,:]))
+
+	empty!(o)
 
 	# # # do a plot of y vs yhat (need to change this to match your plotting package...
 	# # # I have a custom plotting package that is not currently open source, but may be eventually)

@@ -80,7 +80,6 @@ statenames(o::OnlineFLS) = [:βn, :β, :yvar, :xvars, :σε, :yhat, :nobs]
 state(o::OnlineFLS) = Any[copy(o.β), o.β * std(o.yvar) ./ if0then1(std(o.xvars)), copy(o.yvar), copy(o.xvars), std(o.Vε), o.yhat, nobs(o)]
 
 βn(o::OnlineFLS) = o.β
-Base.beta(o::OnlineFLS) = coef(o)
 StatsBase.coef(o::OnlineFLS) = (o.β * std(o.yvar)) ./ if0then1(std(o.xvars))
 
 #---------------------------------------------------------------------# update!
@@ -88,12 +87,12 @@ StatsBase.coef(o::OnlineFLS) = (o.β * std(o.yvar)) ./ if0then1(std(o.xvars))
 
 # NOTE: assumes x mat is (T x p), where T is the number of observations
 # TODO: optimize
-function update!(o::OnlineFLS, x::AMatF, y::AVecF)
-	@assert length(y) == size(x,1)
-	for i in length(y)
-		update!(o, row(x,i), y[i])
-	end
-end
+# function update!(o::OnlineFLS, x::AMatF, y::AVecF)
+# 	@assert length(y) == size(x,1)
+# 	for i in length(y)
+# 		update!(o, row(x,i), y[i])
+# 	end
+# end
 
 function update!(o::OnlineFLS, x::AVecF, y::Real)
 
@@ -144,19 +143,19 @@ function Base.empty!(o::OnlineFLS)
 	o.K = zeros(p)
 	o.yhat = 0.
 end
-
-function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
-	error("not implemented")
-end
-
-
-function StatsBase.coeftable(o::OnlineFLS)
-	error("not implemented")
-end
-
-function StatsBase.confint(o::OnlineFLS, level::Real = 0.95)
-	error("not implemented")
-end
+# 
+# function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
+# 	error("not implemented")
+# end
+#
+#
+# function StatsBase.coeftable(o::OnlineFLS)
+# 	error("not implemented")
+# end
+#
+# function StatsBase.confint(o::OnlineFLS, level::Real = 0.95)
+# 	error("not implemented")
+# end
 
 # predicts yₜ for a given xₜ
 function StatsBase.predict(o::OnlineFLS, x::AVecF)
@@ -172,7 +171,3 @@ function StatsBase.predict(o::OnlineFLS, x::AMatF)
 	end
 	pred
 end
-
-
-
-

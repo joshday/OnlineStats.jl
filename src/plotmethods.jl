@@ -55,4 +55,7 @@ if false
     y = 3.0 + x*β + randn(n)
     o = OnlineStats.SGModel(p, algorithm = OnlineStats.RDA(η = .1))
     OnlineStats.traceplot!(o, 1000, x, y)
+
+    o = OnlineStats.Mean()
+    OnlineStats.traceplot!(o, 1000, y)
 end
