@@ -59,7 +59,7 @@ export
     estimatedCardinality,
     pca,                    # Get top d principal components from CovarianceMatrix
     replicates,             # Get vector of replicates from <: Bootstrap
-    traceplot               # plot the history from Vector{OnlineStat} and
+    traceplot!              # update OnlineStat and plot its history
 
 
 #-----------------------------------------------------------------------------#

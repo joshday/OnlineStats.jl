@@ -37,8 +37,10 @@ end
 @inline function add∇j(x::Float64, p::SCADPenalty, β::VecF, i::Int)
     if abs(β[i]) < p.λ
         x + sign(β[i]) * p.λ
-    else
+    elseif abs(β[i]) < p.a * p.λ
         x + max(p.a * p.λ - abs(β[i]), 0.0) / (p.a - 1.0)
+    else
+        x
     end
 end
 
@@ -103,6 +105,12 @@ end
     s = o.β[j] - alg(o).η * (g + pen(o).λ * (1 - pen(o).α) * o.β[j]) * h
     o.β[j] = sign(s) * max(abs(s) - pen(o).λ * pen(o).α * alg(o).η * h, 0.0)
 end
+
+# SCADPenalty
+# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L1Penalty}, g::Float64, j::Int)
+#     h = 1.0 / (alg(o).δ + sqrt(alg(o).G[j]))
+#     s = o.β[j] - alg(o).η * g * h
+# end
 
 
 

@@ -40,6 +40,7 @@ end
 Base.show(io::IO, p::ElasticNetPenalty) = println(io, "  > Penalty:     ElasticNetPenalty, λ = ", p.λ, ", α = ", p.α)
 
 
+# http://www.pstat.ucsb.edu/student%20seminar%20doc/SCAD%20Jian%20Shi.pdf
 "Smoothly Clipped Absolute Devation penalty on the coefficients"
 type SCADPenalty <: Penalty
     λ::Float64

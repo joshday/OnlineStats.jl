@@ -40,7 +40,9 @@ function traceplot!(o::OnlineStat, b::Integer, data...;
     v = tracefit!(o, b, data...)
     mat = vecvec_to_mat(Vector[collect(f(vi)) for vi in v])
     nvec = Int[nobs(vi) for vi in v]
-    plt = Plots.plot(nvec, mat, xlab = "nobs", ylab = "Function: " * string(f))
+    plt = Plots.plot(nvec, mat, xlab = "nobs", ylab = "value",
+        title = "Trace Plot of " * string(typeof(o)) * ", b = $b, with function " * string(f) * "()"
+    )
 end
 
 
@@ -50,7 +52,7 @@ if false
     n, p = 50_000, 5
     x = randn(n, p)
     β = vcat(1:p) - p/2
-    y = x*β + randn(n)
-    o = OnlineStats.SGModel(p, algorithm = OnlineStats.Proxgrad())
+    y = 3.0 + x*β + randn(n)
+    o = OnlineStats.SGModel(p, algorithm = OnlineStats.RDA(η = .1))
     OnlineStats.traceplot!(o, 1000, x, y)
 end
