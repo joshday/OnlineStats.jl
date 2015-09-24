@@ -1,0 +1,65 @@
+/* Give the main header an underline. */
+h1 {
+  padding-bottom: 21px;
+  margin-bottom: 21px;
+  border-bottom: 1px solid #DDD;
+}
+
+/* Make the inline code blocks look like the paragraph-level ones. */
+*:not(pre) > code {
+  color: #333;
+  background-color: #F5F5F5;
+  padding: 1px 3px;
+  border: 1px solid #CCC;
+}
+
+/* Don't double up on the border for inline code inside admonitions. */
+.admonition code {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Fix links containing inline code. */
+a > code {
+  color: #008CBA !important;
+}
+
+a > code:hover,
+a > code:focus {
+  color: #00526E !important;
+}
+
+/* Reduce the padding for code blocks. */
+pre {
+  padding: 4px;
+}
+
+/* Style the admonitions. */
+.admonition {
+  border: 1px solid #CCC;
+  background-color: #F5F5F5;
+  padding: 8px;
+  margin-bottom: 20px;
+}
+
+.admonition-title {
+  font-weight: bold;
+  float: left;
+  margin-right: 1ch;
+  margin-bottom: 0;
+}
+
+.admonition-title::after {
+  content: ':';
+}
+
+.admonition p:last-child {
+  margin-bottom: 0;
+}
+
+/* Add small subtitles. */
+.subtitle {
+  margin-top: -10.5px;
+  color: #BBB;
+}

@@ -1,0 +1,19 @@
+site_name: OnlineStats.jl
+site_description: Online algorithms for statistics in Julia
+site_author: Josh Day
+repo_url: https://github.com/joshday/OnlineStats.jl
+theme: mkdocs
+
+extra_javascript:
+    - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
+    - mathjaxhelper.js
+
+markdown_extensions:
+    - mdx_math
+
+pages:
+    - 'Introduction': 'index.md'
+    - 'Models':
+        - 'Models': 'Models/Models.md'
+        - 'Examples': 'Models/Examples.md'
+    - 'Visualization': 'Plotting.md'
