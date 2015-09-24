@@ -1,8 +1,8 @@
-# Description
+# Introduction
 
 **OnlineStats** is a Julia package which provides online algorithms for statistical models.  Observations are processed one at a time and all **algorithms use O(1) memory**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  For machine learning (predictive modeling) applications, online algorithms provide fast approximate solutions for when training time is a bottleneck.
 
-# Getting Started
+# Overview
 
 <h3>Every statistic/model is a type</h3>
 
@@ -29,7 +29,7 @@ nobs(o)  # Number of observations = 223
 <h3>Models use a  Common Interface</h3>
 
 
-| method                                     | Description                                                                        | Return               |
+| function                                   | Description                                                                        | Return               |
 |:-------------------------------------------|:-----------------------------------------------------------------------------------|:---------------------|
 | `state(o)`                                 | State of the estimate                                                              | `Vector{Any}`        |
 | `statenames(o)`                            | Names corresponding to `state(o)`                                                  | `Vector{Symbol}`     |
@@ -42,16 +42,16 @@ nobs(o)  # Number of observations = 223
 
 
 # Weighting Schemes
-When creating an OnlineStat, one can specify the weighting to be used (with the exception of `SGModel`, which has its own weighting system.  Updating a model typically involves one of two forms:
+When creating an OnlineStat, one can specify the weighting to be used (with the exception of `SGModel`, which has its own weighting system).  Updating a model typically involves one of two forms:
 
 - weighted average (equivalent forms shown below):
 
-$$\theta^{(t+1)} = (1 - \gamma)\theta^{(t)} + \gamma \theta_{\text{new}}$$
-$$\theta^{(t+1)} = \theta^{(t)} + \gamma(\theta_{\text{new}} - \theta^{(t)})$$
+$$\theta^{(t+1)} = (1 - \gamma_t)\theta^{(t)} + \gamma_t \theta_{\text{new}}$$
+$$\theta^{(t+1)} = \theta^{(t)} + \gamma_t(\theta_{\text{new}} - \theta^{(t)})$$
 
 - stochastic gradient-based:  
 
-$$\theta^{(t+1)} = \theta^{(t)} - \gamma g_{t+1}$$
+$$\theta^{(t+1)} = \theta^{(t)} - \gamma_t g_{t+1}$$
 
 The following schemes are supported for determining weights:
 

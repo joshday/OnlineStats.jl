@@ -16,4 +16,5 @@ pages:
     - 'Models':
         - 'Models': 'Models/Models.md'
         - 'Examples': 'Models/Examples.md'
+        - 'Stochastic Gradient Models': 'Models/SGModel.md'
     - 'Visualization': 'Plotting.md'
