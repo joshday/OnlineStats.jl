@@ -1,4 +1,4 @@
-# Stochastic Gradient Models
+# Stochastic (Sub)gradient Models
 
 The `SGModel` type is a framework for fitting a wide variety of models that are based on stochastic estimates of a (sub)gradient.  An `SGModel` is defined by three things:
 
@@ -77,7 +77,7 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     puts more value on new observations.
 
 - `Proxgrad(η = 1.0)`
-    - Proximal Gradient Method w/ ADAGRAD
+    - Stochastic Proximal Subradient Method w/ ADAGRAD
     - `η` is a constant step size (> 0)
     - This is similar to SGD, but weights are automatically determined by ADAGRAD.
 

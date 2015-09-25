@@ -1,3 +1,29 @@
+
+<!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Bootstrap](#bootstrap)
+- [CovarianceMatrix](#covariancematrix)
+- [Diff](#diff)
+- [Diffs](#diffs)
+- [FiveNumberSummary](#fivenumbersummary)
+- [HyperLogLog](#hyperloglog)
+- [LinReg](#linreg)
+- [Mean](#mean)
+- [Means](#means)
+- [Moments](#moments)
+- [NormalMix](#normalmix)
+- [Principal Components Analysis (no dedicated type)](#principal-components-analysis-no-dedicated-type)
+- [SGModel](#sgmodel)
+- [SparseReg](#sparsereg)
+- [StepwiseReg](#stepwisereg)
+- [Summary](#summary)
+- [QuantileMM](#quantilemm)
+- [QuantRegMM](#quantregmm)
+- [Variance](#variance)
+- [Variances](#variances)
+- [Fitting a Parametric Distribution](#fitting-a-parametric-distribution)
+<!-- /TOC -->
+
 # Bootstrap
 Statistical bootstrap for estimating the variance of an OnlineStat.
 

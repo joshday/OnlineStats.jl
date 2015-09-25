@@ -1,3 +1,6 @@
+# TODO: Minimax Concave Penalty
+# http://arxiv.org/pdf/1002.4734.pdf
+
 #----------------------------------------------------------------------# Penalty
 Base.copy(p::Penalty) = deepcopy(p)
 
@@ -63,9 +66,9 @@ Base.show(io::IO, p::SCADPenalty) = println(io, "  > Penalty:     SCADPenalty, �
         if βj < p.λ
             val += p.λ * βj
         elseif βj < p.λ * p.a
-            val -= 0.5 * (βj^2 - p.a * p.λ * βj + p.λ^2) / (p.a - 1.0)
+            val -= 0.5 * (βj^2 - 2.0 * p.a * p.λ * βj + p.λ^2) / (p.a - 1.0)
         else
-            val += 0.5 * (p.a + 1) * p.λ^2
+            val += 0.5 * (p.a + 1.0) * p.λ^2
         end
     end
     return val

@@ -37,8 +37,8 @@ nobs(o)  # Number of observations = 223
 | `update!(o, data...)`                      | Update model with respect to the weighting scheme                                  |                      |
 | `updatebatch!(o, data...)`                 | Minibatch update.  Available for types that benefit from minibatch updates         |                      |
 | `onlinefit!(o, b, data...; batch = false)` | update `o` with batches of size `b`.  `batch = false`  calls `update!(o, data...)` |                      |
-| `tracefit!(o, b, data...; batch = false)`  | call `onlinefit` and save historical objects at every `b` observations             | `Vector{OnlineStat}` |
-| `traceplot!(o, b, data...)`                | call `onlinefit` and create a trace plot of the estimate                           |                      |
+| `tracefit!(o, b, data...; batch = false)`  | call `onlinefit!` and save historical objects at every `b` observations            | `Vector{OnlineStat}` |
+| `traceplot!(o, b, data...)`                | call `onlinefit!` and create a trace plot of the estimate                          |                      |
 
 
 # Weighting Schemes
@@ -70,3 +70,61 @@ Use equal weighting until the step size reaches `λ = 1/n`, then hold constant.
 - `StochasticWeighting(r::Float64)`
 
 Use weight `γ = number_of_updates ^ -r` where `r` $\in (.5, 1]$.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
+
+
+# What OnlineStats Can Do
+
+<h3> Summary Statistics </h3>
+|                       |                                                                                      |
+|:----------------------|:-------------------------------------------------------------------------------------|
+| five number summary   | `FiveNumberSummary`                                                                  |
+| maximum/minimum       | `Extrema`                                                                            |
+| mean                  | `Mean`, `Means`                                                                      |
+| quantiles             | `QuantileMM`, `QuantileSGD`                                                          |
+| skewness and kurtosis | `Moments`                                                                            |
+| variance              | `Variance`, `Variances`, bootstrapping with `BernoulliBootstrap`, `PoissonBootstrap` |
+
+
+<h3> Linear Models and Predictive Modeling </h3>
+
+|                                   |                              |
+|:----------------------------------|:-----------------------------|
+| L1 Regression                     | `SGModel`                    |
+| linear regression                 | `LinReg`, `SGModel`          |
+| logistic regression               | `SGModel`, `LogRegSGD2`      |
+| poisson regression                | `SGModel`                    |
+| quantile regression               | `QuantRegMM`, `SGModel`      |
+| regression w/ LASSO penalty       | `SparseReg`, `SGModel`       |
+| regression w/ ridge penalty       | `SparseReg`, `SGModel`       |
+| regression w/ elastic net penalty | `SparseReg`, `SGModel`       |
+| regression w/ SCAD penalty        | `SparseReg`, `SGModel`       |
+| self-tuning models                | `SGModelTune`                |
+| stepwise regression               | `StepwiseReg` (experimental) |
+| support vector machine            | `SGModel`                    |
+
+
+<h3> Multivariate Analysis </h3>
+|                               |                                         |
+|:------------------------------|:----------------------------------------|
+| covariance matrix             | `CovarianceMatrix`                      |
+| principal components analysis | `OnlinePCA`, `pca(o::CovarianceMatrix)` |
+| partial least squares         | `OnlinePLS`                             |
+
+
+<h3> Parametric Density Estimation </h3>
+For nonparametric density estimation, see [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl)
+
+|                     |                  |
+|:--------------------|:-----------------|
+| bernoulli           | `FitBernoulli`   |
+| beta                | `FitBeta`        |
+| binomial            | `FitBinomial`    |
+| cauchy              | `FitCauchy`      |
+| exponential         | `FitExponential` |
+| gamma               | `FitGamma`       |
+| lognormal           | `FitLogNormal`   |
+| multinomial         | `FitMultinomial` |
+| multivariate normal | `FitMvNormal`    |
+| normal              | `FitNormal`      |
+| normal mixture      | `NormalMix`      |
+| poisson             | `FitPoisson`     |
