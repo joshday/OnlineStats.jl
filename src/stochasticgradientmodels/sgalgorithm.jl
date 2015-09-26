@@ -82,44 +82,17 @@ end
     nothing
 end
 
-# # NoPenalty
-# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,NoPenalty}, g::Float64, j::Int)
-#     o.β[j] -= alg(o).η * g / (alg(o).δ + sqrt(alg(o).G[j]))
-# end
-
 # L2Penalty
 @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L2Penalty}, g::Float64, j::Int)
     o.β[j] -= alg(o).η * (g + pen(o).λ * o.β[j]) / (alg(o).δ + sqrt(alg(o).G[j]))
 end
 
-# nondifferentiable penalties
+# nondifferentiable penalties and NoPenalty
 @inline function adagrad_update!{M<:ModelDefinition, P<:Penalty}(o::SGModel{Proxgrad,M,P}, g::Float64, j::Int)
     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
     o.β[j] = prox(o.β[j] - g * h, pen(o), h)
 end
 
-
-# # L1Penalty
-# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L1Penalty}, g::Float64, j::Int)
-#     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
-#     o.β[j] -= g * h
-#     o.β[j] = prox(o.β[j], pen(o), h)
-# end
-#
-# # ElasticNetPenalty
-# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,ElasticNetPenalty}, g::Float64, j::Int)
-#     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
-#     o.β[j] -= g * h
-#     o.β[j] = prox(o.β[j], pen(o), h)
-# end
-#
-# # SCADPenalty
-# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,SCADPenalty}, g::Float64, j::Int)
-#     βj = o.β[j]
-#     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
-#     s = βj - g * h
-#     o.β[j] = prox(s, pen(o), h)
-# end
 
 
 
@@ -166,6 +139,7 @@ end
     nothing
 end
 
+# I apologize to my future self for how hard this code is to read
 # NoPenalty
 @inline function rda_update!{M<:ModelDefinition}(o::SGModel{RDA,M,NoPenalty}, g::Float64, j::Int)
     o.β[j] = -nobs(o) * alg(o).η * alg(o).Ḡ[j] / (alg(o).δ + sqrt(alg(o).G[j]))
@@ -178,6 +152,7 @@ end
 end
 
 # L1Penalty
+# See original ADAGRAD paper
 @inline function rda_update!{M<:ModelDefinition}(o::SGModel{RDA,M,L1Penalty}, g::Float64, j::Int)
     if abs(alg(o).Ḡ[j]) < pen(o).λ
         o.β[j] = 0.0
@@ -195,6 +170,11 @@ end
         o.β[j] = 0.0
     else
         ḡ = alg(o).Ḡ[j]
-        o.β[j] = sign(-ḡ) * alg(o).η * nobs(o)  * (abs(ḡ) - λ)/ (alg(o).δ + sqrt(alg(o).G[j]))
+        o.β[j] = sign(-ḡ) * alg(o).η * nobs(o) * (abs(ḡ) - λ) / (alg(o).δ + sqrt(alg(o).G[j]))
     end
+end
+
+# SCADPenalty
+@inline function rda_update!{M<:ModelDefinition}(o::SGModel{RDA,M,SCADPenalty}, g::Float64, j::Int)
+    error("SCADPenalty is not implemented yet for RDA")
 end

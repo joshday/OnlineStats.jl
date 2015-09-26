@@ -23,10 +23,6 @@ x = randn(10_000, 10)
 y = x*β + randn(10_000)
 
 # coefficients of a stochastic gradient descent model
-o = SGModel(size(x, 2))
-traceplot!(o, batchsize, x, y)
-
-# Quantiles [.25, .5, .75] using online MM algorithm
-o = QuantileMM()
-traceplot!(o, batchsize, y)
+o = SGModel(size(x, 2), algorithm = RDA())
+traceplot!(o, 100, x, y, f = coef)
 ```

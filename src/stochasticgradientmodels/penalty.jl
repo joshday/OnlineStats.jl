@@ -96,6 +96,7 @@ end
 Base.copy(p::Penalty) = deepcopy(p)
 
 # Prox operator is only needed for nondifferentiable penalties
+# s = step size
 @inline function prox!(β::AVecF, p::Penalty, s::Float64)
     for j in 1:length(β)
         β[j] = prox(β[j], p, s)
