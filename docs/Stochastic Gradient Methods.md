@@ -52,7 +52,13 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     - `loss(β) + λ * (α * sumabs(β) + (1 - α) * sumabs2(β))`
     - That is, elastic net is a weighted average between ridge and lasso.  This is the
     same parameterization that the popular R package [glmnet](http://www.inside-r.org/packages/cran/glmnet/docs/glmnet) uses.
-    - As for `L1Penalty`, to generate a sparse solution, `RDA` must be the algorithm used.
+    - To generate a sparse solution, the algorithm must be `RDA`.
+
+- `SCADPenalty(λ, a)`
+    - Smoothly clipped absolute deviation: `loss(β) + λ * scad_penalty(β)`
+    - Penalty depends on coefficient size.  Small coefficients are penalized as for LASSO, large coefficients penalized by a constant, middle coefficients penalized somewhere in-between.
+        - See [http://orfe.princeton.edu/~jqfan/papers/01/penlike.pdf](http://orfe.princeton.edu/~jqfan/papers/01/penlike.pdf) for details
+    - To generate a sparse solution, the algorithm must be `RDA`.
 
 # Algorithms
 

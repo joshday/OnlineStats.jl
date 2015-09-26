@@ -1,6 +1,6 @@
 # Introduction
 
-**OnlineStats** is a Julia package which provides online algorithms for statistical models.  Observations are processed one at a time and all **algorithms use O(1) memory**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  For machine learning (predictive modeling) applications, online algorithms provide fast approximate solutions for when training time is a bottleneck.
+**OnlineStats** is a [Julia](http://julialang.org) package which provides online algorithms for statistical models.  Observations are processed one at a time and all **algorithms use O(1) memory**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  For machine learning (predictive modeling) applications, online algorithms provide fast approximate solutions for when training time is a bottleneck.
 
 # Overview
 
@@ -35,13 +35,17 @@ nobs(o)  # Number of observations = 223
 | `statenames(o)`                            | Names corresponding to `state(o)`                                                  | `Vector{Symbol}`     |
 | `nobs(o)`                                  | number of observations                                                             | `Int`                |
 | `update!(o, data...)`                      | Update model with respect to the weighting scheme                                  |                      |
-| `updatebatch!(o, data...)`                 | Minibatch update.  Available for types that benefit from minibatch updates         |                      |
+| `updatebatch!(o, data...)`                 | Minibatch update.  Available only for models that benefit from minibatch updates   |                      |
 | `onlinefit!(o, b, data...; batch = false)` | update `o` with batches of size `b`.  `batch = false`  calls `update!(o, data...)` |                      |
 | `tracefit!(o, b, data...; batch = false)`  | call `onlinefit!` and save historical objects at every `b` observations            | `Vector{OnlineStat}` |
 | `traceplot!(o, b, data...)`                | call `onlinefit!` and create a trace plot of the estimate                          |                      |
 
 
 # Weighting Schemes
+```julia
+o = Mean(x, ExponentialWeighting(1000))
+```
+
 When creating an OnlineStat, one can specify the weighting to be used (with the exception of `SGModel`, which has its own weighting system).  Updating a model typically involves one of two forms:
 
 - weighted average (equivalent forms shown below):
