@@ -82,36 +82,44 @@ end
     nothing
 end
 
-# NoPenalty
-@inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,NoPenalty}, g::Float64, j::Int)
-    o.β[j] -= alg(o).η * g / (alg(o).δ + sqrt(alg(o).G[j]))
-end
+# # NoPenalty
+# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,NoPenalty}, g::Float64, j::Int)
+#     o.β[j] -= alg(o).η * g / (alg(o).δ + sqrt(alg(o).G[j]))
+# end
 
 # L2Penalty
 @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L2Penalty}, g::Float64, j::Int)
     o.β[j] -= alg(o).η * (g + pen(o).λ * o.β[j]) / (alg(o).δ + sqrt(alg(o).G[j]))
 end
 
-# L1Penalty
-@inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L1Penalty}, g::Float64, j::Int)
-    h = 1.0 / (alg(o).δ + sqrt(alg(o).G[j]))
-    s = o.β[j] - alg(o).η * g * h
-    o.β[j] = sign(s) * max(abs(s) - pen(o).λ * alg(o).η * h, 0.0)
+# nondifferentiable penalties
+@inline function adagrad_update!{M<:ModelDefinition, P<:Penalty}(o::SGModel{Proxgrad,M,P}, g::Float64, j::Int)
+    h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
+    o.β[j] = prox(o.β[j] - g * h, pen(o), h)
 end
 
-# ElasticNetPenalty
-@inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,ElasticNetPenalty}, g::Float64, j::Int)
-    h = 1.0 / (alg(o).δ + sqrt(alg(o).G[j]))
-    s = o.β[j] - alg(o).η * (g + pen(o).λ * (1 - pen(o).α) * o.β[j]) * h
-    o.β[j] = sign(s) * max(abs(s) - pen(o).λ * pen(o).α * alg(o).η * h, 0.0)
-end
 
-# SCADPenalty
+# # L1Penalty
 # @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L1Penalty}, g::Float64, j::Int)
-#     h = 1.0 / (alg(o).δ + sqrt(alg(o).G[j]))
-#     s = o.β[j] - alg(o).η * g * h
+#     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
+#     o.β[j] -= g * h
+#     o.β[j] = prox(o.β[j], pen(o), h)
 # end
-
+#
+# # ElasticNetPenalty
+# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,ElasticNetPenalty}, g::Float64, j::Int)
+#     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
+#     o.β[j] -= g * h
+#     o.β[j] = prox(o.β[j], pen(o), h)
+# end
+#
+# # SCADPenalty
+# @inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,SCADPenalty}, g::Float64, j::Int)
+#     βj = o.β[j]
+#     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
+#     s = βj - g * h
+#     o.β[j] = prox(s, pen(o), h)
+# end
 
 
 

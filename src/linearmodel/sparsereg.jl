@@ -72,7 +72,7 @@ function StatsBase.coef(o::SparseReg, penalty::L2Penalty)
     scaled_to_original!(β, mean(o.c), std(o.c))
 end
 
-# L1Penalty, ElasticNetPenalty, SCADPenalty
+# L1Penalty, ElasticNetPenalty, SCADPenalty via FISTA
 function StatsBase.coef(o::SparseReg, penalty::Penalty;
         maxiters::Integer = 50,
         tolerance::Float64 = 1e-4,
@@ -82,6 +82,7 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
     p = length(o.c.B) - 1  # Number of predictors (not including intercept)
     o.s = cor(o.c)  # cor(hcat(x, y))
     β = zeros(p)
+    βold = zeros(p)
     tol = 0.0
     iters = 0
 
@@ -90,62 +91,31 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
 
     for i in 1:maxiters
         iters += 1
-        βold = copy(β)
-        gradient = (xty - xtx * β)
-        β = β + step * gradient  # β + step * x'(y - x * β)
+        βold[:] = β
+        β = β + ((i - 2) / i + 1) * (β - βold)
+        g = (xty - xtx * β)
+        β = β + step * g  # β + step * x'(y - x * β)
         prox!(β, penalty, step)
 
-        # Try step halving a few times if objective isn't decreased
-        k = 1
-        old_objective = ℓ(βold, xtx, xty, penalty)
-        while ℓ(β, xtx, xty, penalty) > old_objective
-            s = 0.5 ^ k * step
-            β = βold + s * gradient
-            prox!(β, penalty, s)
-            k += 1
-            k > 5 && break  # This will try step halving 6 times
-        end
-
+        # # Try step halving a few times if objective isn't decreased
+        # k = 1
+        # old_objective = ℓ(βold, xtx, xty, penalty)
+        # while ℓ(β, xtx, xty, penalty) > old_objective
+        #     s = 0.5 ^ k * step
+        #     β = βold + s * gradient
+        #     prox!(β, penalty, s)
+        #     k += 1
+        #     k > 5 && break  # This will try step halving 6 times
+        # end
         tol = βtol(β, βold, xtx, xty, penalty)
         tol < tolerance && break
     end
-
     tol < tolerance || warn("Algorithm did not achieve convergence")
     verbose && println("tolerance:                ", tol)
     verbose && println("iterations:               ", iters)
     verbose && println("penalized log-likelihood: ", ℓ(β, xtx, xty, penalty))
     scaled_to_original!(β, mean(o.c), std(o.c))
 end
-
-# L1Penalty: J(β) = vecnorm(β, 1)
-function prox!(β::VecF, penalty::L1Penalty, step::Float64)
-    for j in 1:length(β)
-        β[j] = sign(β[j]) * max(abs(β[j]) - step * penalty.λ, 0.0)  # soft-thresholding step
-    end
-end
-
-# ElasticNetPenalty: J(β) = (α * vecnorm(β,1) + (1 - α) * .5 * vecnorm(β, 2))
-function prox!(β::AVecF, penalty::ElasticNetPenalty, step::Float64)
-    for j in 1:length(β)
-        β[j] = sign(β[j]) * max(abs(β[j]) - step * penalty.λ * penalty.α, 0.0)  # Lasso prox
-        β[j] = β[j] / (1.0 + step * penalty.λ * (1.0 - penalty.α))              # Ridge prox
-    end
-end
-
-# SCADPenalty
-function prox!(β::AVecF, penalty::SCADPenalty, step::Float64)
-    for j in 1:length(β)
-        βj = β[j]
-        if abs(βj) > penalty.a * penalty.λ
-        elseif abs(βj) < 2.0 * penalty.λ
-            β[j] = sign(βj) * max(abs(βj) - step * penalty.λ, 0.0)
-        else
-            β[j] = (βj - step * sign(βj) * penalty.a * penalty.λ / (penalty.a - 1.0)) / (1.0 - (1.0 / penalty.a - 1.0))
-        end
-    end
-end
-
-
 
 # convergence criteria for lasso/elasticnet
 function ℓ(β::VecF, xtx::MatF, xty::VecF, penalty::Penalty)

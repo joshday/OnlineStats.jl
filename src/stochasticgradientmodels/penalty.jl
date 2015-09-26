@@ -2,12 +2,12 @@
 # http://arxiv.org/pdf/1002.4734.pdf
 
 #----------------------------------------------------------------------# Penalty
-Base.copy(p::Penalty) = deepcopy(p)
-
 "No penalty on the coefficients"
 immutable NoPenalty <: Penalty end
 Base.show(io::IO, p::NoPenalty) = println(io, "  > Penalty:     NoPenalty")
 @inline _j(p::NoPenalty, β::VecF) = 0.0
+@inline prox(βj::Float64, p::NoPenalty, s::Float64) = βj
+
 
 "An L2 (ridge) penalty on the coefficients"
 type L2Penalty <: Penalty
@@ -19,6 +19,9 @@ type L2Penalty <: Penalty
 end
 Base.show(io::IO, p::L2Penalty) = println(io, "  > Penalty:     L2Penalty, λ = ", p.λ)
 @inline _j(p::L2Penalty, β::VecF) = sumabs2(β)
+# @inline function prox(βj::Float64, p::L2Penalty, s::Float64)
+#     βj / (1.0 + s * p.λ)
+# end
 
 
 "An L1 (LASSO) penalty on the coefficients"
@@ -31,6 +34,7 @@ type L1Penalty <: Penalty
 end
 Base.show(io::IO, p::L1Penalty) = println(io, "  > Penalty:     L1Penalty, λ = ", p.λ)
 @inline _j(p::L1Penalty, β::VecF) = sumabs(β)
+@inline prox(βj::Float64, p::L1Penalty, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
 
 
 "A weighted average of L1 and L2 penalties on the coefficients"
@@ -45,6 +49,10 @@ type ElasticNetPenalty <: Penalty
 end
 Base.show(io::IO, p::ElasticNetPenalty) = println(io, "  > Penalty:     ElasticNetPenalty, λ = ", p.λ, ", α = ", p.α)
 @inline _j(p::ElasticNetPenalty, β::VecF) = p.λ * (p.α * sumabs(β) + (1 - p.α) * .5 * sumabs2(β))
+@inline function prox(βj::Float64, p::ElasticNetPenalty, s::Float64)
+    βj = sign(βj) * max(abs(βj) - s * p.λ * p.α, 0.0)  # Lasso prox
+    βj = βj / (1.0 + s * p.λ * (1.0 - p.α))            # Ridge prox
+end
 
 
 # http://www.pstat.ucsb.edu/student%20seminar%20doc/SCAD%20Jian%20Shi.pdf
@@ -72,4 +80,24 @@ Base.show(io::IO, p::SCADPenalty) = println(io, "  > Penalty:     SCADPenalty, �
         end
     end
     return val
+end
+@inline function prox(βj::Float64, p::SCADPenalty, s::Float64)
+    if abs(βj) > p.a * p.λ
+    elseif abs(βj) < 2.0 * p.λ
+        βj = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
+    else
+        βj = (βj - s * sign(βj) * p.a * p.λ / (p.a - 1.0)) / (1.0 - (1.0 / p.a - 1.0))
+    end
+    βj
+end
+
+
+#-----------------------------------------------------------------------# common
+Base.copy(p::Penalty) = deepcopy(p)
+
+# Prox operator is only needed for nondifferentiable penalties
+@inline function prox!(β::AVecF, p::Penalty, s::Float64)
+    for j in 1:length(β)
+        β[j] = prox(β[j], p, s)
+    end
 end

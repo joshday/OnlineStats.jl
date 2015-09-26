@@ -51,6 +51,10 @@ facts("SGD") do
         o = SGModel(x, y, model = L2Regression(), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
+    context("SCADPenalty") do
+        o = SGModel(x, y, model = L2Regression(), penalty = SCADPenalty(.1, 3.7))
+        predict(o, x)
+    end
 
 
 

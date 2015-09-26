@@ -130,6 +130,7 @@ facts("Linear Model") do
         coef(o, L2Penalty(.1))
         coef(o, L1Penalty(.1), verbose = false)
         coef(o, ElasticNetPenalty(.1, .5), verbose = false)
+        coef(o, SCADPenalty(.1, 3.7), verbose = false)
 
         @fact coef(o, ElasticNetPenalty(.1, 0.0), verbose = false, tolerance = 1e-10, maxiters=400) --> roughly(coef(o, L2Penalty(.1)), .5)
         @fact coef(o, ElasticNetPenalty(.1, 1.0), verbose = false, tolerance = 1e-10, maxiters=400) --> roughly(coef(o, L1Penalty(.1), verbose = false), .5)
