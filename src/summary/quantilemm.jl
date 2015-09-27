@@ -11,9 +11,9 @@ type QuantileMM <: OnlineStat
     o::Float64
 
     n::Int64              # number of observations used
-    weighting::StochasticWeighting
+    weighting::LearningRate
 
-    function QuantileMM(q::VecF, τ::VecF, s::VecF, t::VecF, o::Float64, n::Int64, wgt::StochasticWeighting)
+    function QuantileMM(q::VecF, τ::VecF, s::VecF, t::VecF, o::Float64, n::Int64, wgt::LearningRate)
         all([τ[i] < 1 && τ[i] > 0 for i in 1:length(τ)]) || error("τ must be in (0, 1)")
         n >= 0 || error("n must be nonnegative")
         new(q, τ, s, t, o, n, wgt)
@@ -21,7 +21,7 @@ type QuantileMM <: OnlineStat
 end
 
 function QuantileMM(y::AVecF,
-                    wgt::StochasticWeighting = StochasticWeighting();
+                    wgt::LearningRate = LearningRate(r = .51);
                     τ::VecF = [.25, .5, .75],
                     start::VecF = quantile(y, τ))
     o = QuantileMM(wgt, τ = τ, start = start)
@@ -29,14 +29,7 @@ function QuantileMM(y::AVecF,
     o
 end
 
-function QuantileMM(y::Float64,
-                    wgt::StochasticWeighting = StochasticWeighting();
-                    τ::VecF = [.25, .5, .75],
-                    start::VecF = zeros(length(τ)))
-    QuantileMM([y], wgt, τ = τ, start = start)
-end
-
-function QuantileMM(wgt::StochasticWeighting = StochasticWeighting();
+function QuantileMM(wgt::LearningRate = LearningRate(r = .51);
                     τ = [.25, .5, .75],
                     start::VecF = zeros(length(τ)))
     p = length(τ)

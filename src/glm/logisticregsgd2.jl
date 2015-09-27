@@ -10,12 +10,12 @@ type LogRegSGD2{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function LogRegSGD2(p::Integer, wgt::Weighting = StochasticWeighting();
+function LogRegSGD2(p::Integer, wgt::Weighting = LearningRate(r = .51);
                    start::VecF = zeros(p))
     LogRegSGD2(start, zeros(p,p), 0, wgt)
 end
 
-function LogRegSGD2(X::AMatF, y::AVec, wgt::Weighting = StochasticWeighting();
+function LogRegSGD2(X::AMatF, y::AVec, wgt::Weighting = LearningRate(r = .51);
                    start::VecF = zeros(size(X, 2)), batch::Bool = true)
     o = LogRegSGD2(ncols(X), wgt, start = start)
     batch ? updatebatch!(o, X, y) : update!(o, X, y)

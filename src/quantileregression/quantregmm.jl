@@ -12,13 +12,13 @@ type QuantRegMM{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function QuantRegMM(p::Integer, wgt::Weighting = StochasticWeighting();
+function QuantRegMM(p::Integer, wgt::Weighting = LearningRate(r = .51);
                     τ::Float64 = .5, start::VecF = zeros(p), ϵ::Float64 = 1e-8)
     @assert τ > 0 && τ < 1
     QuantRegMM(start, τ, ϵ, zeros(p, p), zeros(p), 0, wgt)
 end
 
-function QuantRegMM(x::AMatF, y::AVecF, wgt::Weighting = StochasticWeighting();
+function QuantRegMM(x::AMatF, y::AVecF, wgt::Weighting = LearningRate(r = .51);
                     τ::Float64 = .5, start::VecF = zeros(ncols(x)), ϵ::Float64 = 1e-8,
                     batch = true)
     o = QuantRegMM(ncols(x), wgt, τ = τ, start = start, ϵ = ϵ)

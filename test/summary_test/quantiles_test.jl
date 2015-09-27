@@ -5,8 +5,8 @@ facts("Quantiles") do
     context("QuantileSGD") do
 
         τ = collect(1:0.5:9) / 10
-        o_uniform = QuantileSGD(rand(100), StochasticWeighting(.6), τ = τ)
-        o_normal = QuantileSGD(randn(100), StochasticWeighting(.6), τ = τ)
+        o_uniform = QuantileSGD(rand(100), LearningRate(r = .6), τ = τ)
+        o_normal = QuantileSGD(randn(100), LearningRate(r = .6), τ = τ)
         @fact statenames(o_normal) --> [:quantiles, :τ, :nobs]
 
         n = 10_000
@@ -30,8 +30,8 @@ facts("Quantiles") do
 
      context("QuantileMM") do
         τ = collect(1:0.5:9) / 10
-        o_uniform = QuantileMM(rand(100), StochasticWeighting(.6), τ = τ)
-        o_normal = QuantileMM(randn(100), StochasticWeighting(.6), τ = τ)
+        o_uniform = QuantileMM(rand(100), LearningRate(r = .6), τ = τ)
+        o_normal = QuantileMM(randn(100), LearningRate(r = .6), τ = τ)
         @fact statenames(o_normal) --> [:quantiles, :τ, :nobs]
 
         n = 10_000
@@ -49,8 +49,6 @@ facts("Quantiles") do
         @fact statenames(o_normal) --> [:quantiles, :τ, :nobs]
         @fact o_uniform.n --> 100 + n*100
         @fact o_normal.n --> 100 + n*100
-
-        QuantileMM(0.)
     end
 
     context("QuantileSort") do

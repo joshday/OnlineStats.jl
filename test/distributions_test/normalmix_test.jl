@@ -24,7 +24,7 @@ facts("NormalMix") do
         trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
         x = rand(trueModel, n)
         rng = 1:100
-        o = NormalMix(2, x[rng], StochasticWeighting(.8))
+        o = NormalMix(2, x[rng], LearningRate(r = .8))
         while maximum(rng) + 100 <= n
             rng += 100
             updatebatch!(o, x[rng])
@@ -41,7 +41,7 @@ facts("NormalMix") do
         trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
         x = rand(trueModel, n)
         rng = 1:100
-        o = NormalMix(2, x[rng], StochasticWeighting(1.))
+        o = NormalMix(2, x[rng], LearningRate(r = 1.))
         i = 101
         while i <= n
             update!(o, x[i])
@@ -52,7 +52,7 @@ facts("NormalMix") do
         @fact sort(probs(o)) --> roughly([.3, .7], .2)
         @fact statenames(o) --> [:dist, :nobs]
         @fact state(o) --> Any[o.d, nobs(o)]
-        o = NormalMix(2, x[rng], StochasticWeighting(.8))
+        o = NormalMix(2, x[rng], LearningRate(r = .8))
         @fact components(o) --> components(o.d)
         @fact update!(o, randn()) --> nothing
     end

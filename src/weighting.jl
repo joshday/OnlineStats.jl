@@ -39,7 +39,7 @@ end
 
 immutable EqualWeighting <: Weighting end
 
-@compat weight(w::EqualWeighting, n1::Int, n2::Int) =
+weight(w::EqualWeighting, n1::Int, n2::Int) =
     n1 > 0 || n2 > 0 ? Float64(n2 / (n1 + n2)) : 1.0
 
 
@@ -52,27 +52,41 @@ immutable ExponentialWeighting <: Weighting
     	new(λ)
     end
 end
-@compat ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))           # creates an exponential weighting with a lookback window of approximately "lookback" observations
-weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(), n1, n2), w.λ)    # uses equal weighting until we collect enough observations... then uses exponential weighting
+# creates an exponential weighting with a lookback window of approximately "lookback" observations
+ExponentialWeighting(lookback::Int) = ExponentialWeighting(Float64(2 / (lookback + 1)))
+# uses equal weighting until we collect enough observations... then uses exponential weighting
+weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(), n1, n2), w.λ)
+
 
 
 #---------------------------------------------------------------------------# Stochastic
-type StochasticWeighting <: Weighting
+# Recommendated SGD weighting from http://cilvr.cs.nyu.edu/diglib/lsml/bottou-sgd-tricks-2012.pdf
+# γ_t = 1 / (1 + λ * t)
+
+#  LearningRate was this:
+#  γ_t = 1 / t ^ -r
+
+# Combine the above two schemes: γ_t = 1 / (1 + λ * t ^r)
+type LearningRate <: Weighting
     r::Float64
-    nb::Int64   # number of batches
-    λ::Float64  # minimum step size
-    function StochasticWeighting(r::Float64 = .51, λ::Float64 = 0.)
-        @assert r > .0 && r <= 1
-        @assert λ >= 0. && λ <= 1.
-        # r <= .5 && warn("r <= .5 is only valid for using Polyak/Ruppert Averaging")
-        new(r, 0, λ)
+    λ::Float64
+    minstep::Float64    # minimum step size
+    t::Int64            # number of updates
+
+    function LearningRate(;r::Float64 = 1.0, λ::Float64 = 1.0, minstep::Float64 = 0.0)
+        @assert 0 < r <= 1
+        @assert λ > 0
+        new(r, λ, minstep, 0)
     end
 end
-@compat function weight(w::StochasticWeighting, unused1, unused2)
-    w.nb += 1
-    max(Float64(w.nb) ^ -w.r, w.λ)
+function weight(w::LearningRate, unused1, unused2)
+    result = max(1.0 / (1.0 + w.λ * w.t ^ w.r), w.minstep)
+    w.t += 1
+    result
 end
 
+# Ease the transition to the new type
+StochasticWeighting(r::Float64 = .51, minstep::Float64 = 0.) = LearningRate(r = r, minstep = minstep)
 
 
 

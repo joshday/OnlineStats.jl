@@ -8,13 +8,13 @@ type LogRegMM{W <: Weighting} <: OnlineStat
     weighting::W
 end
 
-function LogRegMM(p::Integer, wgt::Weighting = StochasticWeighting();
+function LogRegMM(p::Integer, wgt::Weighting = LearningRate(r = .51);
         start = zeros(p)
     )
     LogRegMM(start, zeros(p), zeros(p, p), zeros(p), 0, wgt)
 end
 
-function LogRegMM(x::AMatF, y::AVec, wgt::Weighting = StochasticWeighting();
+function LogRegMM(x::AMatF, y::AVec, wgt::Weighting = LearningRate(r = .51);
                   start::VecF = zeros(size(x, 2)), batch::Bool = true)
     o = LogRegMM(size(x, 2), wgt; start = start)
     batch ? updatebatch!(o, x, y) : update!(o, x, y)

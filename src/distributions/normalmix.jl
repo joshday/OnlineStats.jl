@@ -5,17 +5,17 @@ type NormalMix <: DistributionStat
     s2::VecF             # mean of (weights .* y)
     s3::VecF             # mean of (weights .* y .* y)
     n::Int64                        # number of observations
-    weighting::StochasticWeighting
+    weighting::LearningRate
 end
 
 
-function NormalMix(p::Integer, y::AVecF, wgt::StochasticWeighting = StochasticWeighting(); start = emstart(p, y, verbose = false))
+function NormalMix(p::Integer, y::AVecF, wgt::LearningRate = LearningRate(r = .51); start = emstart(p, y, verbose = false))
     o = NormalMix(p, wgt, start = start)
     updatebatch!(o, y)
     o
 end
 
-function NormalMix(p::Integer, wgt::StochasticWeighting = StochasticWeighting();
+function NormalMix(p::Integer, wgt::LearningRate = LearningRate(r = .51);
                    start = MixtureModel(map((u,v) -> Normal(u, v), randn(p), ones(p))))
     NormalMix(start, zeros(p), zeros(p), zeros(p), 0, wgt)
 end

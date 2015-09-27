@@ -9,14 +9,14 @@ type FiveNumberSummary <: OnlineStat
     n::Int64
 end
 
-function FiveNumberSummary(y::AVecF, wgt::Weighting = StochasticWeighting();
+function FiveNumberSummary(y::AVecF, wgt::Weighting = LearningRate(r = .51);
                            start = zeros(3))
     o = FiveNumberSummary(wgt, start = start)
     update!(o, y)
     o
 end
 
-function FiveNumberSummary(wgt::Weighting = StochasticWeighting();
+function FiveNumberSummary(wgt::Weighting = LearningRate(r = .51);
                            start = zeros(3))
     FiveNumberSummary(Extrema(), QuantileMM(wgt, start = start), 0)
 end

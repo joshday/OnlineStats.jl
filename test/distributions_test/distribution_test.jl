@@ -80,7 +80,7 @@ facts("Distributions") do
         o = FitBinomial(n = 10)
         o = FitBinomial(rand(Binomial(10, .5), 10), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
-        o = distributionfit(Binomial, rand(Binomial(10,.5), 10), StochasticWeighting(.6), n = 10)
+        o = distributionfit(Binomial, rand(Binomial(10,.5), 10), LearningRate(r = .6), n = 10)
         o = FitBinomial(n = 5, ExponentialWeighting(.001))
         @fact nobs(o) --> 0
         @fact OnlineStats.weighting(o) --> ExponentialWeighting(.001)
@@ -145,7 +145,7 @@ facts("Distributions") do
         o = FitDirichlet()
         o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)')
         o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', ExponentialWeighting(.01))
-        o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', StochasticWeighting(.6))
+        o = distributionfit(Dirichlet, rand(Dirichlet([1., 2., 3.]), 10)', LearningRate(r = .6))
         @fact nobs(o) --> 10
 
         n1 = rand(1:1_000_000)

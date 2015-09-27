@@ -19,6 +19,7 @@ In the examples below, assume y is `Vector{Float64}` and x is `Matrix{Float64}`
 	- [Principal Components Analysis](#principal-components-analysis)
 	- [SGModel](#sgmodel)
 	- [SGModelTune](#sgmodeltune)
+	- [ShermanMorrisonInverse](#shermanmorrisoninverse)
 	- [SparseReg](#sparsereg)
 	- [StepwiseReg](#stepwisereg)
 	- [Summary](#summary)
@@ -114,7 +115,7 @@ kurtosis(o)
 Univariate normal mixture via an online EM algorithm.
 
 ```julia
-o = NormalMix(4, y, StochasticWeighting(.6))
+o = NormalMix(4, y, LearningRate(r = .6))
 mean(o)
 var(o)
 std(o)
@@ -158,6 +159,15 @@ update!(otune, x, y)
 See the section on [Stochastic Subgradient Models](SGModel.md).
 
 
+## ShermanMorrisonInverse
+
+Use the [Sherman-Morrison formula](https://en.wikipedia.org/wiki/Sherman–Morrison_formula)
+for updating the matrix `inv(x'x / n)`.  
+
+```julia
+o = ShermanMorrisonInverse(x)
+```
+
 ## SparseReg
 Analytical regularized regression.  This type collects sufficient statistics.  At
 any point in time, regularized coefficients can be returned using a variety of
@@ -200,7 +210,7 @@ minimum(o)
 Approximate quantiles using an online MM algorithm.
 
 ```julia
-o = QuantileMM(y, [.25, .5, .75], StochasticWeighting(.51))
+o = QuantileMM(y, [.25, .5, .75], LearningRate(r = .51))
 statenames(o)
 state(o)
 ```
@@ -212,6 +222,15 @@ Approximate quantile regression using an online MM algorithm.
 o = QuantRegMM(size(x, 2), τ = .7)
 onlinefit!(o, batchsize, x, y)
 coef(o)
+```
+
+## QuantileSGD
+Approximate quantiles using a stochastic (sub)gradient descent algorithm
+
+```julia
+o = QuantileSGD(y, [.25, .5, .75], LearningRate(r = .7))
+statenames(o)
+state(o)
 ```
 
 ## Variance

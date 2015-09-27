@@ -24,7 +24,7 @@ export
     # common types
     OnlineStat,
     # weighting
-    Weighting, EqualWeighting, ExponentialWeighting, StochasticWeighting,
+    Weighting, EqualWeighting, ExponentialWeighting, LearningRate, 
     # ported from streamstats
     BernoulliBootstrap, PoissonBootstrap, HyperLogLog,
     # summary
@@ -82,6 +82,7 @@ include("stochasticgradientmodels/penalty.jl")
 include("stochasticgradientmodels/sgalgorithm.jl")
 include("stochasticgradientmodels/modeldefinition.jl")
 include("stochasticgradientmodels/sgmodeltune.jl")
+include("stochasticgradientmodels/sgmodelcv.jl")
 
 # Summary Statistics
 include("summary/mean.jl")

@@ -11,8 +11,8 @@ facts("Quantile Regression") do
         x = [ones(100) randn(100, 5)]
         y = vec(sum(x[:, 2:end], 2)) + randn(100)
 
-        o1 = QuantRegMM(x, y, StochasticWeighting(.9), τ = .7)
-        o2 = QuantRegMM(x, y, StochasticWeighting(.9), τ = .7, start = ones(6))
+        o1 = QuantRegMM(x, y, LearningRate(r = .9), τ = .7)
+        o2 = QuantRegMM(x, y, LearningRate(r = .9), τ = .7, start = ones(6))
 
         for i in 1:10000
             x = [ones(100) randn(100, 5)]

@@ -3,11 +3,11 @@ type QuantileSGD <: OnlineStat
     q::VecF              # Quantile estimates
     τ::VecF                # tau values (which quantiles)
     n::Int64
-    weighting::StochasticWeighting
+    weighting::LearningRate
 end
 
 function QuantileSGD(y::AVecF,
-                     wgt::StochasticWeighting = StochasticWeighting();
+                     wgt::LearningRate = LearningRate(r = .51);
                      τ::VecF = [.25, .5, .75],
                      start::VecF = quantile(y, τ))
     o = QuantileSGD(wgt; τ = τ, start = start)
@@ -16,13 +16,13 @@ function QuantileSGD(y::AVecF,
 end
 
 function QuantileSGD(y::Float64,
-                     wgt::StochasticWeighting = StochasticWeighting();
+                     wgt::LearningRate = LearningRate(r = .51);
                      τ::VecF = [.25, .5, .75],
                      start::VecF = zeros(length(τ)))
     QuantileSGD([y], wgt; τ = τ, start = start)
 end
 
-function QuantileSGD(wgt::StochasticWeighting = StochasticWeighting();
+function QuantileSGD(wgt::LearningRate = LearningRate(r = .51);
                      τ::VecF = [.25, .5, .75],
                      start::VecF = zeros(length(τ)))
    QuantileSGD(start, τ, 0, wgt)
@@ -52,5 +52,3 @@ function updatebatch!(o::QuantileSGD, y::AVecF)
     end
     return
 end
-
-

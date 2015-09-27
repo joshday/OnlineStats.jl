@@ -21,7 +21,7 @@ FitBinomial(wgt::Weighting = default(Weighting); n = 1) =
 #---------------------------------------------------------------------# update!
 function update!(o::FitBinomial, y::Integer)
     λ = weight(o)
-    p = smooth(o.d.p, @compat(Float64(y / o.d.n)), λ)
+    p = smooth(o.d.p, Float64(y / o.d.n), λ)
     o.d = Binomial(o.d.n, p)
     o.n += 1
     return
