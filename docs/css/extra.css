@@ -8,7 +8,8 @@ h1 {
 /* Make the inline code blocks look like the paragraph-level ones. */
 *:not(pre) > code {
   color: #333;
-  background-color: #F5F5F5;
+  font-size: inherit;
+  background-color: rgb(255, 255, 255);
   padding: 1px 3px;
   border: 1px solid #CCC;
 }
@@ -34,6 +35,7 @@ a > code:focus {
 pre {
   padding: 4px;
 }
+
 
 /* Style the admonitions. */
 .admonition {

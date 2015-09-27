@@ -8,7 +8,9 @@ The `SGModel` type is a framework for fitting a wide variety of models that are 
 
 # Usage
 
-`SGModel(x, y; model = L2Regression(), penalty = NoPenalty(), algorithm = SGD())`
+```julia
+SGModel(x, y; model = L2Regression(), penalty = NoPenalty(), algorithm = SGD())
+```
 
 | arguments | description          |
 |:----------|:---------------------|
@@ -90,7 +92,7 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 | method                    | description                 |
 |:--------------------------|:----------------------------|
 | `StatsBase.coef(o)`       | return coefficients         |
-| `StatsBase.predict(o, x)` | `x` can be vector or matrix |
+| `StatsBase.predict(o, x)` | `x` can be Vector or Matrix |
 
 # SGModel Examples
 
@@ -104,7 +106,7 @@ o = SGModel(x, y, model = QuantileRegression(.7), algorithm = Proxgrad())
 
 # Self-tuning Models
 
-The `SGModelTune` type can be used to automatically learn the optimal tuning parameter for the penalty of an SGModel.
+The `SGModelTune` type can be used to automatically learn the optimal `λ` for the penalty of an SGModel.
 
 This type is experimental, but very promising.
 

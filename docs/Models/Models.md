@@ -1,5 +1,7 @@
 # Models
 
+In the examples below, assume y is `Vector{Float64}` and x is `Matrix{Float64}`
+
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Models](#models)
@@ -14,9 +16,9 @@
 	- [Means](#means)
 	- [Moments](#moments)
 	- [NormalMix](#normalmix)
-	- [Principal Components Analysis (no dedicated type)](#principal-components-analysis-no-dedicated-type)
-	- [[SGModel](SGModel.md)](#sgmodelsgmodelmd)
-	- [[SGModelTune](SGModel.md)](#sgmodeltunesgmodelmd)
+	- [Principal Components Analysis](#principal-components-analysis)
+	- [SGModel](#sgmodel)
+	- [SGModelTune](#sgmodeltune)
 	- [SparseReg](#sparsereg)
 	- [StepwiseReg](#stepwisereg)
 	- [Summary](#summary)
@@ -33,7 +35,7 @@ Statistical bootstrap for estimating the variance of an OnlineStat.
 ```julia
 o = Mean()
 boot = BernoulliBootstrap(o, mean, 1000)
-update!(boot, x)
+update!(boot, y)
 ```
 
 ## CovarianceMatrix
@@ -119,23 +121,32 @@ std(o)
 quantile(o, .8)
 ```
 
-## Principal Components Analysis (no dedicated type)
+## Principal Components Analysis
 Use `pca(o::CovarianceMatrix, maxoutdim = k)`.  The keyword argument `maxoutdim` specifies
 the top `k` components to return.
 
 
-## [SGModel](SGModel.md)
-This is a flexible type that fits a variety of models using a variety of
-online algorithms.  There are also several regularization options.
+## SGModel
+This is a flexible type that fits a wide variety of models using three different
+online algorithms (`SGD`, `Proxgrad`, and `RDA`).  Each algorithm uses stochastic
+estimates of the (sub)gradient of the loss function.  Models available are :
+
+- `HuberRegression(δ)`
+- `L1Regression()`
+- `L2Regression()`
+- `LogisticRegression()`
+- `PoissonRegression()`
+- `QuantileRegression(τ)`
+- `SVMLike` (Perceptron and Suppert Vector Machine)
 
 ```julia
 o = SGModel(x, y, model = L2Regression(), algorithm = RDA(), penalty = L1Penalty(.1))
 coef(o)
 predict(o, x)
 ```
+See the section on [Stochastic Subgradient Models](SGModel.md).
 
-
-## [SGModelTune](SGModel.md)
+## SGModelTune
 Takes an SGModel and automatically fits the optimal tuning parameter.
 
 ```julia
@@ -144,10 +155,16 @@ otune = SGModelTune(o)
 update!(otune, x, y)
 ```
 
+See the section on [Stochastic Subgradient Models](SGModel.md).
+
 
 ## SparseReg
-Analytical regularized regression.  Currently supports least squares, ridge
-regression, LASSO, and elastic net.  
+Analytical regularized regression.  This type collects sufficient statistics.  At
+any point in time, regularized coefficients can be returned using a variety of
+penalties.  Currently supports least squares, ridge regression, LASSO, elastic net,
+and SCAD coefficients.
+
+$$\ell(\boldsymbol\beta) = \|\mathbf y - \mathbf X^T \boldsymbol \beta\| + λ J(\boldsymbol\beta)$$  
 
 ```julia
 o = SparseReg(x, y)
@@ -155,8 +172,7 @@ coef(o)                             # Least squres
 coef(o, L2Penalty(λ))               # Ridge
 coef(o, L1Penalty(λ))               # LASSO
 coef(o, ElasticNetPenalty(λ, α))    # α * lasso_penalty + (1 - α) * ridge_penalty
-coef(o, ElasticNetPenalty(λ, 0.0))  # Ridge
-coef(o, ElasticNetPenalty(λ, 1.0))  # LASSO
+coef(o, SCADPenalty(λ, a))          # SCAD
 ```
 
 ## StepwiseReg
