@@ -14,7 +14,9 @@ type QuantileMM <: OnlineStat
     weighting::LearningRate
 
     function QuantileMM(q::VecF, τ::VecF, s::VecF, t::VecF, o::Float64, n::Int64, wgt::LearningRate)
-        all([τ[i] < 1 && τ[i] > 0 for i in 1:length(τ)]) || error("τ must be in (0, 1)")
+        for i in 1:length(τ)
+            0 < τ[i] < 1 || error("$(τ[i]) is not in (0, 1)")
+        end
         n >= 0 || error("n must be nonnegative")
         new(q, τ, s, t, o, n, wgt)
     end
