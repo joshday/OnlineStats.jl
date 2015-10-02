@@ -104,14 +104,14 @@ o = SGModel(x, y, model = QuantileRegression(.7), algorithm = Proxgrad())
 ```
 
 
-# Self-tuning Models
+# Cross Validation
 
-The `SGModelTune` type can be used to automatically learn the optimal `λ` for the penalty of an SGModel.
+The `SGModelCV` type can be used to automatically learn the optimal penalty parameter `λ` for minimizing the MSE of a test set.
 
 This type is experimental, but very promising.
 
 ```julia
 o = SGModel(size(x, 2), penalty = L1Penalty(.1))
-o = SGModelTune(o)
+o = SGModelCV(o, xtest, ytest)
 update!(o, x, y)
 ```
