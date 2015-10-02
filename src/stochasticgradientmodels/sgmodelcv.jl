@@ -16,12 +16,14 @@ type SGModelCV <: StochasticGradientStat
     o::SGModel
     o_l::SGModel    # low
     o_h::SGModel    # high
+    η::Float64      # constant part of decay rate
     decay::Float64  # decay rate for λ
-    xtrain::Matrix{Float64}
-    ytrain::Vector{Float64}
-    function SGModelCV(o::SGModel; decay = .7)
+    xtest::AMatF
+    ytest::AVecF
+    burnin::Int
+    function SGModelCV(o::SGModel, xtest, ytest; η = .1, decay = .7, burnin = 1000)
         @assert 0 < decay <= 1
-        new(o, copy(o), copy(o), decay)
+        new(o, copy(o), copy(o), η, decay, xtest, ytest, burnin)
     end
 end
 
@@ -36,9 +38,9 @@ function updateλ!{A <: SGAlgorithm, M <: ModelDefinition}(
 end
 
 # L2Penalty and L1Penalty
-function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64, decay::Float64)
+function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64, xtest, ytest, η::Float64, decay::Float64)
     # alter λ for o_l and o_h
-    γ = 1 / (nobs(o) + 1) ^ decay
+    γ = η / (nobs(o) + 1) ^ decay
     o_l.penalty.λ = max(0.0, o_l.penalty.λ - γ)
     o_h.penalty.λ += γ
 
@@ -47,11 +49,11 @@ function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64,
     update!(o_l, x, y)
     update!(o_h, x, y)
 
-    # Find best model
-    ŷ = predict(o, x)
-    ŷ_l = predict(o_l, x)
-    ŷ_h = predict(o_h, x)
-    v = vcat(abs(y - ŷ_l), abs(y - ŷ), abs(y - ŷ_h))
+    # Find best model for test data
+    ŷ = predict(o, xtest)
+    ŷ_l = predict(o_l, xtest)
+    ŷ_h = predict(o_h, xtest)
+    v = vcat(rmse(ŷ_l, ytest), rmse(ŷ, ytest), rmse(ŷ_h, ytest))
     _, j = findmin(v)
 
     if j == 1 # o_l is winner
@@ -67,9 +69,16 @@ function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64,
 end
 
 function update!(o::SGModelCV, x::AVecF, y::Float64)
-    updateλ!(o.o, o.o_l, o.o_h, x, y, o.decay)
+    if nobs(o) < o.burnin
+        update!(o.o, x, y)
+        update!(o.o_l, x, y)
+        update!(o.o_h, x, y)
+    else
+        updateλ!(o.o, o.o_l, o.o_h, x, y, o.xtest, o.ytest, o.η, o.decay)
+    end
 end
 
+rmse(yhat, y) = mean(abs2(yhat - y))
 
 #------------------------------------------------------------------------# state
 statenames(o::SGModelCV) = [:β, :penalty, :nobs]
@@ -78,6 +87,7 @@ whatisλ(o::SGModelCV) = o.o.penalty.λ
 
 StatsBase.coef(o::SGModelCV) = coef(o.o)
 StatsBase.nobs(o::SGModelCV) = nobs(o.o)
+StatsBase.predict(o::SGModelCV, x) = predict(o.o, x)
 
 function Base.show(io::IO, o::SGModelCV)
     println(io, "Cross-Validated SGModel:")
