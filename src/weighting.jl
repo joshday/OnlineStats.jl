@@ -36,13 +36,26 @@ function addgradient!(avg::AbstractVector, grad::AbstractVector, λ::Float64)
 end
 
 #---------------------------------------------------------------------------#
+"""
+### Equal Weighting
+`EqualWeighting()`
 
+All observations are weighted equally
+"""
 immutable EqualWeighting <: Weighting end
 
 weight(w::EqualWeighting, n1::Int, n2::Int) =
     n1 > 0 || n2 > 0 ? Float64(n2 / (n1 + n2)) : 1.0
 
+"""
+### Exponential Weighting
 
+`ExponentialWeighting(λ::Float64)`
+
+`ExponentialWeighting(n::Int)`
+
+Use equal weighting until step size reaches `λ = 1 / n`, then hold constant.
+"""
 immutable ExponentialWeighting <: Weighting
     λ::Float64
 
@@ -67,6 +80,13 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 #  γ_t = 1 / t ^ -r
 
 # Combine the above two schemes: γ_t = 1 / (1 + λ * t ^r)
+"""
+### Learning Rate for Stochastic Approximation
+
+`LearningRate(;r = 1.0, λ = 1.0, minstep = 0.0)`
+
+Update weights are `max(minstep, γ_t)` where `γ_t = 1 / (1 + λ * t ^ r)`
+"""
 type LearningRate <: Weighting
     r::Float64
     λ::Float64
