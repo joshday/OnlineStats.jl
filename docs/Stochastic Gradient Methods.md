@@ -24,7 +24,7 @@ The model argument specifies both the link function and loss function to be used
 
 - `PoissonRegression`
     - Maximizes the poisson regression loglikelihood.
-    - This is unstable with SGD.  It is recommended you use Proxgrad or RDA.
+    - This is unstable with SGD.  It is recommended you use ProxGrad or RDA.
 
 - `QuantileRegression(τ)`
     - Predict the conditional τ-th quantile of `y` given `X`
@@ -46,7 +46,7 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 
 - `L1Penalty(λ)`
     - AKA "LASSO" term: `loss(β) + λ * sumabs(β)`
-    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/Proxgrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` algorithm
+    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/ProxGrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` algorithm
 
 - `ElasticNetPenalty(λ, α)`
     - `loss(β) + λ * (α * sumabs(β) + (1 - α) * sumabs2(β))`
@@ -69,7 +69,7 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     doing Polyak-Juditsky averaging, this shouldn't be less than 0.5.  A smaller `r`
     puts more value on new observations.
 
-- `Proxgrad(η = 1.0)`
+- `ProxGrad(η = 1.0)`
     - Proximal Gradient Method w/ ADAGRAD
     - `η` is a constant step size (> 0)
     - This is similar to SGD, but weights are automatically determined by ADAGRAD.
@@ -93,5 +93,5 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 o = SGModel(x,y)
 o = SGModel(x,y, penalty = L1Penalty(.1))
 o = SGModel(x, y, algorithm = RDA(), penalty = ElasticNetPenalty(.1, .5))
-o = SGModel(x, y, model = QuantileRegression(.7), algorithm = Proxgrad())
+o = SGModel(x, y, model = QuantileRegression(.7), algorithm = ProxGrad())
 ```

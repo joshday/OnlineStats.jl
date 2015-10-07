@@ -41,7 +41,7 @@ export
     # stochasticgradientmodels
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
     SGModel, SGModelCV,
-    SGD, Proxgrad, RDA,
+    SGD, ProxGrad, RDA,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike,
     HuberRegression, PoissonRegression,
 

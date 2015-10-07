@@ -1,4 +1,4 @@
-module ProxgradTest
+module ProxGradTest
 
 using OnlineStats,FactCheck, Compat, Distributions
 
@@ -23,30 +23,30 @@ function poissondata(n, p)
     (β, x, y)
 end
 
-facts("Proxgrad") do
+facts("ProxGrad") do
     n, p = 100_000, 20
     β, x, y = linearmodeldata(n, p)
 
     ############################################################### L2Regression
     print_with_color(:blue, " * L2Regression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
         @fact length(coef(o)) --> p + 1
 
-        o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, algorithm = Proxgrad())
+        o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, algorithm = ProxGrad())
         @fact length(coef(o)) --> p
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L2Regression(), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L2Regression(), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 
@@ -56,19 +56,19 @@ facts("Proxgrad") do
     ############################################################### L1Regression
     print_with_color(:blue, " * L1Regression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L1Regression(), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L1Regression(), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L1Regression(), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = L1Regression(), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 
@@ -77,19 +77,19 @@ facts("Proxgrad") do
     ######################################################### QuantileRegression
     print_with_color(:blue, " * QuantileRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = QuantileRegression(.5), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = QuantileRegression(.5), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = QuantileRegression(.5), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = QuantileRegression(.5), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 
@@ -98,19 +98,19 @@ facts("Proxgrad") do
     ############################################################ HuberRegression
     print_with_color(:blue, " * HuberRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = HuberRegression(.5), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = HuberRegression(.5), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = HuberRegression(.5), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = HuberRegression(.5), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 
@@ -120,19 +120,19 @@ facts("Proxgrad") do
     ######################################################### LogisticRegression
     print_with_color(:blue, " * LogisticRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = LogisticRegression(), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = LogisticRegression(), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = LogisticRegression(), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = LogisticRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 
@@ -142,19 +142,19 @@ facts("Proxgrad") do
     ########################################################## PoissonRegression
     print_with_color(:blue, " * PoissonRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = PoissonRegression(), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = PoissonRegression(), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = PoissonRegression(), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = PoissonRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 
@@ -164,19 +164,19 @@ facts("Proxgrad") do
     print_with_color(:blue, " * SVMLike * \n")
     y = 2y - 1
     context("NoPenalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = NoPenalty(), algorithm = Proxgrad())
+        o = SGModel(x, y, model = SVMLike(), penalty = NoPenalty(), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = L1Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = SVMLike(), penalty = L1Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = L2Penalty(.1), algorithm = Proxgrad())
+        o = SGModel(x, y, model = SVMLike(), penalty = L2Penalty(.1), algorithm = ProxGrad())
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = ElasticNetPenalty(.1, .5), algorithm = Proxgrad())
+        o = SGModel(x, y, model = SVMLike(), penalty = ElasticNetPenalty(.1, .5), algorithm = ProxGrad())
         predict(o, x)
     end
 end

@@ -84,7 +84,7 @@ facts("React") do
     β = collect(1.:p);
     y = x * β + randn(n)*10;
 
-    reg = SGModel(p, intercept = false, algorithm = Proxgrad())
+    reg = SGModel(p, intercept = false, algorithm = ProxGrad())
 
     # note here... the update! method of SGModel takes an x and y arg, so there
     # should be a 2-item tuple on the left hand side of the pipe
@@ -111,7 +111,7 @@ facts("React") do
     β = collect(1.:p);
     y = x * β + randn(n)*10;
 
-    reg1 = SGModel(p, intercept = false, algorithm = Proxgrad())
+    reg1 = SGModel(p, intercept = false, algorithm = ProxGrad())
     reg2 = SGModel(p, intercept = false, algorithm = SGD())
     reg3 = LinReg(p)
 

@@ -44,21 +44,21 @@ end
     end
 end
 
-#---------------------------------------------------------------------# Proxgrad
+#---------------------------------------------------------------------# ProxGrad
 # θ_t = argmin(η * g'θ + η * J(θ) + B_ψ(θ, θ_t))  where  ψ = .5 * θ' * H * θ
 "Proximal Gradient Method with ADAGRAD weights"
-type Proxgrad <: SGAlgorithm
+type ProxGrad <: SGAlgorithm
     G0::Float64     # sum of squared gradients for intercept
     G::VecF         # sum of squared gradients for everything else
     η::Float64      # constant step size
     δ::Float64      # ensure we don't divide by 0
-    @compat function Proxgrad(;η::Real = 1.0, δ::Real = 1e-8)
+    @compat function ProxGrad(;η::Real = 1.0, δ::Real = 1e-8)
         @assert η > 0
         @assert δ > 0
         new(0.0, zeros(2), Float64(η), Float64(δ))
     end
 end
-@inline function updateβ!{M<:ModelDefinition, P<:Penalty}(o::SGModel{Proxgrad,M,P}, x::AVecF, y::Float64)
+@inline function updateβ!{M<:ModelDefinition, P<:Penalty}(o::SGModel{ProxGrad,M,P}, x::AVecF, y::Float64)
     if nobs(o) == 1
         alg(o).G = zeros(length(x))
     end
@@ -83,12 +83,12 @@ end
 end
 
 # L2Penalty
-@inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{Proxgrad,M,L2Penalty}, g::Float64, j::Int)
+@inline function adagrad_update!{M<:ModelDefinition}(o::SGModel{ProxGrad,M,L2Penalty}, g::Float64, j::Int)
     o.β[j] -= alg(o).η * (g + pen(o).λ * o.β[j]) / (alg(o).δ + sqrt(alg(o).G[j]))
 end
 
 # nondifferentiable penalties and NoPenalty
-@inline function adagrad_update!{M<:ModelDefinition, P<:Penalty}(o::SGModel{Proxgrad,M,P}, g::Float64, j::Int)
+@inline function adagrad_update!{M<:ModelDefinition, P<:Penalty}(o::SGModel{ProxGrad,M,P}, g::Float64, j::Int)
     h = alg(o).η / (alg(o).δ + sqrt(alg(o).G[j]))
     o.β[j] = prox(o.β[j] - g * h, pen(o), h)
 end

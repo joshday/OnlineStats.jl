@@ -129,7 +129,7 @@ the top `k` components to return.
 
 ## SGModel
 This is a flexible type that fits a wide variety of models using three different
-online algorithms (`SGD`, `Proxgrad`, and `RDA`).  Each algorithm uses stochastic
+online algorithms (`SGD`, `ProxGrad`, and `RDA`).  Each algorithm uses stochastic
 estimates of the (sub)gradient of the loss function.  Models available are :
 
 - `HuberRegression(δ)`

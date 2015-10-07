@@ -10,7 +10,7 @@ facts("Plotting") do
         y = x*β + randn(n)
         o = OnlineStats.SGModel(p)
 
-        Plots.gadfly!()
+        Plots.gadfly()
         OnlineStats.traceplot!(o, 1000, x, y)
 
         v = tracefit!(o, 1000, x, y)
