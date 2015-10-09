@@ -6,7 +6,7 @@ Analytical linear regression via the sweep operator.
 """
 type LinReg{W <: Weighting} <: OnlineStat
     c::CovarianceMatrix{W}  # Cov([X y])
-    s::MatF                     # "Swept" version of [X y]' [X y]
+    s::MatF                 # "Swept" version of [X y]' [X y]
     weighting::W
 end
 
@@ -15,6 +15,10 @@ function LinReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
     o = LinReg(p, wgt)
     updatebatch!(o, x, y)
     o
+end
+
+function LinReg(x::AVecF, y::AVecF, wgt::Weighting = default(Weighting))
+    LinReg(hcat(x), y, wgt)
 end
 
 function LinReg(p::Integer, wgt::Weighting = default(Weighting))
