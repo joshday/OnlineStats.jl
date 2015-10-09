@@ -3,7 +3,7 @@
 Automatically tune the penalty parameter for an SGModel by finding the best fit
 to the test data.
 
-`SGModelCV(o::SGModel, xtest, ytest; decay = .7)`
+`SGModelCV(o::SGModel, xtest, ytest; λrate = LearningRate())`
 
 Each call to `update!(o::SGModelCV, x, y)` updates the penalty parameter λ by
 choosing the parameter which provides the best prediction on `y`:
@@ -16,14 +16,12 @@ type SGModelCV <: StochasticGradientStat
     o::SGModel
     o_l::SGModel    # low
     o_h::SGModel    # high
-    η::Float64      # constant part of decay rate
-    decay::Float64  # decay rate for λ
+    λrate::LearningRate
     xtest::AMatF
     ytest::AVecF
     burnin::Int
-    function SGModelCV(o::SGModel, xtest, ytest; η = .1, decay = .7, burnin = 1000)
-        @assert 0 < decay <= 1
-        new(o, copy(o), copy(o), η, decay, xtest, ytest, burnin)
+    function SGModelCV(o::SGModel, xtest, ytest; λrate = LearningRate(), burnin = 1000)
+        new(o, copy(o), copy(o), λrate, xtest, ytest, burnin)
     end
 end
 
@@ -33,14 +31,15 @@ function updateλ!{A <: SGAlgorithm, M <: ModelDefinition}(
         o::SGModel{A, M, NoPenalty},
         o_l::SGModel{A, M, NoPenalty},
         o_h::SGModel{A, M, NoPenalty},
-        x::AVecF, y::Float64, decay::Float64)
+        x::AVecF, y::Float64, λrate::LearningRate)
     update!(o, x, y)
 end
 
 # L2Penalty and L1Penalty
-function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64, xtest, ytest, η::Float64, decay::Float64)
+function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64, xtest, ytest, λrate)
     # alter λ for o_l and o_h
-    γ = η / (nobs(o) + 1) ^ decay
+    # γ = η / (nobs(o) + 1) ^ decay
+    γ = weight(λrate, 1, 1)
     o_l.penalty.λ = max(0.0, o_l.penalty.λ - γ)
     o_h.penalty.λ += γ
 
@@ -74,7 +73,7 @@ function update!(o::SGModelCV, x::AVecF, y::Float64)
         update!(o.o_l, x, y)
         update!(o.o_h, x, y)
     else
-        updateλ!(o.o, o.o_l, o.o_h, x, y, o.xtest, o.ytest, o.η, o.decay)
+        updateλ!(o.o, o.o_l, o.o_h, x, y, o.xtest, o.ytest, o.λrate)
     end
 end
 
@@ -97,7 +96,7 @@ end
 
 
 # Testing
-if false
+if true
     function linearmodeldata(n, p)
         x = randn(n, p)
         β = (collect(1:p) - .5*p) / p
@@ -105,10 +104,11 @@ if false
         (β, x, y)
     end
     n,p = 10_000, 10
-    β,x,y = linearmodeldata(n,p)
+    β, x, y = linearmodeldata(n,p)
+
+    _, x2, y2 = linearmodeldata(1000, 10)
 
     o = OnlineStats.SGModel(p, penalty = OnlineStats.L2Penalty(.1), algorithm = OnlineStats.RDA())
-    ocv = OnlineStats.SGModelCV(o, decay = .9)
-    v = OnlineStats.tracefit!(ocv, 100, x, y)
-    OnlineStats.traceplot(v, x -> vcat(OnlineStats.whatisλ(x)))
+    ocv = OnlineStats.SGModelCV(o, x2, y2)
+    update!(ocv, x, y)
 end

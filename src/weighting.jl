@@ -76,7 +76,7 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 # Recommendated SGD weighting from http://cilvr.cs.nyu.edu/diglib/lsml/bottou-sgd-tricks-2012.pdf
 # γ_t = 1 / (1 + λ * t)
 
-#  LearningRate was this:
+#  StochasticWeighting was this:
 #  γ_t = 1 / t ^ -r
 
 # Combine the above two schemes: γ_t = 1 / (1 + λ * t ^r)

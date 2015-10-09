@@ -24,7 +24,7 @@ export
     # common types
     OnlineStat,
     # weighting
-    Weighting, EqualWeighting, ExponentialWeighting, LearningRate,
+    Weighting, EqualWeighting, ExponentialWeighting, LearningRate, StochasticWeighting,
     # ported from streamstats
     BernoulliBootstrap, PoissonBootstrap, HyperLogLog,
     # summary

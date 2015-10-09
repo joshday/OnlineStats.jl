@@ -24,7 +24,7 @@ facts("SGModelCV") do
     _, xtest, ytest = linearmodeldata(1000, p, ρ)
 
     o = O.SGModel(p, penalty = O.L1Penalty(.1), algorithm = O.RDA())
-    ocv = O.SGModelCV(o, xtest, ytest, decay = .9)
+    ocv = O.SGModelCV(o, xtest, ytest)
     O.update!(ocv, x, y)
 
     println(o.penalty)
