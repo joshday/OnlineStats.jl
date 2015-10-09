@@ -15,4 +15,6 @@
 
 Install with `Pkg.add("OnlineStats")`
 
-### [Documentation](http://onlinestatsjl.readthedocs.org/en/latest/)
+### [Documentation](http://joshday.github.io/OnlineStats.jl/)
+
+The newest version of OnlineStats requires Julia 0.4.  If you are using Julia 0.3, OnlineStats documentation can be found [here](http://onlinestatsjl.readthedocs.org/en/latest/)
