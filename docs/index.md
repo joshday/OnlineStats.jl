@@ -1,10 +1,10 @@
 # Introduction
 
-**OnlineStats** is a [Julia](http://julialang.org) package which provides online algorithms for statistical models.  Observations are processed one at a time and all **algorithms use O(1) memory**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  For machine learning (predictive modeling) applications, online algorithms provide fast approximate solutions for when training time is a bottleneck.
+**OnlineStats** is a [Julia](http://julialang.org) package which provides online algorithms for statistical models.  Observations are processed one at a time and all **algorithms use O(1) memory**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  For machine learning (predictive modeling) applications, online algorithms provide fast approximate solutions to vastly reduce training time.  However, many of the algorithms provide exact analytical solutions.
 
 # Overview
 
-<h3>Every statistic/model is a type</h3>
+<h3>Every OnlineStat is a type</h3>
 
 Two general ways of creating objects:    
 
@@ -18,7 +18,7 @@ update!(o, rand(100))
 o = Mean(rand(100))
 ```
 
-<h3>All models can be updated</h3>
+<h3>All OnlineStats can be updated</h3>
 ```julia
 o = Variance(randn(100))
 update!(o, randn(123))
@@ -26,7 +26,7 @@ nobs(o)  # Number of observations = 223
 ```
 
 
-<h3>Models use a  Common Interface</h3>
+<h3>Common Interface</h3>
 
 
 | function                                   | Description                                                                        | Return               |
@@ -70,11 +70,13 @@ Each piece of data is weighted equally.
 
 Use equal weighting until the step size reaches `λ = 1/n`, then hold constant.
 
-<h3>Stochastic Weighting</h3>
+<h3>Learning Rate</h3>
 - `LearningRate(;r::Float64 = 1.0, λ::Float64 = 1.0, minstep::Float64 = 0.0)`
 
-For the `t`-th update, use weight `γ_t = 1 / (1 + λ * t^r)` (`r` $\in(.5, 1]$, `λ` > 0) until weights reach `minstep`, then hold constant.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.  TODO:  Add visualization of how parameters change weights.
+For the `t`-th update, use weight $γ_t = \frac{1}{1 + \lambda t^r}, r\in (.5, 1], \lambda > 0$, until weights reach `minstep`, then hold constant.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
 
+
+![](images/learningrate_rs.png)
 
 # What OnlineStats Can Do
 
@@ -102,7 +104,7 @@ For the `t`-th update, use weight `γ_t = 1 / (1 + λ * t^r)` (`r` $\in(.5, 1]$,
 | regression w/ ridge penalty       | `SparseReg`, `SGModel`       |
 | regression w/ elastic net penalty | `SparseReg`, `SGModel`       |
 | regression w/ SCAD penalty        | `SparseReg`, `SGModel`       |
-| self-tuning models                | `SGModelTune`                |
+| self-tuning models                | `SGModelCV`                  |
 | stepwise regression               | `StepwiseReg` (experimental) |
 | support vector machine            | `SGModel`                    |
 
@@ -116,7 +118,7 @@ For the `t`-th update, use weight `γ_t = 1 / (1 + λ * t^r)` (`r` $\in(.5, 1]$,
 
 
 <h3> Parametric Density Estimation </h3>
-For nonparametric density estimation, see [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHistograms.jl)
+For nonparametric density estimation, see [AverageShiftedHistograms.jl](https://github.com/joshday/AverageShiftedHistograms.jl)
 
 |                     |                  |
 |:--------------------|:-----------------|

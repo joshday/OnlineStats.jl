@@ -1,7 +1,6 @@
 # Models
 
 In the examples below, assume y is `Vector{Float64}` and x is `Matrix{Float64}`
-
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Models](#models)
@@ -18,12 +17,13 @@ In the examples below, assume y is `Vector{Float64}` and x is `Matrix{Float64}`
 	- [NormalMix](#normalmix)
 	- [Principal Components Analysis](#principal-components-analysis)
 	- [SGModel](#sgmodel)
-	- [SGModelTune](#sgmodeltune)
+	- [SGModelCV](#sgmodelcv)
 	- [ShermanMorrisonInverse](#shermanmorrisoninverse)
 	- [SparseReg](#sparsereg)
 	- [StepwiseReg](#stepwisereg)
 	- [Summary](#summary)
 	- [QuantileMM](#quantilemm)
+	- [QuantileSGD](#quantilesgd)
 	- [QuantRegMM](#quantregmm)
 	- [Variance](#variance)
 	- [Variances](#variances)
@@ -138,7 +138,7 @@ estimates of the (sub)gradient of the loss function.  Models available are :
 - `LogisticRegression()`
 - `PoissonRegression()`
 - `QuantileRegression(τ)`
-- `SVMLike` (Perceptron and Suppert Vector Machine)
+- `SVMLike` (Perceptron and Support Vector Machine)
 
 ```julia
 o = SGModel(x, y, model = L2Regression(), algorithm = RDA(), penalty = L1Penalty(.1))
@@ -147,12 +147,12 @@ predict(o, x)
 ```
 See the section on [Stochastic Subgradient Models](SGModel.md).
 
-## SGModelTune
+## SGModelCV
 Takes an SGModel and automatically fits the optimal tuning parameter.
 
 ```julia
 o = SGModel(size(x, 2))
-otune = SGModelTune(o)
+otune = SGModelCV(o, xtest, ytest)
 update!(otune, x, y)
 ```
 
@@ -215,15 +215,6 @@ statenames(o)
 state(o)
 ```
 
-## QuantRegMM
-Approximate quantile regression using an online MM algorithm.
-
-```julia
-o = QuantRegMM(size(x, 2), τ = .7)
-onlinefit!(o, batchsize, x, y)
-coef(o)
-```
-
 ## QuantileSGD
 Approximate quantiles using a stochastic (sub)gradient descent algorithm
 
@@ -231,6 +222,15 @@ Approximate quantiles using a stochastic (sub)gradient descent algorithm
 o = QuantileSGD(y, [.25, .5, .75], LearningRate(r = .7))
 statenames(o)
 state(o)
+```
+
+## QuantRegMM
+Approximate quantile regression using an online MM algorithm.
+
+```julia
+o = QuantRegMM(size(x, 2), τ = .7)
+onlinefit!(o, batchsize, x, y)
+coef(o)
 ```
 
 ## Variance

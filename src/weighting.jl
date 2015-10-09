@@ -106,7 +106,10 @@ function weight(w::LearningRate, unused1, unused2)
 end
 
 # Ease the transition to the new type
-StochasticWeighting(r::Float64 = .51, minstep::Float64 = 0.) = LearningRate(r = r, minstep = minstep)
+function StochasticWeighting(r::Float64 = .51, minstep::Float64 = 0.)
+    warn("StochasticWeighting is deprecated.  Use LearningRate instead")
+    LearningRate(r = r, minstep = minstep)
+end
 
 
 

@@ -2,7 +2,7 @@
 
 Plotting methods are provided by the [Plots](https://github.com/tbreloff/Plots.jl) package.
 
-The same method can be used to create plots using Gadfly, Immerse, PyPlot, Qwt, etc.  You just need to specify the appropriate backend (`gadfly!()`, `qwt!()`, etc.).  Check out the Plots.jl documentation for more info.
+The same method can be used to create plots using Gadfly, Immerse, PyPlot, Qwt, etc.  You just need to specify the appropriate backend (`gadfly()`, `pyplot()`, etc.).  See the [Plots.jl](https://github.com/tbreloff/Plots.jl) documentation for more info.
 
 ### Trace Plots
 
@@ -22,7 +22,9 @@ x = randn(10_000, 10)
 β = collect(1:10)
 y = x*β + randn(10_000)
 
-# coefficients of a stochastic gradient descent model
-o = SGModel(size(x, 2), algorithm = RDA())
+# traceplot of coefficient estimates
+o = SGModel(10, algorithm = RDA())
 traceplot!(o, 100, x, y, f = coef)
 ```
+
+![](images/traceplot.png)
