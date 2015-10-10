@@ -12,7 +12,7 @@ end
 function SGModel(
         p::Int;
         intercept::Bool = true,
-        algorithm::SGAlgorithm = SGD(),
+        algorithm::SGAlgorithm = ProxGrad(),
         model::ModelDefinition = L2Regression(),
         penalty::Penalty = NoPenalty()
     )
@@ -50,5 +50,3 @@ function Base.show(io::IO, o::SGModel)
     show(io, o.penalty)
     println(io, "  > β: ", StatsBase.coef(o))
 end
-
-#----------------------------------------------------------------------# include

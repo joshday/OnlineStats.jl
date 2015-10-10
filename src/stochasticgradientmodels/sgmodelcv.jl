@@ -31,7 +31,7 @@ function updateλ!{A <: SGAlgorithm, M <: ModelDefinition}(
         o::SGModel{A, M, NoPenalty},
         o_l::SGModel{A, M, NoPenalty},
         o_h::SGModel{A, M, NoPenalty},
-        x::AVecF, y::Float64, λrate::LearningRate)
+        x::AVecF, y::Float64, xtest, ytest, λrate::LearningRate)
     update!(o, x, y)
 end
 
@@ -49,10 +49,10 @@ function updateλ!(o::SGModel, o_l::SGModel, o_h::SGModel, x::AVecF, y::Float64,
     update!(o_h, x, y)
 
     # Find best model for test data
-    ŷ = predict(o, xtest)
-    ŷ_l = predict(o_l, xtest)
-    ŷ_h = predict(o_h, xtest)
-    v = vcat(rmse(ŷ_l, ytest), rmse(ŷ, ytest), rmse(ŷ_h, ytest))
+    loss_low = loss(o_l, xtest, ytest)
+    loss_mid = loss(o, xtest, ytest)
+    loss_hi = loss(o_h, xtest, ytest)
+    v = vcat(loss_low, loss_mid, loss_hi)
     _, j = findmin(v)
 
     if j == 1 # o_l is winner
@@ -106,9 +106,9 @@ if true
     n,p = 10_000, 10
     β, x, y = linearmodeldata(n,p)
 
-    _, x2, y2 = linearmodeldata(1000, 10)
+    _, x2, y2 = linearmodeldata(1000, 10)  # test set
 
-    o = OnlineStats.SGModel(p, penalty = OnlineStats.L2Penalty(.1), algorithm = OnlineStats.RDA())
+    o = OnlineStats.SGModel(p, penalty = OnlineStats.L2Penalty(.1), algorithm = OnlineStats.RDA(), model = L1Regression())
     ocv = OnlineStats.SGModelCV(o, x2, y2)
     update!(ocv, x, y)
 end

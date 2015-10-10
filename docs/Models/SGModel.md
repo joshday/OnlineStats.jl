@@ -21,7 +21,7 @@ SGModel(x, y; model = L2Regression(), penalty = NoPenalty(), algorithm = SGD())
 |:------------------|:--------------------------------------------------------------------|
 | `model`           | one of the ModelDefinition types below, default `L2Regression()`    |
 | `penalty`         | type of regularization, default: `NoPenalty()`                      |
-| `algorithm`       | online algorithm used, default: `SGD()`                             |
+| `algorithm`       | online algorithm used, default: `ProxGrad()`                        |
 | `intercept`       | `Bool`.  Should intercept be included in the model?  Default `true` |
 
 # Models
@@ -81,7 +81,8 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 - `ProxGrad(η = 1.0)`
     - Stochastic Proximal Subradient Method w/ ADAGRAD
     - `η` is a constant step size (> 0)
-    - This is similar to SGD, but weights are automatically determined by ADAGRAD.
+    - Weights are automatically determined by ADAGRAD.
+    - Penalties are handled with prox operators
 
 - `RDA(η = 1.0)`
     - Regularized Dual Averaging w/ ADAGRAD

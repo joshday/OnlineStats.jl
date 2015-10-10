@@ -9,7 +9,7 @@ immutable SGD <: SGAlgorithm   # step size is γ = η * nobs ^ -r
     r::Float64
     function SGD(;η::Real = 1.0, r::Real = .5)
         @assert η > 0
-        @assert 0 < r < 1
+        @assert 0 < r <= 1
         @compat new(Float64(η), Float64(r))
     end
 end
