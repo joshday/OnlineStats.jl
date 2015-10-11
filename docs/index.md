@@ -75,6 +75,8 @@ Use equal weighting until the step size reaches `λ = 1/n`, then hold constant.
 
 For the `t`-th update, use weight $γ_t = \frac{1}{1 + \lambda t^r}, r\in (.5, 1], \lambda > 0$, until weights reach `minstep`, then hold constant.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
 
+If this is unfamiliar territory for you, we recommend starting with `LearningRate(r = 0.6)`.
+
 
 ![](images/learningrate_rs.png)
 

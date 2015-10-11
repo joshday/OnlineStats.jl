@@ -3,14 +3,17 @@
 Automatically tune the penalty parameter for an SGModel by finding the best fit
 to the test data.
 
-`SGModelCV(o::SGModel, xtest, ytest; λrate = LearningRate())`
+`SGModelCV(o::SGModel, xtest, ytest; λrate = LearningRate(), burnin = 1000)`
+
+`SGModelCV(x, y, xtest, ytest; λrate = LearningRate(), burnin = 1000)`
 
 Each call to `update!(o::SGModelCV, x, y)` updates the penalty parameter λ by
-choosing the parameter which provides the best prediction on `y`:
+choosing the parameter which provides the best prediction on `y`, where `step`
+is decided by `λrate`:
 
-- `λ - 1 / nobs(o) ^ decay`
+- `λ - step`
 - `λ`
-- `λ + 1 / nobs(o) ^ decay`
+- `λ + step`
 """
 type SGModelCV <: StochasticGradientStat
     o::SGModel
@@ -23,6 +26,13 @@ type SGModelCV <: StochasticGradientStat
     function SGModelCV(o::SGModel, xtest, ytest; λrate = LearningRate(), burnin = 1000)
         new(o, copy(o), copy(o), λrate, xtest, ytest, burnin)
     end
+end
+
+function SGModelCV(x, y, xtest, ytest; λrate = LearningRate(), burnin = 1000, kw...)
+    o = SGModel(size(x, 2); kw...)
+    ocv = SGModelCV(o, xtest, ytest; λrate = λrate, burnin = burnin)
+    update!(ocv, x, y)
+    ocv
 end
 
 #----------------------------------------------------------------------# update!

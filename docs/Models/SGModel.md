@@ -113,6 +113,8 @@ This type is experimental, but very promising.
 
 ```julia
 o = SGModel(size(x, 2), penalty = L1Penalty(.1))
-o = SGModelCV(o, xtest, ytest)
+o = SGModelCV(o, xtest, ytest; λrate = LearningRate(), burnin = 1000)
 update!(o, x, y)
 ```
+
+After reaching `burnin` observations, updating a single observation will include adjusting (+/-) the penalty parameter by a step size determined by `λrate`.  The `λ` which minimizes the loss on the test set is then chosen.

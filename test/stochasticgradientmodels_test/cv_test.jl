@@ -21,8 +21,9 @@ facts("SGModelCV") do
     n, p = 5_000, 500
     ρ = .9 # correlations
     β, x, y = linearmodeldata(n, p, ρ)
-
     _, xtest, ytest = linearmodeldata(1000, p, ρ)
+
+    constructor_test = O.SGModelCV(x, y, xtest, ytest, penalty = O.L2Penalty(.1))
 
     o = O.SGModel(p, penalty = O.L1Penalty(.1), algorithm = O.RDA())
     ocv = O.SGModelCV(o, xtest, ytest)
