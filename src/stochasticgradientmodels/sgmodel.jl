@@ -1,4 +1,31 @@
 #----------------------------------------------------------------------# SGModel
+"""
+
+# Stochastic (Sub)Gradient-based Models
+
+`SGModel(x, y; model = L2Regression(), algorithm = ProxGrad(), penalty = NoPenalty())`
+
+### Models:
+- `HuberRegression(δ = 1.0)`
+- `L1Regression()`
+- `L2Regression()`
+- `LogisticRegression()`
+- `PoissonRegression()`
+- `QuantileRegression(τ = .5)`
+- `SVMLike()`
+
+### Algorithms:
+- `SGD()`:  Simple stochastic (sub)gradient descent
+- `ProxGrad()`:  Proximal subgradient descent with ADAGRAD-determined weights
+- `RDA()`:  Regularized Dual Averaging with ADAGRAD-determined weights
+
+### Penalties
+- `NoPenalty`
+- `L1Penalty(λ)`
+- `L2Penalty(λ)`
+- `ElasticNetPenalty(λ, α)`
+- `SCADPenalty(λ, a)` (not available for use with `RDA`)
+"""
 type SGModel{A <: SGAlgorithm, M <: ModelDefinition, P <: Penalty} <: StochasticGradientStat
     β0::Float64
     β::VecF
