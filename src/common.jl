@@ -11,7 +11,7 @@ nobs(o::OnlineStat) = o.n
 Update an OnlineStat with `data`.  If `b` is specified, the OnlineStat
 will be updated in batches of size `b`.
 """
-function update!(o::OnlineStat, y::Union{AVec, AMat}; b::Integer = size(y, 1))
+function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer = size(y, 1))
     b = @compat Int(b)
     n = size(y, 1)
     if b < n
@@ -29,7 +29,7 @@ function update!(o::OnlineStat, y::Union{AVec, AMat}; b::Integer = size(y, 1))
 end
 
 # Statistical Model update
-function update!(o::OnlineStat, x::AMat, y::AVec; b::Integer = length(y))
+function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer = length(y))
     b = @compat Int(b)
     n = length(y)
     if b < n
@@ -46,6 +46,8 @@ function update!(o::OnlineStat, x::AMat, y::AVec; b::Integer = length(y))
     end
 end
 
+# If an OnlineStat doesn't have an updatebatch method, update
+updatebatch!(o::OnlineStat, data...) = update!(o, data...)
 
 """
 `tracefit!(o, b, data...; batch = false)`

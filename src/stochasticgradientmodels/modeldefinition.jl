@@ -19,7 +19,7 @@ immutable L1Regression <: ModelDefinition end
 @inline ∇f(::L1Regression, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ) * xᵢ
 function loss{A<:SGAlgorithm, P<:Penalty}(o::SGModel{A, L1Regression, P}, x, y)
     yhat = predict(o, x)
-    sqrt(sumabs(y - yhat))
+    sumabs(y - yhat)
 end
 
 

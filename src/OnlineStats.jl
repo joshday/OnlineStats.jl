@@ -38,12 +38,20 @@ export
     ShermanMorrisonInverse, OnlineCholesky,
     # linearmodel
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
-    # stochasticgradientmodels
+    # stochasticmodel
+    StochasticModel,
+    Loss, L1Loss, L2Loss,
+    Link, IdentityLink,
+    Algorithm, SGD,
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
-    SGModel, SGModelCV,
-    SGD, ProxGrad, RDA,
-    L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike,
-    HuberRegression, PoissonRegression,
+
+
+    # stochasticgradientmodels
+    # Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
+    # SGModel, SGModelCV,
+    # SGD, ProxGrad, RDA,
+    # L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike,
+    # HuberRegression, PoissonRegression,
 
     # functions
     update!,                # update one observation at a time using Weighting scheme
@@ -74,12 +82,16 @@ include("plotmethods.jl")
 # Other
 include("common.jl")
 
-# SGModel
-include("stochasticgradientmodels/sgmodel.jl")
-include("stochasticgradientmodels/penalty.jl")
-include("stochasticgradientmodels/sgalgorithm.jl")
-include("stochasticgradientmodels/modeldefinition.jl")
-include("stochasticgradientmodels/sgmodelcv.jl")
+# StochasticModel
+# include("stochasticgradientmodels/sgmodel.jl")
+# include("stochasticgradientmodels/penalty.jl")
+# include("stochasticgradientmodels/sgalgorithm.jl")
+# include("stochasticgradientmodels/modeldefinition.jl")
+# include("stochasticgradientmodels/sgmodelcv.jl")
+include("stochasticmodel/stochasticmodel.jl")
+include("stochasticmodel/penalty.jl")
+include("stochasticmodel/sgd.jl")
+include("stochasticmodel/testcode.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
