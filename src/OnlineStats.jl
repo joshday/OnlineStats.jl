@@ -38,11 +38,13 @@ export
     ShermanMorrisonInverse, OnlineCholesky,
     # linearmodel
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
+
+
     # stochasticmodel
     StochasticModel,
-    Loss, L1Loss, L2Loss,
-    Link, IdentityLink,
-    Algorithm, SGD,
+    L2Regression, L1Regression, LogisticRegression, QuantileRegression,
+    HuberRegression, SVMLike, PoissonRegression,
+    SGD, ProxGrad, RDA,
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
 
@@ -90,7 +92,9 @@ include("common.jl")
 # include("stochasticgradientmodels/sgmodelcv.jl")
 include("stochasticmodel/stochasticmodel.jl")
 include("stochasticmodel/penalty.jl")
-include("stochasticmodel/sgd.jl")
+include("stochasticmodel/algorithms/sgd.jl")
+include("stochasticmodel/algorithms/proxgrad.jl")
+include("stochasticmodel/algorithms/rda.jl")
 include("stochasticmodel/testcode.jl")
 
 # Summary Statistics

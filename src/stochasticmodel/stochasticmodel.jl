@@ -1,36 +1,61 @@
 #------------------------------------------------------------------------# types
-typealias VecF Vector{Float64}
-typealias MatF Matrix{Float64}
-typealias AVec{T} AbstractVector{T}
-typealias AMat{T} AbstractMatrix{T}
-typealias AVecF AVec{Float64}
-typealias AMatF AMat{Float64}
-
-abstract Loss
-abstract Link
+abstract ModelDefinition
+abstract IdentityLinkModel <: ModelDefinition
 abstract Penalty
 abstract Algorithm
 
-#-------------------------------------------------------------------------# Loss
-immutable L1Loss <: Loss end
-immutable L2Loss <: Loss end
+#--------------------------------------------------------------# ModelDefinition
+immutable L1Regression <: IdentityLinkModel end
+immutable L2Regression <: IdentityLinkModel end
+immutable LogisticRegression <: ModelDefinition end
+immutable PoissonRegression <: ModelDefinition end
+immutable QuantileRegression <: IdentityLinkModel
+    τ::Float64
+    function QuantileRegression(τ::Real = .5)
+        @assert 0 < τ < 1
+        new(Float64(τ))
+    end
+end
+immutable SVMLike <: IdentityLinkModel end
+immutable HuberRegression <: IdentityLinkModel
+    δ::Float64
+    function HuberRegression(δ::Real = 1.0)
+        @assert δ > 0
+        new(Float64(δ))
+    end
+end
 
 
-@inline ∇ᵢloss(::L1Loss, ϵᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -sign(ϵᵢ)
-@inline ∇ᵢloss(::L2Loss, ϵᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = -ϵᵢ
+@inline ∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) = sign(ŷᵢ - yᵢ)
+@inline ∇f(::L2Regression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
+@inline ∇f(::LogisticRegression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
+@inline ∇f(l::QuantileRegression, yᵢ::Float64, ŷᵢ::Float64) = Float64(yᵢ < ŷᵢ) - l.τ
+@inline ∇f(::SVMLike, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ : 0.0
+@inline ∇f(l::HuberRegression, yᵢ::Float64, ŷᵢ::Float64) = abs(yᵢ - ŷᵢ) <= l.δ ? ŷᵢ - yᵢ : l.δ * sign(ŷᵢ - yᵢ)
 
-#-------------------------------------------------------------------------# Link
-immutable IdentityLink <: Link end
-@inline predict(::IdentityLink, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
-@inline predict(::IdentityLink, X::AMatF, β::VecF, β0::Float64) = X * β + β0
-@inline ∇ᵢlink(::IdentityLink, ϵᵢ::Float64, xᵢ::Float64, yᵢ::Float64, ŷᵢ::Float64) = xᵢ
+Base.show(io::IO, o::L1Regression) = println(io, "L1Regression")
+Base.show(io::IO, o::L2Regression) = println(io, "L2Regression")
+Base.show(io::IO, o::QuantileRegression) = println(io, "QuantileLoss(τ = $(o.τ))")
+Base.show(io::IO, o::SVMLike) = println(io, "SVMLike")
+Base.show(io::IO, o::HuberRegression) = println(io, "HuberRegression(δ = $(o.δ))")
 
-type StochasticModel{A<:Algorithm, Li<:Link, Lo<:Loss, P<:Penalty} <: OnlineStat
+@inline StatsBase.predict(::IdentityLinkModel, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
+@inline StatsBase.predict(::IdentityLinkModel, X::AMatF, β::VecF, β0::Float64) = X * β + β0
+@inline StatsBase.predict(::LogisticRegression, x::AVecF, β::VecF, β0::Float64) = 1.0 / (1.0 + exp(-dot(x, β) - β0))
+@inline StatsBase.predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) = 1.0 ./ (1.0 + exp(-X * β - β0))
+@inline StatsBase.predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
+@inline StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
+
+classify(::LogisticRegression, x::AVecF, β, β0) = Float64(predict(o, x) > 0.5)
+classify(::SVMLike, x::AVecF, β, β0) = Float64(predict(o, x) > 0.0)
+
+#------------------------------------------------------------------# StochasticModel
+"Stochastic models that are linear in the parameters"
+type StochasticModel{A<:Algorithm, M<:ModelDefinition, P<:Penalty} <: OnlineStat
     β0::Float64
     β::VecF
     intercept::Bool
-    link::Li
-    loss::Lo
+    model::M
     penalty::P
     algorithm::A
     n::Int
@@ -39,12 +64,11 @@ end
 function StochasticModel(
         p::Int;
         intercept::Bool = true,
-        link::Link = IdentityLink(),
-        loss::Loss = L2Loss(),
+        model::ModelDefinition = L2Regression(),
         penalty::Penalty = NoPenalty(),
         algorithm::Algorithm = SGD()
     )
-    StochasticModel(0.0, zeros(p), intercept, link, loss, penalty, algorithm, 0)
+    StochasticModel(0.0, zeros(p), intercept, model, penalty, algorithm, 0)
 end
 
 function StochasticModel(x::AMatF, y::AVecF; keyargs...)
@@ -53,18 +77,26 @@ function StochasticModel(x::AMatF, y::AVecF; keyargs...)
     o
 end
 
-@inline predict(o::StochasticModel, x::AVecF) = predict(o.link, x, o.β, o.β0)
+@inline StatsBase.predict(o::StochasticModel, x::AVecF) = predict(o.model, x, o.β, o.β0)
+@inline StatsBase.predict(o::StochasticModel, X::AMatF) = predict(o.model, X, o.β, o.β0)
 alg(o::StochasticModel) = o.algorithm
 pen(o::StochasticModel) = o.penalty
-
-
-function update!(o::StochasticModel, x::AMatF, y::AVecF)
-    for i in 1:length(y)
-        update!(o, rowvec_view(x,i), y[i])
-    end
-end
+StatsBase.coef(o::StochasticModel) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
+classify(o::StochasticModel, x::AVecF) = classify(o.model, x, o.β, o.β0)
+classify(o::StochasticModel, x::AMatF) = [classify(o.model, xi, o.β, o.β0) for xi in x]
 
 function update!(o::StochasticModel, x::AVecF, y::Float64)
     o.n += 1
     updateβ!(o, x, y)
+end
+
+function Base.show(io::IO, o::StochasticModel)
+    print_with_color(:blue, io, "StochasticModel")
+    println(io, "")
+    println(io, "  > Intercept:  ", o.intercept)
+    println(io, "")
+    println(io, "  > Model:      ", o.model)
+    println(io, "  > Penalty:    ", o.penalty)
+    println(io, "  > Algorithm:  ", o.algorithm)
+    println(io, "  > β:          ", coef(o))
 end

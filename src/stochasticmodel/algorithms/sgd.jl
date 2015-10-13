@@ -9,20 +9,18 @@ immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     end
 end
 
-@inline function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
-    yhat = predict(o, x)
-    ϵ = y - yhat
-    l = ∇ᵢloss(o.loss, ϵ, y, yhat)
+Base.show(io::IO, o::SGD) = println(io, "SGD(η = $(o.η), r = $(o.r))")
 
+@inline function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
+    g = ∇f(o.model, y, predict(o, x))
     γ = alg(o).η / nobs(o) ^ alg(o).r
 
     if o.intercept
-        o.β0 -= γ * l * ∇ᵢlink(o.link, ϵ, 1.0, y, yhat)
+        o.β0 -= γ * g
     end
 
     @inbounds for j in 1:length(x)
-        g = l * ∇ᵢlink(o.link, ϵ, x[j], y, yhat)
-        o.β[j] -= γ * add∇j(g, pen(o), o.β, j)
+        o.β[j] -= γ * add∇j(g * x[j], pen(o), o.β, j)
     end
     nothing
 end
