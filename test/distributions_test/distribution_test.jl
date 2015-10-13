@@ -162,7 +162,7 @@ facts("Distributions") do
         @fact o.meanlogx --> vec(mean(log(x1), 1))
         @fact o.n --> n1
 
-        updatebatch!(o, x2)
+        update!(o, x2, b = round(Int, n2/2))
         @fact length(o.d.alpha) --> αlength
 
         @pending o.d.alpha --> roughly(fit(Dirichlet, x').alpha, .01) "failure ok. fit() is to blame"
@@ -326,7 +326,7 @@ facts("Distributions") do
         @fact cov(o.c) --> roughly(o.d.Σ.mat)
         @fact o.n --> n1
 
-        OnlineStats.updatebatch!(o, x2)
+        OnlineStats.update!(o, x2, b = round(Int, n2 / 2))
         @fact o.d.μ --> roughly(vec(mean(x, 1)))
         @fact mean(o.c) --> roughly(vec(mean(x, 1)))
         @fact cov(o.c) --> roughly(cov(x))

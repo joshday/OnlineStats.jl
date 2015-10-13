@@ -56,7 +56,7 @@ facts("Mean") do
         o1 = copy(o)
         @fact mean(o) --> roughly(mean(x1))
         @fact nobs(o) --> n1
-        o2 = Mean(x1[1])
+        o2 = Mean(collect(x1[1]))
         @fact mean(o2) --> x1[1]
         @fact nobs(o2) --> 1
 
@@ -71,8 +71,8 @@ facts("Mean") do
 
         o = Mean()
         x = rand(100)
-        updatebatch!(o, x)
-        @fact mean(o) --> mean(x)
+        update!(o, x, b=50)
+        @fact mean(o) --> roughly(mean(x))
         @fact nobs(o) --> 100
     end
 
@@ -86,7 +86,7 @@ facts("Mean") do
         @fact mean(o) --> roughly(vec(mean(x1, 1)))
 
         x2 = rand(n, p)
-        updatebatch!(o, x2)
+        update!(o, x2, b = round(Int, n/ 2))
         @fact mean(o) --> roughly(vec(mean([x1; x2], 1)), 1e-3)
 
         x1 = rand(10)

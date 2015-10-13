@@ -6,55 +6,46 @@ nobs(o::OnlineStat) = o.n
 """
 `update!(o, data...)`
 
-Update an OnlineStat one data point at a time
+`update!(o, data...; b = batchsize)`
+
+Update an OnlineStat with `data`.  If `b` is specified, the OnlineStat
+will be updated in batches of size `b`.
 """
-function update!{T<:Real}(o::OnlineStat, x::AVec{T})
-    for xi in x
-        update!(o, xi)
-    end
-end
-
-function update!{T<:Real}(o::OnlineStat, x::AMat{T})
-  for i in 1:nrows(x)
-      update!(o, row(x,i))
-  end
-end
-
-function update!{T<:Real}(o::OnlineStat, x::AMat{T}, y::AVec{T})
-    @inbounds for i in 1:length(y)
-        update!(o, row(x,i), y[i])
-    end
-end
-
-# This breaks v0.3
-# """
-# `updatebatch!(o, data...)`
-#
-# Update an OnlineStat with a batch of data.  The batch is treated as an equal piece of information.
-# """
-# function updatebatch! end
-
-"""
-`onlinefit!(o, b, data...; batch = false)`
-
-Update the OnlineStat `o` with `data` using batches of size `b`.  If `batch = false`,
-this calls `update!(o, data...)`.  If `batch = true`, it calls `updatebatch!` for each batch.
-"""
-function onlinefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)
+function update!(o::OnlineStat, y::Union{AVec, AMat}; b::Integer = size(y, 1))
     b = @compat Int(b)
-    if !batch
-        update!(o, data...)
-    else
-        n = size(data[1],1)
+    n = size(y, 1)
+    if b < n
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            batch_data = map(x -> rows(x,rng), data)
-            updatebatch!(o, batch_data...)
+            updatebatch!(o, rows(y, rng))
             i += b
+        end
+    else
+        for i in 1:n
+            update!(o, row(y, i))
         end
     end
 end
+
+# Statistical Model update
+function update!(o::OnlineStat, x::AMat, y::AVec; b::Integer = length(y))
+    b = @compat Int(b)
+    n = length(y)
+    if b < n
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            updatebatch!(o, rows(x, rng), rows(y, rng))
+            i += b
+        end
+    else
+        for i in 1:n
+            update!(o, row(x, i), y[i])
+        end
+    end
+end
+
 
 """
 `tracefit!(o, b, data...; batch = false)`

@@ -1,8 +1,7 @@
 module CovarianceMatrixTest
 
-using FactCheck, StatsBase, MultivariateStats
-import OnlineStats
-import OnlineStats: CovarianceMatrix, update!, updatebatch!, state, statenames, pca, cov
+using OnlineStats, FactCheck, StatsBase, MultivariateStats
+
 
 facts("CovarianceMatrix") do
     o = CovarianceMatrix(10)
@@ -12,37 +11,35 @@ facts("CovarianceMatrix") do
     o = CovarianceMatrix(randn(1000, 50))
     @fact nobs(o) --> 1000
 
-    context("update! vs. updatebatch!") do
+    context("update singletons vs batches") do
         o1 = CovarianceMatrix(10)
         o2 = CovarianceMatrix(10)
         x = randn(1000,10)
         update!(o1, x)
-        updatebatch!(o2, x)
+        update!(o2, x, b = 500)
         @fact cov(o1) - cov(o2) --> roughly(zeros(10,10), 1e-8)
     end
 
     # create 4 batches
-    n1, n2, n3, n4 = rand(1:1_000_000, 4)
+    n1, n2, n3, n4 = fill(5000, 4)
     x1 = rand(n1, 10)
     x2 = rand(n2, 10)
     x3 = rand(n3, 10)
     x4 = rand(n4, 10)
     CovarianceMatrix(x1)
 
-    # updatebatch!
-    obj = CovarianceMatrix(x1)
-    @fact statenames(obj) --> [:μ, :Σ, :nobs]
-    @fact state(obj) --> Any[mean(obj), cov(obj), nobs(obj)]
-    updatebatch!(obj, x2)
-    updatebatch!(obj, x3)
-    updatebatch!(obj, x4)
+    # update with batches
+    o = CovarianceMatrix(x1)
+    @fact statenames(o) --> [:μ, :Σ, :nobs]
+    @fact state(o) --> Any[mean(o), cov(o), nobs(o)]
+    update!(o, vcat(x2, x3, x4), b = 5000)
 
     # Check that covariance matrix is approximately equal to truth
     c = cov(vcat(x1,x2,x3,x4))
-    cobj = cov(obj)
-    @fact c --> roughly(cobj, 1e-10)
-    @fact var(obj) - vec(var(vcat(x1, x2, x3, x4), 1)) --> roughly(zeros(10), 1e-10)
-    @fact std(obj) - vec(std(vcat(x1, x2, x3, x4), 1)) --> roughly(zeros(10), 1e-10)
+    covo = cov(o)
+    @fact maxabs(c - covo) --> less_than(1e-10)
+    @fact var(o) - vec(var(vcat(x1, x2, x3, x4), 1)) --> roughly(zeros(10), 1e-10)
+    @fact std(o) - vec(std(vcat(x1, x2, x3, x4), 1)) --> roughly(zeros(10), 1e-10)
 
     o1 = CovarianceMatrix(x1)
     o2 = CovarianceMatrix(x2)

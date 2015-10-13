@@ -96,10 +96,10 @@ facts("Variance") do
         o = [o; o2]
         OnlineStats.DEBUG(typeof(o))
 
-        x = rand(100)
+        x = rand(1000)
         o = Variance()
-        updatebatch!(o, x)
-        @fact mean(o) --> mean(x)
+        update!(o, x)
+        @fact mean(o) --> roughly(mean(x))
         @fact var(o) --> roughly(var(x))
     end
 
@@ -157,8 +157,8 @@ facts("Variance") do
 
         x = rand(100, 5)
         o = Variances(5)
-        updatebatch!(o, x)
-        @fact mean(o) --> vec(mean(x, 1))
+        update!(o, x)
+        @fact mean(o) --> roughly(vec(mean(x, 1)))
         @fact var(o) --> roughly(vec(var(x, 1)))
     end
 

@@ -19,7 +19,7 @@ facts("FiveNumberSummary") do
     @fact nobs(o) --> 2_000_000
 
      for i in 1:10000
-        updatebatch!(o, rand(100))
+        update!(o, rand(100), b=50)
     end
 
     @fact nobs(o) --> 3_000_000

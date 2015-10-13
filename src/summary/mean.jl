@@ -12,7 +12,6 @@ function Mean{T<:Real}(y::AVec{T}, wgt::Weighting = default(Weighting))
     o
 end
 
-Mean(y::Float64, wgt::Weighting = default(Weighting)) = Mean([y], wgt)
 Mean(wgt::Weighting = default(Weighting)) = Mean(0., 0, wgt)
 
 

@@ -12,7 +12,7 @@ facts("Quantiles") do
         n = 10_000
         for i in 1:n
             update!(o_uniform, rand(100))
-            updatebatch!(o_normal, randn(100))
+            update!(o_normal, randn(100), b=50)
         end
 
         @fact maxabs(o_uniform.q - τ) --> roughly(0, .1)
@@ -37,7 +37,7 @@ facts("Quantiles") do
         n = 10_000
         for i in 1:n
             update!(o_uniform, rand(100))
-            updatebatch!(o_normal, randn(100))
+            update!(o_normal, randn(100), b=50)
         end
 
         @fact maxabs(o_uniform.q - τ) --> roughly(0, .1)

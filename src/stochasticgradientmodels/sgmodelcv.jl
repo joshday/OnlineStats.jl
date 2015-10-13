@@ -106,7 +106,7 @@ end
 
 
 # Testing
-if true
+if false
     function linearmodeldata(n, p)
         x = randn(n, p)
         β = (collect(1:p) - .5*p) / p

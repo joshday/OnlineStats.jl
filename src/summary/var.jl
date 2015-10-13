@@ -59,15 +59,15 @@ function update!(o::Variance, y::Real)
     return
 end
 
-function updatebatch!(o::Variance, y::AVecF)
-    n2 = length(y)
-    μ = mean(y)
-    δ = μ - o.μ
-    λ = weight(o, n2)
-    o.μ = smooth(o.μ, μ, λ)
-    o.biasedvar = o.biasedvar + var(y) * ((n2 - 1) / n2) + λ * (1 - λ) * δ ^ 2
-    o.n += n2
-end
+# function updatebatch!(o::Variance, y::AVecF)
+#     n2 = length(y)
+#     μ = mean(y)
+#     δ = μ - o.μ
+#     λ = weight(o, n2)
+#     o.μ = smooth(o.μ, μ, λ)
+#     o.biasedvar = o.biasedvar + var(y) * ((n2 - 1) / n2) + λ * (1.0 - λ) * δ ^ 2
+#     o.n += n2
+# end
 
 
 # NOTE:
