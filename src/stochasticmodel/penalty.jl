@@ -4,7 +4,7 @@
 #----------------------------------------------------------------------# Penalty
 "No penalty on the coefficients"
 immutable NoPenalty <: Penalty end
-Base.show(io::IO, p::NoPenalty) = println(io, "NoPenalty")
+Base.show(io::IO, p::NoPenalty) = print(io, "NoPenalty")
 @inline _j(p::NoPenalty, β::VecF) = 0.0
 @inline prox(βj::Float64, p::NoPenalty, s::Float64) = βj
 
@@ -17,7 +17,7 @@ type L2Penalty <: Penalty
         @compat new(Float64(λ))
     end
 end
-Base.show(io::IO, p::L2Penalty) = println(io, "L2Penalty(λ = $(p.λ))")
+Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty(λ = $(p.λ))")
 @inline _j(p::L2Penalty, β::VecF) = sumabs2(β)
 # @inline function prox(βj::Float64, p::L2Penalty, s::Float64)
 #     βj / (1.0 + s * p.λ)
@@ -32,7 +32,7 @@ type L1Penalty <: Penalty
         new(@compat Float64(λ))
     end
 end
-Base.show(io::IO, p::L1Penalty) = println(io, "L1Penalty(λ = $(p.λ))")
+Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty(λ = $(p.λ))")
 @inline _j(p::L1Penalty, β::VecF) = sumabs(β)
 @inline prox(βj::Float64, p::L1Penalty, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
 
@@ -47,7 +47,7 @@ type ElasticNetPenalty <: Penalty
         @compat new(Float64(λ), Float64(α))
     end
 end
-Base.show(io::IO, p::ElasticNetPenalty) = println(io, "ElasticNetPenalty(λ = $(p.λ), α = $(p.α))")
+Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty(λ = $(p.λ), α = $(p.α))")
 @inline _j(p::ElasticNetPenalty, β::VecF) = p.λ * (p.α * sumabs(β) + (1 - p.α) * .5 * sumabs2(β))
 @inline function prox(βj::Float64, p::ElasticNetPenalty, s::Float64)
     βj = sign(βj) * max(abs(βj) - s * p.λ * p.α, 0.0)  # Lasso prox
@@ -66,7 +66,7 @@ type SCADPenalty <: Penalty
         @compat new(Float64(λ), Float64(a))
     end
 end
-Base.show(io::IO, p::SCADPenalty) = println(io, "SCADPenalty(λ = $(p.λ), a = $(p.a))")
+Base.show(io::IO, p::SCADPenalty) = print(io, "SCADPenalty(λ = $(p.λ), a = $(p.a))")
 @inline function _j(p::SCADPenalty, β::VecF)
     val = 0.0
     for j in 1:length(β)

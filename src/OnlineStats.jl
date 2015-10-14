@@ -41,7 +41,7 @@ export
 
 
     # stochasticmodel
-    StochasticModel,
+    StochasticModel, StochasticModelCV,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression,
     HuberRegression, SVMLike, PoissonRegression,
     SGD, ProxGrad, RDA,
@@ -88,7 +88,6 @@ include("stochasticmodel/algorithms/sgd.jl")
 include("stochasticmodel/algorithms/proxgrad.jl")
 include("stochasticmodel/algorithms/rda.jl")
 include("stochasticmodel/crossvalidate.jl")
-# include("stochasticmodel/testcode.jl")
 
 # Summary Statistics
 include("summary/mean.jl")
@@ -170,3 +169,6 @@ include("react.jl")
 
 
 end # module
+
+
+include("stochasticmodel/testcode.jl")

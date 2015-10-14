@@ -12,7 +12,7 @@ type ProxGrad <: Algorithm
     end
 end
 
-Base.show(io::IO, o::ProxGrad) = println(io, "ProxGrad(η = $(o.η))")
+Base.show(io::IO, o::ProxGrad) = print(io, "ProxGrad(η = $(o.η))")
 
 function updateβ!(o::StochasticModel{ProxGrad}, x::AVecF, y::Float64)
     if nobs(o) == 1 # on first update, set the size of o.algorithm.G

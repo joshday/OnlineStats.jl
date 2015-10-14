@@ -17,14 +17,12 @@ is decided by `λrate`:
 """
 type StochasticModelCV <: StochasticGradientStat
     o::StochasticModel
-    o_l::StochasticModel    # low
-    o_h::StochasticModel    # high
     λrate::LearningRate
     xtest::AMatF
     ytest::AVecF
     burnin::Int
     function StochasticModelCV(o::StochasticModel, xtest, ytest; λrate = LearningRate(), burnin = 1000)
-        new(o, copy(o), copy(o), λrate, xtest, ytest, burnin)
+        new(o, λrate, xtest, ytest, burnin)
     end
 end
 
@@ -39,19 +37,17 @@ end
 # NoPenalty
 function updateλ!{A <: Algorithm, M <: ModelDefinition}(
         o::StochasticModel{A, M, NoPenalty},
-        o_l::StochasticModel{A, M, NoPenalty},
-        o_h::StochasticModel{A, M, NoPenalty},
         x::AVecF, y::Float64, xtest, ytest, λrate::LearningRate)
     update!(o, x, y)
 end
 
 # Actual penalties
-function updateλ!(o::StochasticModel, o_l::StochasticModel, o_h::StochasticModel,
-        x::AVecF, y::Float64, xtest, ytest, λrate
-    )
+function updateλ!(o::StochasticModel, x::AVecF, y::Float64, xtest, ytest, λrate)
     # alter λ for o_l and o_h
-    # γ = η / (nobs(o) + 1) ^ decay
     γ = weight(λrate, 1, 1)
+    o_l = copy(o)
+    o_h = copy(o)
+
     o_l.penalty.λ = max(0.0, o_l.penalty.λ - γ)
     o_h.penalty.λ += γ
 
@@ -68,24 +64,23 @@ function updateλ!(o::StochasticModel, o_l::StochasticModel, o_h::StochasticMode
     _, j = findmin(v)
 
     if j == 1 # o_l is winner
-        o.penalty.λ = o_l.penalty.λ
-        o_h.penalty.λ = o_l.penalty.λ
-    elseif j == 2 # o is winner
-        o_l.penalty.λ = o.penalty.λ
-        o_h.penalty.λ = o.penalty.λ
-    else # o_h is winner
-        o_l.penalty.λ = o_h.penalty.λ
-        o.penalty.λ = o_h.penalty.λ
+        o.β0 = o_l.β0
+        o.β = o_l.β
+        o.algorithm = o_l.algorithm
+        o.penalty = o_l.penalty
+    elseif j == 3 # o_h is winner
+        o.β0 = o_h.β0
+        o.β = o_h.β
+        o.algorithm = o_h.algorithm
+        o.penalty = o_h.penalty
     end
 end
 
 function update!(o::StochasticModelCV, x::AVecF, y::Float64)
     if nobs(o) < o.burnin
         update!(o.o, x, y)
-        update!(o.o_l, x, y)
-        update!(o.o_h, x, y)
     else
-        updateλ!(o.o, o.o_l, o.o_h, x, y, o.xtest, o.ytest, o.λrate)
+        updateλ!(o.o, x, y, o.xtest, o.ytest, o.λrate)
     end
 end
 
@@ -101,29 +96,50 @@ StatsBase.nobs(o::StochasticModelCV) = nobs(o.o)
 StatsBase.predict(o::StochasticModelCV, x) = predict(o.o, x)
 
 function Base.show(io::IO, o::StochasticModelCV)
-    println(io, "Cross-Validated StochasticModelCV:")
-    show(o.o)
+    print_with_color(:blue, io, "Cross-Validated StochasticModel:\n")
+    println(io, "  > Burnin:     ", o.burnin)
+    println(io, "  > Avg. loss:  ", cv_criteria(o.o, o.xtest, o.ytest))
+    show(io, o.o)
 end
 
 #-----------------------------------------------------# cross validation critera
-cv_criteria(o::StochasticModel, x, y) = sumabs2(y - predict(o, x)) / length(y)
+"Cross validation criteria, average loss"
+function cv_criteria(o::StochasticModel, x, y)
+    mean(abs2(y - predict(o, x)))
+end
 
-
-
-# Testing
-if true
-    function linearmodeldata(n, p)
-        x = randn(n, p)
-        β = (collect(1:p) - .5*p) / p
-        y = x*β + randn(n)
-        (β, x, y)
+function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, HuberRegression, P}, x, y)
+    resid = y - predict(o, x)
+    for i in 1:length(resid)
+        if abs(resid[i]) > o.model.δ
+            resid[i] = 0.5 * resid[i] ^ 2
+        else
+            resid[i] = o.model.δ * abs(resid[i] - 0.5 * o.model.δ)
+        end
     end
-    n,p = 10_000, 10
-    β, x, y = linearmodeldata(n,p)
+    mean(resid)
+end
 
-    _, x2, y2 = linearmodeldata(1000, 10)  # test set
+function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, L1Regression, P}, x, y)
+    mean(abs(y - predict(o, x)))
+end
 
-    o = OnlineStats.StochasticModel(p, penalty = OnlineStats.L2Penalty(.1), algorithm = OnlineStats.RDA(), model = L2Regression())
-    ocv = OnlineStats.StochasticModelCV(o, x2, y2)
-    update!(ocv, x, y)
+function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, LogisticRegression, P}, x, y)
+    # p = predict(o, x)
+    # mean([p[i] * y[i] + (1 - p[i]) * (1 - y[i]) for i in 1:length(p)])
+    mean(abs(y - (predict(o, x) .> .5)))
+end
+
+function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, PoissonRegression, P}, x, y)
+    mean(abs(y - predict(o, x)))
+end
+
+function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, QuantileRegression, P}, x, y)
+    resid = y - predict(o, x)
+    mean([resid[i] * (o.model.τ - (resid[i] < 0)) for i in 1:length(y)])
+end
+
+function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, SVMLike, P}, x, y)
+    pred = predict(o, x)
+    mean([max(0.0, 1.0 - y[i] * pred[i]) for i in 1:length(pred)])
 end

@@ -9,7 +9,7 @@ immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     end
 end
 
-Base.show(io::IO, o::SGD) = println(io, "SGD(η = $(o.η), r = $(o.r))")
+Base.show(io::IO, o::SGD) = print(io, "SGD(η = $(o.η), r = $(o.r))")
 
 @inline function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
     g = ∇f(o.model, y, predict(o, x))

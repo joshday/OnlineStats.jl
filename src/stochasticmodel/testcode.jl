@@ -1,32 +1,41 @@
 ########################################################
-module TestMyCode
-using OnlineStats, Distributions, Plots
-n, p = 1_000_000, 20
-x = randn(n, p)
+module Test
 
-β = collect(1.:p) - p/2
-y = x * β
+using OnlineStats,Distributions
 
-# bernoulli responses
-# β = (collect(1.:p) - p/2) / p
-# y = [Float64(rand(Bernoulli(1 / (1 + exp(-xβi))))) for xβi in x*β]
-# y = 2y - 1
+function linearmodeldata(n, p)
+    x = randn(n, p)
+    β = (collect(1:p) - .5*p) / p
+    y = x*β + randn(n)
+    (β, x, y)
+end
 
-# poisson responses
-# β = (collect(1.:p) - p/2) / p
-# y = [Float64(rand(Poisson(exp(xβi)))) for xβi in x*β]
+function logisticdata(n, p)
+    x = randn(n, p)
+    β = (collect(1:p) - .5*p) / p
+    y = Float64[rand(Bernoulli(i)) for i in 1./(1 + exp(-x*β))]
+    (β, x, y)
+end
 
+function poissondata(n, p)
+    x = randn(n, p)
+    β = (collect(1:p) - .5*p) / p
+    y = Float64[rand(Poisson(exp(η))) for η in x*β]
+    (β, x, y)
+end
 
-β = vcat(0.0, β)
+n, p = 10_000, 10
+β, x, y = linearmodeldata(n,p)
+_, x2, y2 = linearmodeldata(1000, p)
+@time ocv = StochasticModelCV(x, y, x2, y2, penalty = L1Penalty(.1), algorithm = RDA())
+update!(ocv, x, y)
+show(ocv)
 
-o = StochasticModel(x, y, model = L1Regression(), algorithm = RDA(), penalty = L1Penalty(.2))
-@time o = StochasticModel(x, y, model = L1Regression(), algorithm = RDA(), penalty = L1Penalty(.2))
+β, x, y = logisticdata(n, p)
+_, x2, y2 = logisticdata(1000, p)
+@time ocv = StochasticModelCV(x, 2y-1, x2, y2, penalty = L2Penalty(.1), algorithm = SGD(), model = LogisticRegression(),
+    burnin = 9000)
+update!(ocv, x, y)
+show(ocv)
 
-# o = SGModel(x,y, model = L1Regression(), algorithm = RDA())
-# @time o = SGModel(x,y, model = L1Regression(), algorithm = RDA())
-
-println(maxabs(coef(o) - β))
-show(o)
-
-# display(plot(o))
-end # module
+end

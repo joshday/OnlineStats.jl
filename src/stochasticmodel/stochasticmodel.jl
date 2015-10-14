@@ -34,11 +34,11 @@ end
 @inline ∇f(::SVMLike, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ : 0.0
 @inline ∇f(l::HuberRegression, yᵢ::Float64, ŷᵢ::Float64) = abs(yᵢ - ŷᵢ) <= l.δ ? ŷᵢ - yᵢ : l.δ * sign(ŷᵢ - yᵢ)
 
-Base.show(io::IO, o::L1Regression) =        println(io, "L1Regression")
-Base.show(io::IO, o::L2Regression) =        println(io, "L2Regression")
-Base.show(io::IO, o::QuantileRegression) =  println(io, "QuantileLoss(τ = $(o.τ))")
-Base.show(io::IO, o::SVMLike) =             println(io, "SVMLike")
-Base.show(io::IO, o::HuberRegression) =     println(io, "HuberRegression(δ = $(o.δ))")
+Base.show(io::IO, o::L1Regression) =        print(io, "L1Regression")
+Base.show(io::IO, o::L2Regression) =        print(io, "L2Regression")
+Base.show(io::IO, o::QuantileRegression) =  print(io, "QuantileLoss(τ = $(o.τ))")
+Base.show(io::IO, o::SVMLike) =             print(io, "SVMLike")
+Base.show(io::IO, o::HuberRegression) =     print(io, "HuberRegression(δ = $(o.δ))")
 
 @inline StatsBase.predict(::IdentityLinkModel, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
 @inline StatsBase.predict(::IdentityLinkModel, X::AMatF, β::VecF, β0::Float64) = X * β + β0
@@ -47,8 +47,8 @@ Base.show(io::IO, o::HuberRegression) =     println(io, "HuberRegression(δ = $(
 @inline StatsBase.predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
 @inline StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
 
-classify(::LogisticRegression, x::AVecF, β, β0) = Float64(predict(o, x) > 0.5)
-classify(::SVMLike, x::AVecF, β, β0) = Float64(predict(o, x) > 0.0)
+classify(m::LogisticRegression, x::AVecF, β, β0) = Float64(predict(m, x, β, β0) > 0.5)
+classify(m::SVMLike, x::AVecF, β, β0) = Float64(predict(m, x, β, β0) > 0.0)
 
 
 #------------------------------------------------------------------# StochasticModel
@@ -85,7 +85,7 @@ alg(o::StochasticModel) = o.algorithm
 pen(o::StochasticModel) = o.penalty
 StatsBase.coef(o::StochasticModel) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
 classify(o::StochasticModel, x::AVecF) = classify(o.model, x, o.β, o.β0)
-classify(o::StochasticModel, x::AMatF) = [classify(o.model, xi, o.β, o.β0) for xi in x]
+classify(o::StochasticModel, x::AMatF) = [classify(o, row(x,i)) for i in 1:nrows(x)]
 statenames(o::StochasticModel) = [:β, :nobs]
 state(o::StochasticModel) = Any[coef(o), nobs(o)]
 
@@ -96,18 +96,14 @@ function update!(o::StochasticModel, x::AVecF, y::Float64)
 end
 
 function Base.show(io::IO, o::StochasticModel)
-    print_with_color(:blue, io, "StochasticModel")
-    println(io, "")
+    print_with_color(:blue, io, "StochasticModel\n")
+    println(io, "  > Nobs:       ", nobs(o))
     println(io, "  > Intercept:  ", o.intercept)
-    println(io, "")
     println(io, "  > Model:      ", o.model)
     println(io, "  > Penalty:    ", o.penalty)
     println(io, "  > Algorithm:  ", o.algorithm)
-    print(io, "  > % Nonzero:  ")
-    println(io, @sprintf "%3.2f percent" mean(coef(o) .!= 0) * 100)
-    println(io, "")
-    println(io, "  > β:          ")
-    show(coef(o))
+    println(io, "  > Sparsity:   ", @sprintf "%3.2f" mean(coef(o)[1+o.intercept:end] .!= 0))
+    println(io, "  > β:          ", coef(o))
 end
 
 function Plots.plot(o::StochasticModel)
