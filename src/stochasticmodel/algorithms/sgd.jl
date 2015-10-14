@@ -1,19 +1,19 @@
 "Stochastic (Sub)Gradient Descent"
 immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     η::Float64
-    r::Float64
-    function SGD(;η::Real = 1.0, r::Real = .5)
+    rate::LearningRate
+    function SGD(;η::Real = 1.0, kw...)
         @assert η > 0
-        @assert 0 < r <= 1
-        @compat new(Float64(η), Float64(r))
+        @compat new(Float64(η), LearningRate(kw...))
     end
 end
-
-Base.show(io::IO, o::SGD) = print(io, "SGD(η = $(o.η), r = $(o.r))")
+weight(alg::SGD) = alg.η * weight(alg.rate)
+Base.show(io::IO, o::SGD) = print(io, "SGD with rate γ_t = $(o.η) / (1 + $(o.rate.λ) * t^$(o.rate.r))")
 
 @inline function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
     g = ∇f(o.model, y, predict(o, x))
-    γ = alg(o).η / nobs(o) ^ alg(o).r
+    # γ = alg(o).η / nobs(o) ^ alg(o).r
+    γ = weight(o.algorithm)
 
     if o.intercept
         o.β0 -= γ * g
