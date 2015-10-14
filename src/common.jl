@@ -15,7 +15,7 @@ Update an OnlineStat with data `x`,`y` using minibatches of size `b`.
 function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer = 1)
     b = Int(b)
     n = size(y, 1)
-    @assert 0 < b <= n "batch size must be greater than 0, less than data size"
+    @assert 0 < b <= n "batch size must be positive and less than data size"
     if b == 1
         for i in 1:n
             update!(o, row(y, i))
@@ -34,7 +34,7 @@ end
 function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer = 1)
     b = @compat Int(b)
     n = length(y)
-    @assert 0 < b <=n "batch size must be greater than 0, less than data size"
+    @assert 0 < b <=n "batch size must be positive and less than data size"
     if b == 1
         for i in 1:n
             update!(o, row(x, i), y[i])
@@ -140,6 +140,6 @@ function Base.show(io::IO, o::OnlineStat)
     svals = state(o)
     print(io, "OnlineStat: ", name(o))
     for (i, sname) in enumerate(snames)
-        print(io, @sprintf("\n * %8s:  %s", sname, mystring(svals[i])))
+        print(io, @sprintf("\n > %8s:  %s", sname, mystring(svals[i])))
     end
 end
