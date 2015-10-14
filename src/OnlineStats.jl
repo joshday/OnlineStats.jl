@@ -44,7 +44,7 @@ export
     StochasticModel, StochasticModelCV,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression,
     HuberRegression, SVMLike, PoissonRegression,
-    SGD, ProxGrad, RDA,
+    SGD, ProxGrad, RDA, SAG,
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
     # functions
@@ -77,16 +77,12 @@ include("plotmethods.jl")
 include("common.jl")
 
 # StochasticModel
-# include("stochasticgradientmodels/sgmodel.jl")
-# include("stochasticgradientmodels/penalty.jl")
-# include("stochasticgradientmodels/sgalgorithm.jl")
-# include("stochasticgradientmodels/modeldefinition.jl")
-# include("stochasticgradientmodels/sgmodelcv.jl")
 include("stochasticmodel/stochasticmodel.jl")
 include("stochasticmodel/penalty.jl")
 include("stochasticmodel/algorithms/sgd.jl")
 include("stochasticmodel/algorithms/proxgrad.jl")
 include("stochasticmodel/algorithms/rda.jl")
+include("stochasticmodel/algorithms/sag.jl")
 include("stochasticmodel/crossvalidate.jl")
 
 # Summary Statistics
