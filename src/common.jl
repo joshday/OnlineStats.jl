@@ -46,7 +46,7 @@ function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer = length(y))
     end
 end
 
-# If an OnlineStat doesn't have an updatebatch method, update
+# If an OnlineStat doesn't have an updatebatch method, just use update
 updatebatch!(o::OnlineStat, data...) = update!(o, data...)
 
 """

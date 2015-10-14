@@ -47,14 +47,6 @@ export
     SGD, ProxGrad, RDA,
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
-
-    # stochasticgradientmodels
-    # Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
-    # SGModel, SGModelCV,
-    # SGD, ProxGrad, RDA,
-    # L2Regression, L1Regression, LogisticRegression, QuantileRegression, SVMLike,
-    # HuberRegression, PoissonRegression,
-
     # functions
     update!,                # update one observation at a time using Weighting scheme
     distributionfit,        # easy constructor syntax for FitDist types
@@ -95,7 +87,8 @@ include("stochasticmodel/penalty.jl")
 include("stochasticmodel/algorithms/sgd.jl")
 include("stochasticmodel/algorithms/proxgrad.jl")
 include("stochasticmodel/algorithms/rda.jl")
-include("stochasticmodel/testcode.jl")
+include("stochasticmodel/crossvalidate.jl")
+# include("stochasticmodel/testcode.jl")
 
 # Summary Statistics
 include("summary/mean.jl")

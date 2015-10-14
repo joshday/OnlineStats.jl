@@ -30,7 +30,7 @@ At each snapshot, the value(s) `y = f(o)` is plotted at `x = nobs(o)`.
 
 ### Example: coefficients of a stochastic gradient descent model
 
-`o = SGModel(size(x,2))`
+`o = StochasticModel(size(x,2))`
 
 `traceplot!(o, batchsize, x, y)`
 """
@@ -53,7 +53,7 @@ if false
     x = randn(n, p)
     β = vcat(1:p) - p/2
     y = 3.0 + x*β + randn(n)
-    o = OnlineStats.SGModel(p, algorithm = OnlineStats.RDA(η = .1))
+    o = OnlineStats.StochasticModel(p, algorithm = OnlineStats.RDA(η = .1))
     OnlineStats.traceplot!(o, 1000, x, y)
 
     o = OnlineStats.Mean()

@@ -11,7 +11,10 @@ type ProxGrad <: Algorithm
         new(Float64(δ), zeros(2), Float64(η))
     end
 end
-@inline function updateβ!(o::StochasticModel{ProxGrad}, x::AVecF, y::Float64)
+
+Base.show(io::IO, o::ProxGrad) = println(io, "ProxGrad(η = $(o.η))")
+
+function updateβ!(o::StochasticModel{ProxGrad}, x::AVecF, y::Float64)
     if nobs(o) == 1 # on first update, set the size of o.algorithm.G
         alg(o).G = zeros(length(x)) + alg(o).G0
     end

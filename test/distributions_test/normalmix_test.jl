@@ -24,7 +24,7 @@ facts("NormalMix") do
         trueModel = MixtureModel(Normal, [(0, 1), (10, 5)], [.3, .7])
         x = rand(trueModel, n)
         o = NormalMix(2, x[1:100], LearningRate(r = .8))
-        update!(o, x[101:end], b = 100)
+        update!(o, x[101:end], 100)
         @fact sort(OnlineStats.means(o)) --> roughly([0., 10.], .1)
         @fact sort(OnlineStats.stds(o)) --> roughly([1., 5.], .1)
         @fact sort(probs(o)) --> roughly([.3, .7], .1)

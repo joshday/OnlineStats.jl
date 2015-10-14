@@ -30,29 +30,29 @@ facts("SGD") do
     ############################################################### L2Regression
     print_with_color(:blue, " * L2Regression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty())
+        o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty())
         predict(o, x)
         @fact length(coef(o)) --> p + 1
         state(o)
         @fact statenames(o) --> [:β, :nobs]
 
-        o = SGModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false)
+        o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false)
         @fact length(coef(o)) --> p
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = L1Penalty(.1))
+        o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = L2Penalty(.1))
+        o = StochasticModel(x, y, model = L2Regression(), penalty = L2Penalty(.1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = ElasticNetPenalty(.1, .5))
+        o = StochasticModel(x, y, model = L2Regression(), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
     context("SCADPenalty") do
-        o = SGModel(x, y, model = L2Regression(), penalty = SCADPenalty(.1, 3.7))
+        o = StochasticModel(x, y, model = L2Regression(), penalty = SCADPenalty(.1, 3.7))
         predict(o, x)
     end
 
@@ -62,19 +62,19 @@ facts("SGD") do
     ############################################################### L1Regression
     print_with_color(:blue, " * L1Regression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = NoPenalty())
+        o = StochasticModel(x, y, model = L1Regression(), penalty = NoPenalty())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = L1Penalty(.1))
+        o = StochasticModel(x, y, model = L1Regression(), penalty = L1Penalty(.1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = L2Penalty(.1))
+        o = StochasticModel(x, y, model = L1Regression(), penalty = L2Penalty(.1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = L1Regression(), penalty = ElasticNetPenalty(.1, .5))
+        o = StochasticModel(x, y, model = L1Regression(), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
 
@@ -83,19 +83,19 @@ facts("SGD") do
     ######################################################### QuantileRegression
     print_with_color(:blue, " * QuantileRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = NoPenalty())
+        o = StochasticModel(x, y, model = QuantileRegression(.5), penalty = NoPenalty())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = L1Penalty(.1))
+        o = StochasticModel(x, y, model = QuantileRegression(.5), penalty = L1Penalty(.1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = L2Penalty(.1))
+        o = StochasticModel(x, y, model = QuantileRegression(.5), penalty = L2Penalty(.1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = QuantileRegression(.5), penalty = ElasticNetPenalty(.1, .5))
+        o = StochasticModel(x, y, model = QuantileRegression(.5), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
 
@@ -104,19 +104,19 @@ facts("SGD") do
     ############################################################ HuberRegression
     print_with_color(:blue, " * HuberRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = NoPenalty())
+        o = StochasticModel(x, y, model = HuberRegression(.5), penalty = NoPenalty())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = L1Penalty(.1))
+        o = StochasticModel(x, y, model = HuberRegression(.5), penalty = L1Penalty(.1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = L2Penalty(.1))
+        o = StochasticModel(x, y, model = HuberRegression(.5), penalty = L2Penalty(.1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = HuberRegression(.5), penalty = ElasticNetPenalty(.1, .5))
+        o = StochasticModel(x, y, model = HuberRegression(.5), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
 
@@ -126,19 +126,19 @@ facts("SGD") do
     ######################################################### LogisticRegression
     print_with_color(:blue, " * LogisticRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = NoPenalty())
+        o = StochasticModel(x, y, model = LogisticRegression(), penalty = NoPenalty())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = L1Penalty(.1))
+        o = StochasticModel(x, y, model = LogisticRegression(), penalty = L1Penalty(.1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = L2Penalty(.1))
+        o = StochasticModel(x, y, model = LogisticRegression(), penalty = L2Penalty(.1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = LogisticRegression(), penalty = ElasticNetPenalty(.1, .5))
+        o = StochasticModel(x, y, model = LogisticRegression(), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
 
@@ -148,19 +148,19 @@ facts("SGD") do
     ########################################################## PoissonRegression
     print_with_color(:blue, " * PoissonRegression * \n")
     context("NoPenalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = NoPenalty(), algorithm = SGD(η = .1))
+        o = StochasticModel(x, y, model = PoissonRegression(), penalty = NoPenalty(), algorithm = SGD(η = .1))
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = L1Penalty(.1), algorithm = SGD(η = .1))
+        o = StochasticModel(x, y, model = PoissonRegression(), penalty = L1Penalty(.1), algorithm = SGD(η = .1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = L2Penalty(.1), algorithm = SGD(η = .1))
+        o = StochasticModel(x, y, model = PoissonRegression(), penalty = L2Penalty(.1), algorithm = SGD(η = .1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = PoissonRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = SGD(η = .1))
+        o = StochasticModel(x, y, model = PoissonRegression(), penalty = ElasticNetPenalty(.1, .5), algorithm = SGD(η = .1))
         predict(o, x)
     end
 
@@ -170,19 +170,19 @@ facts("SGD") do
     print_with_color(:blue, " * SVMLike * \n")
     y = 2y - 1
     context("NoPenalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = NoPenalty())
+        o = StochasticModel(x, y, model = SVMLike(), penalty = NoPenalty())
         predict(o, x)
     end
     context("L1Penalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = L1Penalty(.1))
+        o = StochasticModel(x, y, model = SVMLike(), penalty = L1Penalty(.1))
         predict(o, x)
     end
     context("L2Penalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = L2Penalty(.1))
+        o = StochasticModel(x, y, model = SVMLike(), penalty = L2Penalty(.1))
         predict(o, x)
     end
     context("ElasticNetPenalty") do
-        o = SGModel(x, y, model = SVMLike(), penalty = ElasticNetPenalty(.1, .5))
+        o = StochasticModel(x, y, model = SVMLike(), penalty = ElasticNetPenalty(.1, .5))
         predict(o, x)
     end
 end

@@ -71,7 +71,7 @@ facts("Mean") do
 
         o = Mean()
         x = rand(100)
-        update!(o, x, b=50)
+        update!(o, x, 50)
         @fact mean(o) --> roughly(mean(x))
         @fact nobs(o) --> 100
     end
@@ -86,7 +86,7 @@ facts("Mean") do
         @fact mean(o) --> roughly(vec(mean(x1, 1)))
 
         x2 = rand(n, p)
-        update!(o, x2, b = round(Int, n/ 2))
+        update!(o, x2, round(Int, n/ 2))
         @fact mean(o) --> roughly(vec(mean([x1; x2], 1)), 1e-3)
 
         x1 = rand(10)

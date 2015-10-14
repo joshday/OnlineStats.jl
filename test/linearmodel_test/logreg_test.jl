@@ -14,9 +14,9 @@ facts("LogReg") do
         x = randn(100, 5)
         y = round(Int, logitinverse(x*β) .< rand(100))
 
-        update!(o, x, y, b = 50)
+        update!(o, x, y, 50)
         o = LogRegSGD2(x, y)
-        update!(o, x, y, b = 50)
+        update!(o, x, y, 50)
 
         @fact statenames(o) --> [:β, :nobs]
         @fact state(o)[1] --> coef(o)
@@ -33,7 +33,7 @@ facts("LogReg") do
         x = randn(100, 5)
         y = round(Int, logitinverse(x*β) .< rand(100))
 
-        update!(o, x, y, b = 50)
+        update!(o, x, y, 50)
         o = LogRegMM(x, y)
         update!(o, x, y)
 

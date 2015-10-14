@@ -44,7 +44,7 @@ facts("Linear Model") do
         for i in 1:10_000
             randn!(x)
             y = x*β + randn(100)
-            update!(o, x, y, b = 50)
+            update!(o, x, y, 50)
         end
         @fact coef(o) --> roughly(ones(10), .01)
         @fact predict(o, x) --> x * coef(o)
@@ -56,7 +56,7 @@ facts("Linear Model") do
 
         x = randn(10000, 10)
         y = x*β + randn(10000)
-        OnlineStats.update!(o1, x, y, b = 5000)
+        OnlineStats.update!(o1, x, y, 5000)
         OnlineStats.update!(o2, x, y)
         @fact coef(o1) --> roughly(coef(o2), .1)
 
@@ -78,7 +78,7 @@ facts("Linear Model") do
         # things to add tests for:
         o = OnlineStats.StepwiseReg(p)
         o = OnlineStats.StepwiseReg(x, y)
-        OnlineStats.update!(o, x, y, b = 500)
+        OnlineStats.update!(o, x, y, 500)
         state(o)
         statenames(o)
         coef(o)
@@ -92,7 +92,7 @@ facts("Linear Model") do
         β = [1:5; zeros(p - 5)]
         y = x * β + randn(n)
 
-        update!(o, x, y, b = 5000)
+        update!(o, x, y, 5000)
         @fact coef(o) --> roughly(coef(SparseReg(x, y)))
         @fact statenames(o) --> [:β, :nobs]
         @fact state(o) --> Any[coef(o), nobs(o)]

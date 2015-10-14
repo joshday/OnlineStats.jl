@@ -13,6 +13,8 @@ type RDA <: Algorithm
     end
 end
 
+Base.show(io::IO, o::RDA) = println(io, "RDA(η = $(o.η))")
+
 
 function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
     if nobs(o) == 1

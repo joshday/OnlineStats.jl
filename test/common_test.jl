@@ -19,7 +19,7 @@ facts("Common") do
         show(L1Penalty(.1))
         show(L2Penalty(.1))
         show(ElasticNetPenalty(.1, .5))
-        show(SGModel(10))
+        show(StochasticModel(10))
     end
 
     context("Helper Functions") do

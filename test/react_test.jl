@@ -84,9 +84,9 @@ facts("React") do
     β = collect(1.:p);
     y = x * β + randn(n)*10;
 
-    reg = SGModel(p, intercept = false, algorithm = ProxGrad())
+    reg = StochasticModel(p, intercept = false, algorithm = ProxGrad())
 
-    # note here... the update! method of SGModel takes an x and y arg, so there
+    # note here... the update! method of StochasticModel takes an x and y arg, so there
     # should be a 2-item tuple on the left hand side of the pipe
     # $1 refers to the first arg (x) and $2 refers to the second (y)
     f = @stream ($1,$2) |> reg
@@ -111,8 +111,8 @@ facts("React") do
     β = collect(1.:p);
     y = x * β + randn(n)*10;
 
-    reg1 = SGModel(p, intercept = false, algorithm = ProxGrad())
-    reg2 = SGModel(p, intercept = false, algorithm = SGD())
+    reg1 = StochasticModel(p, intercept = false, algorithm = ProxGrad())
+    reg2 = StochasticModel(p, intercept = false, algorithm = SGD())
     reg3 = LinReg(p)
 
     # there are a few things to note here:

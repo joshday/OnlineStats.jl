@@ -16,7 +16,7 @@ facts("CovarianceMatrix") do
         o2 = CovarianceMatrix(10)
         x = randn(1000,10)
         update!(o1, x)
-        update!(o2, x, b = 500)
+        update!(o2, x, 500)
         @fact cov(o1) - cov(o2) --> roughly(zeros(10,10), 1e-8)
     end
 
@@ -32,7 +32,7 @@ facts("CovarianceMatrix") do
     o = CovarianceMatrix(x1)
     @fact statenames(o) --> [:μ, :Σ, :nobs]
     @fact state(o) --> Any[mean(o), cov(o), nobs(o)]
-    update!(o, vcat(x2, x3, x4), b = 5000)
+    update!(o, vcat(x2, x3, x4), 5000)
 
     # Check that covariance matrix is approximately equal to truth
     c = cov(vcat(x1,x2,x3,x4))

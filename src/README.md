@@ -1,4 +1,7 @@
 # Online Algorithms Implementation Progress
+
+# WARNING: This is typically outdated
+
 ## Summary Statistics
 - [x] Mean: `Mean`, `Means`
 - [x] Variance: `Variance`, `Variances`
@@ -42,18 +45,18 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 - [ ] Negative Multinomial
 
 ## Linear Models
-- [x] OLS: `LinReg`, `SparseReg`, `SGModel`
-- [x] L1 Loss Regression: `SGModel`
-- [x] Huber Loss Regression: `SGModel`
+- [x] OLS: `LinReg`, `SparseReg`, `StochasticModel`
+- [x] L1 Loss Regression: `StochasticModel`
+- [x] Huber Loss Regression: `StochasticModel`
 - [x] Stepwise Regression: `StepwiseReg` (experimental)
 
 ### Penalized Regression
-- [x] LASSO: `SparseReg`, `SGModel`
-- [x] Ridge: `SparseReg`, `SGModel`
+- [x] LASSO: `SparseReg`, `StochasticModel`
+- [x] Ridge: `SparseReg`, `StochasticModel`
 - [x] Elastic Net: `SparseReg`
 
 ### Quantile Regression
-- [x] Linear Quantile Regression: `QuantRegMM`, `SGModel`
+- [x] Linear Quantile Regression: `QuantRegMM`, `StochasticModel`
 - [ ] Composite Linear Quantile Regression:
 
 ### Variance Component Model
@@ -62,10 +65,10 @@ See also: [AverageShiftedHistograms](https://github.com/joshday/AverageShiftedHi
 
 ## Generalized Linear Models (GLM)
 - [ ] Cox Model
-- [x] Logistic Regression: `LogRegMM`, `SGModel`
+- [x] Logistic Regression: `LogRegMM`, `StochasticModel`
 - [ ] Multinomial Logistic Regression
-- [x] Poisson Regression: `SGModel`
+- [x] Poisson Regression: `StochasticModel`
 - [ ] Probit Regression
 
 ## Other
-- [x] Support Vector Machine: `SGModel`
+- [x] Support Vector Machine: `StochasticModel`

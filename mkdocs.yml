@@ -15,5 +15,5 @@ pages:
     - 'Introduction': 'index.md'
     - 'Models':
         - 'Models': 'Models/Models.md'
-        - 'Stochastic Subgradient Models': 'Models/SGModel.md'
+        - 'Stochastic Models': 'Models/StochasticModel.md'
     - 'Visualization': 'Plotting.md'
