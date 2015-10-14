@@ -93,10 +93,10 @@ type LearningRate <: Weighting
     minstep::Float64    # minimum step size
     t::Int64            # number of updates
 
-    function LearningRate(;r::Float64 = 1.0, λ::Float64 = 1.0, minstep::Float64 = 0.0)
+    function LearningRate(;r::Real = 1.0, λ::Real = 1.0, minstep::Real = 0.0)
         @assert 0 < r <= 1
         @assert λ > 0
-        new(r, λ, minstep, 0)
+        new(Float64(r), Float64(λ), Float64(minstep), 0)
     end
 end
 function weight(w::LearningRate, unused1 = 1, unused2 = 1)

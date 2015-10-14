@@ -98,7 +98,13 @@ end
 function Base.show(io::IO, o::StochasticModel)
     print_with_color(:blue, io, "StochasticModel\n")
     println(io, "  > Nobs:       ", nobs(o))
-    println(io, "  > Intercept:  ", o.intercept)
+      print(io, "  > Intercept:  ")
+    if o.intercept
+        print_with_color(:green, io, string(o.intercept))
+    else
+        print_with_color(:red, io, string(o.intercept))
+    end
+    println(io, "")
     println(io, "  > Model:      ", o.model)
     println(io, "  > Penalty:    ", o.penalty)
     println(io, "  > Algorithm:  ", o.algorithm)

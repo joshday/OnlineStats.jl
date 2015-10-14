@@ -4,44 +4,47 @@ nobs(o::OnlineStat) = o.n
 
 
 """
-`update!(o, data...)`
+```
+update!(o, y, b=1)
 
-`update!(o, data...; b = batchsize)`
+update!(o, x, y, b=1)
+```
 
-Update an OnlineStat with `data`.  If `b` is specified, the OnlineStat
-will be updated in batches of size `b`.
+Update an OnlineStat with data `x`,`y` using minibatches of size `b`.
 """
-function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer = size(y, 1))
-    b = @compat Int(b)
+function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer = 1)
+    b = Int(b)
     n = size(y, 1)
-    if b < n
+    @assert 0 < b <= n "batch size must be greater than 0, less than data size"
+    if b == 1
+        for i in 1:n
+            update!(o, row(y, i))
+        end
+    else
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
             updatebatch!(o, rows(y, rng))
             i += b
         end
-    else
-        for i in 1:n
-            update!(o, row(y, i))
-        end
     end
 end
 
 # Statistical Model update
-function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer = length(y))
+function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer = 1)
     b = @compat Int(b)
     n = length(y)
-    if b < n
+    @assert 0 < b <=n "batch size must be greater than 0, less than data size"
+    if b == 1
+        for i in 1:n
+            update!(o, row(x, i), y[i])
+        end
+    else
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
             updatebatch!(o, rows(x, rng), rows(y, rng))
             i += b
-        end
-    else
-        for i in 1:n
-            update!(o, row(x, i), y[i])
         end
     end
 end

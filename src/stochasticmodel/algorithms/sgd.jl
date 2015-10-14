@@ -4,7 +4,7 @@ immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     rate::LearningRate
     function SGD(;η::Real = 1.0, kw...)
         @assert η > 0
-        @compat new(Float64(η), LearningRate(kw...))
+        @compat new(Float64(η), LearningRate(;kw...))
     end
 end
 weight(alg::SGD) = alg.η * weight(alg.rate)
