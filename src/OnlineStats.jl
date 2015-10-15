@@ -50,7 +50,6 @@ export
     # functions
     update!,                # update one observation at a time using Weighting scheme
     distributionfit,        # easy constructor syntax for FitDist types
-    tracefit!,              # return vector, each element is OnlineStat after updating with minibatch
     state,                  # get state of object, typically Any[value, nobs(o)]
     statenames,             # corresponding names to state()
     weighting,              # get the Weighting of an object

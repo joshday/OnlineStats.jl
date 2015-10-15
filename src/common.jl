@@ -1,25 +1,28 @@
-#-----------------------------------------# generic: nobs, update!, copy, merge
 "The number of observations"
-nobs(o::OnlineStat) = o.n
+StatsBase.nobs(o::OnlineStat) = o.n
 
 
+#---------------------------------------------------------------# update methods
 """
 ```
-update!(o, y, b=1)
-
-update!(o, x, y, b=1)
+update!(o, data...)
+update!(o, data..., b)
 ```
 
-Update an OnlineStat with data `x`,`y` using minibatches of size `b`.
+Update an OnlineStat with `data...`. If specified, uses minibatches of size `b`.
 """
-function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer = 1)
+function update!(o::OnlineStat, y::Union{AVec, AMat})
+    for i in 1:size(y, 1)
+        update!(o, row(y, i))
+    end
+end
+
+function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
     b = Int(b)
     n = size(y, 1)
     @assert 0 < b <= n "batch size must be positive and less than data size"
     if b == 1
-        for i in 1:n
-            update!(o, row(y, i))
-        end
+        update!(o, y)
     else
         i = 1
         while i <= n
@@ -31,14 +34,18 @@ function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer = 1)
 end
 
 # Statistical Model update
-function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer = 1)
-    b = @compat Int(b)
+function update!(o::OnlineStat, x::AMat, y::AVec)
+    for i in 1:length(y)
+        update!(o, row(x, i), y[i])
+    end
+end
+
+function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer)
+    b = Int(b)
     n = length(y)
     @assert 0 < b <=n "batch size must be positive and less than data size"
     if b == 1
-        for i in 1:n
-            update!(o, row(x, i), y[i])
-        end
+        update!(o, x, y)
     else
         i = 1
         while i <= n
@@ -52,29 +59,15 @@ end
 # If an OnlineStat doesn't have an updatebatch method, just use update
 updatebatch!(o::OnlineStat, data...) = update!(o, data...)
 
-"""
-`tracefit!(o, b, data...; batch = false)`
-
-Run through data as in `distributionfit!`.  Return a vector of OnlineStats where each
-element has been updated with a batch of size `b`.
-"""
-function tracefit!(o::OnlineStat, b::Integer, data...; batch::Bool = false)
-    b = @compat Int(b)
-    n = nrows(data[1])
-    i = 1
-    s = state(o)
-    result = [copy(o)]
-    while i <= n
-        rng = i:min(i + b - 1, n)
-        batch_data = map(x -> rows(x, rng), data)
-        batch ? updatebatch!(o, batch_data...) : update!(o, batch_data...)
-        push!(result, copy(o))
-        i += b
-    end
-    result
+# With callback
+function update!(o::OnlineStat, data...; f::Function = o->state(o)[1])
+    update!(o, data...)
+    f(o)
 end
 
 
+
+#------------------------------------------------------------------------# Other
 Base.copy(o::OnlineStat) = deepcopy(o)
 
 function Base.merge(o1::OnlineStat, o2::OnlineStat)

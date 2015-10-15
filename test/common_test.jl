@@ -66,15 +66,6 @@ facts("Common") do
         @fact OnlineStats.adjusted_nobs(1, EqualWeighting()) --> 1
     end
 
-    # context("onlinefit!()") do
-    #     o = Mean()
-    #     @fact onlinefit!(o, 5, randn(100), batch = false) --> nothing
-    #     @fact onlinefit!(o, 5, randn(100)) --> nothing
-    #
-    #     o = Mean()
-    #     ovec = tracefit!(o, 5, randn(100))
-    #     @fact nobs(ovec[end]) --> 100
-    # end
 
     context("Show DistributionStat") do
         x1 = randn(100)

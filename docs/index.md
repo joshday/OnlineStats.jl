@@ -29,16 +29,12 @@ nobs(o)  # Number of observations = 223
 <h3>Common Interface</h3>
 
 
-| function                                   | Description                                                                        | Return               |
-|:-------------------------------------------|:-----------------------------------------------------------------------------------|:---------------------|
-| `state(o)`                                 | State of the estimate                                                              | `Vector{Any}`        |
-| `statenames(o)`                            | Names corresponding to `state(o)`                                                  | `Vector{Symbol}`     |
-| `nobs(o)`                                  | number of observations                                                             | `Int`                |
-| `update!(o, data...)`                      | Update model with respect to the weighting scheme                                  |                      |
-| `updatebatch!(o, data...)`                 | Minibatch update.  Available only for models that benefit from minibatch updates   |                      |
-| `onlinefit!(o, b, data...; batch = false)` | update `o` with batches of size `b`.  `batch = false`  calls `update!(o, data...)` |                      |
-| `tracefit!(o, b, data...; batch = false)`  | call `onlinefit!` and save historical objects at every `b` observations            | `Vector{OnlineStat}` |
-| `traceplot!(o, b, data...)`                | call `onlinefit!` and create a trace plot of the estimate                          |                      |
+| function                     | Description                                       | Return           |
+|:-----------------------------|:--------------------------------------------------|:-----------------|
+| `state(o)`                   | State of the estimate                             | `Vector{Any}`    |
+| `statenames(o)`              | Names corresponding to `state(o)`                 | `Vector{Symbol}` |
+| `nobs(o)`                    | number of observations                            | `Int`            |
+| `update!(o, data..., b = 1)` | Update model with respect to the weighting scheme |                  |
 
 
 # Weighting Schemes

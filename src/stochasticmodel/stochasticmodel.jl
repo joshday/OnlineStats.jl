@@ -108,7 +108,7 @@ function Base.show(io::IO, o::StochasticModel)
     println(io, "  > Model:      ", o.model)
     println(io, "  > Penalty:    ", o.penalty)
     println(io, "  > Algorithm:  ", o.algorithm)
-    println(io, "  > Sparsity:   ", @sprintf "%3.2f" mean(coef(o)[1+o.intercept:end] .!= 0))
+    println(io, "  > Sparsity:   ", @sprintf "%3.2f nonzero" mean(coef(o)[1+o.intercept:end] .!= 0))
     println(io, "  > β:          ", coef(o))
 end
 
@@ -117,6 +117,12 @@ function Plots.plot(o::StochasticModel)
     if o.intercept
         x -= 1
     end
-    Plots.scatter(coef(o), legend = false, xlabel = "β", ylabel = "value",
-        xlims = extrema(x), yticks = [0])
+    nonzero = collect(coef(o) .== 0)
+    if length(unique(nonzero)) > 1
+        mylegend = true
+    else
+        mylegend = false
+    end
+    Plots.scatter(x, coef(o), group = nonzero, legend = mylegend, xlabel = "β", ylabel = "value",
+        xlims = extrema(x), yticks = [0], lab = ["nonzero" "zero"])
 end
