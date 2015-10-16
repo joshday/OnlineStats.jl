@@ -1,15 +1,17 @@
-"The number of observations"
-StatsBase.nobs(o::OnlineStat) = o.n
-
-
 #---------------------------------------------------------------# update methods
 """
 ```
 update!(o, data...)
 update!(o, data..., b)
+
+update!(o, args...; f::Function)
+update!(o, args...; plot::Plots.Plot)
 ```
 
 Update an OnlineStat with `data...`. If specified, uses minibatches of size `b`.
+
+- If `f` is provided, `f(o)` is called after updating the OnlineStat.
+- If `plot` is provided, the plot is updated after the OnlineStat is updated.
 """
 function update!(o::OnlineStat, y::Union{AVec, AMat})
     for i in 1:size(y, 1)
@@ -59,15 +61,27 @@ end
 # If an OnlineStat doesn't have an updatebatch method, just use update
 updatebatch!(o::OnlineStat, data...) = update!(o, data...)
 
-# With callback
-function update!(o::OnlineStat, data...; f::Function = o->state(o)[1])
-    update!(o, data...)
+
+############# With keyword arguments
+# Thanks to multiple dispatch and above definitions, these methods can only be called
+# by specifying the keyword argument
+function update!(o::OnlineStat, args...; f::Function = o->state(o)[1])
+    update!(o, args...)
     f(o)
+end
+
+function update!(o::OnlineStat, args...; plot::Plots.Plot = Plots.plot([0]), kw...)
+    update!(o, args...)
+    # make sure state(o)[1] is Vector
+    push!(plot, nobs(o), vcat(state(o)[1]); kw...)
 end
 
 
 
 #------------------------------------------------------------------------# Other
+"The number of observations"
+StatsBase.nobs(o::OnlineStat) = o.n
+
 Base.copy(o::OnlineStat) = deepcopy(o)
 
 function Base.merge(o1::OnlineStat, o2::OnlineStat)
