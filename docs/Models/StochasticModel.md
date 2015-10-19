@@ -61,13 +61,14 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 
 - `L1Penalty(λ)`
     - AKA "LASSO" term: `loss(β) + λ * sumabs(β)`
-    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/ProxGrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` algorithm
+    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/ProxGrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` or one of the `Sparse` variants.
 
 - `ElasticNetPenalty(λ, α)`
     - `loss(β) + λ * (α * sumabs(β) + (1 - α) * sumabs2(β))`
     - That is, elastic net is a weighted average between ridge and lasso.  This is the
     same parameterization that the popular R package [glmnet](http://www.inside-r.org/packages/cran/glmnet/docs/glmnet) uses.
-    - As for `L1Penalty`, to generate a sparse solution, `RDA` must be the algorithm used.
+    - As for `L1Penalty`, to generate a sparse solution, `RDA` or a `Sparse` variant
+    must be used.
 
 # Algorithms
 
@@ -78,8 +79,13 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     doing Polyak-Juditsky averaging, this shouldn't be less than 0.5.  A smaller `r`
     puts more value on new observations.
 
+- `SGDSparse(η = 1.0, r = .5, burnin = 1000, cutoff = .0001)`
+    - SGD with enforced sparsity
+    - After `burnin` observations, any coefficient less than `cutoff` will be set
+    to 0 and will no longer be updated.
+
 - `ProxGrad(η = 1.0)`
-    - Stochastic Proximal Subradient Method w/ ADAGRAD
+    - Stochastic Proximal Subgradient Method w/ ADAGRAD
     - `η` is a constant step size (> 0)
     - Weights are automatically determined by ADAGRAD.
     - Penalties are handled with prox operators

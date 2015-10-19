@@ -1,5 +1,7 @@
 #---------------------------------------------------------------# update methods
 """
+### Update an OnlineStat with more data
+
 ```
 update!(o, data...)
 update!(o, data..., b)
@@ -65,15 +67,21 @@ updatebatch!(o::OnlineStat, data...) = update!(o, data...)
 ############# With keyword arguments
 # Thanks to multiple dispatch and above definitions, these methods can only be called
 # by specifying the keyword argument
-function update!(o::OnlineStat, args...; f::Function = o->state(o)[1])
+function update!(o::OnlineStat, args...; f::Function = x->nothing)
     update!(o, args...)
     f(o)
 end
 
-function update!(o::OnlineStat, args...; plot::Plots.Plot = Plots.plot([0]), kw...)
+function update!(o::OnlineStat, args...; plot::Plots.Plot = Plots.current(), plotkw...)
     update!(o, args...)
     # make sure state(o)[1] is Vector
-    push!(plot, nobs(o), vcat(state(o)[1]); kw...)
+    push!(plot, nobs(o), vcat(state(o)[1]); plotkw...)
+end
+
+function update!(o::OnlineStat, x, y; column::Bool = true)
+    for i in 1:length(y)
+        update!(o, col(x, i), y[i])
+    end
 end
 
 

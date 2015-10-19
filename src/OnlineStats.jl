@@ -136,6 +136,7 @@ include("linearmodel/opls.jl")
 # GLM
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
+include("glm/canonical_link.jl")
 
 # Quantile Regression
 include("quantileregression/quantregmm.jl")

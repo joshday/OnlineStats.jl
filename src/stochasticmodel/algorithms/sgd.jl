@@ -12,7 +12,6 @@ Base.show(io::IO, o::SGD) = print(io, "SGD with rate γ_t = $(o.η) / (1 + $(o.r
 
 @inline function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
     g = ∇f(o.model, y, predict(o, x))
-    # γ = alg(o).η / nobs(o) ^ alg(o).r
     γ = weight(o.algorithm)
 
     if o.intercept
