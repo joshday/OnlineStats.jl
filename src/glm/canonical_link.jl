@@ -50,14 +50,6 @@ function update!(o::GLM{Distributions.Normal}, x::AVec, y::Float64, γ::Float64 
     o.n += 1
 end
 
-function updatebatch!(o::GLM, x::AMatF, y::AVecF)
-    n = length(y)
-    γ = weight(o) / n
-    for i in 1:n
-        update!(o, row(x, i), y[i], γ)
-    end
-end
-
 #------------------------------------------------------------------------# state
 statenames(o::GLM) = [:β, :nobs]
 state(o::GLM) = Any[coef(o), nobs(o)]
@@ -72,13 +64,28 @@ StatsBase.predict(o::GLM{Distributions.Normal}, x::AVecF) = dot(x, coef(o))
 
 
 ######################### TESTING
-# srand(100)
-# n, p = 1_000_000, 5
-# x = randn(n, p)
-# β = vcat(1.:p) / p
-# # y = Float64[rand(Distributions.Poisson(exp(xb))) for xb in x*β]
+n, p = 1_000_000, 5
+x = randn(n, p)
+β = vcat(1.:p) / p
+y = Float64[rand(Distributions.Poisson(exp(xb))) for xb in x*β]
+
+o = OnlineStats.GLM(p, OnlineStats.LearningRate(r=.8), family = Distributions.Poisson())
+@time OnlineStats.update!(o, x, y)
+o2 = OnlineStats.StochasticModel(x,y,model = OnlineStats.PoissonRegression(), algorithm = OnlineStats.SGD(r=.7), intercept = false)
+o3 = OnlineStats.StochasticModel(x,y,model = OnlineStats.PoissonRegression(), algorithm = OnlineStats.ProxGrad(), intercept = false)
+o4 = OnlineStats.StochasticModel(x,y,model = OnlineStats.PoissonRegression(), algorithm = OnlineStats.RDA(), intercept = false)
+
 # y = x * β + randn(n)
-#
-# o = OnlineStats.GLM(p, OnlineStats.LearningRate(r=.7), family = Distributions.Normal())
+# o = OnlineStats.GLM(p, OnlineStats.LearningRate(r=.5))
 # @time OnlineStats.update!(o, x, y)
-# show(o)
+# o2 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.SGD(), intercept = false)
+# o3 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.ProxGrad(), intercept = false)
+# o4 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.RDA(), intercept = false)
+
+println("\n\n")
+println("maxabs(β - coef(o)) for")
+println()
+println("glm:      ", maxabs(β - coef(o)))
+println("sgd:      ", maxabs(β - coef(o2)))
+println("proxgrad: ", maxabs(β - coef(o3)))
+println("rda:      ", maxabs(β - coef(o4)))

@@ -74,7 +74,6 @@ end
 
 function update!(o::OnlineStat, args...; plot::Plots.Plot = Plots.current(), plotkw...)
     update!(o, args...)
-    # make sure state(o)[1] is Vector
     push!(plot, nobs(o), vcat(state(o)[1]); plotkw...)
 end
 

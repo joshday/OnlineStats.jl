@@ -1,4 +1,3 @@
-import Plots
 
 
 function Plots.plot(o::OnlineStat; kw...)
