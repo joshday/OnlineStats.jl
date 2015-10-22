@@ -7,14 +7,14 @@ import Distributions:
     fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
     probs, components, logpdf, pdf, cdf, skewness, kurtosis
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
+import StatsBase
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
-import Plots
 
 using Compat
 using Reexport
-@reexport using StatsBase
+# @reexport using StatsBase
 
 
 #-----------------------------------------------------------------------------#
@@ -38,7 +38,7 @@ export
     ShermanMorrisonInverse, OnlineCholesky,
     # linearmodel
     OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
-
+    OnlineGLM,
 
     # stochasticmodel
     StochasticModel, StochasticModelCV,
@@ -48,6 +48,7 @@ export
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
     # functions
+    nobs, coef, coeftable, predict, vcov, stderr, # from StatsBase
     update!,                # update one observation at a time using Weighting scheme
     distributionfit,        # easy constructor syntax for FitDist types
     state,                  # get state of object, typically Any[value, nobs(o)]

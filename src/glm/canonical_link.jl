@@ -51,10 +51,9 @@ function update!(o::OnlineGLM{Distributions.Bernoulli}, x::AVec, y::Float64, γ:
 end
 
 function update!(o::OnlineGLM{Distributions.Normal}, x::AVec, y::Float64, γ::Float64 = weight(o))
-    sumx = sumabs(x)
-    ϵ = y - predict(o, x)
+    u = γ * (y - predict(o, x)) / sumabs2(x)
     for j in 1:length(x)
-        o.β[j] += γ * sign(x[j]) * ϵ / sumx
+        o.β[j] += x[j] * u
     end
     o.n += 1
 end
@@ -88,20 +87,19 @@ if false
     # o4 = OnlineStats.StochasticModel(x,y,model = OnlineStats.PoissonRegression(), algorithm = OnlineStats.RDA(), intercept = false)
 
     # BERNOULLI
-    y = Float64[rand(Distributions.Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
-    o = OnlineStats.OnlineGLM(p, OnlineStats.LearningRate(r=.8), family = Distributions.Bernoulli())
-    @time OnlineStats.update!(o, x, y)
-    o2 = OnlineStats.StochasticModel(x,y,model = OnlineStats.LogisticRegression(), algorithm = OnlineStats.SGD(r=.7), intercept = false)
-    o3 = OnlineStats.StochasticModel(x,y,model = OnlineStats.LogisticRegression(), algorithm = OnlineStats.ProxGrad(), intercept = false)
-    o4 = OnlineStats.StochasticModel(x,y,model = OnlineStats.LogisticRegression(), algorithm = OnlineStats.RDA(), intercept = false)
+    # y = Float64[rand(Distributions.Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
+    # @time o = OnlineStats.OnlineGLM(x, y, OnlineStats.LearningRate(r=.8), family = Distributions.Bernoulli())
+    # o2 = OnlineStats.StochasticModel(x,y,model = OnlineStats.LogisticRegression(), algorithm = OnlineStats.SGD(r=.7), intercept = false)
+    # o3 = OnlineStats.StochasticModel(x,y,model = OnlineStats.LogisticRegression(), algorithm = OnlineStats.ProxGrad(), intercept = false)
+    # o4 = OnlineStats.StochasticModel(x,y,model = OnlineStats.LogisticRegression(), algorithm = OnlineStats.RDA(), intercept = false)
 
-    # NORMAL
-    # y = x * β + randn(n)
-    # o = OnlineStats.OnlineGLM(p, OnlineStats.LearningRate(r=.5))
-    # @time OnlineStats.update!(o, x, y)
-    # o2 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.SGD(), intercept = false)
-    # o3 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.ProxGrad(), intercept = false)
-    # o4 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.RDA(), intercept = false)
+    NORMAL
+    y = x * β + randn(n)
+    o = OnlineStats.OnlineGLM(p, OnlineStats.LearningRate(r=.7))
+    @time OnlineStats.update!(o, x, y)
+    o2 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.SGD(), intercept = false)
+    o3 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.ProxGrad(), intercept = false)
+    o4 = OnlineStats.StochasticModel(x, y, algorithm = OnlineStats.RDA(), intercept = false)
 
     println("\n\n")
     println("maxabs(β - coef(o)) for")

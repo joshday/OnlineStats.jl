@@ -72,11 +72,6 @@ function update!(o::OnlineStat, args...; f::Function = x->nothing)
     f(o)
 end
 
-function update!(o::OnlineStat, args...; plot::Plots.Plot = Plots.current(), plotkw...)
-    update!(o, args...)
-    push!(plot, nobs(o), vcat(state(o)[1]); plotkw...)
-end
-
 function update!(o::OnlineStat, x, y; column::Bool = true)
     for i in 1:length(y)
         update!(o, col(x, i), y[i])

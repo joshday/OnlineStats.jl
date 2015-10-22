@@ -29,7 +29,7 @@ end
 @inline ∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) = sign(ŷᵢ - yᵢ)
 @inline ∇f(::L2Regression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
 @inline ∇f(::LogisticRegression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
-@inline ∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) = (ŷᵢ - yᵢ) * ŷᵢ
+@inline ∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) = (ŷᵢ - yᵢ)
 @inline ∇f(l::QuantileRegression, yᵢ::Float64, ŷᵢ::Float64) = Float64(yᵢ < ŷᵢ) - l.τ
 @inline ∇f(::SVMLike, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ : 0.0
 @inline ∇f(l::HuberRegression, yᵢ::Float64, ŷᵢ::Float64) = abs(yᵢ - ŷᵢ) <= l.δ ? ŷᵢ - yᵢ : l.δ * sign(ŷᵢ - yᵢ)
@@ -110,19 +110,4 @@ function Base.show(io::IO, o::StochasticModel)
     println(io, "  > Algorithm:  ", o.algorithm)
     println(io, "  > Sparsity:   ", @sprintf "%3.2f nonzero" mean(coef(o)[1+o.intercept:end] .!= 0))
     println(io, "  > β:          ", coef(o))
-end
-
-function Plots.plot(o::StochasticModel)
-    x = 1:length(coef(o))
-    if o.intercept
-        x -= 1
-    end
-    nonzero = collect(coef(o) .== 0)
-    if length(unique(nonzero)) > 1
-        mylegend = true
-    else
-        mylegend = false
-    end
-    Plots.scatter(x, coef(o), group = nonzero, legend = mylegend, xlabel = "β", ylabel = "value",
-        xlims = extrema(x), yticks = [0], lab = ["nonzero" "zero"])
 end
