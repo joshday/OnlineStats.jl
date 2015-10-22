@@ -7,7 +7,7 @@ type SAG <: Algorithm   # step size is γ = η * nobs ^ -r
     G::VecF    # historical gradient vector
     function SAG(;η::Real = 1.0, kw...)
         @assert η > 0
-        @compat new(Float64(η), LearningRate(;kw...), 0.0, zeros(2))
+        new(Float64(η), LearningRate(;kw...), 0.0, zeros(2))
     end
 end
 

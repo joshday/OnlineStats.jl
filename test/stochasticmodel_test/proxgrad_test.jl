@@ -12,14 +12,14 @@ end
 function logisticdata(n, p)
     x = randn(n, p)
     β = (collect(1:p) - .5*p) / p
-     y = @compat Float64[rand(Bernoulli(i)) for i in 1./(1 + exp(-x*β))]
+     y = Float64[rand(Bernoulli(i)) for i in 1./(1 + exp(-x*β))]
     (β, x, y)
 end
 
 function poissondata(n, p)
     x = randn(n, p)
     β = (collect(1:p) - .5*p) / p
-    y = @compat Float64[rand(Poisson(exp(η))) for η in x*β]
+    y = Float64[rand(Poisson(exp(η))) for η in x*β]
     (β, x, y)
 end
 

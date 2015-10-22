@@ -61,7 +61,7 @@ end
 function updatebatch!(o::QuantileMM, y::AVecF)
     γ = weight(o)
     n = length(y)
-    @compat o.o = smooth(o.o, Float64(n), γ)
+    o.o = smooth(o.o, Float64(n), γ)
 
     for i in 1:length(o.τ)
         # Update sufficient statistics

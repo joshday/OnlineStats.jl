@@ -35,12 +35,6 @@ function backtracestring()
   "[]"
 end
 
-if VERSION < v"0.4-"
-    import Dates
-else
-    import Base.Dates
-end
-NOW() = Dates.now()
 
 
 # --------------------------------------------------------
@@ -129,6 +123,3 @@ macro DEBUG(symbols...)
   end
   expr
 end
-
-
-

@@ -14,7 +14,7 @@ type L2Penalty <: Penalty
     λ::Float64
     function L2Penalty(λ::Real)
         @assert λ >= 0
-        @compat new(Float64(λ))
+        new(Float64(λ))
     end
 end
 Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty(λ = $(p.λ))")
@@ -29,7 +29,7 @@ type L1Penalty <: Penalty
     λ::Float64
     function L1Penalty(λ::Real)
         @assert λ >= 0
-        new(@compat Float64(λ))
+        new(Float64(λ))
     end
 end
 Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty(λ = $(p.λ))")
@@ -44,7 +44,7 @@ type ElasticNetPenalty <: Penalty
     function ElasticNetPenalty(λ::Real, α::Real)
         @assert 0 <= α <= 1
         @assert λ >= 0
-        @compat new(Float64(λ), Float64(α))
+        new(Float64(λ), Float64(α))
     end
 end
 Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty(λ = $(p.λ), α = $(p.α))")
@@ -63,7 +63,7 @@ type SCADPenalty <: Penalty
     function SCADPenalty(λ::Real, a::Real = 3.7)  # 3.7 is what Fan and Li use
         @assert λ >= 0
         @assert a > 2
-        @compat new(Float64(λ), Float64(a))
+        new(Float64(λ), Float64(a))
     end
 end
 Base.show(io::IO, p::SCADPenalty) = print(io, "SCADPenalty(λ = $(p.λ), a = $(p.a))")

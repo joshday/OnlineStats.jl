@@ -5,7 +5,7 @@ type ProxGrad <: Algorithm
     G0::Float64     # sum of squared gradients for intercept
     G::VecF         # sum of squared gradients for everything else
     η::Float64      # constant step size
-    @compat function ProxGrad(;η::Real = 1.0, δ::Real = 1e-8)
+    function ProxGrad(;η::Real = 1.0, δ::Real = 1e-8)
         @assert η > 0
         @assert δ > 0
         new(Float64(δ), zeros(2), Float64(η))

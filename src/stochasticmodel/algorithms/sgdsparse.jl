@@ -16,7 +16,7 @@ type SGDSparse <: Algorithm   # step size is γ = η * nobs ^ -r
     cutoff::Float64
     function SGDSparse(;η::Real = 1.0, burnin = 1000, cutoff = .0001, kw...)
         @assert η > 0
-        @compat new(Float64(η), LearningRate(;kw...), IntSet(1:2), burnin, cutoff)
+        new(Float64(η), LearningRate(;kw...), IntSet(1:2), burnin, cutoff)
     end
 end
 weight(alg::SGDSparse) = alg.η * weight(alg.rate)

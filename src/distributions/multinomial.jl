@@ -25,11 +25,11 @@ function update!{T <: Integer}(o::FitMultinomial, x::AVec{T})
     λ = weight(o)
 
     if !isempty(o.means)
-        smooth!(o.means, @compat([Float64(xi) for xi in x]), λ)
+        smooth!(o.means, ([Float64(xi) for xi in x]), λ)
         n = o.d.n
     else
         o.means = zeros(p)
-        smooth!(o.means, @compat([Float64(xi) for xi in x]), λ)
+        smooth!(o.means, ([Float64(xi) for xi in x]), λ)
         n = sum(x)
     end
 

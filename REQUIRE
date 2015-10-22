@@ -1,8 +1,4 @@
-julia 0.4-
-Docile
-Compat
-Reexport
+julia 0.4
 StatsBase
 Distributions
 MultivariateStats
-Dates

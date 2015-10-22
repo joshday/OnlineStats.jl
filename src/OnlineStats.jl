@@ -5,16 +5,13 @@ import Distributions:
     Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal,
     Multinomial, MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
     fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
-    probs, components, logpdf, pdf, cdf, skewness, kurtosis
+    probs, components, logpdf, pdf, cdf, skewness, kurtosis, loglikelihood
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase
 import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
 import MultivariateStats
 import ArrayViews: view, rowvec_view
 
-using Compat
-using Reexport
-# @reexport using StatsBase
 
 
 #-----------------------------------------------------------------------------#
@@ -48,7 +45,8 @@ export
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
     # functions
-    nobs, coef, coeftable, predict, vcov, stderr, # from StatsBase
+
+    nobs, coef, coeftable, predict, vcov, stderr, pca, # rather than using reexport
     update!,                # update one observation at a time using Weighting scheme
     distributionfit,        # easy constructor syntax for FitDist types
     state,                  # get state of object, typically Any[value, nobs(o)]

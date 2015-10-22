@@ -16,7 +16,7 @@ FitPoisson(wgt::Weighting = default(Weighting)) = FitPoisson(Poisson(), Mean(), 
 
 #---------------------------------------------------------------------------# update!
 function update!(o::FitPoisson, y::Integer)
-    @compat update!(o.mean, Float64(y))
+    update!(o.mean, Float64(y))
     o.d = Poisson(mean(o.mean))
 end
 

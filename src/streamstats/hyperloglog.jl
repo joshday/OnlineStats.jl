@@ -11,7 +11,7 @@
 
 
 #-------------------------------------------------------# Type and Constructors
-@compat type HyperLogLog <: OnlineStat
+type HyperLogLog <: OnlineStat
     # TODO: better names and documentation
     m::UInt32
     M::Vector{UInt32}
@@ -67,7 +67,7 @@ function estimatedCardinality(o::HyperLogLog)
         S += 1 / (2^o.M[j])  # !!!!!!!!!! Is this correct? should it be (2 ^ (-o.M[j]))??
     end
     # Z = 1 / S
-    E = α(o.m) * @compat UInt(o.m)^2 / S
+    E = α(o.m) * UInt(o.m)^2 / S
 
     # note: I'm honestly not sure what this does
     if E <= 5//2 * o.m
@@ -100,9 +100,9 @@ state(o::HyperLogLog) = Any[estimatedCardinality(o), nobs(o)]
 #---------------------------------------------------------------------# update!
 
 if VERSION < v"0.4.0-"
-    hash32(d::Any) = @compat UInt32(hash(d))
+    hash32(d::Any) = UInt32(hash(d))
 else
-    hash32(d::Any) = hash(d) % @compat UInt32
+    hash32(d::Any) = hash(d) % UInt32
 end
 
 ρ(s::UInt32) = UInt32(UInt32(leading_zeros(s)) + 0x00000001)
@@ -122,7 +122,7 @@ end
 
 function update!(o::HyperLogLog, v::Real)
     x = hash32(v)
-    j = @compat UInt32((x & o.mask) + 0x00000001)
+    j = UInt32((x & o.mask) + 0x00000001)
     w = x & o.altmask
     o.M[j] = max(o.M[j], ρ(w))
 

@@ -36,7 +36,7 @@ function handlePipeExpr(lhs, rhs)
   if isa(lhs, Expr) && lhs.head == :tuple
     return :(update_get!($rhs, $(lhs.args...)))
   end
-  
+
   # must be a single argument
   return :(update_get!($rhs, $lhs))
 
@@ -84,7 +84,7 @@ function handleCurryingExpr(lhs, rhs)
     # we've now injected this expression into the return tuple of the lhs...
     # return that, plus tell the next curry to continue mapping
     return lhs, ismapped
-  
+
   else
 
     # not mapped, so return a new expr
@@ -113,9 +113,9 @@ function buildStreamExpr(expr::Expr)
     # map build to each arg in the block
     expr.args = map(ex -> buildStreamExpr(ex)[1], expr.args)
     return expr, false
-  
+
   elseif head == :line
-    
+
     # keep this as-is
     return expr, false
 
@@ -182,7 +182,7 @@ end
 Define pipelines of streaming data that include updating OnlineStats.
 The @stream macro creates an anonymous function to calculate a full
 data pipeline on a new data point.  Wrap in begin/end blocks for complex
-processing.  Use "\$i" to refer to the ith argument, and "_" (underscore) 
+processing.  Use "\$i" to refer to the ith argument, and "_" (underscore)
 to curry results through a pipeline.
 
 Some features:
@@ -196,7 +196,7 @@ Some features:
         myRegression = Adagrad(10)
         f = @stream (\$1,\$2) |> myRegression
         # now call f(x,y) to update the regression
-  
+
   - apply arbitrary functions and control flow:
 
         myMean1 = Mean()
@@ -208,7 +208,7 @@ Some features:
           mean(\$2 |> myMean2)
         end
 
-  - mapping pipelines allow you to update many OnlineStats with the same expression, 
+  - mapping pipelines allow you to update many OnlineStats with the same expression,
     plus continue the mapping into curried results:
 
       This example:
@@ -222,7 +222,7 @@ Some features:
           tmp2 = update_get!(reg2, x, y)
           (y - predict(tmp1, x)), y - predict(tmp2, x)))
         end
-    
+
 """
 macro stream(expr::Expr)
 
@@ -266,7 +266,7 @@ end
 # IntInput() = RealInput(Int)
 # VecInput{T<:Real}(::Type{T}) = Input{AVec{T}}(zeros(T,0))
 # VecInput() = VecInput(Float64)
-# RegressionInput{T<:Real}(::Type{T}) = Input{@compat Tuple{AVec{T},T}}((zeros(T,0),zero(T)))
+# RegressionInput{T<:Real}(::Type{T}) = Input{ Tuple{AVec{T},T}}((zeros(T,0),zero(T)))
 # RegressionInput() = RegressionInput(Float64)
 
 
@@ -284,7 +284,7 @@ end
 #   @assert expr.head == :call
 #   fname = expr.args[1]
 #   @assert fname == :|>
-      
+
 #   lhs, rhs = expr.args[2:3]
 #   @assert isa(rhs, Symbol)
 #   # TODO: we assume rhs is an OnlineStat... can we assert this and error now?
@@ -304,7 +304,7 @@ end
 #   return liftexpr(lhs, rhs, f)
 # end
 
-# # pass one to many symbols/expressions that either refer to an OnlineStat object, 
+# # pass one to many symbols/expressions that either refer to an OnlineStat object,
 # # or have it as the first argument to a function call.
 # # returns a Reactive.Input{inputType} object which you should push! the inputs to
 # macro stream(expr::Expr)

@@ -6,7 +6,7 @@ type RDA <: Algorithm
     Ḡ0::Float64     # avg gradient for intercept
     Ḡ::VecF         # avg gradient for everything else
     η::Float64      # constant step size
-    @compat function RDA(;η::Real = 1.0, δ::Real = 1e-8)
+    function RDA(;η::Real = 1.0, δ::Real = 1e-8)
         @assert η > 0
         @assert δ > 0
         new(Float64(δ), zeros(2), 0.0, zeros(2), Float64(η))

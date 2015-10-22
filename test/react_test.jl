@@ -135,7 +135,7 @@ facts("React") do
       outval = f(row(x,i), y[i])
 
       if i == length(y)
-        @fact typeof(outval) --> @compat Tuple{Float64, Float64}
+        @fact typeof(outval) --> Tuple{Float64, Float64}
         # @fact abs(outval[2] - outval[1]) --> roughly(0.0, atol = 1.0)
         # @fact abs(outval[3] - outval[1]) --> roughly(0.0, atol = 0.1)
         println("outval: ", outval)

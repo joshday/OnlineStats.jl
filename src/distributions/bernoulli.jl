@@ -27,7 +27,7 @@ FitBernoulli(wgt::Weighting = default(Weighting)) =
 #---------------------------------------------------------------------# update!
 function update!(obj::FitBernoulli, y::Integer)
     λ = weight(obj)
-    obj.p = smooth(obj.p, @compat(Float64(y)), λ)
+    obj.p = smooth(obj.p, (Float64(y)), λ)
     obj.d = Bernoulli(obj.p)
     obj.n += 1
     return
