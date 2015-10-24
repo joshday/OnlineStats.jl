@@ -18,43 +18,45 @@ function updateβ!(o::StochasticModel{MM}, x::AVecF, y::Float64)
     γ = weight(o.algorithm)
 
     if o.intercept
-        o.β0 -= γ * _grad(o.model, γ, 1.0, y, ŷ)
+        o.β0 -= γ * mm_grad(o.model, γ, 1.0, y, ŷ)
     end
 
     for j in 1:length(x)
-        o.β[j] += x[j] * _grad(o.model, γ, x, y, ŷ)
+        o.β[j] += x[j] * mm_grad(o.model, γ, x, y, ŷ)
     end
 end
 
 function updatebatchβ!(o::StochasticModel{MM}, x::AMatF, y::AVecF)
     n = length(y)
     γ = weight(o.algorithm) / n
-    ŷ = predict(o, x)
 
-    for j in 1:size(x, 2)
-        for i in 1:n
-            r = rowvec_view(x, i)
-            o.β[j] += x[i, j] * _grad(o.model, γ, r, y[i], ŷ[i])
-            if o.intercept
-                o.β0 += _grad(o.model, γ, r, y[i], ŷ[i])
-            end
+    for i in 1:n
+        xi = rowvec_view(x, i)
+        g = ∇f_mm(o.model, xi, y[i], predict(o, xi))
+
+        if o.intercept
+            o.β0 += γ * g
+        end
+
+        for j in 1:size(x, 2)
+            o.β[j] += γ * xi[j] * g
         end
     end
 end
 
-function _grad(::LogisticRegression, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
-     γ * (y - ŷ) / (sumabs2(x) * ŷ * (1 - ŷ))
+function ∇f_mm(::LogisticRegression, x::AVecF, y::Float64, ŷ::Float64)
+     (y - ŷ) / (sumabs2(x) * ŷ * (1 - ŷ))
 end
 
-function _grad(::PoissonRegression, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
-     γ * (y - ŷ) / (sumabs2(x) * ŷ)
+function ∇f_mm(::PoissonRegression, x::AVecF, y::Float64, ŷ::Float64)
+     (y - ŷ) / (sumabs2(x) * ŷ)
 end
 
-function _grad(::L2Regression, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
-     γ * (y - ŷ) / sumabs2(x)
+function ∇f_mm(::L2Regression, x::AVecF, y::Float64, ŷ::Float64)
+     (y - ŷ) / sumabs2(x)
 end
 
-function _grad(m::ModelDefinition, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
+function ∇f_mm(m::ModelDefinition, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
     error("This algorithm is not implemented for model: ", typeof(m))
 end
 
@@ -69,10 +71,14 @@ if true
     x = randn(n, p)
     β = collect(linspace(0, 1, p))
     # y = x*β + randn(n)
-    # y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
-    y = Float64[rand(Poisson(exp(xb))) for xb in x*β]
+    y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
+    # y = Float64[rand(Poisson(exp(xb))) for xb in x*β]
 
-    o = StochasticModel(p, algorithm = MM(r=.6), model = PoissonRegression())
+    o = StochasticModel(p, algorithm = MM(r=.6), model = LogisticRegression())
+    @time update!(o, x, y, 50)
+    show(o)
+
+    o = StochasticModel(p, algorithm = SGD(r=.6), model = LogisticRegression())
     @time update!(o, x, y, 50)
     show(o)
 end

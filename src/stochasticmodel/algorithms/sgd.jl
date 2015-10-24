@@ -26,7 +26,21 @@ function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
     end
 end
 
-function updatebatchβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
+function updatebatchβ!(o::StochasticModel{SGD}, x::AMatF, y::AVecF)
+    n = length(y)
+    γ = weight(o.algorithm) / n
+    for i in 1:n
+        xi = rowvec_view(x, i)
+        g = ∇f(o.model, y[i], predict(o, xi))
+
+        if o.intercept
+            o.β0 -= γ * g
+        end
+
+        @inbounds for j in 1:size(x, 2)
+            o.β[j] -= γ * add∇j(pen(o), g * xi[j], o.β, j)
+        end
+    end
 end
 
 # For adding penalties
