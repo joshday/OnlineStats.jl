@@ -77,11 +77,13 @@ include("common.jl")
 # StochasticModel
 include("stochasticmodel/stochasticmodel.jl")
 include("stochasticmodel/penalty.jl")
+
 include("stochasticmodel/algorithms/sgd.jl")
 include("stochasticmodel/algorithms/sgd_sparse.jl")
 include("stochasticmodel/algorithms/prox_adagrad.jl")
 include("stochasticmodel/algorithms/rda_adagrad.jl")
-include("stochasticmodel/algorithms/sag.jl")
+include("stochasticmodel/algorithms/mm.jl")
+
 include("stochasticmodel/crossvalidate.jl")
 
 # Summary Statistics
@@ -135,7 +137,7 @@ include("linearmodel/opls.jl")
 # GLM
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
-include("glm/canonical_link.jl")
+# include("glm/canonical_link.jl")
 
 # Quantile Regression
 include("quantileregression/quantregmm.jl")

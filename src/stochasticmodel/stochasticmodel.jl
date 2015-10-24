@@ -93,6 +93,20 @@ state(o::StochasticModel) = Any[coef(o), nobs(o)]
 function update!(o::StochasticModel, x::AVecF, y::Float64)
     o.n += 1
     updateβ!(o, x, y)
+    nothing
+end
+
+function updatebatch!(o::StochasticModel, x::AMatF, y::AVecF)
+    o.n += length(y)
+    updatebatchβ!(o, x, y)
+    nothing
+end
+
+# Fall back on this if not implemented
+function udpatebatchβ!(o::StochasticModel, x::AMatF, y::AVecF)
+    for i in 1:length(y)
+        updateβ!(o, rowvec_view(x, i), y[i])
+    end
 end
 
 function Base.show(io::IO, o::StochasticModel)
