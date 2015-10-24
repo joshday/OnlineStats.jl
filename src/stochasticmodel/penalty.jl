@@ -102,3 +102,20 @@ Base.copy(p::Penalty) = deepcopy(p)
         β[j] = prox(p, β[j], s)
     end
 end
+
+
+
+# Add subgradient of penalty into the subgradient of loss
+@inline add∇j(::NoPenalty, g::Float64, β::VecF, i::Int) = g
+@inline add∇j(p::L2Penalty, g::Float64, β::VecF, i::Int) = g + p.λ * β[i]
+@inline add∇j(p::L1Penalty, g::Float64, β::VecF, i::Int) = g + p.λ * sign(β[i])
+@inline add∇j(p::ElasticNetPenalty, g::Float64, β::VecF, i::Int) = g + p.λ * (p.α * sign(β[i]) + (1 - p.α) * β[i])
+@inline function add∇j(p::SCADPenalty, g::Float64, β::VecF, i::Int)
+    if abs(β[i]) < p.λ
+        g + sign(β[i]) * p.λ
+    elseif abs(β[i]) < p.a * p.λ
+        g + max(p.a * p.λ - abs(β[i]), 0.0) / (p.a - 1.0)
+    else
+        g
+    end
+end

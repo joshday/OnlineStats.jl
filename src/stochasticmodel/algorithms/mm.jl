@@ -31,7 +31,7 @@ function updatebatchβ!(o::StochasticModel{MM}, x::AMatF, y::AVecF)
     γ = weight(o.algorithm) / n
 
     for i in 1:n
-        xi = rowvec_view(x, i)
+        xi = row(x, i)
         g = ∇f_mm(o.model, xi, y[i], predict(o, xi))
 
         if o.intercept
@@ -39,7 +39,7 @@ function updatebatchβ!(o::StochasticModel{MM}, x::AMatF, y::AVecF)
         end
 
         for j in 1:size(x, 2)
-            o.β[j] += γ * xi[j] * g
+            o.β[j] += γ * add∇j(pen(o), g * xi[j], o.β, j)
         end
     end
 end
@@ -65,7 +65,7 @@ end
 
 
 # TEST
-if true
+if false
     srand(10)
     n, p = 1_000_000, 5
     x = randn(n, p)
@@ -80,5 +80,9 @@ if true
 
     o = StochasticModel(p, algorithm = SGD(r=.6), model = LogisticRegression())
     @time update!(o, x, y, 50)
+    show(o)
+
+    o = StochasticModel(p, algorithm = ProxGrad(η = .5), model = LogisticRegression())
+    @time update!(o, x, y, 5)
     show(o)
 end
