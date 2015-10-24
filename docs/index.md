@@ -42,7 +42,7 @@ nobs(o)  # Number of observations = 223
 o = Mean(x, ExponentialWeighting(1000))
 ```
 
-When creating an OnlineStat, one can specify the weighting to be used (with the exception of `SGModel`, which has its own weighting system).  Updating a model typically involves one of two forms:
+When creating an OnlineStat, one can specify the weighting to be used (with the exception of `StochasticModel`, which has its own weighting system).  Updating a model typically involves one of two forms:
 
 - weighted average (equivalent forms shown below):
 
@@ -69,7 +69,7 @@ Use equal weighting until the step size reaches `λ = 1/n`, then hold constant.
 <h3>Learning Rate</h3>
 - `LearningRate(;r::Float64 = 1.0, λ::Float64 = 1.0, minstep::Float64 = 0.0)`
 
-For the `t`-th update, use weight $γ_t = \frac{1}{1 + \lambda t^r}, r\in (.5, 1], \lambda > 0$, until weights reach `minstep`, then hold constant.  This is typically used for stochastic gradient-based methods or online EM/MM algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
+For the `t`-th update, use weight $γ_t = \frac{1}{1 + \lambda t^r}, r\in (.5, 1], \lambda > 0$, until weights reach `minstep`, then hold constant.  This is typically used for stochastic approximation algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
 
 If this is unfamiliar territory for you, we recommend starting with `LearningRate(r = 0.6)`.
 
@@ -91,20 +91,20 @@ If this is unfamiliar territory for you, we recommend starting with `LearningRat
 
 <h3> Linear Models and Predictive Modeling </h3>
 
-|                                   |                              |
-|:----------------------------------|:-----------------------------|
-| L1 Regression                     | `SGModel`                    |
-| linear regression                 | `LinReg`, `SGModel`          |
-| logistic regression               | `SGModel`, `LogRegSGD2`      |
-| poisson regression                | `SGModel`                    |
-| quantile regression               | `QuantRegMM`, `SGModel`      |
-| regression w/ LASSO penalty       | `SparseReg`, `SGModel`       |
-| regression w/ ridge penalty       | `SparseReg`, `SGModel`       |
-| regression w/ elastic net penalty | `SparseReg`, `SGModel`       |
-| regression w/ SCAD penalty        | `SparseReg`, `SGModel`       |
-| self-tuning models                | `SGModelCV`                  |
-| stepwise regression               | `StepwiseReg` (experimental) |
-| support vector machine            | `SGModel`                    |
+|                                   |                                 |
+|:----------------------------------|:--------------------------------|
+| L1 Regression                     | `StochasticModel`               |
+| linear regression                 | `LinReg`, `StochasticModel`     |
+| logistic regression               | `StochasticModel`, `OnlineGLM`  |
+| poisson regression                | `StochasticModel`, `OnlineGLM`  |
+| quantile regression               | `QuantRegMM`, `StochasticModel` |
+| regression w/ LASSO penalty       | `SparseReg`, `StochasticModel`  |
+| regression w/ ridge penalty       | `SparseReg`, `StochasticModel`  |
+| regression w/ elastic net penalty | `SparseReg`, `StochasticModel`  |
+| regression w/ SCAD penalty        | `SparseReg`, `StochasticModel`  |
+| self-tuning models                | `StochasticModelCV`             |
+| stepwise regression               | `StepwiseReg` (experimental)    |
+| support vector machine            | `StochasticModel`               |
 
 
 <h3> Multivariate Analysis </h3>

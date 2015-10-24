@@ -73,16 +73,8 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 
 
 #---------------------------------------------------------------------------# Stochastic
-# Recommendated SGD weighting from http://cilvr.cs.nyu.edu/diglib/lsml/bottou-sgd-tricks-2012.pdf
-# γ_t = 1 / (1 + λ * t)
 
-#  StochasticWeighting was this:
-#  γ_t = 1 / t ^ -r
-
-# Combine the above two schemes: γ_t = 1 / (1 + λ * t ^r)
 """
-### Learning Rate for Stochastic Approximation
-
 `LearningRate(;r = 1.0, λ = 1.0, minstep = 0.0)`
 
 Update weights are `max(minstep, γ_t)` where `γ_t = 1 / (1 + λ * t ^ r)`
@@ -100,16 +92,11 @@ type LearningRate <: Weighting
     end
 end
 function weight(w::LearningRate, unused1 = 1, unused2 = 1)
-    result = max(1.0 / (1.0 + w.λ * w.t ^ w.r), w.minstep)
+    result = max(1.0 / (1.0 + w.λ * w.t) ^ w.r, w.minstep)
     w.t += 1
     result
 end
 
-# Ease the transition to the new type
-function StochasticWeighting(r::Float64 = .51, minstep::Float64 = 0.)
-    warn("StochasticWeighting is deprecated.  Use LearningRate instead")
-    LearningRate(r = r, minstep = minstep)
-end
 
 
 

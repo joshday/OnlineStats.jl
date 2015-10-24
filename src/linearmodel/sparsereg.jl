@@ -95,7 +95,7 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
         β = β + ((i - 2) / i + 1) * (β - βold)
         g = (xty - xtx * β)
         β = β + step * g  # β + step * x'(y - x * β)
-        prox!(β, penalty, step)
+        prox!(penalty, β, step)
 
         # # Try step halving a few times if objective isn't decreased
         # k = 1

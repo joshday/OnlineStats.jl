@@ -42,5 +42,5 @@ end
 # nondifferentiable penalties and NoPenalty
 @inline function adagrad_update!{M<:ModelDefinition, P<:Penalty}(o::StochasticModel{ProxGrad,M,P}, g::Float64, j::Int)
     h = alg(o).η / sqrt(alg(o).G[j])
-    o.β[j] = prox(o.β[j] - g * h, pen(o), h)
+    o.β[j] = prox(o.penalty, o.β[j] - g * h, h)
 end

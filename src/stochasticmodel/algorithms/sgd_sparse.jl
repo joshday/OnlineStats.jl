@@ -35,7 +35,7 @@ Base.show(io::IO, o::SGDSparse) = print(io, "SGDSparse with rate γ_t = $(o.η) 
     end
 
     @inbounds for j in alg(o).set
-        o.β[j] -= γ * add∇j(g * x[j], pen(o), o.β, j)
+        o.β[j] -= γ * add∇j(pen(o), g * x[j], o.β, j)
     end
 
     if nobs(o) > alg(o).burnin

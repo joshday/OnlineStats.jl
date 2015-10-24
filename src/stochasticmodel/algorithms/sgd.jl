@@ -19,22 +19,22 @@ Base.show(io::IO, o::SGD) = print(io, "SGD with rate γ_t = $(o.η) / (1 + $(o.r
     end
 
     @inbounds for j in 1:length(x)
-        o.β[j] -= γ * add∇j(g * x[j], pen(o), o.β, j)
+        o.β[j] -= γ * add∇j(pen(o), g * x[j], o.β, j)
     end
     nothing
 end
 
 # For adding penalties
-@inline add∇j(x::Float64, ::NoPenalty, β::VecF, i::Int) = x
-@inline add∇j(x::Float64, p::L2Penalty, β::VecF, i::Int) = x + p.λ * β[i]
-@inline add∇j(x::Float64, p::L1Penalty, β::VecF, i::Int) = x + p.λ * sign(β[i])
-@inline add∇j(x::Float64, p::ElasticNetPenalty, β::VecF, i::Int) = x + p.λ * (p.α * sign(β[i]) + (1 - p.α) * β[i])
-@inline function add∇j(x::Float64, p::SCADPenalty, β::VecF, i::Int)
+@inline add∇j(::NoPenalty, g::Float64, β::VecF, i::Int) = g
+@inline add∇j(p::L2Penalty, g::Float64, β::VecF, i::Int) = g + p.λ * β[i]
+@inline add∇j(p::L1Penalty, g::Float64, β::VecF, i::Int) = g + p.λ * sign(β[i])
+@inline add∇j(p::ElasticNetPenalty, g::Float64, β::VecF, i::Int) = g + p.λ * (p.α * sign(β[i]) + (1 - p.α) * β[i])
+@inline function add∇j(p::SCADPenalty, g::Float64, β::VecF, i::Int)
     if abs(β[i]) < p.λ
-        x + sign(β[i]) * p.λ
+        g + sign(β[i]) * p.λ
     elseif abs(β[i]) < p.a * p.λ
-        x + max(p.a * p.λ - abs(β[i]), 0.0) / (p.a - 1.0)
+        g + max(p.a * p.λ - abs(β[i]), 0.0) / (p.a - 1.0)
     else
-        x
+        g
     end
 end

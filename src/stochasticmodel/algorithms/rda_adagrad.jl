@@ -23,12 +23,9 @@ function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
     end
 
     g = ∇f(o.model, y, predict(o, x))
-    # yhat = predict(o, x)
-    # ε = y - yhat
 
     w = (nobs(o) - 1) / nobs(o)
     if o.intercept
-        # g = ∇f(o.model, ε, 1.0, y, yhat)
         alg(o).G0 += g^2
         alg(o).Ḡ0 = w * alg(o).Ḡ0 + (1 - w) * g
         o.β0 = -alg(o).η * nobs(o) * alg(o).Ḡ0 / sqrt(alg(o).G0)

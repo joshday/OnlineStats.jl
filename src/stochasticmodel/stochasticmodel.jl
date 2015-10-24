@@ -29,7 +29,7 @@ end
 @inline ∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) = sign(ŷᵢ - yᵢ)
 @inline ∇f(::L2Regression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
 @inline ∇f(::LogisticRegression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
-@inline ∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) = (ŷᵢ - yᵢ)
+@inline ∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
 @inline ∇f(l::QuantileRegression, yᵢ::Float64, ŷᵢ::Float64) = Float64(yᵢ < ŷᵢ) - l.τ
 @inline ∇f(::SVMLike, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ : 0.0
 @inline ∇f(l::HuberRegression, yᵢ::Float64, ŷᵢ::Float64) = abs(yᵢ - ŷᵢ) <= l.δ ? ŷᵢ - yᵢ : l.δ * sign(ŷᵢ - yᵢ)

@@ -1,6 +1,8 @@
 # http://arxiv.org/pdf/1309.2388v1.pdf
+# Is this algorithm terrible or is there something wrong with the implementation?
+
 "Stochastic Average Gradient"
-type SAG <: Algorithm   # step size is γ = η * nobs ^ -r
+type SAG <: Algorithm 
     η::Float64
     rate::LearningRate
     G0::Float64
@@ -24,14 +26,14 @@ Base.show(io::IO, o::SAG) = print(io, "SAG with rate γ_t = $(o.η) / (1 + $(o.r
 
     if o.intercept
         alg(o).G0 = g
-        o.β0 -= γ * g
+        o.β0 -= γ * g / nobs(o)
     end
 
     j = rand(1:length(x))
-    alg(o).G[j] = add∇j(g * x[j], pen(o), o.β, j)
+    alg(o).G[j] = add∇j(pen(o), g * x[j], o.β, j)
 
     @inbounds for j in 1:length(x)
-        o.β[j] -= γ * alg(o).G[j]
+        o.β[j] -= γ * alg(o).G[j] / nobs(o)
     end
     nothing
 end

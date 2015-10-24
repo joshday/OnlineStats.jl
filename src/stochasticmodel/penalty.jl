@@ -6,7 +6,7 @@
 immutable NoPenalty <: Penalty end
 Base.show(io::IO, p::NoPenalty) = print(io, "NoPenalty")
 @inline _j(p::NoPenalty, β::VecF) = 0.0
-@inline prox(βj::Float64, p::NoPenalty, s::Float64) = βj
+@inline prox(p::NoPenalty, βj::Float64, s::Float64) = βj
 
 
 "An L2 (ridge) penalty on the coefficients"
@@ -19,9 +19,9 @@ type L2Penalty <: Penalty
 end
 Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty(λ = $(p.λ))")
 @inline _j(p::L2Penalty, β::VecF) = sumabs2(β)
-# @inline function prox(βj::Float64, p::L2Penalty, s::Float64)
-#     βj / (1.0 + s * p.λ)
-# end
+@inline function prox(p::L2Penalty, βj::Float64, s::Float64)
+    βj / (1.0 + s * p.λ)
+end
 
 
 "An L1 (LASSO) penalty on the coefficients"
@@ -34,7 +34,7 @@ type L1Penalty <: Penalty
 end
 Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty(λ = $(p.λ))")
 @inline _j(p::L1Penalty, β::VecF) = sumabs(β)
-@inline prox(βj::Float64, p::L1Penalty, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
+@inline prox(p::L1Penalty, βj::Float64, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
 
 
 "A weighted average of L1 and L2 penalties on the coefficients"
@@ -49,7 +49,7 @@ type ElasticNetPenalty <: Penalty
 end
 Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty(λ = $(p.λ), α = $(p.α))")
 @inline _j(p::ElasticNetPenalty, β::VecF) = p.λ * (p.α * sumabs(β) + (1 - p.α) * .5 * sumabs2(β))
-@inline function prox(βj::Float64, p::ElasticNetPenalty, s::Float64)
+@inline function prox(p::ElasticNetPenalty, βj::Float64, s::Float64)
     βj = sign(βj) * max(abs(βj) - s * p.λ * p.α, 0.0)  # Lasso prox
     βj = βj / (1.0 + s * p.λ * (1.0 - p.α))            # Ridge prox
 end
@@ -81,7 +81,7 @@ Base.show(io::IO, p::SCADPenalty) = print(io, "SCADPenalty(λ = $(p.λ), a = $(p
     end
     return val
 end
-@inline function prox(βj::Float64, p::SCADPenalty, s::Float64)
+@inline function prox(p::SCADPenalty, βj::Float64, s::Float64)
     if abs(βj) > p.a * p.λ
     elseif abs(βj) < 2.0 * p.λ
         βj = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
@@ -97,8 +97,8 @@ Base.copy(p::Penalty) = deepcopy(p)
 
 # Prox operator is only needed for nondifferentiable penalties
 # s = step size
-@inline function prox!(β::AVecF, p::Penalty, s::Float64)
+@inline function prox!(p::Penalty, β::AVecF, s::Float64)
     for j in 1:length(β)
-        β[j] = prox(β[j], p, s)
+        β[j] = prox(p, β[j], s)
     end
 end
