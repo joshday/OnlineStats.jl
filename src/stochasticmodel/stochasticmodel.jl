@@ -25,30 +25,31 @@ immutable HuberRegression <: IdentityLinkModel
     end
 end
 
-
-@inline ∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) = sign(ŷᵢ - yᵢ)
-@inline ∇f(::L2Regression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
-@inline ∇f(::LogisticRegression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
-@inline ∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) = ŷᵢ - yᵢ
-@inline ∇f(l::QuantileRegression, yᵢ::Float64, ŷᵢ::Float64) = Float64(yᵢ < ŷᵢ) - l.τ
-@inline ∇f(::SVMLike, yᵢ::Float64, ŷᵢ::Float64) = yᵢ * ŷᵢ < 1 ? -yᵢ : 0.0
-@inline ∇f(l::HuberRegression, yᵢ::Float64, ŷᵢ::Float64) = abs(yᵢ - ŷᵢ) <= l.δ ? ŷᵢ - yᵢ : l.δ * sign(ŷᵢ - yᵢ)
-
 Base.show(io::IO, o::L1Regression) =        print(io, "L1Regression")
 Base.show(io::IO, o::L2Regression) =        print(io, "L2Regression")
+Base.show(io::IO, o::LogisticRegression) =  print(io, "LogisticRegression")
+Base.show(io::IO, o::PoissonRegression) =   print(io, "PoissonRegression")
 Base.show(io::IO, o::QuantileRegression) =  print(io, "QuantileLoss(τ = $(o.τ))")
 Base.show(io::IO, o::SVMLike) =             print(io, "SVMLike")
 Base.show(io::IO, o::HuberRegression) =     print(io, "HuberRegression(δ = $(o.δ))")
 
-@inline StatsBase.predict(::IdentityLinkModel, x::AVecF, β::VecF, β0::Float64) = dot(x, β) + β0
-@inline StatsBase.predict(::IdentityLinkModel, X::AMatF, β::VecF, β0::Float64) = X * β + β0
-@inline StatsBase.predict(::LogisticRegression, x::AVecF, β::VecF, β0::Float64) = 1.0 / (1.0 + exp(-dot(x, β) - β0))
-@inline StatsBase.predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) = 1.0 ./ (1.0 + exp(-X * β - β0))
-@inline StatsBase.predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) = exp(dot(x, β) + β0)
-@inline StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) = exp(X*β + β0)
+∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) = s       ign(ŷᵢ - yᵢ)
+∇f(::L2Regression, yᵢ::Float64, ŷᵢ::Float64) =         ŷᵢ - yᵢ
+∇f(::LogisticRegression, yᵢ::Float64, ŷᵢ::Float64) =   ŷᵢ - yᵢ
+∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) =    ŷᵢ - yᵢ
+∇f(l::QuantileRegression, yᵢ::Float64, ŷᵢ::Float64) =  Float64(yᵢ < ŷᵢ) - l.τ
+∇f(::SVMLike, yᵢ::Float64, ŷᵢ::Float64) =              yᵢ * ŷᵢ < 1 ? -yᵢ : 0.0
+∇f(l::HuberRegression, yᵢ::Float64, ŷᵢ::Float64) =     abs(yᵢ - ŷᵢ) <= l.δ ? ŷᵢ - yᵢ : l.δ * sign(ŷᵢ - yᵢ)
 
-classify(m::LogisticRegression, x::AVecF, β, β0) = Float64(predict(m, x, β, β0) > 0.5)
-classify(m::SVMLike, x::AVecF, β, β0) = Float64(predict(m, x, β, β0) > 0.0)
+StatsBase.predict(::IdentityLinkModel, x::AVecF, β::VecF, β0::Float64) =    dot(x, β) + β0
+StatsBase.predict(::IdentityLinkModel, X::AMatF, β::VecF, β0::Float64) =    X * β + β0
+StatsBase.predict(::LogisticRegression, x::AVecF, β::VecF, β0::Float64) =   1.0 / (1.0 + exp(-dot(x, β) - β0))
+StatsBase.predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) =   1.0 ./ (1.0 + exp(-X * β - β0))
+StatsBase.predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) =    exp(dot(x, β) + β0)
+StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) =    exp(X*β + β0)
+
+classify(m::LogisticRegression, x::AVecF, β, β0) =  Float64(predict(m, x, β, β0) > 0.5)
+classify(m::SVMLike, x::AVecF, β, β0) =             Float64(predict(m, x, β, β0) > 0.0)
 
 
 #------------------------------------------------------------------# StochasticModel
@@ -79,8 +80,8 @@ function StochasticModel(x::AMatF, y::AVecF; keyargs...)
     o
 end
 
-@inline StatsBase.predict(o::StochasticModel, x::AVecF) = predict(o.model, x, o.β, o.β0)
-@inline StatsBase.predict(o::StochasticModel, X::AMatF) = predict(o.model, X, o.β, o.β0)
+StatsBase.predict(o::StochasticModel, x::AVecF) = predict(o.model, x, o.β, o.β0)
+StatsBase.predict(o::StochasticModel, X::AMatF) = predict(o.model, X, o.β, o.β0)
 alg(o::StochasticModel) = o.algorithm
 pen(o::StochasticModel) = o.penalty
 StatsBase.coef(o::StochasticModel) = o.intercept ? vcat(o.β0, o.β) : copy(o.β)
