@@ -66,7 +66,7 @@ end
 
 # TEST
 if false
-    srand(10)
+    # srand(10)
     n, p = 1_000_000, 5
     x = randn(n, p)
     β = collect(linspace(0, 1, p))
@@ -83,6 +83,10 @@ if false
     show(o)
 
     o = StochasticModel(p, algorithm = ProxGrad(), model = LogisticRegression())
-    @time update!(o, x, y, 1)
+    @time update!(o, x, y, 5)
+    show(o)
+
+    o = StochasticModel(p, algorithm = RDA(), model = LogisticRegression())
+    @time update!(o, x, y, 5)
     show(o)
 end
