@@ -29,7 +29,7 @@ function updateβ!(o::StochasticModel{ProxGrad}, x::AVecF, y::Float64)
     @inbounds for j in 1:length(x)
         gi = g * x[j]
         alg(o).G[j] += gi^2
-        adagrad_update!(o, gi, j)
+        proxgrad_update!(o, gi, j)
     end
 end
 
