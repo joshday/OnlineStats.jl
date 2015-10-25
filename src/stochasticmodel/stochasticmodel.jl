@@ -33,7 +33,7 @@ Base.show(io::IO, o::QuantileRegression) =  print(io, "QuantileLoss(τ = $(o.τ)
 Base.show(io::IO, o::SVMLike) =             print(io, "SVMLike")
 Base.show(io::IO, o::HuberRegression) =     print(io, "HuberRegression(δ = $(o.δ))")
 
-∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) = s       ign(ŷᵢ - yᵢ)
+∇f(::L1Regression, yᵢ::Float64, ŷᵢ::Float64) =         sign(ŷᵢ - yᵢ)
 ∇f(::L2Regression, yᵢ::Float64, ŷᵢ::Float64) =         ŷᵢ - yᵢ
 ∇f(::LogisticRegression, yᵢ::Float64, ŷᵢ::Float64) =   ŷᵢ - yᵢ
 ∇f(::PoissonRegression, yᵢ::Float64, ŷᵢ::Float64) =    ŷᵢ - yᵢ
