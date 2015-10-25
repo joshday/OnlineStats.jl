@@ -32,36 +32,37 @@ function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
     end
 
     # update the average gradient
-    α = nobs(o) / (nobs(o) + 1)
     @inbounds for j in 1:length(x)
         gj = g * x[j]
         alg(o).G[j] += gj^2
         alg(o).Ḡ[j] = w * alg(o).Ḡ[j] + (1 - w) * gj
         rda_update!(o, gj, j)
     end
-    nothing
 end
 
-# I apologize to my future self for how hard this code is to read
+
+
+weight(o::StochasticModel{RDA}, j::Int) = nobs(o) * alg(o).η / sqrt(alg(o).G[j])
+
+
 # NoPenalty
 @inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,NoPenalty}, g::Float64, j::Int)
-    o.β[j] = -nobs(o) * alg(o).η * alg(o).Ḡ[j] / sqrt(alg(o).G[j])
+    o.β[j] = -weight(o, j) * alg(o).Ḡ[j]
 end
 
 # L2Penalty
 @inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,L2Penalty}, g::Float64, j::Int)
     alg(o).Ḡ[j] += (1 / nobs(o)) * pen(o).λ * o.β[j]
-    o.β[j] = -nobs(o) * alg(o).η * alg(o).Ḡ[j] / sqrt(alg(o).G[j])
+    o.β[j] = -weight(o, j) * alg(o).Ḡ[j]
 end
 
-# L1Penalty
-# See original ADAGRAD paper
+# L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
 @inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,L1Penalty}, g::Float64, j::Int)
     if abs(alg(o).Ḡ[j]) < pen(o).λ
         o.β[j] = 0.0
     else
         ḡ = alg(o).Ḡ[j]
-        o.β[j] = sign(-ḡ) * alg(o).η * nobs(o)  * (abs(ḡ) - pen(o).λ)/ sqrt(alg(o).G[j])
+        o.β[j] = sign(-ḡ) * weight(o, j)  * (abs(ḡ) - pen(o).λ)
     end
 end
 
@@ -73,7 +74,7 @@ end
         o.β[j] = 0.0
     else
         ḡ = alg(o).Ḡ[j]
-        o.β[j] = sign(-ḡ) * alg(o).η * nobs(o) * (abs(ḡ) - λ) / sqrt(alg(o).G[j])
+        o.β[j] = sign(-ḡ) * weight(o, j) * (abs(ḡ) - λ)
     end
 end
 

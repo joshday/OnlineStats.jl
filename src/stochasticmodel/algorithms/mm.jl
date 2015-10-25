@@ -74,15 +74,15 @@ if false
     y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
     # y = Float64[rand(Poisson(exp(xb))) for xb in x*β]
 
-    o = StochasticModel(p, algorithm = MM(r=.6), model = LogisticRegression())
+    o = StochasticModel(p, algorithm = MM(r = .6), model = LogisticRegression())
     @time update!(o, x, y, 50)
     show(o)
 
-    o = StochasticModel(p, algorithm = SGD(r=.6), model = LogisticRegression())
+    o = StochasticModel(p, algorithm = SGD(r = .6), model = LogisticRegression())
     @time update!(o, x, y, 50)
     show(o)
 
-    o = StochasticModel(p, algorithm = ProxGrad(η = .5), model = LogisticRegression())
-    @time update!(o, x, y, 5)
+    o = StochasticModel(p, algorithm = ProxGrad(), model = LogisticRegression())
+    @time update!(o, x, y, 1)
     show(o)
 end
