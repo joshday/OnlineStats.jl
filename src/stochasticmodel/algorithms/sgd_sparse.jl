@@ -10,7 +10,7 @@ After `burnin` observations, if the absolute value of an estimate is less than
 """
 type SGDSparse <: Algorithm   # step size is γ = η * nobs ^ -r
     η::Float64
-    rate::LearningRate
+    weighting::LearningRate
     set::IntSet
     burnin::Int
     cutoff::Float64
@@ -19,8 +19,8 @@ type SGDSparse <: Algorithm   # step size is γ = η * nobs ^ -r
         new(Float64(η), LearningRate(;kw...), IntSet(1:2), burnin, cutoff)
     end
 end
-weight(alg::SGDSparse) = alg.η * weight(alg.rate)
-Base.show(io::IO, o::SGDSparse) = print(io, "SGDSparse with rate γ_t = $(o.η) / (1 + $(o.rate.λ) * t ^ $(o.rate.r))")
+weight(alg::SGDSparse) = alg.η * weight(alg.weighting)
+Base.show(io::IO, o::SGDSparse) = print(io, "SGDSparse with rate γ_t = $(o.η) / (1 + $(o.weighting.λ) * t ^ $(o.weighting.r))")
 
 @inline function updateβ!(o::StochasticModel{SGDSparse}, x::AVecF, y::Float64)
     if nobs(o) == 1

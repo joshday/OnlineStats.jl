@@ -74,24 +74,24 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 
 #-----------------------------------------------------------------# LearningRate
 """
-`LearningRate(;r = 1.0, λ = 1.0, minstep = 0.0)`
+`LearningRate(;r = 1.0, s = 1.0, minstep = 0.0)`
 
-Update weights are `max(minstep, γ_t)` where `γ_t = 1 / (1 + λ * t ^ r)`
+Update weights are `max(minstep, γ_t)` where `γ_t = 1 / (1 + s * t) ^ r`
 """
 type LearningRate <: Weighting
     r::Float64
-    λ::Float64
+    s::Float64
     minstep::Float64    # minimum step size
     t::Int64            # number of updates
 
-    function LearningRate(;r::Real = 1.0, λ::Real = 1.0, minstep::Real = 0.0)
+    function LearningRate(;r::Real = 1.0, s::Real = 1.0, minstep::Real = 0.0)
         @assert 0 < r <= 1
-        @assert λ > 0
-        new(Float64(r), Float64(λ), Float64(minstep), 0)
+        @assert s > 0
+        new(Float64(r), Float64(s), Float64(minstep), 0)
     end
 end
 function weight(w::LearningRate, unused1 = 1, unused2 = 1)
-    result = max(1.0 / (1.0 + w.λ * w.t) ^ w.r, w.minstep)
+    result = max(1.0 / (1.0 + w.s * w.t) ^ w.r, w.minstep)
     w.t += 1
     result
 end

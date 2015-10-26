@@ -11,7 +11,7 @@ end
 
 weight(alg::MM) = alg.η * weight(alg.weighting)
 
-Base.show(io::IO, o::MM) = print(io, "MM with rate γ_t = $(o.η) / (1 + $(o.weighting.λ) * t) ^ $(o.weighting.r)")
+Base.show(io::IO, o::MM) = print(io, "MM with rate γ_t = $(o.η) / (1 + $(o.weighting.s) * t) ^ $(o.weighting.r)")
 
 
 function updateβ!(o::StochasticModel{MM}, x::AVecF, y::Float64)

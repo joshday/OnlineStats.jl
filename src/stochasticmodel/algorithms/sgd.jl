@@ -1,4 +1,8 @@
-"Stochastic (Sub)Gradient Descent"
+"""
+###Stochastic (Sub)Gradient Descent
+
+`SGD(; η = 1.0, prox = true, r = 1.0, s = 1.0)`
+"""
 immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     η::Float64
     weighting::LearningRate
@@ -11,7 +15,7 @@ end
 
 weight(alg::SGD) = alg.η * weight(alg.weighting)
 
-Base.show(io::IO, o::SGD) = print(io, "SGD with rate γ_t = $(o.η) / (1 + $(o.weighting.λ) * t) ^ $(o.weighting.r)")
+Base.show(io::IO, o::SGD) = print(io, "SGD with rate γ_t = $(o.η) / (1 + $(o.weighting.s) * t) ^ $(o.weighting.r)")
 
 
 function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
