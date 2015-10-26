@@ -27,9 +27,9 @@ function updateβ!(o::StochasticModel{ProxGrad}, x::AVecF, y::Float64)
     end
 
     @inbounds for j in 1:length(x)
-        gi = g * x[j]
-        alg(o).G[j] += gi^2
-        proxgrad_update!(o, gi, j)
+        gj = g * x[j]
+        alg(o).G[j] += gj^2
+        proxgrad_update!(o, gj, j)
     end
 end
 
@@ -43,7 +43,7 @@ function updatebatchβ!(o::StochasticModel{ProxGrad}, x::AMatF, y::AVecF)
     # update intercept
     if o.intercept
         g = 0.0
-        for i in 1:n
+        @inbounds for i in 1:n
             g += ∇f(o.model, y[i], ŷ[i])
         end
         g /= n
@@ -52,7 +52,7 @@ function updatebatchβ!(o::StochasticModel{ProxGrad}, x::AMatF, y::AVecF)
     end
 
     # update everything else
-    for j in 1:size(x, 2)
+    @inbounds for j in 1:size(x, 2)
         g = 0.0
         for i in 1:n
             g += x[i, j] * ∇f(o.model, y[i], ŷ[i])
@@ -63,13 +63,15 @@ function updatebatchβ!(o::StochasticModel{ProxGrad}, x::AMatF, y::AVecF)
     end
 end
 
+@inline weight(o::StochasticModel{ProxGrad}, j::Int) = o.algorithm.η / sqrt(o.algorithm.G[j])
+
 # L2Penalty
 @inline function proxgrad_update!{M<:ModelDefinition}(o::StochasticModel{ProxGrad,M,L2Penalty}, g::Float64, j::Int)
-    o.β[j] -= alg(o).η * (g + pen(o).λ * o.β[j]) / sqrt(alg(o).G[j])
+    o.β[j] -= weight(o) * (g + o.penalty.λ * o.β[j])
 end
 
 # nondifferentiable penalties and NoPenalty
-@inline function proxgrad_update!{M<:ModelDefinition, P<:Penalty}(o::StochasticModel{ProxGrad,M,P}, g::Float64, j::Int)
-    h = alg(o).η / sqrt(alg(o).G[j])
-    o.β[j] = prox(o.penalty, o.β[j] - g * h, h)
+@inline function proxgrad_update!(o::StochasticModel{ProxGrad}, g::Float64, j::Int)
+    γ = weight(o)
+    o.β[j] = prox(o.penalty, o.β[j] - γ * g, γ)
 end

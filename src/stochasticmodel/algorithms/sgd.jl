@@ -2,9 +2,10 @@
 immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     η::Float64
     weighting::LearningRate
-    function SGD(;η::Real = 1.0, kw...)
+    prox::Bool
+    function SGD(;η::Real = 1.0, prox::Bool = true, kw...)
         @assert η > 0
-        new(Float64(η), LearningRate(;kw...))
+        new(Float64(η), LearningRate(;kw...), prox)
     end
 end
 
@@ -21,8 +22,14 @@ function updateβ!(o::StochasticModel{SGD}, x::AVecF, y::Float64)
         o.β0 -= γ * g
     end
 
-    @inbounds for j in 1:length(x)
-        o.β[j] -= γ * add∇j(pen(o), g * x[j], o.β, j)
+    if o.algorithm.prox
+        for j in 1:length(x)
+            o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j], γ)
+        end
+    else
+        for j in 1:length(x)
+            o.β[j] -= γ * add∇j(pen(o), g * x[j], o.β, j)
+        end
     end
 end
 

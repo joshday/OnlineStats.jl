@@ -75,7 +75,7 @@ function updatebatchβ!(o::StochasticModel{RDA}, x::AMatF, y::AVecF)
 end
 
 n_updates(o::StochasticModel{RDA}) = alg(o).n_updates
-weight(o::StochasticModel{RDA}, j::Int) = n_updates(o) * alg(o).η / sqrt(alg(o).G[j])
+@inline weight(o::StochasticModel{RDA}, j::Int) = n_updates(o) * alg(o).η / sqrt(alg(o).G[j])
 
 # NoPenalty
 @inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,NoPenalty}, j::Int)
