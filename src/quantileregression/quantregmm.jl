@@ -22,7 +22,7 @@ function QuantRegMM(x::AMatF, y::AVecF, wgt::Weighting = LearningRate(r = .51);
                     τ::Float64 = .5, start::VecF = zeros(ncols(x)), ϵ::Float64 = 1e-8,
                     batch = true)
     o = QuantRegMM(ncols(x), wgt, τ = τ, start = start, ϵ = ϵ)
-    batch ? updatebatch!(o, x, y) : update(o, x, y)
+    batch ? updatebatch!(o, x, y) : update!(o, x, y)
     o
 end
 

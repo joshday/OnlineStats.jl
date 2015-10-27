@@ -37,7 +37,7 @@ end
 function update!(o::StochasticModel, s::HardThreshold)
     if nobs(o) > s.burnin
         for j in 1:length(o.β)
-            if o.β[j] < s.ϵ
+            if abs(o.β[j]) < s.ϵ
                 o.β[j] = 0.0
             end
         end
