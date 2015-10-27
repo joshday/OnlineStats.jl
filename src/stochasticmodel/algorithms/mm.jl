@@ -51,7 +51,7 @@ function updatebatchβ!(o::StochasticModel{MM}, x::AMatF, y::AVecF)
                 o.β[j] = prox(o.penalty, o.β[j] - γ * g * xi[j], γ)
             end
         else
-            @inbounds for j in 1:size(x, 2)
+            for j in 1:size(x, 2)
                 o.β[j] -= γ * add∇j(o.penalty, g * xi[j], o.β, j)
             end
         end
@@ -79,7 +79,7 @@ end
 
 
 # TEST
-if true
+if false
     # srand(10)
     n, p = 1_000_000, 5
     x = randn(n, p)

@@ -37,7 +37,7 @@ function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
 end
 
 # Statistical Model update
-function update!(o::OnlineStat, x::AMat, y::AVec)
+function update!(o::OnlineStat, x::AMatF, y::AVecF)
     for i in 1:length(y)
         update!(o, row(x, i), y[i])
     end
@@ -71,11 +71,6 @@ function update!(o::OnlineStat, args...; f::Function = x->nothing)
     f(o)
 end
 
-# function update!(o::OnlineStat, x::AMat, y::AVec; column::Bool = true)
-#     for i in 1:length(y)
-#         update!(o, col(x, i), y[i])
-#     end
-# end
 
 
 
