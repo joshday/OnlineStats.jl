@@ -10,10 +10,10 @@ To make a new penalty type universally accessible within OnlineStats:
     - this is used in the Base.show method for StochasticModel
 - A _j method, the value of the penalty
     - this is used in evaluating convergence criteria for SparseReg
-- A prox method, the prox operator with tradeoff parameter s
+- A prox method, the prox operator with tradeoff parameter s: prox_{sj}(βⱼ)
     - this gets used by SparseReg and ProxGrad
 - an add∇j method: adds penalty subgradient to loss subgradient at index i
-    - this gets used by SGD and SGDSparse
+    - this gets used by SGD, SGDSparse, MM
 ===============================================================================#
 
 #--------------------------------------------------------------------# NoPenalty

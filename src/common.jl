@@ -7,7 +7,6 @@ update!(o, data...)
 update!(o, data..., b)
 
 update!(o, args...; f::Function)
-update!(o, args...; plot::Plots.Plot)
 ```
 
 Update an OnlineStat with `data...`. If specified, uses minibatches of size `b`.
@@ -72,7 +71,7 @@ function update!(o::OnlineStat, args...; f::Function = x->nothing)
     f(o)
 end
 
-function update!(o::OnlineStat, x, y; column::Bool = true)
+function update!(o::OnlineStat, x::AMat, y::AVec; column::Bool = true)
     for i in 1:length(y)
         update!(o, col(x, i), y[i])
     end
