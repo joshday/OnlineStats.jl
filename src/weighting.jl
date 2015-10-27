@@ -97,20 +97,20 @@ function weight(w::LearningRate, unused1 = 1, unused2 = 1)
 end
 
 
-#----------------------------------------------------------------------# ADAGRAD
-# This isn't a subtype of Weighting, since it only makes sense for SGD-like types
-type ADAGRAD
-    g0::Float64
-    g::VecF
-end
-function weight0(w::ADAGRAD, gᵢ::Float64)
-    w.g0 += gᵢ ^ 2
-    sqrt(w.g0)
-end
-function weight(w::ADAGRAD, gᵢ::Float64, i::Integer)
-    w.g[i] += gᵢ ^ 2
-    sqrt(w.g[i])
-end
+# #----------------------------------------------------------------------# ADAGRAD
+# # This isn't a subtype of Weighting, since it only makes sense for SGD-like types
+# type ADAGRAD
+#     g0::Float64
+#     g::VecF
+# end
+# function weight0(w::ADAGRAD, gᵢ::Float64)
+#     w.g0 += gᵢ ^ 2
+#     sqrt(w.g0)
+# end
+# function weight(w::ADAGRAD, gᵢ::Float64, i::Integer)
+#     w.g[i] += gᵢ ^ 2
+#     sqrt(w.g[i])
+# end
 
 
 #---------------------------------------------------------------------------#

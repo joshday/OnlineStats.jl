@@ -1,4 +1,4 @@
-"Majorize-Minimize Algorithm"
+"Stochastic Majorize-Minimize Algorithm"
 type MM <: Algorithm
     η::Float64
     weighting::LearningRate
