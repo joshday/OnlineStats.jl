@@ -18,15 +18,3 @@ p = plot(
 )
 title!(p, "Weights for Different LearningRate Parameters")
 savefig(p, "docs/images/learningrate_rs.png")
-
-
-
-#### traceplot
-x = randn(10_000, 10)
-β = collect(1:10)
-y = x*β + randn(10_000)
-
-# coefficients of a stochastic gradient descent model
-o = SGModel(size(x, 2), algorithm = RDA())
-p = traceplot!(o, 100, x, y, f = coef)
-savefig(p, "docs/images/traceplot.png")

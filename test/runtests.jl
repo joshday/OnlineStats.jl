@@ -39,7 +39,6 @@ include("stochasticmodel_test/cv_test.jl")
 
 include("common_test.jl")
 include("react_test.jl")
-include("plot_test.jl")
 
 
 

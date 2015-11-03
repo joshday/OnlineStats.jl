@@ -12,7 +12,6 @@ update!(o, args...; f::Function)
 Update an OnlineStat with `data...`. If specified, uses minibatches of size `b`.
 
 - If `f` is provided, `f(o)` is called after updating the OnlineStat.
-- If `plot` is provided, the plot is updated after the OnlineStat is updated.
 """
 function update!(o::OnlineStat, y::Union{AVec, AMat})
     for i in 1:size(y, 1)

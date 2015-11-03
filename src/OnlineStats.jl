@@ -56,8 +56,7 @@ export
     sweep!,                 # Symmetric sweep operator
     estimatedCardinality,
     pca,                    # Get top d principal components from CovarianceMatrix
-    replicates,             # Get vector of replicates from <: Bootstrap
-    traceplot!              # update OnlineStat and plot its history
+    replicates              # Get vector of replicates from <: Bootstrap
 
 
 #-----------------------------------------------------------------------------#
@@ -69,7 +68,6 @@ include("log.jl")
 # Common Types
 include("types.jl")
 include("weighting.jl")
-include("plotmethods.jl")
 
 # Other
 include("common.jl")

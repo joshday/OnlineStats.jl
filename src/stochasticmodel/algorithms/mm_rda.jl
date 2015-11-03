@@ -115,30 +115,33 @@ end
 # TEST
 if false
     # srand(10)
-    n, p = 1_000_000, 5
+    n, p = 1_000_000, 20
     x = randn(n, p)
     β = collect(linspace(0, 1, p))
-    y = x*β + randn(n)
-    # y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
-    # y = Float64[rand(Poisson(exp(xb))) for xb in x*β]
 
-    # quantreg
-    o = StochasticModel(p, algorithm = MMRDA(), model = L2Regression(), penalty = L1Penalty(.1))
+    # y = x*β + randn(n)
+    y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
+    # y = Float64[rand(Poisson(exp(xb))) for xb in x*β]
+    β = vcat(0.0, β)
+
+    o = StochasticModel(p, algorithm = MMRDA(), model = LogisticRegression())
     @time update!(o, x, y, 1)
     show(o)
-    # o = StochasticModel(p, algorithm = SGD(r = .5), model = QuantileRegression(.9))
-    # @time update!(o, x, y, 1)
-    # show(o)
+    o2 = StochasticModel(p, algorithm = RDA(), model = LogisticRegression())
+    @time update!(o2, x, y, 1)
+    show(o2)
+    println("mm:  ", maxabs(coef(o) - β))
+    println("sgd: ", maxabs(coef(o2) - β))
 
     # # l1reg
-    # o = StochasticModel(p, algorithm = MMMMRDA(r = .5), model = L1Regression())
+    # o = StochasticModel(p, algorithm = MMRDA(r = .5), model = L1Regression())
     # @time update!(o, x, y, 10)
     # show(o)
     # o = StochasticModel(p, algorithm = SGD(r = .5), model = L1Regression())
     # @time update!(o, x, y, 10)
     # show(o)
 
-    # o = StochasticModel(p, algorithm = MMMMRDA(r = .6), model = LogisticRegression(), penalty = NoPenalty())
+    # o = StochasticModel(p, algorithm = MMRDA(r = .6), model = LogisticRegression(), penalty = NoPenalty())
     # @time update!(o, x, y, 5)
     # show(o)
     #
