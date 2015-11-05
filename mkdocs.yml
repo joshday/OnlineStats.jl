@@ -16,4 +16,4 @@ pages:
     - 'Models':
         - 'Models': 'Models/Models.md'
         - 'Stochastic Models': 'Models/StochasticModel.md'
-    - 'Visualization': 'Plotting.md'
+    - 'Plotting': 'Plotting.md'

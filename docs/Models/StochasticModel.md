@@ -1,28 +1,28 @@
-# Stochastic (Sub)gradient Models
+# Stochastic  Models
 
-The `SGModel` type is a framework for fitting a wide variety of models that are based on stochastic estimates of a (sub)gradient.  An `SGModel` is defined by three things:
+The `StochasticModel` type is a framework for fitting a wide variety of models that are based on stochastic estimates of a (sub)gradient and a linear predictor.  Generalized linear models, quantile regression, and support vector machines fall into this category.  A `StochasticModel` is defined by three things:
 
-1. [Model](SGModel.md#Models)
-1. [Penalty](SGModel.md#Penalties/Regularization)
-1. [Algorithm](SGModel.md#Algorithms)
+1. [Model](StochasticModel.md#Models)
+1. [Penalty](StochasticModel.md#Penalties/Regularization)
+1. [Algorithm](StochasticModel.md#Algorithms)
 
 # Usage
 
 ```julia
-SGModel(x, y; model = L2Regression(), penalty = NoPenalty(), algorithm = SGD())
+StochasticModel(x, y; model = L2Regression(), penalty = NoPenalty(), algorithm = SGD())
 ```
 
-| arguments | description          |
-|:----------|:---------------------|
-| `x`       | matrix of predictors |
-| `y`       | response vector      |
+| arguments | description       |
+|:----------|:------------------|
+| `x`       | `Matrix{Float64}` |
+| `y`       | `Vector{Float64}` |
 
-| keyword arguments | description                                                         |
-|:------------------|:--------------------------------------------------------------------|
-| `model`           | one of the ModelDefinition types below, default `L2Regression()`    |
-| `penalty`         | type of regularization, default: `NoPenalty()`                      |
-| `algorithm`       | online algorithm used, default: `ProxGrad()`                        |
-| `intercept`       | `Bool`.  Should intercept be included in the model?  Default `true` |
+| keyword arguments | description                                                      |
+|:------------------|:-----------------------------------------------------------------|
+| `model`           | one of the ModelDefinition types below, default `L2Regression()` |
+| `penalty`         | type of regularization, default: `NoPenalty()`                   |
+| `algorithm`       | online algorithm used, default: `ProxGrad()`                     |
+| `intercept`       | `Bool`.  Should intercept be added to the model?  Default `true` |
 
 # Models
 
@@ -51,7 +51,8 @@ The model argument specifies both the link function and loss function to be used
     - Robust regression using Huber loss.
 
 # Penalties/Regularization
-Penalties on the size of the coefficients can be used to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.
+Penalties on the size of the coefficients can be used for variable selection or
+to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by default.
 
 - `NoPenalty()`
     - No regularization is used.
@@ -61,14 +62,14 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 
 - `L1Penalty(λ)`
     - AKA "LASSO" term: `loss(β) + λ * sumabs(β)`
-    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the nature of the SGD/ProxGrad algorithms do NOT generate a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA` or one of the `Sparse` variants.
+    - NOTE: A major benefit of the LASSO is that it creates a sparse solution.  However, the SGD/ProxGrad algorithms do not perform well in generating a sparse solution.  If variable selection/sparse solution is desired, `L1Penalty` should be used with the `RDA`.
 
 - `ElasticNetPenalty(λ, α)`
     - `loss(β) + λ * (α * sumabs(β) + (1 - α) * sumabs2(β))`
     - That is, elastic net is a weighted average between ridge and lasso.  This is the
     same parameterization that the popular R package [glmnet](http://www.inside-r.org/packages/cran/glmnet/docs/glmnet) uses.
-    - As for `L1Penalty`, to generate a sparse solution, `RDA` or a `Sparse` variant
-    must be used.
+    - As for `L1Penalty`, to generate a sparse solution, us `RDA`.
+
 
 # Algorithms
 
@@ -79,16 +80,10 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
     doing Polyak-Juditsky averaging, this shouldn't be less than 0.5.  A smaller `r`
     puts more value on new observations.
 
-- `SGDSparse(η = 1.0, r = .5, burnin = 1000, cutoff = .0001)`
-    - SGD with enforced sparsity
-    - After `burnin` observations, any coefficient less than `cutoff` will be set
-    to 0 and will no longer be updated.
-
 - `ProxGrad(η = 1.0)`
     - Stochastic Proximal Subgradient Method w/ ADAGRAD
-    - `η` is a constant step size (> 0)
-    - Weights are automatically determined by ADAGRAD.
-    - Penalties are handled with prox operators
+    - `η` is a constant step size
+    - Penalties are handled using the prox operator
 
 - `RDA(η = 1.0)`
     - Regularized Dual Averaging w/ ADAGRAD
@@ -96,30 +91,34 @@ Penalties on the size of the coefficients can be used to prevent overfitting.  M
 
 # Methods
 
-| method                    | description                 |
-|:--------------------------|:----------------------------|
-| `StatsBase.coef(o)`       | return coefficients         |
-| `StatsBase.predict(o, x)` | `x` can be Vector or Matrix |
+| method                            | description                                    |
+|:----------------------------------|:-----------------------------------------------|
+| `coef(o)`                         | return coefficients                            |
+| `predict(o, x)`                   | `x` can be Vector or Matrix                    |
+| `coefplot(o)`  (if `using Plots`) | Graphical representation of coefficient vector |
+| `loss(o, x, y)`                   | Evaluate the average loss on data `x`, `y`     |
 
-# SGModel Examples
+# Examples
 
 ```julia
-o = SGModel(x,y)
-o = SGModel(x, y, penalty = L1Penalty(.1))
-o = SGModel(x, y, algorithm = RDA(), penalty = ElasticNetPenalty(.1, .5))
-o = SGModel(x, y, model = QuantileRegression(.7), algorithm = ProxGrad())
+o = StochasticModel(x, y)
+o = StochasticModel(x, y, penalty = L1Penalty(.1))
+o = StochasticModel(x, y, algorithm = RDA(), penalty = ElasticNetPenalty(.1, .5))
+o = StochasticModel(x, y, model = QuantileRegression(.7), algorithm = ProxGrad())
 ```
 
 
 # Cross Validation
 
-The `SGModelCV` type can be used to automatically learn the optimal penalty parameter `λ` for minimizing the MSE of a test set.
+<h3>StochasticModelCV</h3>
+
+The `StochasticModelCV` type can be used to automatically learn the optimal penalty parameter `λ` for minimizing the MSE of a test set.
 
 This type is experimental, but very promising.
 
 ```julia
-o = SGModel(size(x, 2), penalty = L1Penalty(.1))
-o = SGModelCV(o, xtest, ytest; λrate = LearningRate(), burnin = 1000)
+o = StochasticModel(size(x, 2), penalty = L1Penalty(.1))
+o = StochasticModelCV(o, xtest, ytest; λrate = LearningRate(), burnin = 1000)
 update!(o, x, y)
 ```
 

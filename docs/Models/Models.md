@@ -1,4 +1,4 @@
-# Models
+# Models and Statistics
 
 In the examples below, assume y is `Vector{Float64}` and x is `Matrix{Float64}`
 <!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
@@ -16,8 +16,8 @@ In the examples below, assume y is `Vector{Float64}` and x is `Matrix{Float64}`
 	- [Moments](#moments)
 	- [NormalMix](#normalmix)
 	- [Principal Components Analysis](#principal-components-analysis)
-	- [SGModel](#sgmodel)
-	- [SGModelCV](#sgmodelcv)
+	- [StochasticModel](#StochasticModel)
+	- [StochasticModelCV](#StochasticModelcv)
 	- [ShermanMorrisonInverse](#shermanmorrisoninverse)
 	- [SparseReg](#sparsereg)
 	- [StepwiseReg](#stepwisereg)
@@ -127,7 +127,7 @@ Use `pca(o::CovarianceMatrix, maxoutdim = k)`.  The keyword argument `maxoutdim`
 the top `k` components to return.
 
 
-## SGModel
+## StochasticModel
 This is a flexible type that fits a wide variety of models using three different
 online algorithms (`SGD`, `ProxGrad`, and `RDA`).  Each algorithm uses stochastic
 estimates of the (sub)gradient of the loss function.  Models available are :
@@ -141,22 +141,22 @@ estimates of the (sub)gradient of the loss function.  Models available are :
 - `SVMLike` (Perceptron and Support Vector Machine)
 
 ```julia
-o = SGModel(x, y, model = L2Regression(), algorithm = RDA(), penalty = L1Penalty(.1))
+o = StochasticModel(x, y, model = L2Regression(), algorithm = RDA(), penalty = L1Penalty(.1))
 coef(o)
 predict(o, x)
 ```
-See the section on [Stochastic Subgradient Models](SGModel.md).
+See the section on [Stochastic Subgradient Models](StochasticModel.md).
 
-## SGModelCV
-Takes an SGModel and automatically fits the optimal tuning parameter.
+## StochasticModelCV
+Takes an StochasticModel and automatically fits the optimal tuning parameter.
 
 ```julia
-o = SGModel(size(x, 2))
-otune = SGModelCV(o, xtest, ytest)
+o = StochasticModel(size(x, 2))
+otune = StochasticModelCV(o, xtest, ytest)
 update!(otune, x, y)
 ```
 
-See the section on [Stochastic Subgradient Models](SGModel.md).
+See the section on [Stochastic Subgradient Models](StochasticModel.md).
 
 
 ## ShermanMorrisonInverse

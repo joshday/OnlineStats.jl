@@ -67,9 +67,9 @@ Each piece of data is weighted equally.
 Use equal weighting until the step size reaches `λ = 1/n`, then hold constant.
 
 <h3>Learning Rate</h3>
-- `LearningRate(;r::Float64 = 1.0, λ::Float64 = 1.0, minstep::Float64 = 0.0)`
+- `LearningRate(;r::Float64 = 1.0, s::Float64 = 1.0, minstep::Float64 = 0.0)`
 
-For the `t`-th update, use weight $γ_t = \frac{1}{1 + \lambda t^r}, r\in (.5, 1], \lambda > 0$, until weights reach `minstep`, then hold constant.  This is typically used for stochastic approximation algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
+For the `t`-th update, use weight $γ_t = \frac{1}{(1 + s t)^r}, r\in (.5, 1], s > 0$, until weights reach `minstep`, then hold constant.  This is typically used for stochastic approximation algorithms.  An `r` closer to 1 makes step sizes decay faster, resulting in slower-moving estimates.
 
 If this is unfamiliar territory for you, we recommend starting with `LearningRate(r = 0.6)`.
 
@@ -95,8 +95,8 @@ If this is unfamiliar territory for you, we recommend starting with `LearningRat
 |:----------------------------------|:--------------------------------|
 | L1 Regression                     | `StochasticModel`               |
 | linear regression                 | `LinReg`, `StochasticModel`     |
-| logistic regression               | `StochasticModel`, `OnlineGLM`  |
-| poisson regression                | `StochasticModel`, `OnlineGLM`  |
+| logistic regression               | `StochasticModel`               |
+| poisson regression                | `StochasticModel`               |
 | quantile regression               | `QuantRegMM`, `StochasticModel` |
 | regression w/ LASSO penalty       | `SparseReg`, `StochasticModel`  |
 | regression w/ ridge penalty       | `SparseReg`, `StochasticModel`  |
