@@ -12,6 +12,10 @@ import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vc
 import MultivariateStats
 import ArrayViews: view, rowvec_view
 
+using Requires
+@require Plots include("plots.jl")
+
+
 
 
 #-----------------------------------------------------------------------------#
@@ -40,12 +44,12 @@ export
     # stochasticmodel
     StochasticModel, StochasticModelCV,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression,
-    HuberRegression, SVMLike, PoissonRegression,
-    SGD, SGDSparse, ProxGrad, RDA, SAG,
+    HuberRegression, SVMLike, PoissonRegression, ModelDefinition,
+    SGD, SGDSparse, ProxGrad, RDA, MMGrad,
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
     # functions
-
+    loss,
     nobs, coef, coeftable, predict, vcov, stderr, pca, # rather than using reexport
     update!,                # update one observation at a time using Weighting scheme
     distributionfit,        # easy constructor syntax for FitDist types

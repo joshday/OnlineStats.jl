@@ -93,7 +93,7 @@ end
 if false
     # srand(10)
     n, p = 1_000_000, 10
-    x = randn(n, p) * 4
+    x = randn(n, p) * 10
     β = collect(linspace(0, 1, p))
 
     y = x*β + randn(n)

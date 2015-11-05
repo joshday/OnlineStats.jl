@@ -48,6 +48,15 @@ StatsBase.predict(::LogisticRegression, X::AMatF, β::VecF, β0::Float64) =   1.
 StatsBase.predict(::PoissonRegression, x::AVecF, β::VecF, β0::Float64) =    exp(dot(x, β) + β0)
 StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) =    exp(X*β + β0)
 
+loss(::L1Regression, y::Float64, η::Float64) =          abs(y - η)
+loss(::L2Regression, y::Float64, η::Float64) =          abs2(y - η)
+loss(::LogisticRegression, y::Float64, η::Float64) =    y * η - log(1.0 + exp(η))
+loss(::PoissonRegression, y::Float64, η::Float64) =     y * η - exp(η)
+loss(m::QuantileRegression, y::Float64, η::Float64) =   (y - η) * (m.τ - Float64(y < η))
+loss(::SVMLike, y::Float64, η::Float64) =               max(0.0, 1.0 - y * η)
+loss(m::HuberRegression, y::Float64, η::Float64) =      abs(y-η) < m.δ ? 0.5 * (y-η)^2 : m.δ * (abs(y-η) - 0.5 * m.δ)
+loss(m::ModelDefinition, y::VecF, η::VecF) = mean([loss(m, y[i], η[i]) for i in 1:length(y)])
+
 classify(m::LogisticRegression, x::AVecF, β, β0) =  Float64(predict(m, x, β, β0) > 0.5)
 classify(m::SVMLike, x::AVecF, β, β0) =             Float64(predict(m, x, β, β0) > 0.0)
 
@@ -89,6 +98,7 @@ classify(o::StochasticModel, x::AVecF) = classify(o.model, x, o.β, o.β0)
 classify(o::StochasticModel, x::AMatF) = [classify(o, row(x,i)) for i in 1:nrows(x)]
 statenames(o::StochasticModel) = [:β, :nobs]
 state(o::StochasticModel) = Any[coef(o), nobs(o)]
+loss(o::StochasticModel, x::MatF, y::VecF) = loss(o.model, y, x*o.β + o.β0)
 
 
 function update!(o::StochasticModel, x::AVecF, y::Float64)

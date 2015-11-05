@@ -62,10 +62,8 @@ end
 updatebatch!(o::OnlineStat, data...) = update!(o, data...)
 
 
-############# With keyword arguments
-# Thanks to multiple dispatch and above definitions, these methods can only be called
-# by specifying the keyword argument
-function update!(o::OnlineStat, args...; f::Function = x->nothing)
+# callbacks...there's room for improvement
+function update_call!(o::OnlineStat, f::Function = x->nothing, args...)
     update!(o, args...)
     f(o)
 end

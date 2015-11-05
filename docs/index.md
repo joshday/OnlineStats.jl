@@ -29,12 +29,12 @@ nobs(o)  # Number of observations = 223
 <h3>Common Interface</h3>
 
 
-| function                     | Description                                       | Return           |
-|:-----------------------------|:--------------------------------------------------|:-----------------|
-| `state(o)`                   | State of the estimate                             | `Vector{Any}`    |
-| `statenames(o)`              | Names corresponding to `state(o)`                 | `Vector{Symbol}` |
-| `nobs(o)`                    | number of observations                            | `Int`            |
-| `update!(o, data..., b = 1)` | Update model with respect to the weighting scheme |                  |
+| function                                      | Description                            | Return           |
+|:----------------------------------------------|:---------------------------------------|:-----------------|
+| `state(o)`                                    | State of the estimate                  | `Vector{Any}`    |
+| `statenames(o)`                               | Names corresponding to `state(o)`      | `Vector{Symbol}` |
+| `nobs(o)`                                     | number of observations                 | `Int`            |
+| `update!(o, x, b=1)`, `update!(o, x, y, b=1)` | Update model using batches of size `b` |                  |
 
 
 # Weighting Schemes
@@ -42,7 +42,7 @@ nobs(o)  # Number of observations = 223
 o = Mean(x, ExponentialWeighting(1000))
 ```
 
-When creating an OnlineStat, one can specify the weighting to be used (with the exception of `StochasticModel`, which has its own weighting system).  Updating a model typically involves one of two forms:
+When creating an OnlineStat, one can specify the weighting to be used (with the exception of `StochasticModel`).  Updating a model typically involves one of two forms:
 
 - weighted average (equivalent forms shown below):
 
