@@ -41,6 +41,7 @@ facts("Mean") do
         @fact o1.μ --> roughly(o3.μ)
         @fact mean(x) --> roughly(mean(o1))
         @fact update!(o, x1) --> nothing
+        @fact sum(o) --> o.μ * nobs(o)
 
 
         # empty constructor, state, Base.mean, nobs, Base.copy

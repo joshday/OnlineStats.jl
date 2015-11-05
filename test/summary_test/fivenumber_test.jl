@@ -23,5 +23,6 @@ facts("FiveNumberSummary") do
     end
 
     @fact nobs(o) --> 3_000_000
+    update!(o, rand(100), 50)
 end
 end #module

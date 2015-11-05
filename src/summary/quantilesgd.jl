@@ -15,13 +15,6 @@ function QuantileSGD(y::AVecF,
     o
 end
 
-function QuantileSGD(y::Float64,
-                     wgt::LearningRate = LearningRate(r = .51);
-                     τ::VecF = [.25, .5, .75],
-                     start::VecF = zeros(length(τ)))
-    QuantileSGD([y], wgt; τ = τ, start = start)
-end
-
 function QuantileSGD(wgt::LearningRate = LearningRate(r = .51);
                      τ::VecF = [.25, .5, .75],
                      start::VecF = zeros(length(τ)))

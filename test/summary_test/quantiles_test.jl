@@ -25,7 +25,7 @@ facts("Quantiles") do
         @fact nobs(o_uniform) --> 100 + n*100
         @fact nobs(o_normal) --> 100 + n*100
 
-        QuantileSGD(0.)
+        update!(o_normal, randn(100), 5)
     end
 
      context("QuantileMM") do
@@ -49,6 +49,8 @@ facts("Quantiles") do
         @fact statenames(o_normal) --> [:quantiles, :τ, :nobs]
         @fact o_uniform.n --> 100 + n*100
         @fact o_normal.n --> 100 + n*100
+
+        update!(o_normal, randn(100), 5)
     end
 
     context("QuantileSort") do

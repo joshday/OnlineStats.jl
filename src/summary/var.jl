@@ -26,7 +26,7 @@ statenames(o::Variance) = [:μ, :σ², :nobs]
 state(o::Variance) = Any[mean(o), var(o), nobs(o)]
 
 Base.mean(o::Variance) = o.μ
-Base.sum(o::Variance) = o.μ + o.n
+Base.sum(o::Variance) = o.μ * o.n
 Base.var(o::Variance) = (n = nobs(o); (n < 2 ? 0. : o.biasedvar * n / (n - 1)))
 Base.std(o::Variance) = sqrt(var(o))
 

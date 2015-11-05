@@ -20,6 +20,7 @@ facts("Summary") do
     @fact o.var.μ --> roughly(mean(x1))
     @fact o.var.biasedvar --> roughly(var(x1) * (n1 - 1) / n1)
     @fact var(o) --> roughly(var(x1), 1e-5)
+    @fact std(o) --> roughly(std(x1), 1e-3)
     @fact o.extrema.max --> maximum(x1)
     @fact o.extrema.min --> minimum(x1)
     @fact o.n --> n1
@@ -84,6 +85,7 @@ facts("Diff") do
     @fact last(o) --> 3
     @fact nobs(o) --> 12
 
+    o = Diff(rand(10))
 end
 
 facts("Diffs") do

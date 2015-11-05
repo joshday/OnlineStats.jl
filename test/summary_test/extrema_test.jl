@@ -13,7 +13,7 @@ facts("Extrema") do
     @fact maximum(o) --> 0.
 
     # Extrema, update!, merge, merge!, max, min,
-    n1, n2 = rand(1:1_000_000, 2)
+    n1, n2 = rand(5:1_000_000, 2)
     n = n1 + n2
     x1 = rand(n1)
     x2 = rand(n2)
@@ -55,6 +55,8 @@ facts("Extrema") do
     @fact nobs(obj1) --> n1
     @fact statenames(obj) --> [:max, :min, :nobs]
     @fact state(obj) --> [maximum(obj), minimum(obj), nobs(obj)]
+
+    update!(obj1, x1, 5)
 end
 
 end  # module
