@@ -1,6 +1,6 @@
 import Plots
 
-export coefplot, TracePlot
+export coefplot, TracePlot, CompareTracePlot
 
 
 """
@@ -26,6 +26,13 @@ end
 
 
 #--------------------------------------------------------------------# TracePlot
+"""
+`TracePlot(o)`
+
+`TracePlot(o, f)`
+
+Create a traceplot from an `OnlineStat`.  The value(s) to be plotted are `f(o)`, which defaults to the first element of `state(o)`.  Each time a `TracePlot` is updated, the corresponding `OnlineStat` will be updated and new value(s) will be added to the plot.
+"""
 type TracePlot
     o::OnlineStat
     p::Plots.Plot
@@ -44,45 +51,42 @@ end
 
 
 #-------------------------------------------------------------# CompareTracePlot
-# type CompareTracePlot
-#     os::Vector{OnlineStats}
-#     p::Plots.Plot
-#     f::Vector{Function}
-# end
-#
-# function TracePlot(os::Vector{OnlineStat}, fs::Vector{Function})
-#     nvals = length(os) * length(fs)
-#     x = zeros(nvals)
-#     i = 1:length(os)
-#     while maximum(i) <= nvals
-#         x[i] = nobs
-#     end
-# end
+"""
+Compare the values of multiple OnlineStats.
 
+Example:
+```
+o1 = StochasticModel(size(x, 2), algorithm = MMGrad())
+o2 = StochasticModel(size(x, 2), algorithm = SGD())
+myloss(o) = loss(o, xtest, ytest)
+comp = CompareTracePlot([o1, o2])
 
+update!(comp, x1, y1)
+update!(comp, x2, y2)
+...
+```
+"""
+type CompareTracePlot
+    os::Vector{OnlineStat}
+    p::Plots.Plot
+    f::Function  # Use a function that returns a scalar
+end
 
-############################################################## TEST
-# module Test
-# using OnlineStats
-# using OnlineStatsPlots
-# using Plots
-# pyplot()
-#
-# n, p = 10_000, 10
-# β = collect(1.:p)
-# x = randn(n, p)
-# y = x*β + randn(n)
-#
-# myloss(o) = OnlineStats.loss(o, x, y)
-# o = StochasticModel(p)
-# tr = TracePlot(o, myloss)
-#
-# b = 1:100
-# for i in 1:10
-#     update!(tr, OnlineStats.rows(x, b), OnlineStats.rows(y, b))
-#     b = b + 100
-# end
-# # plot!(tr.p, ylims = (0,10))
-#
-# println(coef(tr.o))
-# end
+function CompareTracePlot{T<:OnlineStat}(os::Vector{T}, f::Function)
+    p = Plots.plot([nobs(os[1])], [f(os[1])])
+
+    for i in 2:length(os)
+        Plots.plot!(p, [nobs(os[i])], [f(os[i])])
+    end
+    Plots.plot!(p, legend=true, xlabel = "nobs", ylabel = "value of function $f")
+    CompareTracePlot(os, p, f)
+end
+
+function update!(c::CompareTracePlot, args...)
+    for o in c.os
+        update!(o, args...)
+    end
+    for i in 1:length(c.os)
+        push!(c.p, i, nobs(c.os[i]), c.f(c.os[i]))
+    end
+end

@@ -19,10 +19,18 @@ function update!(o::OnlineStat, y::Union{AVec, AMat})
     end
 end
 
+function update!(o::OnlineStat, x::AMat, y::AVec)
+    for i in 1:length(y)
+        update!(o, row(x, i), y[i])
+    end
+end
+
+
+# Update in batches
 function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
     b = Int(b)
     n = size(y, 1)
-    @assert 0 < b <= n "batch size must be positive and less than data size"
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
     if b == 1
         update!(o, y)
     else
@@ -35,17 +43,10 @@ function update!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
     end
 end
 
-# Statistical Model update
-function update!(o::OnlineStat, x::AMatF, y::AVecF)
-    for i in 1:length(y)
-        update!(o, row(x, i), y[i])
-    end
-end
-
 function update!(o::OnlineStat, x::AMat, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
-    @assert 0 < b <=n "batch size must be positive and less than data size"
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
     if b == 1
         update!(o, x, y)
     else

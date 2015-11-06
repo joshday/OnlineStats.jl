@@ -36,7 +36,7 @@ facts("Variance") do
         @fact nobs(o) --> n1
         @fact sum(o) --> o.μ * nobs(o)
 
-        update!(o, x2)
+        update!(o, x2, 1)
         @fact o.μ --> roughly(mean(x))
         @fact o.biasedvar --> roughly(var(x) * ((n -1) / n), 1e-5)
         @fact o.n --> n

@@ -50,8 +50,8 @@ StatsBase.predict(::PoissonRegression, X::AMatF, β::VecF, β0::Float64) =    ex
 
 loss(::L1Regression, y::Float64, η::Float64) =          abs(y - η)
 loss(::L2Regression, y::Float64, η::Float64) =          abs2(y - η)
-loss(::LogisticRegression, y::Float64, η::Float64) =    y * η - log(1.0 + exp(η))
-loss(::PoissonRegression, y::Float64, η::Float64) =     y * η - exp(η)
+loss(::LogisticRegression, y::Float64, η::Float64) =    -y * η + log(1.0 + exp(η))
+loss(::PoissonRegression, y::Float64, η::Float64) =     -y * η + exp(η)
 loss(m::QuantileRegression, y::Float64, η::Float64) =   (y - η) * (m.τ - Float64(y < η))
 loss(::SVMLike, y::Float64, η::Float64) =               max(0.0, 1.0 - y * η)
 loss(m::HuberRegression, y::Float64, η::Float64) =      abs(y-η) < m.δ ? 0.5 * (y-η)^2 : m.δ * (abs(y-η) - 0.5 * m.δ)
