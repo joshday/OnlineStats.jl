@@ -57,9 +57,9 @@ function updateλ!(o::StochasticModel, x::AVecF, y::Float64, xtest, ytest, λrat
     update!(o_h, x, y)
 
     # Find best model for test data
-    loss_low = cv_criteria(o_l, xtest, ytest)
-    loss_mid = cv_criteria(o, xtest, ytest)
-    loss_hi = cv_criteria(o_h, xtest, ytest)
+    loss_low = loss(o_l, xtest, ytest)
+    loss_mid = loss(o, xtest, ytest)
+    loss_hi = loss(o_h, xtest, ytest)
     v = vcat(loss_low, loss_mid, loss_hi)
     _, j = findmin(v)
 
@@ -98,48 +98,48 @@ StatsBase.predict(o::StochasticModelCV, x) = predict(o.o, x)
 function Base.show(io::IO, o::StochasticModelCV)
     print_with_color(:blue, io, "Cross-Validated StochasticModel:\n")
     println(io, "  > Burnin:     ", o.burnin)
-    println(io, "  > Avg. loss:  ", cv_criteria(o.o, o.xtest, o.ytest))
+    println(io, "  > Avg. loss:  ", loss(o.o, o.xtest, o.ytest))
     show(io, o.o)
 end
 
-#-----------------------------------------------------# cross validation critera
-"Cross validation criteria, average loss"
-function cv_criteria(o::StochasticModel, x, y)
-    mean(abs2(y - predict(o, x)))
-end
-
-function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, HuberRegression, P}, x, y)
-    resid = y - predict(o, x)
-    for i in 1:length(resid)
-        if abs(resid[i]) > o.model.δ
-            resid[i] = 0.5 * resid[i] ^ 2
-        else
-            resid[i] = o.model.δ * abs(resid[i] - 0.5 * o.model.δ)
-        end
-    end
-    mean(resid)
-end
-
-function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, L1Regression, P}, x, y)
-    mean(abs(y - predict(o, x)))
-end
-
-function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, LogisticRegression, P}, x, y)
-    # p = predict(o, x)
-    # mean([p[i] * y[i] + (1 - p[i]) * (1 - y[i]) for i in 1:length(p)])
-    mean(abs(y - (predict(o, x) .> .5)))
-end
-
-function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, PoissonRegression, P}, x, y)
-    mean(abs(y - predict(o, x)))
-end
-
-function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, QuantileRegression, P}, x, y)
-    resid = y - predict(o, x)
-    mean([resid[i] * (o.model.τ - (resid[i] < 0)) for i in 1:length(y)])
-end
-
-function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, SVMLike, P}, x, y)
-    pred = predict(o, x)
-    mean([max(0.0, 1.0 - y[i] * pred[i]) for i in 1:length(pred)])
-end
+# #-----------------------------------------------------# cross validation critera
+# "Cross validation criteria, average loss"
+# function cv_criteria(o::StochasticModel, x, y)
+#     mean(abs2(y - predict(o, x)))
+# end
+#
+# function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, HuberRegression, P}, x, y)
+#     resid = y - predict(o, x)
+#     for i in 1:length(resid)
+#         if abs(resid[i]) > o.model.δ
+#             resid[i] = 0.5 * resid[i] ^ 2
+#         else
+#             resid[i] = o.model.δ * abs(resid[i] - 0.5 * o.model.δ)
+#         end
+#     end
+#     mean(resid)
+# end
+#
+# function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, L1Regression, P}, x, y)
+#     mean(abs(y - predict(o, x)))
+# end
+#
+# function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, LogisticRegression, P}, x, y)
+#     # p = predict(o, x)
+#     # mean([p[i] * y[i] + (1 - p[i]) * (1 - y[i]) for i in 1:length(p)])
+#     mean(abs(y - (predict(o, x) .> .5)))
+# end
+#
+# function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, PoissonRegression, P}, x, y)
+#     mean(abs(y - predict(o, x)))
+# end
+#
+# function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, QuantileRegression, P}, x, y)
+#     resid = y - predict(o, x)
+#     mean([resid[i] * (o.model.τ - (resid[i] < 0)) for i in 1:length(y)])
+# end
+#
+# function cv_criteria{A<:Algorithm, P<:Penalty}(o::StochasticModel{A, SVMLike, P}, x, y)
+#     pred = predict(o, x)
+#     mean([max(0.0, 1.0 - y[i] * pred[i]) for i in 1:length(pred)])
+# end

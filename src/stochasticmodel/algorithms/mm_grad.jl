@@ -1,7 +1,8 @@
 """
 ### Stochastic MM Gradient
 
-Uses average derivative/second derivative for updates after using separating majorization.
+Uses noisy first derivative and averaged second derivative of separated majorizing function.
+Think of this as second-order SGD, but updates have the same cost as simple SGD.
 """
 type MMGrad <: Algorithm
     weighting::LearningRate
@@ -85,11 +86,11 @@ end
 
 
 # TEST
-if false
+if true
     # srand(10)
     n, p = 1_000_000, 10
     x = randn(n, p) * 4
-    β = collect(linspace(0, 1, p)) - .5
+    β = collect(linspace(-1, 1, p))
     # β = ones(p)
 
     y = x*β + randn(n)
