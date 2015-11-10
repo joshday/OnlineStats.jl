@@ -72,9 +72,7 @@ weight(w::ExponentialWeighting, n1::Int, n2::Int) = max(weight(EqualWeighting(),
 
 
 
-#----------------------------------------------------------# StochasticWeighting
-abstract StochasticWeighting
-
+#----------------------------------------------------------# LearningRate
 """
 `LearningRate(;r = 1.0, s = 1.0, minstep = 0.0)`
 

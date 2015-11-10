@@ -31,13 +31,13 @@ uncenter(o::Mean, y::Float64) = y + mean(o)
 
 #---------------------------------------------------------------------# update!
 
-function update!(o::Mean, y::Float64, γ::Float64 = weight(o))
+function update!(o::Mean, y::Real, γ::Float64 = weight(o))
     o.μ = smooth(o.μ, y, γ)
     o.n += 1
     return
 end
 
-function updatebatch!(o::Mean, y::AVecF)
+function updatebatch!{T<:Real}(o::Mean, y::AVec{T})
     n2 = length(y)
     o.μ = smooth(o.μ, mean(y), weight(o, n2))
     o.n += n2

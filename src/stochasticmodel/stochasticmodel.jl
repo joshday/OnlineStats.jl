@@ -55,6 +55,7 @@ loss(::PoissonRegression, y::Float64, η::Float64) =     -y * η + exp(η)
 loss(m::QuantileRegression, y::Float64, η::Float64) =   (y - η) * (m.τ - Float64(y < η))
 loss(::SVMLike, y::Float64, η::Float64) =               max(0.0, 1.0 - y * η)
 loss(m::HuberRegression, y::Float64, η::Float64) =      abs(y-η) < m.δ ? 0.5 * (y-η)^2 : m.δ * (abs(y-η) - 0.5 * m.δ)
+
 loss(m::ModelDefinition, y::VecF, η::VecF) = mean([loss(m, y[i], η[i]) for i in 1:length(y)])
 
 classify(m::LogisticRegression, x::AVecF, β, β0) =  Float64(predict(m, x, β, β0) > 0.5)
@@ -98,7 +99,13 @@ classify(o::StochasticModel, x::AVecF) = classify(o.model, x, o.β, o.β0)
 classify(o::StochasticModel, x::AMatF) = [classify(o, row(x,i)) for i in 1:nrows(x)]
 statenames(o::StochasticModel) = [:β, :nobs]
 state(o::StochasticModel) = Any[coef(o), nobs(o)]
-loss(o::StochasticModel, x::MatF, y::VecF) = loss(o.model, y, x*o.β + o.β0)
+
+"""
+`loss(o::StochasticModel, x, y)`
+
+Evaluate the loss of a StochasticModel on data `x`, `y`
+"""
+loss(o::StochasticModel, x::AMat, y::AVec) = loss(o.model, y, x*o.β + o.β0)
 
 
 function update!(o::StochasticModel, x::AVecF, y::Float64)
