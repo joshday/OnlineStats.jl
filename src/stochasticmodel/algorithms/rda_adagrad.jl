@@ -21,10 +21,10 @@ function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
         alg(o).G = zeros(length(x)) + alg(o).G0
         alg(o).Ḡ = zeros(length(x)) + alg(o).G0
     end
-
+    alg(o).n_updates += 1
     g = ∇f(o.model, y, predict(o, x))
 
-    w = 1 / nobs(o)
+    w = 1 / alg(o).n_updates
     if o.intercept
         alg(o).G0 += g^2
         alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
@@ -37,7 +37,6 @@ function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
         alg(o).Ḡ[j] += w * (gj - alg(o).Ḡ[j])
         rda_update!(o, j)
     end
-    alg(o).n_updates += 1
 end
 
 function updatebatchβ!(o::StochasticModel{RDA}, x::AMatF, y::AVecF)

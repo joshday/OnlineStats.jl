@@ -45,7 +45,7 @@ export
     StochasticModel, StochasticModelCV,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression,
     HuberRegression, SVMLike, PoissonRegression, ModelDefinition,
-    SGD, SGDSparse, ProxGrad, RDA, MMGrad, MMGrad2,
+    SGD, SGDSparse, ProxGrad, RDA, MMGrad,
     Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
 
     # functions
@@ -84,8 +84,6 @@ include("stochasticmodel/algorithms/sgd.jl")
 include("stochasticmodel/algorithms/prox_adagrad.jl")
 include("stochasticmodel/algorithms/rda_adagrad.jl")
 include("stochasticmodel/algorithms/mm_grad.jl")
-include("stochasticmodel/algorithms/mm_grad2.jl")
-# include("stochasticmodel/algorithms/mm_rda.jl")
 
 include("stochasticmodel/sparse.jl")
 include("stochasticmodel/crossvalidate.jl")

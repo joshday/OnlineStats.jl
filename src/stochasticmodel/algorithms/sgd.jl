@@ -7,9 +7,14 @@ immutable SGD <: Algorithm   # step size is γ = η * nobs ^ -r
     η::Float64
     weighting::LearningRate
     prox::Bool
+    
     function SGD(;η::Real = 1.0, prox::Bool = true, kw...)
         @assert η > 0
         new(Float64(η), LearningRate(;kw...), prox)
+    end
+    function SGD(wgt::LearningRate; η::Real = 1.0, prox::Bool = true)
+        @assert η > 0
+        new(Float64(η), wgt, prox)
     end
 end
 
