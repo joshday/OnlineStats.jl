@@ -70,6 +70,10 @@ function mmdenom(::L2Regression, xj::Float64, y::Float64, ŷ::Float64, α::Floa
     xj^2 / α
 end
 
+function mmdenom(::QuantileRegression, xj::Float64, y::Float64, ŷ::Float64, α::Float64)
+    xj^2 / (α * abs(y - ŷ))  # Uses Lange Majorization to get second order information
+end
+
 
 # TODO: L1Regression, SVMLike, HuberRegression
 function mmdenom(m::ModelDefinition, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
@@ -88,15 +92,15 @@ if false
     β = collect(linspace(0, 1, p)) - .5
     # β = ones(p)
 
-    # y = x*β + randn(n)
-    y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
+    y = x*β + randn(n)
+    # y = Float64[rand(Bernoulli(1 / (1 + exp(-xb)))) for xb in x*β]
     # y = Float64[rand(Poisson(exp(xb))) for xb in x*β]
     β = vcat(0.0, β)
 
-    @time o = StochasticModel(x, y, algorithm = MMGrad(r = .7), model = LogisticRegression())
-    @time o2 = StochasticModel(x, y, algorithm = SGD(r = .7), model = LogisticRegression())
-    @time o3 = StochasticModel(x, y, algorithm = ProxGrad(), model = LogisticRegression())
-    @time o4 = StochasticModel(x, y, algorithm = RDA(), model = LogisticRegression())
+    @time o = StochasticModel(x, y, algorithm = MMGrad(r = .5), model = QuantileRegression())
+    @time o2 = StochasticModel(x, y, algorithm = SGD(r = .5), model = QuantileRegression())
+    @time o3 = StochasticModel(x, y, algorithm = ProxGrad(), model = QuantileRegression())
+    @time o4 = StochasticModel(x, y, algorithm = RDA(), model = QuantileRegression())
 
     show(o)
     show(o2)
