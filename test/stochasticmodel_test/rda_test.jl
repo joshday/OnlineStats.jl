@@ -45,10 +45,15 @@ facts("RDA") do
     context("L2Penalty") do
         o = StochasticModel(x, y, model = L2Regression(), penalty = L2Penalty(.1), algorithm = RDA())
         predict(o, x)
+        update!(o, x, y, 100)
     end
     context("ElasticNetPenalty") do
         o = StochasticModel(x, y, model = L2Regression(), penalty = ElasticNetPenalty(.1, .5), algorithm = RDA())
         predict(o, x)
+        update!(o, x, y, 100)
+    end
+    context("SCADPenalty") do
+        @fact_throws o = StochasticModel(x, y, model = L2Regression(), penalty = SCADPenalty(.1, .5), algorithm = RDA())
     end
 
 
