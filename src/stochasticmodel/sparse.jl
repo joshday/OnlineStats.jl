@@ -8,6 +8,9 @@ immutable HardThreshold <: StochasticSparsity
     burnin::Int
     ϵ::Float64
 end
+function HardThreshold(;burnin::Integer = 1000, ϵ::Real = .01)
+    HardThreshold(Int(burnin), Float64(ϵ))
+end
 
 """
 ### Enforce sparsity on a StochasticModel
@@ -17,6 +20,10 @@ end
 type SparseModel{S <: StochasticSparsity} <: OnlineStat
     o::StochasticModel
     s::S
+end
+
+function SparseModel(o::StochasticModel, s::StochasticSparsity = HardThreshold())
+    SparseModel(o, s)
 end
 
 function Base.show(io::IO, o::SparseModel)

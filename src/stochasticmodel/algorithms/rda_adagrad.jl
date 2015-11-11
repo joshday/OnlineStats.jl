@@ -17,7 +17,7 @@ end
 Base.show(io::IO, o::RDA) = print(io, "RDA(η = $(o.η))")
 
 function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
-    if nobs(o) == 1
+    if alg(o).n_updates == 0  # on first update, set the size of o.algorithm.G
         alg(o).G = zeros(length(x)) + alg(o).G0
         alg(o).Ḡ = zeros(length(x)) + alg(o).G0
     end
@@ -40,7 +40,7 @@ function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
 end
 
 function updatebatchβ!(o::StochasticModel{RDA}, x::AMatF, y::AVecF)
-    if alg(o).G == zeros(2) # on first update, set the size of o.algorithm.G
+    if alg(o).n_updates == 0  # on first update, set the size of o.algorithm.G
         alg(o).G = zeros(size(x, 2)) + alg(o).G0
         alg(o).Ḡ = zeros(size(x, 2)) + alg(o).G0
     end

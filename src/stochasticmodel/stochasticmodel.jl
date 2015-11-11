@@ -90,6 +90,11 @@ function StochasticModel(x::AMatF, y::AVecF; keyargs...)
     o
 end
 
+# If a combination of Algorithm/Model/Penalty is not implemented, throw error
+function updateβ!(o::StochasticModel, x::AVecF, y::Float64)
+    error("The combination of $(typeof(o.algorithm)), $(typeof(o.model)), and $(typeof(o.penalty)) is not supported")
+end
+
 StatsBase.predict(o::StochasticModel, x::AVecF) = predict(o.model, x, o.β, o.β0)
 StatsBase.predict(o::StochasticModel, X::AMatF) = predict(o.model, X, o.β, o.β0)
 alg(o::StochasticModel) = o.algorithm

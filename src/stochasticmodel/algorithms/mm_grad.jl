@@ -26,7 +26,7 @@ end
 
 
 Base.show(io::IO, o::MMGrad) = println(io, "MMGrad with ", typeof(o.weighting))
-weight(o::StochasticModel{MMGrad}) = o.algorithm.η * weight(o.algorithm.weighting, nobs(o), 1)
+weight(o::StochasticModel{MMGrad}) = o.algorithm.η * weight(o.algorithm.weighting, o.algorithm.n_updates, 1)
 
 function updateβ!(o::StochasticModel{MMGrad}, x::AVecF, y::Float64)
     if nobs(o) == 1
@@ -86,7 +86,7 @@ end
 
 
 # TEST
-if true
+if false
     # srand(10)
     n, p = 1_000_000, 10
     x = randn(n, p) * 4

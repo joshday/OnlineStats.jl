@@ -6,16 +6,17 @@ type QuantRegMM{W <: Weighting} <: OnlineStat
     β::VecF
     τ::Float64        # Desired conditional quantile
     ϵ::Float64        # epsilon for approximate quantile loss function
-    XtWX::MatF         # "sufficient statistic" 1
+    XtWX::MatF        # "sufficient statistic" 1
     Xu::VecF          # "sufficient statistic" 2
     n::Int64
     weighting::W
 end
 
 function QuantRegMM(p::Integer, wgt::Weighting = LearningRate(r = .51);
-                    τ::Float64 = .5, start::VecF = zeros(p), ϵ::Float64 = 1e-8)
+        τ::Real = .5, start::AVecF = zeros(p), ϵ::Real = 1e-8
+    )
     @assert τ > 0 && τ < 1
-    QuantRegMM(start, τ, ϵ, zeros(p, p), zeros(p), 0, wgt)
+    QuantRegMM(start, Float64(τ), Float64(ϵ), zeros(p, p), zeros(p), 0, wgt)
 end
 
 function QuantRegMM(x::AMatF, y::AVecF, wgt::Weighting = LearningRate(r = .51);

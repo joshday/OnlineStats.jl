@@ -79,12 +79,10 @@ include("common.jl")
 # StochasticModel
 include("stochasticmodel/stochasticmodel.jl")
 include("stochasticmodel/penalty.jl")
-
 include("stochasticmodel/algorithms/sgd.jl")
 include("stochasticmodel/algorithms/prox_adagrad.jl")
 include("stochasticmodel/algorithms/rda_adagrad.jl")
 include("stochasticmodel/algorithms/mm_grad.jl")
-
 include("stochasticmodel/sparse.jl")
 include("stochasticmodel/crossvalidate.jl")
 
