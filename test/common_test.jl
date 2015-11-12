@@ -19,9 +19,11 @@ facts("Common") do
         show(L1Penalty(.1))
         show(L2Penalty(.1))
         show(ElasticNetPenalty(.1, .5))
-        show(StochasticModel(10))
+        show(SCADPenalty(.1, 4))
 
         # StochasticModel stuff
+        show(StochasticModel(10))
+
         show(RDA())
         show(MMGrad())
         show(ProxGrad())
@@ -37,6 +39,7 @@ facts("Common") do
 
         show(StochasticModel(5))
         show(StochasticModel(5, intercept = false))
+        show(StochasticModelCV(randn(100,5), randn(100), randn(100,5), randn(100)))
     end
 
     context("Helper Functions") do

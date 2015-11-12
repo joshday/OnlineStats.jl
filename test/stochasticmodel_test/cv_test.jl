@@ -1,8 +1,6 @@
 module StochasticModelCVTest
 
-using FactCheck, Compat, Distributions, StatsBase
-import OnlineStats
-O = OnlineStats
+using FactCheck, OnlineStats, Distributions, StatsBase
 
 # generated data where columns i, j have correlation ρ^abs(i - j)
 # Generating correlated predictors to see how well StochasticModel works
@@ -23,22 +21,25 @@ facts("StochasticModelCV") do
     β, x, y = linearmodeldata(n, p, ρ)
     _, xtest, ytest = linearmodeldata(1000, p, ρ)
 
-    constructor_test = O.StochasticModelCV(x, y, xtest, ytest, penalty = O.L2Penalty(.1))
+    constructor_test = StochasticModelCV(x, y, xtest, ytest, penalty = L2Penalty(.1))
 
-    o = O.StochasticModel(p, penalty = O.L1Penalty(.1), algorithm = O.RDA())
-    ocv = O.StochasticModelCV(o, xtest, ytest)
-    O.update!(ocv, x, y)
+    o = StochasticModel(p, penalty = L1Penalty(.1), algorithm = RDA())
+    ocv = StochasticModelCV(o, xtest, ytest)
+    update!(ocv, x, y)
+    @fact coef(ocv) --> coef(ocv.o)
+    @fact statenames(ocv) --> [:β, :penalty, :nobs]
+    @fact state(ocv)[1] --> coef(ocv)
+    @fact state(ocv)[2].λ --> ocv.o.penalty.λ
+    @fact state(ocv)[3] --> nobs(ocv)
+    @fact predict(ocv, ones(p)) --> predict(ocv.o, ones(p))
 
-    println(o.penalty)
-    println()
+    onotcv = StochasticModel(x, y, algorithm = RDA())
+    lm = LinReg(x, y)
 
-    onotcv = O.StochasticModel(x, y, algorithm = O.RDA())
-    lm = O.LinReg(x, y)
-
-    println("rmse truth:     ", O.rmse(xtest * β, ytest))
-    println("rmse cv fit:    ", O.rmse(predict(o, xtest), ytest))
-    println("rmse fit:       ", O.rmse(predict(onotcv, xtest), ytest))
-    println("rmse LinReg:    ", O.rmse(predict(lm, xtest), ytest))
+    println("OnlineStats.rmse truth:     ", OnlineStats.rmse(xtest * β, ytest))
+    println("OnlineStats.rmse cv fit:    ", OnlineStats.rmse(predict(o, xtest), ytest))
+    println("OnlineStats.rmse fit:       ", OnlineStats.rmse(predict(onotcv, xtest), ytest))
+    println("OnlineStats.rmse LinReg:    ", OnlineStats.rmse(predict(lm, xtest), ytest))
 end
 
 facts("StochasticModelCV: L2Regression") do
@@ -47,34 +48,34 @@ facts("StochasticModelCV: L2Regression") do
     β, x, y = linearmodeldata(n, p, corr)
     _, xtest, ytest = linearmodeldata(1000, p, corr)
     context("NoPenalty") do
-        o1 = O.StochasticModel(x, y, model = O.L2Regression(), algorithm = O.ProxGrad())
-        o2 = O.StochasticModel(p, model = O.L2Regression(), algorithm = O.ProxGrad())
-        ocv = O.StochasticModelCV(o2, xtest, ytest)
-        O.update!(ocv, x, y)
+        o1 = StochasticModel(x, y, model = L2Regression(), algorithm = ProxGrad())
+        o2 = StochasticModel(p, model = L2Regression(), algorithm = ProxGrad())
+        ocv = StochasticModelCV(o2, xtest, ytest)
+        update!(ocv, x, y)
     end
     context("L1Penalty") do
-        o1 = O.StochasticModel(x, y, model = O.L2Regression(), algorithm = O.RDA())
-        o2 = O.StochasticModel(p, model = O.L2Regression(), algorithm = O.RDA(), penalty = O.L1Penalty(10))
-        ocv = O.StochasticModelCV(o2, xtest, ytest)
-        O.update!(ocv, x, y)
+        o1 = StochasticModel(x, y, model = L2Regression(), algorithm = RDA())
+        o2 = StochasticModel(p, model = L2Regression(), algorithm = RDA(), penalty = L1Penalty(10))
+        ocv = StochasticModelCV(o2, xtest, ytest)
+        update!(ocv, x, y)
     end
     context("L2Penalty") do
-        o1 = O.StochasticModel(x, y, model = O.L2Regression(), algorithm = O.ProxGrad())
-        o2 = O.StochasticModel(p, model = O.L2Regression(), algorithm = O.ProxGrad(), penalty = O.L2Penalty(.1))
-        ocv = O.StochasticModelCV(o2, xtest, ytest)
-        O.update!(ocv, x, y)
+        o1 = StochasticModel(x, y, model = L2Regression(), algorithm = ProxGrad())
+        o2 = StochasticModel(p, model = L2Regression(), algorithm = ProxGrad(), penalty = L2Penalty(.1))
+        ocv = StochasticModelCV(o2, xtest, ytest)
+        update!(ocv, x, y)
     end
     context("ElasticNetPenalty") do
-        o1 = O.StochasticModel(x, y, model = O.L2Regression(), algorithm = O.ProxGrad())
-        o2 = O.StochasticModel(p, model = O.L2Regression(), algorithm = O.ProxGrad(), penalty = O.ElasticNetPenalty(.1, .5))
-        ocv = O.StochasticModelCV(o2, xtest, ytest)
-        O.update!(ocv, x, y)
+        o1 = StochasticModel(x, y, model = L2Regression(), algorithm = ProxGrad())
+        o2 = StochasticModel(p, model = L2Regression(), algorithm = ProxGrad(), penalty = ElasticNetPenalty(.1, .5))
+        ocv = StochasticModelCV(o2, xtest, ytest)
+        update!(ocv, x, y)
     end
     context("SCADPenalty") do
-        o1 = O.StochasticModel(x, y, model = O.L2Regression(), algorithm = O.ProxGrad())
-        o2 = O.StochasticModel(p, model = O.L2Regression(), algorithm = O.ProxGrad(), penalty = O.SCADPenalty(.1))
-        ocv = O.StochasticModelCV(o2, xtest, ytest)
-        O.update!(ocv, x, y)
+        o1 = StochasticModel(x, y, model = L2Regression(), algorithm = ProxGrad())
+        o2 = StochasticModel(p, model = L2Regression(), algorithm = ProxGrad(), penalty = SCADPenalty(.1))
+        ocv = StochasticModelCV(o2, xtest, ytest)
+        update!(ocv, x, y)
     end
 end
 
@@ -83,28 +84,28 @@ facts("StochasticModelCV: L1Regression") do
     corr = .7
     β, x, y = linearmodeldata(n, p, corr)
     _, xtest, ytest = linearmodeldata(1000, p, corr)
-    o1 = O.StochasticModel(x, y, model = O.L1Regression(), algorithm = O.ProxGrad())
-    o2 = O.StochasticModel(p, model = O.L1Regression(), algorithm = O.ProxGrad())
-    ocv = O.StochasticModelCV(o2, xtest, ytest)
-    O.update!(ocv, x, y)
+    o1 = StochasticModel(x, y, model = L1Regression(), algorithm = ProxGrad())
+    o2 = StochasticModel(p, model = L1Regression(), algorithm = ProxGrad())
+    ocv = StochasticModelCV(o2, xtest, ytest)
+    update!(ocv, x, y)
 end
 
-facts("StochasticModelCV: LogisticRegression") do
-end
-facts("StochasticModelCV: SVMLike") do
-end
-facts("StochasticModelCV: PoissonRegression") do
-end
+# facts("StochasticModelCV: LogisticRegression") do
+# end
+# facts("StochasticModelCV: SVMLike") do
+# end
+# facts("StochasticModelCV: PoissonRegression") do
+# end
 
 facts("StochasticModelCV: HuberRegression") do
     n, p = 5_000, 500
     corr = .7
     β, x, y = linearmodeldata(n, p, corr)
     _, xtest, ytest = linearmodeldata(1000, p, corr)
-    o1 = O.StochasticModel(x, y, model = O.HuberRegression(5.), algorithm = O.ProxGrad())
-    o2 = O.StochasticModel(p, model = O.HuberRegression(5.), algorithm = O.ProxGrad())
-    ocv = O.StochasticModelCV(o2, xtest, ytest)
-    O.update!(ocv, x, y)
+    o1 = StochasticModel(x, y, model = HuberRegression(5.), algorithm = ProxGrad())
+    o2 = StochasticModel(p, model = HuberRegression(5.), algorithm = ProxGrad())
+    ocv = StochasticModelCV(o2, xtest, ytest)
+    update!(ocv, x, y)
 end
 
 facts("StochasticModelCV: QuantileRegression") do
@@ -112,10 +113,10 @@ facts("StochasticModelCV: QuantileRegression") do
     corr = .7
     β, x, y = linearmodeldata(n, p, corr)
     _, xtest, ytest = linearmodeldata(1000, p, corr)
-    o1 = O.StochasticModel(x, y, model = O.QuantileRegression(.8), algorithm = O.ProxGrad())
-    o2 = O.StochasticModel(p, model = O.QuantileRegression(.8), algorithm = O.ProxGrad())
-    ocv = O.StochasticModelCV(o2, xtest, ytest)
-    O.update!(ocv, x, y)
+    o1 = StochasticModel(x, y, model = QuantileRegression(.8), algorithm = ProxGrad())
+    o2 = StochasticModel(p, model = QuantileRegression(.8), algorithm = ProxGrad())
+    ocv = StochasticModelCV(o2, xtest, ytest)
+    update!(ocv, x, y)
 end
 
 

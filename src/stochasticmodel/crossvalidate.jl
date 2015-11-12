@@ -89,7 +89,7 @@ rmse(yhat, y) = mean(abs2(yhat - y))
 #------------------------------------------------------------------------# state
 statenames(o::StochasticModelCV) = [:β, :penalty, :nobs]
 state(o::StochasticModelCV) = Any[coef(o), copy(o.o.penalty), nobs(o)]
-whatisλ(o::StochasticModelCV) = o.o.penalty.λ
+# whatisλ(o::StochasticModelCV) = o.o.penalty.λ
 
 StatsBase.coef(o::StochasticModelCV) = coef(o.o)
 StatsBase.nobs(o::StochasticModelCV) = nobs(o.o)

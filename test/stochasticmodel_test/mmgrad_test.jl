@@ -26,7 +26,6 @@ end
 facts("MMGrad") do
     MMGrad()
     MMGrad(LearningRate())
-
     n, p = 100_000, 20
     context("L2Regression") do
         β, x, y = linearmodeldata(n, p)
@@ -44,6 +43,11 @@ facts("MMGrad") do
     context("QuantileRegression") do
         β, x, y = linearmodeldata(n, p)
         o = StochasticModel(x, y, algorithm = MMGrad(), model = QuantileRegression())
+    end
+    context("Check that unsupported models give an error") do
+        β, x, y = linearmodeldata(n, p)
+        o = StochasticModel(p, algorithm = MMGrad(), model = HuberRegression())
+        @fact_throws update!(o, x, y)
     end
 
 end
