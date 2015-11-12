@@ -131,7 +131,7 @@ facts("Variance") do
         @fact OnlineStats.uncenter(o, -x) --> zeros(10)
         @fact OnlineStats.center!(o, x) --> zeros(10)
         @fact nobs(o) --> 2
-        update!(o, rand(100, 10))
+        update!(o, rand(100, 10), 10)
         @fact OnlineStats.standardize(o, x) --> roughly( (x - mean(o)) ./ std(o))
         @fact OnlineStats.unstandardize(o, x) --> roughly( x .* std(o) + mean(o))
         OnlineStats.standardize!(o, x)

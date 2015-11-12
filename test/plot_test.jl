@@ -8,7 +8,10 @@ facts("Plots") do
     coefplot(o)
 
     tr = TracePlot(o)
-    update!(o, randn(100, 10), randn(100))
+    update!(tr, randn(100, 10), randn(100))
+
+    o.β[2] = 0.0
+    coefplot(o)
 end
 
 end # module

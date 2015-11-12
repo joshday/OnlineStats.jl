@@ -68,7 +68,7 @@ facts("ModelDefinition Methods") do
         @fact OnlineStats.add∇j(ElasticNetPenalty(.1, .5), g, ones(5), 1) --> g + .1
         @fact OnlineStats.add∇j(SCADPenalty(.1, 3), g, ones(5), 1) --> g
         @fact OnlineStats.add∇j(SCADPenalty(.1, 3), g, ones(5) * .001, 1) --> g + .1
-        @fact OnlineStats.add∇j(SCADPenalty(.1, 3), g, ones(5) * .2, 1) --> g + .1 / 2
+        @fact OnlineStats.add∇j(SCADPenalty(.1, 3), g, ones(5) * .2, 1) --> roughly(g + .1 / 2.)
     end
 end
 
