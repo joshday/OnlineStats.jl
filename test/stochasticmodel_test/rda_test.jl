@@ -55,7 +55,8 @@ facts("RDA") do
         update!(o, x, y, 100)
     end
     context("SCADPenalty") do
-        @fact_throws o = StochasticModel(x, y, model = L2Regression(), penalty = SCADPenalty(.1, .5), algorithm = RDA())
+        o = StochasticModel(p, model = L2Regression(), penalty = SCADPenalty(.1, 3), algorithm = RDA())
+        @fact_throws update!(o, x, y)
     end
 
 
