@@ -36,6 +36,8 @@ facts("RDA") do
 
         o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, algorithm = RDA())
         @fact length(coef(o)) --> p
+        o = StochasticModel(p, algorithm = RDA())
+        update!(o, x, y, 100)
     end
     context("L1Penalty") do
         o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = RDA())

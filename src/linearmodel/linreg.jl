@@ -17,10 +17,6 @@ function LinReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
     o
 end
 
-function LinReg(x::AVecF, y::AVecF, wgt::Weighting = default(Weighting))
-    LinReg(hcat(x), y, wgt)
-end
-
 function LinReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     LinReg(c, zeros(p + 1, p + 1), wgt)

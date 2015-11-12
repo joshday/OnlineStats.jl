@@ -22,6 +22,11 @@ facts("Common") do
         show(StochasticModel(10))
 
         # StochasticModel stuff
+        show(RDA())
+        show(MMGrad())
+        show(ProxGrad())
+        show(SGD())
+
         show(L1Regression())
         show(L2Regression())
         show(LogisticRegression())

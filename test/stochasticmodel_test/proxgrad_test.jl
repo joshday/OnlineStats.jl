@@ -36,6 +36,9 @@ facts("ProxGrad") do
 
         o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, algorithm = ProxGrad())
         @fact length(coef(o)) --> p
+
+        o = StochasticModel(p, algorithm = ProxGrad())
+        update!(o, x, y, 100)
     end
     context("L1Penalty") do
         o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = ProxGrad())

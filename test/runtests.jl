@@ -36,11 +36,13 @@ include("stochasticmodel_test/stochasticmodel_test.jl")
 include("stochasticmodel_test/sgd_test.jl")
 include("stochasticmodel_test/proxgrad_test.jl")
 include("stochasticmodel_test/rda_test.jl")
+include("stochasticmodel_test/mmgrad_test.jl")
 include("stochasticmodel_test/cv_test.jl")
 include("stochasticmodel_test/sparse_test.jl")
 
 include("common_test.jl")
 include("react_test.jl")
+include("plot_test.jl")
 
 
 

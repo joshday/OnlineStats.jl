@@ -41,7 +41,7 @@ facts("SGD") do
         @fact length(coef(o)) --> p
     end
     context("L1Penalty") do
-        o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = SGD(LearningRate(), prox = false))
+        o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = SGD(LearningRate(), prox = true))
         predict(o, x)
         update!(o, x, y, 100)
     end

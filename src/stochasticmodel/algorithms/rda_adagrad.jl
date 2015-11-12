@@ -77,18 +77,18 @@ n_updates(o::StochasticModel{RDA}) = alg(o).n_updates
 @inline weight(o::StochasticModel{RDA}, j::Int) = n_updates(o) * alg(o).η / sqrt(alg(o).G[j])
 
 # NoPenalty
-@inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,NoPenalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,NoPenalty}, j::Int)
     o.β[j] = -weight(o, j) * alg(o).Ḡ[j]
 end
 
 # L2Penalty
-@inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,L2Penalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,L2Penalty}, j::Int)
     alg(o).Ḡ[j] += (1 / n_updates(o)) * pen(o).λ * o.β[j]
     o.β[j] = -weight(o, j) * alg(o).Ḡ[j]
 end
 
 # L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
-@inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,L1Penalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,L1Penalty}, j::Int)
     if abs(alg(o).Ḡ[j]) < pen(o).λ
         o.β[j] = 0.0
     else
@@ -98,7 +98,7 @@ end
 end
 
 # ElasticNetPenalty
-@inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,ElasticNetPenalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,ElasticNetPenalty}, j::Int)
     alg(o).Ḡ[j] += (1 / n_updates(o)) * pen(o).λ * (1 - pen(o).λ) * o.β[j]
     λ = pen(o).λ * pen(o).α
     if abs(alg(o).Ḡ[j]) < λ
@@ -110,6 +110,6 @@ end
 end
 
 # SCADPenalty
-@inline function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,SCADPenalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,SCADPenalty}, j::Int)
     error("SCADPenalty is not implemented yet for RDA")
 end
