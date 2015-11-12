@@ -9,6 +9,8 @@ immutable HardThreshold <: StochasticSparsity
     ϵ::Float64
 end
 function HardThreshold(;burnin::Integer = 1000, ϵ::Real = .01)
+    @assert burnin > 0
+    @assert ϵ > 0
     HardThreshold(Int(burnin), Float64(ϵ))
 end
 
@@ -26,10 +28,10 @@ function SparseModel(o::StochasticModel, s::StochasticSparsity = HardThreshold()
     SparseModel(o, s)
 end
 
-function Base.show(io::IO, o::SparseModel)
-    println(io, "SparseModel with ", typeof(o.s))
-    show(o.o)
-end
+# function Base.show(io::IO, o::SparseModel)
+#     println(io, "SparseModel with ", typeof(o.s))
+#     show(o.o)
+# end
 
 nobs(o::SparseModel) = nobs(o.o)
 state(o::SparseModel) = state(o.o)

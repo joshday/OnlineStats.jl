@@ -32,6 +32,7 @@ facts("SGD") do
     context("NoPenalty") do
         o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty())
         predict(o, x)
+
         @fact length(coef(o)) --> p + 1
         state(o)
         @fact statenames(o) --> [:β, :nobs]

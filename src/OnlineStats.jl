@@ -42,7 +42,7 @@ export
     OnlineGLM,
 
     # stochasticmodel
-    StochasticModel, StochasticModelCV,
+    StochasticModel, StochasticModelCV, SparseModel, HardThreshold,
     L2Regression, L1Regression, LogisticRegression, QuantileRegression,
     HuberRegression, SVMLike, PoissonRegression, ModelDefinition,
     SGD, SGDSparse, ProxGrad, RDA, MMGrad,
@@ -60,7 +60,8 @@ export
     sweep!,                 # Symmetric sweep operator
     estimatedCardinality,
     pca,                    # Get top d principal components from CovarianceMatrix
-    replicates              # Get vector of replicates from <: Bootstrap
+    replicates,              # Get vector of replicates from <: Bootstrap
+    classify
 
 
 #-----------------------------------------------------------------------------#

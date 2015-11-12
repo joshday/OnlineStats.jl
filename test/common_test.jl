@@ -20,6 +20,18 @@ facts("Common") do
         show(L2Penalty(.1))
         show(ElasticNetPenalty(.1, .5))
         show(StochasticModel(10))
+
+        # StochasticModel stuff
+        show(L1Regression())
+        show(L2Regression())
+        show(LogisticRegression())
+        show(PoissonRegression())
+        show(QuantileRegression(.6))
+        show(SVMLike())
+        show(HuberRegression(2.))
+
+        show(StochasticModel(5))
+        show(StochasticModel(5, intercept = false))
     end
 
     context("Helper Functions") do

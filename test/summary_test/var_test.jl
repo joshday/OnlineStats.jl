@@ -82,7 +82,7 @@ facts("Variance") do
 
         @fact OnlineStats.if0then1(0.) --> 1.
         @fact OnlineStats.if0then1(x) --> x
-        update!(o, rand(100))
+        update!(o, rand(100), 10)
         @fact OnlineStats.standardize(o, x) --> (x - mean(o)) / std(o)
         @fact OnlineStats.unstandardize(o, x) --> x * std(o) + mean(o)
         OnlineStats.standardize!(o, 0.)
