@@ -34,7 +34,7 @@ type L2Penalty <: Penalty
     end
 end
 Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty(λ = $(p.λ))")
-@inline _j(p::L2Penalty, β::VecF) = p.λ * sumabs2(β)
+@inline _j(p::L2Penalty, β::VecF) = p.λ * .5 * sumabs2(β)
 @inline prox(p::L2Penalty, βj::Float64, s::Float64) = βj / (1.0 + s * p.λ)
 @inline add∇j(p::L2Penalty, g::Float64, β::VecF, i::Int) = g + p.λ * β[i]
 

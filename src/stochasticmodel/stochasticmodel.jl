@@ -125,13 +125,6 @@ function updatebatch!(o::StochasticModel, x::AMatF, y::AVecF)
     nothing
 end
 
-# Fall back on this if not implemented
-function udpatebatchβ!(o::StochasticModel, x::AMatF, y::AVecF)
-    for i in 1:length(y)
-        updateβ!(o, rowvec_view(x, i), y[i])
-    end
-end
-
 function Base.show(io::IO, o::StochasticModel)
     print_with_color(:blue, io, "StochasticModel\n")
     println(io, "  > Nobs:       ", nobs(o))

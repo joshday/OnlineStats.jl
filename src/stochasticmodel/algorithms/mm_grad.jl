@@ -51,10 +51,6 @@ function updateβ!(o::StochasticModel{MMGrad}, x::AVecF, y::Float64)
     end
 end
 
-function updatebatchβ!(o::StochasticModel{MMGrad}, x::AVecF, y::Float64)
-    error("no batch update method when using algorithm MMGrad")
-end
-
 makeα(o, xj, x) = abs(xj) / (sumabs(x) + o.intercept)
 # makeα(o, xj, x) = abs2(xj) / (sumabs2(x) + o.intercept)
 
@@ -75,11 +71,6 @@ function mmdenom(::QuantileRegression, xj::Float64, y::Float64, ŷ::Float64, α
     xj^2 / (α * abs(y - ŷ))  # Uses Lange Majorization to get second order information
 end
 
-
-# TODO: L1Regression, SVMLike, HuberRegression
-function mmdenom(m::ModelDefinition, γ::Float64, x::AVecF, y::Float64, ŷ::Float64)
-    error("MMGrad is not implemented for model: ", typeof(m))
-end
 
 
 

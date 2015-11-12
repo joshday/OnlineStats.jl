@@ -9,6 +9,7 @@ facts("Constructors") do
     o = StochasticModel(p, penalty = L1Penalty(.1))
     sp = SparseModel(o)
     update!(sp, x, y)
+    update!(o, HardThreshold())
 
     @fact nobs(sp) --> 1_000
     @fact state(sp) --> state(sp.o)

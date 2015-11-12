@@ -27,6 +27,7 @@ facts("ModelDefinition Methods") do
 
     y, eta = randn(2)
 
+
     context("loss") do
         @fact loss(L1Regression(), y, eta) --> abs(y - eta)
         @fact loss(L2Regression(), y, eta) --> abs2(y - eta)
@@ -48,6 +49,24 @@ facts("ModelDefinition Methods") do
         o = StochasticModel(x, y, model = LogisticRegression())
         classify(o, x)
         classify(o, vec(x[1, :]))
+    end
+
+    context("penalty") do
+        p = L1Penalty(.1)
+        copy(p)
+
+        @fact OnlineStats._j(NoPenalty(), ones(5)) --> 0.0
+        @fact OnlineStats._j(L1Penalty(.1), ones(5)) --> .1 * 5
+        @fact OnlineStats._j(L2Penalty(.1), ones(5)) --> .1 * 2.5
+        @fact OnlineStats._j(ElasticNetPenalty(.1, .5), ones(5)) --> .1 * (5/2 + 2.5/2)
+        @fact OnlineStats._j(SCADPenalty(.1, 3), ones(5)) --> .1^2 * .5 * 4 * 5
+
+        g = randn()
+        @fact OnlineStats.add∇j(NoPenalty(), g, ones(5), 1) --> g
+        @fact OnlineStats.add∇j(L1Penalty(.1), g, ones(5), 1) --> g + .1
+        @fact OnlineStats.add∇j(L2Penalty(.1), g, ones(5), 1) --> g + .1
+        @fact OnlineStats.add∇j(ElasticNetPenalty(.1, .5), g, ones(5), 1) --> g + .1
+        @fact OnlineStats.add∇j(SCADPenalty(.1, 3), g, ones(5), 1) --> g
     end
 end
 
