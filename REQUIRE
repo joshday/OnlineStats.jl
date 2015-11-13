@@ -3,5 +3,3 @@ StatsBase
 Distributions
 MultivariateStats
 Requires
-Logging
-ArrayViews

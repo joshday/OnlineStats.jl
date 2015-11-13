@@ -120,7 +120,7 @@ function update!(o::OnlineFLS, x::AVecF, y::Real)
 	# update β
 	o.β += o.K * ε
 
-	@debug(string(o.β))
+	@DEBUG o.β
 
 	# save the denormalized estimate of y
 	o.yhat = unstandardize(o.yvar, yhat)
@@ -143,7 +143,7 @@ function Base.empty!(o::OnlineFLS)
 	o.K = zeros(p)
 	o.yhat = 0.
 end
-#
+# 
 # function Base.merge!(o1::OnlineFLS, o2::OnlineFLS)
 # 	error("not implemented")
 # end
