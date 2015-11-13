@@ -7,6 +7,7 @@ facts("Constructors") do
     β = collect(1.:p)
     y = x*β + randn(n)
     o = StochasticModel(p, penalty = L1Penalty(.1))
+    sp = SparseModel(o)
     sp = SparseModel(o, HardThreshold(burnin = 100))
     update!(sp, x, y)
     update!(o, HardThreshold())
