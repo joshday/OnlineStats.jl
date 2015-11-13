@@ -15,7 +15,8 @@ import ArrayViews: view, rowvec_view
 using Requires
 @require Plots include("plots.jl")
 
-
+import Logging
+Logging.@configure(level=DEBUG)  # set level=OFF for releases
 
 
 #-----------------------------------------------------------------------------#
@@ -67,8 +68,6 @@ export
 #-----------------------------------------------------------------------------#
 # Source files
 #-----------------------------------------------------------------------------#
-
-include("log.jl")
 
 # Common Types
 include("types.jl")
