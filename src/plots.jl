@@ -7,7 +7,7 @@ export coefplot, TracePlot, CompareTracePlot
 For any OnlineStat that has a `coef` method, display a graphical representation of
 the coefficient vector.
 """
-function coefplot(o::OnlineStat)
+function coefplot(o::OnlineStats.OnlineStat)
     x = 1:length(coef(o))
     if o.intercept
         x -= 1
@@ -39,7 +39,7 @@ type TracePlot
     f::Function
 end
 
-function TracePlot(o::OnlineStat, f::Function = x -> state(x)[1])
+function TracePlot(o::OnlineStats.OnlineStat, f::Function = x -> state(x)[1])
     p = Plots.plot([nobs(o)], collect(f(o))')
     TracePlot(o, p, f)
 end
@@ -67,12 +67,12 @@ update!(comp, x2, y2)
 ```
 """
 type CompareTracePlot
-    os::Vector{OnlineStat}
+    os::Vector{OnlineStats.OnlineStat}
     p::Plots.Plot
     f::Function  # Use a function that returns a scalar
 end
 
-function CompareTracePlot{T<:OnlineStat}(os::Vector{T}, f::Function)
+function CompareTracePlot{T<:OnlineStats.OnlineStat}(os::Vector{T}, f::Function)
     p = Plots.plot([nobs(os[1])], [f(os[1])])
 
     for i in 2:length(os)

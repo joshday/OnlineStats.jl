@@ -29,14 +29,14 @@ Base.show(io::IO, o::MMGrad) = println(io, "MMGrad with ", typeof(o.weighting))
 weight(o::StochasticModel{MMGrad}) = o.algorithm.η * weight(o.algorithm.weighting, o.algorithm.n_updates, 1)
 
 function updateβ!(o::StochasticModel{MMGrad}, x::AVecF, y::Float64)
-    if nobs(o) == 1
+    if o.algorithm.n_updates == 0
         o.algorithm.d = zeros(length(x)) + o.algorithm.d0
     end
     o.algorithm.n_updates += 1
     ŷ = predict(o, x)
     γ = weight(o)
     g = ∇f(o.model, y, predict(o, x))
-    w = 1 / o.algorithm.n_updates
+    w = 1 / nobs(o)
 
     if o.intercept
         d = mmdenom(o.model, 1.0, y, ŷ, makeα(o, 1.0, x))
@@ -51,12 +51,37 @@ function updateβ!(o::StochasticModel{MMGrad}, x::AVecF, y::Float64)
     end
 end
 
-makeα(o, xj, x) = abs(xj) / (sumabs(x) + o.intercept)
-# makeα(o, xj, x) = abs2(xj) / (sumabs2(x) + o.intercept)
+function updatebatchβ!(o::StochasticModel{MMGrad}, x::AMatF, y::AVecF)
+    if o.algorithm.n_updates == 0
+        o.algorithm.d = zeros(size(x, 2)) + o.algorithm.d0
+    end
+    o.algorithm.n_updates += 1
+    ŷ = predict(o, x)
+    γ = weight(o) / length(y)  # divide by batch size to get average gradient
+
+    for i in 1:length(y)
+        g = ∇f(o.model, y[i], ŷ[i])
+        w = 1 / (nobs(o) + i)
+        if o.intercept
+            d = mmdenom(o.model, 1.0, y[i], ŷ[i], makeα(o, 1.0, row(x, i)))
+            o.algorithm.d0 = smooth(o.algorithm.d0, d, w)
+            o.β0 -= γ * g / o.algorithm.d0
+        end
+
+        for j in 1:size(x, 2)
+            d = mmdenom(o.model, x[i, j], y[i], ŷ[i], makeα(o, x[i, j], row(x, i)))
+            o.algorithm.d[j] = smooth(o.algorithm.d[j], d, w)
+            o.β[j] -= γ * g * x[i, j] / o.algorithm.d[j]
+        end
+    end
+end
+
+# makeα(o, xj, x) = abs(xj) / (sumabs(x) + o.intercept)
+makeα(o, xj, x) = abs2(xj) / (sumabs2(x) + o.intercept)
 
 
 function mmdenom(::LogisticRegression, xj::Float64, y::Float64, ŷ::Float64, α::Float64)
-    xj^2 / α * ŷ * (1 - ŷ)
+    xj^2 / α * (ŷ * (1 - ŷ) + .0001)
 end
 
 function mmdenom(::PoissonRegression, xj::Float64, y::Float64, ŷ::Float64, α::Float64)

@@ -38,6 +38,8 @@ facts("SGD") do
         @fact statenames(o) --> [:β, :nobs]
 
         o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false)
+        o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, prox = true)
+        o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, prox = false)
         @fact length(coef(o)) --> p
     end
     context("L1Penalty") do
