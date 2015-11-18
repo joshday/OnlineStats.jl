@@ -103,7 +103,7 @@ If this is unfamiliar territory for you, we recommend starting with `LearningRat
 | regression w/ elastic net penalty | `SparseReg`, `StochasticModel`  |
 | regression w/ SCAD penalty        | `SparseReg`, `StochasticModel`  |
 | self-tuning models                | `StochasticModelCV`             |
-| stepwise regression               | `StepwiseReg` (experimental)    |
+| stepwise regression               | `StepwiseReg`                   |
 | support vector machine            | `StochasticModel`               |
 
 
