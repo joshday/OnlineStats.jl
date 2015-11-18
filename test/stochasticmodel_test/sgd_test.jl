@@ -38,11 +38,11 @@ facts("SGD") do
         @fact statenames(o) --> [:β, :nobs]
 
         o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false)
-        o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, prox = true)
-        o = StochasticModel(x, y, model = L2Regression(), penalty = NoPenalty(), intercept = false, prox = false)
         @fact length(coef(o)) --> p
     end
     context("L1Penalty") do
+        o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = SGD(LearningRate(), prox = true))
+        o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = SGD(LearningRate(), prox = false))
         o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = SGD(LearningRate(), prox = true))
         o = StochasticModel(x, y, model = L2Regression(), penalty = L1Penalty(.1), algorithm = SGD(LearningRate(), prox = false))
         predict(o, x)

@@ -13,9 +13,8 @@ Performs best using `updatebatch!()` with large batches.
 type StepwiseReg{W <: Weighting} <: OnlineStat
     C::CovarianceMatrix{W}  # Cov([X y])
     s::MatF                 # "Swept" version of [X y]' [X y] / n
-    set::Vector{Int}        # set of coefficients included in the model
+    set::IntSet             # set of coefficients included in the model
     n::Int
-    weighting::W
 end
 
 function StepwiseReg(x::AMatF, y::AVecF, wgt::Weighting = default(Weighting))
@@ -27,7 +26,7 @@ end
 
 function StepwiseReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
-    StepwiseReg(c, zeros(p + 1, p + 1), Int[], 0, wgt)
+    StepwiseReg(c, zeros(p + 1, p + 1), IntSet([]), 0)
 end
 
 
@@ -43,65 +42,58 @@ function StatsBase.coef(o::StepwiseReg)
     β
 end
 
-#---------------------------------------------------------------------# update!
-# not optimized, but functional
+#----------------------------------------------------------------------# update!
+function update!(o::StepwiseReg, x::AVecF, y::Float64)
+    updatebatch!(o, x', collect(y))
+end
+
 function updatebatch!(o::StepwiseReg, x::AMatF, y::AVecF)
     n, p = size(x)
     o.n += n
     updatebatch!(o.C, hcat(x, y))
     copy!(o.s, o.C.A)
 
-    # get estimate of variance
+    # get average squared error using all predictors
     sweep!(o.s, 1:p)
-    σ² = o.s[end, end] / (nobs(o) - length(o.set))
+    ase = o.s[end, end]
 
-    # get current cp
     copy!(o.s, o.C.A)
-    sweep!(o.s, o.set)
-    q = length(o.set)
-    cp_old = o.s[end, end] / σ² + 2 * q
+    sweep!(o.s, collect(o.set))
 
-    # add variables
-    cp_add = Float64[]
-    notinset = setdiff(1:p, o.set)
-    for i in notinset
-        sweep!(o.s, i)
-        cp = o.s[end, end] / σ² + 2(q + 1)
-        push!(cp_add, cp)
-        sweep!(o.s, i, true)
-    end
-    if !isempty(cp_add)
-        add_cp, add_index = findmin(cp_add)
-    else
-        add_cp = cp_old + 1
-    end
-
-    # remove variables
-    cp_remove = Float64[]
-    for i in o.set
-        sweep!(o.s, i, true)
-        cp = o.s[end, end] / σ² + 2(q - 1)
-        push!(cp_remove, cp)
-        sweep!(o.s, i)
-    end
-    if !isempty(cp_remove)
-        rm_cp, rm_index = findmin(cp_remove)
-    else
-        rm_cp = cp_old + 1
-    end
-
-
-    if cp_old != min(cp_old, add_cp, rm_cp)
-        if add_cp < cp_old
-            push!(o.set, add_index)
-            o.set = unique(o.set)
-            sort!(o.set)
-            sweep!(o.s, add_index)
-        else
-            o.set = setdiff(o.set, rm_index)
-            sweep!(o.s, rm_index, true)
+    # Find best index to add/remove
+    s = 1
+    val = o.s[end, 1] ^ 2 / (o.s[1, 1] * ase) * (o.n - in(1, o.set)) + 2.0 - in(1, o.set)
+    for i in 2:p
+        newval = o.s[end, i] ^ 2 / (o.s[i, i] * ase) * (o.n - in(i, o.set)) - 2.0 * in(i, o.set)
+        if newval > val
+            val = newval
+            s = i
         end
     end
 
+    if s in o.set
+        delete!(o.set, s)
+    else
+        push!(o.set, s)
+    end
+
+
+
     DEBUG("Active set: ", o.set)
+end
+
+
+########## TEST
+if false
+    log_severity!(DebugSeverity)
+
+    n,p = 10_000, 10
+    x = randn(n,p)
+    β = collect(1.:p)
+    β[5] = 0.
+    y = x*β + randn(n)
+
+    o = StepwiseReg(p)
+    @time update!(o, x, y, 500)
+    print(coef(o))
 end

@@ -79,7 +79,7 @@ ERROR(args...) = LOG(ErrorSeverity, args...)
 function LOG(sev::LogSeverity, args...)
   if sev >= log_severity()
     io = log_io()
-    print(io, "$(NOW()) [$sev]: ")
+    print(io, "$(now()) [$sev]: ")
     for arg in args
       print(io, arg, " ")
     end
