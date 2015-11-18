@@ -77,23 +77,19 @@ function updatebatch!(o::StepwiseReg, x::AMatF, y::AVecF)
         push!(o.set, s)
     end
 
-
-
     DEBUG("Active set: ", o.set)
 end
 
 
-########## TEST
-if false
-    log_severity!(DebugSeverity)
-
-    n,p = 10_000, 10
-    x = randn(n,p)
-    β = collect(1.:p)
-    β[5] = 0.
-    y = x*β + randn(n)
-
-    o = StepwiseReg(p)
-    @time update!(o, x, y, 500)
-    print(coef(o))
-end
+########## TEST code
+# log_severity!(DebugSeverity)
+#
+# n,p = 10_000, 10
+# x = randn(n,p)
+# β = collect(1.:p)
+# β[5] = 0.
+# y = x*β + randn(n)
+#
+# o = StepwiseReg(p)
+# @time update!(o, x, y, 500)
+# print(coef(o))

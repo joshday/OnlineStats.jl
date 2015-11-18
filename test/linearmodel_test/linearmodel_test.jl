@@ -57,7 +57,7 @@ facts("Linear Model") do
         x = randn(10000, 10)
         y = x*β + randn(10000)
         OnlineStats.update!(o1, x, y, 5000)
-        OnlineStats.update!(o2, x, y)
+        OnlineStats.update!(o2, x, y, 1)
         @fact coef(o1) --> roughly(coef(o2), .1)
 
         o1 = OnlineStats.LinReg(10)
@@ -79,6 +79,7 @@ facts("Linear Model") do
         o = OnlineStats.StepwiseReg(p)
         o = OnlineStats.StepwiseReg(x, y)
         OnlineStats.update!(o, x, y, 500)
+        OnlineStats.update!(o, x, y)
         state(o)
         statenames(o)
         coef(o)
