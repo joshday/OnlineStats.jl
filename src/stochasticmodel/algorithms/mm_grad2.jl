@@ -5,17 +5,18 @@ Uses weighted average of first and second derivatives
 """
 type MMGrad2 <: Algorithm
     weighting::LearningRate
+    η::Float64
     d::Vector{Float64}
     d2::Vector{Float64}
     n_updates::Int
 
-    function MMGrad2(; ϵ::Real = .01, kw...)
+    function MMGrad2(; ϵ::Real = .01, η::Real = 1.0, kw...)
         @assert ϵ > 0
-        new(LearningRate(;kw...), zeros(1), fill(ϵ, 1), 0)
+        new(LearningRate(;kw...), Float64(η), zeros(1), fill(ϵ, 1), 0)
     end
-    function MMGrad2(wgt::LearningRate; ϵ::Real = .01)
+    function MMGrad2(wgt::LearningRate; ϵ::Real = .01, η::Real = 1.0)
         @assert ϵ > 0
-        new(wgt, zeros(1), fill(ϵ, 1), 0)
+        new(wgt, Float64(η), zeros(1), fill(ϵ, 1), 0)
     end
 end
 
@@ -38,7 +39,7 @@ function updateβ!(o::StochasticModel{MMGrad2}, x::AVecF, y::Float64)
         denom = mmdenom(o.model, 1.0, y, ŷ, makeα(o, 1.0, x))
         o.algorithm.d[1] = smooth(o.algorithm.d[1], g, γ)
         o.algorithm.d2[1] = smooth(o.algorithm.d2[1], denom, γ)
-        o.β0 -= γ * o.algorithm.d[1] / o.algorithm.d2[1]
+        o.β0 -= γ * o.algorithm.η * o.algorithm.d[1] / o.algorithm.d2[1]
     end
 
     for j in 1:length(x)
@@ -47,7 +48,37 @@ function updateβ!(o::StochasticModel{MMGrad2}, x::AVecF, y::Float64)
         denom = mmdenom(o.model, xj, y, ŷ, makeα(o, xj, x))
         o.algorithm.d[j₁] = smooth(o.algorithm.d[j₁], add∇j(o.penalty, g * xj, o.β, j), γ)
         o.algorithm.d2[j₁] = smooth(o.algorithm.d2[j₁], denom, γ)
-        o.β[j] -= γ * o.algorithm.d[j₁] / o.algorithm.d2[j₁]
+        o.β[j] -= γ * o.algorithm.η * o.algorithm.d[j₁] / o.algorithm.d2[j₁]
+    end
+end
+
+function updatebatchβ!(o::StochasticModel{MMGrad2}, x::AMatF, y::AVecF)
+    if o.algorithm.n_updates == 0
+        o.algorithm.d = zeros(size(x,2) + o.intercept)
+        o.algorithm.d2 = fill(o.algorithm.d2[1], size(x, 2) + o.intercept)
+    end
+    o.algorithm.n_updates += 1
+    n = length(y)
+    ŷ = predict(o, x)
+    γ = weight(o) / n
+
+    for i in 1:n
+        g = ∇f(o.model, y[i], ŷ[i])
+        if o.intercept
+            denom = mmdenom(o.model, 1.0, y[i], ŷ[i], makeα(o, 1.0, row(x, i)))
+            o.algorithm.d[1] = smooth(o.algorithm.d[1], g, γ)
+            o.algorithm.d2[1] = smooth(o.algorithm.d2[1], denom, γ)
+            o.β0 -= γ * o.algorithm.η * o.algorithm.d[1] / o.algorithm.d2[1]
+        end
+
+        for j in 1:size(x, 2)
+            j₁ = j + o.intercept
+            xj = x[i, j]
+            denom = mmdenom(o.model, xj, y[i], ŷ[i], makeα(o, xj, row(x, i)))
+            o.algorithm.d[j₁] = smooth(o.algorithm.d[j₁], add∇j(o.penalty, g * xj, o.β, j), γ)
+            o.algorithm.d2[j₁] = smooth(o.algorithm.d2[j₁], denom, γ)
+            o.β[j] -= γ * o.algorithm.η * o.algorithm.d[j₁] / o.algorithm.d2[j₁]
+        end
     end
 end
 

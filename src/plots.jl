@@ -73,7 +73,9 @@ type CompareTracePlot
 end
 
 function CompareTracePlot{T<:OnlineStats.OnlineStat}(os::Vector{T}, f::Function; kw...)
-    p = Plots.plot([nobs(oi) for oi in os]', [f(oi) for oi in os]';
+    p = Plots.plot(
+        Float64[nobs(oi) for oi in os]',   # x
+        Float64[f(oi) for oi in os]';      # y
         ylabel = "value of function $f", xlabel = "nobs", kw...
     )
     #
