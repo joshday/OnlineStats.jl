@@ -89,6 +89,10 @@ to prevent overfitting.  Models are fit without a penalty (`NoPenalty`) by defau
     - Regularized Dual Averaging w/ ADAGRAD
     - `η` is a constant step size
 
+- `MMGrad(η = 1.0, r = .5)`
+    - Online MM Gradient algorithm (for generalized linear models only)
+    - Essentially SGD with a partially adaptive learning rate
+
 # Methods
 
 | method                            | description                                    |
@@ -123,3 +127,17 @@ update!(o, x, y)
 ```
 
 After reaching `burnin` observations, updating a single observation will include adjusting (+/-) the penalty parameter by a step size determined by `λrate`.  The `λ` which minimizes the loss on the test set is then chosen.
+
+
+# Sparse Coefficients
+
+<h3>SparseModel</h3>
+
+The `SparseModel` type can be used to enforce sparsity on the coefficient vector for a `StochasticModel`.  Currently, the only supported type of sparsity is `HardThreshold`.
+
+```
+sp = SparseModel(o::StochasticModel, HardThreshold(burnin, ϵ))
+```
+
+- `HardThreshold`
+    - after `burnin` observations, any coefficient less than `ϵ` will be set to 0. 

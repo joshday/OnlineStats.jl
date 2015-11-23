@@ -39,8 +39,8 @@ type TracePlot
     f::Function
 end
 
-function TracePlot(o::OnlineStats.OnlineStat, f::Function = x -> state(x)[1])
-    p = Plots.plot([nobs(o)], collect(f(o))')
+function TracePlot(o::OnlineStats.OnlineStat, f::Function = x -> state(x)[1]; kw...)
+    p = Plots.plot([nobs(o)], collect(f(o))'; kw...)
     TracePlot(o, p, f)
 end
 
@@ -72,13 +72,15 @@ type CompareTracePlot
     f::Function  # Use a function that returns a scalar
 end
 
-function CompareTracePlot{T<:OnlineStats.OnlineStat}(os::Vector{T}, f::Function)
-    p = Plots.plot([nobs(os[1])], [f(os[1])])
-
-    for i in 2:length(os)
-        Plots.plot!(p, [nobs(os[i])], [f(os[i])])
-    end
-    Plots.plot!(p, legend=true, xlabel = "nobs", ylabel = "value of function $f")
+function CompareTracePlot{T<:OnlineStats.OnlineStat}(os::Vector{T}, f::Function; kw...)
+    p = Plots.plot([nobs(oi) for oi in os]', [f(oi) for oi in os]';
+        ylabel = "value of function $f", xlabel = "nobs", kw...
+    )
+    #
+    # for i in 2:length(os)
+    #     Plots.plot!(p, [nobs(os[i])], [f(os[i])])
+    # end
+    # Plots.plot!(p, legend=true, xlabel = "nobs", ylabel = "value of function $f")
     CompareTracePlot(os, p, f)
 end
 
