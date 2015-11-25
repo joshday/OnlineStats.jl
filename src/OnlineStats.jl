@@ -85,6 +85,7 @@ include("stochasticmodel/algorithms/prox_adagrad.jl")
 include("stochasticmodel/algorithms/rda_adagrad.jl")
 include("stochasticmodel/algorithms/mm_grad.jl")
 include("stochasticmodel/algorithms/mm_grad2.jl")
+include("stochasticmodel/algorithms/mm_rda.jl")
 include("stochasticmodel/sparse.jl")
 include("stochasticmodel/crossvalidate.jl")
 

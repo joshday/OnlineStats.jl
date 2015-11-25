@@ -25,17 +25,19 @@ function updateβ!(o::StochasticModel{RDA}, x::AVecF, y::Float64)
     g = ∇f(o.model, y, predict(o, x))
 
     w = 1 / alg(o).n_updates
-    if o.intercept
-        alg(o).G0 += g^2
-        alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
-        o.β0 = -weight(o) * alg(o).Ḡ0
-    end
+    @inbounds begin
+        if o.intercept
+            alg(o).G0 += g^2
+            alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
+            o.β0 = -weight(o) * alg(o).Ḡ0
+        end
 
-    @inbounds for j in 1:length(x)
-        gj = g * x[j]
-        alg(o).G[j] += gj^2
-        alg(o).Ḡ[j] += w * (gj - alg(o).Ḡ[j])
-        rda_update!(o, j)
+        for j in 1:length(x)
+            gj = g * x[j]
+            alg(o).G[j] += gj^2
+            alg(o).Ḡ[j] += w * (gj - alg(o).Ḡ[j])
+            rda_update!(o, j)
+        end
     end
 end
 
@@ -50,26 +52,29 @@ function updatebatchβ!(o::StochasticModel{RDA}, x::AMatF, y::AVecF)
 
     alg(o).n_updates += 1
     w = 1 / n_updates(o)
-    if o.intercept
-        g = 0.0
-        for i in 1:n
-            g += ∇f(o.model, y[i], ŷ[i])
-        end
-        g /= n
-        alg(o).G0 += g ^ 2
-        alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
-        o.β0 = -weight(o) * alg(o).Ḡ0
-    end
 
-    for j in 1:size(x, 2)
-        g = 0.0
-        for i in 1:n
-            g += x[i, j] * ∇f(o.model, y[i], ŷ[i])
+    @inbounds begin
+        if o.intercept
+            g = 0.0
+            for i in 1:n
+                g += ∇f(o.model, y[i], ŷ[i])
+            end
+            g /= n
+            alg(o).G0 += g ^ 2
+            alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
+            o.β0 = -weight(o) * alg(o).Ḡ0
         end
-        g /= n
-        alg(o).G[j] += g ^ 2
-        alg(o).Ḡ[j] += w * (g - alg(o).Ḡ[j])
-        rda_update!(o, j)
+
+        for j in 1:size(x, 2)
+            g = 0.0
+            for i in 1:n
+                g += x[i, j] * ∇f(o.model, y[i], ŷ[i])
+            end
+            g /= n
+            alg(o).G[j] += g ^ 2
+            alg(o).Ḡ[j] += w * (g - alg(o).Ḡ[j])
+            rda_update!(o, j)
+        end
     end
 end
 
