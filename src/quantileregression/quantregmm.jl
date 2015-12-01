@@ -31,7 +31,7 @@ end
 statenames(o::QuantRegMM) = [:β, :τ, :nobs]
 state(o::QuantRegMM) = Any[coef(o), o.τ, nobs(o)]
 
-coef(o::QuantRegMM) = copy(o.β)
+StatsBase.coef(o::QuantRegMM) = copy(o.β)
 
 #---------------------------------------------------------------------# update!
 function update!(o::QuantRegMM, x::AVecF, y::Float64)

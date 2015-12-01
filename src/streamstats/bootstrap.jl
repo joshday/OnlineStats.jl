@@ -60,7 +60,7 @@ end
 function update!(b::PoissonBootstrap, x::Real)
     b.n += 1
     for replicate in b.replicates
-        repetitions = rand(Poisson(1))
+        repetitions = rand(Dist.Poisson(1))
         for repetition in 1:repetitions
             update!(replicate, x)
         end
@@ -126,7 +126,7 @@ function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method=:quantile)
         if method == :quantile
             return (quantile(states, α / 2), quantile(states, 1 - α / 2))
         elseif method == :normal
-            norm_approx = Normal(mean(states), std(states))
+            norm_approx = Dist.Normal(mean(states), std(states))
             return (quantile(norm_approx, α / 2), quantile(norm_approx, 1 - α / 2))
         else
             error("method $method not recognized.  use :quantile or :normal")

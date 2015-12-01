@@ -93,14 +93,14 @@ end
 
 
 row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
-col(x::AMat, i::Integer) = view(x, :, i)
+col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
 row!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[i,:] = v)
 col!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[:,i] = v)
 row(x::AVec, i::Integer) = x[i]
 
-rows(x::AVec, rs::AVec{Int}) = view(x, rs)
-rows(x::AMat, rs::AVec{Int}) = view(x, rs, :)
-cols(x::AMat, cs::AVec{Int}) = view(x, :, cs)
+rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
+rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+cols(x::AMat, cs::AVec{Int}) = ArrayViews.view(x, :, cs)
 
 rows(x::AbstractArray, i::Integer) = row(x,i)
 cols(x::AbstractArray, i::Integer) = col(x,i)

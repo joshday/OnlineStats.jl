@@ -16,7 +16,7 @@ function NormalMix(p::Integer, y::AVecF, wgt::LearningRate = LearningRate(r = .5
 end
 
 function NormalMix(p::Integer, wgt::LearningRate = LearningRate(r = .51);
-                   start = MixtureModel(map((u,v) -> Normal(u, v), randn(p), ones(p))))
+                   start = Dist.MixtureModel(map((u,v) -> Dist.Normal(u, v), randn(p), ones(p))))
     NormalMix(start, zeros(p), zeros(p), zeros(p), 0, wgt)
 end
 
@@ -24,20 +24,20 @@ end
 means(o::NormalMix) = means(o.d)
 stds(o::NormalMix) = stds(o.d)
 
-Distributions.components(o::NormalMix) = Distributions.components(o.d)
-probs(o::NormalMix) = probs(o.d)
+Dist.components(o::NormalMix) = Dist.components(o.d)
+Dist.probs(o::NormalMix) = Dist.probs(o.d)
 
 
 #---------------------------------------------------------------------# update!
 function updatebatch!(o::NormalMix, y::AVecF)
     n = length(y)
-    nc = length(components(o))
-    π = probs(o)
+    nc = length(Dist.components(o))
+    π = Dist.probs(o)
     γ = weight(o)
 
     w = zeros(n, nc)
     for j = 1:nc, i = 1:n
-        @inbounds w[i, j] = π[j] * Distributions.pdf(components(o)[j], y[i])
+        @inbounds w[i, j] = π[j] * Dist.pdf(Dist.components(o)[j], y[i])
     end
     w ./= sum(w, 2)
     s1 = vec(sum(w, 1))
@@ -55,7 +55,7 @@ function updatebatch!(o::NormalMix, y::AVecF)
         σ = ones(nc)
     end
 
-    o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
+    o.d = Dist.MixtureModel(map((u,v) -> Dist.Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += n
     return
 end
@@ -67,7 +67,7 @@ function update!(o::NormalMix, y::Float64)
 
     w = zeros(p)
     for j in 1:p
-        w[j] = Distributions.pdf(o.d.components[j], y)
+        w[j] = Dist.pdf(o.d.components[j], y)
     end
     w /= sum(w)
     for j in 1:p
@@ -84,7 +84,7 @@ function update!(o::NormalMix, y::Float64)
         σ = ones(p)
     end
 
-    o.d = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
+    o.d = Dist.MixtureModel(map((u,v) -> Dist.Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
     o.n += 1
     return
 end
@@ -94,8 +94,8 @@ function Base.quantile(o::NormalMix, τ::Real; start = mean(o), maxit = 20, tol 
     0 < τ < 1 || error("τ must be in (0, 1)")
     θ = start
     for i in 1:maxit
-        θ += (τ - Distributions.cdf(o, θ)) ./ pdf(o, θ)
-        abs(Distributions.cdf(o, θ) - τ) < tol && break
+        θ += (τ - Dist.cdf(o, θ)) ./ Dist.pdf(o, θ)
+        abs(Dist.cdf(o, θ) - τ) < tol && break
     end
     return θ
 end

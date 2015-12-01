@@ -1,18 +1,15 @@
 module OnlineStats
 
 import Distributions
-Dist = Distributions
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase
-import StatsBase: nobs
+import StatsBase: nobs, coef, predict
 import MultivariateStats
-import ArrayViews: view, rowvec_view
+import ArrayViews
+import Requires
 
-using Requires
-@require Plots include("plots.jl")
-
-
-
+Dist = Distributions
+Requires.@require Plots include("plots.jl")
 
 #-----------------------------------------------------------------------------#
 # Exports
@@ -136,7 +133,6 @@ include("linearmodel/opls.jl")
 # GLM
 include("glm/logisticregsgd2.jl")
 include("glm/logisticregmm.jl")
-# include("glm/canonical_link.jl")
 
 # Quantile Regression
 include("quantileregression/quantregmm.jl")
@@ -166,6 +162,3 @@ include("react.jl")
 
 
 end # module
-
-
-# include("stochasticmodel/testcode.jl")

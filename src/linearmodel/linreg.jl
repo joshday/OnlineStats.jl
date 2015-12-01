@@ -64,20 +64,23 @@ end
 function StatsBase.coeftable(o::LinReg)
     β = coef(o)
     p = length(β)
-    se = stderr(o)
+    se = StatsBase.stderr(o)
     ts = β ./ se
-    CoefTable([β se ts Distributions.ccdf(FDist(1, nobs(o) - p), abs2(ts))],
-              ["Estimate","Std.Error","t value", "Pr(>|t|)"],
-              ["x$i" for i = 1:p], 4)
+    StatsBase.CoefTable(
+        [β se ts Distributions.ccdf(Dist.FDist(1, nobs(o) - p), abs2(ts))],
+        ["Estimate","Std.Error","t value", "Pr(>|t|)"],
+        ["x$i" for i = 1:p],
+        4
+    )
 end
 
 function StatsBase.confint(o::LinReg, level::Real = 0.95)
     β = coef(o)
-    mult = stderr(o) * quantile(TDist(nobs(o) - length(β)), (1. - level) / 2.)
+    mult = StatsBase.stderr(o) * quantile(Dist.TDist(nobs(o) - length(β)), (1. - level) / 2.)
     hcat(β, β) + mult * [1. -1.]
 end
 
-StatsBase.stderr(o::LinReg) = sqrt(diag(vcov(o)))
+StatsBase.stderr(o::LinReg) = sqrt(diag(StatsBase.vcov(o)))
 
 StatsBase.vcov(o::LinReg) = -mse(o) * (o.s[1:end-1, 1:end-1] / nobs(o))
 

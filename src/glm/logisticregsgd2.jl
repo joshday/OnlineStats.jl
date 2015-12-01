@@ -40,5 +40,5 @@ end
 statenames(o::LogRegSGD2) = [:β, :nobs]
 state(o::LogRegSGD2) = Any[copy(o.β), nobs(o)]
 
-coef(o::LogRegSGD2) = copy(o.β)
-predict(o::LogRegSGD2, X::AMatF) = inverselogit(X * o.β)
+StatsBase.coef(o::LogRegSGD2) = copy(o.β)
+StatsBase.predict(o::LogRegSGD2, X::AMatF) = inverselogit(X * o.β)

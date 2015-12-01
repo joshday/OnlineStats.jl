@@ -18,7 +18,7 @@ function emstart(p::Integer, y::AVecF;
     else
         error("$algorithm is not recognized.  Currently, the only option is :naive")
     end
-    m = MixtureModel(map((u,v) -> Normal(u, v), μ, σ), π)
+    m = Dist.MixtureModel(map((u,v) -> Dist.Normal(u, v), μ, σ), π)
     m = em(m, y, tol = tol, maxit = maxit, verbose = verbose)
 end
 
@@ -31,7 +31,7 @@ function em(o::Dist.MixtureModel{Dist.Univariate, Dist.Continuous, Dist.Normal},
 
     n = length(y)
     nj = length(o.components)  # number of components
-    π = probs(o)
+    π = Dist.probs(o)
     μ = means(o)
     σ = stds(o)
 
@@ -63,7 +63,7 @@ function em(o::Dist.MixtureModel{Dist.Univariate, Dist.Continuous, Dist.Normal},
         if any(σ .<= 0)
             σ = ones(nj)
         end
-        o = MixtureModel(map((u,v) -> Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
+        o = Dist.MixtureModel(map((u,v) -> Dist.Normal(u, v), vec(μ), vec(sqrt(σ))), vec(π))
 
         # Check tolerance
         loglik_old = loglik
