@@ -1,22 +1,22 @@
 #-------------------------------------------------------# Type and Constructors
 type FitMultinomial{W <: Weighting} <: DistributionStat
-    d::Multinomial
+    d::Dist.Multinomial
     means::VecF
     n::Int
     weighting::W
 end
 
-function distributionfit{T <: Integer}(::Type{Multinomial}, y::AMat{T}, wgt::Weighting = default(Weighting))
+function distributionfit{T <: Integer}(::Type{Dist.Multinomial}, y::AMat{T}, wgt::Weighting = default(Weighting))
     o = FitMultinomial(wgt)
     update!(o, y)
     o
 end
 
 FitMultinomial{T <: Integer}(y::AMat{T}, wgt::Weighting = default(Weighting)) =
-    distributionfit(Multinomial, y, wgt)
+    distributionfit(Dist.Multinomial, y, wgt)
 
 FitMultinomial(wgt::Weighting = default(Weighting)) =
-    FitMultinomial(Multinomial(1, [0., 1.]), zeros(0), 0, wgt)
+    FitMultinomial(Dist.Multinomial(1, [0., 1.]), zeros(0), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
@@ -34,7 +34,7 @@ function update!{T <: Integer}(o::FitMultinomial, x::AVec{T})
     end
 
     o.n += 1
-    o.d = Multinomial(n, o.means / sum(o.means))
+    o.d = Dist.Multinomial(n, o.means / sum(o.means))
 end
 
 # function update!(o::FitMultinomial, x::Matrix)

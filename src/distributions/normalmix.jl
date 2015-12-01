@@ -1,6 +1,6 @@
 #-------------------------------------------------------# Type and Constructors
 type NormalMix <: DistributionStat
-    d::MixtureModel{Univariate, Continuous, Normal}    # MixtureModel
+    d::Dist.MixtureModel{Dist.Univariate, Dist.Continuous, Dist.Normal}    # MixtureModel
     s1::VecF             # mean of weights
     s2::VecF             # mean of (weights .* y)
     s3::VecF             # mean of (weights .* y .* y)
@@ -24,7 +24,7 @@ end
 means(o::NormalMix) = means(o.d)
 stds(o::NormalMix) = stds(o.d)
 
-components(o::NormalMix) = components(o.d)
+Distributions.components(o::NormalMix) = Distributions.components(o.d)
 probs(o::NormalMix) = probs(o.d)
 
 
@@ -37,7 +37,7 @@ function updatebatch!(o::NormalMix, y::AVecF)
 
     w = zeros(n, nc)
     for j = 1:nc, i = 1:n
-        @inbounds w[i, j] = π[j] * pdf(components(o)[j], y[i])
+        @inbounds w[i, j] = π[j] * Distributions.pdf(components(o)[j], y[i])
     end
     w ./= sum(w, 2)
     s1 = vec(sum(w, 1))
@@ -67,7 +67,7 @@ function update!(o::NormalMix, y::Float64)
 
     w = zeros(p)
     for j in 1:p
-        w[j] = pdf(o.d.components[j], y)
+        w[j] = Distributions.pdf(o.d.components[j], y)
     end
     w /= sum(w)
     for j in 1:p
@@ -94,8 +94,8 @@ function Base.quantile(o::NormalMix, τ::Real; start = mean(o), maxit = 20, tol 
     0 < τ < 1 || error("τ must be in (0, 1)")
     θ = start
     for i in 1:maxit
-        θ += (τ - cdf(o, θ)) ./ pdf(o, θ)
-        abs(cdf(o, θ) - τ) < tol && break
+        θ += (τ - Distributions.cdf(o, θ)) ./ pdf(o, θ)
+        abs(Distributions.cdf(o, θ) - τ) < tol && break
     end
     return θ
 end

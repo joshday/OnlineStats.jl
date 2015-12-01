@@ -40,12 +40,6 @@ function update!(o::Means, y::AVecF)
     return
 end
 
-function update!(o::Means, y::MatF)
-    for i in 1:size(y,1)
-        update!(o, rowvec_view(y, i))
-    end
-end
-
 function updatebatch!(o::Means, y::AMatF)
     n2 = size(y, 1)
     smooth!(o.μ, vec(mean(y, 1)), weight(o, n2))

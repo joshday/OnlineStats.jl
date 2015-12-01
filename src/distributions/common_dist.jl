@@ -8,7 +8,7 @@
 # function distributionfit end
 #------------------------------------------------------------# DistributionStat
 function Base.show(io::IO, o::DistributionStat)
-    println("Online " * string(typeof(o)) * ", nobs:" * string(nobs(o)))
+    println("Online " * string(typeof(o)) * ", nobs:" * string(StatsBase.nobs(o)))
     show(o.d)
 end
 
@@ -31,11 +31,11 @@ Base.var(o::DistributionStat) = var(o.d)
 Base.std(o::DistributionStat) = std(o.d)
 Base.median(o::DistributionStat) = median(o.d)
 
-StatsBase.mode(o::DistributionStat) = Distributions.mode(o.d)
-StatsBase.modes(o::DistributionStat) = Distributions.modes(o.d)
-StatsBase.skewness(o::DistributionStat) = Distributions.skewness(o.d)
-StatsBase.kurtosis(o::DistributionStat) = Distributions.kurtosis(o.d)
-StatsBase.entropy(o::DistributionStat) = Distributions.entropy(o.d)
+StatsBase.mode(o::DistributionStat) = StatsBase.mode(o.d)
+StatsBase.modes(o::DistributionStat) = StatsBase.modes(o.d)
+StatsBase.skewness(o::DistributionStat) = StatsBase.skewness(o.d)
+StatsBase.kurtosis(o::DistributionStat) = StatsBase.kurtosis(o.d)
+StatsBase.entropy(o::DistributionStat) = StatsBase.entropy(o.d)
 
 Distributions.mgf(o::DistributionStat, x) = Distributions.mgf(o.d, x)
 Distributions.cf(o::DistributionStat, x) = Distributions.cf(o.d, x)

@@ -1,22 +1,22 @@
 #------------------------------------------------------# Type and Constructors
 type FitBeta{W <: Weighting} <: DistributionStat
-    d::Beta
+    d::Dist.Beta
     stats::Variance{W}
     n::Int64
     weighting::W
 end
 
-function distributionfit(::Type{Beta}, y::AVecF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Dist.Beta}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitBeta(wgt)
     update!(o, y)
     o
 end
 
 FitBeta{T <: Real}(y::AVec{T}, wgt::Weighting = default(Weighting)) =
-    distributionfit(Beta, y, wgt)
+    distributionfit(Dist.Beta, y, wgt)
 
 FitBeta(wgt::Weighting = default(Weighting)) =
-    FitBeta(Beta(), Variance(wgt), 0, wgt)
+    FitBeta(Dist.Beta(), Variance(wgt), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
@@ -34,6 +34,6 @@ function update!(obj::FitBeta, y::Real)
         β = .01
     end
 
-    obj.d = Beta(α, β)
+    obj.d = Dist.Beta(α, β)
     obj.n += 1
 end

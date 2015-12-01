@@ -26,13 +26,13 @@ Moments(wgt::Weighting = default(Weighting)) = Moments(0., 0., 0., 0., 0, wgt)
 
 #-----------------------------------------------------------------------# state
 statenames(o::Moments) = [:μ, :σ², :skewness, :kurtosis, :nobs]
-state(o::Moments) = Any[mean(o), var(o), skewness(o), kurtosis(o), nobs(o)]
+state(o::Moments) = Any[mean(o), var(o), StatsBase.skewness(o), StatsBase.kurtosis(o), nobs(o)]
 
 Base.mean(o::Moments) = o.m1
 Base.var(o::Moments) = (o.m2 - o.m1 ^2) * (o.n / (o.n - 1))
 Base.std(o::Moments) = sqrt(var(o))
-skewness(o::Moments) = (o.m3  - 3 * o.m1 * var(o) - o.m1 ^ 3) / var(o) ^ 1.5
-kurtosis(o::Moments) = (o.m4 - 4 * o.m1 * o.m3 + 6 * o.m1 ^2 * o.m2 - 3 * o.m1 ^ 4) / var(o)^2 - 3.0
+StatsBase.skewness(o::Moments) = (o.m3  - 3 * o.m1 * var(o) - o.m1 ^ 3) / var(o) ^ 1.5
+StatsBase.kurtosis(o::Moments) = (o.m4 - 4 * o.m1 * o.m3 + 6 * o.m1 ^2 * o.m2 - 3 * o.m1 ^ 4) / var(o)^2 - 3.0
 
 
 #---------------------------------------------------------------------# update!

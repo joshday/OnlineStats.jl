@@ -1,10 +1,10 @@
 #--------------------------------------------------------------# means and stds
-function means(m::MixtureModel{Univariate, Continuous, Normal})
-    map(mean, components(m))
+function means(m::Dist.MixtureModel{Dist.Univariate, Dist.Continuous, Dist.Normal})
+    map(mean, Distributions.components(m))
 end
 
-function stds(m::MixtureModel{Univariate, Continuous, Normal})
-    map(std, components(m))
+function stds(m::Dist.MixtureModel{Dist.Univariate, Dist.Continuous, Dist.Normal})
+    map(std, Distributions.components(m))
 end
 
 
@@ -24,7 +24,7 @@ end
 
 
 #--------------------------------------------------------------------------# em
-function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
+function em(o::Dist.MixtureModel{Dist.Univariate, Dist.Continuous, Dist.Normal}, y::AVecF;
             tol::Float64 = 1e-6,
             maxit::Int = 100,
             verbose::Bool = false)
@@ -42,13 +42,13 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
     s3 = zeros(nj)
 
     tolerance = 1.0
-    loglik = sum(logpdf(o, y))
+    loglik = sum(Distributions.logpdf(o, y))
     iters = 0
 
     for i in 1:maxit
         iters += 1
         for j = 1:nj, i = 1:n
-            w[i, j] = π[j] * pdf(o.components[j], y[i])
+            w[i, j] = π[j] * Distributions.pdf(o.components[j], y[i])
         end
         w ./= sum(w, 2)
         copy!(wy, w .* y)
@@ -67,7 +67,7 @@ function em(o::MixtureModel{Univariate, Continuous, Normal}, y::AVecF;
 
         # Check tolerance
         loglik_old = loglik
-        loglik = loglikelihood(o, y)
+        loglik = Distributions.loglikelihood(o, y)
         numerator = abs(loglik - loglik_old)
         denom = (abs(loglik_old) + 1)
         numerator > tol * denom  || break

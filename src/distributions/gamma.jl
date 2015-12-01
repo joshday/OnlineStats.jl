@@ -1,36 +1,36 @@
 #-------------------------------------------------------# Type and Constructors
 type FitGamma{W <: Weighting} <: DistributionStat
-    d::Gamma
+    d::Dist.Gamma
     m::Mean{W}
     mlog::Mean{W}
     n::Int64
     weighting::W
 end
 
-function distributionfit(::Type{Gamma}, y::AVecF, wgt::Weighting = default(Weighting))
+function distributionfit(::Type{Dist.Gamma}, y::AVecF, wgt::Weighting = default(Weighting))
     o = FitGamma(wgt)
     update!(o, y)
     o
 end
 
 FitGamma(y::AVecF, wgt::Weighting = default(Weighting)) =
-    distributionfit(Gamma, y, wgt)
+    distributionfit(Dist.Gamma, y, wgt)
 
 FitGamma(wgt::Weighting = default(Weighting)) =
-    FitGamma(Gamma(), Mean(wgt), Mean(wgt), 0, wgt)
+    FitGamma(Dist.Gamma(), Mean(wgt), Mean(wgt), 0, wgt)
 
 
 #---------------------------------------------------------------------# update!
 function update!(obj::FitGamma, y::AVecF)
     update!(obj.m, y)
     update!(obj.mlog, log(y))
-    obj.n = nobs(obj.m)
-    obj.d = fit_mle(Gamma, obj)
+    obj.n = StatsBase.nobs(obj.m)
+    obj.d = fit_mle(Dist.Gamma, obj)
 end
 
 
 # Adapted from Distributions:
-function fit_mle(::Type{Gamma}, obj::FitGamma;
+function fit_mle(::Type{Dist.Gamma}, obj::FitGamma;
                  alpha0::Float64=NaN, maxiter::Int=1000, tol::Float64=1.0e-16)
 
     mx = mean(obj.m)
@@ -48,7 +48,7 @@ function fit_mle(::Type{Gamma}, obj::FitGamma;
         converged = abs(a - a_old) <= tol
     end
 
-    Gamma(a, mx / a)
+    Dist.Gamma(a, mx / a)
 end
 function gamma_mle_update(logmx::Float64, mlogx::Float64, a::Float64)
     ia = 1.0 / a

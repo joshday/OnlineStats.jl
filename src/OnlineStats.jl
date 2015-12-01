@@ -1,14 +1,10 @@
 module OnlineStats
 
 import Distributions
-import Distributions:
-    Bernoulli, Beta, Binomial, Cauchy, Dirichlet, Exponential, Gamma, LogNormal,
-    Multinomial, MvNormal, Normal, MixtureModel, Poisson, FDist, TDist,
-    fit_dirichlet!, Univariate, Continuous, UnivariateDistribution,
-    probs, components, logpdf, pdf, cdf, skewness, kurtosis, loglikelihood
+Dist = Distributions
 import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase
-import StatsBase: nobs, coef, coeftable, CoefTable, confint, predict, stderr, vcov, fit
+import StatsBase: nobs
 import MultivariateStats
 import ArrayViews: view, rowvec_view
 

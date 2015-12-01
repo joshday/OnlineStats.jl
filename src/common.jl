@@ -92,7 +92,7 @@ function Base.(:(==)){T<:OnlineStat}(o1::T, o2::T)
 end
 
 
-row(x::AMat, i::Integer) = rowvec_view(x, i)
+row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
 col(x::AMat, i::Integer) = view(x, :, i)
 row!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[i,:] = v)
 col!{T}(x::AMat{T}, i::Integer, v::AVec{T}) = (x[:,i] = v)
