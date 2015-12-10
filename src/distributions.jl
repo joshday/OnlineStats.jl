@@ -33,6 +33,7 @@ Base.mean(o::FitDistribution) = mean(o.value)
 Base.var(o::FitDistribution) = var(o.value)
 Base.std(o::FitDistribution) = std(o.value)
 Ds.params(o::FitDistribution) = Ds.params(o.value)
+Ds.ncategories(o::FitDistribution) = Ds.ncategories(o.value)
 function Base.show(io::IO, o::FitDistribution)
     printheader(io, "FitDistribution")
     print_value_and_nobs(io, o)
@@ -85,7 +86,11 @@ end
 _suff(::Type{Ds.Cauchy}) = QuantileMM()
 function fitdist!(o::FitDistribution{Ds.Cauchy}, y::Real, γ::Float64)
     fit!(o.suff, y)
-    try o.value = Ds.Cauchy(o.suff.value[2], o.suff.value[3] - o.suff.value[1]) end
+    try o.value = Ds.Cauchy(o.suff.value[2], 0.5 * (o.suff.value[3] - o.suff.value[1])) end
+end
+function fitdistbatch!{T<:Real}(o::FitDistribution{Ds.Cauchy}, y::AVec{T}, γ::Float64)
+    fit!(o.suff, y)
+    try o.value = Ds.Cauchy(o.suff.value[2], 0.5 * (o.suff.value[3] - o.suff.value[1])) end
 end
 
 

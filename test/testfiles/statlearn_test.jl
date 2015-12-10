@@ -6,7 +6,7 @@ import OnlineStats: _j
 facts(@title "StatLearn") do
     n, p = 1_000, 10
     x = randn(n, p)
-    β = collect(linspace(-1,1,p))
+    β = collect(linspace(-1, 1, p))
 
     context(@subtitle "L2Regression") do
         y = x*β + randn(n)

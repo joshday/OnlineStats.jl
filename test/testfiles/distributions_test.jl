@@ -17,11 +17,16 @@ facts(@title "FitDistribution / FitMvDistribution") do
     context(@subtitle "Categorical") do
         y = rand(Categorical([.2, .2, .2, .4]), 1000)
         o = FitDistribution(Categorical, y)
+        @fact ncategories(o) --> 4
+        @fact length(o.suff) --> 4
     end
 
     context(@subtitle "Cauchy") do
-        y = rand(Cauchy(), 100)
+        y = rand(Cauchy(), 10000)
         o = FitDistribution(Cauchy, y)
+        fit!(o, y, 5)
+        @fact params(o)[1] --> roughly(0.0, .1)
+        @fact params(o)[2] --> roughly(1.0, .1)
     end
 
     context(@subtitle "Exponential") do
@@ -70,7 +75,6 @@ facts(@title "FitDistribution / FitMvDistribution") do
         y = rand(Poisson(5), 100)
         o = FitDistribution(Poisson, y)
         @fact mean(o) --> roughly(mean(y))
-
     end
 end
 
