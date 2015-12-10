@@ -4,51 +4,40 @@ using TestSetup, OnlineStats, Distributions, FactCheck
 import OnlineStats: _j
 
 facts(@title "StatLearn") do
-    n, p = 1_000, 10
+    n, p = 1_000, 5
     x = randn(n, p)
     β = collect(linspace(-1, 1, p))
+    xβ = x*β
 
-    context(@subtitle "L2Regression") do
+    alg = [SGD(), AdaGrad(), RDA(), MMGrad(), AdaMMGrad()]
+    pen = [NoPenalty(), L2Penalty(), L1Penalty(), ElasticNetPenalty()]
+    mod = [
+        L2Regression(), L1Regression(), LogisticRegression(),
+        PoissonRegression(), QuantileRegression(), SVMLike(), HuberRegression()
+    ]
+
+    generate(::L2Regression, xβ) = xβ + randn(size(xβ, 1))
+    generate(::L1Regression, xβ) = xβ + randn(size(xβ, 1))
+    generate(::LogisticRegression, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
+    generate(::PoissonRegression, xβ) = [rand(Poisson(exp(η))) for η in xβ]
+    generate(::QuantileRegression, xβ) = xβ + randn(size(xβ, 1))
+    generate(::SVMLike, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
+    generate(::HuberRegression, xβ) = xβ + randn(size(xβ, 1))
+
+    context(@subtitle "Full Factorial of Combinations") do
+        for a in alg, p in pen, m in mod
+            y = generate(m, xβ)
+            println("    > $a, $p, $m")
+            StatLearn(x, y, model = m, algorithm = a, penalty = p)
+        end
+    end
+
+
+    context(@subtitle "methods") do
         y = x*β + randn(n)
-        StatLearn(x, y)
-        StatLearn(x, y, 10)
-        StatLearn(x, y, 5, algorithm = AdaGrad())
-        StatLearn(x, y, 5, algorithm = RDA())
-        StatLearn(x, y, 5, algorithm = MMGrad())
-        o = StatLearn(x, y, 5, algorithm = AdaMMGrad())
-
+        o = StatLearn(x, y)
         @fact predict(o, x) --> roughly(x * o.β + o.β0)
         @fact coef(o) --> vcat(o.β0, o.β)
-    end
-
-    context(@subtitle "L1Regression") do
-        y = x*β + randn(n)
-        StatLearn(x, y, model = L1Regression())
-    end
-
-    context(@subtitle "LogisticRegression") do
-        y = [rand(Bernoulli(1.0 / (1.0 + exp(-η)))) for η in x*β]
-        StatLearn(x, y, model = LogisticRegression())
-    end
-
-    context(@subtitle "PoissonRegression") do
-        y = [rand(Poisson(exp(η))) for η in x*β]
-        StatLearn(x, y, model = PoissonRegression())
-    end
-
-    context(@subtitle "QuantileRegression") do
-        y = x*β + randn(n)
-        StatLearn(x, y, model = QuantileRegression(.7))
-    end
-
-    context(@subtitle "SVMLike") do
-        y = [rand(Bernoulli(1.0 / (1.0 + exp(-η)))) for η in x*β]
-        StatLearn(x, y, model = SVMLike())
-    end
-
-    context(@subtitle "HuberRegression") do
-        y = x*β + randn(n)
-        StatLearn(x, y, model = HuberRegression(2.))
     end
 end
 

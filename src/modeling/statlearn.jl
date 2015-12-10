@@ -276,6 +276,9 @@ _α(o::StatLearn, xj, x) = (abs(xj) + _ϵ) / (sumabs(x) + o.intercept + _ϵ)
 function mmdenom{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
     xj^2 / _α(o, xj, x)
 end
+function mmdenom{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ)
+    xj^2 / (_α(o, xj, x) * abs(y - ŷ))
+end
 function mmdenom{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ)
     xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
 end
@@ -284,6 +287,14 @@ function mmdenom{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ
 end
 function mmdenom{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ)
     xj^2 / (_α(o, xj, x) * abs(y - ŷ))
+end
+
+# TODO:
+function mmdenom{A<:Algorithm}(o::StatLearn{A, SVMLike}, xj, x, y, ŷ)
+    xj^2 / _α(o, xj, x)
+end
+function mmdenom{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ)
+    xj^2 / _α(o, xj, x)
 end
 function _updateβ!(o::StatLearn{MMGrad}, γ, g, x, y, ŷ)
     if o.intercept
