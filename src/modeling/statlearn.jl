@@ -126,7 +126,6 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "penalty", o.penalty)
     print_item(io, "nobs", nobs(o))
 end
-deriv(o::StatLearn, y::Real, ŷ::Real) = deriv(o.model, y, ŷ)
 function fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real)
     γ = o.η * weight!(o, 1)
     ŷ = predict(o, x)

@@ -11,6 +11,14 @@ facts(@title "StatLearn") do
     context(@subtitle "L2Regression") do
         y = x*β + randn(n)
         StatLearn(x, y)
+        StatLearn(x, y, 10)
+        StatLearn(x, y, 5, algorithm = AdaGrad())
+        StatLearn(x, y, 5, algorithm = RDA())
+        StatLearn(x, y, 5, algorithm = MMGrad())
+        o = StatLearn(x, y, 5, algorithm = AdaMMGrad())
+
+        @fact predict(o, x) --> roughly(x * o.β + o.β0)
+        @fact coef(o) --> vcat(o.β0, o.β)
     end
 
     context(@subtitle "L1Regression") do

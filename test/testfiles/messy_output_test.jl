@@ -20,13 +20,24 @@ facts(@title "Show Methods") do
     display(QuantileSGD(x))
     display(QuantileMM(x))
     display(Moments(x))
+
     display(FitDistribution(Normal, x))
     display(FitMvDistribution(MvNormal, xs))
+
     display(NoPenalty())
     display(L1Penalty())
     display(L2Penalty())
     display(ElasticNetPenalty())
     display(SCADPenalty())
+
+    display(L2Regression())
+    display(L1Regression())
+    display(LogisticRegression())
+    display(PoissonRegression())
+    display(QuantileRegression(.7))
+    display(HuberRegression(2))
+    display(SVMLike())
+    display(StatLearn(10))
 end
 
 end#module
