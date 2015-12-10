@@ -36,7 +36,7 @@ function updateβ!(o::StochasticModel{MMGrad}, x::AVecF, y::Float64)
     ŷ = predict(o, x)
     γ = weight(o)
     g = ∇f(o.model, y, predict(o, x))
-    w = 1 / nobs(o)
+    w = γ #1 / nobs(o)
 
     if o.intercept
         d = mmdenom(o.model, 1.0, y, ŷ, makeα(o, 1.0, x))
@@ -61,7 +61,7 @@ function updatebatchβ!(o::StochasticModel{MMGrad}, x::AMatF, y::AVecF)
 
     for i in 1:length(y)
         g = ∇f(o.model, y[i], ŷ[i])
-        w = 1 / (nobs(o) + i)
+        w = γ #1 / (nobs(o) + i)
         if o.intercept
             d = mmdenom(o.model, 1.0, y[i], ŷ[i], makeα(o, 1.0, row(x, i)))
             o.algorithm.d0 = smooth(o.algorithm.d0, d, w)
@@ -77,7 +77,7 @@ function updatebatchβ!(o::StochasticModel{MMGrad}, x::AMatF, y::AVecF)
 end
 
 # makeα(o, xj, x) = abs(xj) / (sumabs(x) + o.intercept)
-makeα(o, xj, x) = abs2(xj) / (sumabs2(x) + o.intercept)
+makeα(o, xj, x) = abs(xj) / (sumabs(x) + o.intercept)
 
 
 function mmdenom(::LogisticRegression, xj::Float64, y::Float64, ŷ::Float64, α::Float64)

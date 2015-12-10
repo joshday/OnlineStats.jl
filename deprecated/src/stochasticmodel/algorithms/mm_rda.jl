@@ -1,5 +1,6 @@
-#--------------------------------------------------------------------------# MMMMRDA
-"Regularized Dual Averaging with ADAGRAD weights"
+# Experimental: This may be sketchy to do
+
+#--------------------------------------------------------------------------# MMRDA
 type MMRDA <: Algorithm
     G0::Float64     # sum of squared gradients for intercept
     G::VecF         # sum of squared gradients for everything else
@@ -41,45 +42,45 @@ function updateβ!(o::StochasticModel{MMRDA}, x::AVecF, y::Float64)
         d = mmdenom(o.model, 1.0, y, ŷ, makeα(o, 1.0, x))
         o.algorithm.d[j] = smooth(o.algorithm.d[j], d, w)
         gj = g * x[j] / o.algorithm.d[j]
-        alg(o).G[j] += gj^2
-        alg(o).Ḡ[j] += w * (gj - alg(o).Ḡ[j])
+        alg(o).G[j] += (gj / o.algorithm.d[j])^2
+        alg(o).Ḡ[j] += w * (gj / o.algorithm.d[j] - alg(o).Ḡ[j])
         MMRDA_update!(o, j)
     end
 end
 
-function updatebatchβ!(o::StochasticModel{MMRDA}, x::AMatF, y::AVecF)
-    if alg(o).n_updates == 0  # on first update, set the size of o.algorithm.G
-        alg(o).G = zeros(size(x, 2)) + alg(o).G0
-        alg(o).Ḡ = zeros(size(x, 2)) + alg(o).G0
-    end
-
-    n = length(y)
-    ŷ = predict(o, x)
-
-    alg(o).n_updates += 1
-    w = 1 / n_updates(o)
-    if o.intercept
-        g = 0.0
-        for i in 1:n
-            g += ∇f(o.model, y[i], ŷ[i])
-        end
-        g /= n
-        alg(o).G0 += g ^ 2
-        alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
-        o.β0 = -weight(o) * alg(o).Ḡ0
-    end
-
-    for j in 1:size(x, 2)
-        g = 0.0
-        for i in 1:n
-            g += x[i, j] * ∇f(o.model, y[i], ŷ[i])
-        end
-        g /= n
-        alg(o).G[j] += g ^ 2
-        alg(o).Ḡ[j] += w * (g - alg(o).Ḡ[j])
-        MMRDA_update!(o, j)
-    end
-end
+# function updatebatchβ!(o::StochasticModel{MMRDA}, x::AMatF, y::AVecF)
+#     if alg(o).n_updates == 0  # on first update, set the size of o.algorithm.G
+#         alg(o).G = zeros(size(x, 2)) + alg(o).G0
+#         alg(o).Ḡ = zeros(size(x, 2)) + alg(o).G0
+#     end
+#
+#     n = length(y)
+#     ŷ = predict(o, x)
+#
+#     alg(o).n_updates += 1
+#     w = 1 / n_updates(o)
+#     if o.intercept
+#         g = 0.0
+#         for i in 1:n
+#             g += ∇f(o.model, y[i], ŷ[i])
+#         end
+#         g /= n
+#         alg(o).G0 += g ^ 2
+#         alg(o).Ḡ0 += w * (g - alg(o).Ḡ0)
+#         o.β0 = -weight(o) * alg(o).Ḡ0
+#     end
+#
+#     for j in 1:size(x, 2)
+#         g = 0.0
+#         for i in 1:n
+#             g += x[i, j] * ∇f(o.model, y[i], ŷ[i])
+#         end
+#         g /= n
+#         alg(o).G[j] += g ^ 2
+#         alg(o).Ḡ[j] += w * (g - alg(o).Ḡ[j])
+#         MMRDA_update!(o, j)
+#     end
+# end
 
 n_updates(o::StochasticModel{MMRDA}) = alg(o).n_updates
 @inline weight(o::StochasticModel{MMRDA}, j::Int) = n_updates(o) * alg(o).η / sqrt(alg(o).G[j])

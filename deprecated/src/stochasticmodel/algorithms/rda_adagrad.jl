@@ -104,7 +104,7 @@ end
 
 # ElasticNetPenalty
 function rda_update!{M<:ModelDefinition}(o::StochasticModel{RDA,M,ElasticNetPenalty}, j::Int)
-    alg(o).Ḡ[j] += (1 / n_updates(o)) * pen(o).λ * (1 - pen(o).λ) * o.β[j]
+    alg(o).Ḡ[j] += (1 / n_updates(o)) * pen(o).λ * (1 - pen(o).α) * o.β[j]
     λ = pen(o).λ * pen(o).α
     if abs(alg(o).Ḡ[j]) < λ
         o.β[j] = 0.0

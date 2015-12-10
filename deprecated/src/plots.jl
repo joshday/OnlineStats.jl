@@ -30,6 +30,8 @@ end
 `TracePlot(o)`
 
 `TracePlot(o, f)`
+
+Create a traceplot from an `OnlineStat`.  The value(s) to be plotted are `f(o)`, which defaults to the first element of `state(o)`.  Each time a `TracePlot` is updated, the corresponding `OnlineStat` will be updated and new value(s) will be added to the plot.
 """
 type TracePlot
     o::OnlineStat
@@ -37,13 +39,13 @@ type TracePlot
     f::Function
 end
 
-function TracePlot(o::OnlineStats.OnlineStat, f::Function = value; kw...)
+function TracePlot(o::OnlineStats.OnlineStat, f::Function = x->state(x)[1]; kw...)
     p = Plots.plot([nobs(o)], collect(f(o))'; kw...)
     TracePlot(o, p, f)
 end
 
-function fit!(tr::TracePlot, args...)
-    fit!(tr.o, args...)
+function update!(tr::TracePlot, args...)
+    update!(tr.o, args...)
     push!(tr.p, nobs(tr.o), collect(tr.f(tr.o)))
 end
 
@@ -51,6 +53,18 @@ end
 #-------------------------------------------------------------# CompareTracePlot
 """
 Compare the values of multiple OnlineStats.
+
+Example:
+```
+o1 = StochasticModel(size(x, 2), algorithm = MMGrad())
+o2 = StochasticModel(size(x, 2), algorithm = SGD())
+myloss(o) = loss(o, xtest, ytest)
+comp = CompareTracePlot([o1, o2])
+
+update!(comp, x1, y1)
+update!(comp, x2, y2)
+...
+```
 """
 type CompareTracePlot
     os::Vector{OnlineStats.OnlineStat}
@@ -64,17 +78,12 @@ function CompareTracePlot{T<:OnlineStats.OnlineStat}(os::Vector{T}, f::Function;
         Float64[f(oi) for oi in os]';      # y
         ylabel = "value of function $f", xlabel = "nobs", kw...
     )
-    #
-    # for i in 2:length(os)
-    #     Plots.plot!(p, [nobs(os[i])], [f(os[i])])
-    # end
-    # Plots.plot!(p, legend=true, xlabel = "nobs", ylabel = "value of function $f")
     CompareTracePlot(os, p, f)
 end
 
-function fit!(c::CompareTracePlot, args...)
+function update!(c::CompareTracePlot, args...)
     for o in c.os
-        fit!(o, args...)
+        update!(o, args...)
     end
     for i in 1:length(c.os)
         push!(c.p, i, nobs(c.os[i]), c.f(c.os[i]))

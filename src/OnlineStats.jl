@@ -1,164 +1,165 @@
 module OnlineStats
 
-import Distributions
-import Base: copy, merge, merge!, show, quantile, maximum, minimum, push!, mean, var, std
 import StatsBase
-import StatsBase: nobs, coef, predict
-import MultivariateStats
+import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import ArrayViews
+import Distributions
+Ds = Distributions
 import Requires
-
-Dist = Distributions
 Requires.@require Plots include("plots.jl")
 
-#-----------------------------------------------------------------------------#
-# Exports
-#-----------------------------------------------------------------------------#
 export
-    # common types
     OnlineStat,
-    # weighting
-    Weighting, EqualWeighting, ExponentialWeighting, LearningRate, StochasticWeighting,
-    # ported from streamstats
-    BernoulliBootstrap, PoissonBootstrap, HyperLogLog,
-    # summary
-    Mean, Variance, Moments, Extrema, Summary, QuantileMM, QuantileSGD, FiveNumberSummary, Diff, QuantileSort,
-    # multivariate
-    CovarianceMatrix, Means, Variances, Diffs,
-    # DistributionStat
-    NormalMix, FitBernoulli, FitBeta, FitBinomial, FitCauchy, FitDirichlet, FitExponential,
-    FitGamma, FitLogNormal, FitMultinomial, FitMvNormal, FitNormal, FitPoisson,
-    # matrix
-    ShermanMorrisonInverse, OnlineCholesky,
-    # linearmodel
-    OnlineFLS, LinReg, QuantRegMM, LogRegMM, LogRegSGD2, SparseReg, StepwiseReg,
-    OnlineGLM,
+    # Weight
+    EqualWeight, ExponentialWeight, LearningRate,
+    # Summary
+    Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
+    CovMatrix, LinReg,
+    # Distributions
+    FitDistribution, FitMvDistribution,
+    # Penalties
+    NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty,
+    # StatLearn, ModelDef, Algorithm
+    StatLearn, ModelDef, L2Regression, L1Regression, LogisticRegression,
+    PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
+    SGD, AdaGrad, RDA, MMGrad, AdaMMGrad,
+    # methods
+    value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
+    vcov, stderr, loss
 
-    # stochasticmodel
-    StochasticModel, StochasticModelCV, SparseModel, HardThreshold,
-    L2Regression, L1Regression, LogisticRegression, QuantileRegression,
-    HuberRegression, SVMLike, PoissonRegression, ModelDefinition,
-    SGD, SGDSparse, ProxGrad, RDA, MMGrad, MMGrad2,
-    Penalty, NoPenalty, L1Penalty, L2Penalty, ElasticNetPenalty, SCADPenalty,
+#------------------------------------------------------------------------# types
+abstract OnlineStat
 
-    # functions
-    loss,
-    nobs, coef, coeftable, predict, vcov, stderr, pca, # rather than using reexport
-    update!,                # update one observation at a time using Weighting scheme
-    distributionfit,        # easy constructor syntax for FitDist types
-    state,                  # get state of object, typically Any[value, nobs(o)]
-    statenames,             # corresponding names to state()
-    weighting,              # get the Weighting of an object
-    em,                     # Offline EM algorithm for Normal Mixtures
-    sweep!,                 # Symmetric sweep operator
-    estimatedCardinality,
-    pca,                    # Get top d principal components from CovarianceMatrix
-    replicates,              # Get vector of replicates from <: Bootstrap
-    classify
+typealias VecF Vector{Float64}
+typealias MatF Matrix{Float64}
+typealias AVec{T} AbstractVector{T}
+typealias AMat{T} AbstractMatrix{T}
+typealias AVecF AVec{Float64}
+typealias AMatF AMat{Float64}
 
+#-----------------------------------------------------------------------# weight
+abstract Weight
 
-#-----------------------------------------------------------------------------#
-# Source files
-#-----------------------------------------------------------------------------#
+immutable EqualWeight <: Weight end
+@inline weight(w::EqualWeight, n2::Int, n1::Int, nup::Int) = n2 / (n1 + n2)
 
-include("log.jl")
+immutable ExponentialWeight <: Weight
+    minstep::Float64
+    ExponentialWeight(minstep::Real = 0.0) = new(Float64(minstep))
+end
+@inline weight(w::ExponentialWeight, n2::Int, n1::Int, nup::Int) = max(w.minstep, n2 / (n1 + n2))
 
-# Common Types
-include("types.jl")
-include("weighting.jl")
-
-# Other
-include("common.jl")
-
-# StochasticModel
-include("stochasticmodel/stochasticmodel.jl")
-include("stochasticmodel/penalty.jl")
-include("stochasticmodel/algorithms/sgd.jl")
-include("stochasticmodel/algorithms/prox_adagrad.jl")
-include("stochasticmodel/algorithms/rda_adagrad.jl")
-include("stochasticmodel/algorithms/mm_grad.jl")
-include("stochasticmodel/algorithms/mm_grad2.jl")
-include("stochasticmodel/algorithms/mm_rda.jl")
-include("stochasticmodel/sparse.jl")
-include("stochasticmodel/crossvalidate.jl")
-
-# Summary Statistics
-include("summary/mean.jl")
-include("summary/var.jl")
-include("summary/extrema.jl")
-include("summary/summary.jl")
-include("summary/moments.jl")
-include("summary/quantilesgd.jl")
-include("summary/quantilemm.jl")
-include("summary/fivenumber.jl")
-include("summary/diff.jl")
-
-# Multivariate
-include("multivariate/covmatrix.jl")
-include("multivariate/means.jl")
-include("summary/quantilesort.jl")
-include("multivariate/vars.jl")
-include("multivariate/diffs.jl")
-
-# Parametric Density
-include("distributions/common_dist.jl")
-include("distributions/bernoulli.jl")
-include("distributions/beta.jl")
-include("distributions/binomial.jl")
-include("distributions/cauchy.jl")
-include("distributions/dirichlet.jl")
-include("distributions/exponential.jl")
-include("distributions/gamma.jl")
-include("distributions/lognormal.jl")
-include("distributions/multinomial.jl")
-include("distributions/mvnormal.jl")
-include("distributions/normal.jl")
-include("distributions/offlinenormalmix.jl")
-include("distributions/normalmix.jl")
-include("distributions/poisson.jl")
-
-# Matrix
-include("matrix/sherman_morrison.jl")
-include("matrix/cholesky.jl")
-
-# Linear Model
-include("linearmodel/sweep.jl")
-include("linearmodel/linreg.jl")
-include("linearmodel/sparsereg.jl")
-include("linearmodel/stepwise.jl")
-include("linearmodel/ofls.jl")
-include("linearmodel/opca.jl")
-include("linearmodel/opls.jl")
-
-# GLM
-include("glm/logisticregsgd2.jl")
-include("glm/logisticregmm.jl")
-
-# Quantile Regression
-include("quantileregression/quantregmm.jl")
-
-# ported from StreamStats
-include("streamstats/hyperloglog.jl")
-include("streamstats/bootstrap.jl")
+immutable LearningRate <: Weight
+    r::Float64
+    minstep::Float64
+    LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep))
+end
+@inline weight(w::LearningRate, n2::Int, n1::Int, nup::Int) = max(w.minstep, exp(-w.r * log(nup)))
 
 
-export
-    BiasVector,
-    BiasMatrix
-include("multivariate/bias.jl")
+#----------------------------------------------------------------------# methods
+value(o::OnlineStat) = o.value
+StatsBase.nobs(o::OnlineStat) = o.n
+n_updates(o::OnlineStat) = o.nup
 
-export
-    @stream,
-    update_get!
-include("react.jl")
+@inline function n_and_nup!(o::OnlineStat, n2::Int)
+    o.n += n2
+    o.nup += 1
+end
+@inline function weight!(o::OnlineStat, n2::Int)
+    n1 = o.n
+    o.n += n2
+    o.nup += 1
+    weight(o.weight, n2, n1, o.nup)
+end
+_unbias(o::OnlineStat) = o.n / (o.n - 1)
 
-# using QuickStructs
-# export
-#     Window,
-#     lags,
-#     isfull,
-#     capacity
-# include("window.jl")
+#---------------------------------------------------------------------# printing
+printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")
+function print_item(io::IO, name::AbstractString, value)
+    println(io, " • " * @sprintf("%10s", name * ": "), value)
+end
+function print_value_and_nobs(io::IO, o::OnlineStat)
+    print_item(io, "value", value(o))
+    print_item(io, "nobs", nobs(o))
+end
 
+
+#-------------------------------------------------------------------------# fit!
+function fit!(o::OnlineStat, y::Union{AVec, AMat})
+    @inbounds for i in 1:size(y, 1)
+        fit!(o, row(y, i))
+    end
+end
+function fit!(o::OnlineStat, x::AMat, y::AVec)
+    @inbounds for i in 1:length(y)
+        fit!(o, row(x, i), row(y, i))
+    end
+end
+
+# Update in batches
+function fit!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
+    b = Int(b)
+    n = size(y, 1)
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            @inbounds fitbatch!(o, rows(y, rng))
+            i += b
+        end
+    end
+end
+function fit!(o::OnlineStat, x::AMat, y::AVec, b::Integer)
+    b = Int(b)
+    n = length(y)
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, x, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            @inbounds fitbatch!(o, rows(x, rng), rows(y, rng))
+            i += b
+        end
+    end
+end
+
+# fall back on fit! if there is no fitbatch! method
+fitbatch!(args...) = fit!(args...)
+
+#----------------------------------------------------------------------# helpers
+smooth(m::Float64, v::Real, γ::Float64) = (1.0 - γ) * m + γ * v
+function smooth!{T<:Real}(m::VecF, v::AVec{T}, γ::Float64)
+    for i in 1:length(v)
+        @inbounds m[i] = smooth(m[i], v[i], γ)
+    end
+end
+subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
+
+row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+row(x::AVec, i::Integer) = x[i]
+rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
+rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+const _ϵ = 1e-10
+# row(x::AMat, i::Integer) = slice(x, i, :)
+# row(x::AVec, i::Integer) = x[i]
+# rows(x::AVec, rs::AVec{Int}) = slice(x, rs)
+# rows(x::AMat, rs::AVec{Int}) = slice(x, rs, :)
+
+
+# source files
+include("summary.jl")
+include("distributions.jl")
+include("modeling/sweep.jl")
+include("modeling/penalty.jl")
+include("modeling/statlearn.jl")
+include("modeling/linreg.jl")
 
 end # module
+
+O = OnlineStats

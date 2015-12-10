@@ -91,7 +91,7 @@ type LearningRate <: Weighting
     end
 end
 function weight(w::LearningRate, unused1 = 1, unused2 = 1)
-    result = max(1.0 / (1.0 + w.s * w.t) ^ w.r, w.minstep)
+    result = max(exp(-w.r * log(1.0 + w.s * w.t)), w.minstep)#max(1.0 / (1.0 + w.s * w.t) ^ w.r, w.minstep)
     w.t += 1
     result
 end

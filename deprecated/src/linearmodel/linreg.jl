@@ -27,12 +27,14 @@ end
 statenames(o::LinReg) = [:β, :nobs]
 state(o::LinReg) = Any[coef(o), nobs(o)]
 
-nobs(o::LinReg) = nobs(o.c)
+StatsBase.nobs(o::LinReg) = nobs(o.c)
 
 "Estimate of the error variance"
 mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
-
 StatsBase.coef(o::LinReg) = vec(o.s[end, 1:end - 1])
+# StatsBase.predict(o::LinReg, x::AVecF) = dot(x, vec(o.s[end, 1:end - 1]))
+# StatsBase.predict(o::LinReg, x::AMatF) = [predict(o, row(x, i)) for i in 1:size(x, 1)]
+loss(o::LinReg, x::AMatF, y::AVecF) = mean(abs2(y - predict(o, x)))
 
 
 #---------------------------------------------------------------------# update!

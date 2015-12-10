@@ -92,7 +92,7 @@ function StatsBase.coef(o::SparseReg, penalty::Penalty;
     for i in 1:maxiters
         iters += 1
         βold[:] = β
-        β = β + ((i - 2) / i + 1) * (β - βold)
+        β = β + ((i - 2) / (i + 1)) * (β - βold)
         g = (xty - xtx * β)
         β = β + step * g  # β + step * x'(y - x * β)
         prox!(penalty, β, step)
