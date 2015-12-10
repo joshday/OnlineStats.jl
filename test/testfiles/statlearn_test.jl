@@ -4,7 +4,7 @@ using TestSetup, OnlineStats, Distributions, FactCheck
 import OnlineStats: _j
 
 facts(@title "StatLearn") do
-    n, p = 1_000, 5
+    n, p = 500, 5
     x = randn(n, p)
     β = collect(linspace(-1, 1, p))
     xβ = x*β
@@ -27,8 +27,9 @@ facts(@title "StatLearn") do
     context(@subtitle "Full Factorial of Combinations") do
         for a in alg, p in pen, m in mod
             y = generate(m, xβ)
-            println("    > $a, $p, $m")
+            println("          > $a, $p, $m")
             StatLearn(x, y, model = m, algorithm = a, penalty = p)
+            StatLearn(x, y, 10, model = m, algorithm = a, penalty = p)
         end
     end
 

@@ -37,7 +37,7 @@ immutable QuantileRegression <: ModelDef
         new(Float64(τ))
     end
 end
-Base.show(io::IO, o::QuantileRegression) = print(io, "QuantileRegression, τ = $(o.τ)")
+Base.show(io::IO, o::QuantileRegression) = print(io, "QuantileRegression (τ = $(o.τ))")
 function predict{T<:Real}(o::QuantileRegression, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
@@ -57,7 +57,7 @@ immutable HuberRegression <: ModelDef
         new(Float64(δ))
     end
 end
-Base.show(io::IO, o::HuberRegression) = print(io, "HuberRegression, δ = $(o.δ)")
+Base.show(io::IO, o::HuberRegression) = print(io, "HuberRegression (δ = $(o.δ))")
 function predict{T<:Real}(o::HuberRegression, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
@@ -74,6 +74,15 @@ immutable AdaGrad <: Algorithm end
 immutable RDA <: Algorithm end
 immutable MMGrad <: Algorithm end
 immutable AdaMMGrad <: Algorithm end
+
+for alg in [:SGD, :AdaGrad, :RDA, :MMGrad, :AdaMMGrad]
+    eval(parse(
+    """
+    Base.show(io::IO, o::$alg) = print(io, "$alg")
+    """
+    ))
+end
+# Base.show(io::IO, o::SGD) = print(io, "SGD")
 
 
 #--------------------------------------------------------------------# StatLearn
