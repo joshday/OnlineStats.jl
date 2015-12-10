@@ -57,14 +57,14 @@ facts(@title "Modeling") do
         L1Penalty()
         L2Penalty()
         p = ElasticNetPenalty()
-        p2 = SCADPenalty()
+        p2 = SCADPenalty(10)
 
         β = randn(5)
         @fact _j(NoPenalty(), .1, β) --> 0.0
         @fact _j(L1Penalty(), .1, β) --> .1 * sumabs(β)
         @fact _j(L2Penalty(), .1, β) --> 0.5 * .1 * sumabs2(β)
         @fact _j(p, .1, β) --> .1 * (p.α * sumabs(β) + (1 - p.α) * 0.5 * sumabs2(β))
-        @pending _j(p2, .1, β) --> .1
+        @fact _j(p2, .2, .1) --> .2 * .1
 
         g = randn()
         βj = randn()
@@ -73,7 +73,9 @@ facts(@title "Modeling") do
         @fact add_deriv(L2Penalty(), g, λ, βj) --> g + λ * βj
         @fact add_deriv(L1Penalty(), g, λ, βj) --> g + λ * sign(βj)
         @fact add_deriv(p, g, λ, βj) --> g + λ * (p.α * sign(βj) + (1 - p.α) * βj)
-        @pending add_deriv(p2, g, λ, βj) --> β + λ * g
+        @fact add_deriv(p2, g, .2, .1) --> g + .2
+        @fact add_deriv(p2, g, .1, .2) --> g + max(p2.a * .1 - .2, 0.0) / (p2.a - 1.0)
+        @fact add_deriv(p2, g, .1, 20) --> g 
     end
 end
 
