@@ -49,6 +49,7 @@ facts(@title "Modeling") do
         coef(o, .1, L1Penalty())
         coef(o, .1, L2Penalty())
         coef(o, .1, ElasticNetPenalty())
+        coef(o, .1, SCADPenalty())
     end
 
     context(@subtitle "Penalty") do
@@ -58,10 +59,10 @@ facts(@title "Modeling") do
         p = ElasticNetPenalty()
 
         β = randn(5)
-        @fact _j(NoPenalty(), β) --> 0.0
-        @fact _j(L1Penalty(), β) --> sumabs(β)
-        @fact _j(L2Penalty(), β) --> 0.5 * sumabs2(β)
-        @fact _j(p, β) --> p.α * sumabs(β) + (1 - p.α) * 0.5 * sumabs2(β)
+        @fact _j(NoPenalty(), .1, β) --> 0.0
+        @fact _j(L1Penalty(), .1, β) --> .1 * sumabs(β)
+        @fact _j(L2Penalty(), .1, β) --> 0.5 * .1 * sumabs2(β)
+        @fact _j(p, .1, β) --> .1 * (p.α * sumabs(β) + (1 - p.α) * 0.5 * sumabs2(β))
 
         g = randn()
         βj = randn()

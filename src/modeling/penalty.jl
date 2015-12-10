@@ -27,7 +27,7 @@ immutable ElasticNetPenalty <: Penalty
     α::Float64
     ElasticNetPenalty(a::Real = 0.5) = new(Float64(a))
 end
-Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty, α = $(p.α)")
+Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty (α = $(p.α))")
 add_deriv(p::ElasticNetPenalty, g, λ, βj) = g + λ * (p.α * sign(βj) + (1.0 - p.α) * βj)
 _j(p::ElasticNetPenalty, λ, β) = λ * (p.α * sumabs(β) + (1. - p.α) * 0.5 * sumabs2(β))
 function prox(p::ElasticNetPenalty, λ::Float64, βj::Float64, s::Float64)
@@ -35,7 +35,9 @@ function prox(p::ElasticNetPenalty, λ::Float64, βj::Float64, s::Float64)
     βj = βj / (1.0 + s * λ * (1.0 - p.α))            # Ridge prox
 end
 
+
 #------------------------------------------------------------------# SCADPenalty
+# http://www.pstat.ucsb.edu/student%20seminar%20doc/SCAD%20Jian%20Shi.pdf
 type SCADPenalty <: Penalty
     a::Float64
     function SCADPenalty(a::Real = 3.7)  # 3.7 is what Fan and Li use

@@ -26,6 +26,7 @@ facts(@title "Show Methods") do
     display(L1Penalty())
     display(L2Penalty())
     display(ElasticNetPenalty())
+    display(SCADPenalty())
 end
 
 end#module
