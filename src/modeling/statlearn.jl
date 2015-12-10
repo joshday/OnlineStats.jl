@@ -41,14 +41,14 @@ Base.show(io::IO, o::QuantileRegression) = print(io, "QuantileRegression, τ = $
 function predict{T<:Real}(o::QuantileRegression, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
-deriv(m::QuantileRegression, y::Float64, ŷ::Float64) = Float64(y < ŷ) - m.τ
+deriv(m::QuantileRegression, y::Real, ŷ::Real) = Float64(y < ŷ) - m.τ
 
 immutable SVMLike <: ModelDef end
 Base.show(io::IO, o::SVMLike) = print(io, "SVMLike")
 function predict{T<:Real}(o::SVMLike, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
-deriv(m::SVMLike, y::Float64, ŷ::Float64) = y * ŷ < 1 ? -y : 0.0
+deriv(m::SVMLike, y::Real, ŷ::Real) = y * ŷ < 1 ? -y : 0.0
 
 immutable HuberRegression <: ModelDef
     δ::Float64
@@ -61,7 +61,7 @@ Base.show(io::IO, o::HuberRegression) = print(io, "HuberRegression, δ = $(o.δ)
 function predict{T<:Real}(o::HuberRegression, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
-deriv(m::HuberRegression, y::Float64, ŷ::Float64) = abs(y - ŷ) <= m.δ ? ŷ - y : m.δ * sign(ŷ - y)
+deriv(m::HuberRegression, y::Real, ŷ::Real) = abs(y - ŷ) <= m.δ ? ŷ - y : m.δ * sign(ŷ - y)
 
 
 

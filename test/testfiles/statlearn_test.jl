@@ -22,6 +22,26 @@ facts(@title "StatLearn") do
         y = [rand(Bernoulli(1.0 / (1.0 + exp(-η)))) for η in x*β]
         StatLearn(x, y, model = LogisticRegression())
     end
+
+    context(@subtitle "PoissonRegression") do
+        y = [rand(Poisson(exp(η))) for η in x*β]
+        StatLearn(x, y, model = PoissonRegression())
+    end
+
+    context(@subtitle "QuantileRegression") do
+        y = x*β + randn(n)
+        StatLearn(x, y, model = QuantileRegression(.7))
+    end
+
+    context(@subtitle "SVMLike") do
+        y = [rand(Bernoulli(1.0 / (1.0 + exp(-η)))) for η in x*β]
+        StatLearn(x, y, model = SVMLike())
+    end
+
+    context(@subtitle "HuberRegression") do
+        y = x*β + randn(n)
+        StatLearn(x, y, model = HuberRegression(2.))
+    end
 end
 
 end #module
