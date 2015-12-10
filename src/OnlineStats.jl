@@ -18,7 +18,7 @@ export
     # Distributions
     FitDistribution, FitMvDistribution,
     # Penalties
-    NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty,
+    NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
     # StatLearn, ModelDef, Algorithm
     StatLearn, ModelDef, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,

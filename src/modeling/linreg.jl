@@ -99,7 +99,7 @@ function scaled_to_original!(β::VecF, o::LinReg)
 end
 function _penloglik(β::VecF, xtx::MatF, xty::VecF, λ::Float64, penalty::Penalty)
     # propto penalized likelihood
-    dot(β, xtx * β) - 2.0 * dot(β, xty) + λ * _j(penalty, β)
+    dot(β, xtx * β) - 2.0 * dot(β, xty) + _j(penalty, λ, β)
 end
 function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, λ::Float64, penalty::Penalty)
     # convergence criteria
