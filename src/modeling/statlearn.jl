@@ -6,11 +6,13 @@ end
 abstract GLMDef <: ModelDef
 deriv(o::GLMDef, y::Real, ŷ::Real) = ŷ - y  # derivative without x[j]
 
+
 immutable L2Regression <: GLMDef end
 Base.show(io::IO, o::L2Regression) = print(io, "L2Regression")
 function predict{T<:Real}(o::L2Regression, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
+
 
 immutable L1Regression <: GLMDef end
 Base.show(io::IO, o::L1Regression) = print(io, "L1Regression")
@@ -18,17 +20,20 @@ function predict{T<:Real}(o::L1Regression, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
 
+
 immutable LogisticRegression <: GLMDef end
 Base.show(io::IO, o::LogisticRegression) = print(io, "LogisticRegression")
 function predict{T<:Real}(o::LogisticRegression, x::AVec{T}, β0::Float64, β::VecF)
     1.0 / (1.0 + exp(-β0 - dot(x, β)))
 end
 
+
 immutable PoissonRegression <: GLMDef end
 Base.show(io::IO, o::PoissonRegression) = print(io, "PoissonRegression")
 function predict{T<:Real}(o::PoissonRegression, x::AVec{T}, β0::Float64, β::VecF)
     exp(β0 + dot(x, β))
 end
+
 
 immutable QuantileRegression <: ModelDef
     τ::Float64
@@ -43,12 +48,14 @@ function predict{T<:Real}(o::QuantileRegression, x::AVec{T}, β0::Float64, β::V
 end
 deriv(m::QuantileRegression, y::Real, ŷ::Real) = Float64(y < ŷ) - m.τ
 
+
 immutable SVMLike <: ModelDef end
 Base.show(io::IO, o::SVMLike) = print(io, "SVMLike")
 function predict{T<:Real}(o::SVMLike, x::AVec{T}, β0::Float64, β::VecF)
     β0 + dot(x, β)
 end
 deriv(m::SVMLike, y::Real, ŷ::Real) = y * ŷ < 1 ? -y : 0.0
+
 
 immutable HuberRegression <: ModelDef
     δ::Float64
@@ -62,7 +69,6 @@ function predict{T<:Real}(o::HuberRegression, x::AVec{T}, β0::Float64, β::VecF
     β0 + dot(x, β)
 end
 deriv(m::HuberRegression, y::Real, ŷ::Real) = abs(y - ŷ) <= m.δ ? ŷ - y : m.δ * sign(ŷ - y)
-
 
 
 
@@ -149,8 +155,10 @@ function fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S})
     _updatebatchβ!(o, γ, g, x, y, ŷ)
 end
 setβ0!(o::StatLearn, γ, g) = (o.β0 = subgrad(o.β0, γ, g))
-function loss(o::StatLearn, x::AMat, y::AVec)
 
+
+function loss{A<:Algorithm}(o::StatLearn{A, L1Regression}, x::AMat, y::AVec)
+    mean(y - predict(o, x))
 end
 
 
