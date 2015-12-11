@@ -1,40 +1,13 @@
 #---------------------------------------------------------------------# ModelDef
 abstract ModelDef
-function StatsBase.predict{T<:Real}(o::ModelDef, x::AMat{T}, β0::Float64, β::VecF)
-    [predict(o, row(x, i), β0, β) for i in 1:size(x, 1)]
-end
 abstract GLMDef <: ModelDef
-deriv(o::GLMDef, y::Real, ŷ::Real) = ŷ - y  # derivative without x[j]
+
 
 
 immutable L2Regression <: GLMDef end
-Base.show(io::IO, o::L2Regression) = print(io, "L2Regression")
-function predict{T<:Real}(o::L2Regression, x::AVec{T}, β0::Float64, β::VecF)
-    β0 + dot(x, β)
-end
-
-
 immutable L1Regression <: GLMDef end
-Base.show(io::IO, o::L1Regression) = print(io, "L1Regression")
-function predict{T<:Real}(o::L1Regression, x::AVec{T}, β0::Float64, β::VecF)
-    β0 + dot(x, β)
-end
-
-
 immutable LogisticRegression <: GLMDef end
-Base.show(io::IO, o::LogisticRegression) = print(io, "LogisticRegression")
-function predict{T<:Real}(o::LogisticRegression, x::AVec{T}, β0::Float64, β::VecF)
-    1.0 / (1.0 + exp(-β0 - dot(x, β)))
-end
-
-
 immutable PoissonRegression <: GLMDef end
-Base.show(io::IO, o::PoissonRegression) = print(io, "PoissonRegression")
-function predict{T<:Real}(o::PoissonRegression, x::AVec{T}, β0::Float64, β::VecF)
-    exp(β0 + dot(x, β))
-end
-
-
 immutable QuantileRegression <: ModelDef
     τ::Float64
     function QuantileRegression(τ::Real = .5)
@@ -42,21 +15,7 @@ immutable QuantileRegression <: ModelDef
         new(Float64(τ))
     end
 end
-Base.show(io::IO, o::QuantileRegression) = print(io, "QuantileRegression (τ = $(o.τ))")
-function predict{T<:Real}(o::QuantileRegression, x::AVec{T}, β0::Float64, β::VecF)
-    β0 + dot(x, β)
-end
-deriv(m::QuantileRegression, y::Real, ŷ::Real) = Float64(y < ŷ) - m.τ
-
-
 immutable SVMLike <: ModelDef end
-Base.show(io::IO, o::SVMLike) = print(io, "SVMLike")
-function predict{T<:Real}(o::SVMLike, x::AVec{T}, β0::Float64, β::VecF)
-    β0 + dot(x, β)
-end
-deriv(m::SVMLike, y::Real, ŷ::Real) = y * ŷ < 1 ? -y : 0.0
-
-
 immutable HuberRegression <: ModelDef
     δ::Float64
     function HuberRegression(δ::Real = 1.0)
@@ -64,10 +23,49 @@ immutable HuberRegression <: ModelDef
         new(Float64(δ))
     end
 end
-Base.show(io::IO, o::HuberRegression) = print(io, "HuberRegression (δ = $(o.δ))")
-function predict{T<:Real}(o::HuberRegression, x::AVec{T}, β0::Float64, β::VecF)
-    β0 + dot(x, β)
+
+Base.show(io::IO, o::L2Regression) =        print(io, "L2Regression")
+Base.show(io::IO, o::L1Regression) =        print(io, "L1Regression")
+Base.show(io::IO, o::LogisticRegression) =  print(io, "LogisticRegression")
+Base.show(io::IO, o::PoissonRegression) =   print(io, "PoissonRegression")
+Base.show(io::IO, o::QuantileRegression) =  print(io, "QuantileRegression (τ = $(o.τ))")
+Base.show(io::IO, o::SVMLike) =             print(io, "SVMLike")
+Base.show(io::IO, o::HuberRegression) =     print(io, "HuberRegression (δ = $(o.δ))")
+
+# x is Vector
+predict(o::L2Regression, x::AVec, β0, β) =        β0 + dot(x, β)
+predict(o::L1Regression, x::AVec, β0, β) =        β0 + dot(x, β)
+predict(o::LogisticRegression, x::AVec, β0, β) =  1.0 / (1.0 + exp(-β0 - dot(x, β)))
+predict(o::PoissonRegression, x::AVec, β0, β) =   exp(β0 + dot(x, β))
+predict(o::QuantileRegression, x::AVec, β0, β) =  β0 + dot(x, β)
+predict(o::SVMLike, x::AVec, β0, β) =             β0 + dot(x, β)
+predict(o::HuberRegression, x::AVec, β0, β) =     β0 + dot(x, β)
+function StatsBase.predict{T<:Real}(o::ModelDef, x::AMat{T}, β0::Float64, β::VecF)
+    [predict(o, row(x, i), β0, β) for i in 1:size(x, 1)]
 end
+
+
+# y and η are Vectors
+loss(::L2Regression, y, η) = mean(abs2(y - η))
+loss(::L1Regression, y, η) = mean(abs(y - η))
+loss(::LogisticRegression, y, η) = mean(-y .* η + log(1.0 + exp(η)))
+loss(::PoissonRegression, y, η) = mean(-y .* η + exp(η))
+loss(m::QuantileRegression, y, η) =
+    mean([(y[i] - η[i]) * (m.τ - Float64(y[i] < η[i])) for i in 1:length(y)])
+loss(m::SVMLike, y, η) =
+    mean([max(0.0, 1.0 - y[i] * η[i]) for i in 1:length(y)])
+function loss(m::HuberRegression, y, η)
+    mean([
+        abs(y[i]-η[i]) < m.δ ? 0.5 * (y[i]-η[i])^2 : m.δ * (abs(y[i]-η[i]) - 0.5 * m.δ)
+        for i in 1:length(y)
+        ])
+end
+
+
+
+deriv(o::GLMDef, y::Real, ŷ::Real) = ŷ - y  # Canonical link GLMs
+deriv(m::QuantileRegression, y::Real, ŷ::Real) = Float64(y < ŷ) - m.τ
+deriv(m::SVMLike, y::Real, ŷ::Real) = y * ŷ < 1 ? -y : 0.0
 deriv(m::HuberRegression, y::Real, ŷ::Real) = abs(y - ŷ) <= m.δ ? ŷ - y : m.δ * sign(ŷ - y)
 
 
@@ -157,9 +155,9 @@ end
 setβ0!(o::StatLearn, γ, g) = (o.β0 = subgrad(o.β0, γ, g))
 
 
-function loss{A<:Algorithm}(o::StatLearn{A, L1Regression}, x::AMat, y::AVec)
-    mean(y - predict(o, x))
-end
+loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, o.β0 + x * o.β)
+
+
 
 
 #==============================================================================#
