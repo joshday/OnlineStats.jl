@@ -2,8 +2,6 @@
 abstract ModelDef
 abstract GLMDef <: ModelDef
 
-
-
 immutable L2Regression <: GLMDef end
 immutable L1Regression <: GLMDef end
 immutable LogisticRegression <: GLMDef end
@@ -93,8 +91,8 @@ end
 type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat
     β0::Float64     # intercept
     β::VecF         # coefficients
-    denom0::Float64 # "sufficient statistic" for β0
-    denom::VecF     # "sufficient statistics" for β
+    suff0::Float64 # "sufficient statistic" for β0
+    suff::VecF     # "sufficient statistics" for β
     intercept::Bool # should β0 be estimated?
     algorithm::A    # determines how updates work
     model::M        # model definition
@@ -185,21 +183,21 @@ end
 # ignores Weight
 function _updateβ!(o::StatLearn{AdaGrad}, γ, g, x, y, ŷ)
     if o.intercept
-        o.denom0 += g * g
-        setβ0!(o, o.η / sqrt(o.denom0), g)
+        o.suff0 += g * g
+        setβ0!(o, o.η / sqrt(o.suff0), g)
     end
     for j in 1:length(o.β)
         gx = g * x[j]
-        o.denom[j] += gx * gx
-        γ = o.η / sqrt(o.denom[j])
+        o.suff[j] += gx * gx
+        γ = o.η / sqrt(o.suff[j])
         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{AdaGrad}, γ, g::AVec, x::AMat, y::AVec, ŷ::AVec)
     if o.intercept
         ḡ = mean(g)
-        o.denom0 += ḡ * ḡ
-        setβ0!(o, o.η / o.denom0, ḡ)
+        o.suff0 += ḡ * ḡ
+        setβ0!(o, o.η / o.suff0, ḡ)
     end
     n = length(g)
     for j in 1:length(o.β)
@@ -208,8 +206,8 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, γ, g::AVec, x::AMat, y::AVec, y
             gx += g[i] * x[i, j]
         end
         gx /= n
-        o.denom[j] += gx * gx
-        γ = o.η / sqrt(o.denom[j])
+        o.suff[j] += gx * gx
+        γ = o.η / sqrt(o.suff[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
     end
 end
@@ -218,37 +216,37 @@ end
 #--------------------------------------------------------------------------# RDA
 # ignores Weight
 # - A hack to fit RDA into the same scheme as everything else:
-# o.denom[1] is average gradient for intercept
-# o.denom[2j] is squared gradient for element j
-# o.denom[2j + 1] is average gradient for element j
+# o.suff[1] is average gradient for intercept
+# o.suff[2j] is squared gradient for element j
+# o.suff[2j + 1] is average gradient for element j
 function _updateβ!(o::StatLearn{RDA}, γ, g, x, y, ŷ)
     if o.nup == 1
-        o.denom = fill(o.denom0, length(x) * 2 + 1)
+        o.suff = fill(o.suff0, length(x) * 2 + 1)
     end
     w = 1 / o.nup
     if o.intercept
-        o.denom0 += g * g
-        o.denom[1] = smooth(o.denom[1], g, w)
-        o.β0 = - o.nup * o.η * o.denom[1] / sqrt(o.denom0)
+        o.suff0 += g * g
+        o.suff[1] = smooth(o.suff[1], g, w)
+        o.β0 = - o.nup * o.η * o.suff[1] / sqrt(o.suff0)
     end
     for j in 1:length(o.β)
         gx = g * x[j]
-        o.denom[2j] += gx * gx
-        o.denom[2j + 1] = smooth(o.denom[2j + 1], gx, w)
+        o.suff[2j] += gx * gx
+        o.suff[2j + 1] = smooth(o.suff[2j + 1], gx, w)
         rda_update!(o, j)
     end
 end
 function _updatebatchβ!(o::StatLearn{RDA}, γ, g, x, y, ŷ)
     if o.nup == 1
-        o.denom = fill(o.denom0, length(x) * 2 + 1)
+        o.suff = fill(o.suff0, length(x) * 2 + 1)
     end
     w = 1 / o.nup
     n = length(g)
     if o.intercept
         ḡ = mean(g)
-        o.denom0 += ḡ * ḡ
-        o.denom[1] = smooth(o.denom[1], ḡ, w)
-        o.β0 = - o.nup * o.η * o.denom[1] / sqrt(o.denom0)
+        o.suff0 += ḡ * ḡ
+        o.suff[1] = smooth(o.suff[1], ḡ, w)
+        o.β0 = - o.nup * o.η * o.suff[1] / sqrt(o.suff0)
     end
     for j in 1:length(o.β)
         gx = 0.0
@@ -256,69 +254,71 @@ function _updatebatchβ!(o::StatLearn{RDA}, γ, g, x, y, ŷ)
             gx = g[i] * x[i, j]
         end
         gx /= n
-        o.denom[2j] += gx * gx
-        o.denom[2j + 1] = smooth(o.denom[2j + 1], gx, w)
+        o.suff[2j] += gx * gx
+        o.suff[2j + 1] = smooth(o.suff[2j + 1], gx, w)
         rda_update!(o, j)
     end
 end
 
 # NoPenalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, NoPenalty}, j::Int)
-    o.β[j] = -rda_γ(o, j) * o.denom[2j + 1]
+    o.β[j] = -rda_γ(o, j) * o.suff[2j + 1]
 end
 # L2Penalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L2Penalty}, j::Int)
-    o.denom[2j + 1] += (1 / o.nup) * o.λ * o.β[j]  # add in penalty gradient
-    o.β[j] = -rda_γ(o,j) * o.denom[2j+1]
+    o.suff[2j + 1] += (1 / o.nup) * o.λ * o.β[j]  # add in penalty gradient
+    o.β[j] = -rda_γ(o,j) * o.suff[2j+1]
 end
 # L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L1Penalty}, j::Int)
-    ḡ = o.denom[2j + 1]
+    ḡ = o.suff[2j + 1]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.λ)
 end
 # ElasticNetPenalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, ElasticNetPenalty}, j::Int)
-    o.denom[2j + 1] += (1 / o.nup) * o.λ * (1 - o.penalty.α) * o.β[j]
-    ḡ = o.denom[2j + 1]
+    o.suff[2j + 1] += (1 / o.nup) * o.λ * (1 - o.penalty.α) * o.β[j]
+    ḡ = o.suff[2j + 1]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.λ * o.penalty.α)
 end
 # adaptive weight for element j
-rda_γ(o::StatLearn{RDA}, j::Int) = o.nup * o.η / sqrt(o.denom[2j])
+rda_γ(o::StatLearn{RDA}, j::Int) = o.nup * o.η / sqrt(o.suff[2j])
 
 
 #-----------------------------------------------------------------------# MMGrad
 _α(o::StatLearn, xj, x) = (abs(xj) + _ϵ) / (sumabs(x) + o.intercept + _ϵ)
-function mmdenom{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
     xj^2 / _α(o, xj, x)
 end
-function mmdenom{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ)
     xj^2 / (_α(o, xj, x) * abs(y - ŷ))
 end
-function mmdenom{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ)
     xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
 end
-function mmdenom{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ)
     xj^2 * ŷ / _α(o, xj, x)
 end
-function mmdenom{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ)
     xj^2 / (_α(o, xj, x) * abs(y - ŷ))
 end
 
 # TODO:
-function mmdenom{A<:Algorithm}(o::StatLearn{A, SVMLike}, xj, x, y, ŷ)
-    xj^2 / _α(o, xj, x)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, SVMLike}, xj, x, y, ŷ)
+    1.0
 end
-function mmdenom{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ)
-    xj^2 / _α(o, xj, x)
+function mmsuff{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ)
+    1.0
 end
+
+
 function _updateβ!(o::StatLearn{MMGrad}, γ, g, x, y, ŷ)
     if o.intercept
-        o.denom0 = smooth(o.denom0, mmdenom(o, 1.0, x, y, ŷ), γ)
-        setβ0!(o, γ, g / o.denom0)
+        o.suff0 = smooth(o.suff0, mmsuff(o, 1.0, x, y, ŷ), γ)
+        setβ0!(o, γ, g / o.suff0)
     end
     for j in 1:length(o.β)
-        o.denom[j] = smooth(o.denom[j], mmdenom(o, x[j], x, y, ŷ), γ)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.denom[j], γ)
+        o.suff[j] = smooth(o.suff[j], mmsuff(o, x[j], x, y, ŷ), γ)
+        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.suff[j], γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{MMGrad}, γ, g, x, y, ŷ)
@@ -326,21 +326,21 @@ function _updatebatchβ!(o::StatLearn{MMGrad}, γ, g, x, y, ŷ)
     if o.intercept
         v = 0.0
         for i in 1:n
-            v += mmdenom(o, 1.0, row(x, i), y[i], ŷ[i])
+            v += mmsuff(o, 1.0, row(x, i), y[i], ŷ[i])
         end
-        o.denom0 = smooth(o.denom0, v / n, γ)
-        setβ0!(o, γ, mean(g) / o.denom0)
+        o.suff0 = smooth(o.suff0, v / n, γ)
+        setβ0!(o, γ, mean(g) / o.suff0)
     end
     for j in 1:length(o.β)
         v = 0.0
         u = 0.0
         for i in 1:n
             xij = x[i, j]
-            v += mmdenom(o, xij, row(x, i), y[i], ŷ[i])
+            v += mmsuff(o, xij, row(x, i), y[i], ŷ[i])
             u += g[i] * xij
         end
-        o.denom[j] = smooth(o.denom[j], v / n, γ)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.denom[j], γ)
+        o.suff[j] = smooth(o.suff[j], v / n, γ)
+        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.suff[j], γ)
     end
 end
 
@@ -348,12 +348,12 @@ end
 #--------------------------------------------------------------------# AdaMMGrad
 function _updateβ!(o::StatLearn{AdaMMGrad}, γ, g, x, y, ŷ)
     if o.intercept
-        o.denom0 += mmdenom(o, 1.0, x, y, ŷ)
-        setβ0!(o, o.η / sqrt(o.denom0), g)
+        o.suff0 += mmsuff(o, 1.0, x, y, ŷ)
+        setβ0!(o, o.η / sqrt(o.suff0), g)
     end
     for j in 1:length(o.β)
-        o.denom[j] += mmdenom(o, x[j], x, y, ŷ)
-        γ = o.η / sqrt(o.denom[j])
+        o.suff[j] += mmsuff(o, x[j], x, y, ŷ)
+        γ = o.η / sqrt(o.suff[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - o.η * γ * g * x[j], γ)
     end
 end
@@ -362,48 +362,47 @@ function _updatebatchβ!(o::StatLearn{AdaMMGrad}, γ, g, x, y, ŷ)
     if o.intercept
         v = 0.0
         for i in 1:n
-            v += mmdenom(o, 1.0, row(x,i), y[i], ŷ[i])
+            v += mmsuff(o, 1.0, row(x,i), y[i], ŷ[i])
         end
-        o.denom0 += v / n
-        setβ0!(o, o.η / sqrt(o.denom0), mean(g))
+        o.suff0 += v / n
+        setβ0!(o, o.η / sqrt(o.suff0), mean(g))
     end
     for j in 1:length(o.β)
         v = 0.0
         u = 0.0
         for i in 1:n
             xij = x[i, j]
-            v += mmdenom(o, xij, row(x, i), y[i], ŷ[i])
+            v += mmsuff(o, xij, row(x, i), y[i], ŷ[i])
             u += g[i] * xij
         end
-        o.denom[j] += v / n
-        γ = o.η / sqrt(o.denom[j])
+        o.suff[j] += v / n
+        γ = o.η / sqrt(o.suff[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - o.η * γ * u / n, γ)
     end
 end
 
 
 #----------------------------------------------------------------------# MMGrad2
-# See Yiwen's dissertation
-# function mmdenom2{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
+# function mmsuff2{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
 #     xj^2 / _α(o, xj, x)
 # end
-# function mmdenom2{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ)
+# function mmsuff2{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ)
 #     xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
 # end
-# function mmdenom2{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ)
+# function mmsuff2{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ)
 #     xj^2 * ŷ / _α(o, xj, x)
 # end
-# function mmdenom2{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ)
+# function mmsuff2{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ)
 #     xj^2 / (_α(o, xj, x) * abs(y - ŷ))
 # end
 # function _updateβ!(o::StatLearn{MMGrad2}, γ, g, x, y, ŷ)
 #     if o.intercept
-#         o.denom0 = smooth(o.denom0, mmdenom2(o, 1.0, x, y, ŷ), γ)
-#         setβ0!(o, γ, g / o.denom0)
+#         o.suff0 = smooth(o.suff0, mmsuff2(o, 1.0, x, y, ŷ), γ)
+#         setβ0!(o, γ, g / o.suff0)
 #     end
 #     for j in 1:length(o.β)
-#         o.denom[j] = smooth(o.denom[j], mmdenom2(o, x[j], x, y, ŷ), γ)
-#         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.denom[j], γ)
+#         o.suff[j] = smooth(o.suff[j], mmsuff2(o, x[j], x, y, ŷ), γ)
+#         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.suff[j], γ)
 #     end
 # end
 # function _updatebatchβ!(o::StatLearn{MMGrad2}, γ, g, x, y, ŷ)
@@ -411,20 +410,20 @@ end
 #     if o.intercept
 #         v = 0.0
 #         for i in 1:n
-#             v += mmdenom2(o, 1.0, row(x, i), y[i], ŷ[i])
+#             v += mmsuff2(o, 1.0, row(x, i), y[i], ŷ[i])
 #         end
-#         o.denom0 = smooth(o.denom0, v / n, γ)
-#         setβ0!(o, γ, mean(g) / o.denom0)
+#         o.suff0 = smooth(o.suff0, v / n, γ)
+#         setβ0!(o, γ, mean(g) / o.suff0)
 #     end
 #     for j in 1:length(o.β)
 #         v = 0.0
 #         u = 0.0
 #         for i in 1:n
 #             xij = x[i, j]
-#             v += mmdenom2(o, xij, row(x, i), y[i], ŷ[i])
+#             v += mmsuff2(o, xij, row(x, i), y[i], ŷ[i])
 #             u += g[i] * xij
 #         end
-#         o.denom[j] = smooth(o.denom[j], v / n, γ)
-#         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.denom[j], γ)
+#         o.suff[j] = smooth(o.suff[j], v / n, γ)
+#         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.suff[j], γ)
 #     end
 # end

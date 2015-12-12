@@ -19,10 +19,12 @@ Mean(wgt::Weight = EqualWeight()) = Mean(0.0, wgt, 0, 0)
 function fit!(o::Mean, y::Real)
     γ = weight!(o, 1)
     o.value = smooth(o.value, y, γ)
+    return
 end
 function fitbatch!{T <: Real}(o::Mean, y::AVec{T})
     γ = weight!(o, length(y))
     o.value = smooth(o.value, mean(y), γ)
+    return
 end
 Base.mean(o::Mean) = value(o)
 
@@ -38,10 +40,12 @@ Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt, 0, 0)
 function fit!{T <: Real}(o::Means, y::AVec{T})
     γ = weight!(o, 1)
     smooth!(o.value, y, γ)
+    return
 end
 function fitbatch!{T <: Real}(o::Means, y::AMat{T})
     γ = weight!(o, size(y, 1))
     smooth!(o.value, row(mean(y, 1), 1), γ)
+    return
 end
 Base.mean(o::Means) = value(o)
 
@@ -60,6 +64,7 @@ function fit!(o::Variance, y::Real)
     μ = o.μ
     o.μ = smooth(o.μ, y, γ)
     o.value = smooth(o.value, (y - o.μ) * (y - μ), γ)
+    return
 end
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
