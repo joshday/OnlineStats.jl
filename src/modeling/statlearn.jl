@@ -73,11 +73,34 @@ deriv(m::HuberRegression, y::Real, ŷ::Real) = abs(y - ŷ) <= m.δ ? ŷ - y :
 abstract Algorithm
 
 
-immutable SGD           <: Algorithm end
-immutable AdaGrad       <: Algorithm end
-immutable RDA           <: Algorithm end
-immutable MMGrad        <: Algorithm end
-immutable AdaMMGrad     <: Algorithm end
+immutable SGD <: Algorithm end
+SGD(p::Integer) = SGD()
+type AdaGrad <: Algorithm
+    g0::Float64
+    g::VecF
+    AdaGrad() = new()
+    AdaGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
+type RDA <: Algorithm
+    g0::Float64
+    g::VecF
+    gbar0::Float64
+    gbar::VecF
+    RDA() = new()
+    RDA(p::Integer) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p))
+end
+type MMGrad <: Algorithm
+    g0::Float64
+    g::VecF
+    MMGrad() = new()
+    MMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
+type AdaMMGrad <: Algorithm
+    g0::Float64
+    g::VecF
+    AdaMMGrad() = new()
+    AdaMMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
 
 for alg in [:SGD, :AdaGrad, :RDA, :MMGrad, :AdaMMGrad]
     eval(parse("""Base.show(io::IO, o::$alg) = print(io, "$alg")"""))
@@ -97,12 +120,6 @@ type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat
     weight::W       # Weight, may not get used, depending on algorithm
     n::Int          # nobs
     nup::Int        # n updates
-
-    # optional, depends on algorithm
-    g0::Float64     # sum of squared gradient for β0
-    g::VecF         # sum of squared gradient for β
-    gbar0::Float64  # avg gradient for β0
-    gbar::VecF      # avg gradient for β
 end
 function StatLearn(p::Integer, wgt::Weight = LearningRate();
         model::ModelDef = L2Regression(),
@@ -114,10 +131,9 @@ function StatLearn(p::Integer, wgt::Weight = LearningRate();
     )
     o = StatLearn(
         0.0, zeros(p), intercept, algorithm, model,
-        Float64(η), Float64(λ), penalty, wgt, 0, 0,
-        0., zeros(0), 0., zeros(0) # optional, depends on algorithm
+        Float64(η), Float64(λ), penalty, wgt, 0, 0
     )
-    _init!(o)  # add sufficient statistics per the algorithm
+    o.algorithm = typeof(o.algorithm)(p)
     o
 end
 function StatLearn(x::AMat, y::AVec, wgt::Weight = LearningRate(); kw...)
@@ -163,7 +179,6 @@ loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, o.β0 + x * o.β)
 #                                                           Updates by Algorithm
 #==============================================================================#
 #--------------------------------------------------------------------------# SGD
-_init!(o::StatLearn{SGD}) = nothing
 function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ)
     γ = weight!(o, 1)
     γ *= o.η
@@ -192,17 +207,16 @@ end
 
 
 #----------------------------------------------------------------------# AdaGrad
-_init!(o::StatLearn{AdaGrad}) = (o.g0 = _ϵ; o.g = fill(_ϵ, length(o.β)))
 function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     if o.intercept
-        o.g0 += g * g
-        setβ0!(o, o.η / sqrt(o.g0), g)
+        o.algorithm.g0 += g * g
+        setβ0!(o, o.η / sqrt(o.algorithm.g0), g)
     end
     for j in 1:length(o.β)
         gx = g * x[j]
-        o.g[j] += gx * gx
-        γ = o.η / sqrt(o.g[j])
+        o.algorithm.g[j] += gx * gx
+        γ = o.η / sqrt(o.algorithm.g[j])
         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
     end
 end
@@ -210,8 +224,8 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
     n_and_nup!(o, length(y))
     if o.intercept
         ḡ = mean(g)
-        o.g0 += ḡ * ḡ
-        setβ0!(o, o.η / sqrt(o.g0), ḡ)
+        o.algorithm.g0 += ḡ * ḡ
+        setβ0!(o, o.η / sqrt(o.algorithm.g0), ḡ)
     end
     n = length(g)
     @inbounds for j in 1:length(o.β)
@@ -220,32 +234,26 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
             gx += g[i] * x[i, j]
         end
         gx /= n
-        o.g[j] += gx * gx
-        γ = o.η / sqrt(o.g[j])
+        o.algorithm.g[j] += gx * gx
+        γ = o.η / sqrt(o.algorithm.g[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
     end
 end
 
 
 #--------------------------------------------------------------------------# RDA
-function _init!(o::StatLearn{RDA})
-    o.g0 = _ϵ
-    o.g = fill(_ϵ, length(o.β))
-    o.gbar0 = _ϵ
-    o.gbar = fill(_ϵ, length(o.β))
-end
 function _updateβ!(o::StatLearn{RDA}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     w = 1 / o.nup
     if o.intercept
-        o.g0 += g * g
-        o.gbar0 = smooth(o.gbar0, g, w)
-        o.β0 = -o.nup * o.η * o.gbar0 / sqrt(o.g0)
+        o.algorithm.g0 += g * g
+        o.algorithm.gbar0 = smooth(o.algorithm.gbar0, g, w)
+        o.β0 = -o.nup * o.η * o.algorithm.gbar0 / sqrt(o.algorithm.g0)
     end
     for j in 1:length(o.β)
         gx = g * x[j]
-        o.g[j] += gx * gx
-        o.gbar[j] = smooth(o.gbar[j], gx, w)
+        o.algorithm.g[j] += gx * gx
+        o.algorithm.gbar[j] = smooth(o.algorithm.gbar[j], gx, w)
         rda_update!(o, j)
     end
 end
@@ -255,9 +263,9 @@ function _updatebatchβ!(o::StatLearn{RDA}, g, x, y, ŷ)
     w = 1 / o.nup
     if o.intercept
         ḡ = mean(g)
-        o.g0 += ḡ * ḡ
-        o.gbar0 = smooth(o.gbar0, ḡ, w)
-        o.β0 = -o.nup * o.η * o.gbar0 / sqrt(o.g0)
+        o.algorithm.g0 += ḡ * ḡ
+        o.algorithm.gbar0 = smooth(o.algorithm.gbar0, ḡ, w)
+        o.β0 = -o.nup * o.η * o.algorithm.gbar0 / sqrt(o.algorithm.g0)
     end
     for j in 1:length(o.β)
         gx = 0.0
@@ -265,41 +273,37 @@ function _updatebatchβ!(o::StatLearn{RDA}, g, x, y, ŷ)
             gx = g[i] * x[i, j]
         end
         gx /= n
-        o.g[j] += gx * gx
-        o.gbar[j] = smooth(o.gbar[j], gx, w)
+        o.algorithm.g[j] += gx * gx
+        o.algorithm.gbar[j] = smooth(o.algorithm.gbar[j], gx, w)
         rda_update!(o, j)
     end
 end
 
 # NoPenalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, NoPenalty}, j::Int)
-    o.β[j] = -rda_γ(o, j) * o.gbar[j]
+    o.β[j] = -rda_γ(o, j) * o.algorithm.gbar[j]
 end
 # L2Penalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L2Penalty}, j::Int)
-    o.gbar[j] += (1 / o.nup) * o.λ * o.β[j]  # add in penalty gradient
-    o.β[j] = -rda_γ(o,j) * o.gbar[j]
+    o.algorithm.gbar[j] += (1 / o.nup) * o.λ * o.β[j]  # add in penalty gradient
+    o.β[j] = -rda_γ(o,j) * o.algorithm.gbar[j]
 end
 # L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L1Penalty}, j::Int)
-    ḡ = o.gbar[j]
+    ḡ = o.algorithm.gbar[j]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.λ)
 end
 # ElasticNetPenalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, ElasticNetPenalty}, j::Int)
-    o.gbar[j] += (1 / o.nup) * o.λ * (1 - o.penalty.α) * o.β[j]
-    ḡ = o.gbar[j]
+    o.algorithm.gbar[j] += (1 / o.nup) * o.λ * (1 - o.penalty.α) * o.β[j]
+    ḡ = o.algorithm.gbar[j]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.λ * o.penalty.α)
 end
 # adaptive weight for element j
-rda_γ(o::StatLearn{RDA}, j::Int) = o.nup * o.η / sqrt(o.g[j])
+rda_γ(o::StatLearn{RDA}, j::Int) = o.nup * o.η / sqrt(o.algorithm.g[j])
 
 
 #-----------------------------------------------------------------------# MMGrad
-function _init!(o::StatLearn{MMGrad})
-    o.g0 = _ϵ
-    o.g = fill(_ϵ, length(o.β))
-end
 _α(o::StatLearn, xj, x) = (abs(xj) + _ϵ) / (sumabs(x) + o.intercept + _ϵ)
 function mmsuff{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
     xj^2 / _α(o, xj, x)
@@ -329,12 +333,12 @@ end
 function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
     γ = weight!(o, 1)
     if o.intercept
-        o.g0 = smooth(o.g0, mmsuff(o, 1.0, x, y, ŷ), γ)
-        setβ0!(o, γ, g / o.g0)
+        o.algorithm.g0 = smooth(o.algorithm.g0, mmsuff(o, 1.0, x, y, ŷ), γ)
+        setβ0!(o, γ, g / o.algorithm.g0)
     end
     for j in 1:length(o.β)
-        o.g[j] = smooth(o.g[j], mmsuff(o, x[j], x, y, ŷ), γ)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.g[j], γ)
+        o.algorithm.g[j] = smooth(o.algorithm.g[j], mmsuff(o, x[j], x, y, ŷ), γ)
+        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.algorithm.g[j], γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
@@ -345,8 +349,8 @@ function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
         for i in 1:n
             v += mmsuff(o, 1.0, row(x, i), y[i], ŷ[i])
         end
-        o.g0 = smooth(o.g0, v / n, γ)
-        setβ0!(o, γ, mean(g) / o.g0)
+        o.algorithm.g0 = smooth(o.algorithm.g0, v / n, γ)
+        setβ0!(o, γ, mean(g) / o.algorithm.g0)
     end
     for j in 1:length(o.β)
         v = 0.0
@@ -356,26 +360,22 @@ function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
             v += mmsuff(o, xij, row(x, i), y[i], ŷ[i])
             u += g[i] * xij
         end
-        o.g[j] = smooth(o.g[j], v / n, γ)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.g[j], γ)
+        o.algorithm.g[j] = smooth(o.algorithm.g[j], v / n, γ)
+        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.algorithm.g[j], γ)
     end
 end
 
 
 #--------------------------------------------------------------------# AdaMMGrad
-function _init!(o::StatLearn{AdaMMGrad})
-    o.g0 = _ϵ
-    o.g = fill(_ϵ, length(o.β))
-end
 function _updateβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     if o.intercept
-        o.g0 += mmsuff(o, 1.0, x, y, ŷ)
-        setβ0!(o, o.η / sqrt(o.g0), g)
+        o.algorithm.g0 += mmsuff(o, 1.0, x, y, ŷ)
+        setβ0!(o, o.η / sqrt(o.algorithm.g0), g)
     end
     for j in 1:length(o.β)
-        o.g[j] += mmsuff(o, x[j], x, y, ŷ)
-        γ = o.η / sqrt(o.g[j])
+        o.algorithm.g[j] += mmsuff(o, x[j], x, y, ŷ)
+        γ = o.η / sqrt(o.algorithm.g[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - o.η * γ * g * x[j], γ)
     end
 end
@@ -387,8 +387,8 @@ function _updatebatchβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
         for i in 1:n
             v += mmsuff(o, 1.0, row(x,i), y[i], ŷ[i])
         end
-        o.g0 += v / n
-        setβ0!(o, o.η / sqrt(o.g0), mean(g))
+        o.algorithm.g0 += v / n
+        setβ0!(o, o.η / sqrt(o.algorithm.g0), mean(g))
     end
     for j in 1:length(o.β)
         v = 0.0
@@ -398,8 +398,8 @@ function _updatebatchβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
             v += mmsuff(o, xij, row(x, i), y[i], ŷ[i])
             u += g[i] * xij
         end
-        o.g[j] += v / n
-        γ = o.η / sqrt(o.g[j])
+        o.algorithm.g[j] += v / n
+        γ = o.η / sqrt(o.algorithm.g[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - o.η * γ * u / n, γ)
     end
 end

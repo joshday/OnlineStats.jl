@@ -146,7 +146,8 @@ row(x::AVec, i::Integer) = x[i]
 rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
 
-const _ϵ = 1e-8
+const _ϵ = 1e-8  # global ϵ to avoid dividing by 0, etc.
+
 # row(x::AMat, i::Integer) = slice(x, i, :)
 # row(x::AVec, i::Integer) = x[i]
 # rows(x::AVec, rs::AVec{Int}) = slice(x, rs)
