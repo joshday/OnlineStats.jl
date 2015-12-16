@@ -141,11 +141,12 @@ function smooth!{T<:Real}(m::VecF, v::AVec{T}, γ::Float64)
 end
 subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
 
-row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+@inline row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
 row(x::AVec, i::Integer) = x[i]
 rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
-const _ϵ = 1e-10
+
+const _ϵ = 1e-8
 # row(x::AMat, i::Integer) = slice(x, i, :)
 # row(x::AVec, i::Integer) = x[i]
 # rows(x::AVec, rs::AVec{Int}) = slice(x, rs)

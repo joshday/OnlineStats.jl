@@ -47,28 +47,24 @@ function fit!(tr::TracePlot, args...)
     push!(tr.p, nobs(tr.o), collect(tr.f(tr.o)))
 end
 
+Plots.plot(tr::TracePlot) = tr.p
 
 #-------------------------------------------------------------# CompareTracePlot
 """
 Compare the values of multiple OnlineStats.
 """
 type CompareTracePlot
-    os::Vector{OnlineStats.OnlineStat}
+    os::Vector
     p::Plots.Plot
     f::Function  # Use a function that returns a scalar
 end
 
-function CompareTracePlot{T<:OnlineStats.OnlineStat}(os::Vector{T}, f::Function; kw...)
+function CompareTracePlot(os::Vector, f::Function; kw...)
     p = Plots.plot(
         Float64[nobs(oi) for oi in os]',   # x
         Float64[f(oi) for oi in os]';      # y
         ylabel = "value of function $f", xlabel = "nobs", kw...
     )
-    #
-    # for i in 2:length(os)
-    #     Plots.plot!(p, [nobs(os[i])], [f(os[i])])
-    # end
-    # Plots.plot!(p, legend=true, xlabel = "nobs", ylabel = "value of function $f")
     CompareTracePlot(os, p, f)
 end
 
@@ -80,3 +76,5 @@ function fit!(c::CompareTracePlot, args...)
         push!(c.p, i, nobs(c.os[i]), c.f(c.os[i]))
     end
 end
+
+Plots.Plot(c::CompareTracePlot) = c.p

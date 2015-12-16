@@ -4,7 +4,7 @@ immutable NoPenalty <: Penalty end
 Base.show(io::IO, p::NoPenalty) = print(io, "NoPenalty")
 add_deriv(p::NoPenalty, g, λ, βj) = g
 _j(p::NoPenalty, λ, β) = 0.0
-prox(p::NoPenalty, λ::Float64, βj::Float64, s::Float64) = βj
+@inline prox(p::NoPenalty, λ::Float64, βj::Float64, s::Float64) = βj
 
 #--------------------------------------------------------------------# L2Penalty
 immutable L2Penalty <: Penalty end
@@ -18,7 +18,7 @@ immutable L1Penalty <: Penalty end
 Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty")
 add_deriv(p::L1Penalty, g, λ, βj) = g + λ * sign(βj)
 _j(p::L1Penalty, λ, β) = λ * sumabs(β)
-function prox(p::L1Penalty, λ::Float64, βj::Float64, s::Float64)
+@inline function prox(p::L1Penalty, λ::Float64, βj::Float64, s::Float64)
     sign(βj) * max(abs(βj) - s * λ, 0.0)
 end
 
@@ -30,7 +30,7 @@ end
 Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty (α = $(p.α))")
 add_deriv(p::ElasticNetPenalty, g, λ, βj) = g + λ * (p.α * sign(βj) + (1.0 - p.α) * βj)
 _j(p::ElasticNetPenalty, λ, β) = λ * (p.α * sumabs(β) + (1. - p.α) * 0.5 * sumabs2(β))
-function prox(p::ElasticNetPenalty, λ::Float64, βj::Float64, s::Float64)
+@inline function prox(p::ElasticNetPenalty, λ::Float64, βj::Float64, s::Float64)
     βj = sign(βj) * max(abs(βj) - s * λ * p.α, 0.0)  # Lasso prox
     βj = βj / (1.0 + s * λ * (1.0 - p.α))            # Ridge prox
 end
@@ -69,7 +69,7 @@ function _j(p::SCADPenalty, λ, β)
     end
     return val
 end
-function prox(p::SCADPenalty, λ, βj::Float64, s::Float64)
+@inline function prox(p::SCADPenalty, λ, βj::Float64, s::Float64)
     if abs(βj) > p.a * λ
     elseif abs(βj) < 2.0 * λ
         βj = sign(βj) * max(abs(βj) - s * λ, 0.0)

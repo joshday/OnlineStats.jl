@@ -139,7 +139,7 @@ value(o::FitDistribution{Ds.Normal}) = (o.value = Ds.Normal(mean(o.var), std(o.v
 #------------------------------------------------------------# FitMvDistribution
 type FitMvDistribution{D <: Ds.Distribution{Ds.Multivariate}, W <: Weight} <: OnlineStat
     value::D
-    suff::CovMatrix
+    suff::CovMatrix{W}
     weight::W
     n::Int
     nup::Int
@@ -147,7 +147,7 @@ end
 function FitMvDistribution{D<:Ds.Distribution{Ds.Multivariate}}(
         d::Type{D}, p::Integer, wgt::Weight = EqualWeight()
     )
-    FitMvDistribution(_default(d, p), CovMatrix(p), wgt, 0, 0)
+    FitMvDistribution(_default(d, p), CovMatrix(p, wgt), wgt, 0, 0)
 end
 function FitMvDistribution{D<:Ds.Distribution{Ds.Multivariate}, T<:Real}(
         d::Type{D}, y::AMat{T}, wgt::Weight = EqualWeight()
