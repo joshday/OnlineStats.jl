@@ -101,7 +101,6 @@ type AdaMMGrad <: Algorithm
     AdaMMGrad() = new()
     AdaMMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
 end
-
 for alg in [:SGD, :AdaGrad, :RDA, :MMGrad, :AdaMMGrad]
     eval(parse("""Base.show(io::IO, o::$alg) = print(io, "$alg")"""))
 end

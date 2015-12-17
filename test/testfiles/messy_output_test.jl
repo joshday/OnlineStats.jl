@@ -38,6 +38,8 @@ facts(@title "Show Methods") do
     display(HuberRegression(2))
     display(SVMLike())
     display(StatLearn(10))
+
+    display(QuantReg(5))
 end
 
 end#module

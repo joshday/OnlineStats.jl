@@ -1,0 +1,56 @@
+"Online MM Algorithm for Quantile Regression."
+type QuantReg{W <: Weight} <: OnlineStat
+    β::VecF
+    τ::Float64
+    XWX::MatF
+    Xu::VecF
+    A::MatF  # memory placeholder
+    weight::W
+    n::Int
+    nup::Int
+end
+function QuantReg(p::Integer, τ::Real = 0.5, wgt::Weight = LearningRate())
+    QuantReg(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt, 0, 0)
+end
+function QuantReg(x::AMat, y::AVec, τ::Real = 0.5, wgt::Weight = LearningRate())
+    o = QuantReg(size(x, 2), τ, wgt)
+    fit!(o, x, y)
+    o
+end
+value(o::QuantReg) = coef(o)
+coef(o::QuantReg) = o.β
+function Base.show(io::IO, o::QuantReg)
+    printheader(io, "QuantReg")
+    print_item(io, "value", value(o))
+    print_item(io, "τ", o.τ)
+    print_item(io, "nobs", nobs(o))
+end
+function fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real)
+    γ = weight!(o, 1)
+    w = _ϵ + abs(y - dot(x, o.β))
+    u = y / w + 2.0 * o.τ - 1.0
+    for j in 1:length(o.β)
+        @inbounds o.Xu[j] = smooth(o.Xu[j], x[j] * u, γ)
+    end
+    γ2 = γ / w
+    for j in 1:size(o.XWX, 2), i in 1:j
+        @inbounds o.XWX[i, j] = (1.0 - γ) * o.XWX[i, j] + γ2 * x[i] * x[j]
+    end
+    o.β = copy(o.Xu)
+    copy!(o.A, o.XWX)
+    LAPACK.sysv!('U', o.A, o.β)
+end
+function fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec)
+    n, p = size(x)
+    γ = weight!(o, n)
+
+    w = 1 ./ (_ϵ + abs(y - x * o.β))
+    u = y .* w + 2.0 * o.τ - 1.0
+    wx = scale!(w, copy(x))
+    smooth!(o.XWX, x' * wx, γ)
+    smooth!(o.Xu, x' * u, γ)
+
+    o.β = copy(o.Xu)
+    copy!(o.A, o.XWX)
+    LAPACK.sysv!('U', o.A, o.β)
+end

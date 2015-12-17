@@ -14,7 +14,7 @@ export
     EqualWeight, ExponentialWeight, LearningRate,
     # Summary
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    CovMatrix, LinReg,
+    CovMatrix, LinReg, QuantReg,
     # Distributions
     FitDistribution, FitMvDistribution,
     # Penalties
@@ -84,6 +84,7 @@ function print_value_and_nobs(io::IO, o::OnlineStat)
     print_item(io, "nobs", nobs(o))
 end
 
+Base.show(io::IO, o::OnlineStat) = print_value_and_nobs(io, o)
 
 #-------------------------------------------------------------------------# fit!
 function fit!(o::OnlineStat, y::Union{AVec, AMat})
@@ -140,8 +141,29 @@ function smooth!{T<:Real}(m::VecF, v::AVec{T}, γ::Float64)
     end
 end
 subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
+function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
+    n, p = size(avg)
+    @assert size(avg) == size(v)
+    for j in 1:p, i in 1:n
+        @inbounds avg[i,j] = smooth(avg[i, j], v[i, j], λ)
+    end
+end
 
-@inline row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+"""
+Rank 1 update of symmetric matrix:
+ (1 - γ) * A + γ * x * x'
+
+ Only upper triangle is updated
+"""
+function rank1_smooth!(A::AMat, x::AVec, γ::Real)
+    @assert size(A, 1) == size(A, 2)
+    for j in 1:size(A, 2), i in 1:j
+        @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
+    end
+end
+
+
+row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
 row(x::AVec, i::Integer) = x[i]
 rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
@@ -161,6 +183,7 @@ include("modeling/sweep.jl")
 include("modeling/penalty.jl")
 include("modeling/statlearn.jl")
 include("modeling/linreg.jl")
+include("modeling/quantreg.jl")
 
 end # module
 

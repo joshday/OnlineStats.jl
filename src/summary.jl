@@ -120,9 +120,7 @@ function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
 end
 function fit!{T<:Real}(o::CovMatrix, x::AVec{T})
     γ = weight!(o, 1)
-    for j in 1:size(o.A, 2), i in 1:j
-        @inbounds o.A[i, j] = (1 - γ) * o.A[i, j] + γ * x[i] * x[j]
-    end
+    rank1_smooth!(o.A, x, γ)
     smooth!(o.B, x, γ)
 end
 function fitbatch!{T<:Real}(o::CovMatrix, x::AMat{T})
