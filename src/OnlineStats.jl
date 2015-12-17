@@ -23,6 +23,9 @@ export
     StatLearn, ModelDef, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
     SGD, AdaGrad, RDA, MMGrad, AdaMMGrad,
+    # streamstats
+    BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
+    replicates, 
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
     vcov, stderr, loss
@@ -84,6 +87,7 @@ function print_value_and_nobs(io::IO, o::OnlineStat)
     print_item(io, "nobs", nobs(o))
 end
 
+# fallback show
 Base.show(io::IO, o::OnlineStat) = print_value_and_nobs(io, o)
 
 #-------------------------------------------------------------------------# fit!
@@ -167,16 +171,12 @@ row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
 row(x::AVec, i::Integer) = x[i]
 rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
-
+Base.copy(o::OnlineStat) = deepcopy(o)
 const _ϵ = 1e-8  # global ϵ to avoid dividing by 0, etc.
 
-# row(x::AMat, i::Integer) = slice(x, i, :)
-# row(x::AVec, i::Integer) = x[i]
-# rows(x::AVec, rs::AVec{Int}) = slice(x, rs)
-# rows(x::AMat, rs::AVec{Int}) = slice(x, rs, :)
 
 
-# source files
+#-----------------------------------------------------------------# source files
 include("summary.jl")
 include("distributions.jl")
 include("modeling/sweep.jl")
@@ -184,6 +184,7 @@ include("modeling/penalty.jl")
 include("modeling/statlearn.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
+include("streamstats/bootstrap.jl")
 
 end # module
 
