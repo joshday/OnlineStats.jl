@@ -79,7 +79,7 @@ _unbias(o::OnlineStat) = o.n / (o.n - 1)
 #---------------------------------------------------------------------# printing
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")
 function print_item(io::IO, name::AbstractString, value)
-    println(io, " • " * @sprintf("%10s", name * ": "), value)
+    println(io, "  ▶" * @sprintf("%12s", name * ": "), value)
 end
 function print_value_and_nobs(io::IO, o::OnlineStat)
     print_item(io, "value", value(o))

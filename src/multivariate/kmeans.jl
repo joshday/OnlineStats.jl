@@ -1,13 +1,12 @@
 type KMeans{W<:Weight} <: OnlineStat
     value::MatF
     v::VecF
-    nk::Vector{Int}
     weight::W
     n::Int
     nup::Int
 end
 function KMeans(d::Integer, k::Integer, wgt::Weight = LearningRate())
-    KMeans(randn(d, k), zeros(k), zeros(Int, k), wgt, 0, 0)
+    KMeans(randn(d, k), zeros(k), wgt, 0, 0)
 end
 function KMeans{T<:Real}(x::AMat{T}, k::Integer, wgt::Weight = LearningRate())
     o = KMeans(size(x, 2), k, wgt)
@@ -19,6 +18,13 @@ function KMeans{T<:Real}(x::AMat{T}, k::Integer, b::Integer, wgt::Weight = Learn
     fit!(o, x, b)
     o
 end
+function Base.show(io::IO, o::KMeans)
+    printheader(io, "KMeans")
+    print_item(io, "value", value(o))
+    print_item(io, "K", length(o.v))
+    print_item(io, "nobs", nobs(o))
+end
+
 function fit!{T<:Real}(o::KMeans, x::AVec{T})
     γ = weight!(o, 1)
     d, k = size(o.value)
@@ -27,7 +33,6 @@ function fit!{T<:Real}(o::KMeans, x::AVec{T})
         o.v[j] = sumabs2(x - col(o.value, j))
     end
     kstar = indmin(o.v)
-    o.nk[kstar] += 1
     for i in 1:d
         o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
     end
@@ -41,7 +46,6 @@ function fitbatch!{T<:Real}(o::KMeans, x::AMat{T})
         o.v[j] = sumabs2(x̄ - col(o.value, j))
     end
     kstar = indmin(o.v)
-    o.nk[kstar] += 1
     for i in 1:d
         o.value[i, kstar] = smooth(o.value[i, kstar], x̄[i], γ)
     end

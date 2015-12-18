@@ -40,6 +40,7 @@ facts(@title "Show Methods") do
     display(StatLearn(10))
 
     display(QuantReg(5))
+    display(KMeans(5, 4))
 end
 
 end#module
