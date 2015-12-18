@@ -25,7 +25,7 @@ facts(@title "Bootstrap") do
     context(@subtitle "PoissonBootstrap") do
         o = Mean()
         o = PoissonBootstrap(o, mean, 1000)
-        fit!(o, rand(10000))
+        fit!(o, rand(1000))
         cached_state(o)
         mean(o)
         std(o)
@@ -40,8 +40,8 @@ facts(@title "Bootstrap") do
 
         o2 = Mean()
         o2 = BernoulliBootstrap(o2, mean, 1000)
-        fit!(o, randn(1000))
-        fit!(o2, randn(1000) + 3)
+        fit!(o, randn(100))
+        fit!(o2, randn(100) + 3)
 
         d = o - o2
         mean(d)

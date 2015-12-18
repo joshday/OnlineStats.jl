@@ -14,18 +14,17 @@ export
     EqualWeight, ExponentialWeight, LearningRate,
     # Summary
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    CovMatrix, LinReg, QuantReg,
-    # Distributions
+    CovMatrix, LinReg, QuantReg, StatLearn, KMeans,
     FitDistribution, FitMvDistribution,
     # Penalties
     NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
-    # StatLearn, ModelDef, Algorithm
-    StatLearn, ModelDef, L2Regression, L1Regression, LogisticRegression,
+    # ModelDef and Algorithm
+    ModelDef, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
     SGD, AdaGrad, RDA, MMGrad, AdaMMGrad,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
-    replicates, 
+    replicates,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
     vcov, stderr, loss
@@ -171,7 +170,12 @@ row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
 row(x::AVec, i::Integer) = x[i]
 rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+
+col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
+
+
 Base.copy(o::OnlineStat) = deepcopy(o)
+
 const _ϵ = 1e-8  # global ϵ to avoid dividing by 0, etc.
 
 
@@ -185,6 +189,7 @@ include("modeling/statlearn.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
 include("streamstats/bootstrap.jl")
+include("multivariate/kmeans.jl")
 
 end # module
 
