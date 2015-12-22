@@ -35,13 +35,13 @@ value(o::StatLearnSparse) = value(o.o)
 coef(o::StatLearnSparse) = coef(o.o)
 function fit!(o::StatLearnSparse, x::AVec, y::Real)
     fit!(o.o, x, y)
-    fit!(o.o, o.s)
+    make_sparse!(o.o, o.s)
 end
 function fitbatch!(o::StatLearnSparse, x::AMat, y::AVec)
     fitbatch!(o.o, x, y)
-    fit!(o.o, o.s)
+    make_sparse!(o.o, o.s)
 end
-function fit!(o::StatLearn, s::HardThreshold)
+function make_sparse!(o::StatLearn, s::HardThreshold)
     if nobs(o) > s.burnin
         for j in 1:length(o.β)
             if abs(o.β[j]) < s.ϵ
