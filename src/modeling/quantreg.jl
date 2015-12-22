@@ -38,7 +38,10 @@ function fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real)
     end
     o.β = copy(o.Xu)
     copy!(o.A, o.XWX)
-    LAPACK.sysv!('U', o.A, o.β)
+
+    try LAPACK.sysv!('U', o.A, o.β)
+    catch warn("System is singular.  β not updated.")
+    end
 end
 function fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec)
     n, p = size(x)
@@ -52,5 +55,8 @@ function fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec)
 
     o.β = copy(o.Xu)
     copy!(o.A, o.XWX)
-    LAPACK.sysv!('U', o.A, o.β)
+    
+    try LAPACK.sysv!('U', o.A, o.β)
+    catch warn("System is singular.  β not updated.")
+    end
 end

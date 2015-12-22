@@ -86,9 +86,27 @@ facts(@title "Modeling") do
 
         o = QuantReg(x, y)
         fit!(o, x, y, 10)
-        
+
         @fact coef(o) --> value(o)
         @fact value(o) --> o.β
+    end
+
+    context(@subtitle "BiasVector / BiasMatrix") do
+        x = randn(100, 10)
+        y = randn(100)
+        yb = BiasVector(y)
+        xb = BiasMatrix(x)
+
+        @fact length(yb) --> 101
+        @fact size(yb) --> (101,)
+        @fact length(xb) --> 100 * 10 + 100
+        @fact size(xb) --> (100, 11)
+        @fact yb[101] --> 1
+        @fact xb[1, 11] --> 1
+        xb[1, 1] = 2.0
+        yb[1] = 2.0
+        @fact xb[1, 1] --> 2.0
+        @fact yb[1] --> 2.0
     end
 end
 

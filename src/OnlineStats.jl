@@ -15,7 +15,7 @@ export
     # Summary
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     CovMatrix, LinReg, QuantReg, StatLearn, KMeans,
-    FitDistribution, FitMvDistribution,
+    FitDistribution, FitMvDistribution, BiasVector, BiasMatrix,
     # Penalties
     NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
     # ModelDef and Algorithm
@@ -173,6 +173,9 @@ rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
 
 col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
 
+nrows(x::AMat) = size(x, 1)
+ncols(x::AMat) = size(x, 2)
+
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
@@ -188,6 +191,7 @@ include("modeling/penalty.jl")
 include("modeling/statlearn.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
+include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
 include("multivariate/kmeans.jl")
 
