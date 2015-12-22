@@ -7,7 +7,7 @@ type LinReg{W <: Weight} <: OnlineStat
     nup::Int
 end
 function LinReg(p::Integer, wgt::Weight = EqualWeight())
-    o = LinReg(zeros(p), CovMatrix(p+1), zeros(p+1, p+1), wgt, 0, 0)
+    o = LinReg(zeros(p), CovMatrix(p + 1), zeros(p + 1, p + 1), wgt, 0, 0)
 end
 function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight())
     o = LinReg(size(x, 2), wgt)

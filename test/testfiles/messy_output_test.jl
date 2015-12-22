@@ -38,9 +38,12 @@ facts(@title "Show Methods") do
     display(HuberRegression(2))
     display(SVMLike())
     display(StatLearn(10))
+    display(StatLearnSparse(StatLearn(10), HardThreshold()))
 
     display(QuantReg(5))
     display(KMeans(5, 4))
+
+    display(BernoulliBootstrap(Mean(), mean, 1000))
 end
 
 end#module
