@@ -3,6 +3,21 @@ module StatLearnTest
 using TestSetup, OnlineStats, Distributions, FactCheck
 import OnlineStats: _j
 
+
+function linearmodeldata(n, p, corr = 0)
+    V = zeros(p, p)
+    for j in 1:p, i in 1:p
+        V[i, j] = corr^abs(i - j)
+    end
+    x = rand(MvNormal(ones(p), V), n)'
+    β = vcat(1.:5, zeros(p-5))
+    y = x*β + randn(n)
+    (β, x, y)
+end
+
+
+
+
 facts(@title "StatLearn") do
     n, p = 500, 5
     x = randn(n, p)
@@ -94,21 +109,17 @@ facts(@title "StatLearn") do
     end
 
     context(@subtitle "StatLearnCV") do
-        n, p = 10000, 10
-        x = randn(n, p)
-        xtest = randn(500, p)
-        β = collect(1.:p) - p/2
-        y = x*β + randn(n)
-        ytest = xtest*β + randn(500)
+        n, p, rho = 10000, 10, .1
+        β, x, y = linearmodeldata(n, p, rho)
+        _, xtest, ytest = linearmodeldata(500, p, rho)
 
-        o = StatLearn(p)
-        cv = StatLearnCV(o, xtest, ytest)
-        fit!(cv, x, y)
+        o = StatLearn(p, penalty = L1Penalty(), λ = 1, algorithm = RDA())
+        cv = StatLearnCV(o, xtest, ytest, 1234)
+        o2 = StatLearn(p, algorithm = RDA())
 
-        o = StatLearn(p, penalty = L2Penalty(), λ = 1)
-        cv = StatLearnCV(o, xtest, ytest)
         fit!(cv, x, y)
-        display(cv)
+        fit!(o2, x, y)
+        @fact loss(o2, x, y) --> less_than(loss(cv, x, y))
     end
 end
 

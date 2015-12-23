@@ -44,20 +44,20 @@ typealias AMatF AMat{Float64}
 abstract Weight
 
 immutable EqualWeight <: Weight end
-@inline weight(w::EqualWeight, n2::Int, n1::Int, nup::Int) = n2 / (n1 + n2)
+weight(w::EqualWeight, n2::Int, n1::Int, nup::Int) = n2 / (n1 + n2)
 
 immutable ExponentialWeight <: Weight
     minstep::Float64
     ExponentialWeight(minstep::Real = 0.0) = new(Float64(minstep))
 end
-@inline weight(w::ExponentialWeight, n2::Int, n1::Int, nup::Int) = max(w.minstep, n2 / (n1 + n2))
+weight(w::ExponentialWeight, n2::Int, n1::Int, nup::Int) = max(w.minstep, n2 / (n1 + n2))
 
 immutable LearningRate <: Weight
     r::Float64
     minstep::Float64
     LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep))
 end
-@inline weight(w::LearningRate, n2::Int, n1::Int, nup::Int) = max(w.minstep, exp(-w.r * log(nup)))
+weight(w::LearningRate, n2::Int, n1::Int, nup::Int) = max(w.minstep, exp(-w.r * log(nup)))
 
 
 #----------------------------------------------------------------------# methods

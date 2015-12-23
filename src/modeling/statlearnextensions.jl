@@ -77,11 +77,11 @@ function fit!(o::StatLearnCV, x::AVec, y::Real)
     end
 end
 function tuneλ!{A<:Algorithm, M<:ModelDef}(
-        o::StatLearn{A, M, NoPenalty}, x, y, λ, xtest, ytest
+        o::StatLearn{A, M, NoPenalty}, x, y, γ, xtest, ytest
     )
     fit!(o, x, y)
 end
-function tuneλ!(o::StatLearn, x, y, λ, xtest, ytest)
+function tuneλ!(o::StatLearn, x, y, γ, xtest, ytest)
     o_l = copy(o)
     o_h = copy(o)
     o_l.λ = max(0.0, o_l.λ - γ)
@@ -94,15 +94,17 @@ function tuneλ!(o::StatLearn, x, y, λ, xtest, ytest)
     loss_low = loss(o_l, xtest, ytest)
     loss_mid = loss(o, xtest, ytest)
     loss_hi = loss(o_h, xtest, ytest)
-    lossmin = min(loss_low, loss_mid, loss_hi)
+    best = min(loss_low, loss_mid, loss_hi)
 
-    if lossmin == loss_low # o_l is winner
+    if best == loss_low # o_l is winner
         o.β0 = o_l.β0
         o.β = o_l.β
+        o.algorithm = o_l.algorithm
         o.λ = o_l.λ
-    elseif lossmin == loss_hi # o_h is winner
+    elseif best == loss_hi # o_h is winner
         o.β0 = o_h.β0
         o.β = o_h.β
+        o.algorithm = o_h.algorithm
         o.λ = o_h.λ
     end
 
@@ -112,6 +114,7 @@ n_updates(o::StatLearnCV) = n_updates(o.o)
 value(o::StatLearnCV) = value(o.o)
 coef(o::StatLearnCV) = coef(o.o)
 predict(o::StatLearnCV, x) = predict(o, x)
+loss(o::StatLearnCV, x, y) = loss(o.o, x, y)
 
 function Base.show(io::IO, o::StatLearnCV)
     printheader(io, "StatLearnCV")
