@@ -154,6 +154,7 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "value", coef(o))
     print_item(io, "model", o.model)
     print_item(io, "penalty", o.penalty)
+    print_item(io, "λ", o.λ)
     print_item(io, "nobs", nobs(o))
 end
 function fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real)

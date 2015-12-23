@@ -104,8 +104,6 @@ Base.mean(b::Bootstrap) = mean(cached_state(b))
 Base.std(b::Bootstrap) = std(cached_state(b))
 Base.var(b::Bootstrap) = var(cached_state(b))
 
-state(b::Bootstrap) = [length(b.replicates), nobs(b)]
-statenames(b::Bootstrap) = [:replicates, :nobs]
 
 "Get the replicates of the `OnlineStat` objects used in the bootstrap"
 replicates(b::Bootstrap) = copy(b.replicates)

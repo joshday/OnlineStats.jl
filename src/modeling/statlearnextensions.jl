@@ -1,3 +1,4 @@
+#------------------------------------------------------------# Enforced Sparsity
 abstract AbstractSparsity
 
 """
@@ -28,6 +29,7 @@ function StatLearnSparse(o::StatLearn, s::AbstractSparsity = HardThreshold())
 end
 function Base.show(io::IO, o::StatLearnSparse)
     printheader(io, "StatLearnSparse")
+    print_item(io, "nonzero", mean(o.o.β .!= 0.0))
     show(o.o)
 end
 nobs(o::StatLearnSparse) = nobs(o.o)
@@ -41,6 +43,8 @@ function fitbatch!(o::StatLearnSparse, x::AMat, y::AVec)
     fitbatch!(o.o, x, y)
     make_sparse!(o.o, o.s)
 end
+
+
 function make_sparse!(o::StatLearn, s::HardThreshold)
     if nobs(o) > s.burnin
         for j in 1:length(o.β)
@@ -53,97 +57,65 @@ end
 
 
 
+#-------------------------------------------------------------# Cross Validation
+type StatLearnCV{T<:Real, S<:Real} <: OnlineStat
+    o::StatLearn
+    burnin::Int
+    xtest::AMat{T}
+    ytest::AVec{S}
+end
+function StatLearnCV(o::StatLearn, xtest::AMat, ytest::AVec, burnin = 1000)
+    StatLearnCV(o, burnin, xtest, ytest)
+end
 
-# #-------------------------------------------------------------# Cross Validation
-# type StatLearnCV{W<:Weight} <: OnlineStat
-#     o::StatLearn
-#     burnin::Int
-#     weight::W
-#     n::Int
-#     nup::Int
-# end
-# function StatLearnCV(o::StatLearn, xtest::AMat, ytest::AVec,
-#         wgt::Weight = LearningRate(); burnin = 1000
-#     )
-#     StatLearnCV(o, burnin, wgt, 0, 0)
-# end
-# function fit!(o::StatLearnCV, x::AMat, y::AVec)
-#     if nobs(o) < o.burnin
-#         fit!(o.o, x, y)
-#     else
-#         selftune!(o, x, y)
-#     end
-# end
-#
-# # NoPenalty
-# function selftune!(o::StatLearnCV, x::AMat, y::AVec)
-#     fit!(o.o, x, y)
-# end
-#
-#
-#
-#
-# #----------------------------------------------------------------------# update!
-# # NoPenalty
-# function updateλ!{A <: Algorithm, M <: ModelDefinition}(
-#         o::StatLearn{A, M, NoPenalty},
-#         x::AVecF, y::Float64, xtest, ytest, λrate::LearningRate)
-#     update!(o, x, y)
-# end
-#
-# # Actual penalties
-# function updateλ!(o::StatLearn, x::AVecF, y::Float64, xtest, ytest, λrate)
-#     # alter λ for o_l and o_h
-#     γ = weight(λrate, 1, 1)
-#     o_l = copy(o)
-#     o_h = copy(o)
-#
-#     o_l.penalty.λ = max(0.0, o_l.penalty.λ - γ)
-#     o_h.penalty.λ += γ
-#
-#     # update all three models
-#     update!(o, x, y)
-#     update!(o_l, x, y)
-#     update!(o_h, x, y)
-#
-#     # Find best model for test data
-#     loss_low = loss(o_l, xtest, ytest)
-#     loss_mid = loss(o, xtest, ytest)
-#     loss_hi = loss(o_h, xtest, ytest)
-#     v = vcat(loss_low, loss_mid, loss_hi)
-#     _, j = findmin(v)
-#
-#     if j == 1 # o_l is winner
-#         o.β0 = o_l.β0
-#         o.β = o_l.β
-#         o.algorithm = o_l.algorithm
-#         o.penalty = o_l.penalty
-#     elseif j == 3 # o_h is winner
-#         o.β0 = o_h.β0
-#         o.β = o_h.β
-#         o.algorithm = o_h.algorithm
-#         o.penalty = o_h.penalty
-#     end
-# end
-#
-# function fit!(o::StatLearnCV, x::AVecF, y::Float64)
-#     if nobs(o) < o.burnin
-#         fit!(o.o, x, y)
-#     else
-#         updateλ!(o.o, x, y, o.xtest, o.ytest, o.λrate)
-#     end
-# end
-#
-# rmse(yhat, y) = mean(abs2(yhat - y))
-#
-# #------------------------------------------------------------------------# state
-# value(o::StatLearnCV) = value(o.o)
-# coef(o::StatLearnCV) = coef(o.o)
-# predict(o::StatLearnCV, x) = predict(o, x)
-# nobs(o::StatLearnCV) = nobs(o.o)
-#
-# function Base.show(io::IO, o::StatLearnCV)
-#     printheader(io, "StatLearnCV")
-#     print_item(io, "Burnin", o.burnin)
-#     print_value_and_nobs(io, o)
-# end
+function fit!(o::StatLearnCV, x::AVec, y::Real)
+    if nobs(o) < o.burnin
+        fit!(o.o, x, y)
+    else
+        γ = weight(o.o.weight, 1, nobs(o), n_updates(o))
+        tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
+    end
+end
+function tuneλ!{A<:Algorithm, M<:ModelDef}(
+        o::StatLearn{A, M, NoPenalty}, x, y, λ, xtest, ytest
+    )
+    fit!(o, x, y)
+end
+function tuneλ!(o::StatLearn, x, y, λ, xtest, ytest)
+    o_l = copy(o)
+    o_h = copy(o)
+    o_l.λ = max(0.0, o_l.λ - γ)
+    o_h.λ += γ
+
+    fit!(o, x, y)
+    fit!(o_l, x, y)
+    fit!(o_h, x, y)
+
+    loss_low = loss(o_l, xtest, ytest)
+    loss_mid = loss(o, xtest, ytest)
+    loss_hi = loss(o_h, xtest, ytest)
+    lossmin = min(loss_low, loss_mid, loss_hi)
+
+    if lossmin == loss_low # o_l is winner
+        o.β0 = o_l.β0
+        o.β = o_l.β
+        o.λ = o_l.λ
+    elseif lossmin == loss_hi # o_h is winner
+        o.β0 = o_h.β0
+        o.β = o_h.β
+        o.λ = o_h.λ
+    end
+
+end
+nobs(o::StatLearnCV) = nobs(o.o)
+n_updates(o::StatLearnCV) = n_updates(o.o)
+value(o::StatLearnCV) = value(o.o)
+coef(o::StatLearnCV) = coef(o.o)
+predict(o::StatLearnCV, x) = predict(o, x)
+
+function Base.show(io::IO, o::StatLearnCV)
+    printheader(io, "StatLearnCV")
+    print_item(io, "burnin", o.burnin)
+    # print_item(io, "loss", loss(o.o, o.xtest, o.ytest))
+    show(io, o.o)
+end

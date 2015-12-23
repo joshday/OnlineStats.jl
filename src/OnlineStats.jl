@@ -14,7 +14,8 @@ export
     EqualWeight, ExponentialWeight, LearningRate,
     # Summary
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    CovMatrix, LinReg, QuantReg, StatLearn, StatLearnSparse, HardThreshold,
+    CovMatrix, LinReg, QuantReg,
+    StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
     KMeans, FitDistribution, FitMvDistribution, BiasVector, BiasMatrix,
     # Penalties
     NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
@@ -189,10 +190,10 @@ include("distributions.jl")
 include("modeling/sweep.jl")
 include("modeling/penalty.jl")
 include("modeling/statlearn.jl")
+include("modeling/statlearnextensions.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
 include("modeling/bias.jl")
-include("modeling/statlearnextensions.jl")
 include("streamstats/bootstrap.jl")
 include("multivariate/kmeans.jl")
 

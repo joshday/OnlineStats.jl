@@ -108,20 +108,6 @@ facts(@title "Modeling") do
         @fact xb[1, 1] --> 2.0
         @fact yb[1] --> 2.0
     end
-
-    context(@subtitle "StatLearnSparse") do
-        n, p = 100000, 10
-        x = randn(n, p)
-        β = collect(1.:p) - p/2
-        y = x * β + randn(n)
-        o = StatLearn(p)
-        sp = StatLearnSparse(o, HardThreshold(burnin = 100))
-        fit!(sp, x, y)
-        fit!(sp, x, y, 100)
-        @fact coef(sp) --> coef(o)
-        @fact value(sp) --> value(o)
-        @fact nobs(sp) --> nobs(o)
-    end
 end
 
 end#module

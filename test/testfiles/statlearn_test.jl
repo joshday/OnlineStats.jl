@@ -78,6 +78,38 @@ facts(@title "StatLearn") do
         v = [abs(r[i]) < δ? 0.5 * r[i]^2 : δ * (abs(r[i]) - 0.5 * δ) for i in 1:n]
         @fact loss(o, x, y) --> roughly(mean(v))
     end
+
+    context(@subtitle "StatLearnSparse") do
+        n, p = 100000, 10
+        x = randn(n, p)
+        β = collect(1.:p) - p/2
+        y = x * β + randn(n)
+        o = StatLearn(p)
+        sp = StatLearnSparse(o, HardThreshold(burnin = 100))
+        fit!(sp, x, y)
+        fit!(sp, x, y, 100)
+        @fact coef(sp) --> coef(o)
+        @fact value(sp) --> value(o)
+        @fact nobs(sp) --> nobs(o)
+    end
+
+    context(@subtitle "StatLearnCV") do
+        n, p = 10000, 10
+        x = randn(n, p)
+        xtest = randn(500, p)
+        β = collect(1.:p) - p/2
+        y = x*β + randn(n)
+        ytest = xtest*β + randn(500)
+
+        o = StatLearn(p)
+        cv = StatLearnCV(o, xtest, ytest)
+        fit!(cv, x, y)
+
+        o = StatLearn(p, penalty = L2Penalty(), λ = 1)
+        cv = StatLearnCV(o, xtest, ytest)
+        fit!(cv, x, y)
+        display(cv)
+    end
 end
 
 end #module
