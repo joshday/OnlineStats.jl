@@ -101,6 +101,7 @@ facts(@title "StatLearn") do
         y = x * β + randn(n)
         o = StatLearn(p)
         sp = StatLearnSparse(o, HardThreshold(burnin = 100))
+        sp = StatLearnSparse(o)
         fit!(sp, x, y)
         fit!(sp, x, y, 100)
         @fact coef(sp) --> coef(o)
@@ -109,7 +110,7 @@ facts(@title "StatLearn") do
     end
 
     context(@subtitle "StatLearnCV") do
-        n, p, rho = 10000, 10, .1
+        n, p, rho = 10000, 10, .5
         β, x, y = linearmodeldata(n, p, rho)
         _, xtest, ytest = linearmodeldata(500, p, rho)
 

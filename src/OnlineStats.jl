@@ -196,6 +196,7 @@ include("modeling/quantreg.jl")
 include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
 include("multivariate/kmeans.jl")
+include("multivariate/normalmix.jl")
 
 end # module
 
