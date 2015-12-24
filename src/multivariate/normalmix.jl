@@ -41,11 +41,10 @@ function fit!(o::NormalMix, y::Real)
     k = length(o.μ)
     for j in 1:k
         # o.w[j] = Ds.pdf(Ds.component(o,j), y) * o.s1[j]
-        σinv = 1 / sqrt(o.σ2[j])
+        σinv = 1.0 / sqrt(o.σ2[j])
         o.w[j] = o.s1[j] * σinv * exp(-.5 * σinv * σinv * (y - o.μ[j]) ^ 2)
     end
     o.w /= sum(o.w)
-
     for j in 1:k
         o.s1[j] = smooth(o.s1[j], o.w[j], γ)
         o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
@@ -54,7 +53,36 @@ function fit!(o::NormalMix, y::Real)
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
     end
+    ss1 = sum(o.s1)
+    for j in 1:k
+        o.s1[j] /= ss1
+        if o.σ2[j] <= 0
+            o.σ2 = ones(k)
+        end
+    end
+end
 
+function fitbatch!{T<:Real}(o::NormalMix, y::Vector{T})
+    n2 = length(y)
+    γ = weight!(o, n2)
+    k = length(o.μ)
+    for j in 1:k
+        o.w[j] = 0.0
+        for i in 1:n2
+            σinv = 1.0 / sqrt(o.σ2[j])
+            o.w[j] += σinv * exp(-.5 * σinv * σinv * (y[i] - o.μ[j]) ^ 2)
+        end
+        o.w[j] *= o.s1[j]
+    end
+    o.s /= sum(o.w)
+    for j in 1:k
+        o.s1[j] = smooth(o.s1[j], o.w[j], γ)
+        o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
+        o.s3[j] = smooth(o.s3[j], o.w[j] * y * y, γ)
+
+        o.μ[j] = o.s2[j] / o.s1[j]
+        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
+    end
     ss1 = sum(o.s1)
     for j in 1:k
         o.s1[j] /= ss1
@@ -69,7 +97,8 @@ end
 # testing
 d = Ds.MixtureModel([Ds.Normal(0,1), Ds.Normal(5,2), Ds.Normal(10,10)], [.4, .2, .4])
 y = rand(d, 1_000_000)
-@time o = NormalMix(y, 3, LearningRate(.6))
+o = NormalMix(3, LearningRate(.6))
+fit!(o, y, 10)
 
 Profile.clear()
 @profile o = NormalMix(y, 3, LearningRate(.6))
