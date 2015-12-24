@@ -1,3 +1,43 @@
+#-----------------------------------------------------------------# Multivariate
+# TODO
+type MvNormalMix{W<:Weight} <: OnlineStat
+    value::Ds.MixtureModel{Ds.Multivariate, Ds.Continuous, Ds.MvNormal}
+    s1::VecF
+    s2::MatF
+    s3::Array{Float64, 3}
+    w::VecF
+    μ::MatF
+    V::Array{Float64, 3}
+    weight::W
+    n::Int
+    nup::Int
+end
+function MvNormalMix(p::Integer, k::Integer, wgt::Weight = LearningRate();
+        start = Ds.MixtureModel(Ds.MvNormal[Ds.MvNormal(ones(p) + j, 10 * eye(p)) for j in 1:k])
+    )
+    V = zeros(p, p, k)
+    for j in 1:p
+        V[:, :, k] = eye(p)
+    end
+
+    MvNormalMix(start,
+        zeros(k), zeros(p, k), zeros(p, p, k),  # s1, s2, s3
+        ones(k) / k, zeros(p, k), V,            # w, μ, V
+        wgt, 0, 0
+    )
+end
+function MvNormalMix{T<:Real}(y::AMat{T}, k::Integer, wgt::Weight = LearningRate(); kw...)
+    o = MvNormalMix(size(y, 2), k, wgt; kw...)
+    fit!(o, y)
+    o
+end
+
+function fit!{T<:Real}(o::MvNormalMix, y::AMat{T})
+
+end
+
+
+#-------------------------------------------------------------------# Univariate
 type NormalMix{W<:Weight} <: OnlineStat
     value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal}
     s1::VecF
@@ -10,9 +50,11 @@ type NormalMix{W<:Weight} <: OnlineStat
     n::Int
     nup::Int
 end
-function NormalMix(k::Integer, wgt::Weight = LearningRate())
+function NormalMix(k::Integer, wgt::Weight = LearningRate();
+        start = Ds.MixtureModel(Ds.Normal[Ds.Normal(j-1, 10) for j in 1:k])
+    )
     NormalMix(
-        Ds.MixtureModel(Ds.Normal[Ds.Normal(j-1, 10) for j in 1:k]),
+        start,
         ones(k) / k, zeros(k), zeros(k),  # s1, s2, s3
         zeros(k), collect(1.:k), fill(10.0, k),  # w, μ, σ2
         wgt, 0, 0
@@ -27,6 +69,11 @@ Ds.componentwise_pdf(o::NormalMix, y) = Ds.componentwise_pdf(value(o), y)
 Ds.ncomponents(o::NormalMix) = Ds.ncomponents(value(o))
 Ds.component(o::NormalMix, j) = Ds.component(value(o), j)
 Ds.probs(o::NormalMix) = Ds.probs(value(o))
+Ds.pdf(o::NormalMix, y) = Ds.pdf(value(o), y)
+Ds.cdf(o::NormalMix, y) = Ds.cdf(value(o), y)
+Base.mean(o::NormalMix) = mean(value(o))
+Base.var(o::NormalMix) = var(value(o))
+Base.std(o::NormalMix) = std(value(o))
 function Base.show(io::IO, o::NormalMix)
     printheader(io, "NormalMix (k = $(Ds.ncomponents(o)))")
     print_value_and_nobs(io, o)
@@ -34,8 +81,6 @@ end
 function value(o::NormalMix)
     o.value = Ds.MixtureModel(map((u,v) -> Ds.Normal(u, sqrt(v)), o.μ, o.σ2), o.s1)
 end
-
-
 function fit!(o::NormalMix, y::Real)
     γ = weight!(o, 1)
     k = length(o.μ)
@@ -44,8 +89,9 @@ function fit!(o::NormalMix, y::Real)
         σinv = 1.0 / sqrt(o.σ2[j])
         o.w[j] = o.s1[j] * σinv * exp(-.5 * σinv * σinv * (y - o.μ[j]) ^ 2)
     end
-    o.w /= sum(o.w)
+    sum1 = sum(o.w)
     for j in 1:k
+        o.w[j] /= sum1
         o.s1[j] = smooth(o.s1[j], o.w[j], γ)
         o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
         o.s3[j] = smooth(o.s3[j], o.w[j] * y * y, γ)
@@ -53,15 +99,14 @@ function fit!(o::NormalMix, y::Real)
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
     end
-    ss1 = sum(o.s1)
+    sum2 = sum(o.s1)
     for j in 1:k
-        o.s1[j] /= ss1
+        o.s1[j] /= sum2
         if o.σ2[j] <= 0
             o.σ2 = ones(k)
         end
     end
 end
-
 function fitbatch!{T<:Real}(o::NormalMix, y::Vector{T})
     n2 = length(y)
     γ = weight!(o, n2)
@@ -74,8 +119,9 @@ function fitbatch!{T<:Real}(o::NormalMix, y::Vector{T})
         end
         o.w[j] *= o.s1[j]
     end
-    o.s /= sum(o.w)
+    sum1 = sum(o.w)
     for j in 1:k
+        o.w[j] /= sum1
         o.s1[j] = smooth(o.s1[j], o.w[j], γ)
         o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
         o.s3[j] = smooth(o.s3[j], o.w[j] * y * y, γ)
@@ -83,9 +129,9 @@ function fitbatch!{T<:Real}(o::NormalMix, y::Vector{T})
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
     end
-    ss1 = sum(o.s1)
+    sum2 = sum(o.s1)
     for j in 1:k
-        o.s1[j] /= ss1
+        o.s1[j] /= sum2
         if o.σ2[j] <= 0
             o.σ2 = ones(k)
         end
@@ -93,13 +139,59 @@ function fitbatch!{T<:Real}(o::NormalMix, y::Vector{T})
 end
 
 
+function quantilestart(o::NormalMix, τ::Real)
+    # starting values loosely based on empirical rule (68-95-99)
+    # TODO: Use Chebyshev's inequality?
+    @assert 0 < τ < 1
+    if τ < .05
+        return mean(o) - 2.0 * std(o)
+    elseif τ < .16
+        return mean(o) - std(o)
+    elseif τ < .34
+        return mean(o) - .5 * std(o)
+    elseif τ > .65
+        return mean(o) + .5 * std(o)
+    elseif τ > .84
+        return mean(o) + std(o)
+    elseif τ > .95
+        return mean(o) + 2.0 * std(o)
+    else
+        return mean(o)
+    end
+end
+function Base.quantile(o::NormalMix, τ::Real; start = quantilestart(o, τ), maxit = 20, tol = .001)
+    @assert 0 < τ < 1
+    θ = start
+    for i in 1:maxit
+        θ += (τ - Ds.cdf(o, θ)) / Ds.pdf(o, θ)
+        abs(Ds.cdf(o, θ) - τ) < tol && break
+    end
+    return θ
+end
+function Base.quantile{T<:Real}(o::NormalMix, τ::Vector{T};
+        start = [quantilestart(o, τi) for τi in τ], kw...
+    )
+    [quantile(o, τ[j]; start = start[j], kw...) for j in 1:length(τ)]
+end
+
+
 
 # testing
-d = Ds.MixtureModel([Ds.Normal(0,1), Ds.Normal(5,2), Ds.Normal(10,10)], [.4, .2, .4])
-y = rand(d, 1_000_000)
-o = NormalMix(3, LearningRate(.6))
-fit!(o, y, 10)
+# d = Ds.MixtureModel([Ds.Normal(0,1), Ds.Normal(5,2), Ds.Normal(10,10)], [.4, .2, .4])
+# y = rand(d, 1_000_000)
+# o = NormalMix(3, LearningRate(.6))
+# @time fit!(o, y)
+#
+# # Profile.clear()
+# # @profile o = NormalMix(y, 3, LearningRate(.6))
+# display(o)
+# show(quantile(o, [.25, .5, .75]))
 
-Profile.clear()
-@profile o = NormalMix(y, 3, LearningRate(.6))
-display(o)
+
+# testing MV
+p = 2
+k = 4
+d = Ds.MixtureModel(Ds.MvNormal[Ds.MvNormal(ones(p) + j, eye(p) + j) for j in 1:k])
+y = rand(d, 100)'
+
+o = MvNormalMix(y, k)
