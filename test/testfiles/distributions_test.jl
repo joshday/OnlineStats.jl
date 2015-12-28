@@ -94,6 +94,7 @@ facts(@title "FitDistribution / FitMvDistribution") do
         @fact 0 < cdf(o, randn()) < 1 --> true
         @fact value(o) --> o.value
         @fact quantile(o, [.25, .5, .75]) --> roughly(quantile(y, [.25, .5, .75]), .5)
+        quantile(o, collect(.01:.01:.99))
     end
 end
 
