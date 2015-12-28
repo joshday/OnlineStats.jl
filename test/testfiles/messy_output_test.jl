@@ -20,6 +20,9 @@ facts(@title "Show Methods") do
     display(QuantileSGD(x))
     display(QuantileMM(x))
     display(Moments(x))
+    display(QuantReg(5))
+    display(KMeans(5, 4))
+    display(NormalMix(4))
 
     display(FitDistribution(Normal, x))
     display(FitMvDistribution(MvNormal, xs))
@@ -40,9 +43,6 @@ facts(@title "Show Methods") do
     display(StatLearn(10))
     display(StatLearnSparse(StatLearn(10), HardThreshold()))
     display(StatLearnCV(StatLearn(5), randn(100,10), randn(100)))
-
-    display(QuantReg(5))
-    display(KMeans(5, 4))
 
     display(BernoulliBootstrap(Mean(), mean, 1000))
 end

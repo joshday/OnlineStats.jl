@@ -1,6 +1,6 @@
 
-# these are simple AbstractArray implementations that make it easy to add a bias term on the fly without
-# creating or copying array data:
+# these are simple AbstractArray implementations that make it easy to add a
+# bias/intercept term on the fly without creating or copying array data:
   # "BiasVector(rand(10))" is roughly equivalent to "vcat(rand(10), 1.0)"
   # "BiasMatrix(rand(10,5))" is roughly equivalent to "hcat(rand(10,5), ones(10))"
 

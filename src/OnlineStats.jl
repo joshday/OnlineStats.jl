@@ -12,9 +12,9 @@ export
     OnlineStat,
     # Weight
     EqualWeight, ExponentialWeight, LearningRate,
-    # Summary
+    # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    CovMatrix, LinReg, QuantReg,
+    CovMatrix, LinReg, QuantReg, NormalMix,
     StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
     KMeans, FitDistribution, FitMvDistribution, BiasVector, BiasMatrix,
     # Penalties
@@ -196,7 +196,7 @@ include("modeling/quantreg.jl")
 include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
 include("multivariate/kmeans.jl")
-include("multivariate/normalmix.jl")
+include("normalmix.jl")
 
 end # module
 

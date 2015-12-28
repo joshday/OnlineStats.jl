@@ -76,6 +76,25 @@ facts(@title "FitDistribution / FitMvDistribution") do
         o = FitDistribution(Poisson, y)
         @fact mean(o) --> roughly(mean(y))
     end
+
+    context(@subtitle "NormalMix") do
+        d = MixtureModel(Normal, [(0,1), (2,3), (4,5)])
+        y = rand(d, 50_000)
+        o = NormalMix(y, 3)
+        fit!(o, y)
+        fit!(o, y, 10)
+        @fact mean(o) --> roughly(mean(y), .5)
+        @fact var(o) --> roughly(var(y), 5)
+        @fact std(o) --> roughly(std(y), .5)
+        @fact length(componentwise_pdf(o, 0.5)) --> 3
+        @fact ncomponents(o) --> 3
+        @fact typeof(component(o, 1)) == Normal --> true
+        @fact length(probs(o)) --> 3
+        @fact pdf(o, randn()) > 0 --> true
+        @fact 0 < cdf(o, randn()) < 1 --> true
+        @fact value(o) --> o.value
+        @fact quantile(o, [.25, .5, .75]) --> roughly(quantile(y, [.25, .5, .75]), .5)
+    end
 end
 
 end#module
