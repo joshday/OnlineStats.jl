@@ -29,7 +29,7 @@ end
 function SparseReg(p::Integer, wgt::Weighting = default(Weighting))
     c = CovarianceMatrix(p + 1, wgt)
     s = zeros(p + 1, p + 1)
-    SparseReg(c, zeros(p + 1, p + 1), wgt)
+    SparseReg(c, s, wgt)
 end
 
 
