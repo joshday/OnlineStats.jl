@@ -88,7 +88,10 @@ function print_value_and_nobs(io::IO, o::OnlineStat)
 end
 
 # fallback show
-Base.show(io::IO, o::OnlineStat) = print_value_and_nobs(io, o)
+function Base.show(io::IO, o::OnlineStat)
+    printheader(io, string(typeof(o)))
+    print_value_and_nobs(io, o)
+end
 
 #-------------------------------------------------------------------------# fit!
 function fit!(o::OnlineStat, y::Union{AVec, AMat})
@@ -194,6 +197,7 @@ include("modeling/statlearnextensions.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
 include("modeling/bias.jl")
+include("modeling/stepwise.jl")
 include("streamstats/bootstrap.jl")
 include("multivariate/kmeans.jl")
 include("normalmix.jl")
