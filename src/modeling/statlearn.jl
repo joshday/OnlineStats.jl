@@ -81,6 +81,15 @@ type AdaGrad <: Algorithm
     AdaGrad() = new()
     AdaGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
 end
+type AdaDelta <: Algorithm
+    g0::Float64
+    g::VecF
+    Δ0::Float64
+    Δ::VecF
+    ρ::Float64
+    AdaDelta() = new()
+    AdaDelta(p::Integer) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p), 0.001)
+end
 type RDA <: Algorithm
     g0::Float64
     g::VecF
@@ -101,7 +110,7 @@ type AdaMMGrad <: Algorithm
     AdaMMGrad() = new()
     AdaMMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
 end
-for alg in [:SGD, :AdaGrad, :RDA, :MMGrad, :AdaMMGrad]
+for alg in [:SGD, :AdaGrad, :AdaDelta, :RDA, :MMGrad, :AdaMMGrad]
     eval(parse("""Base.show(io::IO, o::$alg) = print(io, "$alg")"""))
 end
 
@@ -237,6 +246,26 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
         o.algorithm.g[j] += gx * gx
         γ = o.η / sqrt(o.algorithm.g[j])
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
+    end
+end
+
+
+#----------------------------------------------------------------------# AdaDelta
+function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ)
+    n_and_nup!(o, 1)
+    if o.intercept
+        o.algorithm.g0 = smooth(o.algorithm.g0, g * g, o.algorithm.ρ)
+        Δ = sqrt(o.algorithm.Δ0 / o.algorithm.g0) * g
+        o.β0 -= Δ
+        o.algorithm.Δ0 = smooth(o.algorithm.Δ0, Δ * Δ, o.algorithm.ρ)
+    end
+    @inbounds for j in 1:length(o.β)
+        gx = g * x[j]
+        o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, o.algorithm.ρ)
+        γ = sqrt(o.algorithm.Δ[j] / o.algorithm.g[j])
+        Δ = γ * gx
+        o.β[j] = prox(o.penalty, o.λ, o.β[j] - Δ, γ)
+        o.algorithm.Δ[j] = smooth(o.algorithm.Δ[j], Δ * Δ, o.algorithm.ρ)
     end
 end
 
