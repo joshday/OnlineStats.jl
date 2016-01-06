@@ -14,7 +14,7 @@ y = x * β + randn(n)
 β_with_int = vcat(0., β)
 
 
-@time o = O.StatLearn(x, y, algorithm = O.AdaDelta())
+@time o = O.StatLearn(x, y, 100, algorithm = O.AdaDelta(), model = O.L1Regression())
 display(o)
 
 end

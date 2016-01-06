@@ -24,7 +24,7 @@ facts(@title "StatLearn") do
     β = collect(linspace(-1, 1, p))
     xβ = x*β
 
-    alg = [SGD(), AdaGrad(), RDA(), MMGrad(), AdaMMGrad()]
+    alg = [SGD(), AdaGrad(), AdaDelta(), RDA(), MMGrad(), AdaMMGrad()]
     pen = [NoPenalty(), L2Penalty(), L1Penalty(), ElasticNetPenalty()]
     mod = [
         L2Regression(), L1Regression(), LogisticRegression(),

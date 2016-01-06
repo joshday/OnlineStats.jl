@@ -268,6 +268,29 @@ function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ)
         o.algorithm.Δ[j] = smooth(o.algorithm.Δ[j], Δ * Δ, o.algorithm.ρ)
     end
 end
+function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
+    n_and_nup!(o, length(y))
+    if o.intercept
+        ḡ = mean(g)
+        o.algorithm.g0 = smooth(o.algorithm.g0, ḡ * ḡ, o.algorithm.ρ)
+        Δ = sqrt(o.algorithm.Δ0 / o.algorithm.g0) * ḡ
+        o.β0 -= Δ
+        o.algorithm.Δ0 = smooth(o.algorithm.Δ0, Δ * Δ, o.algorithm.ρ)
+    end
+    n = length(g)
+    @inbounds for j in 1:length(o.β)
+        gx = 0.0
+        for i in 1:n
+            gx += g[i] * x[i, j]
+        end
+        gx /= n
+        o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, o.algorithm.ρ)
+        γ = sqrt(o.algorithm.Δ[j] / o.algorithm.g[j])
+        Δ = γ * gx
+        o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
+        o.algorithm.Δ[j] = smooth(o.algorithm.Δ[j], Δ * Δ, o.algorithm.ρ)
+    end
+end
 
 
 #--------------------------------------------------------------------------# RDA
