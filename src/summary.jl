@@ -126,8 +126,8 @@ end
 function fitbatch!{T<:Real}(o::CovMatrix, x::AMat{T})
     n2 = size(x, 1)
     γ = weight!(o, n2)
-    BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
     smooth!(o.B, row(mean(x, 1), 1), γ)
+    BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
 end
 function value(o::CovMatrix)
     copy!(o.value, _unbias(o) * (o.A - BLAS.syrk('U', 'N', 1.0, o.B)))
