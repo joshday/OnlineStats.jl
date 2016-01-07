@@ -103,7 +103,9 @@ function quantilestart(o::NormalMix, τ::Real)
     @assert 0 < τ < 1
     quantile(Ds.Normal(mean(o), std(o)), τ)
 end
-function Base.quantile(o::NormalMix, τ::Real; start = quantilestart(o, τ), maxit = 20, tol = .001)
+function Base.quantile(o::NormalMix, τ::Real;
+        start = quantilestart(o, τ), maxit = 20, tol = .001
+    )
     @assert 0 < τ < 1
     θ = start
     for i in 1:maxit

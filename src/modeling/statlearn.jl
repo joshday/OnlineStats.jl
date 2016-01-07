@@ -77,6 +77,13 @@ immutable SGD <: Algorithm
     SGD() = new()
     SGD(p::Integer) = new()
 end
+type SGDQN <: Algorithm
+    β0old::Float64
+    βold::VecF
+    b::VecF
+    SGDQN() = new()
+    SGDQN(p::Integer) = new(_ϵ, fill(_ϵ, p), fill(_ϵ, p))
+end
 type AdaGrad <: Algorithm
     g0::Float64
     g::VecF
@@ -156,6 +163,52 @@ function StatLearn(x::AMat, y::AVec, b::Integer, wgt::Weight = LearningRate(); k
     fit!(o, x, y, b)
     o
 end
+function StatLearn(x::AMat, y::AVec, args...)
+    v = collect(args)
+    # Weight
+    u = map(x -> typeof(x)<:Weight, v)
+    if any(u)
+        wgt = v[find(u)][1]
+    else
+        wgt = LearningRate()
+    end
+    # Algorithm
+    u = map(x -> typeof(x)<:Algorithm, v)
+    if any(u)
+        alg = v[find(u)][1]
+    else
+        alg = SGD()
+    end
+    # ModelDef
+    u = map(x -> typeof(x)<:ModelDef, v)
+    if any(u)
+        mod = v[find(u)][1]
+    else
+        mod = L2Regression()
+    end
+    # Penalty
+    u = map(x -> typeof(x)<:Penalty, v)
+    if any(u)
+        pen = v[find(u)][1]
+    else
+        pen = NoPenalty()
+    end
+    # b
+    u = map(x -> typeof(x)<:Integer, v)
+    if any(u)
+        b = v[find(u)][1]
+    else
+        b = 1
+    end
+    # λ
+    u = map(x -> typeof(x)<:AbstractFloat, v)
+    if any(u)
+        λ = v[find(u)][1]
+    else
+        λ = 0.0
+    end
+    StatLearn(x, y, b, wgt, model = mod, algorithm = alg, penalty = pen, λ = λ)
+end
 StatsBase.coef(o::StatLearn) = value(o)
 StatsBase.predict{T<:Real}(o::StatLearn, x::AVec{T}) = predict(o.model, x, o.β0, o.β)
 StatsBase.predict{T<:Real}(o::StatLearn, x::AMat{T}) = predict(o.model, x, o.β0, o.β)
@@ -215,6 +268,19 @@ function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec
         o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gj, γ)
     end
 end
+
+
+# #------------------------------------------------------------------------# SGDQN
+# function _updateβ!(o::StatLearn{SGDQN}, g, x, y, ŷ)
+#     γ = weight!(o, 1)
+#     γ *= o.η
+#     if o.intercept
+#         o.β0 -= γ * g
+#     end
+#     for j in 1:length(o.β)
+#         @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j], γ)
+#     end
+# end
 
 
 #----------------------------------------------------------------------# AdaGrad

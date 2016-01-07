@@ -11,7 +11,7 @@ Requires.@require Plots include("plots.jl")
 export
     OnlineStat,
     # Weight
-    EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
+    Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     CovMatrix, LinReg, QuantReg, NormalMix,
@@ -22,7 +22,7 @@ export
     # ModelDef and Algorithm
     ModelDef, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
-    SGD, AdaGrad, AdaDelta, RDA, MMGrad, AdaMMGrad,
+    Algorithm, SGD, SGDQN, AdaGrad, AdaDelta, RDA, MMGrad, AdaMMGrad,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates,
