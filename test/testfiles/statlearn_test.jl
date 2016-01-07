@@ -44,8 +44,8 @@ facts(@title "StatLearn") do
         for a in alg, p in pen, m in mod
             y = generate(m, xβ)
             println("          > $a, $p, $m")
-            StatLearn(x, y, model = m, algorithm = a, penalty = p)
-            StatLearn(x, y, 10, model = m, algorithm = a, penalty = p)
+            StatLearn(x, y, m, a, p)
+            StatLearn(x, y, 10, m, a, p)
         end
     end
 
@@ -59,36 +59,36 @@ facts(@title "StatLearn") do
 
     context(@subtitle "loss") do
         y = generate(L2Regression(), xβ)
-        o = StatLearn(x, y, model = L2Regression())
+        o = StatLearn(x, y, L2Regression())
         @fact loss(o, x, y) --> roughly(mean(abs2(y - predict(o, x))))
 
         y = generate(L1Regression(), xβ)
-        o = StatLearn(x, y, model = L1Regression())
+        o = StatLearn(x, y, L1Regression())
         @fact loss(o, x, y) --> roughly(mean(abs(y - predict(o, x))))
 
         y = generate(LogisticRegression(), xβ)
-        o = StatLearn(x, y, model = LogisticRegression())
+        o = StatLearn(x, y, LogisticRegression())
         η = o.β0 + x * o.β
         l = mean([-y[i] * η[i] + log(1.0 + exp(η[i])) for i in 1:length(η)])
         @fact loss(o, x, y) --> roughly(l)
 
         y = generate(PoissonRegression(), xβ)
-        o = StatLearn(x, y, model = PoissonRegression(), algorithm = RDA())
+        o = StatLearn(x, y, PoissonRegression(), RDA())
         η = o.β0 + x * o.β
         @fact loss(o, x, y) --> roughly(mean(-y .* η + exp(η)))
 
         y = generate(QuantileRegression(), xβ)
-        o = StatLearn(x, y, model = QuantileRegression())
+        o = StatLearn(x, y, QuantileRegression())
         r = y - o.β0 - x * o.β
         @fact loss(o, x, y) --> roughly(mean([r[i] * (o.model.τ - (r[i]<0)) for i in 1:n]))
 
         y = generate(SVMLike(), xβ)
-        o = StatLearn(x, y, model = SVMLike())
+        o = StatLearn(x, y, SVMLike())
         η = o.β0 + x * o.β
         @fact loss(o, x, y) --> roughly(mean([max(0.0, 1.0 - y[i] * η[i]) for i in 1:n]))
 
         y = generate(HuberRegression(), xβ)
-        o = StatLearn(x, y, model = HuberRegression())
+        o = StatLearn(x, y, HuberRegression())
         δ = o.model.δ
         r = y - o.β0 - x * o.β
         v = [abs(r[i]) < δ? 0.5 * r[i]^2 : δ * (abs(r[i]) - 0.5 * δ) for i in 1:n]

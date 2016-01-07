@@ -131,7 +131,7 @@ type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat
     n::Int          # nobs
     nup::Int        # n updates
 end
-function StatLearn(p::Integer, wgt::Weight = LearningRate();
+function _StatLearn(p::Integer, wgt::Weight = LearningRate();
         model::ModelDef = L2Regression(),
         η::Real = 1.0,
         λ::Real = 0.0,
@@ -146,56 +146,44 @@ function StatLearn(p::Integer, wgt::Weight = LearningRate();
     o.algorithm = typeof(o.algorithm)(p)
     o
 end
-function StatLearn(x::AMat, y::AVec, wgt::Weight = LearningRate(); kw...)
-    o = StatLearn(size(x, 2), wgt; kw...)
+# function _StatLearn(x::AMat, y::AVec, wgt::Weight = LearningRate(); kw...)
+#     o = _StatLearn(size(x, 2), wgt; kw...)
+#     fit!(o, x, y)
+#     o
+# end
+# function _StatLearn(x::AMat, y::AVec, b::Integer, wgt::Weight = LearningRate(); kw...)
+#     o = _StatLearn(size(x, 2), wgt; kw...)
+#     fit!(o, x, y, b)
+#     o
+# end
+function StatLearn(p::Integer, args...; kw...)
+    wgt = LearningRate()
+    mod = L1Regression()
+    alg = SGD()
+    pen = NoPenalty()
+    for arg in args
+        T = typeof(arg)
+        if T <: Weight
+            wgt = arg
+        elseif T <: ModelDef
+            mod = arg
+        elseif T <: Algorithm
+            alg = arg
+        elseif T <: Penalty
+            pen = arg
+        end
+    end
+    _StatLearn(p, wgt; model = mod, algorithm = alg, penalty = pen, kw...)
+end
+function StatLearn(x::AMat, y::AVec, args...; kw...)
+    o = StatLearn(size(x, 2), args...; kw...)
     fit!(o, x, y)
     o
 end
-function StatLearn(x::AMat, y::AVec, b::Integer, wgt::Weight = LearningRate(); kw...)
-    o = StatLearn(size(x, 2), wgt; kw...)
+function StatLearn(x::AMat, y::AVec, b::Integer, args...; kw...)
+    o = StatLearn(size(x, 2), args...; kw...)
     fit!(o, x, y, b)
     o
-end
-function StatLearn(x::AMat, y::AVec, args...; kw...)
-    # Constructor w/o keyword args.  Automatically maps args based on type.
-    # λ and η must be keywords since they are the same type/can be confused with b
-    v = collect(args)
-    # Weight
-    u = map(x -> typeof(x)<:Weight, v)
-    if any(u)
-        wgt = v[find(u)][1]
-    else
-        wgt = LearningRate()
-    end
-    # Algorithm
-    u = map(x -> typeof(x)<:Algorithm, v)
-    if any(u)
-        alg = v[find(u)][1]
-    else
-        alg = SGD()
-    end
-    # ModelDef
-    u = map(x -> typeof(x)<:ModelDef, v)
-    if any(u)
-        mod = v[find(u)][1]
-    else
-        mod = L2Regression()
-    end
-    # Penalty
-    u = map(x -> typeof(x)<:Penalty, v)
-    if any(u)
-        pen = v[find(u)][1]
-    else
-        pen = NoPenalty()
-    end
-    # b
-    u = map(x -> typeof(x)<:Integer, v)
-    if any(u)
-        b = v[find(u)][1]
-    else
-        b = 1
-    end
-    StatLearn(x, y, b, wgt, model = mod, algorithm = alg, penalty = pen; kw...)
 end
 StatsBase.coef(o::StatLearn) = value(o)
 StatsBase.predict{T<:Real}(o::StatLearn, x::AVec{T}) = predict(o.model, x, o.β0, o.β)
