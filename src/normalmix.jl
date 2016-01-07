@@ -99,24 +99,9 @@ end
 
 
 function quantilestart(o::NormalMix, τ::Real)
-    # starting values loosely based on empirical rule (68-95-99)
-    # TODO: Use Chebyshev's inequality?
+    # starting values based on Normal Distribution
     @assert 0 < τ < 1
-    if τ < .05
-        return mean(o) - 2.0 * std(o)
-    elseif τ < .16
-        return mean(o) - std(o)
-    elseif τ < .34
-        return mean(o) - .5 * std(o)
-    elseif τ > .65
-        return mean(o) + .5 * std(o)
-    elseif τ > .84
-        return mean(o) + std(o)
-    elseif τ > .95
-        return mean(o) + 2.0 * std(o)
-    else
-        return mean(o)
-    end
+    quantile(Ds.Normal(mean(o), std(o)), τ)
 end
 function Base.quantile(o::NormalMix, τ::Real; start = quantilestart(o, τ), maxit = 20, tol = .001)
     @assert 0 < τ < 1
