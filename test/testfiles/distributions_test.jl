@@ -95,6 +95,10 @@ facts(@title "FitDistribution / FitMvDistribution") do
         @fact value(o) --> o.value
         @fact quantile(o, [.25, .5, .75]) --> roughly(quantile(y, [.25, .5, .75]), .5)
         quantile(o, collect(.01:.01:.99))
+
+        fit!(o, y, 1)
+        fit!(o, y, 2)
+        fit!(o, y, 5)
     end
 end
 
