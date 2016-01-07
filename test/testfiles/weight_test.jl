@@ -13,6 +13,9 @@ facts(@title "Weighting") do
 
     w = LearningRate(.6)
     @fact O.weight(w, 1, 0, 1) --> 1.0
+
+    w = LearningRate2(10, 1)
+    @fact O.weight(w, 1, 0, 1) --> w.γ0 / (1.0 + w.γ0)
 end
 
 end

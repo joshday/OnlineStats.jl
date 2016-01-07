@@ -5,6 +5,7 @@ import OnlineStats: _j
 
 
 function linearmodeldata(n, p, corr = 0)
+    # linear model data with correlated predictors
     V = zeros(p, p)
     for j in 1:p, i in 1:p
         V[i, j] = corr^abs(i - j)

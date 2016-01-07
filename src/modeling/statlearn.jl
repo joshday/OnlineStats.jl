@@ -73,8 +73,10 @@ deriv(m::HuberRegression, y::Real, ŷ::Real) = abs(y - ŷ) <= m.δ ? ŷ - y :
 abstract Algorithm
 
 
-immutable SGD <: Algorithm end
-SGD(p::Integer) = SGD()
+immutable SGD <: Algorithm
+    SGD() = new()
+    SGD(p::Integer) = new()
+end
 type AdaGrad <: Algorithm
     g0::Float64
     g::VecF
@@ -222,11 +224,11 @@ function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ)
         o.algorithm.g0 += g * g
         setβ0!(o, o.η / sqrt(o.algorithm.g0), g)
     end
-    for j in 1:length(o.β)
+    @inbounds for j in 1:length(o.β)
         gx = g * x[j]
         o.algorithm.g[j] += gx * gx
         γ = o.η / sqrt(o.algorithm.g[j])
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
+        o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::AVec)

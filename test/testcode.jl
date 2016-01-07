@@ -13,8 +13,9 @@ x = randn(n, p)
 y = x * β + randn(n)
 β_with_int = vcat(0., β)
 
-
-@time o = O.StatLearn(x, y, 100, algorithm = O.AdaDelta(), model = O.L1Regression())
-display(o)
+@time o = O.StatLearn(x, y, algorithm = O.AdaDelta(), model = O.L1Regression())
+@time o2 = O.StatLearn(x, y, O.LearningRate2(100), algorithm = O.SGD(), model = O.L1Regression())
+println(maxabs(coef(o) - β_with_int))
+println(maxabs(coef(o2) - β_with_int))
 
 end

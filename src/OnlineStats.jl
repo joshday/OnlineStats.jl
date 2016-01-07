@@ -11,7 +11,7 @@ Requires.@require Plots include("plots.jl")
 export
     OnlineStat,
     # Weight
-    EqualWeight, ExponentialWeight, LearningRate,
+    EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     CovMatrix, LinReg, QuantReg, NormalMix,
@@ -59,6 +59,15 @@ immutable LearningRate <: Weight
 end
 weight(w::LearningRate, n2::Int, n1::Int, nup::Int) = max(w.minstep, exp(-w.r * log(nup)))
 
+immutable LearningRate2 <: Weight
+    # Recommendation from http://research.microsoft.com/pubs/192769/tricks-2012.pdf
+    γ0::Float64
+    c::Float64
+    minstep::Float64
+    LearningRate2(γ0::Real, c::Real = 1.0; minstep = 0.0) =
+        new(Float64(γ0), Float64(c), Float64(minstep))
+end
+weight(w::LearningRate2, n2, n1, nup) = max(w.minstep, w.γ0 / (1.0 + w.γ0 * w.c * nup))
 
 #----------------------------------------------------------------------# methods
 value(o::OnlineStat) = o.value
