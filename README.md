@@ -46,13 +46,15 @@ o3 = QuantileMM(y, LearningRate(.6))
 - `EqualWeight()`
     - all observations are weighted equally.  Weight at update `t` is `1 / t`.
 
-- `ExponentialWeight(minstep)`, `ExponentialWeight(lookback)`
+- `ExponentialWeight(minstep::Float64)`, `ExponentialWeight(lookback::Int)`
     - use equal weight until weights reach `minstep = 1 / lookback`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
 
 - `LearningRate(r)`
+    - `r` should be in (0.5, 1].
     - For stochastic approximation methods.  Weight at update `t` is `1 / t^r`.
 
 - `LearningRate2(γ, c)`
+    - `γ` > 0, `c` > 0
     - For stochastic approximation methods.  Weight at update `t` is `γ / (1 + γ * c * t)`.
 
 
