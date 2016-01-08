@@ -52,11 +52,44 @@ Using mini-batches, gradient estimates are less noisy.  The trade-off,
 of course, is that fewer updates occur.
 
 ```julia
-o = StatLearn(x, y, SGD(), LearningRate(.6))  # batch size = 1
-o = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
+o1 = StatLearn(x, y, SGD(), LearningRate(.6))  # batch size = 1
+o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
 ```
 
 **Note**: The order of of `Weight`, `Algorithm`, `ModelDef`, and `Penalty` arguments don't matter.
 
 
 ### TracePlot helps you try out learning rates and batch sizes.
+
+[Plots.jl](https://github.com/tbreloff/Plots.jl) allows OnlineStats.jl to implement
+plot methods for a variety of plotting packages.
+
+```julia
+using Plots
+gadfly()  # use Gadfly for plotting
+
+o = StatLearn(p, LearningRate(.6))  # empty object, p predictors
+tr = TracePlot(o)
+fit!(tr, x1, y1)  # Each call to fit adds a point/points to the trace plot
+...
+fit!(tr, xn, yn)
+plot(tr)
+
+coefplot(o)  # visualize coefficients
+```
+
+
+### CompareTracePlot helps you look at competing models
+
+```julia
+o1 = StatLearn(p, SGD())
+o2 = StatLearn(p, AdaGrad())
+o3 = StatLearn(p, AdaDelta())
+
+myloss(o) = loss(o, xtest, ytest)  # Function argument must return a scalar
+tr = CompareTracePlot(collect(o1, o2, o3), myloss)  
+fit!(tr, x1, y1)
+...
+fit!(tr, xn, yn)
+plot(tr)
+```
