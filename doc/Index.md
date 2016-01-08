@@ -1,139 +1,53 @@
-# Available Statistics and Models
+# Overview
 
-### BernoulliBootstrap
+### Every OnlineStat is a Type
 
-### CovMatrix
+There are two ways of creating an OnlineStat:
+
+1. Create "empty" object and add data
+1. Create object with data
+
 ```julia
-o = CovMatrix(x)
-cov(o)
-cor(o)
-var(o)
-std(o)
-mean(o)
-```
+o = Mean()
+fit!(o, y)
 
-
-### Extrema
-```julia
-o = Extrema(y)
-extrema(o)
-```
-
-
-### FitDistribution
-```julia
-o = FitDistribution(Bernoulli, y)
-o = FitDistribution(Categorical, y)
-o = FitDistribution(Cauchy, y)
-o = FitDistribution(Exponential, y)
-o = FitDistribution(Gamma, y)
-o = FitDistribution(LogNormal, y)
-o = FitDistribution(Normal, y)
-o = FitDistribution(Poisson, y)
-mean(o)
-var(o)
-std(o)
-params(o)
-```
-
-
-### FitMvDistribution
-```julia
-o = FitMvDistribution(Multinomial, x)
-o = FitMvDistribution(MvNormal, x)
-mean(o)
-var(o)
-std(o)
-cov(o)
-```
-
-
-### KMeans
-```julia
-o = KMeans(x, k)
-value(o)
-```
-
-
-### LinReg
-```julia
-o = LinReg(x, y)
-coef(o)
-coef(o, λ, L2Penalty())
-coef(o, λ, L1Penalty())
-coef(o, λ, ElasticNetPenalty())
-coef(o, λ, SCADPenalty())
-predict(o, x)
-```
-
-
-### Mean
-```julia
 o = Mean(y)
-mean(o)
 ```
 
+### All OnlineStats can be updated
 
-### Means
 ```julia
-o = Means(x)
-mean(o)
+o = Variance(randn(100))
+fit!(o, randn(100)) 
+nobs(o) # number of observations == 200
 ```
 
+### New data can be weighted differently
 
-### Moments
 ```julia
-o = Moments(y)
-mean(o)
-var(o)
-std(o)
-skewness(o)
-kurtosis(o)
+o = Mean(EqualWeight())
+o2 = Variance(y, ExponentialWeight(.1))
+o3 = QuantileMM(y, LearningRate(.6))
 ```
 
+#### `EqualWeight()`
+- all observations are weighted equally.  Weight at update `t` is `1 / t`.
 
-### QuantileSGD
-```julia
-o = QuantileSGD(y, tau = [.25, .5, .75])
-value(o)
-```
+#### `ExponentialWeight(minstep)`, `ExponentialWeight(lookback)`
+- use equal weight until weights reach `minstep = 1 / lookback`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
 
+#### `LearningRate(r)`
+- For stochastic approximation methods.  Weight at update `t` is `1 / t^r`.
 
-### QuantileMM
-```julia
-o = QuantileMM(y, tau = [.25, .5, .75])
-value(o)
-```
+#### `LearningRate2(γ, c)`
+- For stochastic approximation methods.  Weight at update `t` is `γ / (1 + γ * c * t)`.
 
 
-### QuantReg
-```julia
-o = QuantReg(x, y, .8)
-coef(o)
-```
+### OnlineStats share a common interface
 
-
-### StatLearn
-```julia
-o = StatLearn(o, model = L2Regression(), algorithm = SGD(), penalty = NoPenalty())
-coef(o)
-predict(o, x)
-loss(o, x, y)
-```
-
-### Variance
-```julia
-o = Variance(y)
-var(o)
-std(o)
-mean(o)
-```
-
-
-### Variances
-```julia
-o = Variances(x)
-var(o)
-std(o)
-mean(o)
-```
+- `value(o)`
+    - the associated value of an OnlineStat
+- `nobs(o)`
+    - the number of observations seen
+- `n_updates(o)`
+    - the number of update performed.  When using batch updates, `nobs(o) != n_updates(o)`.
