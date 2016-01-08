@@ -93,3 +93,33 @@ fit!(tr, x1, y1)
 fit!(tr, xn, yn)
 plot(tr)
 ```
+
+
+### Regularization parameters can be tuned automatically
+
+Given a test dataset, `StatLearnCV` attempts to find the optimal regularization
+parameter `λ` which minimizes the `ModelDef` loss on the test data (cross validation).  
+This works wonders for highly correlated predictors.
+
+```julia
+o = StatLearn(p, AdaDelta(), L1Penalty(.5))
+cv = StatLearnCV(o, xtest, ytest)
+fit!(cv, x, y)
+coef(o)
+```
+
+
+### Sparsity can be enforced in the coefficients
+Because of noisy stochastic gradients, setting coefficients to zero in the on-line
+setting is difficult (`RDA` works well for this in many cases).  An alternative
+is to create a scheme which sets coefficients to zero once they are "close enough to zero".
+
+```julia
+o = StatLearn(p, MMGrad())
+sp = StatLearnSparse(o, HardThreshold(burnin, threshold))
+fit!(sp, x, y)
+coef(o)
+```
+
+For a `HardThreshold`, after `burnin` observations have been seen, any coefficient
+less than `threshold` in absolute value will be set to zero.
