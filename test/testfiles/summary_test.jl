@@ -101,12 +101,20 @@ facts(@title "Diff / Diffs") do
     @fact typeof(o) --> Diff{Float64}
     @fact last(o) --> y[end]
     @fact diff(o) --> y[end] - y[end-1]
-
+    @fact value(o) --> diff(o)
     y = rand(Int, 100)
     o = Diff(y)
     @fact typeof(o) --> Diff{Int64}
     @fact last(o) --> y[end]
     @fact diff(o) --> y[end] - y[end-1]
+
+    Diffs(10)
+    Diffs(Int32, 10)
+    y = randn(100, 10)
+    o = Diffs(y)
+    @fact last(o) --> vec(y[end, :])
+    @fact diff(o) --> vec(y[end, :] - y[end-1, :])
+    @fact value(o) --> diff(o)
 end
 
 

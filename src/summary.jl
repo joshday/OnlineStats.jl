@@ -333,6 +333,29 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real)
     return
 end
 
+"""
+Track both the last values and the last differences for more than one series
+"""
+type Diffs{T <: Real} <: OnlineStat
+    diffs::Vector{T}
+    lastvals::Vector{T}
+    n::Int
+end
+
+Diffs(p::Integer) = Diffs(zeros(p), zeros(p), 0)
+Diffs{T<:Real}(::Type{T}, p::Integer) = Diffs(zeros(T,p), zeros(T,p), 0)
+Diffs{T<:Real}(x::AMat{T}) = (o = Diffs(T,ncols(x)); fit!(o, x); o)
+
+value(o::Diffs) = o.diffs
+Base.last(o::Diffs) = o.lastvals
+Base.diff(o::Diffs) = o.diffs
+function fit!{T<:Real}(o::Diffs{T}, x::AVec{T})
+    o.diffs = (o.n == 0 ? zeros(T,length(o.diffs)) : x - last(o))
+    o.lastvals = collect(x)
+    o.n += 1
+    return
+end
+
 
 
 #---------------------------------------# convenience constructors and Base.show
