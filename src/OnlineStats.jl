@@ -43,15 +43,22 @@ typealias AMatF AMat{Float64}
 #-----------------------------------------------------------------------# weight
 abstract Weight
 
+"All observations weighted equally."
 immutable EqualWeight <: Weight end
 weight(w::EqualWeight, n2::Int, n1::Int, nup::Int) = n2 / (n1 + n2)
 
+"`ExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
 immutable ExponentialWeight <: Weight
     minstep::Float64
     ExponentialWeight(minstep::Real = 0.0) = new(Float64(minstep))
 end
 weight(w::ExponentialWeight, n2::Int, n1::Int, nup::Int) = max(w.minstep, n2 / (n1 + n2))
 
+"""
+`LearningRate(r; minstep = 0.0)`.
+
+Weight at update `t` is `1 / t ^ r`.  Compare to `LearningRate2`.
+"""
 immutable LearningRate <: Weight
     r::Float64
     minstep::Float64
@@ -59,21 +66,30 @@ immutable LearningRate <: Weight
 end
 weight(w::LearningRate, n2::Int, n1::Int, nup::Int) = max(w.minstep, exp(-w.r * log(nup)))
 
+"""
+LearningRate2(γ, c = 1.0; minstep = 0.0).
+
+Weight at update `t` is `γ / (1 + γ * c * t)`.  Compare to `LearningRate`.
+"""
 immutable LearningRate2 <: Weight
     # Recommendation from http://research.microsoft.com/pubs/192769/tricks-2012.pdf
-    γ0::Float64
+    γ::Float64
     c::Float64
     minstep::Float64
-    LearningRate2(γ0::Real, c::Real = 1.0; minstep = 0.0) =
-        new(Float64(γ0), Float64(c), Float64(minstep))
+    LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) =
+        new(Float64(γ), Float64(c), Float64(minstep))
 end
 weight(w::LearningRate2, n2, n1, nup) = max(w.minstep, w.γ0 / (1.0 + w.γ0 * w.c * nup))
 
 #----------------------------------------------------------------------# methods
+"`value(o::OnlineStat)`.  The associated value of an OnlineStat."
 value(o::OnlineStat) = o.value
+"`nobs(o::OnlineStat)`.  The number of observations."
 StatsBase.nobs(o::OnlineStat) = o.n
+"`n_updates(o::OnlineStat)`.  The number of updates an OnlineStat has seen."
 n_updates(o::OnlineStat) = o.nup
 
+# internal functions
 function n!(o::OnlineStat, n2::Int)
     o.n += n2
 end
@@ -106,6 +122,15 @@ function Base.show(io::IO, o::OnlineStat)
 end
 
 #-------------------------------------------------------------------------# fit!
+"""
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates
+make more sense for OnlineStats that use stochastic approximation, such as
+`StatLearn`, `QuantileMM`, and `NormalMix`.
+"""
 function fit!(o::OnlineStat, y::Union{AVec, AMat})
     @inbounds for i in 1:size(y, 1)
         fit!(o, row(y, i))
@@ -195,7 +220,8 @@ ncols(x::AMat) = size(x, 2)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
-const _ϵ = 1e-8  # global ϵ to avoid dividing by 0, etc.
+"epsilon used in special cases to avoid dividing by 0, etc."
+const _ϵ = 1e-8 
 
 
 

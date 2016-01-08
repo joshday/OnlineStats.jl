@@ -9,6 +9,7 @@
 #   - StatsBase.fit! method
 #
 #-------------------------------------------------------------------------# Mean
+"Univariate Mean"
 type Mean{W <: Weight} <: OnlineStat
     value::Float64
     weight::W
@@ -30,6 +31,7 @@ Base.mean(o::Mean) = value(o)
 
 
 #------------------------------------------------------------------------# Means
+"Mean vector of a data matrix, similar to `mean(x, 1)`"
 type Means{W <: Weight} <: OnlineStat
     value::VecF
     weight::W
@@ -51,6 +53,7 @@ Base.mean(o::Means) = value(o)
 
 
 #---------------------------------------------------------------------# Variance
+"Univariate Variance"
 type Variance{W <: Weight} <: OnlineStat
     value::Float64
     μ::Float64
@@ -73,6 +76,7 @@ value(o::Variance) = o.value * _unbias(o)
 
 
 #--------------------------------------------------------------------# Variances
+"Variance vector of a data matrix, similar to `var(x, 1)`"
 type Variances{W <: Weight} <: OnlineStat
     value::VecF
     μ::VecF
@@ -106,6 +110,7 @@ value(o::Variances) = o.value * _unbias(o)
 
 
 #--------------------------------------------------------------------# CovMatrix
+"Covariance matrix"
 type CovMatrix{W <: Weight} <: OnlineStat
     value::MatF
     cormat::MatF
@@ -155,7 +160,7 @@ end
 
 
 #----------------------------------------------------------------------# Extrema
-# Weight gets ignored for Extrema
+"Extrema (maximum and minimum).  Ignores `Weight`."
 type Extrema <: OnlineStat
     min::Float64
     max::Float64
@@ -177,6 +182,7 @@ value(o::Extrema) = extrema(o)
 
 
 #------------------------------------------------------------------# QuantileSGD
+"Approximate quantiles via stochastic gradient descent"
 type QuantileSGD{W <: Weight} <: OnlineStat
     value::VecF
     τ::VecF
@@ -216,6 +222,7 @@ end
 
 
 #------------------------------------------------------------------# QuantileMM
+"Approximate quantiles via an online MM algorithm"
 type QuantileMM{W <: Weight} <: OnlineStat
     value::VecF
     τ::VecF
@@ -267,7 +274,9 @@ function Base.show(io::IO, o::QuantileMM)
     print_value_and_nobs(io, o)
 end
 
+
 #----------------------------------------------------------------------# Moments
+"Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`"
 type Moments{W <: Weight} <: OnlineStat
     value::VecF
     weight::W
@@ -304,9 +313,7 @@ end
 
 
 #-------------------------------------------------------------------# Diff/Diffs
-"""
-Track both the last value and the last difference
-"""
+"Track the last value and the last difference"
 type Diff{T <: Real} <: OnlineStat
     diff::T
     lastval::T
@@ -333,9 +340,7 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real)
     return
 end
 
-"""
-Track both the last values and the last differences for more than one series
-"""
+"Track the last values and the last differences for multiple series"
 type Diffs{T <: Real} <: OnlineStat
     diffs::Vector{T}
     lastvals::Vector{T}
