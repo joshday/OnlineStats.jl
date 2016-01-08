@@ -53,7 +53,7 @@ function StatsBase.vcov(o::LinReg)
  end
 StatsBase.stderr(o::LinReg) = sqrt(diag(StatsBase.vcov(o)))
 loss(o::LinReg, x::AMatF, y::AVecF) = mean(abs2(y - predict(o, x)))
-function StatsBase.coef(o::LinReg, λ::Real, penalty::Penalty = NoPenalty();
+function StatsBase.coef(o::LinReg, penalty::Penalty = NoPenalty();
         maxiters::Integer = 50,
         tolerance::Real = 1e-4,
         step::Real = 1.0,
@@ -76,8 +76,8 @@ function StatsBase.coef(o::LinReg, λ::Real, penalty::Penalty = NoPenalty();
         β = β + ((i - 2) / (i + 1)) * (β - βold)
         g = (xty - xtx * β)
         β = β + s * g
-        prox!(penalty, λ, β, s)
-        tol = βtol(β, βold, xtx, xty, λ, penalty)
+        prox!(penalty, β, s)
+        tol = βtol(β, βold, xtx, xty, penalty)
         tol < tolerance && break
     end
 
@@ -97,14 +97,14 @@ function scaled_to_original!(β::VecF, o::LinReg)
     end
     [β₀; β]
 end
-function _penloglik(β::VecF, xtx::MatF, xty::VecF, λ::Float64, penalty::Penalty)
+function _penloglik(β::VecF, xtx::MatF, xty::VecF, penalty::Penalty)
     # propto penalized likelihood
-    dot(β, xtx * β) - 2.0 * dot(β, xty) + _j(penalty, λ, β)
+    dot(β, xtx * β) - 2.0 * dot(β, xty) + _j(penalty, β)
 end
-function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, λ::Float64, penalty::Penalty)
+function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::Penalty)
     # convergence criteria
-    v = _penloglik(β, xtx, xty, λ, penalty)
-    u = _penloglik(βold, xtx, xty, λ, penalty)
+    v = _penloglik(β, xtx, xty, penalty)
+    u = _penloglik(βold, xtx, xty, penalty)
     abs(u - v) / (abs(v) + 1.0)
 end
 

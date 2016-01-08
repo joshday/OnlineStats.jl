@@ -127,7 +127,6 @@ type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat
     algorithm::A    # determines how updates work
     model::M        # model definition
     η::Float64      # constant part of learning rate
-    λ::Float64      # regularization parameter
     penalty::P      # type of penalty
     weight::W       # Weight, may not get used, depending on algorithm
     n::Int          # nobs
@@ -136,14 +135,13 @@ end
 function _StatLearn(p::Integer, wgt::Weight = LearningRate();
         model::ModelDef = L2Regression(),
         η::Real = 1.0,
-        λ::Real = 0.0,
         penalty::Penalty = NoPenalty(),
         algorithm::Algorithm = SGD(),
         intercept::Bool = true
     )
     o = StatLearn(
         0.0, zeros(p), intercept, algorithm, model,
-        Float64(η), Float64(λ), penalty, wgt, 0, 0
+        Float64(η), penalty, wgt, 0, 0
     )
     o.algorithm = typeof(o.algorithm)(p)
     o
@@ -196,7 +194,6 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "value", coef(o))
     print_item(io, "model", o.model)
     print_item(io, "penalty", o.penalty)
-    print_item(io, "λ", o.λ)
     print_item(io, "nobs", nobs(o))
 end
 function fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real)
@@ -228,7 +225,7 @@ function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ)
         o.β0 -= γ * g
     end
     for j in 1:length(o.β)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j], γ)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j], γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
@@ -243,7 +240,7 @@ function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec
             gj += g[i] * x[i, j]
         end
         gj /= n2
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gj, γ)
+        o.β[j] = prox(o.penalty, o.β[j] - γ * gj, γ)
     end
 end
 
@@ -261,7 +258,7 @@ function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ)
         gx = g * x[j]
         o.algorithm.g[j] += gx * gx
         γ = o.η / sqrt(o.algorithm.g[j])
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
+        o.β[j] = prox(o.penalty, o.β[j] - γ * gx, γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
@@ -280,7 +277,7 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
         gx /= n
         o.algorithm.g[j] += gx * gx
         γ = o.η / sqrt(o.algorithm.g[j])
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
+        o.β[j] = prox(o.penalty, o.β[j] - γ * gx, γ)
     end
 end
 
@@ -299,7 +296,7 @@ function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ)
         o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, o.algorithm.ρ)
         γ = sqrt(o.algorithm.Δ[j] / o.algorithm.g[j])
         Δ = γ * gx
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - Δ, γ)
+        o.β[j] = prox(o.penalty, o.β[j] - Δ, γ)
         o.algorithm.Δ[j] = smooth(o.algorithm.Δ[j], Δ * Δ, o.algorithm.ρ)
     end
 end
@@ -322,7 +319,7 @@ function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ:
         o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, o.algorithm.ρ)
         γ = sqrt(o.algorithm.Δ[j] / o.algorithm.g[j])
         Δ = γ * gx
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * gx, γ)
+        o.β[j] = prox(o.penalty, o.β[j] - γ * gx, γ)
         o.algorithm.Δ[j] = smooth(o.algorithm.Δ[j], Δ * Δ, o.algorithm.ρ)
     end
 end
@@ -372,19 +369,19 @@ function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, NoPenalty}, j::Int)
 end
 # L2Penalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L2Penalty}, j::Int)
-    o.algorithm.gbar[j] += (1 / o.nup) * o.λ * o.β[j]  # add in penalty gradient
+    o.algorithm.gbar[j] += (1 / o.nup) * o.penalty.λ * o.β[j]  # add in penalty gradient
     o.β[j] = -rda_γ(o,j) * o.algorithm.gbar[j]
 end
 # L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L1Penalty}, j::Int)
     ḡ = o.algorithm.gbar[j]
-    o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.λ)
+    o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.penalty.λ)
 end
 # ElasticNetPenalty
 function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, ElasticNetPenalty}, j::Int)
-    o.algorithm.gbar[j] += (1 / o.nup) * o.λ * (1 - o.penalty.α) * o.β[j]
+    o.algorithm.gbar[j] += (1 / o.nup) * o.penalty.λ * (1 - o.penalty.α) * o.β[j]
     ḡ = o.algorithm.gbar[j]
-    o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.λ * o.penalty.α)
+    o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.penalty.λ * o.penalty.α)
 end
 # adaptive weight for element j
 rda_γ(o::StatLearn{RDA}, j::Int) = o.nup * o.η / sqrt(o.algorithm.g[j])
@@ -425,7 +422,7 @@ function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
     end
     for j in 1:length(o.β)
         o.algorithm.g[j] = smooth(o.algorithm.g[j], mmsuff(o, x[j], x, y, ŷ), γ)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * g * x[j] / o.algorithm.g[j], γ)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j] / o.algorithm.g[j], γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
@@ -448,7 +445,7 @@ function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
             u += g[i] * xij
         end
         o.algorithm.g[j] = smooth(o.algorithm.g[j], v / n, γ)
-        @inbounds o.β[j] = prox(o.penalty, o.λ, o.β[j] - γ * u / n / o.algorithm.g[j], γ)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * u / n / o.algorithm.g[j], γ)
     end
 end
 
@@ -463,7 +460,7 @@ function _updateβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
     for j in 1:length(o.β)
         o.algorithm.g[j] += mmsuff(o, x[j], x, y, ŷ)
         γ = o.η / sqrt(o.algorithm.g[j])
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - o.η * γ * g * x[j], γ)
+        o.β[j] = prox(o.penalty, o.β[j] - o.η * γ * g * x[j], γ)
     end
 end
 function _updatebatchβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
@@ -487,6 +484,6 @@ function _updatebatchβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
         end
         o.algorithm.g[j] += v / n
         γ = o.η / sqrt(o.algorithm.g[j])
-        o.β[j] = prox(o.penalty, o.λ, o.β[j] - o.η * γ * u / n, γ)
+        o.β[j] = prox(o.penalty, o.β[j] - o.η * γ * u / n, γ)
     end
 end

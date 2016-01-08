@@ -79,7 +79,7 @@ immutable LearningRate2 <: Weight
     LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) =
         new(Float64(γ), Float64(c), Float64(minstep))
 end
-weight(w::LearningRate2, n2, n1, nup) = max(w.minstep, w.γ0 / (1.0 + w.γ0 * w.c * nup))
+weight(w::LearningRate2, n2, n1, nup) = max(w.minstep, w.γ / (1.0 + w.γ * w.c * nup))
 
 #----------------------------------------------------------------------# methods
 "`value(o::OnlineStat)`.  The associated value of an OnlineStat."
@@ -221,7 +221,7 @@ ncols(x::AMat) = size(x, 2)
 Base.copy(o::OnlineStat) = deepcopy(o)
 
 "epsilon used in special cases to avoid dividing by 0, etc."
-const _ϵ = 1e-8 
+const _ϵ = 1e-8
 
 
 

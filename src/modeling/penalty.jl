@@ -2,87 +2,105 @@ abstract Penalty
 #--------------------------------------------------------------------# NoPenalty
 immutable NoPenalty <: Penalty end
 Base.show(io::IO, p::NoPenalty) = print(io, "NoPenalty")
-add_deriv(p::NoPenalty, g, λ, βj) = g
-_j(p::NoPenalty, λ, β) = 0.0
-prox(p::NoPenalty, λ::Float64, βj::Float64, s::Float64) = βj
+add_deriv(p::NoPenalty, g, βj) = g
+_j(p::NoPenalty, β) = 0.0
+prox(p::NoPenalty, βj::Float64, s::Float64) = βj
 
 #--------------------------------------------------------------------# L2Penalty
-immutable L2Penalty <: Penalty end
-Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty")
-add_deriv(p::L2Penalty, g, λ, βj) = g + λ * βj
-_j(p::L2Penalty, λ, β) = 0.5 * λ * sumabs2(β)
-prox(p::L2Penalty, λ::Float64, βj::Float64, s::Float64) = βj / (1.0 + s * λ)
+type L2Penalty <: Penalty
+    λ::Float64
+    function L2Penalty(λ::Real)
+        @assert λ >= 0
+        new(Float64(λ))
+    end
+end
+Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty (λ = $(p.λ))")
+add_deriv(p::L2Penalty, g, βj) = g + p.λ * βj
+_j(p::L2Penalty, β) = 0.5 * p.λ * sumabs2(β)
+prox(p::L2Penalty, βj::Float64, s::Float64) = βj / (1.0 + s * p.λ)
 
 #--------------------------------------------------------------------# L1Penalty
-immutable L1Penalty <: Penalty end
-Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty")
-add_deriv(p::L1Penalty, g, λ, βj) = g + λ * sign(βj)
-_j(p::L1Penalty, λ, β) = λ * sumabs(β)
-function prox(p::L1Penalty, λ::Float64, βj::Float64, s::Float64)
-    sign(βj) * max(abs(βj) - s * λ, 0.0)
+type L1Penalty <: Penalty
+    λ::Float64
+    function L1Penalty(λ::Real)
+        @assert λ >= 0
+        new(Float64(λ))
+    end
 end
+Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty (λ = $(p.λ))")
+add_deriv(p::L1Penalty, g, βj) = g + p.λ * sign(βj)
+_j(p::L1Penalty, β) = p.λ * sumabs(β)
+prox(p::L1Penalty, βj::Float64, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
+
 
 #------------------------------------------------------------# ElasticNetPenalty
-immutable ElasticNetPenalty <: Penalty
+type ElasticNetPenalty <: Penalty
+    λ::Float64
     α::Float64
-    ElasticNetPenalty(a::Real = 0.5) = new(Float64(a))
+    function ElasticNetPenalty(λ::Real, α::Real = 0.5)
+        @assert λ >= 0
+        @assert 0 <= α <= 1
+        new(Float64(λ), Float64(α))
+    end
 end
-Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty (α = $(p.α))")
-add_deriv(p::ElasticNetPenalty, g, λ, βj) = g + λ * (p.α * sign(βj) + (1.0 - p.α) * βj)
-_j(p::ElasticNetPenalty, λ, β) = λ * (p.α * sumabs(β) + (1. - p.α) * 0.5 * sumabs2(β))
-function prox(p::ElasticNetPenalty, λ::Float64, βj::Float64, s::Float64)
-    βj = sign(βj) * max(abs(βj) - s * λ * p.α, 0.0)  # Lasso prox
-    βj = βj / (1.0 + s * λ * (1.0 - p.α))            # Ridge prox
+Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty (λ = $(p.λ), α = $(p.α))")
+add_deriv(p::ElasticNetPenalty, g, βj) = g + p.λ * (p.α * sign(βj) + (1.0 - p.α) * βj)
+_j(p::ElasticNetPenalty, β) = p.λ * (p.α * sumabs(β) + (1. - p.α) * 0.5 * sumabs2(β))
+function prox(p::ElasticNetPenalty, βj::Float64, s::Float64)
+    βj = sign(βj) * max(abs(βj) - s * p.λ * p.α, 0.0)  # Lasso prox
+    βj = βj / (1.0 + s * p.λ * (1.0 - p.α))            # Ridge prox
 end
 
 
 #------------------------------------------------------------------# SCADPenalty
 # http://www.pstat.ucsb.edu/student%20seminar%20doc/SCAD%20Jian%20Shi.pdf
 type SCADPenalty <: Penalty
+    λ::Float64
     a::Float64
-    function SCADPenalty(a::Real = 3.7)  # 3.7 is what Fan and Li use
+    function SCADPenalty(λ::Real, a::Real = 3.7)  # 3.7 is what Fan and Li use
         @assert a > 2
-        new(Float64(a))
+        @assert λ >= 0
+        new(Float64(λ), Float64(a))
     end
 end
-Base.show(io::IO, p::SCADPenalty) = print(io, "SCADPenalty (a = $(p.a))")
-function add_deriv(p::SCADPenalty, g, λ, βj)
-    if abs(βj) < λ
-        g + sign(βj) * λ
-    elseif abs(βj) < p.a * λ
-        g + max(p.a * λ - abs(βj), 0.0) / (p.a - 1.0)
+Base.show(io::IO, p::SCADPenalty) = print(io, "SCADPenalty (λ = $(p.λ), a = $(p.a))")
+function add_deriv(p::SCADPenalty, g, βj)
+    if abs(βj) < p.λ
+        g + sign(βj) * p.λ
+    elseif abs(βj) < p.a * p.λ
+        g + max(p.a * p.λ - abs(βj), 0.0) / (p.a - 1.0)
     else
         g
     end
 end
-function _j(p::SCADPenalty, λ, β)
+function _j(p::SCADPenalty, β)
     val = 0.0
     for j in 1:length(β)
         βj = abs(β[j])
-        if βj < λ
-            val += λ * βj
-        elseif βj < λ * p.a
-            val -= 0.5 * (βj ^ 2 - 2.0 * p.a * λ * βj + λ ^ 2) / (p.a - 1.0)
+        if βj < p.λ
+            val += p.λ * βj
+        elseif βj < p.λ * p.a
+            val -= 0.5 * (βj ^ 2 - 2.0 * p.a * p.λ * βj + p.λ ^ 2) / (p.a - 1.0)
         else
-            val += 0.5 * (p.a + 1.0) * λ ^ 2
+            val += 0.5 * (p.a + 1.0) * p.λ ^ 2
         end
     end
     return val
 end
-function prox(p::SCADPenalty, λ, βj::Float64, s::Float64)
-    if abs(βj) > p.a * λ
-    elseif abs(βj) < 2.0 * λ
-        βj = sign(βj) * max(abs(βj) - s * λ, 0.0)
+function prox(p::SCADPenalty, βj::Float64, s::Float64)
+    if abs(βj) > p.a * p.λ
+    elseif abs(βj) < 2.0 * p.λ
+        βj = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
     else
-        βj = (βj - s * sign(βj) * p.a * λ / (p.a - 1.0)) / (1.0 - (1.0 / p.a - 1.0))
+        βj = (βj - s * sign(βj) * p.a * p.λ / (p.a - 1.0)) / (1.0 - (1.0 / p.a - 1.0))
     end
     βj
 end
 
 
 
-function prox!(p::Penalty, λ::Float64, β::AVecF, s::Float64)
+function prox!(p::Penalty, β::AVecF, s::Float64)
     for j in 1:length(β)
-        β[j] = prox(p, λ, β[j], s)
+        β[j] = prox(p, β[j], s)
     end
 end

@@ -84,8 +84,8 @@ end
 function tuneλ!(o::StatLearn, x, y, γ, xtest, ytest)
     o_l = copy(o)
     o_h = copy(o)
-    o_l.λ = max(0.0, o_l.λ - γ)
-    o_h.λ += γ
+    o_l.penalty.λ = max(0.0, o_l.penalty.λ - γ)
+    o_h.penalty.λ += γ
 
     fit!(o, x, y)
     fit!(o_l, x, y)
@@ -100,12 +100,12 @@ function tuneλ!(o::StatLearn, x, y, γ, xtest, ytest)
         o.β0 = o_l.β0
         o.β = o_l.β
         o.algorithm = o_l.algorithm
-        o.λ = o_l.λ
+        o.penalty.λ = o_l.penalty.λ
     elseif best == loss_hi # o_h is winner
         o.β0 = o_h.β0
         o.β = o_h.β
         o.algorithm = o_h.algorithm
-        o.λ = o_h.λ
+        o.penalty.λ = o_h.penalty.λ
     end
 
 end
@@ -119,6 +119,6 @@ loss(o::StatLearnCV, x, y) = loss(o.o, x, y)
 function Base.show(io::IO, o::StatLearnCV)
     printheader(io, "StatLearnCV")
     print_item(io, "burnin", o.burnin)
-    # print_item(io, "loss", loss(o.o, o.xtest, o.ytest))
+    print_item(io, "loss", loss(o.o, o.xtest, o.ytest))
     show(io, o.o)
 end

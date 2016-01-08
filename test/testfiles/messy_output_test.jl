@@ -28,10 +28,10 @@ facts(@title "Show Methods") do
     display(FitMvDistribution(MvNormal, xs))
 
     display(NoPenalty())
-    display(L1Penalty())
-    display(L2Penalty())
-    display(ElasticNetPenalty())
-    display(SCADPenalty())
+    display(L1Penalty(.1))
+    display(L2Penalty(.1))
+    display(ElasticNetPenalty(.1, .5))
+    display(SCADPenalty(.1, 3.7))
 
     display(L2Regression())
     display(L1Regression())
