@@ -14,7 +14,7 @@ export
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    CovMatrix, LinReg, QuantReg, NormalMix,
+    Diff, Diffs, CovMatrix, LinReg, QuantReg, NormalMix,
     StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
     KMeans, FitDistribution, FitMvDistribution, BiasVector, BiasMatrix,
     # Penalties
@@ -74,11 +74,14 @@ value(o::OnlineStat) = o.value
 StatsBase.nobs(o::OnlineStat) = o.n
 n_updates(o::OnlineStat) = o.nup
 
-@inline function n_and_nup!(o::OnlineStat, n2::Int)
+function n!(o::OnlineStat, n2::Int)
+    o.n += n2
+end
+function n_and_nup!(o::OnlineStat, n2::Int)
     o.n += n2
     o.nup += 1
 end
-@inline function weight!(o::OnlineStat, n2::Int)
+function weight!(o::OnlineStat, n2::Int)
     n1 = o.n
     o.n += n2
     o.nup += 1

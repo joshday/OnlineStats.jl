@@ -54,7 +54,9 @@ loss(m::SVMLike, y, η) =
     mean([max(0.0, 1.0 - y[i] * η[i]) for i in 1:length(y)])
 function loss(m::HuberRegression, y, η)
     mean([
-        abs(y[i]-η[i]) < m.δ ? 0.5 * (y[i]-η[i])^2 : m.δ * (abs(y[i]-η[i]) - 0.5 * m.δ)
+        abs(y[i]-η[i]) < m.δ ?
+        0.5 * (y[i]-η[i])^2 :
+        m.δ * (abs(y[i]-η[i]) - 0.5 * m.δ)
         for i in 1:length(y)
         ])
 end

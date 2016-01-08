@@ -90,6 +90,25 @@ facts(@title "Moments") do
     @fact kurtosis(o) --> roughly(kurtosis(x1), .1)
 end
 
+facts(@title "Diff / Diffs") do
+    Diff()
+    Diff(Float64)
+    Diff(Float32)
+    Diff(Int64)
+    Diff(Int32)
+    y = randn(100)
+    o = Diff(y)
+    @fact typeof(o) --> Diff{Float64}
+    @fact last(o) --> y[end]
+    @fact diff(o) --> y[end] - y[end-1]
+
+    y = rand(Int, 100)
+    o = Diff(y)
+    @fact typeof(o) --> Diff{Int64}
+    @fact last(o) --> y[end]
+    @fact diff(o) --> y[end] - y[end-1]
+end
+
 
 
 end #module

@@ -303,6 +303,38 @@ function Base.show(io::IO, o::Moments)
 end
 
 
+#-------------------------------------------------------------------# Diff/Diffs
+"""
+Track both the last value and the last difference
+"""
+type Diff{T <: Real} <: OnlineStat
+    diff::T
+    lastval::T
+    n::Int
+end
+Diff() = Diff(0.0, 0.0, 0)
+Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), 0)
+Diff{T<:Real}(x::AVec{T}) = (o = Diff(T); fit!(o, x); o)
+value(o::Diff) = o.diff
+Base.last(o::Diff) = o.lastval
+Base.diff(o::Diff) = o.diff
+function fit!{T<:AbstractFloat}(o::Diff{T}, x::Real)
+    v = convert(T, x)
+    o.diff = (o.n == 0 ? zero(T) : v - last(o))
+    o.lastval = v
+    o.n += 1
+    return
+end
+function fit!{T<:Integer}(o::Diff{T}, x::Real)
+    v = round(T, x)
+    o.diff = (o.n == 0 ? zero(T) : v - last(o))
+    o.lastval = v
+    o.n += 1
+    return
+end
+
+
+
 #---------------------------------------# convenience constructors and Base.show
 # constructors
 for nm in [:Mean, :Variance, :QuantileSGD, :QuantileMM, :Moments]
