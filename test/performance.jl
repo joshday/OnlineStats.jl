@@ -88,57 +88,57 @@ title(s) = print_with_color(:red, @sprintf( "%26s", s * " :"))
 # println("")
 
 
-#
-# y = randn(10_000_000)
-# println("")
-# print_with_color(:blue, "  =======================================\n")
-# print_with_color(:blue, "  Performance on 10 million observations\n")
-# print_with_color(:blue, "  =======================================\n\n")
-#
-# title("Mean new")
-# @time Mean(y)
-# title("Mean old")
-# @time O.Mean(y)
-# println("")
-#
-# title("Mean (batch) new")
-# o = Mean()
-# @time fit!(o, y, length(y))
-# title("Mean (batch) old")
-# o = O.Mean()
-# @time O.update!(o, y, length(y))
-# println("")
-#
-# title("Variance new")
-# @time Variance(y)
-# title("Variance old")
-# @time O.Variance(y)
-# println("")
-#
-# title("Extrema new")
-# o = Extrema()
-# @time fit!(o, y)
-# title("Extrema old")
-# o = O.Extrema()
-# @time O.update!(o, y)
-# println("")
-#
-# title("QuantileSGD new")
-# @time QuantileSGD(y, LearningRate(.6))
-# title("QuantileSGD old")
-# @time O.QuantileSGD(y, O.LearningRate(r = .6))
-# println("")
-#
-# title("QuantileMM new")
-# @time QuantileMM(y, LearningRate(.6))
-# title("QuantileMM old")
-# @time O.QuantileMM(y, O.LearningRate(r = .6))
-# println("")
-#
-# title("Moments new")
-# @time Moments(y)
-# title("Moments old")
-# @time O.Moments(y)
+
+y = randn(10_000_000)
+println("")
+print_with_color(:blue, "  =======================================\n")
+print_with_color(:blue, "  Performance on 10 million observations\n")
+print_with_color(:blue, "  =======================================\n\n")
+
+title("Mean new")
+@time Mean(y)
+title("Mean old")
+@time O.Mean(y)
+println("")
+
+title("Mean (batch) new")
+o = Mean()
+@time fit!(o, y, length(y))
+title("Mean (batch) old")
+o = O.Mean()
+@time O.update!(o, y, length(y))
+println("")
+
+title("Variance new")
+@time Variance(y)
+title("Variance old")
+@time O.Variance(y)
+println("")
+
+title("Extrema new")
+o = Extrema()
+@time fit!(o, y)
+title("Extrema old")
+o = O.Extrema()
+@time O.update!(o, y)
+println("")
+
+title("QuantileSGD new")
+@time QuantileSGD(y, LearningRate(.6))
+title("QuantileSGD old")
+@time O.QuantileSGD(y, O.LearningRate(r = .6))
+println("")
+
+title("QuantileMM new")
+@time QuantileMM(y, LearningRate(.6))
+title("QuantileMM old")
+@time O.QuantileMM(y, O.LearningRate(r = .6))
+println("")
+
+title("Moments new")
+@time Moments(y)
+title("Moments old")
+@time O.Moments(y)
 
 
 
