@@ -48,10 +48,15 @@ fast fitting times to remove training time bottlenecks.
 
 ### Learning rates and batch sizes matter
 
-Using mini-batches, we can get gradient estimates with less noise.  The trade-off,
-of course, is that we have fewer updates to work with.
+Using mini-batches, gradient estimates are less noisy.  The trade-off,
+of course, is that fewer updates occur.
 
 ```julia
-o = Stat
-
+o = StatLearn(x, y, SGD(), LearningRate(.6))  # batch size = 1
+o = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
 ```
+
+**Note**: The order of of `Weight`, `Algorithm`, `ModelDef`, and `Penalty` arguments don't matter.
+
+
+### TracePlot helps you try out learning rates and batch sizes.

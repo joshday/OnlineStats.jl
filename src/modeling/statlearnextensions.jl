@@ -119,6 +119,6 @@ loss(o::StatLearnCV, x, y) = loss(o.o, x, y)
 function Base.show(io::IO, o::StatLearnCV)
     printheader(io, "StatLearnCV")
     print_item(io, "burnin", o.burnin)
-    print_item(io, "loss", loss(o.o, o.xtest, o.ytest))
+    # print_item(io, "loss", loss(o.o, o.xtest, o.ytest))
     show(io, o.o)
 end
