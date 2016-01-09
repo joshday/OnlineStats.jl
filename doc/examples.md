@@ -72,10 +72,10 @@ Linear regression with optional regularization.
 ```julia
 o = LinReg(x, y)
 coef(o)
-coef(o, λ, L2Penalty())  # Ridge
-coef(o, λ, L1Penalty())  # LASSO
-coef(o, λ, ElasticNetPenalty())
-coef(o, λ, SCADPenalty())
+coef(o, L2Penalty(λ))  # Ridge
+coef(o, L1Penalty(λ))  # LASSO
+coef(o, ElasticNetPenalty(λ, α))
+coef(o, SCADPenalty(λ, a))
 predict(o, x)
 ```
 
@@ -137,7 +137,7 @@ coef(o)
 Statistical learning algorithms defined by model, algorithm, and penalty (regularization).
 See [StatLearn Documentation](StatLearn.md).
 ```julia
-o = StatLearn(o, LearningRate(.6), L2Regression(), SGD(), L2Penalty(), λ = .1)
+o = StatLearn(o, LearningRate(.6), L2Regression(), SGD(), L2Penalty(.1))
 coef(o)
 predict(o, x)
 loss(o, x, y)
