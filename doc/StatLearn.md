@@ -17,18 +17,18 @@ fast fitting times to remove training time bottlenecks.
     - `QuantileRegression(τ)`
         - Model conditional quantiles
     - `SVMLike()`
-        - With `NoPenalty()`, this is a perceptron.  With `L2Penalty()`, this is a support vector machine.
+        - With `NoPenalty`, this is a perceptron.  With `L2Penalty`, this is a support vector machine.
     - `HuberRegression(δ)`
         - Robust Huber loss
 
 - `Penalty`
     - `NoPenalty()`
         - No penalty.  Default.
-    - `L2Penalty()`
+    - `L2Penalty(λ)`
         - Ridge regularization
-    - `L1Penalty()`
+    - `L1Penalty(λ)`
         - LASSO regularization
-    - `ElasticNetPenalty(α)`
+    - `ElasticNetPenalty(λ, α)`
         - Weighted average of Ridge and LASSO.  `α = 0` is Ridge, `α = 1` is LASSO.
 
 - `Algorithm`
