@@ -43,7 +43,7 @@ fast fitting times to remove training time bottlenecks.
     - `MMGrad()`
         - Experimental online MM gradient method.
     - `AdaMMGrad()`
-        - Experimental adaptive online MM gradient method.
+        - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 
 ### Learning rates and batch sizes matter
