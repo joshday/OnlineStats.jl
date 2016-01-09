@@ -179,7 +179,7 @@ _default(::Type{Ds.Multinomial}, p::Integer) = Ds.Multinomial(1, ones(p) / p)
 function fitdist!{T<:Real}(o::FitMvDistribution{Ds.Multinomial}, y::AVec{T}, γ::Float64)
     if n_updates(o) == 1
         o.value = Ds.Multinomial(sum(y), y / sum(y))
-    elseif n_updates(o) > 1
+    else
         @assert sum(y) == o.value.n "new observation has a different `n`"
         @assert length(y) == length(o.value.p) "new observation has different `p`"
     end

@@ -122,6 +122,7 @@ type CovMatrix{W <: Weight} <: OnlineStat
 end
 function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
     CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt, 0, 0)
+    # CovMatrix(zeros(p, p), zeros(p), wgt, 0, 0)
 end
 function fit!{T<:Real}(o::CovMatrix, x::AVec{T})
     γ = weight!(o, 1)
@@ -131,7 +132,7 @@ end
 function fitbatch!{T<:Real}(o::CovMatrix, x::AMat{T})
     n2 = size(x, 1)
     γ = weight!(o, n2)
-    smooth!(o.B, row(mean(x, 1), 1), γ)
+    smooth!(o.B, vec(mean(x, 1)), γ)
     BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
 end
 function value(o::CovMatrix)
