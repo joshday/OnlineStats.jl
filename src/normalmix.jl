@@ -127,17 +127,6 @@ function Base.quantile{T<:Real}(o::NormalMix, τ::Vector{T};
 end
 
 
-d = Ds.MixtureModel(Ds.Normal, [(0,1), (2,3), (3, 4)])
-y = rand(d, 100_000)
-o1 = NormalMix(3)
-o2 = NormalMix(3)
-
-fit!(o1, y)
-fit!(o2, y, 10)
-
-display(o1)
-display(o2)
-
 
 # #-----------------------------------------------------------------# Multivariate
 # type MvNormalMix{W<:Weight} <: OnlineStat
