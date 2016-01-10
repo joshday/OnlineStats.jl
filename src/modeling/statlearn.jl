@@ -120,6 +120,59 @@ end
 
 
 #--------------------------------------------------------------------# StatLearn
+"""
+### Online Statistical Learning
+- `StatLearn(p)`
+- `StatLearn(x, y)`
+- `StatLearn(x, y, b)`
+
+The model is defined by:
+
+#### `ModelDef`
+
+- `L2Regression()`
+    - Squared error loss.  Default.
+- `L1Regression()`
+    - Absolute loss
+- `LogisticRegression()`
+    - Model for data in {0, 1}
+- `PoissonRegression()`
+    - Model count data {0, 1, 2, 3, ...}
+- `QuantileRegression(τ)`
+    - Model conditional quantiles
+- `SVMLike()`
+    - Perceptron with `NoPenalty`. SVM with `L2Penalty`.
+- `HuberRegression(δ)`
+    - Robust Huber loss
+
+#### `Penalty`
+- `NoPenalty()`
+    - No penalty.  Default.
+- `L2Penalty(λ)`
+    - Ridge regularization
+- `L1Penalty(λ)`
+    - LASSO regularization
+- `ElasticNetPenalty(λ, α)`
+    - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
+
+#### `Algorithm`
+- `SGD()`
+    - Stochastic gradient descent.  Default.
+- `AdaGrad()`
+    - Adaptive gradient method. Ignores `Weight`.
+- `AdaDelta()`
+    - Extension of AdaGrad.  Ignores `Weight`.
+- `RDA()`
+    - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
+- `MMGrad()`
+    - Experimental online MM gradient method.
+- `AdaMMGrad()`
+    - Experimental adaptive online MM gradient method.  Ignores `Weight`.
+
+
+### Example:
+`StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))`
+"""
 type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat
     β0::Float64     # intercept
     β::VecF         # coefficients

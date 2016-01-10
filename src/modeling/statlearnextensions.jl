@@ -58,6 +58,12 @@ end
 
 
 #-------------------------------------------------------------# Cross Validation
+"""
+`StatLearnCV(o::StatLearn, xtest, ytest)`
+
+Automatically tune the regularization parameter λ for `o` by minimizing loss on
+test data `xtest`, `ytest`.
+"""
 type StatLearnCV{T<:Real, S<:Real} <: OnlineStat
     o::StatLearn
     burnin::Int
