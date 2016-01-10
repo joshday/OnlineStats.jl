@@ -153,7 +153,7 @@ function fit!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            @inbounds fitbatch!(o, rows(y, rng))
+            fitbatch!(o, rows(y, rng))
             i += b
         end
     end
@@ -168,7 +168,7 @@ function fit!(o::OnlineStat, x::AMat, y::AVec, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            @inbounds fitbatch!(o, rows(x, rng), rows(y, rng))
+            fitbatch!(o, rows(x, rng), rows(y, rng))
             i += b
         end
     end

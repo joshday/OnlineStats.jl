@@ -54,43 +54,49 @@ function fit!(o::NormalMix, y::Real)
         o.s1[j] = smooth(o.s1[j], o.w[j], γ)
         o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
         o.s3[j] = smooth(o.s3[j], o.w[j] * y * y, γ)
-
-        o.μ[j] = o.s2[j] / o.s1[j]
-        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
     end
     sum2 = sum(o.s1)
     for j in 1:k
         o.s1[j] /= sum2
+        o.μ[j] = o.s2[j] / o.s1[j]
+        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
         if o.σ2[j] <= 0
             o.σ2 = ones(k)
         end
     end
 end
-function fitbatch!{T<:Real}(o::NormalMix, y::Vector{T})
-    n2 = length(y)
-    γ = weight!(o, n2)
+function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T})
+    n = length(y)
+    γ = weight!(o, n)
     k = length(o.μ)
-    for j in 1:k
-        o.w[j] = 0.0
-        for i in 1:n2
-            σinv = 1.0 / sqrt(o.σ2[j])
-            o.w[j] += σinv * exp(-.5 * σinv * σinv * (y[i] - o.μ[j]) ^ 2)
-        end
-        o.w[j] *= o.s1[j]
-    end
-    sum1 = sum(o.w)
-    for j in 1:k
-        o.w[j] /= sum1
-        o.s1[j] = smooth(o.s1[j], o.w[j], γ)
-        o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
-        o.s3[j] = smooth(o.s3[j], o.w[j] * y * y, γ)
+    s1 = copy(o.s1)
+    s2 = copy(o.s2)
+    s3 = copy(o.s3)
 
-        o.μ[j] = o.s2[j] / o.s1[j]
-        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
+    for yi in y
+        for j in 1:k
+            σinv = 1.0 / sqrt(o.σ2[j])
+            o.w[j] = s1[j] * σinv * exp(-.5 * σinv * σinv * (yi - o.μ[j]) ^ 2)
+        end
+        sum1 = sum(o.w)
+        for j in 1:k
+            o.w[j] /= sum1
+            if yi == y[1]
+                o.s1[j] = smooth(o.s1[j], o.w[j] / n, γ)
+                o.s2[j] = smooth(o.s2[j], o.w[j] * yi / n, γ)
+                o.s3[j] = smooth(o.s3[j], o.w[j] * yi * yi / n, γ)
+            else
+                o.s1[j] += γ * o.w[j] / n
+                o.s2[j] += γ * o.w[j] * yi / n
+                o.s3[j] += γ * o.w[j] * yi * yi / n
+            end
+        end
     end
     sum2 = sum(o.s1)
     for j in 1:k
         o.s1[j] /= sum2
+        o.μ[j] = o.s2[j] / o.s1[j]
+        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
         if o.σ2[j] <= 0
             o.σ2 = ones(k)
         end
@@ -119,6 +125,18 @@ function Base.quantile{T<:Real}(o::NormalMix, τ::Vector{T};
     )
     Float64[quantile(o, τ[j]; start = start[j], kw...) for j in 1:length(τ)]
 end
+
+
+d = Ds.MixtureModel(Ds.Normal, [(0,1), (2,3), (3, 4)])
+y = rand(d, 100_000)
+o1 = NormalMix(3)
+o2 = NormalMix(3)
+
+fit!(o1, y)
+fit!(o2, y, 10)
+
+display(o1)
+display(o2)
 
 
 # #-----------------------------------------------------------------# Multivariate
