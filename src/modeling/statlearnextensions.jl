@@ -65,6 +65,7 @@ type StatLearnCV{T<:Real, S<:Real} <: OnlineStat
     ytest::AVec{S}
 end
 function StatLearnCV(o::StatLearn, xtest::AMat, ytest::AVec, burnin = 1000)
+    @assert length(o.β) == size(xtest, 2) "number of predictors doesn't match test data"
     StatLearnCV(o, burnin, xtest, ytest)
 end
 
@@ -113,12 +114,13 @@ nobs(o::StatLearnCV) = nobs(o.o)
 n_updates(o::StatLearnCV) = n_updates(o.o)
 value(o::StatLearnCV) = value(o.o)
 coef(o::StatLearnCV) = coef(o.o)
-predict(o::StatLearnCV, x) = predict(o, x)
+predict(o::StatLearnCV, x) = predict(o.o, x)
 loss(o::StatLearnCV, x, y) = loss(o.o, x, y)
+loss(o::StatLearnCV) = loss(o, o.xtest, o.ytest)
 
 function Base.show(io::IO, o::StatLearnCV)
     printheader(io, "StatLearnCV")
     print_item(io, "burnin", o.burnin)
-    # print_item(io, "loss", loss(o.o, o.xtest, o.ytest))
+    print_item(io, "loss", loss(o))
     show(io, o.o)
 end

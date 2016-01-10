@@ -122,6 +122,17 @@ facts(@title "StatLearn") do
         fit!(cv, x, y)
         fit!(o2, x, y)
         @fact loss(o2, x, y) --> less_than(loss(o, x, y))
+
+        o = StatLearn(p)
+        cv = StatLearnCV(o, xtest, ytest, 1000)
+        fit!(cv, x, y)
+        @fact nobs(o) --> length(y)
+        @fact value(cv) --> value(o)
+        @fact coef(cv) --> coef(o)
+        @fact predict(cv, x) --> predict(o, x)
+        @fact loss(cv, x, y) --> loss(o, x, y)
+        @fact loss(cv) --> loss(o, xtest, ytest)
+        println(loss(cv))
     end
 end
 
