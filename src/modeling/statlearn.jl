@@ -1,4 +1,5 @@
 #---------------------------------------------------------------------# ModelDef
+abstract Algorithm
 abstract ModelDef
 abstract GLMDef <: ModelDef
 
@@ -75,50 +76,6 @@ deriv(m::HuberRegression, y::Real, ŷ::Real) = abs(y - ŷ) <= m.δ ? ŷ - y :
 abstract Algorithm
 
 
-immutable SGD <: Algorithm
-    SGD() = new()
-    SGD(p::Integer) = new()
-end
-type AdaGrad <: Algorithm
-    g0::Float64
-    g::VecF
-    AdaGrad() = new()
-    AdaGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
-end
-type AdaDelta <: Algorithm
-    g0::Float64
-    g::VecF
-    Δ0::Float64
-    Δ::VecF
-    ρ::Float64
-    AdaDelta() = new()
-    AdaDelta(p::Integer) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p), 0.001)
-end
-type RDA <: Algorithm
-    g0::Float64
-    g::VecF
-    gbar0::Float64
-    gbar::VecF
-    RDA() = new()
-    RDA(p::Integer) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p))
-end
-type MMGrad <: Algorithm
-    g0::Float64
-    g::VecF
-    MMGrad() = new()
-    MMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
-end
-type AdaMMGrad <: Algorithm
-    g0::Float64
-    g::VecF
-    AdaMMGrad() = new()
-    AdaMMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
-end
-for alg in [:SGD, :AdaGrad, :AdaDelta, :RDA, :MMGrad, :AdaMMGrad]
-    eval(parse("""Base.show(io::IO, o::$alg) = print(io, "$alg")"""))
-end
-
-
 #--------------------------------------------------------------------# StatLearn
 """
 ### Online Statistical Learning
@@ -189,7 +146,7 @@ function _StatLearn(p::Integer, wgt::Weight = LearningRate();
         model::ModelDef = L2Regression(),
         η::Real = 1.0,
         penalty::Penalty = NoPenalty(),
-        algorithm::Algorithm = SGD(),
+        algorithm::Algorithm = default(Algorithm),
         intercept::Bool = true
     )
     o = StatLearn(
@@ -199,16 +156,6 @@ function _StatLearn(p::Integer, wgt::Weight = LearningRate();
     o.algorithm = typeof(o.algorithm)(p)
     o
 end
-# function _StatLearn(x::AMat, y::AVec, wgt::Weight = LearningRate(); kw...)
-#     o = _StatLearn(size(x, 2), wgt; kw...)
-#     fit!(o, x, y)
-#     o
-# end
-# function _StatLearn(x::AMat, y::AVec, b::Integer, wgt::Weight = LearningRate(); kw...)
-#     o = _StatLearn(size(x, 2), wgt; kw...)
-#     fit!(o, x, y, b)
-#     o
-# end
 function StatLearn(p::Integer, args...; kw...)
     wgt = LearningRate()
     mod = L1Regression()
@@ -247,6 +194,7 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "value", coef(o))
     print_item(io, "model", o.model)
     print_item(io, "penalty", o.penalty)
+    print_item(io, "algorithm", o.algorithm)
     print_item(io, "nobs", nobs(o))
 end
 function fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real)
@@ -270,7 +218,12 @@ loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, o.β0 + x * o.β)
 #==============================================================================#
 #                                                           Updates by Algorithm
 #==============================================================================#
+default(::Type{Algorithm}) = SGD()
 #--------------------------------------------------------------------------# SGD
+immutable SGD <: Algorithm
+    SGD() = new()
+    SGD(p::Integer) = new()
+end
 function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ)
     γ = weight!(o, 1)
     γ *= o.η
@@ -298,9 +251,49 @@ function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec
 end
 
 
+#--------------------------------------------------------------------------# SGD2
+# Uses diagonals from Hessian matrix
+type SGD2 <: Algorithm
+    d0::Float64
+    d::VecF
+    SGD2() = new()
+    SGD2(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
+function _updateβ!(o::StatLearn{SGD2}, g, x, y, ŷ)
+    γ = weight!(o, 1)
+    γ *= o.η
+    if o.intercept
+        o.algorithm.d0 = smooth(o.algorithm.d0, denom(o.model, g, 1.0, y, ŷ), γ)
+        o.β0 -= γ * g / o.algorithm.d0
+    end
+    for j in 1:length(o.β)
+        o.algorithm.d[j] = smooth(o.algorithm.d[j], denom(o.model, g, x[j], y, ŷ), γ)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j] / o.algorithm.d[j], γ)
+    end
+end
+
+denom(::L2Regression, g, xj, y, ŷ) = xj * xj
+denom(::LogisticRegression, g, xj, y, ŷ) = xj * xj * ŷ * (1.0 - ŷ)
+denom(::PoissonRegression, g, xj, y, ŷ) = xj * xj * ŷ
+
+denom(::L1Regression, g, xj, y, ŷ) = 1.0
+denom(::QuantileRegression, g, xj, y, ŷ) = 1.0
+denom(::SVMLike, g, xj, y, ŷ) = 1.0
+denom(::HuberRegression, g, xj, y, ŷ) = 1.0
+
+
+
+
+
 
 
 #----------------------------------------------------------------------# AdaGrad
+type AdaGrad <: Algorithm
+    g0::Float64
+    g::VecF
+    AdaGrad() = new()
+    AdaGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
 function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     if o.intercept
@@ -335,7 +328,40 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
 end
 
 
+
+#----------------------------------------------------------------------# AdaGrad2
+# Use stochastic average of second order information
+type AdaGrad2 <: Algorithm
+    g0::Float64
+    g::VecF
+    AdaGrad2() = new()
+    AdaGrad2(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
+function _updateβ!(o::StatLearn{AdaGrad2}, g, x, y, ŷ)
+    γ = weight!(o, 1)
+    if o.intercept
+        o.algorithm.g0 = smooth(o.algorithm.g0, g * g, γ)
+        setβ0!(o, γ * o.η / sqrt(o.algorithm.g0), g)
+    end
+    @inbounds for j in 1:length(o.β)
+        gx = g * x[j]
+        o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, γ)
+        γ_G = γ * o.η / sqrt(o.algorithm.g[j])
+        o.β[j] = prox(o.penalty, o.β[j] - γ_G * gx, γ_G)
+    end
+end
+
+
 #----------------------------------------------------------------------# AdaDelta
+type AdaDelta <: Algorithm
+    g0::Float64
+    g::VecF
+    Δ0::Float64
+    Δ::VecF
+    ρ::Float64
+    AdaDelta() = new()
+    AdaDelta(p::Integer) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p), 0.001)
+end
 function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     if o.intercept
@@ -379,6 +405,14 @@ end
 
 
 #--------------------------------------------------------------------------# RDA
+type RDA <: Algorithm
+    g0::Float64
+    g::VecF
+    gbar0::Float64
+    gbar::VecF
+    RDA() = new()
+    RDA(p::Integer) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p))
+end
 function _updateβ!(o::StatLearn{RDA}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     w = 1 / o.nup
@@ -441,32 +475,12 @@ rda_γ(o::StatLearn{RDA}, j::Int) = o.nup * o.η / sqrt(o.algorithm.g[j])
 
 
 #-----------------------------------------------------------------------# MMGrad
-_α(o::StatLearn, xj, x) = (abs(xj) + _ϵ) / (sumabs(x) + o.intercept + _ϵ)
-function mmsuff{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ)
-    xj^2 / _α(o, xj, x)
+type MMGrad <: Algorithm
+    g0::Float64
+    g::VecF
+    MMGrad() = new()
+    MMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
 end
-function mmsuff{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ)
-    xj^2 / (_α(o, xj, x) * abs(y - ŷ))
-end
-function mmsuff{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ)
-    xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
-end
-function mmsuff{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ)
-    xj^2 * ŷ / _α(o, xj, x)
-end
-function mmsuff{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ)
-    xj^2 / (_α(o, xj, x) * abs(y - ŷ))
-end
-
-# TODO:
-function mmsuff{A<:Algorithm}(o::StatLearn{A, SVMLike}, xj, x, y, ŷ)
-    1.0
-end
-function mmsuff{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ)
-    1.0
-end
-
-
 function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
     γ = weight!(o, 1)
     if o.intercept
@@ -502,8 +516,25 @@ function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
     end
 end
 
+_α(o::StatLearn, xj, x) = (abs(xj) + _ϵ) / (sumabs(x) + o.intercept + _ϵ)
+mmsuff{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ) = xj^2 / _α(o, xj, x)
+mmsuff{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ) = xj^2 / (_α(o, xj, x) * abs(y - ŷ))
+mmsuff{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ) = xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
+mmsuff{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ) = xj^2 * ŷ / _α(o, xj, x)
+mmsuff{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ) = xj^2 / (_α(o, xj, x) * abs(y - ŷ))
+# TODO:
+mmsuff{A<:Algorithm}(o::StatLearn{A, SVMLike}, xj, x, y, ŷ) = 1.0
+mmsuff{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ) = 1.0
+
+
 
 #--------------------------------------------------------------------# AdaMMGrad
+type AdaMMGrad <: Algorithm
+    g0::Float64
+    g::VecF
+    AdaMMGrad() = new()
+    AdaMMGrad(p::Integer) = new(_ϵ, fill(_ϵ, p))
+end
 function _updateβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
     n_and_nup!(o, 1)
     if o.intercept
@@ -539,4 +570,12 @@ function _updatebatchβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
         γ = o.η / sqrt(o.algorithm.g[j])
         o.β[j] = prox(o.penalty, o.β[j] - o.η * γ * u / n, γ)
     end
+end
+
+
+
+
+
+for alg in [:SGD, :AdaGrad, :AdaDelta, :RDA, :MMGrad, :AdaMMGrad]
+    eval(parse("""Base.show(io::IO, o::$alg) = print(io, "$alg")"""))
 end
