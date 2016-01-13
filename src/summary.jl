@@ -28,6 +28,7 @@ function fitbatch!{T <: Real}(o::Mean, y::AVec{T})
     return
 end
 Base.mean(o::Mean) = value(o)
+center(o::Mean, x::Real) = x - mean(o)
 
 
 #------------------------------------------------------------------------# Means
@@ -50,6 +51,7 @@ function fitbatch!{T <: Real}(o::Means, y::AMat{T})
     return
 end
 Base.mean(o::Means) = value(o)
+center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 
 
 #---------------------------------------------------------------------# Variance
@@ -73,6 +75,8 @@ Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
 value(o::Variance) = o.value * _unbias(o)
+center(o::Variance, x::Real) = x - mean(o)
+standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
 
 #--------------------------------------------------------------------# Variances
@@ -107,6 +111,8 @@ Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
 Base.mean(o::Variances) = o.μ
 value(o::Variances) = o.value * _unbias(o)
+center{T<:Real}(o::Variances, x::AVec{T}) = x - mean(o)
+standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
 
 
 #--------------------------------------------------------------------# CovMatrix

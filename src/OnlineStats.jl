@@ -28,7 +28,7 @@ export
     replicates,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
-    vcov, stderr, loss
+    vcov, stderr, loss, center, standardize
 
 #------------------------------------------------------------------------# types
 abstract OnlineStat

@@ -16,6 +16,7 @@ facts(@title "Mean / Means") do
     o = Mean(x2)
     @fact mean(o) --> roughly(mean(x2))
     @fact mean(o) --> value(o)
+    @fact center(o, x[1]) --> x[1] - mean(o)
 
     o = Means(2)
     fit!(o, xs, 5)
@@ -25,6 +26,7 @@ facts(@title "Mean / Means") do
     o2 = Means(2)
     fit!(o2, xs)
     @fact mean(o) --> roughly(mean(o2))
+    @fact center(o, vec(xs[1, :])) --> vec(xs[1, :]) - mean(o)
 end
 
 facts(@title "Variance / Variances") do
@@ -36,6 +38,8 @@ facts(@title "Variance / Variances") do
     @fact std(o) --> roughly(std(x1))
     @fact mean(o) --> roughly(mean(x1))
     @fact var(o) --> value(o)
+    @fact center(o, x[1]) --> x[1] - mean(o)
+    @fact standardize(o, x[1]) --> (x[1] - mean(o)) / std(o)
 
     o = Variances(xs)
     @fact var(o) --> roughly(vec(var(xs, 1)))
@@ -45,6 +49,8 @@ facts(@title "Variance / Variances") do
     o2 = Variances(2)
     fit!(o2, xs)
     @fact var(o) --> roughly(var(o2))
+    @fact center(o, vec(xs[1, :])) --> vec(xs[1, :]) - mean(o)
+    @fact standardize(o, vec(xs[1, :])) --> (vec(xs[1, :]) - mean(o)) ./ std(o)
 end
 
 facts(@title "CovMatrix") do
