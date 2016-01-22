@@ -3,11 +3,9 @@ type LinReg{W <: Weight} <: OnlineStat
     c::CovMatrix{W}  # Cov([X y])
     s::MatF          # "Swept" version of [X y]' [X y]
     weight::W
-    n::Int
-    nup::Int
 end
 function LinReg(p::Integer, wgt::Weight = EqualWeight())
-    o = LinReg(zeros(p), CovMatrix(p + 1), zeros(p + 1, p + 1), wgt, 0, 0)
+    o = LinReg(zeros(p), CovMatrix(p + 1), zeros(p + 1, p + 1), wgt)
 end
 function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight())
     o = LinReg(size(x, 2), wgt)

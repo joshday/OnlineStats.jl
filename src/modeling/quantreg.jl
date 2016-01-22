@@ -6,11 +6,9 @@ type QuantReg{W <: Weight} <: OnlineStat
     Xu::VecF
     A::MatF  # memory placeholder
     weight::W
-    n::Int
-    nup::Int
 end
 function QuantReg(p::Integer, τ::Real = 0.5, wgt::Weight = LearningRate())
-    QuantReg(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt, 0, 0)
+    QuantReg(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt)
 end
 function QuantReg(x::AMat, y::AVec, τ::Real = 0.5, wgt::Weight = LearningRate())
     o = QuantReg(size(x, 2), τ, wgt)
@@ -55,7 +53,7 @@ function fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec)
 
     o.β = copy(o.Xu)
     copy!(o.A, o.XWX)
-    
+
     try LAPACK.sysv!('U', o.A, o.β)
     catch warn("System is singular.  β not updated.")
     end

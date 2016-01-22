@@ -1,111 +1,97 @@
-#--------------------------------------------------------------# FitDistribution
-type FitDistribution{D <: Ds.Distribution{Ds.Univariate}, W <: Weight} <: OnlineStat
-    value::D
-    # "sufficient statistics"
+abstract DistributionStat <: OnlineStat
+Base.mean(d::DistributionStat) = mean(value(d))
+Base.var(d::DistributionStat) = var(value(d))
+Base.std(d::DistributionStat) = std(value(d))
+Ds.params(o::DistributionStat) = Ds.params(value(o))
+Ds.ncategories(o::DistributionStat) = Ds.ncategories(value(o))
+Base.cov(o::DistributionStat) = cov(value(o))
+
+
+#--------------------------------------------------------------# Beta
+type FitBeta{W<:Weight} <: DistributionStat
+    value::Ds.Beta
     var::Variance{W}
-    quant::QuantileMM{W}
-    mat::MatF
-    vec::Vector{Int}
-
-    weight::W
-    n::Int
-    nup::Int
 end
-function FitDistribution{D<:Ds.Distribution{Ds.Univariate}}(
-        d::Type{D}, wgt::Weight = EqualWeight()
-    )
-    FitDistribution(d(), Variance(wgt), QuantileMM(wgt), zeros(1, 1), zeros(Int, 1), wgt, 0, 0)
-end
-function FitDistribution{D<:Ds.Distribution{Ds.Univariate}, T<:Real}(
-        d::Type{D}, y::AVec{T}, wgt::Weight = EqualWeight()
-    )
-    o = FitDistribution(d, wgt)
-    fit!(o, y)
-    o
-end
-function fit!(o::FitDistribution, y::Real)
-    γ = weight!(o, 1)
-    fitdist!(o, y, γ)
-    nothing
-end
-function fitbatch!{T<:Real}(o::FitDistribution, y::AVec{T})
-    γ = weight!(o, length(y))
-    fitdistbatch!(o, y, γ)
-    nothing
-end
-Base.mean(o::FitDistribution) = mean(value(o))
-Base.var(o::FitDistribution) = var(value(o))
-Base.std(o::FitDistribution) = std(value(o))
-Ds.params(o::FitDistribution) = Ds.params(value(o))
-Ds.ncategories(o::FitDistribution) = Ds.ncategories(value(o))
-function Base.show(io::IO, o::FitDistribution)
-    printheader(io, "FitDistribution")
-    print_value_and_nobs(io, o)
-end
-
-
-# Distributions based solely on mean
-for d in [:Bernoulli, :Exponential, :Poisson]
-    eval(parse(
-        """
-        function fitdist!(o::FitDistribution{Ds.$d}, y::Real, γ::Float64)
-            θ = smooth(mean(o), Float64(y), γ)
-            o.value = Ds.$d(θ)
-            nothing
-        end
-        """
-    ))
-end
-
-
-#-------------------------------------------------------------------------# Beta
-# method of moments
-function fitdist!(o::FitDistribution{Ds.Beta}, y::Real, γ::Float64)
-    fit!(o.var, y)
-end
-function value(o::FitDistribution{Ds.Beta})
+FitBeta(wgt::Weight = EqualWeight()) = FitBeta(Ds.Beta(), Variance(wgt))
+nobs(o::FitBeta) = nobs(o.var)
+fit!(o::FitBeta, y::Real) = fit!(o.var, y)
+function value(o::FitBeta)
     m = mean(o.var)
     v = var(o.var)
     α = m * (m * (1 - m) / v - 1)
     β = (1 - m) * (m * (1 - m) / v - 1)
-    try o.value = Ds.Beta(α, β) end
+    o.value = Ds.Beta(α, β)
 end
-
 
 #------------------------------------------------------------------# Categorical
-Ds.Categorical() = Ds.Categorical(1)
-function fitdist!(o::FitDistribution{Ds.Categorical}, y::Integer, γ::Float64)
-    if y <= length(o.vec)
-        o.vec[y] += 1
+# Ignores weight
+"""
+`FitCategorical(y)`
+
+Find the proportions for each unique input.  Categories are sorted by proportions.
+"""
+type FitCategorical{W<:Weight, T<:Any} <: DistributionStat
+    value::Ds.Categorical
+    d::Dict{T, Int}
+    weight::W
+end
+FitCategorical(wgt::Weight = EqualWeight()) = FitCategorical(Ds.Categorical(1), Dict{Any, Int}(), wgt)
+function FitCategorical(y, wgt::Weight = EqualWeight())
+    o = FitCategorical()
+    fit!(o, y)
+    o
+end
+function fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol})
+    weight!(o, 1)
+    if haskey(o.d, y)
+        o.d[y] += 1
     else
-        addn = y - length(o.vec)
-        append!(o.vec, zeros(Int, addn))
-        o.vec[y] += 1
+        o.d[y] = 1
     end
 end
-function value(o::FitDistribution{Ds.Categorical})
-    o.value = Ds.Categorical(o.vec / sum(o.vec))
+sortpairs(o::FitCategorical) = sort(collect(o.d), by = x -> 1 / x[2])
+function value(o::FitCategorical)
+    sortedpairs = sortpairs(o)
+    counts = zeros(length(sortedpairs))
+    for i in 1:length(sortedpairs)
+        counts[i] = sortedpairs[i][2]
+    end
+    o.value = Ds.Categorical(counts / sum(counts))
+end
+function Base.show(io::IO, o::FitCategorical)
+    printheader(io, "FitCategorical ($(length(o.d)) categories)")
+    print_item(io, "value", value(o))
+    sortedpairs = sortpairs(o)
+    print_item(io, "labels", [sortedpairs[i][1] for i in 1:length(sortedpairs)])
+    print_item(io, "nobs", nobs(o))
 end
 
 
-#-----------------------------------------------------------------------# Cauchy
-function fitdist!(o::FitDistribution{Ds.Cauchy}, y::Real, γ::Float64)
-    fit!(o.quant, y)
+
+#------------------------------------------------------------------# Cauchy
+type FitCauchy{W<:Weight} <: DistributionStat
+    value::Ds.Cauchy
+    q::QuantileMM{W}
 end
-function fitdistbatch!{T<:Real}(o::FitDistribution{Ds.Cauchy}, y::AVec{T}, γ::Float64)
-    fitbatch!(o.quant, y)
+FitCauchy(wgt::Weight = LearningRate()) = FitCauchy(Ds.Cauchy(), QuantileMM(wgt))
+fit!(o::FitCauchy, y::Real) = fit!(o.q, y)
+nobs(o::FitCauchy) = nobs(o.q)
+function value(o::FitCauchy)
+    o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
 end
-function value(o::FitDistribution{Ds.Cauchy})
-    o.value = Ds.Cauchy(o.quant.value[2], 0.5 * (o.quant.value[3] - o.quant.value[1]))
-end
+
 
 
 #------------------------------------------------------------------------# Gamma
-# method of moments, look at Distributions for MLE
-function fitdist!(o::FitDistribution{Ds.Gamma}, y::Real, γ::Float64)
-    fit!(o.var, y)
+# method of moments, TODO: look at Distributions for MLE
+type FitGamma{W<:Weight} <: DistributionStat
+    value::Ds.Gamma
+    var::Variance{W}
 end
-function value(o::FitDistribution{Ds.Gamma})
+FitGamma(wgt::Weight = EqualWeight()) = FitGamma(Ds.Gamma(), Variance(wgt))
+fit!(o::FitGamma, y::Real) = fit!(o.var, y)
+nobs(o::FitGamma) = nobs(o.var)
+function value(o::FitGamma)
     m = mean(o.var)
     v = var(o.var)
     θ = v / m
@@ -117,10 +103,14 @@ end
 
 
 #-----------------------------------------------------------------------# LogNormal
-function fitdist!(o::FitDistribution{Ds.LogNormal}, y::Real, γ::Float64)
-    fit!(o.var, log(y))
+type FitLogNormal{W<:Weight} <: DistributionStat
+    value::Ds.LogNormal
+    var::Variance{W}
 end
-function value(o::FitDistribution{Ds.LogNormal})
+FitLogNormal(wgt::Weight = EqualWeight()) = FitLogNormal(Ds.LogNormal(), Variance(wgt))
+nobs(o::FitLogNormal) = nobs(o.var)
+fit!(o::FitLogNormal, y::Real) = fit!(o.var, log(y))
+function value(o::FitLogNormal)
     if nobs(o) > 1
         o.value = Ds.LogNormal(mean(o.var), std(o.var))
     end
@@ -128,77 +118,76 @@ end
 
 
 #-----------------------------------------------------------------------# Normal
-function fitdist!(o::FitDistribution{Ds.Normal}, y::Real, γ::Float64)
-    fit!(o.var, y)
+type FitNormal{W<:Weight} <: DistributionStat
+    value::Ds.Normal
+    var::Variance{W}
 end
-value(o::FitDistribution{Ds.Normal}) = (o.value = Ds.Normal(mean(o.var), std(o.var)))
-
-
-
-
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------# FitMvDistribution
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
-type FitMvDistribution{D <: Ds.Distribution{Ds.Multivariate}, W <: Weight} <: OnlineStat
-    value::D
-    suff::CovMatrix{W}
-    weight::W
-    n::Int
-    nup::Int
-end
-function FitMvDistribution{D<:Ds.Distribution{Ds.Multivariate}}(
-        d::Type{D}, p::Integer, wgt::Weight = EqualWeight()
-    )
-    FitMvDistribution(_default(d, p), CovMatrix(p, wgt), wgt, 0, 0)
-end
-function FitMvDistribution{D<:Ds.Distribution{Ds.Multivariate}, T<:Real}(
-        d::Type{D}, y::AMat{T}, wgt::Weight = EqualWeight()
-    )
-    o = FitMvDistribution(d, size(y, 2), wgt)
-    fit!(o, y)
-    o
-end
-function fit!{T<:Real}(o::FitMvDistribution, y::AVec{T})
-    γ = weight!(o, 1)
-    fitdist!(o, y, γ)
-end
-Base.mean(o::FitMvDistribution) = mean(value(o))
-Base.std(o::FitMvDistribution) = sqrt(var(o))
-Base.var(o::FitMvDistribution) = var(value(o))
-Base.cov(o::FitMvDistribution) = cov(value(o))
-function Base.show(io::IO, o::FitMvDistribution)
-    printheader(io, "FitMvDistribution")
-    print_value_and_nobs(io, o)
-end
-
-
-#------------------------------------------------------------------# Multinomial
-_default(::Type{Ds.Multinomial}, p::Integer) = Ds.Multinomial(1, ones(p) / p)
-function fitdist!{T<:Real}(o::FitMvDistribution{Ds.Multinomial}, y::AVec{T}, γ::Float64)
-    if n_updates(o) == 1
-        o.value = Ds.Multinomial(sum(y), y / sum(y))
-    else
-        @assert sum(y) == o.value.n "new observation has a different `n`"
-        @assert length(y) == length(o.value.p) "new observation has different `p`"
+FitNormal(wgt::Weight = EqualWeight()) = FitNormal(Ds.Normal(), Variance(wgt))
+nobs(o::FitNormal) = nobs(o.var)
+fit!(o::FitNormal, y::Real) = fit!(o.var, y)
+function value(o::FitNormal)
+    if nobs(o) > 1
+        o.value = Ds.Normal(mean(o.var), std(o.var))
     end
-    fit!(o.suff, y)
 end
-function value(o::FitMvDistribution{Ds.Multinomial})
-    m = mean(o.suff)
+
+
+#-----------------------------------------------------------------------# Multinomial
+type FitMultinomial{W<:Weight} <: DistributionStat
+    value::Ds.Multinomial
+    means::Means{W}
+end
+function FitMultinomial(p::Integer, wgt::Weight = EqualWeight)
+    FitMultinomial(Ds.Multinomial(p, ones(p) / p), Means(p, wgt))
+end
+nobs(o::FitMultinomial) = nobs(o.means)
+fit!{T<:Real}(o::FitMultinomial, y::AVec{T}) = fit!(o.means, y)
+function value(o::FitMultinomial)
+    m = mean(o.means)
     o.value = Ds.Multinomial(round(Int, sum(m)), m / sum(m))
 end
 
 
+
 #---------------------------------------------------------------------# MvNormal
-_default(::Type{Ds.MvNormal}, p::Integer) = Ds.MvNormal(zeros(p), diagm(ones(p)))
-function fitdist!{D<:Ds.MvNormal, T<:Real}(o::FitMvDistribution{D}, y::AVec{T}, γ::Float64)
-    fit!(o.suff, y)
+type FitMvNormal{W<:Weight} <: DistributionStat
+    value::Ds.MvNormal
+    cov::CovMatrix{W}
 end
-function value{D<:Ds.MvNormal}(o::FitMvDistribution{D})
-    c = cov(o.suff)
+function FitMvNormal(p::Integer, wgt::Weight = EqualWeight)
+    FitMvNormal(Ds.MvNormal(zeros(p), eye(p)), CovMatrix(p, wgt))
+end
+nobs(o::FitMvNormal) = nobs(o.cov)
+Base.std(d::FitMvNormal) = sqrt(var(d))  # No std() method from Distributions?
+fit!{T<:Real}(o::FitMvNormal, y::AMat{T}) = fit!(o.cov, y)
+function value(o::FitMvNormal)
+    c = cov(o.cov)
     if isposdef(c)
-        o.value = Ds.MvNormal(mean(o.suff), c)
+        o.value = Ds.MvNormal(mean(o.cov), c)
+    else
+        warn("Covariance not positive definite.  More data needed.")
     end
+end
+
+
+
+#---------------------------------------------------------------------# convenience constructors
+for nm in [:FitBeta, :FitCauchy, :FitGamma, :FitLogNormal, :FitNormal]
+    eval(parse("""
+        function $nm{T<:Real}(y::AVec{T}, wgt::Weight = EqualWeight())
+            o = $nm(wgt)
+            fit!(o, y)
+            o
+        end
+    """))
+end
+
+for nm in [:FitMultinomial, :FitMvNormal]
+    eval(parse("""
+        function $nm{T<:Real}(y::AMat{T}, wgt::Weight = EqualWeight())
+            o = $nm(size(y, 2), wgt)
+            fit!(o, y)
+            o
+        end
+    """))
 end

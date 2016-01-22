@@ -24,9 +24,6 @@ facts(@title "Show Methods") do
     display(KMeans(5, 4))
     display(NormalMix(4))
 
-    display(FitDistribution(Normal, x))
-    display(FitMvDistribution(MvNormal, xs))
-
     display(NoPenalty())
     display(L1Penalty(.1))
     display(L2Penalty(.1))

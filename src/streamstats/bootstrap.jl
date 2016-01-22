@@ -1,4 +1,5 @@
 abstract Bootstrap <: OnlineStat
+nobs(b::Bootstrap) = b.n
 
 #-----------------------------------------------------------# BernoulliBootstrap
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap

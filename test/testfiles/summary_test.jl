@@ -12,7 +12,6 @@ facts(@title "Mean / Means") do
     fit!(o, x1, 5)
     @fact mean(o) --> roughly(mean(x1))
     @fact nobs(o) --> 500
-    @fact n_updates(o) --> 500 / 5
     o = Mean(x2)
     @fact mean(o) --> roughly(mean(x2))
     @fact mean(o) --> value(o)

@@ -7,8 +7,6 @@ type NormalMix{W<:Weight} <: OnlineStat
     μ::VecF
     σ2::VecF
     weight::W
-    n::Int
-    nup::Int
 end
 function NormalMix(k::Integer, wgt::Weight = LearningRate();
         start = Ds.MixtureModel(Ds.Normal[Ds.Normal(j-1, 10) for j in 1:k])
@@ -17,7 +15,7 @@ function NormalMix(k::Integer, wgt::Weight = LearningRate();
         start,
         ones(k) / k, zeros(k), zeros(k),  # s1, s2, s3
         zeros(k), collect(1.:k), fill(10.0, k),  # w, μ, σ2
-        wgt, 0, 0
+        wgt
     )
 end
 function NormalMix(y::AVec, k::Integer, wgt::Weight = LearningRate())

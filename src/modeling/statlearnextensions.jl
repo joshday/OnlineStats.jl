@@ -64,22 +64,23 @@ end
 Automatically tune the regularization parameter λ for `o` by minimizing loss on
 test data `xtest`, `ytest`.
 """
-type StatLearnCV{T<:Real, S<:Real} <: OnlineStat
+type StatLearnCV{T<:Real, S<:Real, W<:Weight} <: OnlineStat
     o::StatLearn
     burnin::Int
     xtest::AMat{T}
     ytest::AVec{S}
+    weight::W
 end
-function StatLearnCV(o::StatLearn, xtest::AMat, ytest::AVec, burnin = 1000)
+function StatLearnCV(o::StatLearn, xtest::AMat, ytest::AVec, burnin = 1000; wgt::LearningRate = LearningRate())
     @assert length(o.β) == size(xtest, 2) "number of predictors doesn't match test data"
-    StatLearnCV(o, burnin, xtest, ytest)
+    StatLearnCV(o, burnin, xtest, ytest, wgt)
 end
 
 function fit!(o::StatLearnCV, x::AVec, y::Real)
     if nobs(o) < o.burnin
         fit!(o.o, x, y)
     else
-        γ = weight(o.o.weight, 1, nobs(o), n_updates(o))
+        γ = weight!(o, 1)
         tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
     end
 end

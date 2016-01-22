@@ -13,10 +13,8 @@
 type Mean{W <: Weight} <: OnlineStat
     value::Float64
     weight::W
-    n::Int
-    nup::Int
 end
-Mean(wgt::Weight = EqualWeight()) = Mean(0.0, wgt, 0, 0)
+Mean(wgt::Weight = EqualWeight()) = Mean(0.0, wgt)
 function fit!(o::Mean, y::Real)
     γ = weight!(o, 1)
     o.value = smooth(o.value, y, γ)
@@ -36,10 +34,8 @@ center(o::Mean, x::Real) = x - mean(o)
 type Means{W <: Weight} <: OnlineStat
     value::VecF
     weight::W
-    n::Int
-    nup::Int
 end
-Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt, 0, 0)
+Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt)
 function fit!{T <: Real}(o::Means, y::AVec{T})
     γ = weight!(o, 1)
     smooth!(o.value, y, γ)
@@ -60,10 +56,8 @@ type Variance{W <: Weight} <: OnlineStat
     value::Float64
     μ::Float64
     weight::W
-    n::Int
-    nup::Int
 end
-Variance(wgt::Weight = EqualWeight()) = Variance(0.0, 0.0, wgt, 0, 0)
+Variance(wgt::Weight = EqualWeight()) = Variance(0.0, 0.0, wgt)
 function fit!(o::Variance, y::Real)
     γ = weight!(o, 1)
     μ = o.μ
@@ -74,7 +68,7 @@ end
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
-value(o::Variance) = o.value * _unbias(o)
+value(o::Variance) = o.value * unbias(o)
 center(o::Variance, x::Real) = x - mean(o)
 standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
@@ -84,13 +78,11 @@ standardize(o::Variance, x::Real) = center(o, x) / std(o)
 type Variances{W <: Weight} <: OnlineStat
     value::VecF
     μ::VecF
-    μold::VecF  # help avoid allocation in update
+    μold::VecF  # avoid allocation in update
     weight::W
-    n::Int
-    nup::Int
 end
 function Variances(p::Integer, wgt::Weight = EqualWeight())
-    Variances(zeros(p), zeros(p), zeros(p), wgt, 0, 0)
+    Variances(zeros(p), zeros(p), zeros(p), wgt)
 end
 function fit!{T <: Real}(o::Variances, y::AVec{T})
     γ = weight!(o, 1)
@@ -110,7 +102,7 @@ end
 Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
 Base.mean(o::Variances) = o.μ
-value(o::Variances) = o.value * _unbias(o)
+value(o::Variances) = o.value * unbias(o)
 center{T<:Real}(o::Variances, x::AVec{T}) = x - mean(o)
 standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
 
@@ -123,11 +115,9 @@ type CovMatrix{W <: Weight} <: OnlineStat
     A::MatF  # X'X / n
     B::VecF  # X * 1' / n (column means)
     weight::W
-    n::Int
-    nup::Int
 end
 function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
-    CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt, 0, 0)
+    CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt)
     # CovMatrix(zeros(p, p), zeros(p), wgt, 0, 0)
 end
 function fit!{T<:Real}(o::CovMatrix, x::AVec{T})
@@ -142,7 +132,7 @@ function fitbatch!{T<:Real}(o::CovMatrix, x::AMat{T})
     BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
 end
 function value(o::CovMatrix)
-    copy!(o.value, _unbias(o) * (o.A - BLAS.syrk('U', 'N', 1.0, o.B)))
+    copy!(o.value, unbias(o) * (o.A - BLAS.syrk('U', 'N', 1.0, o.B)))
     _covfill!(o.value)
     o.value
 end
@@ -168,18 +158,19 @@ end
 
 #----------------------------------------------------------------------# Extrema
 "Extrema (maximum and minimum).  Ignores `Weight`."
-type Extrema <: OnlineStat
+type Extrema{W<:Weight} <: OnlineStat
     min::Float64
     max::Float64
-    n::Int
-    nup::Int
+    weight::W
 end
-Extrema(wgt::Weight = EqualWeight()) = Extrema(Inf, -Inf, 0, 0)
+Extrema(wgt::Weight = EqualWeight()) = Extrema(Inf, -Inf, wgt)
 function Extrema{T<:Real}(y::AVec{T}, wgt::Weight = EqualWeight())
-    Extrema(minimum(y), maximum(y), length(y), 1)
+    o = Extrema(minimum(y), maximum(y), wgt)
+    weight_noret!(o, length(y))
+    o
 end
 function fit!(o::Extrema, y::Real)
-    n_and_nup!(o, 1)
+    weight_noret!(o, 1)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
 end
@@ -194,8 +185,6 @@ type QuantileSGD{W <: Weight} <: OnlineStat
     value::VecF
     τ::VecF
     weight::W
-    n::Int
-    nup::Int
 end
 function QuantileSGD(wgt::Weight = LearningRate();
         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
@@ -203,7 +192,7 @@ function QuantileSGD(wgt::Weight = LearningRate();
     @inbounds for i in 1:length(tau)
         @assert 0 < tau[i] < 1
     end
-    QuantileSGD(value, tau, wgt, 0, 0)
+    QuantileSGD(value, tau, wgt)
 end
 function fit!(o::QuantileSGD, y::Float64)
     γ = weight!(o, 1)
@@ -239,8 +228,6 @@ type QuantileMM{W <: Weight} <: OnlineStat
     o::Float64
 
     weight::W
-    n::Int
-    nup::Int
 end
 function QuantileMM(wgt::Weight = LearningRate();
         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
@@ -249,7 +236,7 @@ function QuantileMM(wgt::Weight = LearningRate();
     for i in 1:p
         @assert 0 < tau[i] < 1
     end
-    QuantileMM(value, tau, zeros(p), zeros(p), 0.0, wgt, 0, 0)
+    QuantileMM(value, tau, zeros(p), zeros(p), 0.0, wgt)
 end
 function fit!(o::QuantileMM, y::Float64)
     γ = weight!(o, 1)
@@ -291,7 +278,7 @@ type Moments{W <: Weight} <: OnlineStat
     nup::Int
 end
 Moments(wgt::Weight = EqualWeight()) = Moments(zeros(4), wgt, 0, 0)
-@inbounds function fit!(o::Moments, y::Real)
+function fit!(o::Moments, y::Real)
     γ = weight!(o, 1)
     o.value[1] = smooth(o.value[1], y, γ)
     o.value[2] = smooth(o.value[2], y * y, γ)
@@ -299,7 +286,7 @@ Moments(wgt::Weight = EqualWeight()) = Moments(zeros(4), wgt, 0, 0)
     o.value[4] = smooth(o.value[4], y * y * y * y, γ)
 end
 Base.mean(o::Moments) = value(o)[1]
-Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * _unbias(o)
+Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
 Base.std(o::Moments) = sqrt(var(o))
 function StatsBase.skewness(o::Moments)
     v = value(o)
@@ -307,7 +294,7 @@ function StatsBase.skewness(o::Moments)
 end
 function StatsBase.kurtosis(o::Moments)
     v = value(o)
-    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1]^2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
 end
 function Base.show(io::IO, o::Moments)
     printheader(io, "Moments")
@@ -326,6 +313,7 @@ type Diff{T <: Real} <: OnlineStat
     lastval::T
     n::Int
 end
+nobs(o::Diff) = o.n
 Diff() = Diff(0.0, 0.0, 0)
 Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), 0)
 Diff{T<:Real}(x::AVec{T}) = (o = Diff(T); fit!(o, x); o)
@@ -334,14 +322,14 @@ Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
 function fit!{T<:AbstractFloat}(o::Diff{T}, x::Real)
     v = convert(T, x)
-    o.diff = (o.n == 0 ? zero(T) : v - last(o))
+    o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
     o.lastval = v
     o.n += 1
     return
 end
 function fit!{T<:Integer}(o::Diff{T}, x::Real)
     v = round(T, x)
-    o.diff = (o.n == 0 ? zero(T) : v - last(o))
+    o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
     o.lastval = v
     o.n += 1
     return
@@ -353,7 +341,7 @@ type Diffs{T <: Real} <: OnlineStat
     lastvals::Vector{T}
     n::Int
 end
-
+nobs(o::Diffs) = o.n
 Diffs(p::Integer) = Diffs(zeros(p), zeros(p), 0)
 Diffs{T<:Real}(::Type{T}, p::Integer) = Diffs(zeros(T,p), zeros(T,p), 0)
 Diffs{T<:Real}(x::AMat{T}) = (o = Diffs(T,ncols(x)); fit!(o, x); o)
@@ -362,7 +350,7 @@ value(o::Diffs) = o.diffs
 Base.last(o::Diffs) = o.lastvals
 Base.diff(o::Diffs) = o.diffs
 function fit!{T<:Real}(o::Diffs{T}, x::AVec{T})
-    o.diffs = (o.n == 0 ? zeros(T,length(o.diffs)) : x - last(o))
+    o.diffs = (nobs(o) == 0 ? zeros(T,length(o.diffs)) : x - last(o))
     o.lastvals = collect(x)
     o.n += 1
     return

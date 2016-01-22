@@ -16,7 +16,9 @@ export
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, CovMatrix, LinReg, QuantReg, NormalMix,
     StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
-    KMeans, FitDistribution, FitMvDistribution, BiasVector, BiasMatrix,
+    KMeans, BiasVector, BiasMatrix,
+    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
+    FitMultinomial, FitMvNormal,
     # Penalties
     NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
     # ModelDef and Algorithm
@@ -42,68 +44,76 @@ typealias AMatF AMat{Float64}
 
 #-----------------------------------------------------------------------# weight
 abstract Weight
+nobs(w::Weight) = w.n
+# update and return new weight
+weight!(o::OnlineStat, n2::Int) = weight!(o.weight, n2)
+# update weight without returning the new weight
+weight_noret!(o::OnlineStat, n2::Int) = weight_noret!(o.weight, n2)
+
+
 
 "All observations weighted equally."
-immutable EqualWeight <: Weight end
-weight(w::EqualWeight, n2::Int, n1::Int, nup::Int) = n2 / (n1 + n2)
+type EqualWeight <: Weight
+    n::Int
+    EqualWeight() = new(0)
+end
+weight!(w::EqualWeight, n2::Int) = (w.n += n2; return n2/ w.n)
+weight_noret!(w::EqualWeight, n2::Int) = (w.n += n2)
+
 
 "`ExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
-immutable ExponentialWeight <: Weight
+type ExponentialWeight <: Weight
     minstep::Float64
-    ExponentialWeight(minstep::Real = 0.0) = new(Float64(minstep))
+    n::Int
+    ExponentialWeight(minstep::Real = 0.0) = new(Float64(minstep), 0)
 end
-weight(w::ExponentialWeight, n2::Int, n1::Int, nup::Int) = max(w.minstep, n2 / (n1 + n2))
+weight!(w::ExponentialWeight, n2::Int) = (w.n += n2; return max(n2 / w.n, w.minstep))
+weight_noret!(w::ExponentialWeight, n2::Int) = (w.n += n2)
+``
 
 """
 `LearningRate(r; minstep = 0.0)`.
 
 Weight at update `t` is `1 / t ^ r`.  Compare to `LearningRate2`.
 """
-immutable LearningRate <: Weight
+type LearningRate <: Weight
     r::Float64
     minstep::Float64
-    LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep))
+    n::Int
+    nup::Int
+    LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep), 0, 0)
 end
-weight(w::LearningRate, n2::Int, n1::Int, nup::Int) = max(w.minstep, exp(-w.r * log(nup)))
+function weight!(w::LearningRate, n2::Int)
+    w.n += n2
+    w.nup += 1
+    max(w.minstep, exp(-w.r * log(w.nup)))
+end
+weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nup += 1)
+nup(w::LearningRate) = o.nup
+
 
 """
 LearningRate2(γ, c = 1.0; minstep = 0.0).
 
 Weight at update `t` is `γ / (1 + γ * c * t)`.  Compare to `LearningRate`.
 """
-immutable LearningRate2 <: Weight
+type LearningRate2 <: Weight
     # Recommendation from http://research.microsoft.com/pubs/192769/tricks-2012.pdf
     γ::Float64
     c::Float64
     minstep::Float64
+    n::Int
+    nup::Int
     LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) =
-        new(Float64(γ), Float64(c), Float64(minstep))
+        new(Float64(γ), Float64(c), Float64(minstep), 0, 0)
 end
-weight(w::LearningRate2, n2, n1, nup) = max(w.minstep, w.γ / (1.0 + w.γ * w.c * nup))
-
-#----------------------------------------------------------------------# methods
-"`value(o::OnlineStat)`.  The associated value of an OnlineStat."
-value(o::OnlineStat) = o.value
-"`nobs(o::OnlineStat)`.  The number of observations."
-StatsBase.nobs(o::OnlineStat) = o.n
-"`n_updates(o::OnlineStat)`.  The number of updates an OnlineStat has seen."
-n_updates(o::OnlineStat) = o.nup
-
-# internal functions
-function n!(o::OnlineStat, n2::Int)
-    o.n += n2
+function weight!(w::LearningRate2, n2::Int)
+    w.n += n2
+    w.nup += 1
+    max(w.minstep, w.γ / (1.0 + w.γ * w.c * w.nup))
 end
-function n_and_nup!(o::OnlineStat, n2::Int)
-    o.n += n2
-    o.nup += 1
-end
-function weight!(o::OnlineStat, n2::Int)
-    n1 = o.n
-    o.n += n2
-    o.nup += 1
-    weight(o.weight, n2, n1, o.nup)
-end
-_unbias(o::OnlineStat) = o.n / (o.n - 1)
+weight_noret!(w::LearningRate2, n2::Int) = (w.n += n2; w.nup += 1)
+nup(w::LearningRate2) = o.nup
 
 #---------------------------------------------------------------------# printing
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")
@@ -132,12 +142,12 @@ make more sense for OnlineStats that use stochastic approximation, such as
 `StatLearn`, `QuantileMM`, and `NormalMix`.
 """
 function fit!(o::OnlineStat, y::Union{AVec, AMat})
-    @inbounds for i in 1:size(y, 1)
+    for i in 1:size(y, 1)
         fit!(o, row(y, i))
     end
 end
 function fit!(o::OnlineStat, x::AMat, y::AVec)
-    @inbounds for i in 1:length(y)
+    for i in 1:length(y)
         fit!(o, row(x, i), row(y, i))
     end
 end
@@ -178,6 +188,12 @@ end
 fitbatch!(args...) = fit!(args...)
 
 #----------------------------------------------------------------------# helpers
+"`value(o::OnlineStat)`.  The associated value of an OnlineStat."
+value(o::OnlineStat) = o.value
+StatsBase.nobs(o::OnlineStat) = nobs(o.weight)
+unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
+
+# for updating
 smooth(m::Float64, v::Real, γ::Float64) = (1.0 - γ) * m + γ * v
 function smooth!{T<:Real}(m::VecF, v::AVec{T}, γ::Float64)
     for i in 1:length(v)
@@ -192,19 +208,15 @@ function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
         @inbounds avg[i,j] = smooth(avg[i, j], v[i, j], λ)
     end
 end
-
-"""
-Rank 1 update of symmetric matrix:
- (1 - γ) * A + γ * x * x'
-
- Only upper triangle is updated
-"""
+# Rank 1 update of symmetric matrix: (1 - γ) * A + γ * x * x'
+# Only upper triangle is updated...I was having trouble with BLAS.syr!
 function rank1_smooth!(A::AMat, x::AVec, γ::Real)
     @assert size(A, 1) == size(A, 2)
     for j in 1:size(A, 2), i in 1:j
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end
 end
+
 
 
 row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)

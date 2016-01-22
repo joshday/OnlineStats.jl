@@ -26,7 +26,7 @@ facts(@title "StatLearn") do
     β_with_intercept = vcat(0.0, β)
     xβ = x*β
 
-    alg = [SGD(), AdaGrad(), AdaDelta(), RDA(), MMGrad(), AdaMMGrad()]
+    alg = [SGD(), AdaGrad(), AdaDelta(), RDA(), MMGrad()]
     pen = [NoPenalty(), L2Penalty(.1), L1Penalty(.1), ElasticNetPenalty(.1, .5)]
     mod = [
         L2Regression(), L1Regression(), LogisticRegression(),
