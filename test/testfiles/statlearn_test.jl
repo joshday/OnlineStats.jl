@@ -23,6 +23,7 @@ facts(@title "StatLearn") do
     n, p = 500, 5
     x = randn(n, p)
     β = collect(linspace(-1, 1, p))
+    β_with_intercept = vcat(0.0, β)
     xβ = x*β
 
     alg = [SGD(), AdaGrad(), AdaDelta(), RDA(), MMGrad(), AdaMMGrad()]

@@ -22,10 +22,10 @@ export
     # ModelDef and Algorithm
     ModelDef, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
-    Algorithm, SGD, AdaGrad, AdaDelta, RDA, MMGrad, AdaMMGrad,
+    Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, RDA, MMGrad,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
-    replicates,
+    replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
     vcov, stderr, loss, center, standardize
@@ -236,6 +236,7 @@ include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
 include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
+include("streamstats/hyperloglog.jl")
 include("multivariate/kmeans.jl")
 include("normalmix.jl")
 
