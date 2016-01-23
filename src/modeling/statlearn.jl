@@ -649,6 +649,6 @@ d2_h{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ) = 1.0
 
 
 
-for alg in [:SGD, :AdaGrad, :AdaDelta, :RDA, :MMGrad]
+for alg in [:SGD, :AdaGrad, :AdaGrad2, :AdaDelta, :RDA, :MMGrad]
     eval(parse("""Base.show(io::IO, o::$alg) = print(io, "$alg")"""))
 end

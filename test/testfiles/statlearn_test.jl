@@ -20,13 +20,15 @@ end
 
 
 facts(@title "StatLearn") do
+    @fact OnlineStats.default(Algorithm) --> SGD()
+
     n, p = 500, 5
     x = randn(n, p)
     β = collect(linspace(-1, 1, p))
     β_with_intercept = vcat(0.0, β)
     xβ = x*β
 
-    alg = [SGD(), AdaGrad(), AdaDelta(), RDA(), MMGrad()]
+    alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), RDA(), MMGrad()]
     pen = [NoPenalty(), L2Penalty(.1), L1Penalty(.1), ElasticNetPenalty(.1, .5)]
     mod = [
         L2Regression(), L1Regression(), LogisticRegression(),
@@ -133,7 +135,6 @@ facts(@title "StatLearn") do
         @fact predict(cv, x) --> predict(o, x)
         @fact loss(cv, x, y) --> loss(o, x, y)
         @fact loss(cv) --> loss(o, xtest, ytest)
-        println(loss(cv))
     end
 end
 
