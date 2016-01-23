@@ -89,7 +89,7 @@ function weight!(w::LearningRate, n2::Int)
     max(w.minstep, exp(-w.r * log(w.nup)))
 end
 weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nup += 1)
-nup(w::LearningRate) = o.nup
+nup(w::LearningRate) = w.nup
 
 
 """
@@ -113,7 +113,7 @@ function weight!(w::LearningRate2, n2::Int)
     max(w.minstep, w.γ / (1.0 + w.γ * w.c * w.nup))
 end
 weight_noret!(w::LearningRate2, n2::Int) = (w.n += n2; w.nup += 1)
-nup(w::LearningRate2) = o.nup
+nup(w::LearningRate2) = w.nup
 
 #---------------------------------------------------------------------# printing
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")

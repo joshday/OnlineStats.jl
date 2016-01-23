@@ -102,13 +102,9 @@ function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T})
 end
 
 
-function quantilestart(o::NormalMix, τ::Real)
-    # starting values based on Normal Distribution
-    @assert 0 < τ < 1
-    quantile(Ds.Normal(mean(o), std(o)), τ)
-end
+# Quantiles.  Starting values based on Normal distribution.
 function Base.quantile(o::NormalMix, τ::Real;
-        start = quantilestart(o, τ), maxit = 20, tol = .001
+        start = quantile(Ds.Normal(mean(o), std(o)), τ), maxit = 20, tol = .001
     )
     @assert 0 < τ < 1
     θ = start
@@ -119,7 +115,7 @@ function Base.quantile(o::NormalMix, τ::Real;
     return θ
 end
 function Base.quantile{T<:Real}(o::NormalMix, τ::Vector{T};
-        start = [quantilestart(o, τi) for τi in τ], kw...
+        start = start = quantile(Ds.Normal(mean(o), std(o)), τ), kw...
     )
     Float64[quantile(o, τ[j]; start = start[j], kw...) for j in 1:length(τ)]
 end

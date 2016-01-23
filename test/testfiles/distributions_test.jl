@@ -12,6 +12,7 @@ facts(@title "FitDistribution / FitMvDistribution") do
         @fact var(o) --> roughly(var(d))
         @fact params(o)[1] --> roughly(params(d)[1])
         @fact params(o)[2] --> roughly(params(d)[2])
+        @fact nobs(o) --> 100
     end
 
     context(@subtitle "Categorical") do
@@ -34,6 +35,7 @@ facts(@title "FitDistribution / FitMvDistribution") do
         fit!(o, y, 5)
         @fact params(o)[1] --> roughly(0.0, .1)
         @fact params(o)[2] --> roughly(1.0, .1)
+        @fact nobs(o) --> 2 * 10000
     end
 
     context(@subtitle "Gamma") do
@@ -61,6 +63,7 @@ facts(@title "FitDistribution / FitMvDistribution") do
         y = rand(Multinomial(5, x/sum(x)), 100)'
         o = FitMultinomial(y)
         @fact mean(o) --> roughly(vec(mean(y, 1)))
+        @fact nobs(o) --> 100
     end
 
     context(@subtitle "MvNormal") do
@@ -70,6 +73,7 @@ facts(@title "FitDistribution / FitMvDistribution") do
         @fact var(o) --> roughly(vec(var(y, 1)))
         @fact std(o) --> roughly(vec(std(y, 1)))
         @fact cov(o) --> roughly(cov(y))
+        @fact nobs(o) --> 100
     end
 
     context(@subtitle "NormalMix") do

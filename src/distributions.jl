@@ -16,11 +16,13 @@ FitBeta(wgt::Weight = EqualWeight()) = FitBeta(Ds.Beta(), Variance(wgt))
 nobs(o::FitBeta) = nobs(o.var)
 fit!(o::FitBeta, y::Real) = fit!(o.var, y)
 function value(o::FitBeta)
-    m = mean(o.var)
-    v = var(o.var)
-    α = m * (m * (1 - m) / v - 1)
-    β = (1 - m) * (m * (1 - m) / v - 1)
-    o.value = Ds.Beta(α, β)
+    if nobs(o) > 1
+        m = mean(o.var)
+        v = var(o.var)
+        α = m * (m * (1 - m) / v - 1)
+        β = (1 - m) * (m * (1 - m) / v - 1)
+        o.value = Ds.Beta(α, β)
+    end
 end
 
 #------------------------------------------------------------------# Categorical
@@ -51,12 +53,14 @@ function fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol})
 end
 sortpairs(o::FitCategorical) = sort(collect(o.d), by = x -> 1 / x[2])
 function value(o::FitCategorical)
-    sortedpairs = sortpairs(o)
-    counts = zeros(length(sortedpairs))
-    for i in 1:length(sortedpairs)
-        counts[i] = sortedpairs[i][2]
+    if nobs(o) !== 0
+        sortedpairs = sortpairs(o)
+        counts = zeros(length(sortedpairs))
+        for i in 1:length(sortedpairs)
+            counts[i] = sortedpairs[i][2]
+        end
+        o.value = Ds.Categorical(counts / sum(counts))
     end
-    o.value = Ds.Categorical(counts / sum(counts))
 end
 function Base.show(io::IO, o::FitCategorical)
     printheader(io, "FitCategorical ($(length(o.d)) categories)")

@@ -12,7 +12,7 @@ title(s) = print_with_color(:red, @sprintf( "%26s", s * " :\n"))
 
 
 
-function comparison(title, n::AbstractString, o::AbstractString, nrep = 10)
+function comparison(title, n::AbstractString, o::AbstractString, nrep = 20)
     old_behavior() = eval(parse(o))
     new_behavior() = eval(parse(n))
     print_with_color(:red, "▶ " * title * ":\n")
