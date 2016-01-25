@@ -64,8 +64,8 @@ o3 = QuantileMM(y, LearningRate(.6))
     - the associated value of an OnlineStat
 - `nobs(o)`
     - the number of observations seen
-- `n_updates(o)`
-    - the number of update performed.  When using batch updates, `nobs(o) != n_updates(o)`.
+- `nup(o)`
+    - the number of updates performed (For `LeaningRate` only).  When using batch updates, `nobs(o) != n_updates(o)`.
 
 
 
@@ -76,6 +76,6 @@ o3 = QuantileMM(y, LearningRate(.6))
 Batch updates have an effect on convergence for stochastic approximation methods.
 ```julia
 y = randn(1000)
-o = QuantileMM(tau = [.25, .75])
+o = QuantileMM(tau = [.25, .75])  # Online MM algorithm for quantiles
 fit!(o, y, 10)  # update in batches of size 10
 ```
