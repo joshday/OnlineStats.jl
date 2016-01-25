@@ -44,7 +44,6 @@ typealias AMatF AMat{Float64}
 
 #-----------------------------------------------------------------------# weight
 abstract Weight
-abstract LearningRateWeight <: Weight
 nobs(w::Weight) = w.n
 # update and return new weight
 weight!(o::OnlineStat, n2::Int) = weight!(o.weight, n2)
@@ -77,7 +76,7 @@ weight_noret!(w::ExponentialWeight, n2::Int) = (w.n += n2)
 
 Weight at update `t` is `1 / t ^ r`.  Compare to `LearningRate2`.
 """
-type LearningRate <: LearningRateWeight
+type LearningRate <: Weight
     r::Float64
     minstep::Float64
     n::Int
@@ -89,7 +88,7 @@ function weight!(w::LearningRate, n2::Int)
     w.nup += 1
     max(w.minstep, exp(-w.r * log(w.nup)))
 end
-weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nup += f1)
+weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nup += 1)
 nup(w::LearningRate) = w.nup
 
 
@@ -98,7 +97,7 @@ LearningRate2(γ, c = 1.0; minstep = 0.0).
 
 Weight at update `t` is `γ / (1 + γ * c * t)`.  Compare to `LearningRate`.
 """
-type LearningRate2 <: LearningRateWeight
+type LearningRate2 <: Weight
     # Recommendation from http://research.microsoft.com/pubs/192769/tricks-2012.pdf
     γ::Float64
     c::Float64
@@ -116,7 +115,7 @@ end
 weight_noret!(w::LearningRate2, n2::Int) = (w.n += n2; w.nup += 1)
 nup(w::LearningRate2) = w.nup
 
-nup{W <: LearningRateWeight}(o::OnlineStat{W}) = nup(o.w)
+nup(o::OnlineStat) = nup(o.w)
 
 #---------------------------------------------------------------------# printing
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")

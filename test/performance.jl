@@ -12,7 +12,7 @@ title(s) = print_with_color(:red, @sprintf( "%26s", s * " :\n"))
 
 
 
-function comparison(title, n::AbstractString, o::AbstractString, nrep = 20)
+function comparison(title, n::AbstractString, o::AbstractString, nrep = 10)
     old_behavior() = eval(parse(o))
     new_behavior() = eval(parse(n))
     print_with_color(:red, "▶ " * title * ":\n")
@@ -112,32 +112,32 @@ comparison("CovMatrix batch",
     "(o = O.CovarianceMatrix(p); O.updatebatch!(o, y)); cor(o)"
 )
 
-#
-#
-# println("")
-# println("")
-# print_with_color(:blue, "  ===========================================\n")
-# print_with_color(:blue, "  Performance on 1 million × 200 design matrix\n")
-# print_with_color(:blue, "  ===========================================\n\n")
-#
-# n, p = 1_000_000, 200
-# x = randn(n, p)
-# β = collect(1.:p)
-# y = x * β + randn(n)
-#
-# comparison("LinReg vs. LinReg",
-#     "(o = LinReg(x, y); coef(o))",
-#     "(o = O.LinReg(x, y); coef(o))"
-# )
-# comparison("LinReg vs. SparseReg",
-#     "(o = LinReg(x, y); coef(o))",
-#     "(o = O.SparseReg(x, y); coef(o))"
-# )
-# comparison("SGD", "StatLearn(x, y)", "O.StochasticModel(x, y)")
-# comparison("AdaGrad", "StatLearn(x, y, AdaGrad())", "O.StochasticModel(x, y, algorithm = O.ProxGrad())")
-# comparison("RDA", "StatLearn(x, y, algorithm = RDA())", "O.StochasticModel(x, y, algorithm = O.RDA())")
-# comparison("MMGrad", "StatLearn(x, y, algorithm = MMGrad())", "O.StochasticModel(x, y, algorithm = O.MMGrad())")
-#
+
+
+println("")
+println("")
+print_with_color(:blue, "  ===========================================\n")
+print_with_color(:blue, "  Performance on 1 million × 200 design matrix\n")
+print_with_color(:blue, "  ===========================================\n\n")
+
+n, p = 1_000_000, 200
+x = randn(n, p)
+β = collect(1.:p)
+y = x * β + randn(n)
+
+comparison("LinReg vs. LinReg",
+    "(o = LinReg(x, y); coef(o))",
+    "(o = O.LinReg(x, y); coef(o))"
+)
+comparison("LinReg vs. SparseReg",
+    "(o = LinReg(x, y); coef(o))",
+    "(o = O.SparseReg(x, y); coef(o))"
+)
+comparison("SGD", "StatLearn(x, y)", "O.StochasticModel(x, y)")
+comparison("AdaGrad", "StatLearn(x, y, AdaGrad())", "O.StochasticModel(x, y, algorithm = O.ProxGrad())")
+comparison("RDA", "StatLearn(x, y, algorithm = RDA())", "O.StochasticModel(x, y, algorithm = O.RDA())")
+comparison("MMGrad", "StatLearn(x, y, algorithm = MMGrad())", "O.StochasticModel(x, y, algorithm = O.MMGrad())")
+
 
 # cleanup
 y = 0
