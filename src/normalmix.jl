@@ -133,7 +133,7 @@ end
 #     V::Array{Float64, 3}
 #     weight::W
 #     n::Int
-#     nup::Int
+#     nups::Int
 # end
 # function MvNormalMix(p::Integer, k::Integer, wgt::Weight = LearningRate();
 #         start = Ds.MixtureModel(Ds.MvNormal[Ds.MvNormal(ones(p) + j, 10 * eye(p)) for j in 1:k])

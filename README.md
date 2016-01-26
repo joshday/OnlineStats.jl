@@ -64,8 +64,8 @@ o3 = QuantileMM(y, LearningRate(.6))
     - the associated value of an OnlineStat
 - `nobs(o)`
     - the number of observations seen
-- `nup(o)`
-    - the number of updates performed (For `LeaningRate` only).  When using batch updates, `nobs(o) != n_updates(o)`.
+- `nups(o)`
+    - the number of updates performed (For `LeaningRate` only).  When using batch updates, `nobs(o) != nups(o)`.
 
 
 

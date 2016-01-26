@@ -80,16 +80,16 @@ type LearningRate <: Weight
     r::Float64
     minstep::Float64
     n::Int
-    nup::Int
+    nups::Int
     LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep), 0, 0)
 end
 function weight!(w::LearningRate, n2::Int)
     w.n += n2
-    w.nup += 1
-    max(w.minstep, exp(-w.r * log(w.nup)))
+    w.nups += 1
+    max(w.minstep, exp(-w.r * log(w.nups)))
 end
-weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nup += 1)
-nup(w::LearningRate) = w.nup
+weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nups += 1)
+nups(w::LearningRate) = w.nups
 
 
 """
@@ -103,19 +103,19 @@ type LearningRate2 <: Weight
     c::Float64
     minstep::Float64
     n::Int
-    nup::Int
+    nups::Int
     LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) =
         new(Float64(γ), Float64(c), Float64(minstep), 0, 0)
 end
 function weight!(w::LearningRate2, n2::Int)
     w.n += n2
-    w.nup += 1
-    max(w.minstep, w.γ / (1.0 + w.γ * w.c * w.nup))
+    w.nups += 1
+    max(w.minstep, w.γ / (1.0 + w.γ * w.c * w.nups))
 end
-weight_noret!(w::LearningRate2, n2::Int) = (w.n += n2; w.nup += 1)
-nup(w::LearningRate2) = w.nup
+weight_noret!(w::LearningRate2, n2::Int) = (w.n += n2; w.nups += 1)
+nups(w::LearningRate2) = w.nups
 
-nup(o::OnlineStat) = nup(o.w)
+nups(o::OnlineStat) = nups(o.w)
 
 #---------------------------------------------------------------------# printing
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")

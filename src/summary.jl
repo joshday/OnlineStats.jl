@@ -2,7 +2,7 @@
 #   - value:    value of the statistic
 #   - weight:   subtype of Weight
 #   - n:        nobs
-#   - nup:      n updates
+#   - nups:      n updates
 #
 # Each type needs to have:
 #   - empty constructor
@@ -275,7 +275,7 @@ type Moments{W <: Weight} <: OnlineStat
     value::VecF
     weight::W
     n::Int
-    nup::Int
+    nups::Int
 end
 Moments(wgt::Weight = EqualWeight()) = Moments(zeros(4), wgt, 0, 0)
 function fit!(o::Moments, y::Real)

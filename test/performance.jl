@@ -139,7 +139,7 @@ comparison("RDA", "StatLearn(x, y, algorithm = RDA())", "O.StochasticModel(x, y,
 comparison("MMGrad", "StatLearn(x, y, algorithm = MMGrad())", "O.StochasticModel(x, y, algorithm = O.MMGrad())")
 
 
-# cleanup
+# cleanups
 y = 0
 println("")
 end # module

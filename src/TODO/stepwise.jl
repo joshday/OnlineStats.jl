@@ -7,7 +7,7 @@
 #     set::IntSet
 #     weight::W
 #     n::Int
-#     nup::Int
+#     nups::Int
 # end
 # function StepReg(p::Integer, wgt::Weight = EqualWeight(); intercept::Bool = true)
 #     StepReg(
