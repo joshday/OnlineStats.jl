@@ -66,6 +66,7 @@ type ExponentialWeight <: Weight
     minstep::Float64
     n::Int
     ExponentialWeight(minstep::Real = 0.0) = new(Float64(minstep), 0)
+    ExponentialWeight(lookback::Integer) = new(Float64(1 / lookback), 0)
 end
 weight!(w::ExponentialWeight, n2::Int) = (w.n += n2; return max(n2 / w.n, w.minstep))
 weight_noret!(w::ExponentialWeight, n2::Int) = (w.n += n2)

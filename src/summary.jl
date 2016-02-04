@@ -68,7 +68,7 @@ end
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
-value(o::Variance) = o.value * unbias(o)
+value(o::Variance) = nobs(o) < 2 ? 0.0 : o.value * unbias(o)
 center(o::Variance, x::Real) = x - mean(o)
 standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
