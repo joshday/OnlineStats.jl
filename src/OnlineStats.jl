@@ -46,37 +46,49 @@ typealias AMatF AMat{Float64}
 abstract Weight
 nobs(w::Weight) = w.n
 # update and return new weight
-weight!(o::OnlineStat, n2::Int) = weight!(o.weight, n2)
+weight!(o::OnlineStat, n2::Int = 1) = weight!(o.weight, n2)
 # update weight without returning the new weight
-weight_noret!(o::OnlineStat, n2::Int) = weight_noret!(o.weight, n2)
+weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 
 
 
 "All observations weighted equally."
 type EqualWeight <: Weight
     n::Int
-    EqualWeight() = new(0)
 end
-weight!(w::EqualWeight, n2::Int) = (w.n += n2; return n2/ w.n)
-weight_noret!(w::EqualWeight, n2::Int) = (w.n += n2)
+EqualWeight() = EqualWeight(0)
+weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; return n2 / w.n)
+weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
 
 
-"`ExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
+"`ExponentialWeight(λ)`.  Most recent observation has a constant weight of λ."
 type ExponentialWeight <: Weight
+    λ::Float64
+    n::Int
+    function ExponentialWeight(λ::Real, n::Integer)
+        @assert 0 <= λ <= 1
+        new(λ, n)
+    end
+end
+ExponentialWeight(λ::Real = 1.0) = ExponentialWeight(λ, 0)
+ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
+weight!(w::ExponentialWeight, n2::Int = 1)  = (w.n += n2; w.λ)
+weight_noret!(w::ExponentialWeight, n2::Int = 1) = (w.n += n2)
+
+
+"`BoundedExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
+type BoundedExponentialWeight <: Weight
     minstep::Float64
     n::Int
-    function ExponentialWeight(minstep::Real = 0.0)
-        @assert 0 < minstep < 1
-        new(Float64(minstep), 0)
-    end
-    function ExponentialWeight(lookback::Integer)
-        @assert lookback > 1
-        new(Float64(1 / lookback), 0)
+    function BoundedExponentialWeight(minstep::Real, n::Integer)
+        @assert 0 <= minstep <= 1
+        new(minstep, n)
     end
 end
-weight!(w::ExponentialWeight, n2::Int) = (w.n += n2; return max(n2 / w.n, w.minstep))
-weight_noret!(w::ExponentialWeight, n2::Int) = (w.n += n2)
-``
+BoundedExponentialWeight(minstep::Real = 1.0) = BoundedExponentialWeight(minstep, 0)
+BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
+weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.minstep))
+weight_noret!(w::BoundedExponentialWeight, n2::Int = 1) = (w.n += n2)
 
 """
 `LearningRate(r; minstep = 0.0)`.
@@ -90,12 +102,12 @@ type LearningRate <: Weight
     nups::Int
     LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep), 0, 0)
 end
-function weight!(w::LearningRate, n2::Int)
+function weight!(w::LearningRate, n2::Int = 1)
     w.n += n2
     w.nups += 1
     max(w.minstep, exp(-w.r * log(w.nups)))
 end
-weight_noret!(w::LearningRate, n2::Int) = (w.n += n2; w.nups += 1)
+weight_noret!(w::LearningRate, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate) = w.nups
 
 
@@ -114,12 +126,12 @@ type LearningRate2 <: Weight
     LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) =
         new(Float64(γ), Float64(c), Float64(minstep), 0, 0)
 end
-function weight!(w::LearningRate2, n2::Int)
+function weight!(w::LearningRate2, n2::Int = 1)
     w.n += n2
     w.nups += 1
     max(w.minstep, w.γ / (1.0 + w.γ * w.c * w.nups))
 end
-weight_noret!(w::LearningRate2, n2::Int) = (w.n += n2; w.nups += 1)
+weight_noret!(w::LearningRate2, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate2) = w.nups
 
 nups(o::OnlineStat) = nups(o.w)
