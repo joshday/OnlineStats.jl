@@ -20,7 +20,7 @@ end
 
 `StatLearnSparse(o::StatLearn, s::AbstractSparsity)`
 """
-type StatLearnSparse{S <: AbstractSparsity} <: OnlineStat
+type StatLearnSparse{S <: AbstractSparsity} <: OnlineStat{XYInput}
     o::StatLearn
     s::S
 end
@@ -64,7 +64,7 @@ end
 Automatically tune the regularization parameter λ for `o` by minimizing loss on
 test data `xtest`, `ytest`.
 """
-type StatLearnCV{T<:Real, S<:Real, W<:Weight} <: OnlineStat
+type StatLearnCV{T<:Real, S<:Real, W<:Weight} <: OnlineStat{XYInput}
     o::StatLearn
     burnin::Int
     xtest::AMat{T}

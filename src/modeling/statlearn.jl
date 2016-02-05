@@ -130,7 +130,7 @@ The model is defined by:
 ### Example:
 `StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))`
 """
-type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat
+type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat{XYInput}
     β0::Float64     # intercept
     β::VecF         # coefficients
     intercept::Bool # should β0 be estimated?

@@ -1,4 +1,4 @@
-type KMeans{W<:Weight} <: OnlineStat
+type KMeans{W<:Weight} <: OnlineStat{VectorInput}
     value::MatF
     v::VecF
     weight::W

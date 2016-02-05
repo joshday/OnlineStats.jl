@@ -1,4 +1,4 @@
-abstract DistributionStat <: OnlineStat
+abstract DistributionStat{I<:Input} <: OnlineStat{I}
 Base.mean(d::DistributionStat) = mean(value(d))
 Base.var(d::DistributionStat) = var(value(d))
 Base.std(d::DistributionStat) = std(value(d))
@@ -8,7 +8,7 @@ Base.cov(o::DistributionStat) = cov(value(o))
 
 
 #--------------------------------------------------------------# Beta
-type FitBeta{W<:Weight} <: DistributionStat
+type FitBeta{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.Beta
     var::Variance{W}
 end
@@ -32,7 +32,7 @@ end
 
 Find the proportions for each unique input.  Categories are sorted by proportions.
 """
-type FitCategorical{W<:Weight, T<:Any} <: DistributionStat
+type FitCategorical{W<:Weight, T<:Any} <: DistributionStat{ScalarInput}
     value::Ds.Categorical
     d::Dict{T, Int}
     weight::W
@@ -73,7 +73,7 @@ end
 
 
 #------------------------------------------------------------------# Cauchy
-type FitCauchy{W<:Weight} <: DistributionStat
+type FitCauchy{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.Cauchy
     q::QuantileMM{W}
 end
@@ -88,7 +88,7 @@ end
 
 #------------------------------------------------------------------------# Gamma
 # method of moments, TODO: look at Distributions for MLE
-type FitGamma{W<:Weight} <: DistributionStat
+type FitGamma{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.Gamma
     var::Variance{W}
 end
@@ -107,7 +107,7 @@ end
 
 
 #-----------------------------------------------------------------------# LogNormal
-type FitLogNormal{W<:Weight} <: DistributionStat
+type FitLogNormal{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.LogNormal
     var::Variance{W}
 end
@@ -122,7 +122,7 @@ end
 
 
 #-----------------------------------------------------------------------# Normal
-type FitNormal{W<:Weight} <: DistributionStat
+type FitNormal{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.Normal
     var::Variance{W}
 end
@@ -137,7 +137,7 @@ end
 
 
 #-----------------------------------------------------------------------# Multinomial
-type FitMultinomial{W<:Weight} <: DistributionStat
+type FitMultinomial{W<:Weight} <: DistributionStat{VectorInput}
     value::Ds.Multinomial
     means::Means{W}
 end
@@ -154,7 +154,7 @@ end
 
 
 #---------------------------------------------------------------------# MvNormal
-type FitMvNormal{W<:Weight} <: DistributionStat
+type FitMvNormal{W<:Weight} <: DistributionStat{VectorInput}
     value::Ds.MvNormal
     cov::CovMatrix{W}
 end

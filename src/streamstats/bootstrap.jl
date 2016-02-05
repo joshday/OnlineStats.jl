@@ -1,4 +1,4 @@
-abstract Bootstrap <: OnlineStat
+abstract Bootstrap <: OnlineStat{ScalarInput}
 nobs(b::Bootstrap) = b.n
 
 #-----------------------------------------------------------# BernoulliBootstrap

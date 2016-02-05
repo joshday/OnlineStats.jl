@@ -10,7 +10,7 @@
 #
 #-------------------------------------------------------------------------# Mean
 "Univariate Mean"
-type Mean{W <: Weight} <: OnlineStat
+type Mean{W <: Weight} <: OnlineStat{ScalarInput}
     value::Float64
     weight::W
 end
@@ -31,7 +31,7 @@ center(o::Mean, x::Real) = x - mean(o)
 
 #------------------------------------------------------------------------# Means
 "Mean vector of a data matrix, similar to `mean(x, 1)`"
-type Means{W <: Weight} <: OnlineStat
+type Means{W <: Weight} <: OnlineStat{VectorInput}
     value::VecF
     weight::W
 end
@@ -52,7 +52,7 @@ center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 
 #---------------------------------------------------------------------# Variance
 "Univariate Variance"
-type Variance{W <: Weight} <: OnlineStat
+type Variance{W <: Weight} <: OnlineStat{ScalarInput}
     value::Float64
     μ::Float64
     weight::W
@@ -75,7 +75,7 @@ standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
 #--------------------------------------------------------------------# Variances
 "Variance vector of a data matrix, similar to `var(x, 1)`"
-type Variances{W <: Weight} <: OnlineStat
+type Variances{W <: Weight} <: OnlineStat{VectorInput}
     value::VecF
     μ::VecF
     μold::VecF  # avoid allocation in update
@@ -109,7 +109,7 @@ standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
 
 #--------------------------------------------------------------------# CovMatrix
 "Covariance matrix"
-type CovMatrix{W <: Weight} <: OnlineStat
+type CovMatrix{W <: Weight} <: OnlineStat{VectorInput}
     value::MatF
     cormat::MatF
     A::MatF  # X'X / n
@@ -158,7 +158,7 @@ end
 
 #----------------------------------------------------------------------# Extrema
 "Extrema (maximum and minimum).  Ignores `Weight`."
-type Extrema{W<:Weight} <: OnlineStat
+type Extrema{W<:Weight} <: OnlineStat{ScalarInput}
     min::Float64
     max::Float64
     weight::W
@@ -181,7 +181,7 @@ value(o::Extrema) = extrema(o)
 
 #------------------------------------------------------------------# QuantileSGD
 "Approximate quantiles via stochastic gradient descent"
-type QuantileSGD{W <: Weight} <: OnlineStat
+type QuantileSGD{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     τ::VecF
     weight::W
@@ -219,7 +219,7 @@ end
 
 #------------------------------------------------------------------# QuantileMM
 "Approximate quantiles via an online MM algorithm"
-type QuantileMM{W <: Weight} <: OnlineStat
+type QuantileMM{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     τ::VecF
 
@@ -271,7 +271,7 @@ end
 
 #----------------------------------------------------------------------# Moments
 "Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`"
-type Moments{W <: Weight} <: OnlineStat
+type Moments{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     weight::W
     n::Int
@@ -308,7 +308,7 @@ end
 
 #-------------------------------------------------------------------# Diff/Diffs
 "Track the last value and the last difference"
-type Diff{T <: Real} <: OnlineStat
+type Diff{T <: Real} <: OnlineStat{ScalarInput}
     diff::T
     lastval::T
     n::Int
@@ -336,7 +336,7 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real)
 end
 
 "Track the last values and the last differences for multiple series"
-type Diffs{T <: Real} <: OnlineStat
+type Diffs{T <: Real} <: OnlineStat{VectorInput}
     diffs::Vector{T}
     lastvals::Vector{T}
     n::Int

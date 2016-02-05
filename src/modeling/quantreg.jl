@@ -1,5 +1,5 @@
 "Online MM Algorithm for Quantile Regression."
-type QuantReg{W <: Weight} <: OnlineStat
+type QuantReg{W <: Weight} <: OnlineStat{XYInput}
     β::VecF
     τ::Float64
     XWX::MatF

@@ -9,7 +9,7 @@ facts(@title "Weighting") do
     O.weight_noret!(w, 1)
 
     w = ExponentialWeight(.5)
-    @fact O.weight!(w, 1) --> 1.0
+    @fact O.weight!(w, 1) --> 0.5
     O.weight!(w, 10)
     O.weight_noret!(w, 1)
 

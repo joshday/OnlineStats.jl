@@ -1,3 +1,4 @@
+__precompile__()
 module OnlineStats
 
 import StatsBase
@@ -33,7 +34,11 @@ export
     vcov, stderr, loss, center, standardize
 
 #------------------------------------------------------------------------# types
-abstract OnlineStat
+abstract Input
+abstract ScalarInput <: Input  # observation = scalar
+abstract VectorInput <: Input  # observation = vector
+abstract XYInput <: Input      # observation = (x, y) pair
+abstract OnlineStat{I <: Input}
 
 typealias VecF Vector{Float64}
 typealias MatF Matrix{Float64}
@@ -162,32 +167,24 @@ Include more data for an OnlineStat using batch updates of size `b`.  Batch upda
 make more sense for OnlineStats that use stochastic approximation, such as
 `StatLearn`, `QuantileMM`, and `NormalMix`.
 """
-function fit!(o::OnlineStat, y::AMat)
-    for i in 1:size(y, 1)
-        fit!(o, row(y, i))
-    end
-end
-function fit!(o::OnlineStat, y::AVec)
+function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     for yi in y
         fit!(o, yi)
     end
 end
-function fit!(o::OnlineStat, x::AMat, y::AVec)
+function fit!(o::OnlineStat{VectorInput}, y::AMat)
+    for i in 1:size(y, 1)
+        fit!(o, row(y, i))
+    end
+end
+function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     for i in 1:length(y)
         fit!(o, row(x, i), row(y, i))
     end
 end
 
-fit_get!(o::OnlineStat, args...) = (fit!(o, args...); o)
-function fit2!(o::OnlineStat, y::AVec)
-    for yi in y
-        fit_get!(o, yi)
-    end
-    o
-end
-
 # Update in batches
-function fit!(o::OnlineStat, y::AVec, b::Integer)
+function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
     @assert 0 < b <= n "batch size must be positive and smaller than data size"
@@ -202,7 +199,7 @@ function fit!(o::OnlineStat, y::AVec, b::Integer)
         end
     end
 end
-function fit!(o::OnlineStat, y::AMat, b::Integer)
+function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     b = Int(b)
     n = size(y, 1)
     @assert 0 < b <= n "batch size must be positive and smaller than data size"
@@ -217,7 +214,7 @@ function fit!(o::OnlineStat, y::AMat, b::Integer)
         end
     end
 end
-function fit!(o::OnlineStat, x::AMat, y::AVec, b::Integer)
+function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
     @assert 0 < b <= n "batch size must be positive and smaller than data size"

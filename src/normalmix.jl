@@ -1,4 +1,4 @@
-type NormalMix{W<:Weight} <: OnlineStat
+type NormalMix{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal}
     s1::VecF
     s2::VecF

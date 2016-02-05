@@ -1,4 +1,4 @@
-type LinReg{W <: Weight} <: OnlineStat
+type LinReg{W <: Weight} <: OnlineStat{XYInput}
     value::VecF
     c::CovMatrix{W}  # Cov([X y])
     s::MatF          # "Swept" version of [X y]' [X y]
