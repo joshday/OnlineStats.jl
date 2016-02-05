@@ -127,7 +127,7 @@ nups(o::OnlineStat) = nups(o.w)
 #---------------------------------------------------------------------# printing
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")
 function print_item(io::IO, name::AbstractString, value)
-    println(io, "  ▶" * @sprintf("%12s", name * ": "), value)
+    println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end
 function print_value_and_nobs(io::IO, o::OnlineStat)
     print_item(io, "value", value(o))
@@ -150,9 +150,14 @@ Include more data for an OnlineStat using batch updates of size `b`.  Batch upda
 make more sense for OnlineStats that use stochastic approximation, such as
 `StatLearn`, `QuantileMM`, and `NormalMix`.
 """
-function fit!(o::OnlineStat, y::Union{AVec, AMat})
+function fit!(o::OnlineStat, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, row(y, i))
+    end
+end
+function fit!(o::OnlineStat, y::AVec)
+    for yi in y
+        fit!(o, yi)
     end
 end
 function fit!(o::OnlineStat, x::AMat, y::AVec)
@@ -161,8 +166,31 @@ function fit!(o::OnlineStat, x::AMat, y::AVec)
     end
 end
 
+fit_get!(o::OnlineStat, args...) = (fit!(o, args...); o)
+function fit2!(o::OnlineStat, y::AVec)
+    for yi in y
+        fit_get!(o, yi)
+    end
+    o
+end
+
 # Update in batches
-function fit!(o::OnlineStat, y::Union{AVec, AMat}, b::Integer)
+function fit!(o::OnlineStat, y::AVec, b::Integer)
+    b = Int(b)
+    n = length(y)
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            fitbatch!(o, rows(y, rng))
+            i += b
+        end
+    end
+end
+function fit!(o::OnlineStat, y::AMat, b::Integer)
     b = Int(b)
     n = size(y, 1)
     @assert 0 < b <= n "batch size must be positive and smaller than data size"
