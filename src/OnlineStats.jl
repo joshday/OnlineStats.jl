@@ -32,7 +32,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
-    vcov, stderr, loss, center, standardize
+    vcov, stderr, loss, center, standardize, show_weight
 
 #------------------------------------------------------------------------# types
 abstract Input
@@ -57,7 +57,6 @@ weight!(o::OnlineStat, n2::Int = 1) = weight!(o.weight, n2)
 weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 
 
-
 "All observations weighted equally."
 type EqualWeight <: Weight
     n::Int
@@ -65,6 +64,7 @@ end
 EqualWeight() = EqualWeight(0)
 weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; return n2 / w.n)
 weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
+show_weight(w::EqualWeight) = print("1 / nobs")
 
 
 "`ExponentialWeight(λ)`.  Most recent observation has a constant weight of λ."
@@ -80,6 +80,7 @@ ExponentialWeight(λ::Real = 1.0) = ExponentialWeight(λ, 0)
 ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
 weight!(w::ExponentialWeight, n2::Int = 1)  = (w.n += n2; w.λ)
 weight_noret!(w::ExponentialWeight, n2::Int = 1) = (w.n += n2)
+show_weight(w::ExponentialWeight) = print("$(w.λ)")
 
 
 "`BoundedExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
@@ -95,6 +96,8 @@ BoundedExponentialWeight(minstep::Real = 1.0) = BoundedExponentialWeight(minstep
 BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
 weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.minstep))
 weight_noret!(w::BoundedExponentialWeight, n2::Int = 1) = (w.n += n2)
+show_weight(w::BoundedExponentialWeight) = print("max(1 / nobs, $(w.minstep))")
+
 
 """
 `LearningRate(r; minstep = 0.0)`.
@@ -115,6 +118,13 @@ function weight!(w::LearningRate, n2::Int = 1)
 end
 weight_noret!(w::LearningRate, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate) = w.nups
+function show_weight(w::LearningRate)
+    if w.minstep == 0
+        return print("nups ^ -$(w.r)")
+    else
+        return print("max(nups ^ -$(w.r), $(w.minstep))")
+    end
+end
 
 
 """
@@ -138,10 +148,19 @@ function weight!(w::LearningRate2, n2::Int = 1)
 end
 weight_noret!(w::LearningRate2, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate2) = w.nups
+function show_weight(w::LearningRate2)
+    if w.minstep == 0
+        return print("$(w.γ) / (1.0 + $(w.γ) * $(w.c) * nups)")
+    else
+        return print("max($(w.γ) / (1.0 + $(w.γ) * $(w.c) * nups), w.minstep)")
+    end
+end
 
 nups(o::OnlineStat) = nups(o.w)
+show_weight(o::OnlineStat) = (show_weight(o.w); println())
 
 #---------------------------------------------------------------------# printing
+name(o) = replace(string(typeof(o)), "OnlineStats.", "")
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
@@ -153,7 +172,7 @@ end
 
 # fallback show
 function Base.show(io::IO, o::OnlineStat)
-    printheader(io, string(typeof(o)))
+    printheader(io, name(o))
     print_value_and_nobs(io, o)
 end
 

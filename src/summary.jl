@@ -366,7 +366,7 @@ end
 
 
 
-#---------------------------------------# convenience constructors and Base.show
+#----------------------------------------------------------# convenience constructors
 # constructors
 for nm in [:Mean, :Variance, :QuantileSGD, :QuantileMM, :Moments]
     eval(parse(
@@ -387,18 +387,6 @@ for nm in [:Means, :Variances, :CovMatrix]
             o = $nm(size(y, 2), wgt)
             fit!(o, y, size(y, 1))
             o
-        end
-        """
-    ))
-end
-
-# Base.show
-for nm in [:Mean, :Variance, :Extrema, :Means, :Variances, :CovMatrix]
-    eval(parse(
-        """
-        function Base.show(io::IO, o::$nm)
-            printheader(io, "$nm")
-            print_value_and_nobs(io, o)
         end
         """
     ))

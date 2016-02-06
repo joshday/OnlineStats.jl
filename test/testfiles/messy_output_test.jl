@@ -45,6 +45,12 @@ facts(@title "Show Methods") do
     display(StatLearnCV(StatLearn(5), randn(100, 5), randn(100)))
 
     display(BernoulliBootstrap(Mean(), mean, 1000))
+
+    show_weight(EqualWeight())
+    show_weight(ExponentialWeight(.1))
+    show_weight(BoundedExponentialWeight(.1))
+    show_weight(LearningRate())
+    show_weight(LearningRate2(1))
 end
 
 end#module
