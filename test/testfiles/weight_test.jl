@@ -13,6 +13,10 @@ facts(@title "Weighting") do
     O.weight!(w, 10)
     O.weight_noret!(w, 1)
 
+    w = BoundedExponentialWeight(.5)
+    @fact O.weight!(w, 1) --> 1.0
+    O.weight!(w, 10)
+    O.weight_noret!(w, 1)
 
     w = LearningRate(.6)
     @fact O.weight!(w, 1) --> 1.0

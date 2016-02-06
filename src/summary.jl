@@ -18,12 +18,12 @@ Mean(wgt::Weight = EqualWeight()) = Mean(0.0, wgt)
 function fit!(o::Mean, y::Real)
     γ = weight!(o, 1)
     o.value = smooth(o.value, y, γ)
-    return
+    o
 end
 function fitbatch!{T <: Real}(o::Mean, y::AVec{T})
     γ = weight!(o, length(y))
     o.value = smooth(o.value, mean(y), γ)
-    return
+    o
 end
 Base.mean(o::Mean) = value(o)
 center(o::Mean, x::Real) = x - mean(o)
@@ -39,12 +39,12 @@ Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt)
 function fit!{T <: Real}(o::Means, y::AVec{T})
     γ = weight!(o, 1)
     smooth!(o.value, y, γ)
-    return
+    o
 end
 function fitbatch!{T <: Real}(o::Means, y::AMat{T})
     γ = weight!(o, size(y, 1))
     smooth!(o.value, row(mean(y, 1), 1), γ)
-    return
+    o
 end
 Base.mean(o::Means) = value(o)
 center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
@@ -63,7 +63,7 @@ function fit!(o::Variance, y::Real)
     μ = o.μ
     o.μ = smooth(o.μ, y, γ)
     o.value = smooth(o.value, (y - o.μ) * (y - μ), γ)
-    return
+    o
 end
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
@@ -91,13 +91,14 @@ function fit!{T <: Real}(o::Variances, y::AVec{T})
     for i in 1:length(y)
         o.value[i] = smooth(o.value[i], (y[i] - o.μ[i]) * (y[i] - o.μold[i]), γ)
     end
+    o
 end
 function fitbatch!{T <: Real}(o::Variances, y::AMat{T})
     n2 = size(y, 1)
     γ = weight!(o, n2)
     smooth!(o.μ, row(mean(y, 1), 1), γ)
     smooth!(o.value, row(var(y,1), 1) * ((n2 - 1) / n2), γ)
-    return
+    o
 end
 Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
@@ -118,18 +119,19 @@ type CovMatrix{W <: Weight} <: OnlineStat{VectorInput}
 end
 function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
     CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt)
-    # CovMatrix(zeros(p, p), zeros(p), wgt, 0, 0)
 end
 function fit!{T<:Real}(o::CovMatrix, x::AVec{T})
     γ = weight!(o, 1)
     rank1_smooth!(o.A, x, γ)
     smooth!(o.B, x, γ)
+    o
 end
 function fitbatch!{T<:Real}(o::CovMatrix, x::AMat{T})
     n2 = size(x, 1)
     γ = weight!(o, n2)
     smooth!(o.B, vec(mean(x, 1)), γ)
     BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
+    o
 end
 function value(o::CovMatrix)
     copy!(o.value, unbias(o) * (o.A - BLAS.syrk('U', 'N', 1.0, o.B)))
@@ -173,6 +175,7 @@ function fit!(o::Extrema, y::Real)
     weight_noret!(o, 1)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
+    o
 end
 Base.extrema(o::Extrema) = (o.min, o.max)
 value(o::Extrema) = extrema(o)
@@ -200,6 +203,7 @@ function fit!(o::QuantileSGD, y::Float64)
         v = Float64(y < o.value[i]) - o.τ[i]
         o.value[i] = subgrad(o.value[i], γ, v)
     end
+    o
 end
 function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T})
     n2 = length(y)
@@ -210,6 +214,7 @@ function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T})
             o.value[i] = subgrad(o.value[i], γ, v)
         end
     end
+    o
 end
 function Base.show(io::IO, o::QuantileSGD)
     printheader(io, "QuantileSGD, τ = $(o.τ)")
@@ -247,6 +252,7 @@ function fit!(o::QuantileMM, y::Float64)
         o.t[j] = smooth(o.t[j], w, γ)
         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
     end
+    o
 end
 function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T})
     n2 = length(y)
@@ -262,6 +268,7 @@ function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T})
     @inbounds for j in 1:length(o.τ)
         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
     end
+    o
 end
 function Base.show(io::IO, o::QuantileMM)
     printheader(io, "QuantileMM, τ = $(o.τ)")
@@ -284,6 +291,7 @@ function fit!(o::Moments, y::Real)
     o.value[2] = smooth(o.value[2], y * y, γ)
     o.value[3] = smooth(o.value[3], y * y * y, γ)
     o.value[4] = smooth(o.value[4], y * y * y * y, γ)
+    o
 end
 Base.mean(o::Moments) = value(o)[1]
 Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
@@ -325,14 +333,14 @@ function fit!{T<:AbstractFloat}(o::Diff{T}, x::Real)
     o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
     o.lastval = v
     o.n += 1
-    return
+    o
 end
 function fit!{T<:Integer}(o::Diff{T}, x::Real)
     v = round(T, x)
     o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
     o.lastval = v
     o.n += 1
-    return
+    o
 end
 
 "Track the last values and the last differences for multiple series"
@@ -353,7 +361,7 @@ function fit!{T<:Real}(o::Diffs{T}, x::AVec{T})
     o.diffs = (nobs(o) == 0 ? zeros(T,length(o.diffs)) : x - last(o))
     o.lastvals = collect(x)
     o.n += 1
-    return
+    o
 end
 
 

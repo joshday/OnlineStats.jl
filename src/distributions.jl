@@ -14,7 +14,7 @@ type FitBeta{W<:Weight} <: DistributionStat{ScalarInput}
 end
 FitBeta(wgt::Weight = EqualWeight()) = FitBeta(Ds.Beta(), Variance(wgt))
 nobs(o::FitBeta) = nobs(o.var)
-fit!(o::FitBeta, y::Real) = fit!(o.var, y)
+fit!(o::FitBeta, y::Real) = (fit!(o.var, y); o)
 function value(o::FitBeta)
     if nobs(o) > 1
         m = mean(o.var)
@@ -50,6 +50,7 @@ function fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol})
     else
         o.d[y] = 1
     end
+    o
 end
 sortpairs(o::FitCategorical) = sort(collect(o.d), by = x -> 1 / x[2])
 function value(o::FitCategorical)
@@ -78,7 +79,7 @@ type FitCauchy{W<:Weight} <: DistributionStat{ScalarInput}
     q::QuantileMM{W}
 end
 FitCauchy(wgt::Weight = LearningRate()) = FitCauchy(Ds.Cauchy(), QuantileMM(wgt))
-fit!(o::FitCauchy, y::Real) = fit!(o.q, y)
+fit!(o::FitCauchy, y::Real) = (fit!(o.q, y); o)
 nobs(o::FitCauchy) = nobs(o.q)
 function value(o::FitCauchy)
     o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
@@ -93,7 +94,7 @@ type FitGamma{W<:Weight} <: DistributionStat{ScalarInput}
     var::Variance{W}
 end
 FitGamma(wgt::Weight = EqualWeight()) = FitGamma(Ds.Gamma(), Variance(wgt))
-fit!(o::FitGamma, y::Real) = fit!(o.var, y)
+fit!(o::FitGamma, y::Real) = (fit!(o.var, y); o)
 nobs(o::FitGamma) = nobs(o.var)
 function value(o::FitGamma)
     m = mean(o.var)
@@ -113,7 +114,7 @@ type FitLogNormal{W<:Weight} <: DistributionStat{ScalarInput}
 end
 FitLogNormal(wgt::Weight = EqualWeight()) = FitLogNormal(Ds.LogNormal(), Variance(wgt))
 nobs(o::FitLogNormal) = nobs(o.var)
-fit!(o::FitLogNormal, y::Real) = fit!(o.var, log(y))
+fit!(o::FitLogNormal, y::Real) = (fit!(o.var, log(y)); o)
 function value(o::FitLogNormal)
     if nobs(o) > 1
         o.value = Ds.LogNormal(mean(o.var), std(o.var))
@@ -128,7 +129,7 @@ type FitNormal{W<:Weight} <: DistributionStat{ScalarInput}
 end
 FitNormal(wgt::Weight = EqualWeight()) = FitNormal(Ds.Normal(), Variance(wgt))
 nobs(o::FitNormal) = nobs(o.var)
-fit!(o::FitNormal, y::Real) = fit!(o.var, y)
+fit!(o::FitNormal, y::Real) = (fit!(o.var, y); o)
 function value(o::FitNormal)
     if nobs(o) > 1
         o.value = Ds.Normal(mean(o.var), std(o.var))
@@ -145,7 +146,7 @@ function FitMultinomial(p::Integer, wgt::Weight = EqualWeight)
     FitMultinomial(Ds.Multinomial(p, ones(p) / p), Means(p, wgt))
 end
 nobs(o::FitMultinomial) = nobs(o.means)
-fit!{T<:Real}(o::FitMultinomial, y::AVec{T}) = fit!(o.means, y)
+fit!{T<:Real}(o::FitMultinomial, y::AVec{T}) = (fit!(o.means, y); o)
 function value(o::FitMultinomial)
     m = mean(o.means)
     o.value = Ds.Multinomial(round(Int, sum(m)), m / sum(m))
@@ -163,7 +164,7 @@ function FitMvNormal(p::Integer, wgt::Weight = EqualWeight)
 end
 nobs(o::FitMvNormal) = nobs(o.cov)
 Base.std(d::FitMvNormal) = sqrt(var(d))  # No std() method from Distributions?
-fit!{T<:Real}(o::FitMvNormal, y::AMat{T}) = fit!(o.cov, y)
+fit!{T<:Real}(o::FitMvNormal, y::AMat{T}) = (fit!(o.cov, y); o)
 function value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)

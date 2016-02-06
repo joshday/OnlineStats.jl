@@ -62,6 +62,7 @@ function fit!(o::NormalMix, y::Real)
             o.σ2 = ones(k)
         end
     end
+    o
 end
 function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T})
     n = length(y)
@@ -99,6 +100,7 @@ function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T})
             o.σ2 = ones(k)
         end
     end
+    o
 end
 
 

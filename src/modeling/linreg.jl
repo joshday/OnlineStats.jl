@@ -14,9 +14,11 @@ function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight())
 end
 function fit!(o::LinReg, x::AVec, y::Real)
     fit!(o.c, vcat(x, y))
+    o
 end
 function fitbatch!(o::LinReg, x::AMat, y::AVec)
     fitbatch!(o.c, hcat(x, y))
+    o
 end
 function value(o::LinReg)
     copy!(o.s, o.c.A)

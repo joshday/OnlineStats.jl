@@ -13,6 +13,7 @@ export
     OnlineStat,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
+    BoundedExponentialWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, CovMatrix, LinReg, QuantReg, NormalMix,
@@ -105,7 +106,7 @@ type LearningRate <: Weight
     minstep::Float64
     n::Int
     nups::Int
-    LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(Float64(r), Float64(minstep), 0, 0)
+    LearningRate(r::Real = 0.6; minstep::Real = 0.0) = new(r, minstep, 0, 0)
 end
 function weight!(w::LearningRate, n2::Int = 1)
     w.n += n2
@@ -128,8 +129,7 @@ type LearningRate2 <: Weight
     minstep::Float64
     n::Int
     nups::Int
-    LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) =
-        new(Float64(γ), Float64(c), Float64(minstep), 0, 0)
+    LearningRate2(γ::Real, c::Real = 1.0; minstep = 0.0) = new(γ, c, minstep, 0, 0)
 end
 function weight!(w::LearningRate2, n2::Int = 1)
     w.n += n2
@@ -171,16 +171,19 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     for yi in y
         fit!(o, yi)
     end
+    o
 end
 function fit!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, row(y, i))
     end
+    o
 end
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     for i in 1:length(y)
         fit!(o, row(x, i), row(y, i))
     end
+    o
 end
 
 # Update in batches
@@ -198,6 +201,7 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
             i += b
         end
     end
+    o
 end
 function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     b = Int(b)
@@ -213,6 +217,7 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
             i += b
         end
     end
+    o
 end
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
@@ -228,6 +233,7 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
             i += b
         end
     end
+    o
 end
 
 # fall back on fit! if there is no fitbatch! method

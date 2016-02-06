@@ -33,7 +33,7 @@ function fit!(b::BernoulliBootstrap, x::Real)
         end
     end
     b.cache_is_dirty = true
-    return
+    b
 end
 
 #-------------------------------------------------------------# PoissonBootstrap
@@ -55,7 +55,7 @@ end
 function PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
     replicates = OnlineStat[copy(o) for i in 1:r]
     cached_state = Array(Float64, r)
-    return PoissonBootstrap(replicates, cached_state, f, 0, true)
+    PoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
 function fit!(b::PoissonBootstrap, x::Real)
@@ -67,7 +67,7 @@ function fit!(b::PoissonBootstrap, x::Real)
         end
     end
     b.cache_is_dirty = true
-    return
+    b
 end
 
 

@@ -36,6 +36,7 @@ function fit!{T<:Real}(o::KMeans, x::AVec{T})
     for i in 1:d
         o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
     end
+    o
 end
 function fitbatch!{T<:Real}(o::KMeans, x::AMat{T})
     γ = weight!(o, size(x, 1))
@@ -49,4 +50,5 @@ function fitbatch!{T<:Real}(o::KMeans, x::AMat{T})
     for i in 1:d
         o.value[i, kstar] = smooth(o.value[i, kstar], x̄[i], γ)
     end
+    o
 end

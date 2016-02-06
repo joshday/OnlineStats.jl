@@ -201,12 +201,14 @@ function fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real)
     ŷ = predict(o, x)
     g = deriv(o.model, y, ŷ)
     _updateβ!(o, g, x, y, ŷ)
+    o
 end
 function fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S})
     size(x, 2) == length(o.β) || error("x has incorrect number of columns")
     ŷ = predict(o, x)
     g = [deriv(o.model, y[i], ŷ[i]) for i in 1:size(x, 1)]
     _updatebatchβ!(o, g, x, y, ŷ)
+    o
 end
 setβ0!(o::StatLearn, γ, g) = (o.β0 = subgrad(o.β0, γ, g))
 loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, o.β0 + x * o.β)

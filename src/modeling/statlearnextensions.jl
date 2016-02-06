@@ -38,10 +38,12 @@ coef(o::StatLearnSparse) = coef(o.o)
 function fit!(o::StatLearnSparse, x::AVec, y::Real)
     fit!(o.o, x, y)
     make_sparse!(o.o, o.s)
+    o
 end
 function fitbatch!(o::StatLearnSparse, x::AMat, y::AVec)
     fitbatch!(o.o, x, y)
     make_sparse!(o.o, o.s)
+    o
 end
 
 
@@ -83,7 +85,9 @@ function fit!(o::StatLearnCV, x::AVec, y::Real)
         γ = weight!(o, 1)
         tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
     end
+    o
 end
+# TODO: fitbatch!
 function tuneλ!{A<:Algorithm, M<:ModelDef}(
         o::StatLearn{A, M, NoPenalty}, x, y, γ, xtest, ytest
     )
