@@ -6,6 +6,15 @@ x = randn(500)
 x1 = randn(500)
 x2 = randn(501)
 xs = hcat(x1, x)
+facts(@title "HyperLogLog") do
+    o = HyperLogLog(5)
+    y = rand(Bool, 10000)
+    for yi in y
+        fit!(o, yi)
+    end
+    @fact value(o) --> roughly(2, .5)
+end
+
 
 facts(@title "Bootstrap") do
     context(@subtitle "BernoulliBootstrap") do
