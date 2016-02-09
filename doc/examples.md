@@ -109,6 +109,7 @@ Linear regression with optional regularization.  Multiple penalties and tuning p
 can be applied to the same object.  Using EqualWeight produces the same estimates as
 offline linear regression.  
 ```julia
+using  StatsBase
 n, p = 100_000, 10
 x = randn(n, p)
 y = x * collect(1.:p) + randn(n)
@@ -120,6 +121,7 @@ confint(o, .95)
 vcov(o)
 stderr(o)
 coeftable(o)
+using Plots; coefplot(o)
 
 # regularized estimates
 coef(o, L2Penalty(.1))  # Ridge
@@ -191,10 +193,15 @@ Statistical learning algorithms defined by model, algorithm, and penalty (regula
 See [StatLearn Documentation](StatLearn.md).
 
 ```julia
+n, p = 100_000, 10
+x = randn(n, p)
+y = x * collect(1.:p) + randn(n)
+
 o = StatLearn(x, y, LearningRate(.6), L2Regression(), SGD(), L2Penalty(.1))
 coef(o)
 predict(o, x)
 loss(o, x, y)
+using Plots; coefplot(o)
 ```
 
 
@@ -217,18 +224,26 @@ plot(tr)
 ### Variance
 Univariate variance.
 ```julia
-o = Variance(y)
+o = Variance(randn(1000))
 var(o)
 std(o)
 mean(o)
+
+x = randn()
+center(o, x)       # x - mean(o)
+standardize(o, x)  # (x - mean(o)) / std(o)
 ```
 
 
 ### Variances
 Variances of multiple series.
 ```julia
-o = Variances(x)
+o = Variances(randn(1000, 5))
 var(o)
 std(o)
 mean(o)
+
+x = randn(5)
+center(o, x)       # x - mean(o)
+standardize(o, x)  # (x - mean(o)) ./ std(o)
 ```
