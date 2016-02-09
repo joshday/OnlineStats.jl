@@ -59,6 +59,17 @@ cov(o)
 ```
 
 
+### HyperLogLog (see http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf)
+Approximate count of unique elements.
+```julia
+o = HyperLogLog(b)  # b ∈ 4:16
+for yi in y
+    fit!(o, yi)
+end
+value(o)
+```
+
+
 ### KMeans
 K-Means clustering of multivariate data
 ```julia

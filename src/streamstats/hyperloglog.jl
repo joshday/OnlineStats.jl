@@ -22,6 +22,20 @@ function α(m::UInt32)
     end
 end
 
+"""
+`HyperLogLog(b)`
+
+Approximate count of distinct elements.  `HyperLogLog` differs from other OnlineStats
+in that any input to `fit!(o::HyperLogLog, input)` is considered a singleton.  Thus,
+a vector of inputs must be similar to:
+
+```julia
+o = HyperLogLog(4)
+for yi in y
+    fit!(o, yi)
+end
+```
+"""
 type HyperLogLog
     m::UInt32
     M::Vector{UInt32}

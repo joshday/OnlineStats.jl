@@ -44,19 +44,17 @@ o3 = QuantileMM(y, LearningRate(.6))
 ```
 
 - `EqualWeight()`
-    - all observations are weighted equally.  Weight at update `t` is `1 / t`.
+    - All observations are weighted equally.  Weight at update `t` is `1 / t`.
 
-- `ExponentialWeight(minstep::Float64)`, `ExponentialWeight(lookback::Int)`
-    - use equal weight until weights reach `minstep = 1 / lookback`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
+- `BoundedExponentialWeight(minstep::Real)`, `BoundedExponentialWeight(lookback::Integer)`
+    -Uuse equal weight until weights reach `minstep = 2 / (lookback + 1)`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
+
+- `ExponentialWeight(λ::Real)`, `ExponentialWeight(lookback::Integer)`
+    - True exponential weighting.  Each update weight is constant `λ = 2 / (lookback + 1)`
 
 - `LearningRate(r)`
     - `r` should be in (0.5, 1].
     - For stochastic approximation methods.  Weight at update `t` is `1 / t^r`.
-
-- `LearningRate2(γ, c)`
-    - `γ` > 0, `c` > 0
-    - For stochastic approximation methods.  Weight at update `t` is `γ / (1 + γ * c * t)`.
-
 
 ### OnlineStats share a common interface
 
@@ -65,7 +63,7 @@ o3 = QuantileMM(y, LearningRate(.6))
 - `nobs(o)`
     - the number of observations seen
 - `nups(o)`
-    - the number of updates performed (For `LeaningRate` only).  When using batch updates, `nobs(o) != nups(o)`.
+    - the number of updates performed (For `LearningRate` only).  When using batch updates, `nobs(o) != nups(o)`.
 
 
 
