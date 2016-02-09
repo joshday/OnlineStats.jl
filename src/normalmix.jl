@@ -1,3 +1,15 @@
+"""
+`NormalMix(k, wgt; start)`
+
+Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword
+argument specifying the initial parameters.
+
+If the algorithm diverges, try using a different `start`.
+
+Example:
+
+`NormalMix(k, wgt; start = MixtureModel(Normal, [(0, 1), (3, 1)]))`
+"""
 type NormalMix{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal}
     s1::VecF
@@ -18,11 +30,12 @@ function NormalMix(k::Integer, wgt::Weight = LearningRate();
         wgt
     )
 end
-function NormalMix(y::AVec, k::Integer, wgt::Weight = LearningRate())
-    o = NormalMix(k, wgt)
+function NormalMix(y::AVec, k::Integer, wgt::Weight = LearningRate(); kw...)
+    o = NormalMix(k, wgt; kw...)
     fit!(o, y)
     o
 end
+NormalMix(k::Integer, y::AVec, wgt::Weight = LearningRate(); kw...) = NormalMix(y, k, wgt; kw...)
 Ds.componentwise_pdf(o::NormalMix, y) = Ds.componentwise_pdf(value(o), y)
 Ds.ncomponents(o::NormalMix) = Ds.ncomponents(value(o))
 Ds.component(o::NormalMix, j) = Ds.component(value(o), j)
@@ -37,10 +50,13 @@ function Base.show(io::IO, o::NormalMix)
     print_value_and_nobs(io, o)
 end
 function value(o::NormalMix)
-    if any(o.σ2 .< 0)
-        warn("Negative variance component.  More data needed.")
-    else
+    try
         o.value = Ds.MixtureModel(map((u,v) -> Ds.Normal(u, sqrt(v)), o.μ, o.σ2), o.s1)
+    catch
+        println(sqrt(o.σ2))
+        println(sqrt(o.μ))
+        println(sqrt(o.s1))
+        error("Algorithm is fucked, nobs = $(nobs(o))")
     end
 end
 function fit!(o::NormalMix, y::Real)
@@ -62,7 +78,7 @@ function fit!(o::NormalMix, y::Real)
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
         o.s1[j] /= sum2
-        if o.σ2[j] <= 0
+        if o.σ2[j] <= _ϵ
             o.σ2 = ones(k)
         end
     end
@@ -100,7 +116,7 @@ function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T})
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
         o.s1[j] /= sum2
-        if o.σ2[j] <= 0
+        if o.σ2[j] <= _ϵ
             o.σ2 = ones(k)
         end
     end
