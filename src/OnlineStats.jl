@@ -32,7 +32,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
-    vcov, stderr, loss, center, standardize, show_weight
+    vcov, stderr, loss, center, standardize, show_weight, fitdistribution
 
 #------------------------------------------------------------------------# types
 abstract Input

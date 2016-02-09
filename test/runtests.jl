@@ -1,5 +1,7 @@
 module TestSetup
 export @title, @subtitle
+
+
 macro title(s)
     return :("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ " * $s)
 end
@@ -9,6 +11,8 @@ end
 end
 
 
+
+module OnlineStatsTest
 include("testfiles/messy_output_test.jl")
 include("testfiles/multivariate_test.jl")
 # include("testfiles/plots_test.jl")
@@ -18,3 +22,4 @@ include("testfiles/distributions_test.jl")
 include("testfiles/modeling_test.jl")
 include("testfiles/statlearn_test.jl")
 include("testfiles/streamstats_test.jl")
+end

@@ -18,7 +18,7 @@
 There are two ways of creating an OnlineStat:
 
 1. Create "empty" object and add data
-1. Create object with data
+2. Create object with data
 
 ```julia
 o = Mean()
@@ -29,11 +29,19 @@ o = Mean(y)
 
 ### All OnlineStats can be updated
 
+*Note*: `fit!(o, y)` is a cleaner way to write `for yi in y; fit!(o, yi); end`
+
 ```julia
-o = Variance(randn(100))
-fit!(o, randn(100))
+y1 = randn(100)
+y2 = randn(100)
+
+o = Variance()
+fit!(o, y1)
+fit!(o, y2)
 nobs(o) # number of observations == 200
 ```
+
+
 
 ### New data can be weighted differently
 
@@ -62,9 +70,6 @@ o3 = QuantileMM(y, LearningRate(.6))
     - the associated value of an OnlineStat
 - `nobs(o)`
     - the number of observations seen
-- `nups(o)`
-    - the number of updates performed (For `LearningRate` only).  When using batch updates, `nobs(o) != nups(o)`.
-
 
 
 # Advanced Usage

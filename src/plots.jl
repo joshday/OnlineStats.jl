@@ -31,7 +31,7 @@ end
 
 `TracePlot(o, f)`
 """
-type TracePlot
+type TracePlot <: OnlineStat
     o::OnlineStat
     p::Plots.Plot
     f::Function
@@ -48,6 +48,8 @@ function fit!(tr::TracePlot, args...)
 end
 
 Plots.plot(tr::TracePlot) = tr.p
+nobs(tr::TracePlot) = nobs(tr.o)
+value(tr::TracePlot) = value(tr.o)
 
 #-------------------------------------------------------------# CompareTracePlot
 """
@@ -77,4 +79,4 @@ function fit!(c::CompareTracePlot, args...)
     end
 end
 
-Plots.Plot(c::CompareTracePlot) = c.p
+Plots.plot(c::CompareTracePlot) = c.p

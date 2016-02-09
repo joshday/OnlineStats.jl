@@ -29,6 +29,7 @@ function value(o::FitBeta)
     end
 end
 
+
 #------------------------------------------------------------------# Categorical
 # Ignores weight
 """
@@ -68,13 +69,12 @@ function value(o::FitCategorical)
     end
 end
 function Base.show(io::IO, o::FitCategorical)
-    printheader(io, "FitCategorical ($(length(o.d)) categories)")
+    printheader(io, "FitCategorical ($(length(o.d)) levels)")
     print_item(io, "value", value(o))
     sortedpairs = sortpairs(o)
     print_item(io, "labels", [sortedpairs[i][1] for i in 1:length(sortedpairs)])
     print_item(io, "nobs", nobs(o))
 end
-
 
 
 #------------------------------------------------------------------# Cauchy
@@ -88,7 +88,6 @@ nobs(o::FitCauchy) = nobs(o.q)
 function value(o::FitCauchy)
     o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
 end
-
 
 
 #------------------------------------------------------------------------# Gamma
@@ -198,5 +197,11 @@ for nm in [:FitMultinomial, :FitMvNormal]
             fit!(o, y)
             o
         end
+    """))
+end
+
+for nm in[:Beta, :Categorical, :Cauchy, :Gamma, :LogNormal, :Normal, :Multinomial, :MvNormal]
+    eval(parse("""
+        fitdistribution(::Type{Ds.$nm}, args...) = Fit$nm(args...)
     """))
 end

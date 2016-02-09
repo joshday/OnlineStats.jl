@@ -3,7 +3,31 @@ module DistributionsTest
 using TestSetup, OnlineStats, FactCheck, Distributions
 srand(02082016)  # today's date...removes nondeterministic NormalMix algorithm divergence.
 
-facts(@title "FitDistribution / FitMvDistribution") do
+facts(@title "Distributions") do
+    context(@subtitle "fitdistribution") do
+        y = rand(Beta(), 100)
+        fitdistribution(Beta, y)
+
+        y = rand(Categorical([.2, .2, .2, .4]), 100)
+        fitdistribution(Categorical, y)
+
+        y = rand(Cauchy(), 100)
+        fitdistribution(Cauchy, y)
+
+        y = rand(Gamma(2, 6), 100)
+        fitdistribution(Gamma, y)
+
+        y = randn(100)
+        fitdistribution(Normal, y)
+
+        x = rand(10)
+        y = rand(Multinomial(5, x/sum(x)), 100)'
+        fitdistribution(Multinomial, y)
+
+        y = rand(MvNormal(zeros(4), diagm(ones(4))), 100)'
+        fitdistribution(MvNormal, y)
+    end
+
     context(@subtitle "Beta") do
         y = rand(Beta(), 100)
         o = FitBeta(y)
