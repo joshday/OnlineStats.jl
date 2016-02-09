@@ -37,7 +37,11 @@ function Base.show(io::IO, o::NormalMix)
     print_value_and_nobs(io, o)
 end
 function value(o::NormalMix)
-    o.value = Ds.MixtureModel(map((u,v) -> Ds.Normal(u, sqrt(v)), o.μ, o.σ2), o.s1)
+    if any(o.σ2 .< 0)
+        warn("Negative variance component.  More data needed.")
+    else
+        o.value = Ds.MixtureModel(map((u,v) -> Ds.Normal(u, sqrt(v)), o.μ, o.σ2), o.s1)
+    end
 end
 function fit!(o::NormalMix, y::Real)
     γ = weight!(o, 1)
