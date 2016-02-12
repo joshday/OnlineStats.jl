@@ -55,7 +55,7 @@ o3 = QuantileMM(y, LearningRate(.6))
     - All observations are weighted equally.  Weight at update `t` is `1 / t`.
 
 - `BoundedExponentialWeight(minstep::Real)`, `BoundedExponentialWeight(lookback::Integer)`
-    -Uuse equal weight until weights reach `minstep = 2 / (lookback + 1)`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
+    - Use equal weight until weights reach `minstep = 2 / (lookback + 1)`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
 
 - `ExponentialWeight(λ::Real)`, `ExponentialWeight(lookback::Integer)`
     - True exponential weighting.  Each update weight is constant `λ = 2 / (lookback + 1)`
