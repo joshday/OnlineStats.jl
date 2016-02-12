@@ -3,15 +3,31 @@
 ### BernoulliBootstrap
 Double-or-nothing statistical bootstrap for estimating variance of an OnlineStat.
 ```julia
-o = Mean()
-b = BernoulliBootstrap(o, mean, 1000)
-fit!(b, y)  # updates b and o
+b = BernoulliBootstrap(Mean(), mean, 1000)  # create 1000 replicates
+fit!(b, randn(10_000))  
 ```
+
+
+### CompareTracePlot
+Compare multiple OnlineStats by plotting each series on the same graph.  
+```julia
+using Plots
+m = Mean()
+v = Variance()
+
+# arguments:  Vector of OnlineStats, function that returns a scalar
+tr = CompareTracePlot([m, v], value)  
+for i in 1:10
+    fit!(tr, randn(100))
+end
+plot(tr)
+```
+
 
 ### CovMatrix
 Covariance Matrix.  
 ```julia
-o = CovMatrix(x, EqualWeight())
+o = CovMatrix(randn(1000, 5), EqualWeight())
 cov(o)
 cor(o)
 var(o)
@@ -21,37 +37,31 @@ mean(o)
 
 
 ### Extrema
-Maximum and minimum of univariate data.
+Maximum and minimum of univariate data (ignores Weight).
 ```julia
-o = Extrema(y)
+o = Extrema(rand(10_000))
 extrema(o)
 ```
 
 
-### FitDistribution
-Estimate parameters of a univariate distribution.
+### Fitting Distributions
+Estimate the parameters of a distribution.
 ```julia
-o = FitDistribution(Bernoulli, y)
-o = FitDistribution(Beta, y)
-o = FitDistribution(Categorical, y)
-o = FitDistribution(Cauchy, y)
-o = FitDistribution(Exponential, y)
-o = FitDistribution(Gamma, y)
-o = FitDistribution(LogNormal, y)
-o = FitDistribution(Normal, y)
-o = FitDistribution(Poisson, y)
+# Univariate distributions
+o = fitdistribution(Beta, y)
+o = fitdistribution(Categorical, y)  # ignores Weight
+o = fitdistribution(Cauchy, y)
+o = fitdistribution(Gamma, y)
+o = fitdistribution(LogNormal, y)
+o = fitdistribution(Normal, y)
 mean(o)
 var(o)
 std(o)
 params(o)
-```
 
-
-### FitMvDistribution
-Estimate parameters of a multivariate distribution.
-```julia
-o = FitMvDistribution(Multinomial, x)
-o = FitMvDistribution(MvNormal, x)
+# Multivariate distributions
+o = fitdistribution(Multinomial, x)
+o = fitdistribution(MvNormal, x)
 mean(o)
 var(o)
 std(o)
@@ -59,31 +69,72 @@ cov(o)
 ```
 
 
+### FitCategorical
+FitCategorical gets special mention for its usefulness in keeping track of the number
+levels and keeping them sorted by frequency.  Useful when the input variable is known
+to have a finite number of levels.
+
+```julia
+y = rand(["a", "b", "c"], 1000)
+o = FitCategorical(y)
+
+y = rand(1:3, 1000);
+fit!(o, y)
+```
+
+
+### HyperLogLog (see http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf)
+Approximate count of unique elements.  By nature of the HyperLogLog algorithm, the second
+argument to `fit!(o, y)` is considered a singleton.  To update the object with a vector
+of observations, follow the example below.
+```julia
+o = HyperLogLog(b)  # b ∈ 4:16
+for yi in y
+    fit!(o, yi)
+end
+value(o)
+```
+
+
 ### KMeans
 K-Means clustering of multivariate data
 ```julia
-o = KMeans(x, k)
+o = KMeans(y, 3)
 value(o)
 ```
 
 
 ### LinReg
-Linear regression with optional regularization.
+Linear regression with optional regularization.  Multiple penalties and tuning parameters
+can be applied to the same object.  Using EqualWeight produces the same estimates as
+offline linear regression.  
 ```julia
+using  StatsBase
+n, p = 100_000, 10
+x = randn(n, p)
+y = x * collect(1.:p) + randn(n)
+
 o = LinReg(x, y)
 coef(o)
-coef(o, L2Penalty(λ))  # Ridge
-coef(o, L1Penalty(λ))  # LASSO
-coef(o, ElasticNetPenalty(λ, α))
-coef(o, SCADPenalty(λ, a))
 predict(o, x)
+confint(o, .95)
+vcov(o)
+stderr(o)
+coeftable(o)
+using Plots; coefplot(o)
+
+# regularized estimates
+coef(o, L2Penalty(.1))  # Ridge
+coef(o, L1Penalty(.1))  # LASSO
+coef(o, ElasticNetPenalty(.1, .5))
+coef(o, SCADPenalty(.1, 3.7))
 ```
 
 
 ### Mean
 Univariate mean.
 ```julia
-o = Mean(y)
+o = Mean(randn(1000))
 mean(o)
 ```
 
@@ -91,7 +142,7 @@ mean(o)
 ### Means
 Means of multiple series.
 ```julia
-o = Means(x)
+o = Means(randn(1000, 5))
 mean(o)
 ```
 
@@ -99,7 +150,7 @@ mean(o)
 ### Moments
 First four moments of univariate data.
 ```julia
-o = Moments(y)
+o = Moments(randn(10_000))
 mean(o)
 var(o)
 std(o)
@@ -111,24 +162,28 @@ kurtosis(o)
 ### QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 ```julia
-o = QuantileSGD(y, tau = [.25, .5, .75])
+o = QuantileSGD(randn(10_000), tau = [.25, .5, .75])
 value(o)
 ```
 
 
 ### QuantileMM
-Approximate quantiles via an online MM algorithm.  Typically more accurate
+Approximate quantiles via an online MM algorithm.  Typically more accurate/stable
 than `QuantileSGD`.
 ```julia
-o = QuantileMM(y, tau = [.25, .5, .75])
+o = QuantileMM(randn(10_000), tau = [.25, .5, .75])
 value(o)
 ```
 
 
 ### QuantReg
-Quantile Regression via an online MM algorithm.
+Approximate Quantile Regression via an online MM algorithm.
 ```julia
-o = QuantReg(x, y, .8)
+n, p = 100_000, 10
+x = randn(n, p)
+y = x * collect(1.:p) + randn(n)
+
+o = QuantReg(x, y, .5)
 coef(o)
 ```
 
@@ -136,28 +191,59 @@ coef(o)
 ### StatLearn
 Statistical learning algorithms defined by model, algorithm, and penalty (regularization).
 See [StatLearn Documentation](StatLearn.md).
+
 ```julia
-o = StatLearn(o, LearningRate(.6), L2Regression(), SGD(), L2Penalty(.1))
+n, p = 100_000, 10
+x = randn(n, p)
+y = x * collect(1.:p) + randn(n)
+
+o = StatLearn(x, y, LearningRate(.6), L2Regression(), SGD(), L2Penalty(.1))
 coef(o)
 predict(o, x)
 loss(o, x, y)
+using Plots; coefplot(o)
 ```
+
+
+### TracePlot
+Construct a TracePlot with an OnlineStat.  Each call to `fit!(o::TracePlot, args...)`
+will update the corresponding OnlineStat and add a data point/points to the plot.
+```julia
+using Plots
+gadfly()  # or pyplot(), plotly()
+
+o = QuantileMM()
+tr = TracePlot(o, value)  # second arg is a function used to get values from the OnlineStat
+for i in 1:10
+    fit!(tr, randn(100))
+end
+plot(tr)
+```
+
 
 ### Variance
 Univariate variance.
 ```julia
-o = Variance(y)
+o = Variance(randn(1000))
 var(o)
 std(o)
 mean(o)
+
+x = randn()
+center(o, x)       # x - mean(o)
+standardize(o, x)  # (x - mean(o)) / std(o)
 ```
 
 
 ### Variances
 Variances of multiple series.
 ```julia
-o = Variances(x)
+o = Variances(randn(1000, 5))
 var(o)
 std(o)
 mean(o)
+
+x = randn(5)
+center(o, x)       # x - mean(o)
+standardize(o, x)  # (x - mean(o)) ./ std(o)
 ```

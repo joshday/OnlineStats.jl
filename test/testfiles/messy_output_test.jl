@@ -51,6 +51,7 @@ facts(@title "Show Methods") do
     show_weight(BoundedExponentialWeight(.1))
     show_weight(LearningRate())
     show_weight(LearningRate2(1))
+    println()
 end
 
 end#module

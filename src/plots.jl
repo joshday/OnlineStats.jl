@@ -7,19 +7,22 @@ export coefplot, TracePlot, CompareTracePlot
 For any OnlineStat that has a `coef` method, display a graphical representation of
 the coefficient vector.
 """
-function coefplot(o::OnlineStats.OnlineStat)
-    x = 1:length(coef(o))
-    if o.intercept
-        x -= 1
+function coefplot(o::OnlineStats.OnlineStat{XYInput})
+    β = coef(o)
+    x = 1:length(β)
+    try
+        if o.intercept
+            x -= 1
+        end
     end
-    nonzero = collect(coef(o) .== 0)
-    if length(unique(nonzero)) > 1
-        mylegend = true
-    else
-        mylegend = false
-    end
-    Plots.scatter(x, coef(o), group = nonzero, legend = mylegend, xlabel = "β", ylabel = "value",
-    xlims = extrema(x), yticks = [0], lab = ["nonzero" "zero"])
+    coefplot(β, x)
+end
+
+function coefplot(β::VecF, x = 1:length(β))
+    nonzero = collect(β.== 0)
+    mylegend = length(unique(nonzero)) > 1
+    Plots.scatter(x, β, group = nonzero, legend = mylegend, xlabel = "Coefficient Vector",
+    ylabel = "value", lab = ["nonzero" "zero"], xlims = (minimum(x)-1, maximum(x)+1))
 end
 
 
@@ -31,14 +34,17 @@ end
 
 `TracePlot(o, f)`
 """
-type TracePlot
+type TracePlot <: OnlineStat
     o::OnlineStat
     p::Plots.Plot
     f::Function
 end
 
 function TracePlot(o::OnlineStats.OnlineStat, f::Function = value; kw...)
-    p = Plots.plot([nobs(o)], collect(f(o))'; kw...)
+    p = Plots.plot([nobs(o)], collect(f(o))';
+        xlabel = "nobs",
+        ylabel = "value of function $f",
+        kw...)
     TracePlot(o, p, f)
 end
 
@@ -48,6 +54,8 @@ function fit!(tr::TracePlot, args...)
 end
 
 Plots.plot(tr::TracePlot) = tr.p
+nobs(tr::TracePlot) = nobs(tr.o)
+value(tr::TracePlot) = value(tr.o)
 
 #-------------------------------------------------------------# CompareTracePlot
 """
@@ -77,4 +85,4 @@ function fit!(c::CompareTracePlot, args...)
     end
 end
 
-Plots.Plot(c::CompareTracePlot) = c.p
+Plots.plot(c::CompareTracePlot) = c.p

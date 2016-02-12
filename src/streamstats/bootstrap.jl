@@ -1,5 +1,6 @@
 abstract Bootstrap <: OnlineStat{ScalarInput}
 nobs(b::Bootstrap) = b.n
+value(b::Bootstrap) = b.replicates
 
 #-----------------------------------------------------------# BernoulliBootstrap
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap

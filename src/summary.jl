@@ -192,7 +192,7 @@ end
 function QuantileSGD(wgt::Weight = LearningRate();
         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
     )
-    @inbounds for i in 1:length(tau)
+    for i in 1:length(tau)
         @assert 0 < tau[i] < 1
     end
     QuantileSGD(value, tau, wgt)
@@ -371,14 +371,37 @@ end
 for nm in [:Mean, :Variance, :QuantileSGD, :QuantileMM, :Moments]
     eval(parse(
         """
-        function $nm{T <: Real}(y::AVec{T}, wgt::Weight = EqualWeight())
-            o = $nm(wgt)
+        function $nm{T <: Real}(y::AVec{T}, wgt::Weight = EqualWeight(); kw...)
+            o = $nm(wgt; kw...)
             fit!(o, y)
             o
         end
         """
     ))
 end
+
+# for nm in [:QuantileSGD, :QuantileMM]
+#     eval(parse(
+#         """
+#         function $nm{T <: Real}(y::AVec{T}, wgt::Weight = EqualWeight(), tau::VecF = [.25, .5, .75])
+#             o = $nm(wgt; tau = tau)
+#             fit!(o, y)
+#             o
+#         end
+#         """
+#     ))
+# end
+#
+# for nm in [:QuantileSGD, :QuantileMM]
+#     eval(parse(
+#         """
+#         function $nm{T <: Real}(y::AVec{T}, tau::VecF = [.25, .5, .75], wgt::Weight = EqualWeight())
+#             $nm(y, wgt, tau)
+#         end
+#         """
+#     ))
+# end
+
 
 for nm in [:Means, :Variances, :CovMatrix]
     eval(parse(
