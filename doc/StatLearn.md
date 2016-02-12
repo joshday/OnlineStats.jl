@@ -42,8 +42,6 @@ fast fitting times to remove training time bottlenecks.
         - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
     - `MMGrad()`
         - Experimental online MM gradient method.
-    - `AdaMMGrad()`
-        - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 
 ### Learning rates and batch sizes matter
