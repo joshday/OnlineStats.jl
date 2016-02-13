@@ -9,7 +9,17 @@
 #   - StatsBase.fit! method
 #
 #-------------------------------------------------------------------------# Mean
-"Univariate Mean"
+"""
+Univariate mean.
+
+##### Examples
+```julia
+o = Mean(y, EqualWeight())
+o = Mean(y)
+fit!(o, y2)
+mean(o)
+```
+"""
 type Mean{W <: Weight} <: OnlineStat{ScalarInput}
     value::Float64
     weight::W
@@ -30,7 +40,17 @@ center(o::Mean, x::Real) = x - mean(o)
 
 
 #------------------------------------------------------------------------# Means
-"Mean vector of a data matrix, similar to `mean(x, 1)`"
+"""
+Mean vector of a data matrix, similar to `mean(x, 1)`.
+
+##### Examples
+```julia
+o = Means(x, EqualWeight())
+o = Means(x)
+fit!(o, x2)
+mean(o)
+```
+"""
 type Means{W <: Weight} <: OnlineStat{VectorInput}
     value::VecF
     weight::W
@@ -51,7 +71,20 @@ center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 
 
 #---------------------------------------------------------------------# Variance
-"Univariate Variance"
+"""
+Univariate variance.
+
+##### Examples
+```julia
+o = Variance(y, EqualWeight())
+o = Variance(y)
+fit!(o, y2)
+
+mean(o)
+var(o)
+std(o)
+```
+"""
 type Variance{W <: Weight} <: OnlineStat{ScalarInput}
     value::Float64
     μ::Float64
@@ -74,7 +107,20 @@ standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
 
 #--------------------------------------------------------------------# Variances
-"Variance vector of a data matrix, similar to `var(x, 1)`"
+"""
+Variances of a data matrix, similar to `var(x, 1)`.
+
+##### Examples
+```julia
+o = Variances(x, EqualWeight())
+o = Variances(x)
+fit!(o, x2)
+
+mean(o)
+var(o)
+std(o)
+```
+"""
 type Variances{W <: Weight} <: OnlineStat{VectorInput}
     value::VecF
     μ::VecF
@@ -109,7 +155,21 @@ standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
 
 
 #--------------------------------------------------------------------# CovMatrix
-"Covariance matrix"
+"""
+Covariance matrix, similar to `cov(x)`.
+
+##### Examples
+```julia
+o = CovMatrix(x, EqualWeight())
+o = CovMatrix(x)
+fit!(o, x2)
+
+cor(o)
+cov(o)
+mean(o)
+var(o)
+```
+"""
 type CovMatrix{W <: Weight} <: OnlineStat{VectorInput}
     value::MatF
     cormat::MatF
@@ -159,7 +219,16 @@ end
 
 
 #----------------------------------------------------------------------# Extrema
-"Extrema (maximum and minimum).  Ignores `Weight`."
+"""
+Extrema (maximum and minimum).  Ignores `Weight`.
+
+##### Examples
+```julia
+o = Extrema(y)
+fit!(o, y2)
+extrema(o)
+```
+"""
 type Extrema{W<:Weight} <: OnlineStat{ScalarInput}
     min::Float64
     max::Float64
@@ -183,7 +252,16 @@ value(o::Extrema) = extrema(o)
 
 
 #------------------------------------------------------------------# QuantileSGD
-"Approximate quantiles via stochastic gradient descent"
+"""
+Approximate quantiles via stochastic gradient descent.
+
+##### Examples
+```julia
+o = QuantileSGD(y, LearningRate())
+o = QuantileSGD(y, tau = [.25, .5, .75])
+fit!(o, y2)
+```
+"""
 type QuantileSGD{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     τ::VecF
@@ -223,7 +301,16 @@ end
 
 
 #------------------------------------------------------------------# QuantileMM
-"Approximate quantiles via an online MM algorithm"
+"""
+Approximate quantiles via an online MM algorithm.
+
+##### Examples
+```julia
+o = QuantileMM(y, LearningRate())
+o = QuantileMM(y, tau = [.25, .5, .75])
+fit!(o, y2)
+```
+"""
 type QuantileMM{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     τ::VecF
@@ -277,7 +364,22 @@ end
 
 
 #----------------------------------------------------------------------# Moments
-"Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`"
+"""
+Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
+
+##### Examples
+```julia
+o = Moments(x, EqualWeight())
+o = Moments(x)
+fit!(o, x2)
+
+mean(o)
+var(o)
+std(o)
+StatsBase.skewness(o)
+StatsBase.kurtosis(o)
+```
+"""
 type Moments{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     weight::W
@@ -315,7 +417,15 @@ end
 
 
 #-------------------------------------------------------------------# Diff/Diffs
-"Track the last value and the last difference"
+"""
+Track the last value and the last difference.  Ignores `Weight`.
+
+##### Examples
+```julia
+o = Diff()
+o = Diff(y)
+```
+"""
 type Diff{T <: Real} <: OnlineStat{ScalarInput}
     diff::T
     lastval::T
@@ -343,7 +453,15 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real)
     o
 end
 
-"Track the last values and the last differences for multiple series"
+"""
+Track the last value and the last difference for multiple series.  Ignores `Weight`.
+
+##### Examples
+```julia
+o = Diffs()
+o = Diffs(y)
+```
+"""
 type Diffs{T <: Real} <: OnlineStat{VectorInput}
     diffs::Vector{T}
     lastvals::Vector{T}

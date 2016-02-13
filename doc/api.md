@@ -1,7 +1,6 @@
 # API for OnlineStats
 
 # Table of Contents
-1. [BernoulliBootstrap](#bernoullibootstrap)
 1. [BoundedExponentialWeight](#boundedexponentialweight)
 1. [CovMatrix](#covmatrix)
 1. [Diff](#diff)
@@ -10,7 +9,6 @@
 1. [ExponentialWeight](#exponentialweight)
 1. [Extrema](#extrema)
 1. [FitCategorical](#fitcategorical)
-1. [FrozenBootstrap](#frozenbootstrap)
 1. [HardThreshold](#hardthreshold)
 1. [HyperLogLog](#hyperloglog)
 1. [LearningRate](#learningrate)
@@ -19,7 +17,6 @@
 1. [Means](#means)
 1. [Moments](#moments)
 1. [NormalMix](#normalmix)
-1. [PoissonBootstrap](#poissonbootstrap)
 1. [QuantReg](#quantreg)
 1. [QuantileMM](#quantilemm)
 1. [QuantileSGD](#quantilesgd)
@@ -28,47 +25,74 @@
 1. [StatLearnSparse](#statlearnsparse)
 1. [Variance](#variance)
 1. [Variances](#variances)
-1. [cached_state](#cached_state)
 1. [fit!](#fit!)
-1. [replicates](#replicates)
 1. [sweep!](#sweep!)
 1. [value](#value)
 
-# BernoulliBootstrap
-`BernoulliBootstrap(o, f, r)`
-
-Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
-
-Example: `BernoulliBootstrap(Mean(), mean, 1000)`
-
 # BoundedExponentialWeight
-`BoundedExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant.
+`BoundedExponentialWeight(λ::Float64)` `BoundedExponentialWeight(lookback::Int)`
+
+Use equal weights until reaching λ = 2 / (1 + lookback), then hold constant.
 
 # CovMatrix
-Covariance matrix
+Covariance matrix, similar to `cov(x)`.
+
+##### Examples
+
+```julia
+o = CovMatrix(x, EqualWeight())
+o = CovMatrix(x)
+fit!(o, x2)
+
+cor(o)
+cov(o)
+mean(o)
+var(o)
+```
 
 # Diff
-Track the last value and the last difference
+Track the last value and the last difference.  Ignores `Weight`.
+
+##### Examples
+
+```julia
+o = Diff()
+o = Diff(y)
+```
 
 # Diffs
-Track the last values and the last differences for multiple series
+Track the last value and the last difference for multiple series.  Ignores `Weight`.
+
+##### Examples
+
+```julia
+o = Diffs()
+o = Diffs(y)
+```
 
 # EqualWeight
-All observations weighted equally.
+`EqualWeight()`.  All observations weighted equally.
 
 # ExponentialWeight
-`ExponentialWeight(λ)`.  Most recent observation has a constant weight of λ.
+`ExponentialWeight(λ::Float64)` `ExponentialWeight(lookback::Int)`
+
+Weights are held constant at λ = 2 / (1 + lookback).
 
 # Extrema
 Extrema (maximum and minimum).  Ignores `Weight`.
+
+##### Examples
+
+```julia
+o = Extrema(y)
+fit!(o, y2)
+extrema(o)
+```
 
 # FitCategorical
 `FitCategorical(y)`
 
 Find the proportions for each unique input.  Categories are sorted by proportions.
-
-# FrozenBootstrap
-Frozen bootstrap object are generated when two bootstrap distributions are combined, e.g., if they are differenced.
 
 # HardThreshold
 After `burnin` observations, coefficients will be set to zero if they are less than `ϵ`.
@@ -88,21 +112,53 @@ end
 # LearningRate
 `LearningRate(r; minstep = 0.0)`.
 
-Weight at update `t` is `1 / t ^ r`.  Compare to `LearningRate2`.
+Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
 
 # LearningRate2
 LearningRate2(γ, c = 1.0; minstep = 0.0).
 
-Weight at update `t` is `γ / (1 + γ * c * t)`.  Compare to `LearningRate`.
+Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 
 # Mean
-Univariate Mean
+Univariate mean.
+
+##### Examples
+
+```julia
+o = Mean(y, EqualWeight())
+o = Mean(y)
+fit!(o, y2)
+mean(o)
+```
 
 # Means
-Mean vector of a data matrix, similar to `mean(x, 1)`
+Mean vector of a data matrix, similar to `mean(x, 1)`.
+
+##### Examples
+
+```julia
+o = Means(x, EqualWeight())
+o = Means(x)
+fit!(o, x2)
+mean(o)
+```
 
 # Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
+
+##### Examples
+
+```julia
+o = Moments(x, EqualWeight())
+o = Moments(x)
+fit!(o, x2)
+
+mean(o)
+var(o)
+std(o)
+StatsBase.skewness(o)
+StatsBase.kurtosis(o)
+```
 
 # NormalMix
 `NormalMix(k, wgt; start)`
@@ -115,21 +171,30 @@ Example:
 
 `NormalMix(k, wgt; start = MixtureModel(Normal, [(0, 1), (3, 1)]))`
 
-# PoissonBootstrap
-`PoissonBootstrap(o, f, r)`
-
-Create a poisson bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
-
-Example: `PoissonBootstrap(Mean(), mean, 1000)`
-
 # QuantReg
 Online MM Algorithm for Quantile Regression.
 
 # QuantileMM
-Approximate quantiles via an online MM algorithm
+Approximate quantiles via an online MM algorithm.
+
+##### Examples
+
+```julia
+o = QuantileMM(y, LearningRate())
+o = QuantileMM(y, tau = [.25, .5, .75])
+fit!(o, y2)
+```
 
 # QuantileSGD
-Approximate quantiles via stochastic gradient descent
+Approximate quantiles via stochastic gradient descent.
+
+##### Examples
+
+```julia
+o = QuantileSGD(y, LearningRate())
+o = QuantileSGD(y, tau = [.25, .5, .75])
+fit!(o, y2)
+```
 
 # StatLearn
 ### Online Statistical Learning
@@ -181,13 +246,34 @@ Automatically tune the regularization parameter λ for `o` by minimizing loss on
 `StatLearnSparse(o::StatLearn, s::AbstractSparsity)`
 
 # Variance
-Univariate Variance
+Univariate variance.
+
+##### Examples
+
+```julia
+o = Variance(y, EqualWeight())
+o = Variance(y)
+fit!(o, y2)
+
+mean(o)
+var(o)
+std(o)
+```
 
 # Variances
-Variance vector of a data matrix, similar to `var(x, 1)`
+Variances of a data matrix, similar to `var(x, 1)`.
 
-# cached_state
-Return the value of interest for each of the `OnlineStat` replicates
+##### Examples
+
+```julia
+o = Variances(x, EqualWeight())
+o = Variances(x)
+fit!(o, x2)
+
+mean(o)
+var(o)
+std(o)
+```
 
 # fit!
 `fit!(o::OnlineStat, y, b = 1)`
@@ -196,8 +282,59 @@ Return the value of interest for each of the `OnlineStat` replicates
 
 Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
 
-# replicates
-Get the replicates of the `OnlineStat` objects used in the bootstrap
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
 
 # sweep!
 ### `sweep!(A, k, v, inv = false)`
@@ -211,9 +348,5 @@ Symmetric sweep of the matrix `A` on element `k` using vector `v` as storage to 
 Symmetric sweep of the matrix `A` on element `k`.
 
 # value
-`value(o::OnlineStat)`.  The associated value of an OnlineStat.
-
-
-
 `value(o::OnlineStat)`.  The associated value of an OnlineStat.
 

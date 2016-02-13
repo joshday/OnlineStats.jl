@@ -57,7 +57,9 @@ weight!(o::OnlineStat, n2::Int = 1) = weight!(o.weight, n2)
 weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 
 
-"All observations weighted equally."
+"""
+`EqualWeight()`.  All observations weighted equally.
+"""
 type EqualWeight <: Weight
     n::Int
 end
@@ -67,7 +69,12 @@ weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
 show_weight(w::EqualWeight) = print("1 / nobs")
 
 
-"`ExponentialWeight(λ)`.  Most recent observation has a constant weight of λ."
+"""
+`ExponentialWeight(λ::Float64)`
+`ExponentialWeight(lookback::Int)`
+
+Weights are held constant at λ = 2 / (1 + lookback).
+"""
 type ExponentialWeight <: Weight
     λ::Float64
     n::Int
@@ -83,26 +90,31 @@ weight_noret!(w::ExponentialWeight, n2::Int = 1) = (w.n += n2)
 show_weight(w::ExponentialWeight) = print("$(w.λ)")
 
 
-"`BoundedExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
+"""
+`BoundedExponentialWeight(λ::Float64)`
+`BoundedExponentialWeight(lookback::Int)`
+
+Use equal weights until reaching λ = 2 / (1 + lookback), then hold constant.
+"""
 type BoundedExponentialWeight <: Weight
-    minstep::Float64
+    λ::Float64
     n::Int
-    function BoundedExponentialWeight(minstep::Real, n::Integer)
-        @assert 0 <= minstep <= 1
-        new(minstep, n)
+    function BoundedExponentialWeight(λ::Real, n::Integer)
+        @assert 0 <= λ <= 1
+        new(λ, n)
     end
 end
-BoundedExponentialWeight(minstep::Real = 1.0) = BoundedExponentialWeight(minstep, 0)
+BoundedExponentialWeight(λ::Real = 1.0) = BoundedExponentialWeight(λ, 0)
 BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
-weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.minstep))
+weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.λ))
 weight_noret!(w::BoundedExponentialWeight, n2::Int = 1) = (w.n += n2)
-show_weight(w::BoundedExponentialWeight) = print("max(1 / nobs, $(w.minstep))")
+show_weight(w::BoundedExponentialWeight) = print("max(1 / nobs, $(w.λ))")
 
 
 """
 `LearningRate(r; minstep = 0.0)`.
 
-Weight at update `t` is `1 / t ^ r`.  Compare to `LearningRate2`.
+Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
 """
 type LearningRate <: Weight
     r::Float64
@@ -130,7 +142,7 @@ end
 """
 LearningRate2(γ, c = 1.0; minstep = 0.0).
 
-Weight at update `t` is `γ / (1 + γ * c * t)`.  Compare to `LearningRate`.
+Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 """
 type LearningRate2 <: Weight
     # Recommendation from http://research.microsoft.com/pubs/192769/tricks-2012.pdf

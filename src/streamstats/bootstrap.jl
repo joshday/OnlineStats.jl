@@ -3,13 +3,16 @@ nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
 
 #-----------------------------------------------------------# BernoulliBootstrap
-"""
-`BernoulliBootstrap(o, f, r)`
-
-Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
-
-Example: `BernoulliBootstrap(Mean(), mean, 1000)`
-"""
+# """
+# `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+#
+# Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
+#
+# Example:
+# ```julia
+# BernoulliBootstrap(Mean(), mean, 1000)
+# ```
+# """
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
@@ -38,13 +41,16 @@ function fit!(b::BernoulliBootstrap, x::Real)
 end
 
 #-------------------------------------------------------------# PoissonBootstrap
-"""
-`PoissonBootstrap(o, f, r)`
-
-Create a poisson bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
-
-Example: `PoissonBootstrap(Mean(), mean, 1000)`
-"""
+# """
+# `PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+#
+# Create a poisson bootstrap using `r` replicates of `o` for estimate `f(o)`
+#
+# Example:
+# ```julia
+# PoissonBootstrap(Mean(), mean, 1000)
+# ```
+# """
 type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
@@ -73,13 +79,14 @@ end
 
 
 #--------------------------------------------------------------# FrozenBootstrap
-"Frozen bootstrap object are generated when two bootstrap distributions are combined, e.g., if they are differenced."
+# "Frozen bootstraps object are generated when two bootstrap distributions are combined
+#  e.g., if they are differenced."
 immutable FrozenBootstrap <: Bootstrap
     cached_state::Vector{Float64}  # cache of replicate states
     n::Int                          # number of observations
 end
 
-"Return the value of interest for each of the `OnlineStat` replicates"
+# "Return the value of interest for each of the `OnlineStat` replicates"
 cached_state(b::FrozenBootstrap) = copy(b.cached_state)
 
 #-----------------------------------------------------------------------# Common
@@ -107,7 +114,6 @@ Base.std(b::Bootstrap) = std(cached_state(b))
 Base.var(b::Bootstrap) = var(cached_state(b))
 
 
-"Get the replicates of the `OnlineStat` objects used in the bootstrap"
 replicates(b::Bootstrap) = copy(b.replicates)
 
 # Assumes a and b are independent.
