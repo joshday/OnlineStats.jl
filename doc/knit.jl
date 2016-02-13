@@ -11,16 +11,18 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
     file = open(dest, "r+")
 
     write(file, "# API for " * string(mod) * "\n\n")
-    write(file, "---\n")
-    write(file, "# Table of Contents")
+    write(file, "# Table of Contents\n")
 
+    # Make TOC
     for nm in nms
         d = Docs.doc(eval(parse(string(mod) * "." * string(nm))))
         if typeof(d) != Void
-            write(file, "1. [$nm](#$nm)\n")
+            write(file, "1. [$nm](#$(lowercase(string(nm)))\n")
         end
     end
+    write(file, "\n")
 
+    # Fill in docs
     print_with_color(:blue, "The following items are included in the output file:\n")
     for nm in nms
         d = Docs.doc(eval(parse(string(mod) * "." * string(nm))))
