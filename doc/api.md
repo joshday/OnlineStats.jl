@@ -37,7 +37,7 @@ Use equal weights until reaching λ = 2 / (1 + lookback), then hold constant.
 # CovMatrix
 Covariance matrix, similar to `cov(x)`.
 
-##### Examples
+
 
 ```julia
 o = CovMatrix(x, EqualWeight())
@@ -53,7 +53,7 @@ var(o)
 # Diff
 Track the last value and the last difference.  Ignores `Weight`.
 
-##### Examples
+
 
 ```julia
 o = Diff()
@@ -63,7 +63,7 @@ o = Diff(y)
 # Diffs
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 
-##### Examples
+
 
 ```julia
 o = Diffs()
@@ -81,7 +81,7 @@ Weights are held constant at λ = 2 / (1 + lookback).
 # Extrema
 Extrema (maximum and minimum).  Ignores `Weight`.
 
-##### Examples
+
 
 ```julia
 o = Extrema(y)
@@ -122,7 +122,7 @@ Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, 
 # Mean
 Univariate mean.
 
-##### Examples
+
 
 ```julia
 o = Mean(y, EqualWeight())
@@ -134,7 +134,7 @@ mean(o)
 # Means
 Mean vector of a data matrix, similar to `mean(x, 1)`.
 
-##### Examples
+
 
 ```julia
 o = Means(x, EqualWeight())
@@ -146,7 +146,7 @@ mean(o)
 # Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
-##### Examples
+
 
 ```julia
 o = Moments(x, EqualWeight())
@@ -177,7 +177,7 @@ Online MM Algorithm for Quantile Regression.
 # QuantileMM
 Approximate quantiles via an online MM algorithm.
 
-##### Examples
+
 
 ```julia
 o = QuantileMM(y, LearningRate())
@@ -188,7 +188,7 @@ fit!(o, y2)
 # QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 
-##### Examples
+
 
 ```julia
 o = QuantileSGD(y, LearningRate())
@@ -248,7 +248,7 @@ Automatically tune the regularization parameter λ for `o` by minimizing loss on
 # Variance
 Univariate variance.
 
-##### Examples
+
 
 ```julia
 o = Variance(y, EqualWeight())
@@ -263,7 +263,7 @@ std(o)
 # Variances
 Variances of a data matrix, similar to `var(x, 1)`.
 
-##### Examples
+
 
 ```julia
 o = Variances(x, EqualWeight())
@@ -349,4 +349,3 @@ Symmetric sweep of the matrix `A` on element `k`.
 
 # value
 `value(o::OnlineStat)`.  The associated value of an OnlineStat.
-

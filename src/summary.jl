@@ -12,7 +12,6 @@
 """
 Univariate mean.
 
-##### Examples
 ```julia
 o = Mean(y, EqualWeight())
 o = Mean(y)
@@ -43,7 +42,6 @@ center(o::Mean, x::Real) = x - mean(o)
 """
 Mean vector of a data matrix, similar to `mean(x, 1)`.
 
-##### Examples
 ```julia
 o = Means(x, EqualWeight())
 o = Means(x)
@@ -74,7 +72,6 @@ center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 """
 Univariate variance.
 
-##### Examples
 ```julia
 o = Variance(y, EqualWeight())
 o = Variance(y)
@@ -110,7 +107,6 @@ standardize(o::Variance, x::Real) = center(o, x) / std(o)
 """
 Variances of a data matrix, similar to `var(x, 1)`.
 
-##### Examples
 ```julia
 o = Variances(x, EqualWeight())
 o = Variances(x)
@@ -158,7 +154,6 @@ standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
 """
 Covariance matrix, similar to `cov(x)`.
 
-##### Examples
 ```julia
 o = CovMatrix(x, EqualWeight())
 o = CovMatrix(x)
@@ -222,7 +217,6 @@ end
 """
 Extrema (maximum and minimum).  Ignores `Weight`.
 
-##### Examples
 ```julia
 o = Extrema(y)
 fit!(o, y2)
@@ -255,7 +249,6 @@ value(o::Extrema) = extrema(o)
 """
 Approximate quantiles via stochastic gradient descent.
 
-##### Examples
 ```julia
 o = QuantileSGD(y, LearningRate())
 o = QuantileSGD(y, tau = [.25, .5, .75])
@@ -304,7 +297,6 @@ end
 """
 Approximate quantiles via an online MM algorithm.
 
-##### Examples
 ```julia
 o = QuantileMM(y, LearningRate())
 o = QuantileMM(y, tau = [.25, .5, .75])
@@ -367,7 +359,6 @@ end
 """
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
-##### Examples
 ```julia
 o = Moments(x, EqualWeight())
 o = Moments(x)
@@ -420,7 +411,6 @@ end
 """
 Track the last value and the last difference.  Ignores `Weight`.
 
-##### Examples
 ```julia
 o = Diff()
 o = Diff(y)
@@ -456,7 +446,6 @@ end
 """
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 
-##### Examples
 ```julia
 o = Diffs()
 o = Diffs(y)
