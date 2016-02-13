@@ -12,7 +12,7 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
 
     write(file, "# API for " * string(mod) * "\n\n")
     write(file, "---\n")
-    write(file, "## Table of Contents")
+    write(file, "# Table of Contents")
 
     for nm in nms
         d = Docs.doc(eval(parse(string(mod) * "." * string(nm))))
@@ -26,7 +26,7 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
         d = Docs.doc(eval(parse(string(mod) * "." * string(nm))))
         if typeof(d) != Void
             println(nm)
-            write(file, "### " * string(nm) * "\n")
+            write(file, "# " * string(nm) * "\n")
             write(file, Markdown.plain(d))
             write(file, "\n")
         end
