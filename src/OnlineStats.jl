@@ -31,8 +31,8 @@ export
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,
     # methods
-    value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
-    vcov, stderr, loss, center, standardize, show_weight, fitdistribution
+    value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
+    loss, center, standardize, show_weight, fitdistribution
 
 #------------------------------------------------------------------------# types
 abstract Input

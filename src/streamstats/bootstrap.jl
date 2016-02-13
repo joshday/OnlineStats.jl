@@ -79,7 +79,7 @@ immutable FrozenBootstrap <: Bootstrap
     n::Int                          # number of observations
 end
 
-"return the value of interest for each of the `OnlineStat` replicates"
+"Return the value of interest for each of the `OnlineStat` replicates"
 cached_state(b::FrozenBootstrap) = copy(b.cached_state)
 
 #-----------------------------------------------------------------------# Common
