@@ -11,13 +11,13 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
     file = open(dest, "r+")
 
     write(file, "# API for " * string(mod) * "\n\n")
-    write(file, "---")
+    write(file, "---\n")
     write(file, "## Table of Contents")
 
     for nm in nms
         d = Docs.doc(eval(parse(string(mod) * "." * string(nm))))
         if typeof(d) != Void
-            write(file, "* [$nm](#$nm)\n")
+            write(file, "1. [$nm](#$nm)\n")
         end
     end
 
