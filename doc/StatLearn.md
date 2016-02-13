@@ -1,7 +1,6 @@
 # `StatLearn`
 
-Approximate solutions to statistical learning problems.  `StatLearn` has extremely
-fast fitting times to remove training time bottlenecks.
+Approximate solutions to statistical learning problems using online algorithms.  `StatLearn` has extremely fast fitting times.
 
 ### StatLearn types are defined by three things
 

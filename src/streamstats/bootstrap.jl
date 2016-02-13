@@ -3,6 +3,13 @@ nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
 
 #-----------------------------------------------------------# BernoulliBootstrap
+"""
+`BernoulliBootstrap(o, f, r)`
+
+Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
+
+Example: `BernoulliBootstrap(Mean(), mean, 1000)`
+"""
 type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
@@ -11,13 +18,6 @@ type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     cache_is_dirty::Bool
 end
 
-"""
-`BernoulliBootstrap(o, f, r)`
-
-Create a double-or-nothing bootstrap using `r` replicates of OnlineStat `o` for estimate `f(o)`
-
-Example: `BernoulliBootstrap(Mean(), mean, 1000)`
-"""
 function BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
     replicates = OnlineStat[copy(o) for i in 1:r]
     cached_state = Array(Float64, r)

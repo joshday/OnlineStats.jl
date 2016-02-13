@@ -303,7 +303,7 @@ ncols(x::AMat) = size(x, 2)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
-"epsilon used in special cases to avoid dividing by 0, etc."
+# epsilon used in special cases to avoid dividing by 0, etc.
 const _ϵ = 1e-8
 
 

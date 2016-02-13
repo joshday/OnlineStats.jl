@@ -122,7 +122,7 @@ function tuneλ!(o::StatLearn, x, y, γ, xtest, ytest)
 
 end
 nobs(o::StatLearnCV) = nobs(o.o)
-n_updates(o::StatLearnCV) = n_updates(o.o)
+nups(o::StatLearnCV) = nups(o.o)
 value(o::StatLearnCV) = value(o.o)
 coef(o::StatLearnCV) = coef(o.o)
 predict(o::StatLearnCV, x) = predict(o.o, x)
