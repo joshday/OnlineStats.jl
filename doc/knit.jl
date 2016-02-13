@@ -17,7 +17,7 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
     for nm in nms
         d = Docs.doc(eval(parse(string(mod) * "." * string(nm))))
         if typeof(d) != Void
-            write(file, "1. [$nm](#$(lowercase(string(nm)))\n")
+            write(file, "1. [$nm](#$(lowercase(string(nm))))\n")
         end
     end
     write(file, "\n")

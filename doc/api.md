@@ -1,38 +1,38 @@
 # API for OnlineStats
 
 # Table of Contents
-1. [BernoulliBootstrap](#bernoullibootstrap
-1. [BoundedExponentialWeight](#boundedexponentialweight
-1. [CovMatrix](#covmatrix
-1. [Diff](#diff
-1. [Diffs](#diffs
-1. [EqualWeight](#equalweight
-1. [ExponentialWeight](#exponentialweight
-1. [Extrema](#extrema
-1. [FitCategorical](#fitcategorical
-1. [FrozenBootstrap](#frozenbootstrap
-1. [HardThreshold](#hardthreshold
-1. [HyperLogLog](#hyperloglog
-1. [LearningRate](#learningrate
-1. [LearningRate2](#learningrate2
-1. [Mean](#mean
-1. [Means](#means
-1. [Moments](#moments
-1. [NormalMix](#normalmix
-1. [PoissonBootstrap](#poissonbootstrap
-1. [QuantReg](#quantreg
-1. [QuantileMM](#quantilemm
-1. [QuantileSGD](#quantilesgd
-1. [StatLearn](#statlearn
-1. [StatLearnCV](#statlearncv
-1. [StatLearnSparse](#statlearnsparse
-1. [Variance](#variance
-1. [Variances](#variances
-1. [cached_state](#cached_state
-1. [fit!](#fit!
-1. [replicates](#replicates
-1. [sweep!](#sweep!
-1. [value](#value
+1. [BernoulliBootstrap](#bernoullibootstrap)
+1. [BoundedExponentialWeight](#boundedexponentialweight)
+1. [CovMatrix](#covmatrix)
+1. [Diff](#diff)
+1. [Diffs](#diffs)
+1. [EqualWeight](#equalweight)
+1. [ExponentialWeight](#exponentialweight)
+1. [Extrema](#extrema)
+1. [FitCategorical](#fitcategorical)
+1. [FrozenBootstrap](#frozenbootstrap)
+1. [HardThreshold](#hardthreshold)
+1. [HyperLogLog](#hyperloglog)
+1. [LearningRate](#learningrate)
+1. [LearningRate2](#learningrate2)
+1. [Mean](#mean)
+1. [Means](#means)
+1. [Moments](#moments)
+1. [NormalMix](#normalmix)
+1. [PoissonBootstrap](#poissonbootstrap)
+1. [QuantReg](#quantreg)
+1. [QuantileMM](#quantilemm)
+1. [QuantileSGD](#quantilesgd)
+1. [StatLearn](#statlearn)
+1. [StatLearnCV](#statlearncv)
+1. [StatLearnSparse](#statlearnsparse)
+1. [Variance](#variance)
+1. [Variances](#variances)
+1. [cached_state](#cached_state)
+1. [fit!](#fit!)
+1. [replicates](#replicates)
+1. [sweep!](#sweep!)
+1. [value](#value)
 
 # BernoulliBootstrap
 `BernoulliBootstrap(o, f, r)`
@@ -212,8 +212,6 @@ Symmetric sweep of the matrix `A` on element `k`.
 
 # value
 `value(o::OnlineStat)`.  The associated value of an OnlineStat.
-
-ciated value of an OnlineStat.
 
 
 
