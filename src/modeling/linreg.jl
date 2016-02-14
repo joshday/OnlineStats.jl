@@ -1,3 +1,28 @@
+"""
+Linear regression with optional regularization.
+
+```julia
+using  StatsBase
+n, p = 100_000, 10
+x = randn(n, p)
+y = x * collect(1.:p) + randn(n)
+
+o = LinReg(x, y)
+coef(o)
+predict(o, x)
+confint(o, .95)
+vcov(o)
+stderr(o)
+coeftable(o)
+using Plots; coefplot(o)
+
+# regularized estimates
+coef(o, L2Penalty(.1))  # Ridge
+coef(o, L1Penalty(.1))  # LASSO
+coef(o, ElasticNetPenalty(.1, .5))
+coef(o, SCADPenalty(.1, 3.7))
+```
+"""
 type LinReg{W <: Weight} <: OnlineStat{XYInput}
     value::VecF
     c::CovMatrix{W}  # Cov([X y])

@@ -33,9 +33,12 @@ end
 #------------------------------------------------------------------# Categorical
 # Ignores weight
 """
-`FitCategorical(y)`
-
 Find the proportions for each unique input.  Categories are sorted by proportions.
+Ignores `Weight`.
+
+```julia
+o = FitCategorical(y)
+```
 """
 type FitCategorical{W<:Weight, T<:Any} <: DistributionStat{ScalarInput}
     value::Ds.Categorical
@@ -205,3 +208,34 @@ for nm in[:Beta, :Categorical, :Cauchy, :Gamma, :LogNormal, :Normal, :Multinomia
         fitdistribution(::Type{Ds.$nm}, args...) = Fit$nm(args...)
     """))
 end
+
+
+
+#--------------------------------------------------------------# fitdistribution docs
+"""
+Estimate the parameters of a distribution.
+
+```julia
+using Distributions
+# Univariate distributions
+o = fitdistribution(Beta, y)
+o = fitdistribution(Categorical, y)  # ignores Weight
+o = fitdistribution(Cauchy, y)
+o = fitdistribution(Gamma, y)
+o = fitdistribution(LogNormal, y)
+o = fitdistribution(Normal, y)
+mean(o)
+var(o)
+std(o)
+params(o)
+
+# Multivariate distributions
+o = fitdistribution(Multinomial, x)
+o = fitdistribution(MvNormal, x)
+mean(o)
+var(o)
+std(o)
+cov(o)
+```
+"""
+fitdistribution

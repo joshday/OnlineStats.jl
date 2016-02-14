@@ -1,3 +1,11 @@
+"""
+Approximate K-Means clustering of multivariate data.
+
+```julia
+o = KMeans(y, 3, LearningRate())
+value(o)
+```
+"""
 type KMeans{W<:Weight} <: OnlineStat{VectorInput}
     value::MatF
     v::VecF

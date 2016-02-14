@@ -1,14 +1,13 @@
 """
-`NormalMix(k, wgt; start)`
-
 Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword
 argument specifying the initial parameters.
 
-If the algorithm diverges, try using a different `start`.
-
-Example:
-
-`NormalMix(k, wgt; start = MixtureModel(Normal, [(0, 1), (3, 1)]))`
+```julia
+o = NormalMix(2, LearningRate(); start = MixtureModel(Normal, [(0, 1), (3, 1)]))
+mean(o)
+var(o)
+std(o)
+```
 """
 type NormalMix{W<:Weight} <: DistributionStat{ScalarInput}
     value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal}

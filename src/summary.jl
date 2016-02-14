@@ -40,7 +40,7 @@ center(o::Mean, x::Real) = x - mean(o)
 
 #------------------------------------------------------------------------# Means
 """
-Mean vector of a data matrix, similar to `mean(x, 1)`.
+Means of multiple series, similar to `mean(x, 1)`.
 
 ```julia
 o = Means(x, EqualWeight())
@@ -105,7 +105,7 @@ standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
 #--------------------------------------------------------------------# Variances
 """
-Variances of a data matrix, similar to `var(x, 1)`.
+Variances of a multiple series, similar to `var(x, 1)`.
 
 ```julia
 o = Variances(x, EqualWeight())

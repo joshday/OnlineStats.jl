@@ -1,5 +1,5 @@
 """
-### `sweep!(A, k, inv = false)`
+`sweep!(A, k, inv = false)`
 
 Symmetric sweep of the matrix `A` on element `k`.
 """
@@ -40,7 +40,7 @@ end
 
 #------------------------------------------------------------------------------#
 """
-### `sweep!(A, k, v, inv = false)`
+`sweep!(A, k, v, inv = false)`
 
 Symmetric sweep of the matrix `A` on element `k` using vector `v` as storage to
 avoid memory allocation.  This requires `length(v) == size(A, 1)`.  Both `A` and `v`

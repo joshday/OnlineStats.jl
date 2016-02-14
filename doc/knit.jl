@@ -1,7 +1,7 @@
 module KnitDocs
 
 
-import OnlineStats
+import OnlineStats, Plots
 
 
 function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.md"))
