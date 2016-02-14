@@ -75,7 +75,7 @@ function fit!(counter::HyperLogLog, v::Any)
     j = maskadd32(x, counter.mask, 0x00000001)
     w = x & counter.altmask
     counter.M[j] = max(counter.M[j], ρ(w))
-    n += 1
+    counter.n += 1
     return
 end
 
