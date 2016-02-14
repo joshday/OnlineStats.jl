@@ -6,7 +6,7 @@ O = OnlineStats
 
 function title(nm::Symbol, subnm::DataType, mod::Module)
     s = replace(string(subnm), string(mod) * ".", "")
-    @sprintf "`%-50s %s`" "$nm" "(<: $s)"
+    @sprintf "<pre>%-50s %s" "$nm" "(<: $s) </pre>"
 end
 
 
