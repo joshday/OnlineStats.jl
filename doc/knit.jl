@@ -44,6 +44,7 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
             println(nm)
             write(file, "# " * string(nm) * "\n")
             write(file, Markdown.plain(d))
+            write(file, "[Top](#table-of-contents)")
             write(file, "\n")
         end
     end

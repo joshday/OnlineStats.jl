@@ -38,7 +38,7 @@
 `BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
 
 Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
-
+[Top](#table-of-contents)
 # CompareTracePlot
 Compare the values of multiple OnlineStats.  Useful for comparing competing models.
 
@@ -50,7 +50,7 @@ fit!(o1, x1, y1); fit!(o2, x1, y1)
 fit!(o1, x2, y2); fit!(o2, x2, y2)
 ...
 ```
-
+[Top](#table-of-contents)
 # CovMatrix
 Covariance matrix, similar to `cov(x)`.
 
@@ -64,7 +64,7 @@ cov(o)
 mean(o)
 var(o)
 ```
-
+[Top](#table-of-contents)
 # Diff
 Track the last value and the last difference.  Ignores `Weight`.
 
@@ -72,7 +72,7 @@ Track the last value and the last difference.  Ignores `Weight`.
 o = Diff()
 o = Diff(y)
 ```
-
+[Top](#table-of-contents)
 # Diffs
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 
@@ -80,15 +80,15 @@ Track the last value and the last difference for multiple series.  Ignores `Weig
 o = Diffs()
 o = Diffs(y)
 ```
-
+[Top](#table-of-contents)
 # EqualWeight
 `EqualWeight()`.  All observations weighted equally.
-
+[Top](#table-of-contents)
 # ExponentialWeight
 `ExponentialWeight(λ::Float64)`, `ExponentialWeight(lookback::Int)`
 
 Weights are held constant at `λ = 2 / (1 + lookback)`.
-
+[Top](#table-of-contents)
 # Extrema
 Extrema (maximum and minimum).  Ignores `Weight`.
 
@@ -97,14 +97,14 @@ o = Extrema(y)
 fit!(o, y2)
 extrema(o)
 ```
-
+[Top](#table-of-contents)
 # FitCategorical
 Find the proportions for each unique input.  Categories are sorted by proportions. Ignores `Weight`.
 
 ```julia
 o = FitCategorical(y)
 ```
-
+[Top](#table-of-contents)
 # HyperLogLog
 `HyperLogLog(b)`
 
@@ -116,7 +116,7 @@ for yi in y
     fit!(o, yi)
 end
 ```
-
+[Top](#table-of-contents)
 # KMeans
 Approximate K-Means clustering of multivariate data.
 
@@ -124,17 +124,17 @@ Approximate K-Means clustering of multivariate data.
 o = KMeans(y, 3, LearningRate())
 value(o)
 ```
-
+[Top](#table-of-contents)
 # LearningRate
 `LearningRate(r = 0.6; minstep = 0.0)`.
 
 Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
-
+[Top](#table-of-contents)
 # LearningRate2
 `LearningRate2(γ, c = 1.0; minstep = 0.0)`.
 
 Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
-
+[Top](#table-of-contents)
 # LinReg
 Linear regression with optional regularization.
 
@@ -159,7 +159,7 @@ coef(o, L1Penalty(.1))  # LASSO
 coef(o, ElasticNetPenalty(.1, .5))
 coef(o, SCADPenalty(.1, 3.7))
 ```
-
+[Top](#table-of-contents)
 # Mean
 Univariate mean.
 
@@ -169,7 +169,7 @@ o = Mean(y)
 fit!(o, y2)
 mean(o)
 ```
-
+[Top](#table-of-contents)
 # Means
 Means of multiple series, similar to `mean(x, 1)`.
 
@@ -179,7 +179,7 @@ o = Means(x)
 fit!(o, x2)
 mean(o)
 ```
-
+[Top](#table-of-contents)
 # Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
@@ -194,7 +194,7 @@ std(o)
 StatsBase.skewness(o)
 StatsBase.kurtosis(o)
 ```
-
+[Top](#table-of-contents)
 # NormalMix
 Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword argument specifying the initial parameters.
 
@@ -204,10 +204,10 @@ mean(o)
 var(o)
 std(o)
 ```
-
+[Top](#table-of-contents)
 # QuantReg
 Online MM Algorithm for Quantile Regression.
-
+[Top](#table-of-contents)
 # QuantileMM
 Approximate quantiles via an online MM algorithm.
 
@@ -216,7 +216,7 @@ o = QuantileMM(y, LearningRate())
 o = QuantileMM(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
-
+[Top](#table-of-contents)
 # QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 
@@ -225,7 +225,7 @@ o = QuantileSGD(y, LearningRate())
 o = QuantileSGD(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
-
+[Top](#table-of-contents)
 # StatLearn
 ### Online Statistical Learning
 
@@ -264,17 +264,17 @@ The model is defined by:
 ### Example:
 
 `StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))`
-
+[Top](#table-of-contents)
 # StatLearnCV
 `StatLearnCV(o::StatLearn, xtest, ytest)`
 
 Automatically tune the regularization parameter λ for `o` by minimizing loss on test data `xtest`, `ytest`.
-
+[Top](#table-of-contents)
 # StatLearnSparse
 ### Enforce sparsity on a `StatLearn` object
 
 `StatLearnSparse(o::StatLearn, s::AbstractSparsity)`
-
+[Top](#table-of-contents)
 # TracePlot
 `TracePlot(o::OnlineStat, f::Function = value)`
 
@@ -294,7 +294,7 @@ for i in 1:100
     fit!(tr, randn(100))
 end
 ```
-
+[Top](#table-of-contents)
 # Variance
 Univariate variance.
 
@@ -307,7 +307,7 @@ mean(o)
 var(o)
 std(o)
 ```
-
+[Top](#table-of-contents)
 # Variances
 Variances of a multiple series, similar to `var(x, 1)`.
 
@@ -320,7 +320,7 @@ mean(o)
 var(o)
 std(o)
 ```
-
+[Top](#table-of-contents)
 # coefplot
 For any OnlineStat that has a `coef` method, display a graphical representation of the coefficient vector.
 
@@ -329,7 +329,7 @@ using Plots
 o = LinReg(x, y)
 coefplot(o)
 ```
-
+[Top](#table-of-contents)
 # fit!
 `fit!(o::OnlineStat, y, b = 1)`
 
@@ -342,7 +342,7 @@ Include more data for an OnlineStat using batch updates of size `b`.  Batch upda
 `fit!(o::OnlineStat, x, y, b = 1)`
 
 Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
+[Top](#table-of-contents)
 # fitdistribution
 Estimate the parameters of a distribution.
 
@@ -368,7 +368,7 @@ var(o)
 std(o)
 cov(o)
 ```
-
+[Top](#table-of-contents)
 # sweep!
 `sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
@@ -382,7 +382,7 @@ xtx = x'x
 sweep!(xtx, 1)
 sweep!(xtx, 1, true)
 ```
-
+[Top](#table-of-contents)
 # value
 The associated value of an OnlineStat.
 
@@ -392,4 +392,4 @@ o2 = Variance()
 value(o1)
 value(o2)
 ```
-
+[Top](#table-of-contents)
