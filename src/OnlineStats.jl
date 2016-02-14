@@ -72,7 +72,7 @@ show_weight(w::EqualWeight) = print("1 / nobs")
 """
 `ExponentialWeight(λ::Float64)`, `ExponentialWeight(lookback::Int)`
 
-Weights are held constant at λ = 2 / (1 + lookback).
+Weights are held constant at `λ = 2 / (1 + lookback)`.
 """
 type ExponentialWeight <: Weight
     λ::Float64
@@ -92,7 +92,7 @@ show_weight(w::ExponentialWeight) = print("$(w.λ)")
 """
 `BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
 
-Use equal weights until reaching λ = 2 / (1 + lookback), then hold constant.
+Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
 """
 type BoundedExponentialWeight <: Weight
     λ::Float64
@@ -138,7 +138,7 @@ end
 
 
 """
-LearningRate2(γ, c = 1.0; minstep = 0.0).
+`LearningRate2(γ, c = 1.0; minstep = 0.0)`.
 
 Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 """

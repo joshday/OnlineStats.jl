@@ -1,10 +1,6 @@
 #------------------------------------------------------------# Enforced Sparsity
 abstract AbstractSparsity
 
-"""
-After `burnin` observations, coefficients will be set to zero if they are less
-than `ϵ`.
-"""
 immutable HardThreshold <: AbstractSparsity
     burnin::Int
     ϵ::Float64
