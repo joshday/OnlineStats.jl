@@ -10,7 +10,7 @@
 1. [<pre><code>ExponentialWeight                                       Weight </code></pre>](#exponentialweight)
 1. [<pre><code>Extrema                                                 OnlineStat{ScalarInput} </code></pre>](#extrema)
 1. [<pre><code>FitCategorical                                          DistributionStat{ScalarInput} </code></pre>](#fitcategorical)
-1. [<pre><code>HyperLogLog                                             Any </code></pre>](#hyperloglog)
+1. [<pre><code>HyperLogLog                                             OnlineStat{I<:Input} </code></pre>](#hyperloglog)
 1. [<pre><code>KMeans                                                  OnlineStat{VectorInput} </code></pre>](#kmeans)
 1. [<pre><code>LearningRate                                            Weight </code></pre>](#learningrate)
 1. [<pre><code>LearningRate2                                           Weight </code></pre>](#learningrate2)
@@ -108,7 +108,7 @@ o = FitCategorical(y)
 # HyperLogLog
 `HyperLogLog(b)`
 
-Approximate count of distinct elements.  `HyperLogLog` differs from other OnlineStats in that any input to `fit!(o::HyperLogLog, input)` is considered a singleton.  Thus, a vector of inputs must be similar to:
+Approximate count of distinct elements.  `HyperLogLog` differs from other OnlineStats in that any input to `fit!(o::HyperLogLog, input)` is considered a singleton.  Thus, a vector of inputs must be done by:
 
 ```julia
 o = HyperLogLog(4)
@@ -331,6 +331,12 @@ coefplot(o)
 ```
 
 # fit!
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
 `fit!(o::OnlineStat, y, b = 1)`
 
 `fit!(o::OnlineStat, x, y, b = 1)`
