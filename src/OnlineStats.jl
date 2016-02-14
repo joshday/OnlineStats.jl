@@ -269,7 +269,16 @@ end
 fitbatch!(args...) = fit!(args...)
 
 #----------------------------------------------------------------------# helpers
-"`value(o::OnlineStat)`.  The associated value of an OnlineStat."
+"""
+The associated value of an OnlineStat.
+
+```
+o1 = Mean()
+o2 = Variance()
+value(o1)
+value(o2)
+```
+"""
 value(o::OnlineStat) = o.value
 StatsBase.nobs(o::OnlineStat) = nobs(o.weight)
 unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)

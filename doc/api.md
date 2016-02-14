@@ -1,44 +1,43 @@
 # API for OnlineStats
 
 # Table of Contents
-1. [BoundedExponentialWeight](#boundedexponentialweight)
-1. [CompareTracePlot](#comparetraceplot)
-1. [CovMatrix](#covmatrix)
-1. [Diff](#diff)
-1. [Diffs](#diffs)
-1. [EqualWeight](#equalweight)
-1. [ExponentialWeight](#exponentialweight)
-1. [Extrema](#extrema)
-1. [FitCategorical](#fitcategorical)
-1. [HardThreshold](#hardthreshold)
-1. [HyperLogLog](#hyperloglog)
-1. [KMeans](#kmeans)
-1. [LearningRate](#learningrate)
-1. [LearningRate2](#learningrate2)
-1. [LinReg](#linreg)
-1. [Mean](#mean)
-1. [Means](#means)
-1. [Moments](#moments)
-1. [NormalMix](#normalmix)
-1. [QuantReg](#quantreg)
-1. [QuantileMM](#quantilemm)
-1. [QuantileSGD](#quantilesgd)
-1. [StatLearn](#statlearn)
-1. [StatLearnCV](#statlearncv)
-1. [StatLearnSparse](#statlearnsparse)
-1. [TracePlot](#traceplot)
-1. [Variance](#variance)
-1. [Variances](#variances)
-1. [coefplot](#coefplot)
-1. [fit!](#fit!)
-1. [fitdistribution](#fitdistribution)
-1. [sweep!](#sweep!)
-1. [value](#value)
+1. [BoundedExponentialWeight (<: Weight)](#boundedexponentialweight)
+1. [CompareTracePlot (<: Any)](#comparetraceplot)
+1. [CovMatrix (<: OnlineStat{VectorInput})](#covmatrix)
+1. [Diff (<: OnlineStat{ScalarInput})](#diff)
+1. [Diffs (<: OnlineStat{VectorInput})](#diffs)
+1. [EqualWeight (<: Weight)](#equalweight)
+1. [ExponentialWeight (<: Weight)](#exponentialweight)
+1. [Extrema (<: OnlineStat{ScalarInput})](#extrema)
+1. [FitCategorical (<: DistributionStat{ScalarInput})](#fitcategorical)
+1. [HyperLogLog (<: Any)](#hyperloglog)
+1. [KMeans (<: OnlineStat{VectorInput})](#kmeans)
+1. [LearningRate (<: Weight)](#learningrate)
+1. [LearningRate2 (<: Weight)](#learningrate2)
+1. [LinReg (<: OnlineStat{XYInput})](#linreg)
+1. [Mean (<: OnlineStat{ScalarInput})](#mean)
+1. [Means (<: OnlineStat{VectorInput})](#means)
+1. [Moments (<: OnlineStat{ScalarInput})](#moments)
+1. [NormalMix (<: DistributionStat{ScalarInput})](#normalmix)
+1. [QuantReg (<: OnlineStat{XYInput})](#quantreg)
+1. [QuantileMM (<: OnlineStat{ScalarInput})](#quantilemm)
+1. [QuantileSGD (<: OnlineStat{ScalarInput})](#quantilesgd)
+1. [StatLearn (<: OnlineStat{XYInput})](#statlearn)
+1. [StatLearnCV (<: OnlineStat{XYInput})](#statlearncv)
+1. [StatLearnSparse (<: OnlineStat{XYInput})](#statlearnsparse)
+1. [TracePlot (<: OnlineStat{I<:Input})](#traceplot)
+1. [Variance (<: OnlineStat{ScalarInput})](#variance)
+1. [Variances (<: OnlineStat{VectorInput})](#variances)
+1. [coefplot (<: Function)](#coefplot)
+1. [fit! (<: Function)](#fit!)
+1. [fitdistribution (<: Function)](#fitdistribution)
+1. [sweep! (<: Function)](#sweep!)
+1. [value (<: Function)](#value)
 
 # BoundedExponentialWeight
 `BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
 
-Use equal weights until reaching λ = 2 / (1 + lookback), then hold constant.
+Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
 
 # CompareTracePlot
 Compare the values of multiple OnlineStats.  Useful for comparing competing models.
@@ -88,7 +87,7 @@ o = Diffs(y)
 # ExponentialWeight
 `ExponentialWeight(λ::Float64)`, `ExponentialWeight(lookback::Int)`
 
-Weights are held constant at λ = 2 / (1 + lookback).
+Weights are held constant at `λ = 2 / (1 + lookback)`.
 
 # Extrema
 Extrema (maximum and minimum).  Ignores `Weight`.
@@ -105,9 +104,6 @@ Find the proportions for each unique input.  Categories are sorted by proportion
 ```julia
 o = FitCategorical(y)
 ```
-
-# HardThreshold
-After `burnin` observations, coefficients will be set to zero if they are less than `ϵ`.
 
 # HyperLogLog
 `HyperLogLog(b)`
@@ -135,7 +131,7 @@ value(o)
 Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
 
 # LearningRate2
-LearningRate2(γ, c = 1.0; minstep = 0.0).
+`LearningRate2(γ, c = 1.0; minstep = 0.0)`.
 
 Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 
@@ -368,53 +364,26 @@ cov(o)
 ```
 
 # sweep!
-`sweep!(A, k, v, inv = false)`
+`sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
-Symmetric sweep of the matrix `A` on element `k` using vector `v` as storage to avoid memory allocation.  This requires `length(v) == size(A, 1)`.  Both `A` and `v` will be overwritten.
+Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten. `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
 
-`inv = true` will perform an inverse sweep.  Only the upper triangle is read and swept.
+An optional vector `v` can be provided to avoid memory allocation. This requires `length(v) == size(A, 1)`.  Both `A` and `v` will be overwritten.
 
-`sweep!(A, k, inv = false)`
-
-Symmetric sweep of the matrix `A` on element `k`.
-
-# value
-`value(o::OnlineStat)`.  The associated value of an OnlineStat.
-
-for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
-`fit!(o::OnlineStat, y, b = 1)`
-
-`fit!(o::OnlineStat, x, y, b = 1)`
-
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
-`fit!(o::OnlineStat, y, b = 1)`
-
-`fit!(o::OnlineStat, x, y, b = 1)`
-
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
-`fit!(o::OnlineStat, y, b = 1)`
-
-`fit!(o::OnlineStat, x, y, b = 1)`
-
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
-# fitdistribution
-Fit a distribution.
-
-# sweep!
-### `sweep!(A, k, v, inv = false)`
-
-Symmetric sweep of the matrix `A` on element `k` using vector `v` as storage to avoid memory allocation.  This requires `length(v) == size(A, 1)`.  Both `A` and `v` will be overwritten.
-
-`inv = true` will perform an inverse sweep.  Only the upper triangle is read and swept.
-
-### `sweep!(A, k, inv = false)`
-
-Symmetric sweep of the matrix `A` on element `k`.
+```julia
+x = randn(100, 10)
+xtx = x'x
+sweep!(xtx, 1)
+sweep!(xtx, 1, true)
+```
 
 # value
-`value(o::OnlineStat)`.  The associated value of an OnlineStat.
+The associated value of an OnlineStat.
+
+```
+o1 = Mean()
+o2 = Variance()
+value(o1)
+value(o2)
+```
 

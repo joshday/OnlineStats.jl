@@ -1,9 +1,21 @@
 """
-`sweep!(A, k, inv = false)`
+`sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
-Symmetric sweep of the matrix `A` on element `k`.
+Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten.
+`inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
+
+An optional vector `v` can be provided to avoid memory allocation.
+This requires `length(v) == size(A, 1)`.  Both `A` and `v`
+will be overwritten.
+
+```julia
+x = randn(100, 10)
+xtx = x'x
+sweep!(xtx, 1)
+sweep!(xtx, 1, true)
+```
 """
-function sweep!(A::AMatF, k::Integer, inv::Bool = false)
+function sweep!{T<:Real}(A::AMat{T}, k::Integer, inv::Bool = false)
     n, p = size(A)
     # ensure @inbounds is safe
     @assert n == p "A must be square"
@@ -30,7 +42,7 @@ function sweep!(A::AMatF, k::Integer, inv::Bool = false)
     A
 end
 
-function sweep!{T<:Integer}(A::AMatF, ks::AVec{T}, inv::Bool = false)
+function sweep!{T<:Real, I<:Integer}(A::AMat{T}, ks::AVec{I}, inv::Bool = false)
     for k in ks
         sweep!(A, k, inv)
     end
@@ -39,16 +51,7 @@ end
 
 
 #------------------------------------------------------------------------------#
-"""
-`sweep!(A, k, v, inv = false)`
-
-Symmetric sweep of the matrix `A` on element `k` using vector `v` as storage to
-avoid memory allocation.  This requires `length(v) == size(A, 1)`.  Both `A` and `v`
-will be overwritten.
-
-`inv = true` will perform an inverse sweep.  Only the upper triangle is read and swept.
-"""
-function sweep!(A::AMatF, k::Integer, v::AVecF, inv::Bool = false)
+function sweep!{T<:Real}(A::AMat{T}, k::Integer, v::AVecF, inv::Bool = false)
     n, p = size(A)
     # ensure that @inbounds is safe
     @assert n == p "A must be square"
@@ -74,7 +77,7 @@ function sweep!(A::AMatF, k::Integer, v::AVecF, inv::Bool = false)
     A
 end
 
-function sweep!{T<:Integer}(A::AMatF, ks::AVec{T}, v::VecF, inv::Bool = false)
+function sweep!{T<:Real,I<:Integer}(A::AMat{T}, ks::AVec{I}, v::VecF, inv::Bool = false)
     for k in ks
         sweep!(A, k, v, inv)
     end
