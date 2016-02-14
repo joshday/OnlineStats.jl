@@ -4,6 +4,11 @@ module KnitDocs
 import OnlineStats, Plots
 O = OnlineStats
 
+function title(nm::Symbol, subnm::DataType, mod::Module)
+    s = replace(string(subnm), string(mod) * ".", "")
+    @sprintf "`%-50s %s`" "$nm" "(<: $s)"
+end
+
 
 function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.md"))
     nms = names(mod)
@@ -21,10 +26,11 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
             objtype = typeof(obj)       # get type
             if objtype == DataType      # if DataType, get supertype
                 objsuper = super(obj)
-                superstring = replace(string(objsuper), string(mod) * ".", "")
-                write(file, "1. [$nm (<: $superstring)](#$(lowercase(string(nm))))\n")
+                heading = title(nm, objsuper, mod)
+                write(file, "1. [" * heading * "](#$(lowercase(string(nm))))\n")
             else
-                write(file, "1. [$nm (<: $objtype)](#$(lowercase(string(nm))))\n")
+                heading = title(nm, objtype, mod)
+                write(file, "1. [" * heading * "](#$(lowercase(string(nm))))\n")
             end
         end
     end
