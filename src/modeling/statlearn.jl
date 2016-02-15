@@ -127,6 +127,7 @@ The model is defined by:
 - `AdaMMGrad()`
     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
+**Note:** The order of the `ModelDef`, `Penalty`, and `Algorithm` arguments don't matter.
 
 ```julia
 StatLearn(x, y)

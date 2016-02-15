@@ -1,8 +1,5 @@
-<!--- This file was generated at 2016-02-15T09:46:32.  Do not edit by hand --->
+<!--- This file was generated at 2016-02-15T09:56:20.  Do not edit by hand --->
 # API for OnlineStats
-
-# Introduction
-hello there
 
 # Table of Contents
 [<pre><code>BoundedExponentialWeight                                Weight </code></pre>](#boundedexponentialweight)
@@ -430,5 +427,8 @@ o2 = Variance()
 value(o1)
 value(o2)
 ```
+
+[Top](#table-of-contents)
+
 
 [Top](#table-of-contents)
