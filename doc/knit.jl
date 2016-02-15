@@ -4,18 +4,26 @@ module KnitDocs
 import OnlineStats, Plots
 O = OnlineStats
 
+# entries for TOC
 function title(nm::Symbol, subnm::DataType, mod::Module)
     s = replace(string(subnm), string(mod) * ".", "")
     @sprintf "<pre><code>%-55s %s" "$nm" "$s </code></pre>"
 end
 
 
-function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.md"))
+function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.md");
+        intro::AbstractString = ""
+    )
     nms = names(mod)
     nms = setdiff(nms, [symbol(mod)])  # hack to avoid including README
     touch(dest)
     file = open(dest, "r+")
 
+    write(file,
+        "<!--- This file was generated at "
+        * string(now()) *
+        ".  Do not edit by hand --->\n"
+    )
     write(file, "# API for " * string(mod) * "\n\n")
     write(file, "# Table of Contents\n")
 
@@ -27,10 +35,10 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
             if objtype == DataType      # if DataType, get supertype
                 objsuper = super(obj)
                 heading = title(nm, objsuper, mod)
-                write(file, "1. [" * heading * "](#$(lowercase(string(nm))))\n")
+                write(file, "[" * heading * "](#$(lowercase(string(nm))))\n")
             else
                 heading = title(nm, objtype, mod)
-                write(file, "1. [" * heading * "](#$(lowercase(string(nm))))\n")
+                write(file, "[" * heading * "](#$(lowercase(string(nm))))\n")
             end
         end
     end

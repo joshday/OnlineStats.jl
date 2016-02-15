@@ -78,7 +78,8 @@ abstract Algorithm
 
 #--------------------------------------------------------------------# StatLearn
 """
-### Online Statistical Learning
+Online statistical learning algorithms.
+
 - `StatLearn(p)`
 - `StatLearn(x, y)`
 - `StatLearn(x, y, b)`
@@ -98,7 +99,7 @@ The model is defined by:
 - `QuantileRegression(τ)`
     - Model conditional quantiles
 - `SVMLike()`
-    - Perceptron with `NoPenalty`. SVM with `L2Penalty`.
+    - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `L2Penalty`.
 - `HuberRegression(δ)`
     - Robust Huber loss
 
@@ -127,8 +128,12 @@ The model is defined by:
     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 
-### Example:
-`StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))`
+```julia
+StatLearn(x, y)
+StatLearn(x, y, AdaGrad())
+StatLearn(x, y, MMGrad(), LearningRate(.5))
+StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
+```
 """
 type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat{XYInput}
     β0::Float64     # intercept

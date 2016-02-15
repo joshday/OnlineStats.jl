@@ -1,38 +1,42 @@
+<!--- This file was generated at 2016-02-15T09:46:32.  Do not edit by hand --->
 # API for OnlineStats
 
+# Introduction
+hello there
+
 # Table of Contents
-1. [<pre><code>BoundedExponentialWeight                                Weight </code></pre>](#boundedexponentialweight)
-1. [<pre><code>CompareTracePlot                                        Any </code></pre>](#comparetraceplot)
-1. [<pre><code>CovMatrix                                               OnlineStat{VectorInput} </code></pre>](#covmatrix)
-1. [<pre><code>Diff                                                    OnlineStat{ScalarInput} </code></pre>](#diff)
-1. [<pre><code>Diffs                                                   OnlineStat{VectorInput} </code></pre>](#diffs)
-1. [<pre><code>EqualWeight                                             Weight </code></pre>](#equalweight)
-1. [<pre><code>ExponentialWeight                                       Weight </code></pre>](#exponentialweight)
-1. [<pre><code>Extrema                                                 OnlineStat{ScalarInput} </code></pre>](#extrema)
-1. [<pre><code>FitCategorical                                          DistributionStat{ScalarInput} </code></pre>](#fitcategorical)
-1. [<pre><code>HyperLogLog                                             OnlineStat{I<:Input} </code></pre>](#hyperloglog)
-1. [<pre><code>KMeans                                                  OnlineStat{VectorInput} </code></pre>](#kmeans)
-1. [<pre><code>LearningRate                                            Weight </code></pre>](#learningrate)
-1. [<pre><code>LearningRate2                                           Weight </code></pre>](#learningrate2)
-1. [<pre><code>LinReg                                                  OnlineStat{XYInput} </code></pre>](#linreg)
-1. [<pre><code>Mean                                                    OnlineStat{ScalarInput} </code></pre>](#mean)
-1. [<pre><code>Means                                                   OnlineStat{VectorInput} </code></pre>](#means)
-1. [<pre><code>Moments                                                 OnlineStat{ScalarInput} </code></pre>](#moments)
-1. [<pre><code>NormalMix                                               DistributionStat{ScalarInput} </code></pre>](#normalmix)
-1. [<pre><code>QuantReg                                                OnlineStat{XYInput} </code></pre>](#quantreg)
-1. [<pre><code>QuantileMM                                              OnlineStat{ScalarInput} </code></pre>](#quantilemm)
-1. [<pre><code>QuantileSGD                                             OnlineStat{ScalarInput} </code></pre>](#quantilesgd)
-1. [<pre><code>StatLearn                                               OnlineStat{XYInput} </code></pre>](#statlearn)
-1. [<pre><code>StatLearnCV                                             OnlineStat{XYInput} </code></pre>](#statlearncv)
-1. [<pre><code>StatLearnSparse                                         OnlineStat{XYInput} </code></pre>](#statlearnsparse)
-1. [<pre><code>TracePlot                                               OnlineStat{I<:Input} </code></pre>](#traceplot)
-1. [<pre><code>Variance                                                OnlineStat{ScalarInput} </code></pre>](#variance)
-1. [<pre><code>Variances                                               OnlineStat{VectorInput} </code></pre>](#variances)
-1. [<pre><code>coefplot                                                Function </code></pre>](#coefplot)
-1. [<pre><code>fit!                                                    Function </code></pre>](#fit!)
-1. [<pre><code>fitdistribution                                         Function </code></pre>](#fitdistribution)
-1. [<pre><code>sweep!                                                  Function </code></pre>](#sweep!)
-1. [<pre><code>value                                                   Function </code></pre>](#value)
+[<pre><code>BoundedExponentialWeight                                Weight </code></pre>](#boundedexponentialweight)
+[<pre><code>CompareTracePlot                                        Any </code></pre>](#comparetraceplot)
+[<pre><code>CovMatrix                                               OnlineStat{VectorInput} </code></pre>](#covmatrix)
+[<pre><code>Diff                                                    OnlineStat{ScalarInput} </code></pre>](#diff)
+[<pre><code>Diffs                                                   OnlineStat{VectorInput} </code></pre>](#diffs)
+[<pre><code>EqualWeight                                             Weight </code></pre>](#equalweight)
+[<pre><code>ExponentialWeight                                       Weight </code></pre>](#exponentialweight)
+[<pre><code>Extrema                                                 OnlineStat{ScalarInput} </code></pre>](#extrema)
+[<pre><code>FitCategorical                                          DistributionStat{ScalarInput} </code></pre>](#fitcategorical)
+[<pre><code>HyperLogLog                                             OnlineStat{I<:Input} </code></pre>](#hyperloglog)
+[<pre><code>KMeans                                                  OnlineStat{VectorInput} </code></pre>](#kmeans)
+[<pre><code>LearningRate                                            Weight </code></pre>](#learningrate)
+[<pre><code>LearningRate2                                           Weight </code></pre>](#learningrate2)
+[<pre><code>LinReg                                                  OnlineStat{XYInput} </code></pre>](#linreg)
+[<pre><code>Mean                                                    OnlineStat{ScalarInput} </code></pre>](#mean)
+[<pre><code>Means                                                   OnlineStat{VectorInput} </code></pre>](#means)
+[<pre><code>Moments                                                 OnlineStat{ScalarInput} </code></pre>](#moments)
+[<pre><code>NormalMix                                               DistributionStat{ScalarInput} </code></pre>](#normalmix)
+[<pre><code>QuantReg                                                OnlineStat{XYInput} </code></pre>](#quantreg)
+[<pre><code>QuantileMM                                              OnlineStat{ScalarInput} </code></pre>](#quantilemm)
+[<pre><code>QuantileSGD                                             OnlineStat{ScalarInput} </code></pre>](#quantilesgd)
+[<pre><code>StatLearn                                               OnlineStat{XYInput} </code></pre>](#statlearn)
+[<pre><code>StatLearnCV                                             OnlineStat{XYInput} </code></pre>](#statlearncv)
+[<pre><code>StatLearnSparse                                         OnlineStat{XYInput} </code></pre>](#statlearnsparse)
+[<pre><code>TracePlot                                               OnlineStat{I<:Input} </code></pre>](#traceplot)
+[<pre><code>Variance                                                OnlineStat{ScalarInput} </code></pre>](#variance)
+[<pre><code>Variances                                               OnlineStat{VectorInput} </code></pre>](#variances)
+[<pre><code>coefplot                                                Function </code></pre>](#coefplot)
+[<pre><code>fit!                                                    Function </code></pre>](#fit!)
+[<pre><code>fitdistribution                                         Function </code></pre>](#fitdistribution)
+[<pre><code>sweep!                                                  Function </code></pre>](#sweep!)
+[<pre><code>value                                                   Function </code></pre>](#value)
 
 # BoundedExponentialWeight
 `BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
@@ -248,7 +252,7 @@ fit!(o, y2)
 
 [Top](#table-of-contents)
 # StatLearn
-### Online Statistical Learning
+Online statistical learning algorithms.
 
   * `StatLearn(p)`
   * `StatLearn(x, y)`
@@ -263,7 +267,7 @@ The model is defined by:
   * `LogisticRegression()`     - Model for data in {0, 1}
   * `PoissonRegression()`     - Model count data {0, 1, 2, 3, ...}
   * `QuantileRegression(τ)`     - Model conditional quantiles
-  * `SVMLike()`     - Perceptron with `NoPenalty`. SVM with `L2Penalty`.
+  * `SVMLike()`     - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `L2Penalty`.
   * `HuberRegression(δ)`     - Robust Huber loss
 
 #### `Penalty`
@@ -282,9 +286,12 @@ The model is defined by:
   * `MMGrad()`     - Experimental online MM gradient method.
   * `AdaMMGrad()`     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
-### Example:
-
-`StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))`
+```julia
+StatLearn(x, y)
+StatLearn(x, y, AdaGrad())
+StatLearn(x, y, MMGrad(), LearningRate(.5))
+StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
+```
 
 [Top](#table-of-contents)
 # StatLearnCV

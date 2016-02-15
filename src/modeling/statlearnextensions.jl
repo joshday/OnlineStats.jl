@@ -12,9 +12,14 @@ function HardThreshold(;burnin::Integer = 1000, threshold::Real = .01)
 end
 
 """
-### Enforce sparsity on a `StatLearn` object
+Enforce sparsity on a `StatLearn` object.  Currently, the only option is
+`HardThreshold`, which after `burnin` observations, any coefficient less than
+`threshold` is set to 0.
 
-`StatLearnSparse(o::StatLearn, s::AbstractSparsity)`
+```julia
+StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
+fit!(o, x, y)
+```
 """
 type StatLearnSparse{S <: AbstractSparsity} <: OnlineStat{XYInput}
     o::StatLearn
@@ -61,6 +66,12 @@ end
 
 Automatically tune the regularization parameter λ for `o` by minimizing loss on
 test data `xtest`, `ytest`.
+
+```julia
+sl = StatLearn(size(x, 2), L1Penalty(.1))
+o = StatLearnCV(sl, xtest, ytest)
+fit!(o, x, y)
+```
 """
 type StatLearnCV{T<:Real, S<:Real, W<:Weight} <: OnlineStat{XYInput}
     o::StatLearn
