@@ -25,7 +25,7 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
         ".  Do not edit by hand --->\n"
     )
     write(file, "# API for " * string(mod) * "\n\n")
-    write(file, "# Table of Contents\n")
+    write(file, "# Table of Contents\n\n")
 
     # Make TOC
     for nm in nms
