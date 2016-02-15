@@ -1,4 +1,4 @@
-<!--- This file was generated at 2016-02-15T09:56:20.  Do not edit by hand --->
+<!--- This file was generated at 2016-02-15T09:57:41.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
@@ -283,6 +283,8 @@ The model is defined by:
   * `MMGrad()`     - Experimental online MM gradient method.
   * `AdaMMGrad()`     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
+**Note:** The order of the `ModelDef`, `Penalty`, and `Algorithm` arguments don't matter.
+
 ```julia
 StatLearn(x, y)
 StatLearn(x, y, AdaGrad())
@@ -296,11 +298,20 @@ StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
 
 Automatically tune the regularization parameter λ for `o` by minimizing loss on test data `xtest`, `ytest`.
 
+```julia
+sl = StatLearn(size(x, 2), L1Penalty(.1))
+o = StatLearnCV(sl, xtest, ytest)
+fit!(o, x, y)
+```
+
 [Top](#table-of-contents)
 # StatLearnSparse
-### Enforce sparsity on a `StatLearn` object
+Enforce sparsity on a `StatLearn` object.  Currently, the only option is `HardThreshold`, which after `burnin` observations, any coefficient less than `threshold` is set to 0.
 
-`StatLearnSparse(o::StatLearn, s::AbstractSparsity)`
+```julia
+StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
+fit!(o, x, y)
+```
 
 [Top](#table-of-contents)
 # TracePlot
@@ -369,12 +380,6 @@ coefplot(o)
 
 Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
 
-`fit!(o::OnlineStat, y, b = 1)`
-
-`fit!(o::OnlineStat, x, y, b = 1)`
-
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
 [Top](#table-of-contents)
 # fitdistribution
 Estimate the parameters of a distribution.
@@ -427,8 +432,5 @@ o2 = Variance()
 value(o1)
 value(o2)
 ```
-
-[Top](#table-of-contents)
-
 
 [Top](#table-of-contents)
