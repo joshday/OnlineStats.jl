@@ -153,10 +153,7 @@ function _StatLearn(p::Integer, wgt::Weight = LearningRate();
         algorithm::Algorithm = default(Algorithm),
         intercept::Bool = true
     )
-    o = StatLearn(
-        0.0, zeros(p), intercept, algorithm, model,
-        Float64(η), penalty, wgt
-    )
+    o = StatLearn(0.0, zeros(p), intercept, algorithm, model, Float64(η), penalty, wgt)
     o.algorithm = typeof(o.algorithm)(p, o.algorithm)
     o
 end
