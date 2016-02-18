@@ -39,6 +39,7 @@ predict(o::PoissonRegression, x::AVec, β0, β) =   exp(β0 + dot(x, β))
 predict(o::QuantileRegression, x::AVec, β0, β) =  β0 + dot(x, β)
 predict(o::SVMLike, x::AVec, β0, β) =             β0 + dot(x, β)
 predict(o::HuberRegression, x::AVec, β0, β) =     β0 + dot(x, β)
+
 function StatsBase.predict{T<:Real}(o::ModelDef, x::AMat{T}, β0::Float64, β::VecF)
     [predict(o, row(x, i), β0, β) for i in 1:size(x, 1)]
 end

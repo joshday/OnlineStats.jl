@@ -41,6 +41,9 @@ abstract VectorInput <: Input  # observation = vector
 abstract XYInput <: Input      # observation = (x, y) pair
 abstract OnlineStat{I <: Input}
 
+abstract RowObs     # Each row is observation
+abstract ColObs     # Each column is observation
+
 typealias VecF Vector{Float64}
 typealias MatF Matrix{Float64}
 typealias AVec{T} AbstractVector{T}
