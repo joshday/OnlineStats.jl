@@ -205,18 +205,36 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     end
     o
 end
+
 function fit!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, row(y, i))
     end
     o
 end
+function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
+    for i in 1:size(y, 2)
+        fit!(o, col(y, i))
+    end
+    o
+end
+
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
+    @assert size(x, 1) == length(y)
     for i in 1:length(y)
         fit!(o, row(x, i), row(y, i))
     end
     o
 end
+function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
+    @assert size(x, 2) == length(y)
+    for i in 1:length(y)
+        fit!(o, col(x, i), row(y, i))
+    end
+    o
+end
+
+
 
 # Update in batches
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
@@ -235,6 +253,7 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
     end
     o
 end
+
 function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     b = Int(b)
     n = size(y, 1)
@@ -251,6 +270,23 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     end
     o
 end
+function fit_col!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
+    b = Int(b)
+    n = size(y, 2)
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            fitbatch!(o, cols(y, rng))
+            i += b
+        end
+    end
+    o
+end
+
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
@@ -262,6 +298,23 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
         while i <= n
             rng = i:min(i + b - 1, n)
             fitbatch!(o, rows(x, rng), rows(y, rng))
+            i += b
+        end
+    end
+    o
+end
+function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
+    b = Int(b)
+    n = length(y)
+    @assert size(x, 2) == n "number of observations don't match.  Did you mean `fit!(...)`?"
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, x, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            fitbatch!(o, cols(x, rng), rows(y, rng))
             i += b
         end
     end
@@ -318,6 +371,7 @@ rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
 rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
 
 col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
+cols(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, :, rs)
 
 nrows(x::AMat) = size(x, 1)
 ncols(x::AMat) = size(x, 2)
