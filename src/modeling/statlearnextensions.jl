@@ -95,7 +95,7 @@ function fit!(o::StatLearnCV, x::AVec, y::Real)
     o
 end
 # TODO: fitbatch!
-function tuneλ!{A<:Algorithm, M<:ModelDef}(
+function tuneλ!{A<:Algorithm, M<:ModelDefinition}(
         o::StatLearn{A, M, NoPenalty}, x, y, γ, xtest, ytest
     )
     fit!(o, x, y)

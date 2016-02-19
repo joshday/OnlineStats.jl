@@ -258,7 +258,7 @@ Online statistical learning algorithms.
 
 The model is defined by:
 
-#### `ModelDef`
+#### `ModelDefinition`
 
   * `L2Regression()`     - Squared error loss.  Default.
   * `L1Regression()`     - Absolute loss
@@ -284,7 +284,7 @@ The model is defined by:
   * `MMGrad()`     - Experimental online MM gradient method.
   * `AdaMMGrad()`     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
-**Note:** The order of the `ModelDef`, `Penalty`, and `Algorithm` arguments don't matter.
+**Note:** The order of the `ModelDefinition`, `Penalty`, and `Algorithm` arguments don't matter.
 
 ```julia
 StatLearn(x, y)

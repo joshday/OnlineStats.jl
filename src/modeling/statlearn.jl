@@ -1,21 +1,21 @@
-#---------------------------------------------------------------------# ModelDef
+#---------------------------------------------------------------------# ModelDefinition
 abstract Algorithm
-abstract ModelDef
-abstract GLMDef <: ModelDef
+abstract ModelDefinition
+abstract GLMDef <: ModelDefinition
 
 immutable L2Regression <: GLMDef end
-immutable L1Regression <: ModelDef end
+immutable L1Regression <: ModelDefinition end
 immutable LogisticRegression <: GLMDef end
 immutable PoissonRegression <: GLMDef end
-immutable QuantileRegression <: ModelDef
+immutable QuantileRegression <: ModelDefinition
     τ::Float64
     function QuantileRegression(τ::Real = .5)
         @assert 0 < τ < 1
         new(Float64(τ))
     end
 end
-immutable SVMLike <: ModelDef end
-immutable HuberRegression <: ModelDef
+immutable SVMLike <: ModelDefinition end
+immutable HuberRegression <: ModelDefinition
     δ::Float64
     function HuberRegression(δ::Real = 1.0)
         @assert δ > 0
@@ -40,7 +40,7 @@ predict(o::QuantileRegression, x::AVec, β0, β) =  β0 + dot(x, β)
 predict(o::SVMLike, x::AVec, β0, β) =             β0 + dot(x, β)
 predict(o::HuberRegression, x::AVec, β0, β) =     β0 + dot(x, β)
 
-function StatsBase.predict{T<:Real}(o::ModelDef, x::AMat{T}, β0::Float64, β::VecF)
+function StatsBase.predict{T<:Real}(o::ModelDefinition, x::AMat{T}, β0::Float64, β::VecF)
     [predict(o, row(x, i), β0, β) for i in 1:size(x, 1)]
 end
 
@@ -87,7 +87,7 @@ Online statistical learning algorithms.
 
 The model is defined by:
 
-#### `ModelDef`
+#### `ModelDefinition`
 
 - `L2Regression()`
     - Squared error loss.  Default.
@@ -128,7 +128,7 @@ The model is defined by:
 - `AdaMMGrad()`
     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
-**Note:** The order of the `ModelDef`, `Penalty`, and `Algorithm` arguments don't matter.
+**Note:** The order of the `ModelDefinition`, `Penalty`, and `Algorithm` arguments don't matter.
 
 ```julia
 StatLearn(x, y)
@@ -137,7 +137,7 @@ StatLearn(x, y, MMGrad(), LearningRate(.5))
 StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
 ```
 """
-type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat{XYInput}
+type StatLearn{A<:Algorithm, M<:ModelDefinition, P<:Penalty, W<:Weight} <: OnlineStat{XYInput}
     β0::Float64     # intercept
     β::VecF         # coefficients
     intercept::Bool # should β0 be estimated?
@@ -148,7 +148,7 @@ type StatLearn{A<:Algorithm, M<:ModelDef, P<:Penalty, W<:Weight} <: OnlineStat{X
     weight::W       # Weight, may not get used, depending on algorithm
 end
 function _StatLearn(p::Integer, wgt::Weight = LearningRate();
-        model::ModelDef = L2Regression(),
+        model::ModelDefinition = L2Regression(),
         η::Real = 1.0,
         penalty::Penalty = NoPenalty(),
         algorithm::Algorithm = default(Algorithm),
@@ -167,7 +167,7 @@ function StatLearn(p::Integer, args...; kw...)
         T = typeof(arg)
         if T <: Weight
             wgt = arg
-        elseif T <: ModelDef
+        elseif T <: ModelDefinition
             mod = arg
         elseif T <: Algorithm
             alg = arg
@@ -503,21 +503,21 @@ function _updatebatchβ!(o::StatLearn{RDA}, g, x, y, ŷ)
 end
 
 # NoPenalty
-function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, NoPenalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, NoPenalty}, j::Int)
     o.β[j] = -rda_γ(o, j) * o.algorithm.gbar[j]
 end
 # L2Penalty
-function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L2Penalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, L2Penalty}, j::Int)
     o.algorithm.gbar[j] += (1 / o.weight.nups) * o.penalty.λ * o.β[j]  # add in penalty gradient
     o.β[j] = -rda_γ(o,j) * o.algorithm.gbar[j]
 end
 # L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
-function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, L1Penalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, L1Penalty}, j::Int)
     ḡ = o.algorithm.gbar[j]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.penalty.λ)
 end
 # ElasticNetPenalty
-function rda_update!{M<:ModelDef}(o::StatLearn{RDA, M, ElasticNetPenalty}, j::Int)
+function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, ElasticNetPenalty}, j::Int)
     o.algorithm.gbar[j] += (1 / o.weight.nups) * o.penalty.λ * (1 - o.penalty.α) * o.β[j]
     ḡ = o.algorithm.gbar[j]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.penalty.λ * o.penalty.α)

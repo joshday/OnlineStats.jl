@@ -1,4 +1,3 @@
-# __precompile__()
 module OnlineStats
 
 import StatsBase
@@ -23,8 +22,8 @@ export
     FitMultinomial, FitMvNormal,
     # Penalties
     NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
-    # ModelDef and Algorithm
-    ModelDef, L2Regression, L1Regression, LogisticRegression,
+    # ModelDefinition and Algorithm
+    ModelDefinition, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
     Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, RDA, MMGrad,
     # streamstats
@@ -170,7 +169,16 @@ function show_weight(w::LearningRate2)
 end
 
 nups(o::OnlineStat) = nups(o.w)
-show_weight(o::OnlineStat) = (show_weight(o.w); println())
+
+"""
+Display the weight for a singleton update.
+
+```julia
+o = Mean(LearningRate(.6))
+show_weight(o)
+```
+"""
+show_weight(o::OnlineStat) = (show_weight(o.weight); println())
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
