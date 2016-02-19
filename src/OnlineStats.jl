@@ -364,14 +364,19 @@ function rank1_smooth!(A::AMat, x::AVec, γ::Real)
 end
 
 
-
-row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+row(x::AMat, i::Integer) = slice(x, i, :)
 row(x::AVec, i::Integer) = x[i]
-rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
-rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+rows(x::AMat, rs::AVec{Int}) = sub(x, rs, :)
+rows(x::AVec, rs::AVec{Int}) = sub(x, rs)
+col(x::AMat, i::Integer) = slice(x, :, i)
+cols(x::AMat, rs::AVec{Int}) = sub(x, :, rs)
 
-col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
-cols(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, :, rs)
+# row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+# row(x::AVec, i::Integer) = x[i]
+# rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+# rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
+# col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
+# cols(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, :, rs)
 
 nrows(x::AMat) = size(x, 1)
 ncols(x::AMat) = size(x, 2)
