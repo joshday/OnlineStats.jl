@@ -46,11 +46,6 @@ facts(@title "Show Methods") do
 
     display(BernoulliBootstrap(Mean(), mean, 1000))
 
-    show_weight(EqualWeight())
-    show_weight(ExponentialWeight(.1))
-    show_weight(BoundedExponentialWeight(.1))
-    show_weight(LearningRate())
-    show_weight(LearningRate2(1))
     println()
 end
 

@@ -64,11 +64,10 @@ weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 """
 type EqualWeight <: Weight
     n::Int
+    EqualWeight() = new(0)
 end
-EqualWeight() = EqualWeight(0)
 weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; return n2 / w.n)
 weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
-show_weight(w::EqualWeight) = print("1 / nobs")
 
 
 """
@@ -83,12 +82,11 @@ type ExponentialWeight <: Weight
         @assert 0 <= λ <= 1
         new(λ, n)
     end
+    ExponentialWeight(λ::Real = 1.0) = ExponentialWeight(λ, 0)
+    ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
 end
-ExponentialWeight(λ::Real = 1.0) = ExponentialWeight(λ, 0)
-ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
 weight!(w::ExponentialWeight, n2::Int = 1)  = (w.n += n2; w.λ)
 weight_noret!(w::ExponentialWeight, n2::Int = 1) = (w.n += n2)
-show_weight(w::ExponentialWeight) = print("$(w.λ)")
 
 
 """
@@ -103,12 +101,11 @@ type BoundedExponentialWeight <: Weight
         @assert 0 <= λ <= 1
         new(λ, n)
     end
+    BoundedExponentialWeight(λ::Real = 1.0) = BoundedExponentialWeight(λ, 0)
+    BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
 end
-BoundedExponentialWeight(λ::Real = 1.0) = BoundedExponentialWeight(λ, 0)
-BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
 weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.λ))
 weight_noret!(w::BoundedExponentialWeight, n2::Int = 1) = (w.n += n2)
-show_weight(w::BoundedExponentialWeight) = print("max(1 / nobs, $(w.λ))")
 
 
 """
@@ -130,13 +127,6 @@ function weight!(w::LearningRate, n2::Int = 1)
 end
 weight_noret!(w::LearningRate, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate) = w.nups
-function show_weight(w::LearningRate)
-    if w.minstep == 0
-        return print("nups ^ -$(w.r)")
-    else
-        return print("max(nups ^ -$(w.r), $(w.minstep))")
-    end
-end
 
 
 """
@@ -160,25 +150,9 @@ function weight!(w::LearningRate2, n2::Int = 1)
 end
 weight_noret!(w::LearningRate2, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate2) = w.nups
-function show_weight(w::LearningRate2)
-    if w.minstep == 0
-        return print("$(w.γ) / (1.0 + $(w.γ) * $(w.c) * nups)")
-    else
-        return print("max($(w.γ) / (1.0 + $(w.γ) * $(w.c) * nups), w.minstep)")
-    end
-end
 
 nups(o::OnlineStat) = nups(o.w)
 
-"""
-Display the weight for a singleton update.
-
-```julia
-o = Mean(LearningRate(.6))
-show_weight(o)
-```
-"""
-show_weight(o::OnlineStat) = (show_weight(o.weight); println())
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
