@@ -21,7 +21,7 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
     # Penalties
-    NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
+    Penalty, NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
     # ModelDefinition and Algorithm
     ModelDefinition, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
@@ -39,9 +39,6 @@ abstract ScalarInput <: Input  # observation = scalar
 abstract VectorInput <: Input  # observation = vector
 abstract XYInput <: Input      # observation = (x, y) pair
 abstract OnlineStat{I <: Input}
-
-abstract RowObs     # Each row is observation
-abstract ColObs     # Each column is observation
 
 typealias VecF Vector{Float64}
 typealias MatF Matrix{Float64}
