@@ -153,7 +153,7 @@ nups(o::OnlineStat) = nups(o.w)
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
-printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "▌ $s \n")
+printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "■ $s \n")
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end

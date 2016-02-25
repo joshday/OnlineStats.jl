@@ -295,7 +295,8 @@ end
 
 #------------------------------------------------------------------# QuantileMM
 """
-Approximate quantiles via an online MM algorithm.
+Approximate quantiles via an online MM algorithm.  Typically more accurate than
+`QuantileSGD`.
 
 ```julia
 o = QuantileMM(y, LearningRate())
