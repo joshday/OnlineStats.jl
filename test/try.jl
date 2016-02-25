@@ -2,7 +2,7 @@
 # include("src/OnlineStats.jl")
 # include("test/testcode.jl")
 
-module Test
+module Try
 import OnlineStats
 # import DeprecatedOnlineStats  # josh's local repo.  Simply an old commit of OnlineStats.jl
 using StatsBase, Distributions

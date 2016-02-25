@@ -1,10 +1,6 @@
 #------------------------------------------------------------# Enforced Sparsity
 abstract AbstractSparsity
 
-"""
-After `burnin` observations, coefficients will be set to zero if they are less
-than `ϵ`.
-"""
 immutable HardThreshold <: AbstractSparsity
     burnin::Int
     ϵ::Float64
@@ -16,9 +12,14 @@ function HardThreshold(;burnin::Integer = 1000, threshold::Real = .01)
 end
 
 """
-### Enforce sparsity on a `StatLearn` object
+Enforce sparsity on a `StatLearn` object.  Currently, the only option is
+`HardThreshold`, which after `burnin` observations, any coefficient less than
+`threshold` is set to 0.
 
-`StatLearnSparse(o::StatLearn, s::AbstractSparsity)`
+```julia
+StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
+fit!(o, x, y)
+```
 """
 type StatLearnSparse{S <: AbstractSparsity} <: OnlineStat{XYInput}
     o::StatLearn
@@ -65,6 +66,12 @@ end
 
 Automatically tune the regularization parameter λ for `o` by minimizing loss on
 test data `xtest`, `ytest`.
+
+```julia
+sl = StatLearn(size(x, 2), L1Penalty(.1))
+o = StatLearnCV(sl, xtest, ytest)
+fit!(o, x, y)
+```
 """
 type StatLearnCV{T<:Real, S<:Real, W<:Weight} <: OnlineStat{XYInput}
     o::StatLearn
@@ -88,7 +95,7 @@ function fit!(o::StatLearnCV, x::AVec, y::Real)
     o
 end
 # TODO: fitbatch!
-function tuneλ!{A<:Algorithm, M<:ModelDef}(
+function tuneλ!{A<:Algorithm, M<:ModelDefinition}(
         o::StatLearn{A, M, NoPenalty}, x, y, γ, xtest, ytest
     )
     fit!(o, x, y)
@@ -122,7 +129,7 @@ function tuneλ!(o::StatLearn, x, y, γ, xtest, ytest)
 
 end
 nobs(o::StatLearnCV) = nobs(o.o)
-n_updates(o::StatLearnCV) = n_updates(o.o)
+nups(o::StatLearnCV) = nups(o.o)
 value(o::StatLearnCV) = value(o.o)
 coef(o::StatLearnCV) = coef(o.o)
 predict(o::StatLearnCV, x) = predict(o.o, x)

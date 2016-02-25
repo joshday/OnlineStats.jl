@@ -27,7 +27,7 @@ end
 
 Approximate count of distinct elements.  `HyperLogLog` differs from other OnlineStats
 in that any input to `fit!(o::HyperLogLog, input)` is considered a singleton.  Thus,
-a vector of inputs must be similar to:
+a vector of inputs must be done by:
 
 ```julia
 o = HyperLogLog(4)
@@ -36,11 +36,12 @@ for yi in y
 end
 ```
 """
-type HyperLogLog
+type HyperLogLog <: OnlineStat
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
     altmask::UInt32
+    n::Int
 end
 
 function HyperLogLog(b::Integer)
@@ -61,7 +62,7 @@ function HyperLogLog(b::Integer)
 
     altmask = ~mask
 
-    return HyperLogLog(m, M, mask, altmask)
+    return HyperLogLog(m, M, mask, altmask, 0)
 end
 
 function Base.show(io::IO, counter::HyperLogLog)
@@ -74,8 +75,11 @@ function fit!(counter::HyperLogLog, v::Any)
     j = maskadd32(x, counter.mask, 0x00000001)
     w = x & counter.altmask
     counter.M[j] = max(counter.M[j], ρ(w))
+    counter.n += 1
     return
 end
+
+nobs(o::HyperLogLog) = o.n
 
 function value(counter::HyperLogLog)
     S = 0.0

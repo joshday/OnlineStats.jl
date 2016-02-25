@@ -1,3 +1,11 @@
+"""
+Approximate K-Means clustering of multivariate data.
+
+```julia
+o = KMeans(y, 3, LearningRate())
+value(o)
+```
+"""
 type KMeans{W<:Weight} <: OnlineStat{VectorInput}
     value::MatF
     v::VecF
@@ -21,7 +29,7 @@ end
 function Base.show(io::IO, o::KMeans)
     printheader(io, "KMeans")
     print_item(io, "value", value(o))
-    print_item(io, "K", length(o.v))
+    print_item(io, "K", size(o.v, 2))
     print_item(io, "nobs", nobs(o))
 end
 

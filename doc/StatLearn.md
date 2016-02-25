@@ -1,11 +1,10 @@
 # `StatLearn`
 
-Approximate solutions to statistical learning problems.  `StatLearn` has extremely
-fast fitting times to remove training time bottlenecks.
+Approximate solutions to statistical learning problems using online algorithms.  `StatLearn` has extremely fast fitting times.
 
 ### StatLearn types are defined by three things
 
-- `ModelDef`
+- `ModelDefinition`
     - `L2Regression()`
         - Squared error loss.  Default.
     - `L1Regression()`
@@ -42,8 +41,6 @@ fast fitting times to remove training time bottlenecks.
         - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
     - `MMGrad()`
         - Experimental online MM gradient method.
-    - `AdaMMGrad()`
-        - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 
 ### Learning rates and batch sizes matter
@@ -56,7 +53,7 @@ o1 = StatLearn(x, y, SGD(), LearningRate(.6))  # batch size = 1
 o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
 ```
 
-**Note**: The order of of `Weight`, `Algorithm`, `ModelDef`, and `Penalty` arguments don't matter.
+**Note**: The order of of `Weight`, `Algorithm`, `ModelDefinition`, and `Penalty` arguments don't matter.
 
 
 ### TracePlot helps you try out learning rates and batch sizes.
@@ -98,7 +95,7 @@ plot(tr)
 ### Regularization parameters can be tuned automatically
 
 Given a test dataset, `StatLearnCV` attempts to find the optimal regularization
-parameter `λ` which minimizes the `ModelDef` loss on the test data (cross validation).  
+parameter `λ` which minimizes the `ModelDefinition` loss on the test data (cross validation).  
 This works wonders for highly correlated predictors.
 
 ```julia

@@ -1,4 +1,3 @@
-# __precompile__()
 module OnlineStats
 
 import StatsBase
@@ -22,17 +21,17 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
     # Penalties
-    NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
-    # ModelDef and Algorithm
-    ModelDef, L2Regression, L1Regression, LogisticRegression,
+    Penalty, NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
+    # ModelDefinition and Algorithm
+    ModelDefinition, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
     Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, RDA, MMGrad,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,
     # methods
-    value, fit, fit!, nobs, skewness, kurtosis, n_updates, sweep!, coef, predict,
-    vcov, stderr, loss, center, standardize, show_weight, fitdistribution
+    value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
+    loss, center, standardize, show_weight, fitdistribution
 
 #------------------------------------------------------------------------# types
 abstract Input
@@ -57,17 +56,22 @@ weight!(o::OnlineStat, n2::Int = 1) = weight!(o.weight, n2)
 weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 
 
-"All observations weighted equally."
+"""
+`EqualWeight()`.  All observations weighted equally.
+"""
 type EqualWeight <: Weight
     n::Int
+    EqualWeight() = new(0)
 end
-EqualWeight() = EqualWeight(0)
 weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; return n2 / w.n)
 weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
-show_weight(w::EqualWeight) = print("1 / nobs")
 
 
-"`ExponentialWeight(λ)`.  Most recent observation has a constant weight of λ."
+"""
+`ExponentialWeight(λ::Float64)`, `ExponentialWeight(lookback::Int)`
+
+Weights are held constant at `λ = 2 / (1 + lookback)`.
+"""
 type ExponentialWeight <: Weight
     λ::Float64
     n::Int
@@ -75,34 +79,36 @@ type ExponentialWeight <: Weight
         @assert 0 <= λ <= 1
         new(λ, n)
     end
+    ExponentialWeight(λ::Real = 1.0) = ExponentialWeight(λ, 0)
+    ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
 end
-ExponentialWeight(λ::Real = 1.0) = ExponentialWeight(λ, 0)
-ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
 weight!(w::ExponentialWeight, n2::Int = 1)  = (w.n += n2; w.λ)
 weight_noret!(w::ExponentialWeight, n2::Int = 1) = (w.n += n2)
-show_weight(w::ExponentialWeight) = print("$(w.λ)")
-
-
-"`BoundedExponentialWeight(minstep)`.  Once equal weights reach `minstep`, hold weights constant."
-type BoundedExponentialWeight <: Weight
-    minstep::Float64
-    n::Int
-    function BoundedExponentialWeight(minstep::Real, n::Integer)
-        @assert 0 <= minstep <= 1
-        new(minstep, n)
-    end
-end
-BoundedExponentialWeight(minstep::Real = 1.0) = BoundedExponentialWeight(minstep, 0)
-BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
-weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.minstep))
-weight_noret!(w::BoundedExponentialWeight, n2::Int = 1) = (w.n += n2)
-show_weight(w::BoundedExponentialWeight) = print("max(1 / nobs, $(w.minstep))")
 
 
 """
-`LearningRate(r; minstep = 0.0)`.
+`BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
 
-Weight at update `t` is `1 / t ^ r`.  Compare to `LearningRate2`.
+Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
+"""
+type BoundedExponentialWeight <: Weight
+    λ::Float64
+    n::Int
+    function BoundedExponentialWeight(λ::Real, n::Integer)
+        @assert 0 <= λ <= 1
+        new(λ, n)
+    end
+    BoundedExponentialWeight(λ::Real = 1.0) = BoundedExponentialWeight(λ, 0)
+    BoundedExponentialWeight(lookback::Integer) = BoundedExponentialWeight(2.0 / (lookback + 1))
+end
+weight!(w::BoundedExponentialWeight, n2::Int = 1)  = (w.n += n2; return max(n2 / w.n, w.λ))
+weight_noret!(w::BoundedExponentialWeight, n2::Int = 1) = (w.n += n2)
+
+
+"""
+`LearningRate(r = 0.6; minstep = 0.0)`.
+
+Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
 """
 type LearningRate <: Weight
     r::Float64
@@ -118,19 +124,12 @@ function weight!(w::LearningRate, n2::Int = 1)
 end
 weight_noret!(w::LearningRate, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate) = w.nups
-function show_weight(w::LearningRate)
-    if w.minstep == 0
-        return print("nups ^ -$(w.r)")
-    else
-        return print("max(nups ^ -$(w.r), $(w.minstep))")
-    end
-end
 
 
 """
-LearningRate2(γ, c = 1.0; minstep = 0.0).
+`LearningRate2(γ, c = 1.0; minstep = 0.0)`.
 
-Weight at update `t` is `γ / (1 + γ * c * t)`.  Compare to `LearningRate`.
+Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 """
 type LearningRate2 <: Weight
     # Recommendation from http://research.microsoft.com/pubs/192769/tricks-2012.pdf
@@ -148,16 +147,9 @@ function weight!(w::LearningRate2, n2::Int = 1)
 end
 weight_noret!(w::LearningRate2, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate2) = w.nups
-function show_weight(w::LearningRate2)
-    if w.minstep == 0
-        return print("$(w.γ) / (1.0 + $(w.γ) * $(w.c) * nups)")
-    else
-        return print("max($(w.γ) / (1.0 + $(w.γ) * $(w.c) * nups), w.minstep)")
-    end
-end
 
 nups(o::OnlineStat) = nups(o.w)
-show_weight(o::OnlineStat) = (show_weight(o.w); println())
+
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
@@ -192,18 +184,36 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     end
     o
 end
+
 function fit!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, row(y, i))
     end
     o
 end
+function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
+    for i in 1:size(y, 2)
+        fit!(o, col(y, i))
+    end
+    o
+end
+
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
+    @assert size(x, 1) == length(y)
     for i in 1:length(y)
         fit!(o, row(x, i), row(y, i))
     end
     o
 end
+function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
+    @assert size(x, 2) == length(y)
+    for i in 1:length(y)
+        fit!(o, col(x, i), row(y, i))
+    end
+    o
+end
+
+
 
 # Update in batches
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
@@ -222,6 +232,7 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
     end
     o
 end
+
 function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     b = Int(b)
     n = size(y, 1)
@@ -238,6 +249,23 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     end
     o
 end
+function fit_col!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
+    b = Int(b)
+    n = size(y, 2)
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            fitbatch!(o, cols(y, rng))
+            i += b
+        end
+    end
+    o
+end
+
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
@@ -254,12 +282,38 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     end
     o
 end
+function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
+    b = Int(b)
+    n = length(y)
+    @assert size(x, 2) == n "number of observations don't match.  Did you mean `fit!(...)`?"
+    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    if b == 1
+        fit!(o, x, y)
+    else
+        i = 1
+        while i <= n
+            rng = i:min(i + b - 1, n)
+            fitbatch!(o, cols(x, rng), rows(y, rng))
+            i += b
+        end
+    end
+    o
+end
 
 # fall back on fit! if there is no fitbatch! method
 fitbatch!(args...) = fit!(args...)
 
 #----------------------------------------------------------------------# helpers
-"`value(o::OnlineStat)`.  The associated value of an OnlineStat."
+"""
+The associated value of an OnlineStat.
+
+```
+o1 = Mean()
+o2 = Variance()
+value(o1)
+value(o2)
+```
+"""
 value(o::OnlineStat) = o.value
 StatsBase.nobs(o::OnlineStat) = nobs(o.weight)
 unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
@@ -289,13 +343,19 @@ function rank1_smooth!(A::AMat, x::AVec, γ::Real)
 end
 
 
-
-row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+row(x::AMat, i::Integer) = slice(x, i, :)
 row(x::AVec, i::Integer) = x[i]
-rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
-rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+rows(x::AMat, rs::AVec{Int}) = sub(x, rs, :)
+rows(x::AVec, rs::AVec{Int}) = sub(x, rs)
+col(x::AMat, i::Integer) = slice(x, :, i)
+cols(x::AMat, rs::AVec{Int}) = sub(x, :, rs)
 
-col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
+# row(x::AMat, i::Integer) = ArrayViews.rowvec_view(x, i)
+# row(x::AVec, i::Integer) = x[i]
+# rows(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, rs, :)
+# rows(x::AVec, rs::AVec{Int}) = ArrayViews.view(x, rs)
+# col(x::AMat, i::Integer) = ArrayViews.view(x, :, i)
+# cols(x::AMat, rs::AVec{Int}) = ArrayViews.view(x, :, rs)
 
 nrows(x::AMat) = size(x, 1)
 ncols(x::AMat) = size(x, 2)
@@ -303,7 +363,7 @@ ncols(x::AMat) = size(x, 2)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
-"epsilon used in special cases to avoid dividing by 0, etc."
+# epsilon used in special cases to avoid dividing by 0, etc.
 const _ϵ = 1e-8
 
 

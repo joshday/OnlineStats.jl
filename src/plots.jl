@@ -6,6 +6,12 @@ export coefplot, TracePlot, CompareTracePlot
 """
 For any OnlineStat that has a `coef` method, display a graphical representation of
 the coefficient vector.
+
+```julia
+using Plots
+o = LinReg(x, y)
+coefplot(o)
+```
 """
 function coefplot(o::OnlineStats.OnlineStat{XYInput})
     β = coef(o)
@@ -30,9 +36,25 @@ end
 
 #--------------------------------------------------------------------# TracePlot
 """
-`TracePlot(o)`
+`TracePlot(o::OnlineStat, f::Function = value)`
 
-`TracePlot(o, f)`
+Create a trace plot using values from OnlineStat `o`.  Every call to `fit!(o, args...)`
+adds a new observation to the plot.
+
+```julia
+using Plots
+o = Mean(ExponentialWeight(.1))
+tr = TracePlot(o)
+for i in 1:100
+    fit!(tr, i / 100 + randn(100))
+end
+
+o = Variance()
+tr = TracePlot(o, x -> [mean(o), var(o)])
+for i in 1:100
+    fit!(tr, randn(100))
+end
+```
 """
 type TracePlot <: OnlineStat
     o::OnlineStat
@@ -59,7 +81,16 @@ value(tr::TracePlot) = value(tr.o)
 
 #-------------------------------------------------------------# CompareTracePlot
 """
-Compare the values of multiple OnlineStats.
+Compare the values of multiple OnlineStats.  Useful for comparing competing models.
+
+```julia
+o1 = StatLearn(size(x, 2), SGD())
+o2 = StatLearn(size(x, 2), AdaGrad())
+tr = CompareTracePlot([o1, o2], o -> loss(o, x, y))
+fit!(o1, x1, y1); fit!(o2, x1, y1)
+fit!(o1, x2, y2); fit!(o2, x2, y2)
+...
+```
 """
 type CompareTracePlot
     os::Vector
