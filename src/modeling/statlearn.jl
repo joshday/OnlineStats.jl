@@ -113,6 +113,9 @@ The model is defined by:
     - LASSO regularization
 - `ElasticNetPenalty(λ, α)`
     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
+- `SCADPenalty(λ, a = 3.7)`
+    - Smoothly clipped absolute deviation penalty.  Essentially LASSO with less bias
+    for larger coefficients.
 
 #### `Algorithm`
 - `SGD()`
@@ -125,8 +128,6 @@ The model is defined by:
     - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
 - `MMGrad()`
     - Experimental online MM gradient method.
-- `AdaMMGrad()`
-    - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 **Note:** The order of the `ModelDefinition`, `Penalty`, and `Algorithm` arguments don't matter.
 

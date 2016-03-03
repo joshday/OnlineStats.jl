@@ -6,7 +6,6 @@ import ArrayViews
 import Distributions
 Ds = Distributions
 import Requires
-Requires.@require Plots include("plots.jl")
 
 export
     OnlineStat,
@@ -382,6 +381,7 @@ include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")
 include("multivariate/kmeans.jl")
 include("normalmix.jl")
+Requires.@require Plots include("plots.jl")
 
 end # module
 
