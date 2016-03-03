@@ -472,6 +472,64 @@ function fit!{T<:Real}(o::Diffs{T}, x::AVec{T})
     o
 end
 
+#-------------------------------------------------------------------# Sum/Sums
+"""
+Track the running sum.  Ignores `Weight`.
+
+```julia
+o = Sum()
+o = Sum(y)
+```
+"""
+type Sum{T <: Real} <: OnlineStat{ScalarInput}
+    sum::T
+    n::Int
+end
+nobs(o::Sum) = o.n
+Sum() = Sum(0.0, 0)
+Sum{T<:Real}(::Type{T}) = Sum(zero(T), 0)
+Sum{T<:Real}(x::AVec{T}) = (o = Sum(T); fit!(o, x); o)
+value(o::Sum) = o.sum
+Base.sum(o::Sum) = o.sum
+function fit!{T<:AbstractFloat}(o::Sum{T}, x::Real)
+    v = convert(T, x)
+    o.sum += v
+    o.n += 1
+    o
+end
+function fit!{T<:Integer}(o::Sum{T}, x::Real)
+    v = round(T, x)
+    o.sum += v
+    o.n += 1
+    o
+end
+
+"""
+Track the running sum for multiple series.  Ignores `Weight`.
+
+```julia
+o = Sums()
+o = Sums(y)
+```
+"""
+type Sums{T <: Real} <: OnlineStat{VectorInput}
+    sums::Vector{T}
+    n::Int
+end
+nobs(o::Sums) = o.n
+Sums(p::Integer) = Sums(zeros(p), 0)
+Sums{T<:Real}(::Type{T}, p::Integer) = Sums(zeros(T,p), 0)
+Sums{T<:Real}(x::AMat{T}) = (o = Sums(T,ncols(x)); fit!(o, x); o)
+
+value(o::Sums) = o.sums
+Base.sum(o::Sums) = o.sums
+function fit!{T<:Real}(o::Sums{T}, x::AVec{T})
+    for i in eachindex(x)
+        o.sums[i] += x[i]
+    end
+    o.n += 1
+    o
+end
 
 
 #----------------------------------------------------------# convenience constructors

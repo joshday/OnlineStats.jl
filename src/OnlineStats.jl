@@ -14,7 +14,7 @@ export
     BoundedExponentialWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    Diff, Diffs, CovMatrix, LinReg, QuantReg, NormalMix,
+    Diff, Diffs, Sum, Sums, CovMatrix, LinReg, QuantReg, NormalMix,
     StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
     KMeans, BiasVector, BiasMatrix,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
