@@ -49,9 +49,7 @@ typealias AMatF AMat{Float64}
 #-----------------------------------------------------------------------# weight
 abstract Weight
 nobs(w::Weight) = w.n
-# update and return new weight
 weight!(o::OnlineStat, n2::Int = 1) = weight!(o.weight, n2)
-# update weight without returning the new weight
 weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 
 
@@ -199,14 +197,14 @@ end
 
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     @assert size(x, 1) == length(y)
-    for i in 1:length(y)
+    for i in eachindex(y)
         fit!(o, row(x, i), row(y, i))
     end
     o
 end
 function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     @assert size(x, 2) == length(y)
-    for i in 1:length(y)
+    for i in eachindex(y)
         fit!(o, col(x, i), row(y, i))
     end
     o
@@ -320,7 +318,7 @@ unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
 # for updating
 smooth(m::Float64, v::Real, γ::Float64) = (1.0 - γ) * m + γ * v
 function smooth!{T<:Real}(m::VecF, v::AVec{T}, γ::Float64)
-    for i in 1:length(v)
+    for i in eachindex(v)
         @inbounds m[i] = smooth(m[i], v[i], γ)
     end
 end

@@ -132,18 +132,18 @@ facts(@title "Sum / Sums") do
     y = randn(100)
     o = Sum(y)
     @fact typeof(o) --> Sum{Float64}
-    @fact sum(o) --> sum(y)
+    @fact sum(o) --> roughly(sum(y))
     @fact value(o) --> sum(o)
     y = rand(Int, 100)
     o = Sum(y)
     @fact typeof(o) --> Sum{Int64}
-    @fact sum(o) --> sum(y)
+    @fact sum(o) --> roughly(sum(y))
 
     Sums(10)
     Sums(Int32, 10)
     y = randn(100, 10)
     o = Sums(y)
-    @fact sum(o) --> vec(sum(y,1))
+    @fact sum(o) --> roughly(vec(sum(y,1)))
     @fact value(o) --> sum(o)
 end
 
