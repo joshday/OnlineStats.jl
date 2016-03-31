@@ -82,7 +82,7 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     end
     o
 end
-function fit!(o::OnlineStat{ScalarInput}, wts::AVec, y::AVec)
+function fit!(o::OnlineStat{ScalarInput}, y::AVec, wts::AVec)
     check_user_weight(o)
     @assert length(y) == length(wts) "input and weights length differ"
     for i in eachindex(y)
@@ -99,7 +99,7 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat)
     end
     o
 end
-function fit!(o::OnlineStat{VectorInput}, wts::AVec, y::AMat)
+function fit!(o::OnlineStat{VectorInput}, y::AMat, wts::AVec)
     check_user_weight(o)
     @assert size(y, 1) == length(wts) "input and weights length differ"
     for i in 1:size(y, 1)
@@ -110,6 +110,7 @@ function fit!(o::OnlineStat{VectorInput}, wts::AVec, y::AMat)
 end
 
 function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
+    # fit with observations in the columns
     for i in 1:size(y, 2)
         fit!(o, col(y, i))
     end
@@ -124,7 +125,7 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     end
     o
 end
-function fit!(o::OnlineStat{XYInput}, wts::AVec, x::AMat, y::AVec)
+function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, wts::AVec)
     check_user_weight(o)
     @assert length(y) == length(wts) "input and weights length differ"
     for i in eachindex(y)
@@ -135,6 +136,7 @@ function fit!(o::OnlineStat{XYInput}, wts::AVec, x::AMat, y::AVec)
 end
 
 function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
+    # fit with observations in the columns
     @assert size(x, 2) == length(y)
     for i in eachindex(y)
         fit!(o, col(x, i), row(y, i))

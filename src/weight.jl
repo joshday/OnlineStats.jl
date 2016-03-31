@@ -41,7 +41,7 @@ type UserWeight <: Weight
     w::Float64      # most recent weight
     denom::Float64  # sum of weights
     n::Int
-    UserWeight() = new(0., 0., 0)
+    UserWeight() = new(1., 0., 0)
     UserWeight(w::Real) = new(w, 0., 0)
 end
 function weight!(o::UserWeight, n2::Int = 1)

@@ -10,7 +10,7 @@ y = randn(n)
 w = rand(n)
 
 o = Mean(UserWeight())
-fit!(o, w, y)
+fit!(o, y, w)
 @show value(o)
 @show mean(y, WeightVec(w))
 
@@ -18,7 +18,7 @@ fit!(o, w, y)
 o = Means(5, UserWeight())
 x = randn(n, 5)
 
-fit!(o, w, x)
+fit!(o, x, w)
 @show value(o)
 @show mean(x, WeightVec(w), 1)
 
