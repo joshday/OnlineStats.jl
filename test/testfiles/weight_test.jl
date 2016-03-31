@@ -7,6 +7,12 @@ facts(@title "Weighting") do
     w = EqualWeight()
     @fact O.weight!(w, 1) --> 1.0
     O.weight_noret!(w, 1)
+    w = EqualWeight()
+    O.set_sample_weight!(w, ObsWeight(2.5))
+    @fact O.weight!(w, 1) --> 1.0
+    O.set_sample_weight!(w, ObsWeight(7.5))
+    @fact O.weight!(w, 1) --> 0.75
+    O.weight_noret!(w, 1)
 
     w = ExponentialWeight(.5)
     @fact O.weight!(w, 1) --> 0.5

@@ -35,6 +35,7 @@ facts(@title "Bootstrap") do
         o = Mean()
         o = PoissonBootstrap(o, mean, 1000)
         fit!(o, rand(1000))
+        fit!(o, rand(2), ObsWeight(1000))
         cached_state(o)
         mean(o)
         std(o)

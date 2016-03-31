@@ -26,6 +26,15 @@ facts(@title "Mean / Means") do
     fit!(o2, xs)
     @fact mean(o) --> roughly(mean(o2))
     @fact center(o, vec(xs[1, :])) --> vec(xs[1, :]) - mean(o)
+
+    o = Mean()
+    fit!(o, 1, ObsWeight(1))
+    @fact mean(o) --> roughly(1)
+    fit!(o, 0, ObsWeight(9))
+    @fact mean(o) --> roughly(0.1)
+    fit!(o, 0, ObsWeight(9))
+    fit!(o, 1)
+    @fact mean(o) --> roughly(0.1)
 end
 
 facts(@title "Variance / Variances") do

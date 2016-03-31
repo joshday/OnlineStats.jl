@@ -77,6 +77,12 @@ function fit!(b::PoissonBootstrap, x::Real)
     b
 end
 
+function set_sample_weight!(b::Union{PoissonBootstrap,BernoulliBootstrap}, ow::ObsWeight)
+    for replicate in b.replicates
+        set_sample_weight!(replicate.weight, ow)
+    end
+end
+
 
 #--------------------------------------------------------------# FrozenBootstrap
 # "Frozen bootstraps object are generated when two bootstrap distributions are combined
