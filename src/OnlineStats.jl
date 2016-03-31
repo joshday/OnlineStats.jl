@@ -82,11 +82,9 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     end
     o
 end
-function fit!(o::OnlineStat{ScalarInput}, y::AVec, wts::AVec)
-    @assert typeof(o.weight) == UserWeight
-        "Using a weight vector only allowed with UserWeight"
-    @assert length(y) == length(wts)
-        "length of input different from length of weights"
+function fit!(o::OnlineStat{ScalarInput}, wts::AVec, y::AVec)
+    check_user_weight(o)
+    @assert length(y) == length(wts) "input and weights length differ"
     for i in eachindex(y)
         fit!(o.weight, wts[i])
         fit!(o, y[i])
@@ -94,12 +92,23 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec, wts::AVec)
     o
 end
 
+# VectorInput
 function fit!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, row(y, i))
     end
     o
 end
+function fit!(o::OnlineStat{VectorInput}, wts::AVec, y::AMat)
+    check_user_weight(o)
+    @assert size(y, 1) == length(wts) "input and weights length differ"
+    for i in 1:size(y, 1)
+        fit!(o.weight, wts[i])
+        fit!(o, row(y, i))
+    end
+    o
+end
+
 function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 2)
         fit!(o, col(y, i))
@@ -107,6 +116,7 @@ function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
     o
 end
 
+# XYInput
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     @assert size(x, 1) == length(y)
     for i in eachindex(y)
@@ -114,6 +124,16 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     end
     o
 end
+function fit!(o::OnlineStat{XYInput}, wts::AVec, x::AMat, y::AVec)
+    check_user_weight(o)
+    @assert length(y) == length(wts) "input and weights length differ"
+    for i in eachindex(y)
+        fit!(o.weight, wts[i])
+        fit!(o, row(x, i), row(y, i))
+    end
+    o
+end
+
 function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     @assert size(x, 2) == length(y)
     for i in eachindex(y)

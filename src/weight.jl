@@ -51,6 +51,10 @@ function weight!(o::UserWeight, n2::Int = 1)
 end
 weight_noret!(w::UserWeight, n2::Int = 1) = (o.denom += o.w; w.n += n2)
 fit!(o::UserWeight, w::Real) = (o.w = w)
+function check_user_weight(o::OnlineStat)
+    @assert typeof(o.weight) == UserWeight
+        "Weight vectors can only be supplied when using UserWeight"
+end
 
 
 """
