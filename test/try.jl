@@ -3,19 +3,15 @@
 # include("test/testcode.jl")
 
 module Try
-import OnlineStats
-using StatsBase
-O = OnlineStats
+using OnlineStats, StatsBase
 
 n = 100
 y = randn(n)
 w = rand(n)
 
-@show mean(y, WeightVec(w))
-
-o = O.Mean(O.UserWeight())
+o = Mean(UserWeight())
 fit!(o, y, w)
-@show O.value(o)
-
+@show value(o)
+@show mean(y, WeightVec(w))
 
 end
