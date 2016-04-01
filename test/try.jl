@@ -5,22 +5,28 @@
 module Try
 using OnlineStats, StatsBase
 
-n = 100
+n = 1000
 y = randn(n)
-w = rand(n)
+wts = rand(n)
 
-o = Mean(UserWeight())
-fit!(o, y, w)
-@show value(o)
-@show mean(y, WeightVec(w))
+# ScalarInput
+o = WeightedOnlineStat(Mean)
+fit!(o, y, wts)
+
+@show mean(o.o)
+@show mean(y, WeightVec(wts))
+
+# VectorInput
+y2 = randn(n, 3)
 
 
-o = Means(5, UserWeight())
-x = randn(n, 5)
+o2 = WeightedOnlineStat(CovMatrix, 3)
+fit!(o2, y2, wts)
 
-fit!(o, x, w)
-@show value(o)
-@show mean(x, WeightVec(w), 1)
+@show cov(o2.o)
+@show cov(y2, WeightVec(wts))
+
+
 
 
 end

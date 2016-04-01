@@ -34,28 +34,6 @@ weight!(w::ExponentialWeight, n2::Int = 1)  = (w.n += n2; w.λ)
 weight_noret!(w::ExponentialWeight, n2::Int = 1) = (w.n += n2)
 
 
-"""
-User-defined weights
-"""
-type UserWeight <: Weight
-    w::Float64      # most recent weight
-    denom::Float64  # sum of weights
-    n::Int
-    UserWeight() = new(1., 0., 0)
-    UserWeight(w::Real) = new(w, 0., 0)
-end
-function weight!(o::UserWeight, n2::Int = 1)
-    o.n += n2
-    o.denom += o.w
-    o.w / o.denom
-end
-weight_noret!(w::UserWeight, n2::Int = 1) = (o.denom += o.w; w.n += n2)
-fit!(o::UserWeight, w::Real) = (o.w = w)
-function check_user_weight(o::OnlineStat)
-    @assert typeof(o.weight) == UserWeight
-        "Weight vectors can only be supplied when using UserWeight"
-end
-
 
 """
 `BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
@@ -120,3 +98,68 @@ weight_noret!(w::LearningRate2, n2::Int = 1) = (w.n += n2; w.nups += 1)
 nups(w::LearningRate2) = w.nups
 
 nups(o::OnlineStat) = nups(o.w)
+
+
+
+
+
+#----------------------------------------------------------------# WeightedOnlineStat
+type WeightedOnlineStat{I <: Input}
+    o::OnlineStat{I}
+    wsum::Float64
+end
+function WeightedOnlineStat(o::OnlineStat)
+    @assert typeof(o.weight) == ExponentialWeight
+    WeightedOnlineStat(o, 0.0)
+end
+function WeightedOnlineStat(t::Type, args...)
+    WeightedOnlineStat(t(args..., ExponentialWeight()))
+end
+
+# ScalarInput
+function fit!(o::WeightedOnlineStat{ScalarInput}, y::Real, w::Real)
+    @assert w > 0
+    o.wsum += w
+    o.o.weight.λ = w / o.wsum
+    fit!(o.o, y)
+    o
+end
+function fit!(o::WeightedOnlineStat{ScalarInput}, y::AVec, w::AVec)
+    @assert length(y) == length(w)
+    for i in eachindex(y)
+        fit!(o, y[i], w[i])
+    end
+    o
+end
+
+# VectorInput
+function fit!(o::WeightedOnlineStat{VectorInput}, y::AVec, w::Real)
+    @assert w > 0
+    o.wsum += w
+    o.o.weight.λ = w / o.wsum
+    fit!(o.o, y)
+    o
+end
+function fit!(o::WeightedOnlineStat{VectorInput}, y::AMat, w::AVec)
+    @assert size(y, 1) == length(w)
+    for i in eachindex(w)
+        fit!(o, row(y, i), w[i])
+    end
+    o
+end
+
+# XYInput
+function fit!(o::WeightedOnlineStat{XYInput}, x::AVec, y::Real, w::Real)
+    @assert w > 0
+    o.wsum += w
+    o.o.weight.λ = w / o.wsum
+    fit!(o.o, x, y)
+    o
+end
+function fit!(o::WeightedOnlineStat{XYInput}, x::AMat, y::AVec, w::AVec)
+    @assert length(y) == length(w)
+    for i in eachindex(w)
+        fit!(o, row(x, i), row(y, i), w[i])
+    end
+    o
+end

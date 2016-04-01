@@ -11,7 +11,7 @@ export
     OnlineStat,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
-    BoundedExponentialWeight, UserWeight,
+    BoundedExponentialWeight, WeightedOnlineStat,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, LinReg, QuantReg, NormalMix,
@@ -82,15 +82,6 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     end
     o
 end
-function fit!(o::OnlineStat{ScalarInput}, y::AVec, wts::AVec)
-    check_user_weight(o)
-    @assert length(y) == length(wts) "input and weights length differ"
-    for i in eachindex(y)
-        fit!(o.weight, wts[i])
-        fit!(o, y[i])
-    end
-    o
-end
 
 # VectorInput
 function fit!(o::OnlineStat{VectorInput}, y::AMat)
@@ -99,16 +90,6 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat)
     end
     o
 end
-function fit!(o::OnlineStat{VectorInput}, y::AMat, wts::AVec)
-    check_user_weight(o)
-    @assert size(y, 1) == length(wts) "input and weights length differ"
-    for i in 1:size(y, 1)
-        fit!(o.weight, wts[i])
-        fit!(o, row(y, i))
-    end
-    o
-end
-
 function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
     # fit with observations in the columns
     for i in 1:size(y, 2)
@@ -125,16 +106,6 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     end
     o
 end
-function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, wts::AVec)
-    check_user_weight(o)
-    @assert length(y) == length(wts) "input and weights length differ"
-    for i in eachindex(y)
-        fit!(o.weight, wts[i])
-        fit!(o, row(x, i), row(y, i))
-    end
-    o
-end
-
 function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     # fit with observations in the columns
     @assert size(x, 2) == length(y)
