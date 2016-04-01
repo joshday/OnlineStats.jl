@@ -9,24 +9,14 @@ n = 1000
 y = randn(n)
 wts = rand(n)
 
-# ScalarInput
 o = WeightedOnlineStat(Mean)
 fit!(o, y, wts)
+value(o)
 
-@show mean(o.o)
-@show mean(y, WeightVec(wts))
-
-# VectorInput
-y2 = randn(n, 3)
-
-
-o2 = WeightedOnlineStat(CovMatrix, 3)
-fit!(o2, y2, wts)
-
-@show cov(o2.o)
-@show cov(y2, WeightVec(wts))
-
-
+y2 = randn(n, 5)
+o = WeightedOnlineStat(CovMatrix, 5)
+fit!(o, y2, wts)
+value(o)
 
 
 end

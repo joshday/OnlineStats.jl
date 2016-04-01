@@ -104,6 +104,9 @@ nups(o::OnlineStat) = nups(o.w)
 
 
 #----------------------------------------------------------------# WeightedOnlineStat
+"""
+`WeightedOnlineStat(Mean)`
+"""
 type WeightedOnlineStat{I <: Input}
     o::OnlineStat{I}
     wsum::Float64
@@ -115,6 +118,14 @@ end
 function WeightedOnlineStat(t::Type, args...)
     WeightedOnlineStat(t(args..., ExponentialWeight()))
 end
+
+function Base.show(io::IO, o::WeightedOnlineStat)
+    printheader(io, "WeightedOnlineStat")
+    show(o.o)
+end
+
+value(w::WeightedOnlineStat) = value(w.o)
+
 
 # ScalarInput
 function fit!(o::WeightedOnlineStat{ScalarInput}, y::Real, w::Real)
