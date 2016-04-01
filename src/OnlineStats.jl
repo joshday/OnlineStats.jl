@@ -9,7 +9,7 @@ import Requires
 Requires.@require Plots include("plots.jl")
 
 export
-    OnlineStat,
+    OnlineStat,ObsWeight,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     BoundedExponentialWeight,
@@ -55,16 +55,23 @@ weight!(o::OnlineStat, n2::Int = 1) = weight!(o.weight, n2)
 # update weight without returning the new weight
 weight_noret!(o::OnlineStat, n2::Int = 1) = weight_noret!(o.weight, n2)
 
+immutable ObsWeight
+    value::Float64
+end
+unitObsWeight = ObsWeight(1)
 
 """
 `EqualWeight()`.  All observations weighted equally.
 """
 type EqualWeight <: Weight
+    sumw::Float64
+    samplew::Float64
     n::Int
-    EqualWeight() = new(0)
+    EqualWeight() = new(0.0, 1.0, 0)
 end
-weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; return n2 / w.n)
-weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
+set_sample_weight!(w::EqualWeight, ow::ObsWeight) = (w.samplew = ow.value)
+weight!(w::EqualWeight, n2::Int = 1)       = (w.sumw += n2*w.samplew; w.n += n2; return n2*w.samplew / w.sumw)
+weight_noret!(w::EqualWeight, n2::Int = 1) = (w.sumw += n2*w.samplew; w.n += n2)
 
 
 """
@@ -213,6 +220,20 @@ function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     o
 end
 
+
+# Update with weights
+function fit!(o::OnlineStat, y, ow::ObsWeight)
+    set_sample_weight!(o, ow)
+    out = fit!(o, y)
+    set_sample_weight!(o, unitObsWeight)
+    out
+end
+function fit!(o::OnlineStat, x, y, ow::ObsWeight)
+    set_sample_weight!(o, ow)
+    out = fit!(o, x, y)
+    set_sample_weight!(o, unitObsWeight)
+    out
+end
 
 
 # Update in batches

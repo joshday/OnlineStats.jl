@@ -1,4 +1,4 @@
-abstract Bootstrap <: OnlineStat{ScalarInput}
+abstract Bootstrap{I <: Input} <: OnlineStat{I}
 nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
 
@@ -13,7 +13,7 @@ value(b::Bootstrap) = b.replicates
 # BernoulliBootstrap(Mean(), mean, 1000)
 # ```
 # """
-type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
+type BernoulliBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInput}
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
     f::Function                      # function to generate state. Ex: mean, var, std
@@ -21,8 +21,8 @@ type BernoulliBootstrap{S <: OnlineStat} <: Bootstrap
     cache_is_dirty::Bool
 end
 
-function BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
-    replicates = OnlineStat[copy(o) for i in 1:r]
+function BernoulliBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
+    replicates = OnlineStat{T}[copy(o) for i in 1:r]
     cached_state = Array(Float64, r)
     return BernoulliBootstrap(replicates, cached_state, f, 0, true)
 end
@@ -51,21 +51,33 @@ end
 # PoissonBootstrap(Mean(), mean, 1000)
 # ```
 # """
-type PoissonBootstrap{S <: OnlineStat} <: Bootstrap
+type ScalarPoissonBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInput}
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
     f::Function
     n::Int                          # number of observations
     cache_is_dirty::Bool
 end
-
-function PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1_000)
-    replicates = OnlineStat[copy(o) for i in 1:r]
+function PoissonBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
+    replicates = OnlineStat{T}[copy(o) for i in 1:r]
     cached_state = Array(Float64, r)
-    PoissonBootstrap(replicates, cached_state, f, 0, true)
+    ScalarPoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
-function fit!(b::PoissonBootstrap, x::Real)
+type VectorPoissonBootstrap{S <: OnlineStat{VectorInput}} <: Bootstrap{VectorInput}
+    replicates::Vector{S}           # replicates of base stat
+    cached_state::Matrix{Float64}  # cache of replicate states
+    f::Function
+    n::Int                          # number of observations
+    cache_is_dirty::Bool
+end
+function PoissonBootstrap{T <: VectorInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
+    replicates = OnlineStat{T}[copy(o) for i in 1:r]
+    cached_state = Array(Float64, length(value(o)), r)
+    VectorPoissonBootstrap(replicates, cached_state, f, 0, true)
+end
+
+function fit!(b::Union{ScalarPoissonBootstrap, VectorPoissonBootstrap}, x::Union{Real,Vector})
     b.n += 1
     for replicate in b.replicates
         repetitions = rand(Ds.Poisson(1))
@@ -77,11 +89,17 @@ function fit!(b::PoissonBootstrap, x::Real)
     b
 end
 
+function set_sample_weight!(b::Bootstrap, ow::ObsWeight)
+    for replicate in b.replicates
+        set_sample_weight!(replicate, ow)
+    end
+end
+
 
 #--------------------------------------------------------------# FrozenBootstrap
 # "Frozen bootstraps object are generated when two bootstrap distributions are combined
 #  e.g., if they are differenced."
-immutable FrozenBootstrap <: Bootstrap
+immutable FrozenBootstrap <: Bootstrap{ScalarInput}
     cached_state::Vector{Float64}  # cache of replicate states
     n::Int                          # number of observations
 end
@@ -99,7 +117,7 @@ function Base.show(io::IO, b::Bootstrap)
 end
 
 # update cached_state' states if necessary and return their values
-function cached_state(b::Bootstrap)
+function cached_state(b::Bootstrap{ScalarInput})
     if b.cache_is_dirty
         for (i, replicate) in enumerate(b.replicates)
             b.cached_state[i] = b.f(replicate)
@@ -108,16 +126,29 @@ function cached_state(b::Bootstrap)
     end
     return b.cached_state
 end
+function cached_state(b::Bootstrap{VectorInput})
+    if b.cache_is_dirty
+        for (i, replicate) in enumerate(b.replicates)
+            b.cached_state[:,i] = b.f(replicate)
+        end
+        b.cache_is_dirty = false
+    end
+    return b.cached_state
+end
 
-Base.mean(b::Bootstrap) = mean(cached_state(b))
-Base.std(b::Bootstrap) = std(cached_state(b))
-Base.var(b::Bootstrap) = var(cached_state(b))
+Base.mean(b::Bootstrap{ScalarInput}) = mean(cached_state(b))
+Base.std(b::Bootstrap{ScalarInput}) = std(cached_state(b))
+Base.var(b::Bootstrap{ScalarInput}) = var(cached_state(b))
+
+Base.mean(b::Bootstrap{VectorInput}) = vec(mean(cached_state(b),2))
+Base.std(b::Bootstrap{VectorInput}) = vec(std(cached_state(b),2))
+Base.var(b::Bootstrap{VectorInput}) = vec(var(cached_state(b),2))
 
 
 replicates(b::Bootstrap) = copy(b.replicates)
 
 # Assumes a and b are independent.
-function Base.(:-)(a::Bootstrap, b::Bootstrap)
+function Base.(:-)(a::Bootstrap{ScalarInput}, b::Bootstrap{ScalarInput})
     return FrozenBootstrap(cached_state(a) - cached_state(b), nobs(a) + nobs(b))
 end
 

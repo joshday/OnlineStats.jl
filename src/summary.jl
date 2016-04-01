@@ -34,6 +34,7 @@ function fitbatch!{T <: Real}(o::Mean, y::AVec{T})
     o.value = smooth(o.value, mean(y), γ)
     o
 end
+set_sample_weight!(o::Mean, ow::ObsWeight) = set_sample_weight!(o.weight, ow)
 Base.mean(o::Mean) = value(o)
 center(o::Mean, x::Real) = x - mean(o)
 
@@ -64,6 +65,7 @@ function fitbatch!{T <: Real}(o::Means, y::AMat{T})
     smooth!(o.value, row(mean(y, 1), 1), γ)
     o
 end
+set_sample_weight!(o::Means, ow::ObsWeight) = set_sample_weight!(o.weight, ow)
 Base.mean(o::Means) = value(o)
 center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 
@@ -95,6 +97,7 @@ function fit!(o::Variance, y::Real)
     o.value = smooth(o.value, (y - o.μ) * (y - μ), γ)
     o
 end
+set_sample_weight!(o::Variance, ow::ObsWeight) = set_sample_weight!(o.weight, ow)
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
@@ -142,6 +145,7 @@ function fitbatch!{T <: Real}(o::Variances, y::AMat{T})
     smooth!(o.value, row(var(y,1), 1) * ((n2 - 1) / n2), γ)
     o
 end
+set_sample_weight!(o::Variances, ow::ObsWeight) = set_sample_weight!(o.weight, ow)
 Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
 Base.mean(o::Variances) = o.μ
