@@ -41,6 +41,17 @@ facts(@title "Bootstrap") do
         var(o)
         confint(o)
         replicates(o)
+
+        # vector input
+        o = Means(2)
+        o = PoissonBootstrap(o, mean, 1000)
+        for i in 1:10 fit!(o, rand(2)) end
+        cached_state(o)
+        @fact length(mean(o)) --> 2
+        std(o)
+        var(o)
+        #confint(o) not supported right now
+        replicates(o)
     end
 
     context(@subtitle "FrozenBootstrap") do
