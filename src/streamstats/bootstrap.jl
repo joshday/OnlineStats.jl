@@ -77,11 +77,11 @@ function PoissonBootstrap{T <: VectorInput}(o::OnlineStat{T}, f::Function, r::In
     VectorPoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
+const unitPoissonDist = Ds.Poisson(1)
 function fit!(b::Union{ScalarPoissonBootstrap, VectorPoissonBootstrap}, x::Union{Real,Vector})
     b.n += 1
     for replicate in b.replicates
-        repetitions = rand(Ds.Poisson(1))
-        for repetition in 1:repetitions
+        for repetition in 1:rand(unitPoissonDist)
             fit!(replicate, x)
         end
     end
@@ -113,8 +113,8 @@ end
 # update cached_state' states if necessary and return their values
 function cached_state(b::Bootstrap{ScalarInput})
     if b.cache_is_dirty
-        for (i, replicate) in enumerate(b.replicates)
-            b.cached_state[i] = b.f(replicate)
+        for i in 1:length(b.replicates)
+            b.cached_state[i] = b.f(b.replicates[i])
         end
         b.cache_is_dirty = false
     end
@@ -122,8 +122,8 @@ function cached_state(b::Bootstrap{ScalarInput})
 end
 function cached_state(b::Bootstrap{VectorInput})
     if b.cache_is_dirty
-        for (i, replicate) in enumerate(b.replicates)
-            b.cached_state[:,i] = b.f(replicate)
+        for i in 1:length(b.replicates)
+            b.cached_state[:,i] = b.f(b.replicates[i])
         end
         b.cache_is_dirty = false
     end
