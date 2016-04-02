@@ -3,16 +3,16 @@ nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
 
 #-----------------------------------------------------------# BernoulliBootstrap
-# """
-# `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
-#
-# Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
-#
-# Example:
-# ```julia
-# BernoulliBootstrap(Mean(), mean, 1000)
-# ```
-# """
+"""
+`BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+
+Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
+
+Example:
+```julia
+BernoulliBootstrap(Mean(), mean, 1000)
+```
+"""
 type BernoulliBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInput}
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
@@ -41,16 +41,16 @@ function fit!(b::BernoulliBootstrap, x::Real)
 end
 
 #-------------------------------------------------------------# PoissonBootstrap
-# """
-# `PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
-#
-# Create a poisson bootstrap using `r` replicates of `o` for estimate `f(o)`
-#
-# Example:
-# ```julia
-# PoissonBootstrap(Mean(), mean, 1000)
-# ```
-# """
+"""
+`PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+
+Create a poisson bootstrap using `r` replicates of `o` for estimate `f(o)`
+
+Example:
+```julia
+PoissonBootstrap(Mean(), mean, 1000)
+```
+"""
 type ScalarPoissonBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInput}
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states

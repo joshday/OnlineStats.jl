@@ -103,74 +103,74 @@ nups(o::OnlineStat) = nups(o.w)
 
 
 
-#----------------------------------------------------------------# WeightedOnlineStat
-"""
-`WeightedOnlineStat(Mean)`
-"""
-type WeightedOnlineStat{I <: Input}
-    o::OnlineStat{I}
-    wsum::Float64
-end
-function WeightedOnlineStat(o::OnlineStat)
-    @assert typeof(o.weight) == ExponentialWeight
-    WeightedOnlineStat(o, 0.0)
-end
-function WeightedOnlineStat(t::Type, args...)
-    WeightedOnlineStat(t(args..., ExponentialWeight()))
-end
-
-function Base.show(io::IO, o::WeightedOnlineStat)
-    printheader(io, "WeightedOnlineStat")
-    show(o.o)
-end
-
-value(w::WeightedOnlineStat) = value(w.o)
-
-
-# ScalarInput
-function fit!(o::WeightedOnlineStat{ScalarInput}, y::Real, w::Real)
-    @assert w > 0
-    o.wsum += w
-    o.o.weight.λ = w / o.wsum
-    fit!(o.o, y)
-    o
-end
-function fit!(o::WeightedOnlineStat{ScalarInput}, y::AVec, w::AVec)
-    @assert length(y) == length(w)
-    for i in eachindex(y)
-        fit!(o, y[i], w[i])
-    end
-    o
-end
-
-# VectorInput
-function fit!(o::WeightedOnlineStat{VectorInput}, y::AVec, w::Real)
-    @assert w > 0
-    o.wsum += w
-    o.o.weight.λ = w / o.wsum
-    fit!(o.o, y)
-    o
-end
-function fit!(o::WeightedOnlineStat{VectorInput}, y::AMat, w::AVec)
-    @assert size(y, 1) == length(w)
-    for i in eachindex(w)
-        fit!(o, row(y, i), w[i])
-    end
-    o
-end
-
-# XYInput
-function fit!(o::WeightedOnlineStat{XYInput}, x::AVec, y::Real, w::Real)
-    @assert w > 0
-    o.wsum += w
-    o.o.weight.λ = w / o.wsum
-    fit!(o.o, x, y)
-    o
-end
-function fit!(o::WeightedOnlineStat{XYInput}, x::AMat, y::AVec, w::AVec)
-    @assert length(y) == length(w)
-    for i in eachindex(w)
-        fit!(o, row(x, i), row(y, i), w[i])
-    end
-    o
-end
+# #----------------------------------------------------------------# WeightedOnlineStat
+# """
+# `WeightedOnlineStat(Mean)`
+# """
+# type WeightedOnlineStat{I <: Input}
+#     o::OnlineStat{I}
+#     wsum::Float64
+# end
+# function WeightedOnlineStat(o::OnlineStat)
+#     @assert typeof(o.weight) == ExponentialWeight
+#     WeightedOnlineStat(o, 0.0)
+# end
+# function WeightedOnlineStat(t::Type, args...)
+#     WeightedOnlineStat(t(args..., ExponentialWeight()))
+# end
+#
+# function Base.show(io::IO, o::WeightedOnlineStat)
+#     printheader(io, "WeightedOnlineStat")
+#     show(o.o)
+# end
+#
+# value(w::WeightedOnlineStat) = value(w.o)
+#
+#
+# # ScalarInput
+# function fit!(o::WeightedOnlineStat{ScalarInput}, y::Real, w::Real)
+#     @assert w > 0
+#     o.wsum += w
+#     o.o.weight.λ = w / o.wsum
+#     fit!(o.o, y)
+#     o
+# end
+# function fit!(o::WeightedOnlineStat{ScalarInput}, y::AVec, w::AVec)
+#     @assert length(y) == length(w)
+#     for i in eachindex(y)
+#         fit!(o, y[i], w[i])
+#     end
+#     o
+# end
+#
+# # VectorInput
+# function fit!(o::WeightedOnlineStat{VectorInput}, y::AVec, w::Real)
+#     @assert w > 0
+#     o.wsum += w
+#     o.o.weight.λ = w / o.wsum
+#     fit!(o.o, y)
+#     o
+# end
+# function fit!(o::WeightedOnlineStat{VectorInput}, y::AMat, w::AVec)
+#     @assert size(y, 1) == length(w)
+#     for i in eachindex(w)
+#         fit!(o, row(y, i), w[i])
+#     end
+#     o
+# end
+#
+# # XYInput
+# function fit!(o::WeightedOnlineStat{XYInput}, x::AVec, y::Real, w::Real)
+#     @assert w > 0
+#     o.wsum += w
+#     o.o.weight.λ = w / o.wsum
+#     fit!(o.o, x, y)
+#     o
+# end
+# function fit!(o::WeightedOnlineStat{XYInput}, x::AMat, y::AVec, w::AVec)
+#     @assert length(y) == length(w)
+#     for i in eachindex(w)
+#         fit!(o, row(x, i), row(y, i), w[i])
+#     end
+#     o
+# end

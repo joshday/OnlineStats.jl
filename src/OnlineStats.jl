@@ -32,7 +32,7 @@ export
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
     loss, center, standardize, show_weight, fitdistribution
 
-#------------------------------------------------------------------------# types
+#-----------------------------------------------------------------------------# types
 abstract Input
 abstract ScalarInput    <: Input  # observation = scalar
 abstract VectorInput    <: Input  # observation = vector
@@ -46,9 +46,6 @@ typealias AMat{T}   AbstractMatrix{T}
 typealias AVecF     AVec{Float64}
 typealias AMatF     AMat{Float64}
 
-
-
-
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
 printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "■ $s \n")
@@ -59,14 +56,12 @@ function print_value_and_nobs(io::IO, o::OnlineStat)
     print_item(io, "value", value(o))
     print_item(io, "nobs", nobs(o))
 end
-
-# fallback show
 function Base.show(io::IO, o::OnlineStat)
     printheader(io, name(o))
     print_value_and_nobs(io, o)
 end
 
-#-------------------------------------------------------------------------# fit!
+#------------------------------------------------------------------------------# fit!
 """
 `fit!(o::OnlineStat, y, b = 1)`
 
@@ -82,23 +77,12 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     end
     o
 end
-
-# VectorInput
 function fit!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, row(y, i))
     end
     o
 end
-function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
-    # fit with observations in the columns
-    for i in 1:size(y, 2)
-        fit!(o, col(y, i))
-    end
-    o
-end
-
-# XYInput
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     @assert size(x, 1) == length(y)
     for i in eachindex(y)
@@ -106,8 +90,14 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     end
     o
 end
+# fit with observations in the columns
+function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
+    for i in 1:size(y, 2)
+        fit!(o, col(y, i))
+    end
+    o
+end
 function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
-    # fit with observations in the columns
     @assert size(x, 2) == length(y)
     for i in eachindex(y)
         fit!(o, col(x, i), row(y, i))
@@ -115,9 +105,7 @@ function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     o
 end
 
-
-
-# Update in batches
+#------------------------------------------------------------------# fit! for batches
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
@@ -151,22 +139,6 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     end
     o
 end
-function fit_col!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
-    b = Int(b)
-    n = size(y, 2)
-    @assert 0 < b <= n "batch size must be positive and smaller than data size"
-    if b == 1
-        fit!(o, y)
-    else
-        i = 1
-        while i <= n
-            rng = i:min(i + b - 1, n)
-            fitbatch!(o, cols(y, rng))
-            i += b
-        end
-    end
-    o
-end
 
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
@@ -184,28 +156,11 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     end
     o
 end
-function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
-    b = Int(b)
-    n = length(y)
-    @assert size(x, 2) == n "number of observations don't match.  Did you mean `fit!(...)`?"
-    @assert 0 < b <= n "batch size must be positive and smaller than data size"
-    if b == 1
-        fit!(o, x, y)
-    else
-        i = 1
-        while i <= n
-            rng = i:min(i + b - 1, n)
-            fitbatch!(o, cols(x, rng), rows(y, rng))
-            i += b
-        end
-    end
-    o
-end
 
 # fall back on fit! if there is no fitbatch! method
 fitbatch!(args...) = fit!(args...)
 
-#----------------------------------------------------------------------# helpers
+#---------------------------------------------------------------------------# helpers
 """
 The associated value of an OnlineStat.
 
@@ -263,7 +218,7 @@ const _ϵ = 1e-8
 
 
 
-#-----------------------------------------------------------------# source files
+#----------------------------------------------------------------------# source files
 include("weight.jl")
 include("summary.jl")
 include("distributions.jl")
@@ -282,4 +237,4 @@ Requires.@require Plots include("plots.jl")
 
 end # module
 
-O = OnlineStats
+# O = OnlineStats
