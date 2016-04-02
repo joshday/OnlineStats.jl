@@ -3,20 +3,18 @@
 # include("test/testcode.jl")
 
 module Try
-using OnlineStats, StatsBase
+using OnlineStats, StatsBase, Benchmarks
+import OnlineStats2; O2 = OnlineStats2
 
-n = 1000
+n = 1_000_000
 y = randn(n)
 wts = rand(n)
 
-o = WeightedOnlineStat(Mean)
-fit!(o, y, wts)
-value(o)
+o1 = Mean()
+o2 = O2.Mean()
 
-y2 = randn(n, 5)
-o = WeightedOnlineStat(CovMatrix, 5)
-fit!(o, y2, wts)
-value(o)
+@show @benchmark fit!(o1, y)
+@show @benchmark O2.fit!(o2, y)
 
 
 end

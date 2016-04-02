@@ -11,7 +11,7 @@ type EqualWeight <: Weight
     n::Int
     EqualWeight() = new(0)
 end
-weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; return n2 / w.n)
+weight!(w::EqualWeight, n2::Int = 1)        = (w.n += n2; n2 / w.n)
 weight_noret!(w::EqualWeight, n2::Int = 1)  = (w.n += n2)
 
 

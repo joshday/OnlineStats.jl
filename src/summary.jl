@@ -1,13 +1,3 @@
-# Each type needs fields:
-#   - value:    value of the statistic
-#   - weight:   subtype of Weight
-#   - n:        nobs
-#   - nups:      n updates
-#
-# Each type needs to have:
-#   - empty constructor
-#   - StatsBase.fit! method
-#
 #-------------------------------------------------------------------------# Mean
 """
 Univariate mean.
