@@ -58,8 +58,7 @@ function value(o::NormalMix)
         error("Algorithm is fucked, nobs = $(nobs(o))")
     end
 end
-function fit!(o::NormalMix, y::Real)
-    γ = weight!(o, 1)
+function _fit!(o::NormalMix, y::Real, γ::Float64)
     k = length(o.μ)
     for j in 1:k
         σinv = 1.0 / sqrt(o.σ2[j])
@@ -83,9 +82,8 @@ function fit!(o::NormalMix, y::Real)
     end
     o
 end
-function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T})
+function _fitbatch!{T<:Real}(o::NormalMix, y::AVec{T}, γ::Float64)
     n = length(y)
-    γ = weight!(o, n)
     k = length(o.μ)
     s1 = copy(o.s1)
     s2 = copy(o.s2)

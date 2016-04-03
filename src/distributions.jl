@@ -1,5 +1,5 @@
 # DistributionStat objects
-# fit! methods should only update "sufficient statistics"
+# _fit! methods should only update "sufficient statistics"
 # value methods should create the distribution
 
 abstract DistributionStat{I<:Input} <: OnlineStat{I}
@@ -18,7 +18,7 @@ type FitBeta{W<:Weight} <: DistributionStat{ScalarInput}
 end
 FitBeta(wgt::Weight = EqualWeight()) = FitBeta(Ds.Beta(), Variance(wgt))
 nobs(o::FitBeta) = nobs(o.var)
-fit!(o::FitBeta, y::Real) = (fit!(o.var, y); o)
+_fit!(o::FitBeta, y::Real, γ::Float64) = _fit!(o.var, y, γ)
 function value(o::FitBeta)
     if nobs(o) > 1
         m = mean(o.var)
@@ -28,6 +28,8 @@ function value(o::FitBeta)
         o.value = Ds.Beta(α, β)
     end
 end
+updatecounter!(o::FitBeta, n2::Int = 1) = updatecounter!(o.var, n2)
+weight(o::FitBeta, n2::Int = 1) = weight(o.var, n2)
 
 
 #------------------------------------------------------------------# Categorical
@@ -40,19 +42,18 @@ Ignores `Weight`.
 o = FitCategorical(y)
 ```
 """
-type FitCategorical{W<:Weight, T<:Any} <: DistributionStat{ScalarInput}
+type FitCategorical{T<:Any} <: DistributionStat{ScalarInput}
     value::Ds.Categorical
     d::Dict{T, Int}
-    weight::W
+    nobs::Int
 end
-FitCategorical(wgt::Weight = EqualWeight()) = FitCategorical(Ds.Categorical(1), Dict{Any, Int}(), wgt)
-function FitCategorical(y, wgt::Weight = EqualWeight())
+FitCategorical() = FitCategorical(Ds.Categorical(1), Dict{Any, Int}(), 0)
+function FitCategorical(y)
     o = FitCategorical()
     fit!(o, y)
     o
 end
-function fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol})
-    weight!(o, 1)
+function _fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol}, γ::Float64)
     if haskey(o.d, y)
         o.d[y] += 1
     else
@@ -60,6 +61,20 @@ function fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol})
     end
     o
 end
+# FitCategorical allows more than just Real input, so it needs special fit! methods
+function fit!(o::FitCategorical, y::Union{AbstractString, Symbol})
+    updatecounter!(o)
+    γ = weight(o)
+    _fit!(o, y, γ)
+    o
+end
+function fit!{T <: Union{AbstractString, Symbol}}(o::FitCategorical, y::AVec{T})
+    for yi in y
+        fit!(o, yi)
+    end
+    o
+end
+
 sortpairs(o::FitCategorical) = sort(collect(o.d), by = x -> 1 / x[2])
 function value(o::FitCategorical)
     if nobs(o) !== 0
@@ -78,6 +93,9 @@ function Base.show(io::IO, o::FitCategorical)
     print_item(io, "labels", [sortedpairs[i][1] for i in 1:length(sortedpairs)])
     print_item(io, "nobs", nobs(o))
 end
+updatecounter!(o::FitCategorical, n2::Int = 1) = (o.nobs += n2)
+weight(o::FitCategorical, n2::Int = 1) = 0.0
+nobs(o::FitCategorical) = o.nobs
 
 
 #------------------------------------------------------------------# Cauchy
@@ -86,11 +104,13 @@ type FitCauchy{W<:Weight} <: DistributionStat{ScalarInput}
     q::QuantileMM{W}
 end
 FitCauchy(wgt::Weight = LearningRate()) = FitCauchy(Ds.Cauchy(), QuantileMM(wgt))
-fit!(o::FitCauchy, y::Real) = (fit!(o.q, y); o)
+_fit!(o::FitCauchy, y::Real, γ::Float64) = _fit!(o.q, y, γ)
 nobs(o::FitCauchy) = nobs(o.q)
 function value(o::FitCauchy)
     o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
 end
+updatecounter!(o::FitCauchy, n2::Int = 1) = updatecounter!(o.q, n2)
+weight(o::FitCauchy, n2::Int = 1) = weight(o.q, n2)
 
 
 #------------------------------------------------------------------------# Gamma
@@ -100,7 +120,7 @@ type FitGamma{W<:Weight} <: DistributionStat{ScalarInput}
     var::Variance{W}
 end
 FitGamma(wgt::Weight = EqualWeight()) = FitGamma(Ds.Gamma(), Variance(wgt))
-fit!(o::FitGamma, y::Real) = (fit!(o.var, y); o)
+_fit!(o::FitGamma, y::Real, γ::Float64) = _fit!(o.var, y, γ)
 nobs(o::FitGamma) = nobs(o.var)
 function value(o::FitGamma)
     m = mean(o.var)
@@ -111,6 +131,8 @@ function value(o::FitGamma)
         o.value = Ds.Gamma(α, θ)
     end
 end
+updatecounter!(o::FitGamma, n2::Int = 1) = updatecounter!(o.var, n2)
+weight(o::FitGamma, n2::Int = 1) = weight(o.var, n2)
 
 
 #-----------------------------------------------------------------------# LogNormal
@@ -120,12 +142,14 @@ type FitLogNormal{W<:Weight} <: DistributionStat{ScalarInput}
 end
 FitLogNormal(wgt::Weight = EqualWeight()) = FitLogNormal(Ds.LogNormal(), Variance(wgt))
 nobs(o::FitLogNormal) = nobs(o.var)
-fit!(o::FitLogNormal, y::Real) = (fit!(o.var, log(y)); o)
+_fit!(o::FitLogNormal, y::Real, γ::Float64) = _fit!(o.var, log(y), γ)
 function value(o::FitLogNormal)
     if nobs(o) > 1
         o.value = Ds.LogNormal(mean(o.var), std(o.var))
     end
 end
+updatecounter!(o::FitLogNormal, n2::Int = 1) = updatecounter!(o.var, n2)
+weight(o::FitLogNormal, n2::Int = 1) = weight(o.var, n2)
 
 
 #-----------------------------------------------------------------------# Normal
@@ -135,12 +159,14 @@ type FitNormal{W<:Weight} <: DistributionStat{ScalarInput}
 end
 FitNormal(wgt::Weight = EqualWeight()) = FitNormal(Ds.Normal(), Variance(wgt))
 nobs(o::FitNormal) = nobs(o.var)
-fit!(o::FitNormal, y::Real) = (fit!(o.var, y); o)
+_fit!(o::FitNormal, y::Real, γ::Float64) = _fit!(o.var, y, γ)
 function value(o::FitNormal)
     if nobs(o) > 1
         o.value = Ds.Normal(mean(o.var), std(o.var))
     end
 end
+updatecounter!(o::FitNormal, n2::Int = 1) = updatecounter!(o.var, n2)
+weight(o::FitNormal, n2::Int = 1) = weight(o.var, n2)
 
 
 #-----------------------------------------------------------------------# Multinomial
@@ -152,11 +178,13 @@ function FitMultinomial(p::Integer, wgt::Weight = EqualWeight)
     FitMultinomial(Ds.Multinomial(p, ones(p) / p), Means(p, wgt))
 end
 nobs(o::FitMultinomial) = nobs(o.means)
-fit!{T<:Real}(o::FitMultinomial, y::AVec{T}) = (fit!(o.means, y); o)
+_fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64) = _fit!(o.means, y, γ)
 function value(o::FitMultinomial)
     m = mean(o.means)
     o.value = Ds.Multinomial(round(Int, sum(m)), m / sum(m))
 end
+updatecounter!(o::FitMultinomial, n2::Int = 1) = updatecounter!(o.means, n2)
+weight(o::FitMultinomial, n2::Int = 1) = weight(o.means, n2)
 
 
 
@@ -170,7 +198,7 @@ function FitMvNormal(p::Integer, wgt::Weight = EqualWeight)
 end
 nobs(o::FitMvNormal) = nobs(o.cov)
 Base.std(d::FitMvNormal) = sqrt(var(d))  # No std() method from Distributions?
-fit!{T<:Real}(o::FitMvNormal, y::AMat{T}) = (fit!(o.cov, y); o)
+_fit!{T<:Real}(o::FitMvNormal, y::AVec{T}, γ::Float64) = _fit!(o.cov, y, γ)
 function value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)
@@ -179,11 +207,13 @@ function value(o::FitMvNormal)
         warn("Covariance not positive definite.  More data needed.")
     end
 end
+updatecounter!(o::FitMvNormal, n2::Int = 1) = updatecounter!(o.cov, n2)
+weight(o::FitMvNormal, n2::Int = 1) = weight(o.cov, n2)
 
 
 
 #---------------------------------------------------------------------# convenience constructors
-for nm in [:FitBeta, :FitCauchy, :FitGamma, :FitLogNormal, :FitNormal]
+for nm in [:FitBeta, :FitGamma, :FitLogNormal, :FitNormal]
     eval(parse("""
         function $nm{T<:Real}(y::AVec{T}, wgt::Weight = EqualWeight())
             o = $nm(wgt)
@@ -191,6 +221,12 @@ for nm in [:FitBeta, :FitCauchy, :FitGamma, :FitLogNormal, :FitNormal]
             o
         end
     """))
+end
+
+function FitCauchy{T<:Real}(y::AVec{T}, wgt::Weight = LearningRate())
+    o = FitCauchy(wgt)
+    fit!(o, y)
+    o
 end
 
 for nm in [:FitMultinomial, :FitMvNormal]

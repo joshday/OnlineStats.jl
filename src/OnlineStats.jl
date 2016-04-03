@@ -290,9 +290,10 @@ const _ϵ = 1e-8
 #----------------------------------------------------------------------# source files
 include("weight.jl")
 include("summary.jl")
-# include("distributions.jl")
-# include("modeling/sweep.jl")
-# include("modeling/penalty.jl")
+include("distributions.jl")
+include("normalmix.jl")
+include("modeling/sweep.jl")
+include("modeling/penalty.jl")
 # include("modeling/statlearn.jl")
 # include("modeling/statlearnextensions.jl")
 # include("modeling/linreg.jl")
@@ -301,7 +302,6 @@ include("summary.jl")
 # include("streamstats/bootstrap.jl")
 # include("streamstats/hyperloglog.jl")
 # include("multivariate/kmeans.jl")
-# include("normalmix.jl")
 # Requires.@require Plots include("plots.jl")
 
 end # module
