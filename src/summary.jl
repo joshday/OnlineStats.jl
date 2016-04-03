@@ -13,16 +13,10 @@ type Mean{W <: Weight} <: OnlineStat{ScalarInput}
     value::Float64
     weight::W
 end
-Mean(wgt::Weight = EqualWeight()) = Mean(0.0, wgt)
-function fit!(o::Mean, y::Real)
-    γ = weight!(o, 1)
-    o.value = smooth(o.value, y, γ)
-    o
-end
-function fitbatch!{T <: Real}(o::Mean, y::AVec{T})
-    γ = weight!(o, length(y))
+Mean(wt::Weight = EqualWeight()) = Mean(0.0, wt)
+_fit!(o::Mean, y::Real, γ::Float64) = (o.value = smooth(o.value, y, γ))
+function _fitbatch!{W <: BatchWeight}(o::Mean{W}, y::AVec, γ::Float64)
     o.value = smooth(o.value, mean(y), γ)
-    o
 end
 Base.mean(o::Mean) = value(o)
 center(o::Mean, x::Real) = x - mean(o)
@@ -44,15 +38,9 @@ type Means{W <: Weight} <: OnlineStat{VectorInput}
     weight::W
 end
 Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt)
-function fit!{T <: Real}(o::Means, y::AVec{T})
-    γ = weight!(o, 1)
-    smooth!(o.value, y, γ)
-    o
-end
-function fitbatch!{T <: Real}(o::Means, y::AMat{T})
-    γ = weight!(o, size(y, 1))
+_fit!(o::Means, y::AVec, γ::Float64) = smooth!(o.value, y, γ)
+function _fitbatch!{W <: BatchWeight}(o::Means{W}, y::AMat, γ::Float64)
     smooth!(o.value, row(mean(y, 1), 1), γ)
-    o
 end
 Base.mean(o::Means) = value(o)
 center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
@@ -78,12 +66,10 @@ type Variance{W <: Weight} <: OnlineStat{ScalarInput}
     weight::W
 end
 Variance(wgt::Weight = EqualWeight()) = Variance(0.0, 0.0, wgt)
-function fit!(o::Variance, y::Real)
-    γ = weight!(o, 1)
+function _fit!(o::Variance, y::Real, γ::Float64)
     μ = o.μ
     o.μ = smooth(o.μ, y, γ)
     o.value = smooth(o.value, (y - o.μ) * (y - μ), γ)
-    o
 end
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
@@ -116,21 +102,17 @@ end
 function Variances(p::Integer, wgt::Weight = EqualWeight())
     Variances(zeros(p), zeros(p), zeros(p), wgt)
 end
-function fit!{T <: Real}(o::Variances, y::AVec{T})
-    γ = weight!(o, 1)
+function _fit!(o::Variances, y::AVec, γ::Float64)
     copy!(o.μold, o.μ)
     smooth!(o.μ, y, γ)
     for i in 1:length(y)
         o.value[i] = smooth(o.value[i], (y[i] - o.μ[i]) * (y[i] - o.μold[i]), γ)
     end
-    o
 end
-function fitbatch!{T <: Real}(o::Variances, y::AMat{T})
+function _fitbatch!{W <: BatchWeight}(o::Variances{W}, y::AMat, γ::Float64)
     n2 = size(y, 1)
-    γ = weight!(o, n2)
     smooth!(o.μ, row(mean(y, 1), 1), γ)
     smooth!(o.value, row(var(y,1), 1) * ((n2 - 1) / n2), γ)
-    o
 end
 Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
@@ -165,15 +147,13 @@ end
 function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
     CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt)
 end
-function fit!{T<:Real}(o::CovMatrix, x::AVec{T})
-    γ = weight!(o, 1)
+function _fit!(o::CovMatrix, x::AVec, γ::Float64)
     rank1_smooth!(o.A, x, γ)
     smooth!(o.B, x, γ)
     o
 end
-function fitbatch!{T<:Real}(o::CovMatrix, x::AMat{T})
+function _fitbatch!(o::CovMatrix, x::AMat, γ::Float64)
     n2 = size(x, 1)
-    γ = weight!(o, n2)
     smooth!(o.B, vec(mean(x, 1)), γ)
     BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
     o
@@ -205,7 +185,7 @@ end
 
 #----------------------------------------------------------------------# Extrema
 """
-Extrema (maximum and minimum).  Ignores `Weight`.
+Extrema (maximum and minimum).
 
 ```julia
 o = Extrema(y)
@@ -213,25 +193,23 @@ fit!(o, y2)
 extrema(o)
 ```
 """
-type Extrema{W<:Weight} <: OnlineStat{ScalarInput}
+type Extrema <: WeightlessOnlineStat{ScalarInput}
     min::Float64
     max::Float64
-    weight::W
+    nobs::Int
+    Extrema() = new(Inf, -Inf, 0)
+    Extrema{T<:Real}(y::AVec{T}) = new(minimum(y), maximum(y), length(y))
 end
-Extrema(wgt::Weight = EqualWeight()) = Extrema(Inf, -Inf, wgt)
-function Extrema{T<:Real}(y::AVec{T}, wgt::Weight = EqualWeight())
-    o = Extrema(minimum(y), maximum(y), wgt)
-    weight_noret!(o, length(y))
-    o
-end
-function fit!(o::Extrema, y::Real)
-    weight_noret!(o, 1)
+function _fit!(o::Extrema, y::Real, γ::Float64)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
     o
 end
+updatecounter!(o::Extrema, n2::Int) = (o.nobs += n2)
 Base.extrema(o::Extrema) = (o.min, o.max)
 value(o::Extrema) = extrema(o)
+StatsBase.nobs(o::Extrema) = o.nobs
+
 
 
 
@@ -245,12 +223,12 @@ o = QuantileSGD(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 """
-type QuantileSGD{W <: Weight} <: OnlineStat{ScalarInput}
+type QuantileSGD{W <: StochasticWeight} <: OnlineStat{ScalarInput}
     value::VecF
     τ::VecF
     weight::W
 end
-function QuantileSGD(wgt::Weight = LearningRate();
+function QuantileSGD(wgt::StochasticWeight = LearningRate();
         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
     )
     for i in 1:length(tau)
@@ -258,24 +236,21 @@ function QuantileSGD(wgt::Weight = LearningRate();
     end
     QuantileSGD(value, tau, wgt)
 end
-function fit!(o::QuantileSGD, y::Float64)
-    γ = weight!(o, 1)
+function _fit!(o::QuantileSGD, y::Float64, γ::Float64)
     @inbounds for i in 1:length(o.τ)
         v = Float64(y < o.value[i]) - o.τ[i]
         o.value[i] = subgrad(o.value[i], γ, v)
     end
-    o
 end
-function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T})
+function _fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
     n2 = length(y)
-    γ = weight!(o, n2) / n2
+    γ = γ / n2
     @inbounds for yi in y
         for i in 1:length(o.τ)
             v = Float64(yi < o.value[i]) - o.τ[i]
             o.value[i] = subgrad(o.value[i], γ, v)
         end
     end
-    o
 end
 function Base.show(io::IO, o::QuantileSGD)
     printheader(io, "QuantileSGD, τ = $(o.τ)")
@@ -297,7 +272,7 @@ fit!(o, y2)
 type QuantileMM{W <: Weight} <: OnlineStat{ScalarInput}
     value::VecF
     τ::VecF
-
+    # "sufficient statistics"
     s::VecF
     t::VecF
     o::Float64
@@ -313,8 +288,7 @@ function QuantileMM(wgt::Weight = LearningRate();
     end
     QuantileMM(value, tau, zeros(p), zeros(p), 0.0, wgt)
 end
-function fit!(o::QuantileMM, y::Float64)
-    γ = weight!(o, 1)
+function _fit!(o::QuantileMM, y::Real, γ::Float64)
     o.o = smooth(o.o, 1.0, γ)
     @inbounds for j in 1:length(o.τ)
         w::Float64 = 1.0 / (abs(y - o.value[j]) + _ϵ)
@@ -322,11 +296,10 @@ function fit!(o::QuantileMM, y::Float64)
         o.t[j] = smooth(o.t[j], w, γ)
         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
     end
-    o
 end
-function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T})
+function _fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
     n2 = length(y)
-    γ = weight!(o, n2) / n2
+    γ = γ / n2
     o.o = smooth(o.o, 1.0, γ)
     @inbounds for yi in y
         for j in 1:length(o.τ)
@@ -369,13 +342,11 @@ type Moments{W <: Weight} <: OnlineStat{ScalarInput}
     nups::Int
 end
 Moments(wgt::Weight = EqualWeight()) = Moments(zeros(4), wgt, 0, 0)
-function fit!(o::Moments, y::Real)
-    γ = weight!(o, 1)
+function _fit!(o::Moments, y::Real, γ::Float64)
     o.value[1] = smooth(o.value[1], y, γ)
     o.value[2] = smooth(o.value[2], y * y, γ)
     o.value[3] = smooth(o.value[3], y * y * y, γ)
     o.value[4] = smooth(o.value[4], y * y * y * y, γ)
-    o
 end
 Base.mean(o::Moments) = value(o)[1]
 Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
@@ -407,32 +378,29 @@ o = Diff()
 o = Diff(y)
 ```
 """
-type Diff{T <: Real} <: OnlineStat{ScalarInput}
+type Diff{T <: Real} <: WeightlessOnlineStat{ScalarInput}
     diff::T
     lastval::T
-    n::Int
+    nobs::Int
 end
-nobs(o::Diff) = o.n
+nobs(o::Diff) = o.nobs
 Diff() = Diff(0.0, 0.0, 0)
 Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), 0)
 Diff{T<:Real}(x::AVec{T}) = (o = Diff(T); fit!(o, x); o)
 value(o::Diff) = o.diff
 Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
-function fit!{T<:AbstractFloat}(o::Diff{T}, x::Real)
+function _fit!{T<:AbstractFloat}(o::Diff{T}, x::Real, γ::Float64)
     v = convert(T, x)
     o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
     o.lastval = v
-    o.n += 1
-    o
 end
-function fit!{T<:Integer}(o::Diff{T}, x::Real)
+function _fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
     v = round(T, x)
     o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
     o.lastval = v
-    o.n += 1
-    o
 end
+
 
 """
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
@@ -442,12 +410,12 @@ o = Diffs()
 o = Diffs(y)
 ```
 """
-type Diffs{T <: Real} <: OnlineStat{VectorInput}
+type Diffs{T <: Real} <: WeightlessOnlineStat{VectorInput}
     diffs::Vector{T}
     lastvals::Vector{T}
-    n::Int
+    nobs::Int
 end
-nobs(o::Diffs) = o.n
+nobs(o::Diffs) = o.nobs
 Diffs(p::Integer) = Diffs(zeros(p), zeros(p), 0)
 Diffs{T<:Real}(::Type{T}, p::Integer) = Diffs(zeros(T,p), zeros(T,p), 0)
 Diffs{T<:Real}(x::AMat{T}) = (o = Diffs(T,ncols(x)); fit!(o, x); o)
@@ -455,10 +423,10 @@ Diffs{T<:Real}(x::AMat{T}) = (o = Diffs(T,ncols(x)); fit!(o, x); o)
 value(o::Diffs) = o.diffs
 Base.last(o::Diffs) = o.lastvals
 Base.diff(o::Diffs) = o.diffs
-function fit!{T<:Real}(o::Diffs{T}, x::AVec{T})
+function _fit!{T<:Real}(o::Diffs{T}, x::AVec{T}, γ::Float64)
     o.diffs = (nobs(o) == 0 ? zeros(T,length(o.diffs)) : x - last(o))
     o.lastvals = collect(x)
-    o.n += 1
+    o.nobs += 1
     o
 end
 
@@ -471,27 +439,23 @@ o = Sum()
 o = Sum(y)
 ```
 """
-type Sum{T <: Real} <: OnlineStat{ScalarInput}
+type Sum{T <: Real} <: WeightlessOnlineStat{ScalarInput}
     sum::T
-    n::Int
+    nobs::Int
 end
-nobs(o::Sum) = o.n
+nobs(o::Sum) = o.nobs
 Sum() = Sum(0.0, 0)
 Sum{T<:Real}(::Type{T}) = Sum(zero(T), 0)
 Sum{T<:Real}(x::AVec{T}) = (o = Sum(T); fit!(o, x); o)
 value(o::Sum) = o.sum
 Base.sum(o::Sum) = o.sum
-function fit!{T<:AbstractFloat}(o::Sum{T}, x::Real)
+function _fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64)
     v = convert(T, x)
     o.sum += v
-    o.n += 1
-    o
 end
-function fit!{T<:Integer}(o::Sum{T}, x::Real)
+function _fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64)
     v = round(T, x)
     o.sum += v
-    o.n += 1
-    o
 end
 
 """
@@ -502,29 +466,26 @@ o = Sums()
 o = Sums(y)
 ```
 """
-type Sums{T <: Real} <: OnlineStat{VectorInput}
+type Sums{T <: Real} <: WeightlessOnlineStat{VectorInput}
     sums::Vector{T}
-    n::Int
+    nobs::Int
 end
-nobs(o::Sums) = o.n
+nobs(o::Sums) = o.nobs
 Sums(p::Integer) = Sums(zeros(p), 0)
 Sums{T<:Real}(::Type{T}, p::Integer) = Sums(zeros(T,p), 0)
 Sums{T<:Real}(x::AMat{T}) = (o = Sums(T,ncols(x)); fit!(o, x); o)
 
 value(o::Sums) = o.sums
 Base.sum(o::Sums) = o.sums
-function fit!{T<:Real}(o::Sums{T}, x::AVec{T})
+function _fit!{T<:Real}(o::Sums{T}, x::AVec{T}, γ::Float64)
     for i in eachindex(x)
         o.sums[i] += x[i]
     end
-    o.n += 1
-    o
 end
 
 
 #----------------------------------------------------------# convenience constructors
-# constructors
-for nm in [:Mean, :Variance, :QuantileSGD, :QuantileMM, :Moments]
+for nm in [:Mean, :Variance, :Moments]
     eval(parse(
         """
         function $nm{T <: Real}(y::AVec{T}, wgt::Weight = EqualWeight(); kw...)
@@ -535,30 +496,17 @@ for nm in [:Mean, :Variance, :QuantileSGD, :QuantileMM, :Moments]
         """
     ))
 end
-
-# for nm in [:QuantileSGD, :QuantileMM]
-#     eval(parse(
-#         """
-#         function $nm{T <: Real}(y::AVec{T}, wgt::Weight = EqualWeight(), tau::VecF = [.25, .5, .75])
-#             o = $nm(wgt; tau = tau)
-#             fit!(o, y)
-#             o
-#         end
-#         """
-#     ))
-# end
-#
-# for nm in [:QuantileSGD, :QuantileMM]
-#     eval(parse(
-#         """
-#         function $nm{T <: Real}(y::AVec{T}, tau::VecF = [.25, .5, .75], wgt::Weight = EqualWeight())
-#             $nm(y, wgt, tau)
-#         end
-#         """
-#     ))
-# end
-
-
+for nm in [:QuantileSGD, :QuantileMM]
+    eval(parse(
+        """
+        function $nm{T <: Real}(y::AVec{T}, wgt::Weight = LearningRate(); kw...)
+            o = $nm(wgt; kw...)
+            fit!(o, y)
+            o
+        end
+        """
+    ))
+end
 for nm in [:Means, :Variances, :CovMatrix]
     eval(parse(
         """

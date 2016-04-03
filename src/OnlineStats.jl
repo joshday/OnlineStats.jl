@@ -37,7 +37,9 @@ abstract Input
 abstract ScalarInput    <: Input  # observation = scalar
 abstract VectorInput    <: Input  # observation = vector
 abstract XYInput        <: Input  # observation = (x, y) pair
+
 abstract OnlineStat{I <: Input}
+abstract WeightlessOnlineStat{I <: Input} <: OnlineStat{I}
 
 typealias VecF      Vector{Float64}
 typealias MatF      Matrix{Float64}
@@ -71,6 +73,44 @@ Include more data for an OnlineStat using batch updates of size `b`.  Batch upda
 make more sense for OnlineStats that use stochastic approximation, such as
 `StatLearn`, `QuantileMM`, and `NormalMix`.
 """
+############ single observation
+function fit!(o::OnlineStat{ScalarInput}, y::Real)
+    updatecounter!(o)
+    γ = weight(o)
+    _fit!(o, y, γ)
+    o
+end
+function fit!{T <: Real}(o::OnlineStat{VectorInput}, y::AVec{T})
+    updatecounter!(o)
+    γ = weight(o)
+    _fit!(o, y, γ)
+    o
+end
+function fit!{T <: Real, S <: Real}(o::OnlineStat{XYInput}, s::AVec{T}, y::AVec{S})
+    updatecounter!(o)
+    γ = weight(o)
+    _fit!(o, x, y, γ)
+    o
+end
+
+############ single observation, override the weight
+function fit!(o::OnlineStat{ScalarInput}, y::Real, γ::Float64)
+    updatecounter!(o)
+    _fit!(o, y, γ)
+    o
+end
+function fit!{T <: Real}(o::OnlineStat{VectorInput}, y::AVec{T}, γ::Float64)
+    updatecounter!(o)
+    _fit!(o, y, γ)
+    o
+end
+function fit!{T <: Real, S <: Real}(o::OnlineStat{XYInput}, s::AVec{T}, y::AVec{S}, γ::Float64)
+    updatecounter!(o)
+    _fit!(o, x, y, γ)
+    o
+end
+
+############ multiple observations
 function fit!(o::OnlineStat{ScalarInput}, y::AVec)
     for yi in y
         fit!(o, yi)
@@ -90,7 +130,32 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     end
     o
 end
-# fit with observations in the columns
+
+############ multiple observations, override weight
+function fit!(o::OnlineStat{ScalarInput}, y::AVec, w::AVec)
+    @assert length(y) == length(w)
+    for i in eachindex(y)
+        fit!(o, y[i], w[i])
+    end
+    o
+end
+function fit!(o::OnlineStat{VectorInput}, y::AMat, w::AVec)
+    n2 = nrows(y)
+    @assert n2 == length(w)
+    for i in 1:n2
+        fit!(o, row(y, i), w[i])
+    end
+    o
+end
+function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, w::AVec)
+    @assert size(x, 1) == length(y) == length(w)
+    for i in eachindex(y)
+        fit!(o, row(x, i), row(y, i), w[i])
+    end
+    o
+end
+
+############ fit with observations in the columns (experimental)
 function fit_col!(o::OnlineStat{VectorInput}, y::AMat)
     for i in 1:size(y, 2)
         fit!(o, col(y, i))
@@ -105,7 +170,7 @@ function fit_col!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
     o
 end
 
-#------------------------------------------------------------------# fit! for batches
+############ multiple observations, update in batches
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
@@ -116,13 +181,14 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            fitbatch!(o, rows(y, rng))
+            updatecounter!(o, b)
+            γ = weight(o, b)
+            _fitbatch!(o, rows(y, rng), γ)
             i += b
         end
     end
     o
 end
-
 function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     b = Int(b)
     n = size(y, 1)
@@ -133,13 +199,14 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            fitbatch!(o, rows(y, rng))
+            updatecounter!(o, b)
+            γ = weight(o, b)
+            _fitbatch!(o, rows(y, rng), γ)
             i += b
         end
     end
     o
 end
-
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
@@ -150,7 +217,9 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            fitbatch!(o, rows(x, rng), rows(y, rng))
+            updatecounter!(o, b)
+            γ = weight(o, b)
+            fitbatch!(o, rows(x, rng), rows(y, rng), γ)
             i += b
         end
     end
@@ -158,7 +227,7 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
 end
 
 # fall back on fit! if there is no fitbatch! method
-fitbatch!(args...) = fit!(args...)
+_fitbatch!(args...) = fit!(args...)
 
 #---------------------------------------------------------------------------# helpers
 """
@@ -221,19 +290,19 @@ const _ϵ = 1e-8
 #----------------------------------------------------------------------# source files
 include("weight.jl")
 include("summary.jl")
-include("distributions.jl")
-include("modeling/sweep.jl")
-include("modeling/penalty.jl")
-include("modeling/statlearn.jl")
-include("modeling/statlearnextensions.jl")
-include("modeling/linreg.jl")
-include("modeling/quantreg.jl")
-include("modeling/bias.jl")
-include("streamstats/bootstrap.jl")
-include("streamstats/hyperloglog.jl")
-include("multivariate/kmeans.jl")
-include("normalmix.jl")
-Requires.@require Plots include("plots.jl")
+# include("distributions.jl")
+# include("modeling/sweep.jl")
+# include("modeling/penalty.jl")
+# include("modeling/statlearn.jl")
+# include("modeling/statlearnextensions.jl")
+# include("modeling/linreg.jl")
+# include("modeling/quantreg.jl")
+# include("modeling/bias.jl")
+# include("streamstats/bootstrap.jl")
+# include("streamstats/hyperloglog.jl")
+# include("multivariate/kmeans.jl")
+# include("normalmix.jl")
+# Requires.@require Plots include("plots.jl")
 
 end # module
 

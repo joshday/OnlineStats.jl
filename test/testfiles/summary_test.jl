@@ -32,7 +32,7 @@ facts(@title "Variance / Variances") do
     o = Variance(x1)
     @fact var(o) --> roughly(var(x1))
     o = Variance()
-    fit!(o, x1, 5)
+    fit!(o, x1)
     @fact var(o) --> roughly(var(x1))
     @fact std(o) --> roughly(std(x1))
     @fact mean(o) --> roughly(mean(x1))
