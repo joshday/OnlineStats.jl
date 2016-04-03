@@ -4,28 +4,41 @@ using TestSetup, OnlineStats, FactCheck
 O = OnlineStats
 
 facts(@title "Weighting") do
-    w = EqualWeight()
-    @fact O.weight!(w, 1) --> 1.0
-    O.weight_noret!(w, 1)
-
-    w = ExponentialWeight(.5)
-    @fact O.weight!(w, 1) --> 0.5
-    O.weight!(w, 10)
-    O.weight_noret!(w, 1)
-
-    w = BoundedExponentialWeight(.5)
-    @fact O.weight!(w, 1) --> 1.0
-    O.weight!(w, 10)
-    O.weight_noret!(w, 1)
-
-    w = LearningRate(.6)
-    @fact O.weight!(w, 1) --> 1.0
-    O.weight_noret!(w, 1)
-    @fact O.nups(w) --> 2
-
-    w = LearningRate2(10, 1)
-    @fact O.weight!(w, 1) --> w.γ / (1.0 + w.γ)
-    O.weight_noret!(w, 1)
-end
-
-end
+    context(@subtitle "EqualWeight") do
+        w = EqualWeight()
+        O.updatecounter!(w)
+        @fact O.weight(w) --> 1.0
+        O.updatecounter!(w, 5)
+        @fact O.weight(w, 5) --> 5 / 6
+    end
+    context(@subtitle "ExponentialWeight") do
+        w = ExponentialWeight(.5)
+        O.updatecounter!(w)
+        @fact O.weight(w) --> 0.5
+        O.updatecounter!(w, 5)
+        @fact O.weight(w) --> 0.5
+    end
+    context(@subtitle "BoundedEqualWeight") do
+        w = BoundedEqualWeight(.1)
+        O.updatecounter!(w)
+        @fact O.weight(w, 1) --> 1.0
+        O.updatecounter!(w, 100)
+        @fact O.weight(w) --> 0.1
+    end
+    context(@subtitle "LearningRate") do
+        w = LearningRate(.6)
+        O.updatecounter!(w)
+        @fact O.weight(w) --> 1.0
+        O.updatecounter!(w, 5)
+        @fact O.weight(w, 5) --> 2 ^ -.6
+        @fact O.nups(w) --> 2
+    end
+    context(@subtitle "LearningRate2") do
+        w = LearningRate2(0.5)
+        O.updatecounter!(w)
+        @fact O.weight(w) --> 1.0
+        O.updatecounter!(w, 5)
+        @fact O.weight(w, 5) --> 1 / (1 + .5)
+    end
+end  # facts
+end  # module

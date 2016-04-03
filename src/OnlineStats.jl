@@ -11,7 +11,7 @@ export
     OnlineStat,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
-    BoundedExponentialWeight, WeightedOnlineStat,
+    BoundedEqualWeight, WeightedOnlineStat,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, LinReg, QuantReg, NormalMix,

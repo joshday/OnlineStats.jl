@@ -18,7 +18,7 @@ end
 
 Weights are held constant at `λ = 2 / (1 + lookback)`.
 """
-immutable ExponentialWeight <: Weight
+type ExponentialWeight <: Weight
     nobs::Int
     λ::Float64
     function ExponentialWeight(λ::Real = 1.0)
@@ -35,7 +35,7 @@ end
 
 Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
 """
-immutable BoundedEqualWeight <: Weight
+type BoundedEqualWeight <: Weight
     nobs::Int
     λ::Float64
     function BoundedEqualWeight(λ::Real = 1.0)
@@ -63,7 +63,7 @@ end
 
 #---------------------------------------------------------------------# LearningRate2
 """
-`LearningRate2(γ, c = 0.5, λ = 0.0)`.
+`LearningRate2(c = 0.5, λ = 0.0)`.
 
 Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 """
@@ -72,7 +72,7 @@ type LearningRate2 <: StochasticWeight
     nups::Int
     c::Float64
     λ::Float64
-    LearningRate2(γ::Real, c::Real = 0.5, λ = 0.0) = new(c, λ, 0, 0)
+    LearningRate2(c::Real = 0.5, λ = 0.0) = new(0, 0, c, λ)
 end
 
 
