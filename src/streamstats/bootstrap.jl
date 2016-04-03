@@ -1,6 +1,8 @@
 abstract Bootstrap{I <: Input} <: OnlineStat{I}
 nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
+updatecounter!(b::Bootstrap, n2::Int) = (b.n += n2)
+weight(b::Bootstrap, n2::Int) = 0.0
 
 #-----------------------------------------------------------# BernoulliBootstrap
 """
@@ -27,9 +29,8 @@ function BernoulliBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::
     return BernoulliBootstrap(replicates, cached_state, f, 0, true)
 end
 
-function fit!(b::BernoulliBootstrap, x::Real)
-    b.n += 1
 
+function _fit!(b::BernoulliBootstrap, x::Real, γ::Float64)
     for replicate in b.replicates
         if rand() > 0.5
             fit!(replicate, x)
@@ -78,8 +79,8 @@ function PoissonBootstrap{T <: VectorInput}(o::OnlineStat{T}, f::Function, r::In
 end
 
 const unitPoissonDist = Ds.Poisson(1)
-function fit!(b::Union{ScalarPoissonBootstrap, VectorPoissonBootstrap}, x::Union{Real,Vector})
-    b.n += 1
+function _fit!(b::Union{ScalarPoissonBootstrap, VectorPoissonBootstrap},
+        x::Union{Real,Vector}, γ::Float64)
     for replicate in b.replicates
         for repetition in 1:rand(unitPoissonDist)
             fit!(replicate, x)
