@@ -301,7 +301,7 @@ include("modeling/quantreg.jl")
 include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")
-# include("multivariate/kmeans.jl")
+include("multivariate/kmeans.jl")
 Requires.@require Plots include("plots.jl")
 
 end # module
