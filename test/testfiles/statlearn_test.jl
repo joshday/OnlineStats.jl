@@ -98,44 +98,44 @@ facts(@title "StatLearn") do
         @fact loss(o, x, y) --> roughly(mean(v))
     end
 
-    context(@subtitle "StatLearnSparse") do
-        n, p = 100000, 10
-        x = randn(n, p)
-        β = collect(1.:p) - p/2
-        y = x * β + randn(n)
-        o = StatLearn(p)
-        sp = StatLearnSparse(o, HardThreshold(burnin = 100))
-        sp = StatLearnSparse(o)
-        fit!(sp, x, y)
-        fit!(sp, x, y, 100)
-        @fact coef(sp) --> coef(o)
-        @fact value(sp) --> value(o)
-        @fact nobs(sp) --> nobs(o)
-    end
-
-    context(@subtitle "StatLearnCV") do
-        n, p, rho = 10000, 10, .5
-        β, x, y = linearmodeldata(n, p, rho)
-        _, xtest, ytest = linearmodeldata(500, p, rho)
-
-        o = StatLearn(p, penalty = L1Penalty(1.), algorithm = RDA())
-        cv = StatLearnCV(o, xtest, ytest, 1234)
-        o2 = StatLearn(p, algorithm = RDA())
-
-        fit!(cv, x, y)
-        fit!(o2, x, y)
-        @fact loss(o2, x, y) --> less_than(loss(o, x, y))
-
-        o = StatLearn(p)
-        cv = StatLearnCV(o, xtest, ytest, 1000)
-        fit!(cv, x, y)
-        @fact nobs(o) --> length(y)
-        @fact value(cv) --> value(o)
-        @fact coef(cv) --> coef(o)
-        @fact predict(cv, x) --> predict(o, x)
-        @fact loss(cv, x, y) --> loss(o, x, y)
-        @fact loss(cv) --> loss(o, xtest, ytest)
-    end
+    # context(@subtitle "StatLearnSparse") do
+    #     n, p = 100000, 10
+    #     x = randn(n, p)
+    #     β = collect(1.:p) - p/2
+    #     y = x * β + randn(n)
+    #     o = StatLearn(p)
+    #     sp = StatLearnSparse(o, HardThreshold(burnin = 100))
+    #     sp = StatLearnSparse(o)
+    #     fit!(sp, x, y)
+    #     fit!(sp, x, y)
+    #     @fact coef(sp) --> coef(o)
+    #     @fact value(sp) --> value(o)
+    #     @fact nobs(sp) --> nobs(o)
+    # end
+    #
+    # context(@subtitle "StatLearnCV") do
+    #     n, p, rho = 10000, 10, .5
+    #     β, x, y = linearmodeldata(n, p, rho)
+    #     _, xtest, ytest = linearmodeldata(500, p, rho)
+    #
+    #     o = StatLearn(p, penalty = L1Penalty(1.), algorithm = RDA())
+    #     cv = StatLearnCV(o, xtest, ytest, 1234)
+    #     o2 = StatLearn(p, algorithm = RDA())
+    #
+    #     fit!(cv, x, y)
+    #     fit!(o2, x, y)
+    #     @fact loss(o2, x, y) --> less_than(loss(o, x, y))
+    #
+    #     o = StatLearn(p)
+    #     cv = StatLearnCV(o, xtest, ytest, 1000)
+    #     fit!(cv, x, y)
+    #     @fact nobs(o) --> length(y)
+    #     @fact value(cv) --> value(o)
+    #     @fact coef(cv) --> coef(o)
+    #     @fact predict(cv, x) --> predict(o, x)
+    #     @fact loss(cv, x, y) --> loss(o, x, y)
+    #     @fact loss(cv) --> loss(o, xtest, ytest)
+    # end
 end
 
 end #module

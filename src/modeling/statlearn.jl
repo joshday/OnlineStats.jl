@@ -201,18 +201,18 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "algorithm", o.algorithm)
     print_item(io, "nobs", nobs(o))
 end
-function fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real)
+function _fit!{T<:Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     length(x) == length(o.β) || error("x is incorrect length")
     ŷ = predict(o, x)
     g = deriv(o.model, y, ŷ)
-    _updateβ!(o, g, x, y, ŷ)
+    _updateβ!(o, g, x, y, ŷ, γ)
     o
 end
-function fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S})
+function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
     size(x, 2) == length(o.β) || error("x has incorrect number of columns")
     ŷ = predict(o, x)
     g = [deriv(o.model, y[i], ŷ[i]) for i in 1:size(x, 1)]
-    _updatebatchβ!(o, g, x, y, ŷ)
+    _updatebatchβ!(o, g, x, y, ŷ, γ)
     o
 end
 setβ0!(o::StatLearn, γ, g) = (o.β0 = subgrad(o.β0, γ, g))
@@ -230,8 +230,7 @@ immutable SGD <: Algorithm
     SGD() = new()
     SGD(p::Integer, alg::SGD) = new()
 end
-function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ)
-    γ = weight!(o, 1)
+function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ, γ)
     γ *= o.η
     if o.intercept
         o.β0 -= γ * g
@@ -240,9 +239,9 @@ function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ)
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j], γ)
     end
 end
-function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
+function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     n2 = length(y)
-    γ = o.η * weight!(o, n2)
+    γ *= o.η
     if o.intercept
         o.β -= γ * mean(g)
     end
@@ -265,8 +264,7 @@ type SGD2 <: Algorithm
     SGD2() = new()
     SGD2(p::Integer, alg::SGD2) = new(_ϵ, fill(_ϵ, p))
 end
-function _updateβ!(o::StatLearn{SGD2}, g, x, y, ŷ)
-    γ = weight!(o, 1)
+function _updateβ!(o::StatLearn{SGD2}, g, x, y, ŷ, γ)
     γ *= o.η
     if o.intercept
         o.algorithm.d0 = smooth(o.algorithm.d0, denom(o.model, g, 1.0, y, ŷ), γ)
@@ -279,9 +277,8 @@ function _updateβ!(o::StatLearn{SGD2}, g, x, y, ŷ)
 end
 
 
-function _updatebatchβ!(o::StatLearn{SGD2}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
+function _updatebatchβ!(o::StatLearn{SGD2}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     n = length(y)
-    γ = weight!(o, n)
     if o.intercept
         v = 0.0
         for i in 1:n
@@ -327,8 +324,7 @@ type AdaGrad <: Algorithm
     AdaGrad() = new()
     AdaGrad(p::Integer, alg::AdaGrad) = new(_ϵ, fill(_ϵ, p))
 end
-function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ)
-    weight_noret!(o, 1)
+function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ, γ)
     if o.intercept
         o.algorithm.g0 += g * g
         setβ0!(o, o.η / sqrt(o.algorithm.g0), g)
@@ -340,8 +336,7 @@ function _updateβ!(o::StatLearn{AdaGrad}, g, x, y, ŷ)
         o.β[j] = prox(o.penalty, o.β[j] - γ * gx, γ)
     end
 end
-function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
-    weight_noret!(o, length(y))
+function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     if o.intercept
         ḡ = mean(g)
         o.algorithm.g0 += ḡ * ḡ
@@ -370,8 +365,7 @@ type AdaGrad2 <: Algorithm
     AdaGrad2() = new()
     AdaGrad2(p::Integer, alg::AdaGrad2) = new(_ϵ, fill(_ϵ, p))
 end
-function _updateβ!(o::StatLearn{AdaGrad2}, g, x, y, ŷ)
-    γ = weight!(o, 1)
+function _updateβ!(o::StatLearn{AdaGrad2}, g, x, y, ŷ, γ)
     γη = γ * o.η
     if o.intercept
         o.algorithm.g0 = smooth(o.algorithm.g0, g * g, γ)
@@ -384,8 +378,7 @@ function _updateβ!(o::StatLearn{AdaGrad2}, g, x, y, ŷ)
         o.β[j] = prox(o.penalty, o.β[j] - γ_G * gx, γ_G)
     end
 end
-function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
-    γ = weight!(o, length(y))
+function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     γη = γ * o.η
     if o.intercept
         ḡ = mean(g)
@@ -415,8 +408,7 @@ type AdaDelta <: Algorithm
     AdaDelta(ρ::Real = .001) = new(0.0, zeros(1), 0.0, zeros(1), Float64(ρ))
     AdaDelta(p::Integer, alg::AdaDelta) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p), alg.ρ)
 end
-function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ)
-    weight_noret!(o, 1)
+function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ, γ)
     if o.intercept
         o.algorithm.g0 = smooth(o.algorithm.g0, g * g, o.algorithm.ρ)
         Δ = sqrt(o.algorithm.Δ0 / o.algorithm.g0) * g
@@ -432,8 +424,7 @@ function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ)
         o.algorithm.Δ[j] = smooth(o.algorithm.Δ[j], Δ * Δ, o.algorithm.ρ)
     end
 end
-function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ::AVec)
-    weight_noret!(o, length(y))
+function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     if o.intercept
         ḡ = mean(g)
         o.algorithm.g0 = smooth(o.algorithm.g0, ḡ * ḡ, o.algorithm.ρ)
@@ -466,8 +457,7 @@ type RDA <: Algorithm
     RDA() = new()
     RDA(p::Integer, alg::RDA) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p))
 end
-function _updateβ!(o::StatLearn{RDA}, g, x, y, ŷ)
-    weight_noret!(o, 1)
+function _updateβ!(o::StatLearn{RDA}, g, x, y, ŷ, γ)
     w = 1 / o.weight.nups
     if o.intercept
         o.algorithm.g0 += g * g
@@ -481,9 +471,8 @@ function _updateβ!(o::StatLearn{RDA}, g, x, y, ŷ)
         rda_update!(o, j)
     end
 end
-function _updatebatchβ!(o::StatLearn{RDA}, g, x, y, ŷ)
+function _updatebatchβ!(o::StatLearn{RDA}, g, x, y, ŷ, γ)
     n = length(g)
-    weight_noret!(o, n)
     w = 1 / o.weight.nups
     if o.intercept
         ḡ = mean(g)
@@ -534,8 +523,7 @@ type MMGrad <: Algorithm
     MMGrad() = new()
     MMGrad(p::Integer, alg::MMGrad) = new(_ϵ, fill(_ϵ, p))
 end
-function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
-    γ = weight!(o, 1)
+function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ, γ)
     if o.intercept
         # weighted average of second order information
         o.algorithm.h0 = smooth(o.algorithm.h0, d2_h(o, 1.0, x, y, ŷ), γ)
@@ -548,9 +536,8 @@ function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
     end
 end
 
-function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ)
+function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ, γ)
     n = length(g)
-    γ = weight!(o, n)
     if o.intercept
         v = 0.0
         for i in 1:n
