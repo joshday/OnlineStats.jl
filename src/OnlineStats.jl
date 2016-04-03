@@ -86,7 +86,7 @@ function fit!{T <: Real}(o::OnlineStat{VectorInput}, y::AVec{T})
     _fit!(o, y, γ)
     o
 end
-function fit!{T <: Real, S <: Real}(o::OnlineStat{XYInput}, s::AVec{T}, y::AVec{S})
+function fit!{T <: Real}(o::OnlineStat{XYInput}, x::AVec{T}, y::Real)
     updatecounter!(o)
     γ = weight(o)
     _fit!(o, x, y, γ)
@@ -104,7 +104,7 @@ function fit!{T <: Real}(o::OnlineStat{VectorInput}, y::AVec{T}, γ::Float64)
     _fit!(o, y, γ)
     o
 end
-function fit!{T <: Real, S <: Real}(o::OnlineStat{XYInput}, s::AVec{T}, y::AVec{S}, γ::Float64)
+function fit!{T <: Real}(o::OnlineStat{XYInput}, s::AVec{T}, y::Real, γ::Float64)
     updatecounter!(o)
     _fit!(o, x, y, γ)
     o
@@ -219,7 +219,7 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
             rng = i:min(i + b - 1, n)
             updatecounter!(o, b)
             γ = weight(o, b)
-            fitbatch!(o, rows(x, rng), rows(y, rng), γ)
+            _fitbatch!(o, rows(x, rng), rows(y, rng), γ)
             i += b
         end
     end
@@ -296,13 +296,13 @@ include("modeling/sweep.jl")
 include("modeling/penalty.jl")
 # include("modeling/statlearn.jl")
 # include("modeling/statlearnextensions.jl")
-# include("modeling/linreg.jl")
+include("modeling/linreg.jl")
 # include("modeling/quantreg.jl")
-# include("modeling/bias.jl")
+include("modeling/bias.jl")
 # include("streamstats/bootstrap.jl")
 # include("streamstats/hyperloglog.jl")
 # include("multivariate/kmeans.jl")
-# Requires.@require Plots include("plots.jl")
+Requires.@require Plots include("plots.jl")
 
 end # module
 

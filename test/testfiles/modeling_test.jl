@@ -79,18 +79,18 @@ facts(@title "Modeling") do
         @fact add_deriv(p3, g, 20) --> g
     end
 
-    context(@subtitle "QuantReg") do
-        n, p = 10000, 10
-        x = randn(n, p)
-        β = collect(1.:p)
-        y = x * β + randn(n)
-
-        o = QuantReg(x, y)
-        fit!(o, x, y, 10)
-
-        @fact coef(o) --> value(o)
-        @fact value(o) --> o.β
-    end
+    # context(@subtitle "QuantReg") do
+    #     n, p = 10000, 10
+    #     x = randn(n, p)
+    #     β = collect(1.:p)
+    #     y = x * β + randn(n)
+    #
+    #     o = QuantReg(x, y)
+    #     fit!(o, x, y, 10)
+    #
+    #     @fact coef(o) --> value(o)
+    #     @fact value(o) --> o.β
+    # end
 
     context(@subtitle "BiasVector / BiasMatrix") do
         x = randn(100, 10)

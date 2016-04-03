@@ -19,7 +19,7 @@ module OnlineStatsTest
 include("testfiles/summary_test.jl")
 include("testfiles/weight_test.jl")
 include("testfiles/distributions_test.jl")
-# include("testfiles/modeling_test.jl")
+include("testfiles/modeling_test.jl")
 # include("testfiles/statlearn_test.jl")
 # include("testfiles/streamstats_test.jl")
 end
