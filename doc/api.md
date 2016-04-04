@@ -1,4 +1,4 @@
-<!--- This file was generated at 2016-04-04T13:10:06.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-04T13:12:45.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
@@ -461,41 +461,6 @@ Returns the number of independent observations on which the model was fitted. Be
 Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten. `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
 
 An optional vector `v` can be provided to avoid memory allocation. This requires `length(v) == size(A, 1)`.  Both `A` and `v` will be overwritten.
-
-```julia
-x = randn(100, 10)
-xtx = x'x
-sweep!(xtx, 1)
-sweep!(xtx, 1, true)
-```
-
-[Top](#table-of-contents)
-# value
-The associated value of an OnlineStat.
-
-```
-o1 = Mean()
-o2 = Variance()
-value(o1)
-value(o2)
-```
-
-[Top](#table-of-contents)
-(o2)
-```
-
-[Top](#table-of-contents)
-value of an OnlineStat.
-
-```
-o1 = Mean()
-o2 = Variance()
-value(o1)
-value(o2)
-```
-
-[Top](#table-of-contents)
-size(A, 1)`.  Both `A` and `v` will be overwritten.
 
 ```julia
 x = randn(100, 10)
