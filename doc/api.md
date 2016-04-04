@@ -1,7 +1,8 @@
-<!--- This file was generated at 2016-04-04T13:00:03.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-04T13:02:39.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
+
 
 [<pre><code>BernoulliBootstrap                                      Bootstrap{ScalarInput} </code></pre>](#bernoullibootstrap)
 [<pre><code>BoundedEqualWeight                                      Weight </code></pre>](#boundedequalweight)
@@ -157,13 +158,13 @@ value(o)
 # LearningRate
 `LearningRate(r = 0.6, λ = 0.0)`.
 
-Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
+Weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate2`.
 
 [Top](#table-of-contents)
 # LearningRate2
 `LearningRate2(c = 0.5, λ = 0.0)`.
 
-Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
+Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate`.
 
 [Top](#table-of-contents)
 # LinReg
@@ -409,6 +410,12 @@ coefplot(o)
 
 [Top](#table-of-contents)
 # fit!
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
 `fit!(o::OnlineStat, y, b = 1)`
 
 `fit!(o::OnlineStat, x, y, b = 1)`

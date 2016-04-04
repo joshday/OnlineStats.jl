@@ -51,7 +51,7 @@ end
 """
 `LearningRate(r = 0.6, λ = 0.0)`.
 
-Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
+Weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate2`.
 """
 type LearningRate <: StochasticWeight
     nobs::Int
@@ -66,7 +66,7 @@ end
 """
 `LearningRate2(c = 0.5, λ = 0.0)`.
 
-Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
+Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate`.
 """
 type LearningRate2 <: StochasticWeight
     nobs::Int
