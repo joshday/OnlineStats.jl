@@ -1,6 +1,8 @@
 *.png
 
-#coveralls files
+# coveralls files
 *.cov
 
 *.ipynb
+
+test/try.jl
