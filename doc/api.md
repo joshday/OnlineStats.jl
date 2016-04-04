@@ -1,44 +1,44 @@
-<!--- This file was generated at 2016-04-04T13:06:07.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-04T13:07:58.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
 
-##### [`BernoulliBootstrap                                      Bootstrap{ScalarInput}`](#bernoullibootstrap)
-##### [`BoundedEqualWeight                                      Weight`](#boundedequalweight)
-##### [`CompareTracePlot                                        Any`](#comparetraceplot)
-##### [`CovMatrix                                               OnlineStat{VectorInput}`](#covmatrix)
-##### [`Diff                                                    OnlineStat{ScalarInput}`](#diff)
-##### [`Diffs                                                   OnlineStat{VectorInput}`](#diffs)
-##### [`EqualWeight                                             BatchWeight`](#equalweight)
-##### [`ExponentialWeight                                       Weight`](#exponentialweight)
-##### [`Extrema                                                 OnlineStat{ScalarInput}`](#extrema)
-##### [`FitCategorical                                          DistributionStat{ScalarInput}`](#fitcategorical)
-##### [`HyperLogLog                                             OnlineStat{I<:Input}`](#hyperloglog)
-##### [`KMeans                                                  OnlineStat{VectorInput}`](#kmeans)
-##### [`LearningRate                                            StochasticWeight`](#learningrate)
-##### [`LearningRate2                                           StochasticWeight`](#learningrate2)
-##### [`LinReg                                                  OnlineStat{XYInput}`](#linreg)
-##### [`Mean                                                    OnlineStat{ScalarInput}`](#mean)
-##### [`Means                                                   OnlineStat{VectorInput}`](#means)
-##### [`Moments                                                 OnlineStat{ScalarInput}`](#moments)
-##### [`NormalMix                                               DistributionStat{ScalarInput}`](#normalmix)
-##### [`QuantReg                                                OnlineStat{XYInput}`](#quantreg)
-##### [`QuantileMM                                              OnlineStat{ScalarInput}`](#quantilemm)
-##### [`QuantileSGD                                             OnlineStat{ScalarInput}`](#quantilesgd)
-##### [`StatLearn                                               OnlineStat{XYInput}`](#statlearn)
-##### [`StatLearnCV                                             OnlineStat{XYInput}`](#statlearncv)
-##### [`StatLearnSparse                                         OnlineStat{XYInput}`](#statlearnsparse)
-##### [`Sum                                                     OnlineStat{ScalarInput}`](#sum)
-##### [`Sums                                                    OnlineStat{VectorInput}`](#sums)
-##### [`TracePlot                                               OnlineStat{I<:Input}`](#traceplot)
-##### [`Variance                                                OnlineStat{ScalarInput}`](#variance)
-##### [`Variances                                               OnlineStat{VectorInput}`](#variances)
-##### [`coefplot                                                Function`](#coefplot)
-##### [`fit!                                                    Function`](#fit!)
-##### [`fitdistribution                                         Function`](#fitdistribution)
-##### [`nobs                                                    Function`](#nobs)
-##### [`sweep!                                                  Function`](#sweep!)
-##### [`value                                                   Function`](#value)
+##### [<pre>BernoulliBootstrap                                      Bootstrap{ScalarInput}</pre>](#bernoullibootstrap)
+##### [<pre>BoundedEqualWeight                                      Weight</pre>](#boundedequalweight)
+##### [<pre>CompareTracePlot                                        Any</pre>](#comparetraceplot)
+##### [<pre>CovMatrix                                               OnlineStat{VectorInput}</pre>](#covmatrix)
+##### [<pre>Diff                                                    OnlineStat{ScalarInput}</pre>](#diff)
+##### [<pre>Diffs                                                   OnlineStat{VectorInput}</pre>](#diffs)
+##### [<pre>EqualWeight                                             BatchWeight</pre>](#equalweight)
+##### [<pre>ExponentialWeight                                       Weight</pre>](#exponentialweight)
+##### [<pre>Extrema                                                 OnlineStat{ScalarInput}</pre>](#extrema)
+##### [<pre>FitCategorical                                          DistributionStat{ScalarInput}</pre>](#fitcategorical)
+##### [<pre>HyperLogLog                                             OnlineStat{I<:Input}</pre>](#hyperloglog)
+##### [<pre>KMeans                                                  OnlineStat{VectorInput}</pre>](#kmeans)
+##### [<pre>LearningRate                                            StochasticWeight</pre>](#learningrate)
+##### [<pre>LearningRate2                                           StochasticWeight</pre>](#learningrate2)
+##### [<pre>LinReg                                                  OnlineStat{XYInput}</pre>](#linreg)
+##### [<pre>Mean                                                    OnlineStat{ScalarInput}</pre>](#mean)
+##### [<pre>Means                                                   OnlineStat{VectorInput}</pre>](#means)
+##### [<pre>Moments                                                 OnlineStat{ScalarInput}</pre>](#moments)
+##### [<pre>NormalMix                                               DistributionStat{ScalarInput}</pre>](#normalmix)
+##### [<pre>QuantReg                                                OnlineStat{XYInput}</pre>](#quantreg)
+##### [<pre>QuantileMM                                              OnlineStat{ScalarInput}</pre>](#quantilemm)
+##### [<pre>QuantileSGD                                             OnlineStat{ScalarInput}</pre>](#quantilesgd)
+##### [<pre>StatLearn                                               OnlineStat{XYInput}</pre>](#statlearn)
+##### [<pre>StatLearnCV                                             OnlineStat{XYInput}</pre>](#statlearncv)
+##### [<pre>StatLearnSparse                                         OnlineStat{XYInput}</pre>](#statlearnsparse)
+##### [<pre>Sum                                                     OnlineStat{ScalarInput}</pre>](#sum)
+##### [<pre>Sums                                                    OnlineStat{VectorInput}</pre>](#sums)
+##### [<pre>TracePlot                                               OnlineStat{I<:Input}</pre>](#traceplot)
+##### [<pre>Variance                                                OnlineStat{ScalarInput}</pre>](#variance)
+##### [<pre>Variances                                               OnlineStat{VectorInput}</pre>](#variances)
+##### [<pre>coefplot                                                Function</pre>](#coefplot)
+##### [<pre>fit!                                                    Function</pre>](#fit!)
+##### [<pre>fitdistribution                                         Function</pre>](#fitdistribution)
+##### [<pre>nobs                                                    Function</pre>](#nobs)
+##### [<pre>sweep!                                                  Function</pre>](#sweep!)
+##### [<pre>value                                                   Function</pre>](#value)
 
 # BernoulliBootstrap
 `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
@@ -481,11 +481,7 @@ value(o2)
 ```
 
 [Top](#table-of-contents)
-weep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
-
-Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten. `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
-
-An optional vector `v` can be provided to avoid memory allocation. This requires `length(v) == size(A, 1)`.  Both `A` and `v` will be overwritten.
+size(A, 1)`.  Both `A` and `v` will be overwritten.
 
 ```julia
 x = randn(100, 10)
