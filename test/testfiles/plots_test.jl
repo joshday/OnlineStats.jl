@@ -1,7 +1,7 @@
 module PlotTest
 
 using OnlineStats, FactCheck, Plots
-gadfly()
+plotlyjs()
 
 facts("Plots") do
     o = StatLearn(10)
