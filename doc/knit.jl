@@ -7,7 +7,7 @@ O = OnlineStats
 # entries for TOC
 function title(nm::Symbol, subnm::DataType, mod::Module)
     s = replace(string(subnm), string(mod) * ".", "")
-    @sprintf "<pre><code>%-55s %s" "$nm" "$s </code></pre>"
+    @sprintf "##### `%-55s %s" "$nm" "$s`"
 end
 
 

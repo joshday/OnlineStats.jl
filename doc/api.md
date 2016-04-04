@@ -1,45 +1,44 @@
-<!--- This file was generated at 2016-04-04T13:02:39.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-04T13:04:59.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
 
-
-[<pre><code>BernoulliBootstrap                                      Bootstrap{ScalarInput} </code></pre>](#bernoullibootstrap)
-[<pre><code>BoundedEqualWeight                                      Weight </code></pre>](#boundedequalweight)
-[<pre><code>CompareTracePlot                                        Any </code></pre>](#comparetraceplot)
-[<pre><code>CovMatrix                                               OnlineStat{VectorInput} </code></pre>](#covmatrix)
-[<pre><code>Diff                                                    OnlineStat{ScalarInput} </code></pre>](#diff)
-[<pre><code>Diffs                                                   OnlineStat{VectorInput} </code></pre>](#diffs)
-[<pre><code>EqualWeight                                             BatchWeight </code></pre>](#equalweight)
-[<pre><code>ExponentialWeight                                       Weight </code></pre>](#exponentialweight)
-[<pre><code>Extrema                                                 OnlineStat{ScalarInput} </code></pre>](#extrema)
-[<pre><code>FitCategorical                                          DistributionStat{ScalarInput} </code></pre>](#fitcategorical)
-[<pre><code>HyperLogLog                                             OnlineStat{I<:Input} </code></pre>](#hyperloglog)
-[<pre><code>KMeans                                                  OnlineStat{VectorInput} </code></pre>](#kmeans)
-[<pre><code>LearningRate                                            StochasticWeight </code></pre>](#learningrate)
-[<pre><code>LearningRate2                                           StochasticWeight </code></pre>](#learningrate2)
-[<pre><code>LinReg                                                  OnlineStat{XYInput} </code></pre>](#linreg)
-[<pre><code>Mean                                                    OnlineStat{ScalarInput} </code></pre>](#mean)
-[<pre><code>Means                                                   OnlineStat{VectorInput} </code></pre>](#means)
-[<pre><code>Moments                                                 OnlineStat{ScalarInput} </code></pre>](#moments)
-[<pre><code>NormalMix                                               DistributionStat{ScalarInput} </code></pre>](#normalmix)
-[<pre><code>QuantReg                                                OnlineStat{XYInput} </code></pre>](#quantreg)
-[<pre><code>QuantileMM                                              OnlineStat{ScalarInput} </code></pre>](#quantilemm)
-[<pre><code>QuantileSGD                                             OnlineStat{ScalarInput} </code></pre>](#quantilesgd)
-[<pre><code>StatLearn                                               OnlineStat{XYInput} </code></pre>](#statlearn)
-[<pre><code>StatLearnCV                                             OnlineStat{XYInput} </code></pre>](#statlearncv)
-[<pre><code>StatLearnSparse                                         OnlineStat{XYInput} </code></pre>](#statlearnsparse)
-[<pre><code>Sum                                                     OnlineStat{ScalarInput} </code></pre>](#sum)
-[<pre><code>Sums                                                    OnlineStat{VectorInput} </code></pre>](#sums)
-[<pre><code>TracePlot                                               OnlineStat{I<:Input} </code></pre>](#traceplot)
-[<pre><code>Variance                                                OnlineStat{ScalarInput} </code></pre>](#variance)
-[<pre><code>Variances                                               OnlineStat{VectorInput} </code></pre>](#variances)
-[<pre><code>coefplot                                                Function </code></pre>](#coefplot)
-[<pre><code>fit!                                                    Function </code></pre>](#fit!)
-[<pre><code>fitdistribution                                         Function </code></pre>](#fitdistribution)
-[<pre><code>nobs                                                    Function </code></pre>](#nobs)
-[<pre><code>sweep!                                                  Function </code></pre>](#sweep!)
-[<pre><code>value                                                   Function </code></pre>](#value)
+[##### `BernoulliBootstrap                                      Bootstrap{ScalarInput}`](#bernoullibootstrap)
+[##### `BoundedEqualWeight                                      Weight`](#boundedequalweight)
+[##### `CompareTracePlot                                        Any`](#comparetraceplot)
+[##### `CovMatrix                                               OnlineStat{VectorInput}`](#covmatrix)
+[##### `Diff                                                    OnlineStat{ScalarInput}`](#diff)
+[##### `Diffs                                                   OnlineStat{VectorInput}`](#diffs)
+[##### `EqualWeight                                             BatchWeight`](#equalweight)
+[##### `ExponentialWeight                                       Weight`](#exponentialweight)
+[##### `Extrema                                                 OnlineStat{ScalarInput}`](#extrema)
+[##### `FitCategorical                                          DistributionStat{ScalarInput}`](#fitcategorical)
+[##### `HyperLogLog                                             OnlineStat{I<:Input}`](#hyperloglog)
+[##### `KMeans                                                  OnlineStat{VectorInput}`](#kmeans)
+[##### `LearningRate                                            StochasticWeight`](#learningrate)
+[##### `LearningRate2                                           StochasticWeight`](#learningrate2)
+[##### `LinReg                                                  OnlineStat{XYInput}`](#linreg)
+[##### `Mean                                                    OnlineStat{ScalarInput}`](#mean)
+[##### `Means                                                   OnlineStat{VectorInput}`](#means)
+[##### `Moments                                                 OnlineStat{ScalarInput}`](#moments)
+[##### `NormalMix                                               DistributionStat{ScalarInput}`](#normalmix)
+[##### `QuantReg                                                OnlineStat{XYInput}`](#quantreg)
+[##### `QuantileMM                                              OnlineStat{ScalarInput}`](#quantilemm)
+[##### `QuantileSGD                                             OnlineStat{ScalarInput}`](#quantilesgd)
+[##### `StatLearn                                               OnlineStat{XYInput}`](#statlearn)
+[##### `StatLearnCV                                             OnlineStat{XYInput}`](#statlearncv)
+[##### `StatLearnSparse                                         OnlineStat{XYInput}`](#statlearnsparse)
+[##### `Sum                                                     OnlineStat{ScalarInput}`](#sum)
+[##### `Sums                                                    OnlineStat{VectorInput}`](#sums)
+[##### `TracePlot                                               OnlineStat{I<:Input}`](#traceplot)
+[##### `Variance                                                OnlineStat{ScalarInput}`](#variance)
+[##### `Variances                                               OnlineStat{VectorInput}`](#variances)
+[##### `coefplot                                                Function`](#coefplot)
+[##### `fit!                                                    Function`](#fit!)
+[##### `fitdistribution                                         Function`](#fitdistribution)
+[##### `nobs                                                    Function`](#nobs)
+[##### `sweep!                                                  Function`](#sweep!)
+[##### `value                                                   Function`](#value)
 
 # BernoulliBootstrap
 `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
@@ -458,6 +457,31 @@ Returns the number of independent observations on which the model was fitted. Be
 [Top](#table-of-contents)
 # sweep!
 `sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
+
+Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten. `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
+
+An optional vector `v` can be provided to avoid memory allocation. This requires `length(v) == size(A, 1)`.  Both `A` and `v` will be overwritten.
+
+```julia
+x = randn(100, 10)
+xtx = x'x
+sweep!(xtx, 1)
+sweep!(xtx, 1, true)
+```
+
+[Top](#table-of-contents)
+# value
+The associated value of an OnlineStat.
+
+```
+o1 = Mean()
+o2 = Variance()
+value(o1)
+value(o2)
+```
+
+[Top](#table-of-contents)
+weep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
 Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten. `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
 
