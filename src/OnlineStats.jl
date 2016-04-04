@@ -11,7 +11,7 @@ export
     OnlineStat,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
-    BoundedEqualWeight, WeightedOnlineStat,
+    BoundedEqualWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, LinReg, QuantReg, NormalMix,
@@ -30,7 +30,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, center, standardize, show_weight, fitdistribution
+    loss, center, standardize, fitdistribution
 
 #-----------------------------------------------------------------------------# types
 abstract Input

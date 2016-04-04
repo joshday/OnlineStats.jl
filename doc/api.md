@@ -1,21 +1,22 @@
-<!--- This file was generated at 2016-02-15T10:51:12.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-04T13:00:03.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
 
-[<pre><code>BoundedExponentialWeight                                Weight </code></pre>](#boundedexponentialweight)
+[<pre><code>BernoulliBootstrap                                      Bootstrap{ScalarInput} </code></pre>](#bernoullibootstrap)
+[<pre><code>BoundedEqualWeight                                      Weight </code></pre>](#boundedequalweight)
 [<pre><code>CompareTracePlot                                        Any </code></pre>](#comparetraceplot)
 [<pre><code>CovMatrix                                               OnlineStat{VectorInput} </code></pre>](#covmatrix)
 [<pre><code>Diff                                                    OnlineStat{ScalarInput} </code></pre>](#diff)
 [<pre><code>Diffs                                                   OnlineStat{VectorInput} </code></pre>](#diffs)
-[<pre><code>EqualWeight                                             Weight </code></pre>](#equalweight)
+[<pre><code>EqualWeight                                             BatchWeight </code></pre>](#equalweight)
 [<pre><code>ExponentialWeight                                       Weight </code></pre>](#exponentialweight)
 [<pre><code>Extrema                                                 OnlineStat{ScalarInput} </code></pre>](#extrema)
 [<pre><code>FitCategorical                                          DistributionStat{ScalarInput} </code></pre>](#fitcategorical)
 [<pre><code>HyperLogLog                                             OnlineStat{I<:Input} </code></pre>](#hyperloglog)
 [<pre><code>KMeans                                                  OnlineStat{VectorInput} </code></pre>](#kmeans)
-[<pre><code>LearningRate                                            Weight </code></pre>](#learningrate)
-[<pre><code>LearningRate2                                           Weight </code></pre>](#learningrate2)
+[<pre><code>LearningRate                                            StochasticWeight </code></pre>](#learningrate)
+[<pre><code>LearningRate2                                           StochasticWeight </code></pre>](#learningrate2)
 [<pre><code>LinReg                                                  OnlineStat{XYInput} </code></pre>](#linreg)
 [<pre><code>Mean                                                    OnlineStat{ScalarInput} </code></pre>](#mean)
 [<pre><code>Means                                                   OnlineStat{VectorInput} </code></pre>](#means)
@@ -27,17 +28,32 @@
 [<pre><code>StatLearn                                               OnlineStat{XYInput} </code></pre>](#statlearn)
 [<pre><code>StatLearnCV                                             OnlineStat{XYInput} </code></pre>](#statlearncv)
 [<pre><code>StatLearnSparse                                         OnlineStat{XYInput} </code></pre>](#statlearnsparse)
+[<pre><code>Sum                                                     OnlineStat{ScalarInput} </code></pre>](#sum)
+[<pre><code>Sums                                                    OnlineStat{VectorInput} </code></pre>](#sums)
 [<pre><code>TracePlot                                               OnlineStat{I<:Input} </code></pre>](#traceplot)
 [<pre><code>Variance                                                OnlineStat{ScalarInput} </code></pre>](#variance)
 [<pre><code>Variances                                               OnlineStat{VectorInput} </code></pre>](#variances)
 [<pre><code>coefplot                                                Function </code></pre>](#coefplot)
 [<pre><code>fit!                                                    Function </code></pre>](#fit!)
 [<pre><code>fitdistribution                                         Function </code></pre>](#fitdistribution)
+[<pre><code>nobs                                                    Function </code></pre>](#nobs)
 [<pre><code>sweep!                                                  Function </code></pre>](#sweep!)
 [<pre><code>value                                                   Function </code></pre>](#value)
 
-# BoundedExponentialWeight
-`BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
+# BernoulliBootstrap
+`BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+
+Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
+
+Example:
+
+```julia
+BernoulliBootstrap(Mean(), mean, 1000)
+```
+
+[Top](#table-of-contents)
+# BoundedEqualWeight
+`BoundedEqualWeight(λ::Float64)`, `BoundedEqualWeight(lookback::Int)`
 
 Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
 
@@ -71,7 +87,7 @@ var(o)
 
 [Top](#table-of-contents)
 # Diff
-Track the last value and the last difference.  Ignores `Weight`.
+Track the last value and the last difference.
 
 ```julia
 o = Diff()
@@ -99,7 +115,7 @@ Weights are held constant at `λ = 2 / (1 + lookback)`.
 
 [Top](#table-of-contents)
 # Extrema
-Extrema (maximum and minimum).  Ignores `Weight`.
+Extrema (maximum and minimum).
 
 ```julia
 o = Extrema(y)
@@ -139,15 +155,15 @@ value(o)
 
 [Top](#table-of-contents)
 # LearningRate
-`LearningRate(r = 0.6; minstep = 0.0)`.
+`LearningRate(r = 0.6, λ = 0.0)`.
 
 Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
 
 [Top](#table-of-contents)
 # LearningRate2
-`LearningRate2(γ, c = 1.0; minstep = 0.0)`.
+`LearningRate2(c = 0.5, λ = 0.0)`.
 
-Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
+Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
 
 [Top](#table-of-contents)
 # LinReg
@@ -230,7 +246,7 @@ Online MM Algorithm for Quantile Regression.
 
 [Top](#table-of-contents)
 # QuantileMM
-Approximate quantiles via an online MM algorithm.
+Approximate quantiles via an online MM algorithm.  Typically more accurate than `QuantileSGD`.
 
 ```julia
 o = QuantileMM(y, LearningRate())
@@ -271,9 +287,10 @@ The model is defined by:
 #### `Penalty`
 
   * `NoPenalty()`     - No penalty.  Default.
-  * `RidgePenalty(λ)`     - Ridge regularization
-  * `LassoPenalty(λ)`     - LASSO regularization
+  * `RidgePenalty(λ)`     - Ridge regularization: `dot(β, β)`
+  * `LassoPenalty(λ)`     - Lasso regularization: `sumabs(β)`
   * `ElasticNetPenalty(λ, α)`     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
+  * `SCADPenalty(λ, a = 3.7)`     - Smoothly clipped absolute deviation penalty.  Essentially LASSO with less bias     for larger coefficients.
 
 #### `Algorithm`
 
@@ -282,7 +299,6 @@ The model is defined by:
   * `AdaDelta()`     - Extension of AdaGrad.  Ignores `Weight`.
   * `RDA()`     - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
   * `MMGrad()`     - Experimental online MM gradient method.
-  * `AdaMMGrad()`     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 **Note:** The order of the `ModelDefinition`, `Penalty`, and `Algorithm` arguments don't matter.
 
@@ -312,6 +328,24 @@ Enforce sparsity on a `StatLearn` object.  Currently, the only option is `HardTh
 ```julia
 StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
 fit!(o, x, y)
+```
+
+[Top](#table-of-contents)
+# Sum
+Track the running sum.  Ignores `Weight`.
+
+```julia
+o = Sum()
+o = Sum(y)
+```
+
+[Top](#table-of-contents)
+# Sums
+Track the running sum for multiple series.  Ignores `Weight`.
+
+```julia
+o = Sums()
+o = Sums(y)
 ```
 
 [Top](#table-of-contents)
@@ -407,6 +441,12 @@ var(o)
 std(o)
 cov(o)
 ```
+
+[Top](#table-of-contents)
+# nobs
+nobs(obj::StatisticalModel)
+
+Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
 [Top](#table-of-contents)
 # sweep!

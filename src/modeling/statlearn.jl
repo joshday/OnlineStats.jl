@@ -108,9 +108,9 @@ The model is defined by:
 - `NoPenalty()`
     - No penalty.  Default.
 - `RidgePenalty(λ)`
-    - Ridge regularization
+    - Ridge regularization: `dot(β, β)`
 - `LassoPenalty(λ)`
-    - LASSO regularization
+    - Lasso regularization: `sumabs(β)`
 - `ElasticNetPenalty(λ, α)`
     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
 - `SCADPenalty(λ, a = 3.7)`
