@@ -30,7 +30,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, center, standardize, fitdistribution
+    loss, cost, center, standardize, fitdistribution
 
 #-----------------------------------------------------------------------------# types
 abstract Input
@@ -304,5 +304,3 @@ include("multivariate/kmeans.jl")
 Requires.@require Plots include("plots.jl")
 
 end # module
-
-# O = OnlineStats

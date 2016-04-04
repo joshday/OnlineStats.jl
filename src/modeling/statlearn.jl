@@ -218,6 +218,10 @@ end
 setβ0!(o::StatLearn, γ, g) = (o.β0 = subgrad(o.β0, γ, g))
 loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, o.β0 + x * o.β)
 
+cost(o::StatLearn, x::AVec, y::Real) =
+    loss(o.model, y, o.β0 + dot(x, o.β)) + _j(o.penalty, o.β)
+cost(o::StatLearn, x::AMat, y::AVec) =
+    loss(o.model, y, o.β0 + x * o.β) + _j(o.penalty, o.β)
 
 
 
@@ -518,10 +522,11 @@ rda_γ(o::StatLearn{RDA}, j::Int) = o.weight.nups * o.η / sqrt(o.algorithm.g[j]
 
 #-----------------------------------------------------------------------# MMGrad
 type MMGrad <: Algorithm
+    α::Function
     h0::Float64
     h::VecF  # Diagonal elements of H = -d^2 h(β)
-    MMGrad() = new()
-    MMGrad(p::Integer, alg::MMGrad) = new(_ϵ, fill(_ϵ, p))
+    MMGrad(α::Function = abs) = new(α)
+    MMGrad(p::Integer, alg::MMGrad) = new(alg.α, _ϵ, fill(_ϵ, p))
 end
 function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ, γ)
     if o.intercept
@@ -560,7 +565,8 @@ function _updatebatchβ!(o::StatLearn{MMGrad}, g, x, y, ŷ, γ)
 end
 
 # for De Pierro majorization, requires: sum(α) == 1 and α_j > 0 for all j
-_α(o::StatLearn, xj, x) = (abs(xj) + _ϵ) / (sumabs(x) + o.intercept + ndims(o) * _ϵ)
+_α(o::StatLearn, xj, x) =
+    (o.algorithm.α(xj) + _ϵ) / (sum(o.algorithm.α(x)) + o.intercept + ndims(o) * _ϵ)
 
 # second (partial) derivative of majorizing function, h(β_t)
 d2_h{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ) = xj^2 / _α(o, xj, x)

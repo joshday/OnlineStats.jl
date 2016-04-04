@@ -3,6 +3,7 @@ abstract Weight
 abstract BatchWeight <: Weight  # only BatchWeight types work for fitting by batch
 abstract StochasticWeight <: BatchWeight
 
+
 #-----------------------------------------------------------------------# EqualWeight
 """
 `EqualWeight()`.  All observations weighted equally.
@@ -12,6 +13,7 @@ type EqualWeight <: BatchWeight
     EqualWeight() = new(0)
     EqualWeight(n::Int) = new(n)
 end
+
 
 #-----------------------------------------------------------------# ExponentialWeight
 """
@@ -75,7 +77,6 @@ type LearningRate2 <: StochasticWeight
     λ::Float64
     LearningRate2(c::Real = 0.5, λ = 0.0) = new(0, 0, c, λ)
 end
-
 
 
 #---------------------------------------------------------------------------# methods
