@@ -17,8 +17,8 @@ coeftable(o)
 using Plots; coefplot(o)
 
 # regularized estimates
-coef(o, L2Penalty(.1))  # Ridge
-coef(o, L1Penalty(.1))  # LASSO
+coef(o, RidgePenalty(.1))  # Ridge
+coef(o, LassoPenalty(.1))  # LASSO
 coef(o, ElasticNetPenalty(.1, .5))
 coef(o, SCADPenalty(.1, 3.7))
 ```

@@ -169,8 +169,8 @@ coeftable(o)
 using Plots; coefplot(o)
 
 # regularized estimates
-coef(o, L2Penalty(.1))  # Ridge
-coef(o, L1Penalty(.1))  # LASSO
+coef(o, RidgePenalty(.1))  # Ridge
+coef(o, LassoPenalty(.1))  # LASSO
 coef(o, ElasticNetPenalty(.1, .5))
 coef(o, SCADPenalty(.1, 3.7))
 ```
@@ -265,14 +265,14 @@ The model is defined by:
   * `LogisticRegression()`     - Model for data in {0, 1}
   * `PoissonRegression()`     - Model count data {0, 1, 2, 3, ...}
   * `QuantileRegression(τ)`     - Model conditional quantiles
-  * `SVMLike()`     - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `L2Penalty`.
+  * `SVMLike()`     - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `RidgePenalty`.
   * `HuberRegression(δ)`     - Robust Huber loss
 
 #### `Penalty`
 
   * `NoPenalty()`     - No penalty.  Default.
-  * `L2Penalty(λ)`     - Ridge regularization
-  * `L1Penalty(λ)`     - LASSO regularization
+  * `RidgePenalty(λ)`     - Ridge regularization
+  * `LassoPenalty(λ)`     - LASSO regularization
   * `ElasticNetPenalty(λ, α)`     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
 
 #### `Algorithm`
@@ -290,7 +290,7 @@ The model is defined by:
 StatLearn(x, y)
 StatLearn(x, y, AdaGrad())
 StatLearn(x, y, MMGrad(), LearningRate(.5))
-StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
+StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
 ```
 
 [Top](#table-of-contents)
@@ -300,7 +300,7 @@ StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
 Automatically tune the regularization parameter λ for `o` by minimizing loss on test data `xtest`, `ytest`.
 
 ```julia
-sl = StatLearn(size(x, 2), L1Penalty(.1))
+sl = StatLearn(size(x, 2), LassoPenalty(.1))
 o = StatLearnCV(sl, xtest, ytest)
 fit!(o, x, y)
 ```

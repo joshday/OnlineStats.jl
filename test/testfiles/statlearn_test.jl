@@ -29,7 +29,7 @@ facts(@title "StatLearn") do
     xβ = x*β
 
     alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), RDA(), MMGrad()]
-    pen = [NoPenalty(), L2Penalty(.1), L1Penalty(.1), ElasticNetPenalty(.1, .5)]
+    pen = [NoPenalty(), RidgePenalty(.1), LassoPenalty(.1), ElasticNetPenalty(.1, .5)]
     mod = [
         L2Regression(), L1Regression(), LogisticRegression(),
         PoissonRegression(), QuantileRegression(), SVMLike(), HuberRegression()
@@ -118,7 +118,7 @@ facts(@title "StatLearn") do
     #     β, x, y = linearmodeldata(n, p, rho)
     #     _, xtest, ytest = linearmodeldata(500, p, rho)
     #
-    #     o = StatLearn(p, penalty = L1Penalty(1.), algorithm = RDA())
+    #     o = StatLearn(p, penalty = LassoPenalty(1.), algorithm = RDA())
     #     cv = StatLearnCV(o, xtest, ytest, 1234)
     #     o2 = StatLearn(p, algorithm = RDA())
     #

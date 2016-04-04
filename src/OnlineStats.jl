@@ -20,7 +20,7 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
     # Penalties
-    Penalty, NoPenalty, L2Penalty, L1Penalty, ElasticNetPenalty, SCADPenalty,
+    Penalty, NoPenalty, RidgePenalty, LassoPenalty, ElasticNetPenalty, SCADPenalty,
     # ModelDefinition and Algorithm
     ModelDefinition, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,

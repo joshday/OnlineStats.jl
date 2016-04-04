@@ -66,7 +66,7 @@ Automatically tune the regularization parameter λ for `o` by minimizing loss on
 test data `xtest`, `ytest`.
 
 ```julia
-sl = StatLearn(size(x, 2), L1Penalty(.1))
+sl = StatLearn(size(x, 2), LassoPenalty(.1))
 o = StatLearnCV(sl, xtest, ytest)
 fit!(o, x, y)
 ```

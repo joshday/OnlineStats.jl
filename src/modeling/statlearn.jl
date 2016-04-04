@@ -100,16 +100,16 @@ The model is defined by:
 - `QuantileRegression(τ)`
     - Model conditional quantiles
 - `SVMLike()`
-    - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `L2Penalty`.
+    - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `RidgePenalty`.
 - `HuberRegression(δ)`
     - Robust Huber loss
 
 #### `Penalty`
 - `NoPenalty()`
     - No penalty.  Default.
-- `L2Penalty(λ)`
+- `RidgePenalty(λ)`
     - Ridge regularization
-- `L1Penalty(λ)`
+- `LassoPenalty(λ)`
     - LASSO regularization
 - `ElasticNetPenalty(λ, α)`
     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
@@ -135,7 +135,7 @@ The model is defined by:
 StatLearn(x, y)
 StatLearn(x, y, AdaGrad())
 StatLearn(x, y, MMGrad(), LearningRate(.5))
-StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
+StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
 ```
 """
 type StatLearn{A<:Algorithm, M<:ModelDefinition, P<:Penalty, W<:Weight} <: OnlineStat{XYInput}
@@ -496,13 +496,13 @@ end
 function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, NoPenalty}, j::Int)
     o.β[j] = -rda_γ(o, j) * o.algorithm.gbar[j]
 end
-# L2Penalty
-function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, L2Penalty}, j::Int)
+# RidgePenalty
+function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, RidgePenalty}, j::Int)
     o.algorithm.gbar[j] += (1 / o.weight.nups) * o.penalty.λ * o.β[j]  # add in penalty gradient
     o.β[j] = -rda_γ(o,j) * o.algorithm.gbar[j]
 end
-# L1Penalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
-function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, L1Penalty}, j::Int)
+# LassoPenalty (http://www.magicbroom.info/Papers/DuchiHaSi10.pdf)
+function rda_update!{M<:ModelDefinition}(o::StatLearn{RDA, M, LassoPenalty}, j::Int)
     ḡ = o.algorithm.gbar[j]
     o.β[j] = sign(-ḡ) * rda_γ(o, j) * max(0.0, abs(ḡ) - o.penalty.λ)
 end
