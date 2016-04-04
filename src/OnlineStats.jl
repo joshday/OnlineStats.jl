@@ -39,7 +39,6 @@ abstract VectorInput    <: Input  # observation = vector
 abstract XYInput        <: Input  # observation = (x, y) pair
 
 abstract OnlineStat{I <: Input}
-abstract WeightlessOnlineStat{I <: Input} <: OnlineStat{I}
 
 typealias VecF      Vector{Float64}
 typealias MatF      Matrix{Float64}

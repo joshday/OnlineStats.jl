@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------# Mean
+#------------------------------------------------------------------------------# Mean
 """
 Univariate mean.
 
@@ -22,7 +22,7 @@ Base.mean(o::Mean) = value(o)
 center(o::Mean, x::Real) = x - mean(o)
 
 
-#------------------------------------------------------------------------# Means
+#-----------------------------------------------------------------------------# Means
 """
 Means of multiple series, similar to `mean(x, 1)`.
 
@@ -46,7 +46,7 @@ Base.mean(o::Means) = value(o)
 center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 
 
-#---------------------------------------------------------------------# Variance
+#--------------------------------------------------------------------------# Variance
 """
 Univariate variance.
 
@@ -79,7 +79,7 @@ center(o::Variance, x::Real) = x - mean(o)
 standardize(o::Variance, x::Real) = center(o, x) / std(o)
 
 
-#--------------------------------------------------------------------# Variances
+#-------------------------------------------------------------------------# Variances
 """
 Variances of a multiple series, similar to `var(x, 1)`.
 
@@ -122,7 +122,7 @@ center{T<:Real}(o::Variances, x::AVec{T}) = x - mean(o)
 standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
 
 
-#--------------------------------------------------------------------# CovMatrix
+#-------------------------------------------------------------------------# CovMatrix
 """
 Covariance matrix, similar to `cov(x)`.
 
@@ -182,8 +182,7 @@ function Base.cor(o::CovMatrix)
 end
 
 
-
-#----------------------------------------------------------------------# Extrema
+#---------------------------------------------------------------------------# Extrema
 """
 Extrema (maximum and minimum).
 
@@ -193,27 +192,23 @@ fit!(o, y2)
 extrema(o)
 ```
 """
-type Extrema <: WeightlessOnlineStat{ScalarInput}
+type Extrema <: OnlineStat{ScalarInput}
     min::Float64
     max::Float64
-    nobs::Int
-    Extrema() = new(Inf, -Inf, 0)
-    Extrema{T<:Real}(y::AVec{T}) = new(minimum(y), maximum(y), length(y))
+    weight::EqualWeight
+    Extrema() = new(Inf, -Inf, EqualWeight())
+    Extrema{T<:Real}(y::AVec{T}) = new(minimum(y), maximum(y), EqualWeight(length(y)))
 end
 function _fit!(o::Extrema, y::Real, γ::Float64)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
     o
 end
-updatecounter!(o::Extrema, n2::Int) = (o.nobs += n2)
 Base.extrema(o::Extrema) = (o.min, o.max)
 value(o::Extrema) = extrema(o)
-StatsBase.nobs(o::Extrema) = o.nobs
 
 
-
-
-#------------------------------------------------------------------# QuantileSGD
+#-----------------------------------------------------------------------# QuantileSGD
 """
 Approximate quantiles via stochastic gradient descent.
 
@@ -258,7 +253,7 @@ function Base.show(io::IO, o::QuantileSGD)
 end
 
 
-#------------------------------------------------------------------# QuantileMM
+#------------------------------------------------------------------------# QuantileMM
 """
 Approximate quantiles via an online MM algorithm.  Typically more accurate than
 `QuantileSGD`.
@@ -319,7 +314,7 @@ function Base.show(io::IO, o::QuantileMM)
 end
 
 
-#----------------------------------------------------------------------# Moments
+#---------------------------------------------------------------------------# Moments
 """
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
@@ -369,23 +364,22 @@ function Base.show(io::IO, o::Moments)
 end
 
 
-#-------------------------------------------------------------------# Diff/Diffs
+#------------------------------------------------------------------------# Diff/Diffs
 """
-Track the last value and the last difference.  Ignores `Weight`.
+Track the last value and the last difference.
 
 ```julia
 o = Diff()
 o = Diff(y)
 ```
 """
-type Diff{T <: Real} <: WeightlessOnlineStat{ScalarInput}
+type Diff{T <: Real} <: OnlineStat{ScalarInput}
     diff::T
     lastval::T
-    nobs::Int
+    weight::EqualWeight
 end
-nobs(o::Diff) = o.nobs
-Diff() = Diff(0.0, 0.0, 0)
-Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), 0)
+Diff() = Diff(0.0, 0.0, EqualWeight())
+Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), EqualWeight())
 Diff{T<:Real}(x::AVec{T}) = (o = Diff(T); fit!(o, x); o)
 value(o::Diff) = o.diff
 Base.last(o::Diff) = o.lastval
@@ -410,14 +404,13 @@ o = Diffs()
 o = Diffs(y)
 ```
 """
-type Diffs{T <: Real} <: WeightlessOnlineStat{VectorInput}
+type Diffs{T <: Real} <: OnlineStat{VectorInput}
     diffs::Vector{T}
     lastvals::Vector{T}
-    nobs::Int
+    weight::EqualWeight
 end
-nobs(o::Diffs) = o.nobs
-Diffs(p::Integer) = Diffs(zeros(p), zeros(p), 0)
-Diffs{T<:Real}(::Type{T}, p::Integer) = Diffs(zeros(T,p), zeros(T,p), 0)
+Diffs(p::Integer) = Diffs(zeros(p), zeros(p), EqualWeight())
+Diffs{T<:Real}(::Type{T}, p::Integer) = Diffs(zeros(T,p), zeros(T,p), EqualWeight())
 Diffs{T<:Real}(x::AMat{T}) = (o = Diffs(T,ncols(x)); fit!(o, x); o)
 
 value(o::Diffs) = o.diffs
@@ -426,7 +419,6 @@ Base.diff(o::Diffs) = o.diffs
 function _fit!{T<:Real}(o::Diffs{T}, x::AVec{T}, γ::Float64)
     o.diffs = (nobs(o) == 0 ? zeros(T,length(o.diffs)) : x - last(o))
     o.lastvals = collect(x)
-    o.nobs += 1
     o
 end
 
@@ -439,13 +431,13 @@ o = Sum()
 o = Sum(y)
 ```
 """
-type Sum{T <: Real} <: WeightlessOnlineStat{ScalarInput}
+type Sum{T <: Real} <: OnlineStat{ScalarInput}
     sum::T
-    nobs::Int
+    weight::EqualWeight
 end
 nobs(o::Sum) = o.nobs
-Sum() = Sum(0.0, 0)
-Sum{T<:Real}(::Type{T}) = Sum(zero(T), 0)
+Sum() = Sum(0.0, EqualWeight())
+Sum{T<:Real}(::Type{T}) = Sum(zero(T), EqualWeight())
 Sum{T<:Real}(x::AVec{T}) = (o = Sum(T); fit!(o, x); o)
 value(o::Sum) = o.sum
 Base.sum(o::Sum) = o.sum
@@ -466,14 +458,13 @@ o = Sums()
 o = Sums(y)
 ```
 """
-type Sums{T <: Real} <: WeightlessOnlineStat{VectorInput}
+type Sums{T <: Real} <: OnlineStat{VectorInput}
     sums::Vector{T}
-    nobs::Int
+    weight::EqualWeight
 end
-nobs(o::Sums) = o.nobs
-Sums(p::Integer) = Sums(zeros(p), 0)
-Sums{T<:Real}(::Type{T}, p::Integer) = Sums(zeros(T,p), 0)
-Sums{T<:Real}(x::AMat{T}) = (o = Sums(T,ncols(x)); fit!(o, x); o)
+Sums(p::Integer) = Sums(zeros(p), EqualWeight())
+Sums{T<:Real}(::Type{T}, p::Integer) = Sums(zeros(T,p), EqualWeight())
+Sums{T<:Real}(x::AMat{T}) = (o = Sums(T, ncols(x)); fit!(o, x); o)
 
 value(o::Sums) = o.sums
 Base.sum(o::Sums) = o.sums

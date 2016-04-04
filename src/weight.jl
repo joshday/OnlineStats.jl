@@ -10,6 +10,7 @@ abstract StochasticWeight <: BatchWeight
 type EqualWeight <: BatchWeight
     nobs::Int
     EqualWeight() = new(0)
+    EqualWeight(n::Int) = new(n)
 end
 
 #-----------------------------------------------------------------# ExponentialWeight
@@ -93,8 +94,3 @@ weight(w::ExponentialWeight, n2::Int = 1)   = w.λ
 weight(w::LearningRate, n2::Int = 1)        = max(w.λ, exp(-w.r * log(w.nups)))
 weight(w::LearningRate2, n2::Int = 1)       = max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
 weight(o::OnlineStat, n2::Int = 1) = weight(o.weight, n2)
-
-
-# For onlinestats that don't have/need a weight
-updatecounter!(o::WeightlessOnlineStat, n2::Int = 1) = (o.nobs += n2)
-weight(o::WeightlessOnlineStat, n2::Int = 1) = 0.0
