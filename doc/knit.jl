@@ -7,7 +7,7 @@ O = OnlineStats
 # entries for TOC
 function title(nm::Symbol, subnm::DataType, mod::Module)
     s = replace(string(subnm), string(mod) * ".", "")
-    @sprintf "##### `%-55s %s" "$nm" "$s`"
+    @sprintf "`%-55s %s" "$nm" "$s`"
 end
 
 
@@ -35,10 +35,10 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
             if objtype == DataType      # if DataType, get supertype
                 objsuper = super(obj)
                 heading = title(nm, objsuper, mod)
-                write(file, "[" * heading * "](#$(lowercase(string(nm))))\n")
+                write(file, "##### [" * heading * "](#$(lowercase(string(nm))))\n")
             else
                 heading = title(nm, objtype, mod)
-                write(file, "[" * heading * "](#$(lowercase(string(nm))))\n")
+                write(file, "##### [" * heading * "](#$(lowercase(string(nm))))\n")
             end
         end
     end
