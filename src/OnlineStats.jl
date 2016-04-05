@@ -103,7 +103,7 @@ function fit!{T <: Real}(o::OnlineStat{VectorInput}, y::AVec{T}, γ::Float64)
     _fit!(o, y, γ)
     o
 end
-function fit!{T <: Real}(o::OnlineStat{XYInput}, s::AVec{T}, y::Real, γ::Float64)
+function fit!{T <: Real}(o::OnlineStat{XYInput}, x::AVec{T}, y::Real, γ::Float64)
     updatecounter!(o)
     _fit!(o, x, y, γ)
     o
@@ -150,6 +150,28 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, w::AVec)
     @assert size(x, 1) == length(y) == length(w)
     for i in eachindex(y)
         fit!(o, row(x, i), row(y, i), w[i])
+    end
+    o
+end
+
+############ multiple observations, override weight, each update gets the same weight
+function fit!(o::OnlineStat{ScalarInput}, y::AVec, w::Real)
+    for i in eachindex(y)
+        fit!(o, y[i], w)
+    end
+    o
+end
+function fit!(o::OnlineStat{VectorInput}, y::AMat, w::Real)
+    n2 = nrows(y)
+    for i in 1:n2
+        fit!(o, row(y, i), w)
+    end
+    o
+end
+function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, w::Real)
+    @assert size(x, 1) == length(y)
+    for i in eachindex(y)
+        fit!(o, row(x, i), row(y, i), w)
     end
     o
 end
