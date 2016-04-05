@@ -17,6 +17,7 @@ facts(@title "Weighting") do
         @fact O.weight(w) --> 0.5
         O.updatecounter!(w, 5)
         @fact O.weight(w) --> 0.5
+        @fact ExponentialWeight(5).λ --> ExponentialWeight(1/3).λ
     end
     context(@subtitle "BoundedEqualWeight") do
         w = BoundedEqualWeight(.1)
@@ -24,6 +25,7 @@ facts(@title "Weighting") do
         @fact O.weight(w, 1) --> 1.0
         O.updatecounter!(w, 100)
         @fact O.weight(w) --> 0.1
+        @fact BoundedEqualWeight(5).λ --> BoundedEqualWeight(1/3).λ
     end
     context(@subtitle "LearningRate") do
         w = LearningRate(.6)

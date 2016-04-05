@@ -55,7 +55,7 @@ function value(o::NormalMix)
         println(sqrt(o.σ2))
         println(sqrt(o.μ))
         println(sqrt(o.s1))
-        error("Algorithm is fucked, nobs = $(nobs(o))")
+        error("Algorithm possibly diverging, nobs = $(nobs(o))")
     end
 end
 function _fit!(o::NormalMix, y::Real, γ::Float64)

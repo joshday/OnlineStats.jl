@@ -435,7 +435,6 @@ type Sum{T <: Real} <: OnlineStat{ScalarInput}
     sum::T
     weight::EqualWeight
 end
-nobs(o::Sum) = o.nobs
 Sum() = Sum(0.0, EqualWeight())
 Sum{T<:Real}(::Type{T}) = Sum(zero(T), EqualWeight())
 Sum{T<:Real}(x::AVec{T}) = (o = Sum(T); fit!(o, x); o)

@@ -124,6 +124,7 @@ facts(@title "Distributions") do
         fit!(o, y, 1)
         fit!(o, y, 2)
         fit!(o, y, 5)
+        NormalMix(3, y)
     end
 end
 
