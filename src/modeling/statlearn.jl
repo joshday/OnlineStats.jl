@@ -240,10 +240,43 @@ function _updateβ!(o::StatLearn{SGD}, g, x, y, ŷ, γ)
         o.β0 -= γ * g
     end
     for j in 1:length(o.β)
-        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j], γ)
+        Δ = add_deriv(o.penalty, g * x[j], o.β[j])
+        @inbounds o.β[j] = o.β[j] - γ * Δ
     end
 end
 function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
+    n2 = length(y)
+    γ *= o.η
+    if o.intercept
+        o.β -= γ * mean(g)
+    end
+    for j in 1:length(o.β)
+        gj = 0.0
+        for i in 1:n2
+            gj += g[i] * x[i, j]
+        end
+        gj /= n2
+        Δ = add_deriv(o.penalty, gj, o.β[j])
+        o.β[j] = o.β[j] - γ * Δ
+    end
+end
+
+
+#--------------------------------------------------------------------------# FOBOS
+immutable FOBOS <: Algorithm
+    FOBOS() = new()
+    FOBOS(p::Integer, alg::FOBOS) = new()
+end
+function _updateβ!(o::StatLearn{FOBOS}, g, x, y, ŷ, γ)
+    γ *= o.η
+    if o.intercept
+        o.β0 -= γ * g
+    end
+    for j in 1:length(o.β)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j], γ)
+    end
+end
+function _updatebatchβ!(o::StatLearn{FOBOS}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     n2 = length(y)
     γ *= o.η
     if o.intercept

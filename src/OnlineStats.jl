@@ -64,13 +64,30 @@ end
 
 #------------------------------------------------------------------------------# fit!
 """
-`fit!(o::OnlineStat, y, b = 1)`
+`fit!(o::OnlineStat, input...)`
 
-`fit!(o::OnlineStat, x, y, b = 1)`
+Include more data for an OnlineStat.
 
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates
-make more sense for OnlineStats that use stochastic approximation, such as
-`StatLearn`, `QuantileMM`, and `NormalMix`.
+There are multiple `fit!` methods for each OnlineStat.
+
+- Adding an `Integer` after the input arguments will perform minibatch updates.
+
+```
+y = randn(100)
+o = Mean()
+fit!(o, y, 10)
+```
+
+- Adding a `Float64` after the input arguments will override the weight
+
+```julia
+y = randn(100)
+wts = rand(100)
+
+o = Mean()
+fit!(o, y, .1)   # Use weight of .1 for each update
+fit!(o, y, wts)  # Update the Mean with y[i] using wts[i]
+```
 """
 ############ single observation
 function fit!(o::OnlineStat{ScalarInput}, y::Real)
