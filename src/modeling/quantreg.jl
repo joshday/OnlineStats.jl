@@ -23,8 +23,7 @@ function Base.show(io::IO, o::QuantReg)
     print_item(io, "τ", o.τ)
     print_item(io, "nobs", nobs(o))
 end
-function fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real)
-    γ = weight!(o, 1)
+function _fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real, γ::Float64)
     w = _ϵ + abs(y - dot(x, o.β))
     u = y / w + 2.0 * o.τ - 1.0
     for j in 1:length(o.β)
@@ -40,11 +39,9 @@ function fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real)
     try LAPACK.sysv!('U', o.A, o.β)
     catch warn("System is singular.  β not updated.")
     end
-    o
 end
-function fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec)
+function _fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec, γ::Float64)
     n, p = size(x)
-    γ = weight!(o, n)
 
     w = 1 ./ (_ϵ + abs(y - x * o.β))
     u = y .* w + 2.0 * o.τ - 1.0

@@ -32,7 +32,7 @@ facts(@title "Variance / Variances") do
     o = Variance(x1)
     @fact var(o) --> roughly(var(x1))
     o = Variance()
-    fit!(o, x1, 5)
+    fit!(o, x1)
     @fact var(o) --> roughly(var(x1))
     @fact std(o) --> roughly(std(x1))
     @fact mean(o) --> roughly(mean(x1))
@@ -120,6 +120,31 @@ facts(@title "Diff / Diffs") do
     @fact last(o) --> vec(y[end, :])
     @fact diff(o) --> vec(y[end, :] - y[end-1, :])
     @fact value(o) --> diff(o)
+end
+
+
+facts(@title "Sum / Sums") do
+    Sum()
+    Sum(Float64)
+    Sum(Float32)
+    Sum(Int64)
+    Sum(Int32)
+    y = randn(100)
+    o = Sum(y)
+    @fact typeof(o) --> Sum{Float64}
+    @fact sum(o) --> roughly(sum(y))
+    @fact value(o) --> sum(o)
+    y = rand(Int, 100)
+    o = Sum(y)
+    @fact typeof(o) --> Sum{Int64}
+    @fact sum(o) --> roughly(sum(y))
+
+    Sums(10)
+    Sums(Int32, 10)
+    y = randn(100, 10)
+    o = Sums(y)
+    @fact sum(o) --> roughly(vec(sum(y,1)))
+    @fact value(o) --> sum(o)
 end
 
 

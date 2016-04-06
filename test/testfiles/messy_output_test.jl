@@ -28,8 +28,8 @@ facts(@title "Show Methods") do
     display(FitBeta())
 
     display(NoPenalty())
-    display(L1Penalty(.1))
-    display(L2Penalty(.1))
+    display(LassoPenalty(.1))
+    display(RidgePenalty(.1))
     display(ElasticNetPenalty(.1, .5))
     display(SCADPenalty(.1, 3.7))
 

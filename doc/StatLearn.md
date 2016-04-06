@@ -16,16 +16,16 @@ Approximate solutions to statistical learning problems using online algorithms. 
     - `QuantileRegression(τ)`
         - Model conditional quantiles
     - `SVMLike()`
-        - With `NoPenalty`, this is a perceptron.  With `L2Penalty`, this is a support vector machine.
+        - With `NoPenalty`, this is a perceptron.  With `RidgePenalty`, this is a support vector machine.
     - `HuberRegression(δ)`
         - Robust Huber loss
 
 - `Penalty`
     - `NoPenalty()`
         - No penalty.  Default.
-    - `L2Penalty(λ)`
+    - `RidgePenalty(λ)`
         - Ridge regularization
-    - `L1Penalty(λ)`
+    - `LassoPenalty(λ)`
         - LASSO regularization
     - `ElasticNetPenalty(λ, α)`
         - Weighted average of Ridge and LASSO.  `α = 0` is Ridge, `α = 1` is LASSO.
@@ -99,7 +99,7 @@ parameter `λ` which minimizes the `ModelDefinition` loss on the test data (cros
 This works wonders for highly correlated predictors.
 
 ```julia
-o = StatLearn(p, AdaDelta(), L1Penalty(.5))
+o = StatLearn(p, AdaDelta(), LassoPenalty(.5))
 cv = StatLearnCV(o, xtest, ytest)
 fit!(cv, x, y)
 coef(o)

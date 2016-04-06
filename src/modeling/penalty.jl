@@ -6,31 +6,31 @@ add_deriv(p::NoPenalty, g, βj) = g
 _j(p::NoPenalty, β) = 0.0
 prox(p::NoPenalty, βj::Float64, s::Float64) = βj
 
-#--------------------------------------------------------------------# L2Penalty
-type L2Penalty <: Penalty
+#--------------------------------------------------------------------# RidgePenalty
+type RidgePenalty <: Penalty
     λ::Float64
-    function L2Penalty(λ::Real)
+    function RidgePenalty(λ::Real)
         @assert λ >= 0
         new(Float64(λ))
     end
 end
-Base.show(io::IO, p::L2Penalty) = print(io, "L2Penalty (λ = $(p.λ))")
-add_deriv(p::L2Penalty, g, βj) = g + p.λ * βj
-_j(p::L2Penalty, β) = 0.5 * p.λ * sumabs2(β)
-prox(p::L2Penalty, βj::Float64, s::Float64) = βj / (1.0 + s * p.λ)
+Base.show(io::IO, p::RidgePenalty) = print(io, "RidgePenalty (λ = $(p.λ))")
+add_deriv(p::RidgePenalty, g, βj) = g + p.λ * βj
+_j(p::RidgePenalty, β) = 0.5 * p.λ * sumabs2(β)
+prox(p::RidgePenalty, βj::Float64, s::Float64) = βj / (1.0 + s * p.λ)
 
-#--------------------------------------------------------------------# L1Penalty
-type L1Penalty <: Penalty
+#--------------------------------------------------------------------# LassoPenalty
+type LassoPenalty <: Penalty
     λ::Float64
-    function L1Penalty(λ::Real)
+    function LassoPenalty(λ::Real)
         @assert λ >= 0
         new(Float64(λ))
     end
 end
-Base.show(io::IO, p::L1Penalty) = print(io, "L1Penalty (λ = $(p.λ))")
-add_deriv(p::L1Penalty, g, βj) = g + p.λ * sign(βj)
-_j(p::L1Penalty, β) = p.λ * sumabs(β)
-prox(p::L1Penalty, βj::Float64, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
+Base.show(io::IO, p::LassoPenalty) = print(io, "LassoPenalty (λ = $(p.λ))")
+add_deriv(p::LassoPenalty, g, βj) = g + p.λ * sign(βj)
+_j(p::LassoPenalty, β) = p.λ * sumabs(β)
+prox(p::LassoPenalty, βj::Float64, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
 
 
 #------------------------------------------------------------# ElasticNetPenalty

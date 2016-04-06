@@ -2,5 +2,3 @@ julia 0.4
 StatsBase
 Distributions
 Requires
-
-ArrayViews

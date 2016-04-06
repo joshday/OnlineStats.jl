@@ -14,8 +14,9 @@ end
 
 module OnlineStatsTest
 include("testfiles/messy_output_test.jl")
+include("testfiles/fit_methods_test.jl")
 include("testfiles/multivariate_test.jl")
-# include("testfiles/plots_test.jl")
+include("testfiles/plots_test.jl")
 include("testfiles/summary_test.jl")
 include("testfiles/weight_test.jl")
 include("testfiles/distributions_test.jl")

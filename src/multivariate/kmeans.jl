@@ -33,8 +33,7 @@ function Base.show(io::IO, o::KMeans)
     print_item(io, "nobs", nobs(o))
 end
 
-function fit!{T<:Real}(o::KMeans, x::AVec{T})
-    γ = weight!(o, 1)
+function _fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
     d, k = size(o.value)
     @assert length(x) == d
     for j in 1:k
@@ -44,10 +43,8 @@ function fit!{T<:Real}(o::KMeans, x::AVec{T})
     for i in 1:d
         o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
     end
-    o
 end
-function fitbatch!{T<:Real}(o::KMeans, x::AMat{T})
-    γ = weight!(o, size(x, 1))
+function _fitbatch!{T<:Real}(o::KMeans, x::AMat{T}, γ::Float64)
     d, k = size(o.value)
     @assert size(x, 2) == d
     x̄ = vec(mean(x, 1))
@@ -58,5 +55,4 @@ function fitbatch!{T<:Real}(o::KMeans, x::AMat{T})
     for i in 1:d
         o.value[i, kstar] = smooth(o.value[i, kstar], x̄[i], γ)
     end
-    o
 end

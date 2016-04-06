@@ -36,15 +36,13 @@ end
 nobs(o::StatLearnSparse) = nobs(o.o)
 value(o::StatLearnSparse) = value(o.o)
 coef(o::StatLearnSparse) = coef(o.o)
-function fit!(o::StatLearnSparse, x::AVec, y::Real)
-    fit!(o.o, x, y)
+function _fit!(o::StatLearnSparse, x::AVec, y::Real, γ::Float64)
+    _fit!(o.o, x, y, γ)
     make_sparse!(o.o, o.s)
-    o
 end
 function fitbatch!(o::StatLearnSparse, x::AMat, y::AVec)
-    fitbatch!(o.o, x, y)
+    _fitbatch!(o.o, x, y, γ)
     make_sparse!(o.o, o.s)
-    o
 end
 
 
@@ -68,7 +66,7 @@ Automatically tune the regularization parameter λ for `o` by minimizing loss on
 test data `xtest`, `ytest`.
 
 ```julia
-sl = StatLearn(size(x, 2), L1Penalty(.1))
+sl = StatLearn(size(x, 2), LassoPenalty(.1))
 o = StatLearnCV(sl, xtest, ytest)
 fit!(o, x, y)
 ```
@@ -85,15 +83,23 @@ function StatLearnCV(o::StatLearn, xtest::AMat, ytest::AVec, burnin = 1000; wgt:
     StatLearnCV(o, burnin, xtest, ytest, wgt)
 end
 
-function fit!(o::StatLearnCV, x::AVec, y::Real)
+function _fit!(o::StatLearnCV, x::AVec, y::Real, γ::Float64)
     if nobs(o) < o.burnin
-        fit!(o.o, x, y)
+        _fit!(o.o, x, y, γ)
     else
-        γ = weight!(o, 1)
         tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
     end
     o
 end
+function _fit!(o::StatLearnCV, x::AMat, y::AVec, γ::Float64)
+    if nobs(o) < o.burnin
+        _fit!(o.o, x, y, γ)
+    else
+        tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
+    end
+    o
+end
+
 # TODO: fitbatch!
 function tuneλ!{A<:Algorithm, M<:ModelDefinition}(
         o::StatLearn{A, M, NoPenalty}, x, y, γ, xtest, ytest

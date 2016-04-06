@@ -17,8 +17,8 @@ coeftable(o)
 using Plots; coefplot(o)
 
 # regularized estimates
-coef(o, L2Penalty(.1))  # Ridge
-coef(o, L1Penalty(.1))  # LASSO
+coef(o, RidgePenalty(.1))  # Ridge
+coef(o, LassoPenalty(.1))  # LASSO
 coef(o, ElasticNetPenalty(.1, .5))
 coef(o, SCADPenalty(.1, 3.7))
 ```
@@ -37,14 +37,12 @@ function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight())
     fit!(o, x, y, size(x, 1))
     o
 end
-function fit!(o::LinReg, x::AVec, y::Real)
-    fit!(o.c, vcat(x, y))
-    o
-end
-function fitbatch!(o::LinReg, x::AMat, y::AVec)
-    fitbatch!(o.c, hcat(x, y))
-    o
-end
+
+updatecounter!(o::LinReg, n2::Int) = updatecounter!(o.c, n2)
+weight(o::LinReg, n2::Int) = weight(o.c, n2)
+_fit!(o::LinReg, x::AVec, y::Real, γ::Float64) = _fit!(o.c, vcat(x, y), γ)
+_fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64) = _fitbatch!(o.c, hcat(x, y), γ)
+
 function value(o::LinReg)
     copy!(o.s, o.c.A)
     sweep!(o.s, 1:length(o.value))
@@ -52,7 +50,6 @@ function value(o::LinReg)
     o.value
 end
 mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
-# invlink(o::LinReg, η::Real) = η
 function StatsBase.coeftable(o::LinReg)
     β = coef(o)
     p = length(β)

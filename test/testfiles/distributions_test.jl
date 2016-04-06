@@ -57,7 +57,7 @@ facts(@title "Distributions") do
     context(@subtitle "Cauchy") do
         y = rand(Cauchy(), 10000)
         o = FitCauchy(y, LearningRate())
-        fit!(o, y, 5)
+        fit!(o, y)
         @fact params(o)[1] --> roughly(0.0, .1)
         @fact params(o)[2] --> roughly(1.0, .1)
         @fact nobs(o) --> 2 * 10000
@@ -124,6 +124,7 @@ facts(@title "Distributions") do
         fit!(o, y, 1)
         fit!(o, y, 2)
         fit!(o, y, 5)
+        NormalMix(3, y)
     end
 end
 

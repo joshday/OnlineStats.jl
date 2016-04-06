@@ -1,43 +1,59 @@
-<!--- This file was generated at 2016-02-15T10:51:12.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-04T13:12:45.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
 
-[<pre><code>BoundedExponentialWeight                                Weight </code></pre>](#boundedexponentialweight)
-[<pre><code>CompareTracePlot                                        Any </code></pre>](#comparetraceplot)
-[<pre><code>CovMatrix                                               OnlineStat{VectorInput} </code></pre>](#covmatrix)
-[<pre><code>Diff                                                    OnlineStat{ScalarInput} </code></pre>](#diff)
-[<pre><code>Diffs                                                   OnlineStat{VectorInput} </code></pre>](#diffs)
-[<pre><code>EqualWeight                                             Weight </code></pre>](#equalweight)
-[<pre><code>ExponentialWeight                                       Weight </code></pre>](#exponentialweight)
-[<pre><code>Extrema                                                 OnlineStat{ScalarInput} </code></pre>](#extrema)
-[<pre><code>FitCategorical                                          DistributionStat{ScalarInput} </code></pre>](#fitcategorical)
-[<pre><code>HyperLogLog                                             OnlineStat{I<:Input} </code></pre>](#hyperloglog)
-[<pre><code>KMeans                                                  OnlineStat{VectorInput} </code></pre>](#kmeans)
-[<pre><code>LearningRate                                            Weight </code></pre>](#learningrate)
-[<pre><code>LearningRate2                                           Weight </code></pre>](#learningrate2)
-[<pre><code>LinReg                                                  OnlineStat{XYInput} </code></pre>](#linreg)
-[<pre><code>Mean                                                    OnlineStat{ScalarInput} </code></pre>](#mean)
-[<pre><code>Means                                                   OnlineStat{VectorInput} </code></pre>](#means)
-[<pre><code>Moments                                                 OnlineStat{ScalarInput} </code></pre>](#moments)
-[<pre><code>NormalMix                                               DistributionStat{ScalarInput} </code></pre>](#normalmix)
-[<pre><code>QuantReg                                                OnlineStat{XYInput} </code></pre>](#quantreg)
-[<pre><code>QuantileMM                                              OnlineStat{ScalarInput} </code></pre>](#quantilemm)
-[<pre><code>QuantileSGD                                             OnlineStat{ScalarInput} </code></pre>](#quantilesgd)
-[<pre><code>StatLearn                                               OnlineStat{XYInput} </code></pre>](#statlearn)
-[<pre><code>StatLearnCV                                             OnlineStat{XYInput} </code></pre>](#statlearncv)
-[<pre><code>StatLearnSparse                                         OnlineStat{XYInput} </code></pre>](#statlearnsparse)
-[<pre><code>TracePlot                                               OnlineStat{I<:Input} </code></pre>](#traceplot)
-[<pre><code>Variance                                                OnlineStat{ScalarInput} </code></pre>](#variance)
-[<pre><code>Variances                                               OnlineStat{VectorInput} </code></pre>](#variances)
-[<pre><code>coefplot                                                Function </code></pre>](#coefplot)
-[<pre><code>fit!                                                    Function </code></pre>](#fit!)
-[<pre><code>fitdistribution                                         Function </code></pre>](#fitdistribution)
-[<pre><code>sweep!                                                  Function </code></pre>](#sweep!)
-[<pre><code>value                                                   Function </code></pre>](#value)
+- [<pre>BernoulliBootstrap                                      Bootstrap{ScalarInput}</pre>](#bernoullibootstrap)
+- [<pre>BoundedEqualWeight                                      Weight</pre>](#boundedequalweight)
+- [<pre>CompareTracePlot                                        Any</pre>](#comparetraceplot)
+- [<pre>CovMatrix                                               OnlineStat{VectorInput}</pre>](#covmatrix)
+- [<pre>Diff                                                    OnlineStat{ScalarInput}</pre>](#diff)
+- [<pre>Diffs                                                   OnlineStat{VectorInput}</pre>](#diffs)
+- [<pre>EqualWeight                                             BatchWeight</pre>](#equalweight)
+- [<pre>ExponentialWeight                                       Weight</pre>](#exponentialweight)
+- [<pre>Extrema                                                 OnlineStat{ScalarInput}</pre>](#extrema)
+- [<pre>FitCategorical                                          DistributionStat{ScalarInput}</pre>](#fitcategorical)
+- [<pre>HyperLogLog                                             OnlineStat{I<:Input}</pre>](#hyperloglog)
+- [<pre>KMeans                                                  OnlineStat{VectorInput}</pre>](#kmeans)
+- [<pre>LearningRate                                            StochasticWeight</pre>](#learningrate)
+- [<pre>LearningRate2                                           StochasticWeight</pre>](#learningrate2)
+- [<pre>LinReg                                                  OnlineStat{XYInput}</pre>](#linreg)
+- [<pre>Mean                                                    OnlineStat{ScalarInput}</pre>](#mean)
+- [<pre>Means                                                   OnlineStat{VectorInput}</pre>](#means)
+- [<pre>Moments                                                 OnlineStat{ScalarInput}</pre>](#moments)
+- [<pre>NormalMix                                               DistributionStat{ScalarInput}</pre>](#normalmix)
+- [<pre>QuantReg                                                OnlineStat{XYInput}</pre>](#quantreg)
+- [<pre>QuantileMM                                              OnlineStat{ScalarInput}</pre>](#quantilemm)
+- [<pre>QuantileSGD                                             OnlineStat{ScalarInput}</pre>](#quantilesgd)
+- [<pre>StatLearn                                               OnlineStat{XYInput}</pre>](#statlearn)
+- [<pre>StatLearnCV                                             OnlineStat{XYInput}</pre>](#statlearncv)
+- [<pre>StatLearnSparse                                         OnlineStat{XYInput}</pre>](#statlearnsparse)
+- [<pre>Sum                                                     OnlineStat{ScalarInput}</pre>](#sum)
+- [<pre>Sums                                                    OnlineStat{VectorInput}</pre>](#sums)
+- [<pre>TracePlot                                               OnlineStat{I<:Input}</pre>](#traceplot)
+- [<pre>Variance                                                OnlineStat{ScalarInput}</pre>](#variance)
+- [<pre>Variances                                               OnlineStat{VectorInput}</pre>](#variances)
+- [<pre>coefplot                                                Function</pre>](#coefplot)
+- [<pre>fit!                                                    Function</pre>](#fit!)
+- [<pre>fitdistribution                                         Function</pre>](#fitdistribution)
+- [<pre>nobs                                                    Function</pre>](#nobs)
+- [<pre>sweep!                                                  Function</pre>](#sweep!)
+- [<pre>value                                                   Function</pre>](#value)
 
-# BoundedExponentialWeight
-`BoundedExponentialWeight(λ::Float64)`, `BoundedExponentialWeight(lookback::Int)`
+# BernoulliBootstrap
+`BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+
+Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
+
+Example:
+
+```julia
+BernoulliBootstrap(Mean(), mean, 1000)
+```
+
+[Top](#table-of-contents)
+# BoundedEqualWeight
+`BoundedEqualWeight(λ::Float64)`, `BoundedEqualWeight(lookback::Int)`
 
 Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
 
@@ -71,7 +87,7 @@ var(o)
 
 [Top](#table-of-contents)
 # Diff
-Track the last value and the last difference.  Ignores `Weight`.
+Track the last value and the last difference.
 
 ```julia
 o = Diff()
@@ -99,7 +115,7 @@ Weights are held constant at `λ = 2 / (1 + lookback)`.
 
 [Top](#table-of-contents)
 # Extrema
-Extrema (maximum and minimum).  Ignores `Weight`.
+Extrema (maximum and minimum).
 
 ```julia
 o = Extrema(y)
@@ -139,15 +155,15 @@ value(o)
 
 [Top](#table-of-contents)
 # LearningRate
-`LearningRate(r = 0.6; minstep = 0.0)`.
+`LearningRate(r = 0.6, λ = 0.0)`.
 
-Weight at update `t` is `1 / t ^ r`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate2`.
+Weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate2`.
 
 [Top](#table-of-contents)
 # LearningRate2
-`LearningRate2(γ, c = 1.0; minstep = 0.0)`.
+`LearningRate2(c = 0.5, λ = 0.0)`.
 
-Weight at update `t` is `γ / (1 + γ * c * t)`.  When weights reach `minstep`, hold weights constant.  Compare to `LearningRate`.
+Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate`.
 
 [Top](#table-of-contents)
 # LinReg
@@ -169,8 +185,8 @@ coeftable(o)
 using Plots; coefplot(o)
 
 # regularized estimates
-coef(o, L2Penalty(.1))  # Ridge
-coef(o, L1Penalty(.1))  # LASSO
+coef(o, RidgePenalty(.1))  # Ridge
+coef(o, LassoPenalty(.1))  # LASSO
 coef(o, ElasticNetPenalty(.1, .5))
 coef(o, SCADPenalty(.1, 3.7))
 ```
@@ -230,7 +246,7 @@ Online MM Algorithm for Quantile Regression.
 
 [Top](#table-of-contents)
 # QuantileMM
-Approximate quantiles via an online MM algorithm.
+Approximate quantiles via an online MM algorithm.  Typically more accurate than `QuantileSGD`.
 
 ```julia
 o = QuantileMM(y, LearningRate())
@@ -265,15 +281,16 @@ The model is defined by:
   * `LogisticRegression()`     - Model for data in {0, 1}
   * `PoissonRegression()`     - Model count data {0, 1, 2, 3, ...}
   * `QuantileRegression(τ)`     - Model conditional quantiles
-  * `SVMLike()`     - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `L2Penalty`.
+  * `SVMLike()`     - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `RidgePenalty`.
   * `HuberRegression(δ)`     - Robust Huber loss
 
 #### `Penalty`
 
   * `NoPenalty()`     - No penalty.  Default.
-  * `L2Penalty(λ)`     - Ridge regularization
-  * `L1Penalty(λ)`     - LASSO regularization
+  * `RidgePenalty(λ)`     - Ridge regularization: `dot(β, β)`
+  * `LassoPenalty(λ)`     - Lasso regularization: `sumabs(β)`
   * `ElasticNetPenalty(λ, α)`     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
+  * `SCADPenalty(λ, a = 3.7)`     - Smoothly clipped absolute deviation penalty.  Essentially LASSO with less bias     for larger coefficients.
 
 #### `Algorithm`
 
@@ -282,7 +299,6 @@ The model is defined by:
   * `AdaDelta()`     - Extension of AdaGrad.  Ignores `Weight`.
   * `RDA()`     - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
   * `MMGrad()`     - Experimental online MM gradient method.
-  * `AdaMMGrad()`     - Experimental adaptive online MM gradient method.  Ignores `Weight`.
 
 **Note:** The order of the `ModelDefinition`, `Penalty`, and `Algorithm` arguments don't matter.
 
@@ -290,7 +306,7 @@ The model is defined by:
 StatLearn(x, y)
 StatLearn(x, y, AdaGrad())
 StatLearn(x, y, MMGrad(), LearningRate(.5))
-StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
+StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
 ```
 
 [Top](#table-of-contents)
@@ -300,7 +316,7 @@ StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), L2Penalty(.1))
 Automatically tune the regularization parameter λ for `o` by minimizing loss on test data `xtest`, `ytest`.
 
 ```julia
-sl = StatLearn(size(x, 2), L1Penalty(.1))
+sl = StatLearn(size(x, 2), LassoPenalty(.1))
 o = StatLearnCV(sl, xtest, ytest)
 fit!(o, x, y)
 ```
@@ -312,6 +328,24 @@ Enforce sparsity on a `StatLearn` object.  Currently, the only option is `HardTh
 ```julia
 StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
 fit!(o, x, y)
+```
+
+[Top](#table-of-contents)
+# Sum
+Track the running sum.  Ignores `Weight`.
+
+```julia
+o = Sum()
+o = Sum(y)
+```
+
+[Top](#table-of-contents)
+# Sums
+Track the running sum for multiple series.  Ignores `Weight`.
+
+```julia
+o = Sums()
+o = Sums(y)
 ```
 
 [Top](#table-of-contents)
@@ -381,6 +415,12 @@ coefplot(o)
 
 Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
 
+`fit!(o::OnlineStat, y, b = 1)`
+
+`fit!(o::OnlineStat, x, y, b = 1)`
+
+Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+
 [Top](#table-of-contents)
 # fitdistribution
 Estimate the parameters of a distribution.
@@ -407,6 +447,12 @@ var(o)
 std(o)
 cov(o)
 ```
+
+[Top](#table-of-contents)
+# nobs
+nobs(obj::StatisticalModel)
+
+Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
 [Top](#table-of-contents)
 # sweep!
