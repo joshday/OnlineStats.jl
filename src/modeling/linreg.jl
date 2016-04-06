@@ -73,7 +73,7 @@ function StatsBase.vcov(o::LinReg)
  end
 StatsBase.stderr(o::LinReg) = sqrt(diag(StatsBase.vcov(o)))
 loss(o::LinReg, x::AMatF, y::AVecF) = mean(abs2(y - predict(o, x)))
-function StatsBase.coef(o::LinReg, penalty::Penalty = NoPenalty();
+function coef(o::LinReg, penalty::Penalty;
         maxiters::Integer = 50,
         tolerance::Real = 1e-4,
         step::Real = 1.0,
@@ -128,6 +128,6 @@ function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::Penalty)
     abs(u - v) / (abs(v) + 1.0)
 end
 
-StatsBase.coef(o::LinReg) = value(o)
-StatsBase.predict{T<:Real}(o::LinReg, x::AVec{T}) = dot(x, coef(o))
-StatsBase.predict{T<:Real}(o::LinReg, x::AMat{T}) = x * value(o)
+coef(o::LinReg) = value(o)
+predict{T<:Real}(o::LinReg, x::AVec{T}) = dot(x, coef(o))
+predict{T<:Real}(o::LinReg, x::AMat{T}) = x * value(o)

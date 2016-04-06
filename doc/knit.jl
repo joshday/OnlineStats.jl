@@ -10,6 +10,10 @@ function title(nm::Symbol, subnm::DataType, mod::Module)
     @sprintf "<pre>%-55s %s" "$nm" "$s</pre>"
 end
 
+function no_docs(obj)
+    Markdown.plain(Docs.doc(obj))[1:22] == "No documentation found" 
+end
+
 
 function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.md");
         intro::AbstractString = ""
@@ -30,10 +34,10 @@ function knit(mod::Module, dest::AbstractString = Pkg.dir(string(mod), "doc/api.
     # Make TOC
     for nm in nms
         obj = eval(parse("$mod.$nm"))   # Get identifier (OnlineStats.AdaDelta)
-        if Docs.doc(obj) != nothing     # If there is documentation for the identifier:
+        if !no_docs(obj)                 # If there is documentation for the identifier:
             objtype = typeof(obj)       # get type
             if objtype == DataType      # if DataType, get supertype
-                objsuper = super(obj)
+                objsuper = supertype(obj)
                 heading = title(nm, objsuper, mod)
                 write(file, "- [" * heading * "](#$(lowercase(string(nm))))\n")
             else
