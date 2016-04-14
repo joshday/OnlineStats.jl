@@ -76,7 +76,10 @@ Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
 value(o::Variance) = nobs(o) < 2 ? 0.0 : o.value * unbias(o)
 center(o::Variance, x::Real) = x - mean(o)
-standardize(o::Variance, x::Real) = center(o, x) / std(o)
+function standardize(o::Variance, x::Real)
+    σ = std(o)
+    σ == 0.0 ? 1.0 : center(o, x) / σ
+end
 
 
 #-------------------------------------------------------------------------# Variances
@@ -117,9 +120,17 @@ end
 Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
 Base.mean(o::Variances) = o.μ
-value(o::Variances) = o.value * unbias(o)
+value(o::Variances) = nobs(o) < 2 ? zeros(o.value) : o.value * unbias(o)
 center{T<:Real}(o::Variances, x::AVec{T}) = x - mean(o)
-standardize{T<:Real}(o::Variances, x::AVec{T}) = center(o, x) ./ std(o)
+function standardize{T<:Real}(o::Variances, x::AVec{T})
+    σs = std(o)
+    for j in eachindex(σs)
+        @inbounds if σs[j] == 0.0
+            σs[j] = 1.0
+        end
+    end
+    center(o, x) ./ σs
+end
 
 
 #-------------------------------------------------------------------------# CovMatrix
