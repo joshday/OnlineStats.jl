@@ -46,7 +46,7 @@ end
 
 
 # y and η are Vectors
-loss(::L2Regression, y, η) = mean(abs2(y - η))
+loss(::L2Regression, y, η) = 0.5 * mean(abs2(y - η))
 loss(::L1Regression, y, η) = mean(abs(y - η))
 loss(::LogisticRegression, y, η) = mean(-y .* η + log(1.0 + exp(η)))
 loss(::PoissonRegression, y, η) = mean(-y .* η + exp(η))
@@ -56,9 +56,9 @@ loss(m::SVMLike, y, η) =
     mean([max(0.0, 1.0 - y[i] * η[i]) for i in 1:length(y)])
 function loss(m::HuberRegression, y, η)
     mean([
-        abs(y[i]-η[i]) < m.δ ?
-        0.5 * (y[i]-η[i])^2 :
-        m.δ * (abs(y[i]-η[i]) - 0.5 * m.δ)
+        abs(y[i] - η[i]) < m.δ ?
+        0.5 * (y[i] - η[i])^2 :
+        m.δ * (abs(y[i] - η[i]) - 0.5 * m.δ)
         for i in 1:length(y)
         ])
 end
@@ -559,18 +559,17 @@ type MMGrad <: Algorithm
     h0::Float64
     h::VecF  # Diagonal elements of H = -d^2 h(β)
     MMGrad(α::Function = abs) = new(α)
-    MMGrad(p::Integer, alg::MMGrad) = new(alg.α, _ϵ, fill(_ϵ, p))
+    MMGrad(p::Integer, alg::MMGrad) = new(alg.α, 0., zeros(p))
 end
 function _updateβ!(o::StatLearn{MMGrad}, g, x, y, ŷ, γ)
+    ηγ = o.η * γ
     if o.intercept
-        # weighted average of second order information
         o.algorithm.h0 = smooth(o.algorithm.h0, d2_h(o, 1.0, x, y, ŷ), γ)
-        # update β0
-        setβ0!(o, γ, g / o.algorithm.h0)
+        setβ0!(o, ηγ, g / (o.algorithm.h0 + _ϵ))
     end
     for j in 1:length(o.β)
         o.algorithm.h[j] = smooth(o.algorithm.h[j], d2_h(o, x[j], x, y, ŷ), γ)
-        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j] / o.algorithm.h[j], γ)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - ηγ * g * x[j] / (o.algorithm.h[j] + _ϵ), ηγ)
     end
 end
 
@@ -599,84 +598,22 @@ end
 
 # for De Pierro majorization, requires: sum(α) == 1 and α_j > 0 for all j
 _α(o::StatLearn, xj, x) =
-    (o.algorithm.α(xj) + _ϵ) / (sum(o.algorithm.α(x)) + o.intercept + ndims(o) * _ϵ)
+    (o.algorithm.α(xj) + .001) / (sum(o.algorithm.α(x)) + o.intercept + ndims(o) * .001)
 
 # second (partial) derivative of majorizing function, h(β_t)
-d2_h{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ) = xj^2 / _α(o, xj, x)
-d2_h{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ) = xj^2 / (_α(o, xj, x) * abs(y - ŷ))
-d2_h{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ) = xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
-d2_h{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ) = xj^2 * ŷ / _α(o, xj, x)
-d2_h{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ) = xj^2 / (_α(o, xj, x) * abs(y - ŷ))
+d2_h{A<:Algorithm}(o::StatLearn{A, L2Regression}, xj, x, y, ŷ) =
+    xj^2 / _α(o, xj, x)
+d2_h{A<:Algorithm}(o::StatLearn{A, L1Regression}, xj, x, y, ŷ) =
+    xj^2 / (_α(o, xj, x) * abs(y - ŷ))
+d2_h{A<:Algorithm}(o::StatLearn{A, LogisticRegression}, xj, x, y, ŷ) =
+    xj^2 / _α(o, xj, x) * (ŷ * (1 - ŷ))
+d2_h{A<:Algorithm}(o::StatLearn{A, PoissonRegression}, xj, x, y, ŷ) =
+    xj^2 * ŷ / _α(o, xj, x)
+d2_h{A<:Algorithm}(o::StatLearn{A, QuantileRegression}, xj, x, y, ŷ) =
+    xj^2 / (_α(o, xj, x) * abs(y - ŷ))
 # MMGrad only derived for canonical link GLMs (for now).
 d2_h{A<:Algorithm}(o::StatLearn{A, SVMLike}, xj, x, y, ŷ) = 1.0
 d2_h{A<:Algorithm}(o::StatLearn{A, HuberRegression}, xj, x, y, ŷ) = 1.0
-
-
-#
-# #--------------------------------------------------------------------# AdaMMGrad
-# type AdaMMGrad <: Algorithm
-#     g0::Float64
-#     g::VecF
-#     AdaMMGrad() = new()
-#     AdaMMGrad(p::Integer, alg::AdaMMGrad) = new(_ϵ, fill(_ϵ, p))
-# end
-# function _updateβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
-#     weight_noret!(o, 1)
-#     if o.intercept
-#         o.algorithm.g0 += d2_h(o, 1.0, x, y, ŷ)
-#         setβ0!(o, o.η / sqrt(o.algorithm.g0), g)
-#     end
-#     for j in 1:length(o.β)
-#         o.algorithm.g[j] += d2_h(o, x[j], x, y, ŷ)
-#         γ = o.η / sqrt(o.algorithm.g[j])
-#         o.β[j] = prox(o.penalty, o.β[j] - γ * g * x[j], γ)
-#     end
-# end
-# function _updatebatchβ!(o::StatLearn{AdaMMGrad}, g, x, y, ŷ)
-#     n = length(g)
-#     weight_noret!(o, n)
-#     if o.intercept
-#         v = 0.0
-#         for i in 1:n
-#             v += d2_h(o, 1.0, row(x,i), y[i], ŷ[i])
-#         end
-#         o.algorithm.g0 += v / n
-#         setβ0!(o, o.η / sqrt(o.algorithm.g0), mean(g))
-#     end
-#     for j in 1:length(o.β)
-#         v = 0.0
-#         u = 0.0
-#         for i in 1:n
-#             xij = x[i, j]
-#             v += d2_h(o, xij, row(x, i), y[i], ŷ[i])
-#             u += g[i] * xij
-#         end
-#         o.algorithm.g[j] += v / n
-#         γ = o.η / sqrt(o.algorithm.g[j])
-#         o.β[j] = prox(o.penalty, o.β[j] - γ * u / n, γ)
-#     end
-# end
-#
-#
-# #--------------------------------------------------------------------# AdaMMGrad2
-# type AdaMMGrad2 <: Algorithm
-#     g0::Float64
-#     g::VecF
-#     AdaMMGrad2() = new()
-#     AdaMMGrad2(p::Integer, alg::AdaMMGrad2) = new(_ϵ, fill(_ϵ, p))
-# end
-# function _updateβ!(o::StatLearn{AdaMMGrad2}, g, x, y, ŷ)
-#     γ = weight!(o, 1)
-#     if o.intercept
-#         o.algorithm.g0 = smooth(o.algorithm.g0, d2_h(o, 1.0, x, y, ŷ), γ)
-#         setβ0!(o, γ * o.η / sqrt(o.algorithm.g0), g)
-#     end
-#     for j in 1:length(o.β)
-#         o.algorithm.g[j] = smooth(o.algorithm.g[j], d2_h(o, x[j], x, y, ŷ), γ)
-#         γ_H = γ * o.η / sqrt(o.algorithm.g[j])
-#         o.β[j] = prox(o.penalty, o.β[j] - γ_H * g * x[j], γ_H)
-#     end
-# end
 
 
 

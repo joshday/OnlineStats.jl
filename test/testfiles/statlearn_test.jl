@@ -63,7 +63,7 @@ facts(@title "StatLearn") do
     context(@subtitle "loss") do
         y = generate(L2Regression(), xβ)
         o = StatLearn(x, y, L2Regression())
-        @fact loss(o, x, y) --> roughly(mean(abs2(y - predict(o, x))))
+        @fact loss(o, x, y) --> roughly(.5 * mean(abs2(y - predict(o, x))))
 
         y = generate(L1Regression(), xβ)
         o = StatLearn(x, y, L1Regression())

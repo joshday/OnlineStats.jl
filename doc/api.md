@@ -1,11 +1,10 @@
-<!--- This file was generated at 2016-04-04T13:12:45.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-13T11:26:58.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
 
 - [<pre>BernoulliBootstrap                                      Bootstrap{ScalarInput}</pre>](#bernoullibootstrap)
 - [<pre>BoundedEqualWeight                                      Weight</pre>](#boundedequalweight)
-- [<pre>CompareTracePlot                                        Any</pre>](#comparetraceplot)
 - [<pre>CovMatrix                                               OnlineStat{VectorInput}</pre>](#covmatrix)
 - [<pre>Diff                                                    OnlineStat{ScalarInput}</pre>](#diff)
 - [<pre>Diffs                                                   OnlineStat{VectorInput}</pre>](#diffs)
@@ -30,10 +29,8 @@
 - [<pre>StatLearnSparse                                         OnlineStat{XYInput}</pre>](#statlearnsparse)
 - [<pre>Sum                                                     OnlineStat{ScalarInput}</pre>](#sum)
 - [<pre>Sums                                                    OnlineStat{VectorInput}</pre>](#sums)
-- [<pre>TracePlot                                               OnlineStat{I<:Input}</pre>](#traceplot)
 - [<pre>Variance                                                OnlineStat{ScalarInput}</pre>](#variance)
 - [<pre>Variances                                               OnlineStat{VectorInput}</pre>](#variances)
-- [<pre>coefplot                                                Function</pre>](#coefplot)
 - [<pre>fit!                                                    Function</pre>](#fit!)
 - [<pre>fitdistribution                                         Function</pre>](#fitdistribution)
 - [<pre>nobs                                                    Function</pre>](#nobs)
@@ -56,19 +53,6 @@ BernoulliBootstrap(Mean(), mean, 1000)
 `BoundedEqualWeight(λ::Float64)`, `BoundedEqualWeight(lookback::Int)`
 
 Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
-
-[Top](#table-of-contents)
-# CompareTracePlot
-Compare the values of multiple OnlineStats.  Useful for comparing competing models.
-
-```julia
-o1 = StatLearn(size(x, 2), SGD())
-o2 = StatLearn(size(x, 2), AdaGrad())
-tr = CompareTracePlot([o1, o2], o -> loss(o, x, y))
-fit!(o1, x1, y1); fit!(o2, x1, y1)
-fit!(o1, x2, y2); fit!(o2, x2, y2)
-...
-```
 
 [Top](#table-of-contents)
 # CovMatrix
@@ -349,27 +333,6 @@ o = Sums(y)
 ```
 
 [Top](#table-of-contents)
-# TracePlot
-`TracePlot(o::OnlineStat, f::Function = value)`
-
-Create a trace plot using values from OnlineStat `o`.  Every call to `fit!(o, args...)` adds a new observation to the plot.
-
-```julia
-using Plots
-o = Mean(ExponentialWeight(.1))
-tr = TracePlot(o)
-for i in 1:100
-    fit!(tr, i / 100 + randn(100))
-end
-
-o = Variance()
-tr = TracePlot(o, x -> [mean(o), var(o)])
-for i in 1:100
-    fit!(tr, randn(100))
-end
-```
-
-[Top](#table-of-contents)
 # Variance
 Univariate variance.
 
@@ -398,28 +361,31 @@ std(o)
 ```
 
 [Top](#table-of-contents)
-# coefplot
-For any OnlineStat that has a `coef` method, display a graphical representation of the coefficient vector.
+# fit!
+`fit!(o::OnlineStat, input...)`
 
-```julia
-using Plots
-o = LinReg(x, y)
-coefplot(o)
+Include more data for an OnlineStat.
+
+There are multiple `fit!` methods for each OnlineStat.
+
+  * Adding an `Integer` after the input arguments will perform minibatch updates.
+
+```
+y = randn(100)
+o = Mean()
+fit!(o, y, 10)
 ```
 
-[Top](#table-of-contents)
-# fit!
-`fit!(o::OnlineStat, y, b = 1)`
+  * Adding a `Float64` after the input arguments will override the weight
 
-`fit!(o::OnlineStat, x, y, b = 1)`
+```julia
+y = randn(100)
+wts = rand(100)
 
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
-
-`fit!(o::OnlineStat, y, b = 1)`
-
-`fit!(o::OnlineStat, x, y, b = 1)`
-
-Include more data for an OnlineStat using batch updates of size `b`.  Batch updates make more sense for OnlineStats that use stochastic approximation, such as `StatLearn`, `QuantileMM`, and `NormalMix`.
+o = Mean()
+fit!(o, y, .1)   # Use weight of .1 for each update
+fit!(o, y, wts)  # Update the Mean with y[i] using wts[i]
+```
 
 [Top](#table-of-contents)
 # fitdistribution
