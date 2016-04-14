@@ -1,4 +1,4 @@
-<!--- This file was generated at 2016-04-13T11:26:58.  Do not edit by hand --->
+<!--- This file was generated at 2016-04-14T14:32:11.  Do not edit by hand --->
 # API for OnlineStats
 
 # Table of Contents
@@ -154,12 +154,22 @@ Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, hold 
 Linear regression with optional regularization.
 
 ```julia
+LinReg(x::Matrix, y::Vector, pen::Penalty = NoPenalty())
+```
+
+Examples:
+
+```julia
 using  StatsBase
 n, p = 100_000, 10
 x = randn(n, p)
 y = x * collect(1.:p) + randn(n)
+```
 
-o = LinReg(x, y)
+Methods for `LinReg{NoPenalty}`:
+
+```julia
+o = LinReg(x, y)  # NoPenalty() by default
 coef(o)
 predict(o, x)
 confint(o, .95)
@@ -167,10 +177,13 @@ vcov(o)
 stderr(o)
 coeftable(o)
 using Plots; coefplot(o)
+```
 
-# regularized estimates
-coef(o, RidgePenalty(.1))  # Ridge
-coef(o, LassoPenalty(.1))  # LASSO
+Get estimate for a different penalty:
+
+```
+coef(o, RidgePenalty(.1))
+coef(o, LassoPenalty(.1))
 coef(o, ElasticNetPenalty(.1, .5))
 coef(o, SCADPenalty(.1, 3.7))
 ```
