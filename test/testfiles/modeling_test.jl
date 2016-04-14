@@ -32,7 +32,7 @@ facts(@title "Modeling") do
         l = lm(x, y)
         @fact predict(l, x) --> roughly(predict(o, x))
         @fact predict(l, vec(x[1, :])') --> roughly([predict(o, vec(x[1, :]))])
-        @fact loss(o, x, y) --> roughly(mean(abs2(y - x*coef(o))))
+        @fact loss(o, x, y) --> roughly(0.5 * mean(abs2(y - x*coef(o))))
 
         ltab = coeftable(l)
         otab = coeftable(o)
@@ -50,6 +50,11 @@ facts(@title "Modeling") do
         coef(o, RidgePenalty(.1))
         coef(o, ElasticNetPenalty(.1, .5))
         coef(o, SCADPenalty(.1, 3.7))
+
+        LinReg(p, RidgePenalty(.1))
+        LinReg(p, ExponentialWeight(.1))
+        LinReg(x, y, RidgePenalty(.1))
+        LinReg(x, y, ExponentialWeight(.1))
     end
 
     context(@subtitle "Penalty") do
