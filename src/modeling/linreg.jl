@@ -63,7 +63,7 @@ value(o::LinReg) = coef(o)
 
 
 # NoPenalty
-function coef(o::LinReg{NoPenalty})
+function coef(o::LinReg, pen::NoPenalty)
     copy!(o.s, o.c.A)
     sweep!(o.s, 1:length(o.value))
     copy!(o.value, o.s[1:end-1, end])
@@ -94,7 +94,7 @@ function StatsBase.vcov(o::LinReg{NoPenalty})
 
 StatsBase.stderr(o::LinReg{NoPenalty}) = sqrt(diag(StatsBase.vcov(o)))
 
-coef{P <: Penalty}(o::LinReg{P}) = coef(o, o.penalty)
+coef(o::LinReg; kw...) = coef(o, o.penalty; kw...)
 
 function coef(o::LinReg, penalty::Penalty;
         maxit::Integer = 100,
