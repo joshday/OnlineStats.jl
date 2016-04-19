@@ -84,3 +84,21 @@ y = randn(1000)
 o = QuantileMM(tau = [.25, .75])  # Online MM algorithm for quantiles
 fit!(o, y, 10)  # update in batches of size 10
 ```
+
+### Weights can be overridden
+
+Users can provide a vector of weights along with the input:
+```julia
+y = randn(1000)
+weights = rand(1000)
+
+o = Mean()
+fit!(o, y, weights)
+```
+
+Or a single weight to be used for each update:
+```julia
+weight = rand()
+o = Mean()
+fit!(o, y, weight)
+```
