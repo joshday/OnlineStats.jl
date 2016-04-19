@@ -211,7 +211,10 @@ end
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
     size(x, 2) == length(o.β) || error("x has incorrect number of columns")
     ŷ = predict(o, x)
-    g = [deriv(o.model, y[i], ŷ[i]) for i in 1:size(x, 1)]
+    g = zeros(length(ŷ))
+    for i in eachindex(g)
+        @inbounds g[i] = deriv(o.model, y[i], ŷ[i])
+    end
     _updatebatchβ!(o, g, x, y, ŷ, γ)
     o
 end

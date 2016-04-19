@@ -50,6 +50,7 @@ facts(@title "Variance / Variances") do
     @fact var(o) --> roughly(var(o2))
     @fact center(o, vec(xs[1, :])) --> vec(xs[1, :]) - mean(o)
     @fact standardize(o, vec(xs[1, :])) --> (vec(xs[1, :]) - mean(o)) ./ std(o)
+    @fact standardize(Variances(5), ones(5)) --> ones(5)
 end
 
 facts(@title "CovMatrix") do

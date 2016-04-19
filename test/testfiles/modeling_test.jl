@@ -1,5 +1,4 @@
 module ModelingTest
-
 using TestSetup, OnlineStats, FactCheck, GLM
 import OnlineStats: _j, add_deriv
 
@@ -45,6 +44,8 @@ facts(@title "Modeling") do
         @fact stderr(o)[1:5] --> roughly(stderr(l)[1:5], .001)
         @fact confint(o)[1:5] --> roughly(confint(l)[1:5], .001)
 
+        @fact coef(LinReg(10)) --> zeros(10)
+
         coef(o, NoPenalty())
         coef(o, LassoPenalty(.1))
         coef(o, RidgePenalty(.1))
@@ -55,6 +56,9 @@ facts(@title "Modeling") do
         LinReg(p, ExponentialWeight(.1))
         LinReg(x, y, RidgePenalty(.1))
         LinReg(x, y, ExponentialWeight(.1))
+        o = LinReg(x, y, LassoPenalty(.1))
+        @fact predict(o, ones(p)) --> coef(o)[1] + sum(coef(o)[2:end])
+        @fact predict(o, ones(n, p)) --> coef(o)[1] + ones(n, p) * coef(o)[2:end]
     end
 
     context(@subtitle "Penalty") do
