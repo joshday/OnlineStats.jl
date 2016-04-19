@@ -488,6 +488,58 @@ function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ:
 end
 
 
+#--------------------------------------------------------------------------# ADAM
+type ADAM <: Algorithm
+    β1::Float64
+    β2::Float64
+    m0::Float64
+    m::VecF
+    v0::Float64
+    v::VecF
+    ADAM(beta1 = .1, beta2 = .001) = new(beta1, beta2)
+    ADAM(p::Integer, alg::ADAM) = new(alg.β1, alg.β2, _ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p))
+end
+function _updateβ!(o::StatLearn{ADAM}, g, x, y, ŷ, γ)
+    alg = o.algorithm
+    β1 = alg.β1
+    β2 = alg.β2
+    nups = o.weight.nups
+    bias = (1. - β1 ^ (.5 * nups)) / (1. - β1 ^ nups)
+    if o.intercept
+        alg.m0 = (1. - β1) * alg.m0 + β1 * g
+        alg.v0 = (1. - β2) * alg.v0 + β2 * g * g
+        o.β0 -= γ * bias * alg.m0 / sqrt(alg.v0)
+    end
+    for j in eachindex(o.β)
+        gx = g * x[j]
+        alg.m[j] = (1. - β1) * alg.m[j] + β1 * gx
+        alg.v[j] = (1. - β2) * alg.v[j] + β2 * gx * gx
+        o.β[j] = prox(o.penalty, o.β[j] - γ * bias * alg.m[j] / sqrt(alg.v[j]), γ)
+    end
+end
+function _updatebatchβ!(o::StatLearn{ADAM}, g, x, y, ŷ, γ)
+    n = length(g)
+    alg = o.algorithm
+    β1 = alg.β1
+    β2 = alg.β2
+    nups = o.weight.nups
+    bias = (1. - β1 ^ (.5 * nups)) / (1. - β1 ^ nups)
+    if o.intercept
+        gbar = mean(g)
+        alg.m0 = (1. - β1) * alg.m0 + β1 * gbar
+        alg.v0 = (1. - β2) * alg.v0 + β2 * gbar * gbar
+        o.β0 -= γ * bias * alg.m0 / sqrt(alg.v0)
+    end
+    for j in eachindex(o.β)
+        gx = mean(g .* x[:, j])
+        alg.m[j] = (1. - β1) * alg.m[j] + β1 * gx
+        alg.v[j] = (1. - β2) * alg.v[j] + β2 * gx * gx
+        o.β[j] = prox(o.penalty, o.β[j] - γ * bias * alg.m[j] / sqrt(alg.v[j]), γ)
+    end
+
+end
+
+
 #--------------------------------------------------------------------------# RDA
 type RDA <: Algorithm
     g0::Float64

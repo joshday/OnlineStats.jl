@@ -24,7 +24,7 @@ export
     # ModelDefinition and Algorithm
     ModelDefinition, L2Regression, L1Regression, LogisticRegression,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
-    Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, RDA, MMGrad,
+    Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, RDA, MMGrad, ADAM,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,
