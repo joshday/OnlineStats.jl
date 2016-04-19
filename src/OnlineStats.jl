@@ -16,7 +16,7 @@ export
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, LinReg, QuantReg, NormalMix,
     StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
-    KMeans, BiasVector, BiasMatrix,
+    KMeans, BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
     # Penalties

@@ -59,6 +59,9 @@ facts(@title "Modeling") do
         o = LinReg(x, y, LassoPenalty(.1))
         @fact predict(o, ones(p)) --> coef(o)[1] + sum(coef(o)[2:end])
         @fact predict(o, ones(n, p)) --> coef(o)[1] + ones(n, p) * coef(o)[2:end]
+
+        r = y - predict(o, x)
+        @fact cost(o, x, y) --> .5 * mean(abs2(r)) + OnlineStats._j(o.penalty, coef(o)[2:end])
     end
 
     context(@subtitle "Penalty") do
@@ -117,6 +120,24 @@ facts(@title "Modeling") do
         yb[1] = 2.0
         @fact xb[1, 1] --> 2.0
         @fact yb[1] --> 2.0
+    end
+
+    context(@subtitle "TwoWayInteractionVector / TwoWayInteractionMatrix") do
+        x = rand(5)
+        v = TwoWayInteractionVector(x)
+        @fact v[5] --> x[5]
+        @fact v[6] --> x[1] * x[2]
+        @fact v[7] --> x[1] * x[3]
+        @fact v[8] --> x[1] * x[4]
+        @fact v[9] --> x[1] * x[5]
+        @fact v[10] --> x[2] * x[3]
+
+        x = rand(10, 5)
+        m = TwoWayInteractionMatrix(x)
+        @fact m[1, 1] --> x[1, 1]
+        @fact m[1, 5] --> x[1, 5]
+        @fact m[1, 6] --> x[1, 1] * x[1, 2]
+        @fact m[1, 10] --> x[1, 2] * x[1, 3]
     end
 end
 
