@@ -383,43 +383,43 @@ end
 
 
 
-#----------------------------------------------------------------------# AdaGrad2
-# Use stochastic average of second order information
+#--------------------------------------------------------------------------# AdaGrad2
 type AdaGrad2 <: Algorithm
     g0::Float64
     g::VecF
     AdaGrad2() = new()
-    AdaGrad2(p::Integer, alg::AdaGrad2) = new(_ϵ, fill(_ϵ, p))
+    AdaGrad2(p::Integer, alg::AdaGrad2) = new(0.0, zeros(p))
 end
 function _updateβ!(o::StatLearn{AdaGrad2}, g, x, y, ŷ, γ)
-    γη = γ * o.η
+    alg = o.algorithm
+    ηγ = o.η * γ
     if o.intercept
-        o.algorithm.g0 = smooth(o.algorithm.g0, g * g, γ)
-        setβ0!(o, γη / sqrt(o.algorithm.g0), g)
+        alg.g0 += g * g
+        alg.g0 = smooth(alg.g0, g * g, γ)
+        step = ηγ / (sqrt(alg.g0) + _ϵ)
+        setβ0!(o, step, g)
     end
-    @inbounds for j in 1:length(o.β)
+    for j in 1:length(o.β)
         gx = g * x[j]
-        o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, γ)
-        γ_G = γη / sqrt(o.algorithm.g[j])
-        o.β[j] = prox(o.penalty, o.β[j] - γ_G * gx, γ_G)
+        alg.g[j] = smooth(alg.g[j], gx * gx, γ)
+        step = ηγ / (sqrt(alg.g[j]) + _ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
     end
 end
 function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
-    γη = γ * o.η
+    alg = o.algorithm
+    ηγ = o.η * γ
     if o.intercept
-        ḡ = mean(g)
-        o.algorithm.g0 = smooth(o.algorithm.g0, ḡ * ḡ, γ)
-        setβ0!(o, γη / sqrt(o.algorithm.g0), ḡ)
+        gbar = mean(g)
+        alg.g0 = smooth(alg.g0, gbar * gbar, γ)
+        step = ηγ / (sqrt(alg.g0) + _ϵ)
+        setβ0!(o, step, gbar)
     end
-    n = length(g)
-    @inbounds for j in 1:length(o.β)
-        gx = 0.0
-        for i in 1:n
-            gx += g[i] * x[i, j]
-        end
-        gx /= n
-        o.algorithm.g[j] = smooth(o.algorithm.g[j], gx * gx, γ)
-        o.β[j] = prox(o.penalty, o.β[j] - γη * gx / o.algorithm.g[j], γ)
+    for j in eachindex(o.β)
+        gx = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        alg.g[j] = smooth(alg.g[j], gx * gx, γ)
+        step = ηγ / (sqrt(alg.g[j]) + _ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
     end
 end
 
