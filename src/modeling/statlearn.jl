@@ -238,6 +238,15 @@ cost(o::StatLearn, x::AMat, y::AVec) =
 # For Adaptive Proximal Methods (everything but SGD), the step argument for prox should be:
 # step = η * γ / o.algorithm.h[j]
 
+function batch_g(xj::AVec, g::AVec)
+    v = 0.0
+    n = length(xj)
+    for i in 1:n
+        @inbounds v += xj[i] * g[i]
+    end
+    v / n
+end
+
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm
     SGD() = new()
@@ -256,7 +265,7 @@ function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec
     step = o.η * γ
     o.intercept && setβ0!(o, step, mean(g))
     for j in eachindex(o.β)
-        gj = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        gj = batch_g(sub(x, :, j), g)
         Δ = add_deriv(o.penalty, gj, o.β[j])
         o.β[j] = o.β[j] - step * Δ
     end
@@ -280,7 +289,7 @@ function _updatebatchβ!(o::StatLearn{FOBOS}, g::AVec, x::AMat, y::AVec, ŷ::AV
     step = γ * o.η
     o.intercept && setβ0!(o, step, mean(g))
     for j in eachindex(o.β)
-        gj = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        gj = batch_g(sub(x, :, j), g)
         o.β[j] = prox(o.penalty, o.β[j] - step * gj, step)
     end
 end
@@ -327,7 +336,7 @@ function _updatebatchβ!(o::StatLearn{SGD2}, g::AVec, x::AMat, y::AVec, ŷ::AVe
             v += denom(o.model, g[i], x[i, j], y[i], ŷ[i])
         end
         v /= n
-        gx = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        gx = batch_g(sub(x, :, j), g)
         alg.d[j] = smooth(alg.d[j], v / n, γ)
         step = ηγ / (alg.d[j] + _ϵ)
         o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
@@ -374,13 +383,12 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
         setβ0!(o, step, gbar)
     end
     for j in eachindex(o.β)
-        gx = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        gx = batch_g(sub(x, :, j), g)
         alg.g[j] = smooth(alg.g[j], gx * gx, α)
         step = ηγ / (sqrt(alg.g[j]) + _ϵ)
         o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
     end
 end
-
 
 
 #--------------------------------------------------------------------------# AdaGrad2
@@ -416,7 +424,7 @@ function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ:
         setβ0!(o, step, gbar)
     end
     for j in eachindex(o.β)
-        gx = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        gx = batch_g(sub(x, :, j), g)
         alg.g[j] = smooth(alg.g[j], gx * gx, γ)
         step = ηγ / (sqrt(alg.g[j]) + _ϵ)
         o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
@@ -424,53 +432,61 @@ function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ:
 end
 
 
+
+
+
+
+
+
+
+
 #----------------------------------------------------------------------# AdaDelta
+# Ignores weight.  `step` needs special attention here. See paper:
+# http://arxiv.org/abs/1212.5701
 type AdaDelta <: Algorithm
     g0::Float64
     g::VecF
     Δ0::Float64
     Δ::VecF
     ρ::Float64
-    AdaDelta(ρ::Real = .001) = new(0.0, zeros(1), 0.0, zeros(1), Float64(ρ))
-    AdaDelta(p::Integer, alg::AdaDelta) = new(_ϵ, fill(_ϵ, p), _ϵ, fill(_ϵ, p), alg.ρ)
+    ϵ::Float64
+    AdaDelta(ρ::Real = .05, ϵ::Real = 1e-6) = new(0.0, zeros(1), 0.0, zeros(1), ρ, ϵ)
+    AdaDelta(p::Integer, alg::AdaDelta) = new(0.0, zeros(p), 0.0, zeros(p), alg.ρ, alg.ϵ)
 end
 function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ, γ)
     alg = o.algorithm
     if o.intercept
         alg.g0 = smooth(alg.g0, g * g, alg.ρ)
-        Δ = sqrt(alg.Δ0 / alg.g0) * g
+        step = sqrt(alg.Δ0 / (alg.g0 + alg.ϵ))
+        Δ = step * g
         o.β0 -= o.η * Δ
         alg.Δ0 = smooth(alg.Δ0, Δ * Δ, alg.ρ)
     end
-    @inbounds for j in 1:length(o.β)
+    for j in eachindex(o.β)
         gx = g * x[j]
         alg.g[j] = smooth(alg.g[j], gx * gx, alg.ρ)
-        γ = sqrt(alg.Δ[j] / alg.g[j])
-        Δ = γ * gx
-        o.β[j] = prox(o.penalty, o.β[j] - o.η * Δ, o.η * γ)
+        step = sqrt(alg.Δ[j] / (alg.g[j] + alg.ϵ))
+        Δ = step * gx
+        o.β[j] = prox(o.penalty, o.β[j] - o.η * Δ, o.η * step)
         alg.Δ[j] = smooth(alg.Δ[j], Δ * Δ, alg.ρ)
     end
 end
 function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ::AVec, γ)
     alg = o.algorithm
     if o.intercept
-        ḡ = mean(g)
-        alg.g0 = smooth(alg.g0, ḡ * ḡ, alg.ρ)
-        Δ = sqrt(alg.Δ0 / alg.g0) * ḡ
-        o.β0 -= Δ
+        gbar = mean(g)
+        alg.g0 = smooth(alg.g0, gbar * gbar, alg.ρ)
+        step = sqrt(alg.Δ0 / (alg.g0 + alg.ϵ))
+        Δ = step* gbar
+        o.β0 -= o.η * Δ
         alg.Δ0 = smooth(alg.Δ0, Δ * Δ, alg.ρ)
     end
-    n = length(g)
-    @inbounds for j in 1:length(o.β)
-        gx = 0.0
-        for i in 1:n
-            gx += g[i] * x[i, j]
-        end
-        gx /= n
+    for j in eachindex(o.β)
+        gx = mean(sub(x, :, j), StatsBase.WeightVec(g))
         alg.g[j] = smooth(alg.g[j], gx * gx, alg.ρ)
-        γ = sqrt(alg.Δ[j] / alg.g[j])
-        Δ = γ * gx
-        o.β[j] = prox(o.penalty, o.β[j] - γ * gx, γ)
+        step = sqrt(alg.Δ[j] / (alg.g[j] + alg.ϵ))
+        Δ = step * gx
+        o.β[j] = prox(o.penalty, o.β[j] - o.η * Δ, o.η * step)
         alg.Δ[j] = smooth(alg.Δ[j], Δ * Δ, alg.ρ)
     end
 end
