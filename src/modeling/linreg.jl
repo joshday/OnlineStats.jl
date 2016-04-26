@@ -106,7 +106,7 @@ end
 # function coef(o::LinReg, pen::RidgePenalty)
 #     copy!(o.s, o.c.A)
 #     for j in 1:length(o.value)
-#         o.s += o.penalty.λ
+#         o.s[j] += pen.λ
 #     end
 #     sweep!(o.s, 1:length(o.value))
 #     copy!(o.value, o.s[1:end-1, end])
@@ -125,16 +125,17 @@ function coef(o::LinReg, penalty::Penalty;
     copy!(o.s, cor(o.c))
     β = zeros(p)
     βold = zeros(p)
+    old_tolerance = Inf
     tolerance = 0.0
     iters = 0
 
-    xtx = o.s[1:p, 1:p]  # x'x
-    xty = o.s[1:p, end]  # x'y
+    xtx = o.s[1:p, 1:p]  # x'x / n
+    xty = o.s[1:p, end]  # x'y / n
 
     for i in 1:maxit
         iters += 1
         copy!(βold, β)
-        β = β + ((i - 2) / (i + 1)) * (β - βold)
+        # β = β + ((i - 2) / (i + 1)) * (β - βold)
         g = (xty - xtx * β)
         β = β + s * g
         prox!(penalty, β, s)
@@ -149,11 +150,12 @@ function coef(o::LinReg, penalty::Penalty;
     scaled_to_original!(β, o)
 end
 function scaled_to_original!(β::VecF, o::LinReg)
-    μ = mean(o.c)
-    σ = std(o.c)
-    β₀ = μ[end] - σ[end] * sum(μ[1:end-1] ./ σ[1:end-1] .* β)
-    for i in 1:length(β)
-        β[i] = β[i] * σ[end] / σ[i]
+    μ = mean(o.c)   # mean(y) is μ[end]
+    σ = std(o.c)    # std(y) is σ[end]
+    σy = σ[end]
+    β₀ = μ[end] - σy * sum(μ[1:end-1] ./ σ[1:end-1] .* β)
+    for j in eachindex(β)
+        β[j] = β[j] * σy / σ[j]
     end
     [β₀; β]
 end
@@ -182,7 +184,7 @@ function predict(o::LinReg, x::AMat; kw...)
 end
 
 
-loss(o::LinReg, x::AMatF, y::AVecF; kw...) = .5 * mean(abs2(y - predict(o, x; kw...)))
+loss(o::LinReg, x::AMatF, y::AVecF; kw...) = loss(L2Regression(), y, predict(o, x; kw...))
 
 function cost(o::LinReg, x::AMatF, y::AVecF; kw...)
     β = coef(o; kw...)

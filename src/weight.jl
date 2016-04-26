@@ -60,7 +60,7 @@ type LearningRate <: StochasticWeight
     nups::Int
     r::Float64
     λ::Float64
-    LearningRate(r::Real = 0.6, λ::Real = 0.0) = new(0, 0, r, λ)
+    LearningRate(r::Real = 0.5, λ::Real = 0.0) = new(0, 0, r, λ)
 end
 
 

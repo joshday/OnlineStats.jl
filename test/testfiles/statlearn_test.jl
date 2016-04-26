@@ -20,8 +20,6 @@ end
 
 
 facts(@title "StatLearn") do
-    @fact OnlineStats.default(Algorithm) --> SGD()
-
     n, p = 500, 5
     x = randn(n, p)
     β = collect(linspace(-1, 1, p))

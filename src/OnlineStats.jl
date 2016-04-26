@@ -212,7 +212,7 @@ end
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
-    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    0 < b <= n || warn("batch size larger than data size")
     if b == 1
         fit!(o, y)
     else
@@ -230,7 +230,7 @@ end
 function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
     b = Int(b)
     n = size(y, 1)
-    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    0 < b <= n || warn("batch size larger than data size")
     if b == 1
         fit!(o, y)
     else
@@ -248,7 +248,7 @@ end
 function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
     b = Int(b)
     n = length(y)
-    @assert 0 < b <= n "batch size must be positive and smaller than data size"
+    0 < b <= n || warn("batch size larger than data size")
     if b == 1
         fit!(o, x, y)
     else

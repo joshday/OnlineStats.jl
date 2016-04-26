@@ -1,18 +1,15 @@
 module Experiments
-reload("OnlineStats")
+# reload("OnlineStats")
 using OnlineStats, StatsBase
 
-n, p = 100_000, 5
+n, p = 10_000_000, 5
 x = randn(n, p)
 y = x * collect(1.:p) + randn(n)
 
 
-o = StatLearn(p, ADAM())
-@time fit!(o, x, y, 5)
-@time o2 = StatLearn(x, y, MMGrad())
-
+@time o = StatLearn(x, y, AdaGrad())
 @show coef(o)
-@show coef(o2)
+
 
 
 
