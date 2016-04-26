@@ -432,15 +432,7 @@ function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ:
 end
 
 
-
-
-
-
-
-
-
-
-#----------------------------------------------------------------------# AdaDelta
+#--------------------------------------------------------------------------# AdaDelta
 # Ignores weight.  `step` needs special attention here. See paper:
 # http://arxiv.org/abs/1212.5701
 type AdaDelta <: Algorithm
@@ -450,14 +442,14 @@ type AdaDelta <: Algorithm
     Δ::VecF
     ρ::Float64
     ϵ::Float64
-    AdaDelta(ρ::Real = .05, ϵ::Real = 1e-6) = new(0.0, zeros(1), 0.0, zeros(1), ρ, ϵ)
+    AdaDelta(ρ::Real = .05, ϵ::Real = .01) = new(0.0, zeros(1), 0.0, zeros(1), ρ, ϵ)
     AdaDelta(p::Integer, alg::AdaDelta) = new(0.0, zeros(p), 0.0, zeros(p), alg.ρ, alg.ϵ)
 end
 function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ, γ)
     alg = o.algorithm
     if o.intercept
         alg.g0 = smooth(alg.g0, g * g, alg.ρ)
-        step = sqrt(alg.Δ0 / (alg.g0 + alg.ϵ))
+        step = sqrt((alg.Δ0 + alg.ϵ) / (alg.g0 + alg.ϵ))
         Δ = step * g
         o.β0 -= o.η * Δ
         alg.Δ0 = smooth(alg.Δ0, Δ * Δ, alg.ρ)
@@ -465,7 +457,7 @@ function _updateβ!(o::StatLearn{AdaDelta}, g, x, y, ŷ, γ)
     for j in eachindex(o.β)
         gx = g * x[j]
         alg.g[j] = smooth(alg.g[j], gx * gx, alg.ρ)
-        step = sqrt(alg.Δ[j] / (alg.g[j] + alg.ϵ))
+        step = sqrt((alg.Δ0 + alg.ϵ) / (alg.g[j] + alg.ϵ))
         Δ = step * gx
         o.β[j] = prox(o.penalty, o.β[j] - o.η * Δ, o.η * step)
         alg.Δ[j] = smooth(alg.Δ[j], Δ * Δ, alg.ρ)
@@ -476,15 +468,15 @@ function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ:
     if o.intercept
         gbar = mean(g)
         alg.g0 = smooth(alg.g0, gbar * gbar, alg.ρ)
-        step = sqrt(alg.Δ0 / (alg.g0 + alg.ϵ))
+        step = sqrt((alg.Δ0 + alg.ϵ) / (alg.g0 + alg.ϵ))
         Δ = step* gbar
         o.β0 -= o.η * Δ
         alg.Δ0 = smooth(alg.Δ0, Δ * Δ, alg.ρ)
     end
     for j in eachindex(o.β)
-        gx = mean(sub(x, :, j), StatsBase.WeightVec(g))
+        gx = batch_g(sub(x, :, j), g)
         alg.g[j] = smooth(alg.g[j], gx * gx, alg.ρ)
-        step = sqrt(alg.Δ[j] / (alg.g[j] + alg.ϵ))
+        step = sqrt((alg.Δ0 + alg.ϵ) / (alg.g[j] + alg.ϵ))
         Δ = step * gx
         o.β[j] = prox(o.penalty, o.β[j] - o.η * Δ, o.η * step)
         alg.Δ[j] = smooth(alg.Δ[j], Δ * Δ, alg.ρ)
@@ -492,7 +484,7 @@ function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ:
 end
 
 
-#--------------------------------------------------------------------------# ADAM
+#------------------------------------------------------------------------------# ADAM
 type ADAM <: Algorithm
     β1::Float64
     β2::Float64
@@ -509,17 +501,19 @@ function _updateβ!(o::StatLearn{ADAM}, g, x, y, ŷ, γ)
     β2 = alg.β2
     nups = o.weight.nups
     bias = (1. - β1 ^ (.5 * nups)) / (1. - β1 ^ nups)
-    γ *= o.η
+    ηγ = o.η * γ
     if o.intercept
         alg.m0 = (1. - β1) * alg.m0 + β1 * g
         alg.v0 = (1. - β2) * alg.v0 + β2 * g * g
-        o.β0 -= γ * bias * alg.m0 / sqrt(alg.v0)
+        step = ηγ * bias / (sqrt(alg.v0) + _ϵ)
+        o.β0 -= step * alg.m0
     end
     for j in eachindex(o.β)
         gx = g * x[j]
         alg.m[j] = (1. - β1) * alg.m[j] + β1 * gx
         alg.v[j] = (1. - β2) * alg.v[j] + β2 * gx * gx
-        o.β[j] = prox(o.penalty, o.β[j] - γ * bias * alg.m[j] / sqrt(alg.v[j]), γ)
+        step = ηγ * bias / (sqrt(alg.v[j]) + _ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - step * alg.m[j], step)
     end
 end
 function _updatebatchβ!(o::StatLearn{ADAM}, g, x, y, ŷ, γ)
@@ -529,21 +523,27 @@ function _updatebatchβ!(o::StatLearn{ADAM}, g, x, y, ŷ, γ)
     β2 = alg.β2
     nups = o.weight.nups
     bias = (1. - β1 ^ (.5 * nups)) / (1. - β1 ^ nups)
-    γ *= o.η
+    ηγ = o.η * γ
     if o.intercept
         gbar = mean(g)
         alg.m0 = (1. - β1) * alg.m0 + β1 * gbar
         alg.v0 = (1. - β2) * alg.v0 + β2 * gbar * gbar
-        o.β0 -= γ * bias * alg.m0 / sqrt(alg.v0)
+        step = ηγ * bias / (sqrt(alg.v0) + _ϵ)
+        o.β0 -= step * alg.m0
     end
     for j in eachindex(o.β)
-        gx = mean(g .* x[:, j])
+        gx = batch_g(sub(x, :, j), g)
         alg.m[j] = (1. - β1) * alg.m[j] + β1 * gx
         alg.v[j] = (1. - β2) * alg.v[j] + β2 * gx * gx
-        o.β[j] = prox(o.penalty, o.β[j] - γ * bias * alg.m[j] / sqrt(alg.v[j]), γ)
+        step = ηγ * bias / (sqrt(alg.v[j]) + _ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - step * alg.m[j], step)
     end
-
 end
+
+
+
+
+
 
 
 #--------------------------------------------------------------------------# RDA
