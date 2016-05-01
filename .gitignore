@@ -5,4 +5,4 @@
 
 *.ipynb
 
-test/try.jl
+test/experiment.jl
