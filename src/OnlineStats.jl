@@ -219,8 +219,9 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            updatecounter!(o, b)
-            γ = weight(o, b)
+            bsize = length(rng)
+            updatecounter!(o, bsize)
+            γ = weight(o, bsize)
             _fitbatch!(o, rows(y, rng), γ)
             i += b
         end
@@ -237,8 +238,9 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            updatecounter!(o, b)
-            γ = weight(o, b)
+            bsize = length(rng)
+            updatecounter!(o, bsize)
+            γ = weight(o, bsize)
             _fitbatch!(o, rows(y, rng), γ)
             i += b
         end
@@ -255,8 +257,9 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
         i = 1
         while i <= n
             rng = i:min(i + b - 1, n)
-            updatecounter!(o, b)
-            γ = weight(o, b)
+            bsize = length(rng)
+            updatecounter!(o, bsize)
+            γ = weight(o, bsize)
             _fitbatch!(o, rows(x, rng), rows(y, rng), γ)
             i += b
         end
