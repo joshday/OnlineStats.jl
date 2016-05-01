@@ -108,7 +108,7 @@ end
 function _fit!(o::Variances, y::AVec, γ::Float64)
     copy!(o.μold, o.μ)
     smooth!(o.μ, y, γ)
-    for i in 1:length(y)
+    for i in eachindex(y)
         o.value[i] = smooth(o.value[i], (y[i] - o.μ[i]) * (y[i] - o.μold[i]), γ)
     end
 end
@@ -512,12 +512,24 @@ for nm in [:QuantileSGD, :QuantileMM]
         """
     ))
 end
-for nm in [:Means, :Variances, :CovMatrix]
+for nm in [:Means, :CovMatrix]
     eval(parse(
         """
         function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
             o = $nm(size(y, 2), wgt)
             fit!(o, y, size(y, 1))
+            o
+        end
+        """
+    ))
+end
+# Variances does not have a _fitbatch! method
+for nm in [:Variances]
+    eval(parse(
+        """
+        function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
+            o = $nm(size(y, 2), wgt)
+            fit!(o, y)
             o
         end
         """

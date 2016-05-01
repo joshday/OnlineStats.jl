@@ -265,7 +265,7 @@ function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
 end
 
 # error if no fitbatch! method
-_fitbatch!(o, args...) = error("No batch update method for $(typeof(o))")
+_fitbatch!(o, args...) = (warn("no fitbatch! method for $(typeof(o))"); _fit!(o, args...))
 
 #---------------------------------------------------------------------------# helpers
 """
