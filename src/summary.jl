@@ -112,11 +112,6 @@ function _fit!(o::Variances, y::AVec, γ::Float64)
         o.value[i] = smooth(o.value[i], (y[i] - o.μ[i]) * (y[i] - o.μold[i]), γ)
     end
 end
-function _fitbatch!{W <: BatchWeight}(o::Variances{W}, y::AMat, γ::Float64)
-    n2 = size(y, 1)
-    smooth!(o.μ, row(mean(y, 1), 1), γ)
-    smooth!(o.value, row(var(y,1), 1) * ((n2 - 1) / n2), γ)
-end
 Base.var(o::Variances) = value(o)
 Base.std(o::Variances) = sqrt(value(o))
 Base.mean(o::Variances) = o.μ
@@ -130,6 +125,15 @@ function standardize{T<:Real}(o::Variances, x::AVec{T})
         end
     end
     center(o, x) ./ σs
+end
+function standardize{T<:Real}(o::Variances, x::AMat{T})
+    σs = std(o)
+    for j in eachindex(σs)
+        if σs[j] == 0.0
+            σs[j] = 1.0
+        end
+    end
+    StatsBase.zscore(x, mean(o)', σs')
 end
 
 

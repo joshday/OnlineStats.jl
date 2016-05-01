@@ -1,4 +1,4 @@
-"""
+ """
 Linear regression with optional regularization.
 
 ```julia
@@ -115,8 +115,8 @@ end
 
 # coef for Lasso, ElasticNet, SCAD
 function coef(o::LinReg, penalty::Penalty;
-        maxit::Integer = 100,
-        tol::Real = 1e-4,
+        maxit::Integer = 200,
+        tol::Real = 1e-6,
         step::Real = 1.0,
         verbose::Bool = false
     )
@@ -135,15 +135,15 @@ function coef(o::LinReg, penalty::Penalty;
     for i in 1:maxit
         iters += 1
         copy!(βold, β)
-        # β = β + ((i - 2) / (i + 1)) * (β - βold)
+        β = β + ((i - 2) / (i + 1)) * (β - βold)
         g = (xty - xtx * β)
         β = β + s * g
         prox!(penalty, β, s)
-        tolerance = βtol(β, βold, xtx, xty, penalty)
+        tolerance = vecnorm(β - βold) #βtol(β, βold, xtx, xty, penalty)
         tolerance < tol && break
     end
 
-    tolerance < tol || warn("Algorithm did not achieve convergence")
+    tolerance < tol || warn("Algorithm did not achieve convergence (tolerance = $tolerance)")
     verbose && println("tolerance:                ", tolerance)
     verbose && println("iterations:               ", iters)
     verbose && println("penalized log-likelihood: ", _penloglik(β, xtx, xty, penalty))
@@ -170,22 +170,23 @@ function βtol(β::VecF, βold::VecF, xtx::MatF, xty::VecF, penalty::Penalty)
     abs(u - v) / abs(v)
 end
 
-# predict and loss (kw... are the control parameters for coef)
+# predict for vector
 predict(o::LinReg{NoPenalty}, x::AVec) = dot(x, coef(o))
 function predict(o::LinReg, x::AVec; kw...)
     β = coef(o; kw...)
     β[1] + dot(x, β[2:end])
 end
-
+# predict for matrix
 predict(o::LinReg{NoPenalty}, x::AMat) = x * coef(o)
 function predict(o::LinReg, x::AMat; kw...)
     β = coef(o; kw...)
     β[1] + x * β[2:end]
 end
 
-
-loss(o::LinReg, x::AMatF, y::AVecF; kw...) = loss(L2Regression(), y, predict(o, x; kw...))
-
+# loss and cost (loss + penalty)
+function loss(o::LinReg, x::AMatF, y::AVecF; kw...)
+    loss(L2Regression(), y, predict(o, x; kw...))
+end
 function cost(o::LinReg, x::AMatF, y::AVecF; kw...)
     β = coef(o; kw...)
     η = β[1] + x * β[2:end]
