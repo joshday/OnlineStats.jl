@@ -80,7 +80,7 @@ o3 = QuantileMM(y, LearningRate(.6))
 
 Batch updates have an effect on convergence for stochastic approximation methods.
 ```julia
-y = randn(1000)
+y = randn(100_000)
 o = QuantileMM(tau = [.25, .75])  # Online MM algorithm for quantiles
 fit!(o, y, 10)  # update in batches of size 10
 ```
