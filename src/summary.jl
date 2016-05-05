@@ -76,7 +76,7 @@ Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
 value(o::Variance) = nobs(o) < 2 ? 0.0 : o.value * unbias(o)
 center(o::Variance, x::Real) = x - mean(o)
-function standardize(o::Variance, x::Real)
+function StatsBase.zscore(o::Variance, x::Real)
     σ = std(o)
     σ == 0.0 ? 1.0 : center(o, x) / σ
 end
@@ -117,7 +117,7 @@ Base.std(o::Variances) = sqrt(value(o))
 Base.mean(o::Variances) = o.μ
 value(o::Variances) = nobs(o) < 2 ? zeros(o.value) : o.value * unbias(o)
 center{T<:Real}(o::Variances, x::AVec{T}) = x - mean(o)
-function standardize{T<:Real}(o::Variances, x::AVec{T})
+function StatsBase.zscore{T<:Real}(o::Variances, x::AVec{T})
     σs = std(o)
     for j in eachindex(σs)
         @inbounds if σs[j] == 0.0
@@ -126,7 +126,7 @@ function standardize{T<:Real}(o::Variances, x::AVec{T})
     end
     center(o, x) ./ σs
 end
-function standardize{T<:Real}(o::Variances, x::AMat{T})
+function StatsBase.zscore{T<:Real}(o::Variances, x::AMat{T})
     σs = std(o)
     for j in eachindex(σs)
         if σs[j] == 0.0

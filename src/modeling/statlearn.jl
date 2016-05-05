@@ -40,8 +40,14 @@ predict(o::QuantileRegression, x::AVec, β0, β) =  β0 + dot(x, β)
 predict(o::SVMLike, x::AVec, β0, β) =             β0 + dot(x, β)
 predict(o::HuberRegression, x::AVec, β0, β) =     β0 + dot(x, β)
 
+classify(o::LogisticRegression, x::AVec, β0, β) = Float64(β0 + dot(x, β) > 0.0)
+classify(o::SVMLike, x::AVec, β0, β) = sign(β0 + dot(x, β))
+
 function StatsBase.predict{T<:Real}(o::ModelDefinition, x::AMat{T}, β0::Float64, β::VecF)
     [predict(o, row(x, i), β0, β) for i in 1:size(x, 1)]
+end
+function classify{T<:Real}(o::ModelDefinition, x::AMat{T}, β0::Float64, β::VecF)
+    [classify(o, row(x, i), β0, β) for i in 1:size(x, 1)]
 end
 
 
@@ -195,6 +201,8 @@ end
 StatsBase.coef(o::StatLearn) = value(o)
 StatsBase.predict{T<:Real}(o::StatLearn, x::AVec{T}) = predict(o.model, x, o.β0, o.β)
 StatsBase.predict{T<:Real}(o::StatLearn, x::AMat{T}) = predict(o.model, x, o.β0, o.β)
+classify{T<:Real}(o::StatLearn, x::AVec{T}) = classify(o.model, x, o.β0, o.β)
+classify{T<:Real}(o::StatLearn, x::AMat{T}) = classify(o.model, x, o.β0, o.β)
 value(o::StatLearn) = o.intercept ? vcat(o.β0, o.β) : o.β
 Base.ndims(o::StatLearn) = length(o.β) + o.intercept
 function Base.show(io::IO, o::StatLearn)

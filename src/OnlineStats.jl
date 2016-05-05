@@ -30,7 +30,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, cost, center, standardize, fitdistribution
+    loss, cost, center, standardize, fitdistribution, classify
 
 #-----------------------------------------------------------------------------# types
 abstract Input

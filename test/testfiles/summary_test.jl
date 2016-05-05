@@ -1,6 +1,6 @@
 module SummaryTest
 
-using TestSetup, OnlineStats, FactCheck
+using TestSetup, OnlineStats, FactCheck, StatsBase
 
 x = randn(500)
 x1 = randn(500)
@@ -38,7 +38,7 @@ facts(@title "Variance / Variances") do
     @fact mean(o) --> roughly(mean(x1))
     @fact var(o) --> value(o)
     @fact center(o, x[1]) --> x[1] - mean(o)
-    @fact standardize(o, x[1]) --> (x[1] - mean(o)) / std(o)
+    @fact zscore(o, x[1]) --> (x[1] - mean(o)) / std(o)
 
     o = Variances(xs)
     @fact var(o) --> roughly(vec(var(xs, 1)))
@@ -49,8 +49,8 @@ facts(@title "Variance / Variances") do
     fit!(o2, xs)
     @fact var(o) --> roughly(var(o2))
     @fact center(o, vec(xs[1, :])) --> vec(xs[1, :]) - mean(o)
-    @fact standardize(o, vec(xs[1, :])) --> (vec(xs[1, :]) - mean(o)) ./ std(o)
-    @fact standardize(Variances(5), ones(5)) --> ones(5)
+    @fact zscore(o, vec(xs[1, :])) --> (vec(xs[1, :]) - mean(o)) ./ std(o)
+    @fact zscore(Variances(5), ones(5)) --> ones(5)
 end
 
 facts(@title "CovMatrix") do
