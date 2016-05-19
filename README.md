@@ -22,14 +22,14 @@ o = Mean()
 ### All OnlineStats can be updated
 ```julia
 y = randn(100)
+
+# update Mean
+for yi in y
+    fit!(o, yi)
+end
+
+# or more simply:
 fit!(o, y)
-```
-
-
-### Different weighting schemes can be applied to new data
-```julia
-o = Mean(EqualWeight())  # the default
-o2 = Mean(ExponentialWeight(.1))
 ```
 
 ### OnlineStats share a common interface
@@ -39,7 +39,10 @@ o2 = Mean(ExponentialWeight(.1))
     - the number of observations seen
 
 
-# What Can OnlineStats Estimate?
+# What Can OnlineStats Do?
+While many estimates can be calculated analytically with an online algorithm, several
+type rely on stochastic approximation.
+
 ### Summary Statistics
 - Mean: `Mean`, `Means`
 - Variance: `Variance`, `Variances`
@@ -59,7 +62,7 @@ o2 = Mean(ExponentialWeight(.1))
 - Logistic Regression: `StatLearn`
 - Poisson Regression: `StatLearn`
 - Support Vector Machines: `StatLearn`
-- Quantile Regression: `StatLearn`
+- Quantile Regression: `StatLearn`, `QuantReg`
 - Huber Loss Regression: `StatLearn`
 - L1 Loss Regression: `StatLearn`
 
@@ -67,3 +70,4 @@ o2 = Mean(ExponentialWeight(.1))
 - K-Means clustering: `KMeans`
 - Bootstrapping: `BernoulliBootstrap`, `PoissonBootstrap`
 - Approximate count of distinct elements: `HyperLogLog`
+- Visualizing value of OnlineStats: `TracePlot`, `CompareTracePlot`

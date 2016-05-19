@@ -27,23 +27,6 @@ facts(@title "Show Methods") do
     display(FitCategorical())
     display(FitBeta())
 
-    display(NoPenalty())
-    display(LassoPenalty(.1))
-    display(RidgePenalty(.1))
-    display(ElasticNetPenalty(.1, .5))
-    display(SCADPenalty(.1, 3.7))
-
-    display(L2Regression())
-    display(L1Regression())
-    display(LogisticRegression())
-    display(PoissonRegression())
-    display(QuantileRegression(.7))
-    display(HuberRegression(2))
-    display(SVMLike())
-    display(StatLearn(10))
-    display(StatLearnSparse(StatLearn(10), HardThreshold()))
-    display(StatLearnCV(StatLearn(5), randn(100, 5), randn(100)))
-
     display(BernoulliBootstrap(Mean(), mean, 1000))
 
     println()

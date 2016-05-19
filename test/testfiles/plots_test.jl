@@ -4,7 +4,7 @@ using OnlineStats, TestSetup, FactCheck, Plots
 plotly()
 
 facts(@title "Plots") do
-    o = StatLearn(10)
+    o = LinReg(10)
     coefplot(o)
 
     tr = TracePlot(o)
@@ -16,8 +16,8 @@ facts(@title "Plots") do
     o.β[2] = 0.0
     coefplot(o)
 
-    o1 = StatLearn(10, algorithm = SGD())
-    o2 = StatLearn(10, algorithm = RDA())
+    o1 = LinReg(10)
+    o2 = LinReg(10, ExponentialWeight(.1))
     tr = CompareTracePlot(OnlineStat[o1, o2], x -> maxabs(coef(x)))
     fit!(tr, randn(100,10), randn(100))
     plot(tr)

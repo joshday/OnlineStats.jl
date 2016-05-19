@@ -2,10 +2,10 @@ module OnlineStats
 
 import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
-import ArrayViews
-import Distributions
-Ds = Distributions
+import Distributions; Ds = Distributions
 import Requires
+using SparseRegression
+import SparseRegression: loss
 
 export
     OnlineStat,
@@ -49,7 +49,7 @@ typealias AMatF     AMat{Float64}
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
-printheader(io::IO, s::AbstractString) = print_with_color(:blue, io, "■ $s \n")
+printheader(io::IO, s::AbstractString) = println(io, "■ $s")
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end
@@ -334,9 +334,10 @@ include("summary.jl")
 include("distributions.jl")
 include("normalmix.jl")
 include("modeling/sweep.jl")
-include("modeling/penalty.jl")
-include("modeling/statlearn.jl")
-include("modeling/statlearnextensions.jl")
+include("modeling/sparsereg.jl")
+# include("modeling/penalty.jl")
+# include("modeling/statlearn.jl")
+# include("modeling/statlearnextensions.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
 include("modeling/bias.jl")
@@ -344,5 +345,6 @@ include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")
 include("multivariate/kmeans.jl")
 Requires.@require Plots include("plots.jl")
+
 
 end # module
