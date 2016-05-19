@@ -4,8 +4,8 @@ import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
 import Requires
-using SparseRegression
-import SparseRegression: loss
+# using SparseRegression
+# import SparseRegression: loss
 
 export
     OnlineStat,

@@ -85,11 +85,8 @@ predict(o::LinReg, x::AVec) = dot(x, coef(o))
 predict(o::LinReg, x::AMat) = x * coef(o)
 
 # loss
-function loss(o::LinReg, x::AVecF, y::Float64)
-    loss(L2Regression(), y, predict(o, x))
-end
-function loss(o::LinReg, x::AMatF, y::AVecF)
-    loss(L2Regression(), y, predict(o, x))
+function loss(o::LinReg, x, y)
+    0.5 * mean(abs2(y - predict(o, x)))
 end
 
 # # coef for Ridge
