@@ -14,91 +14,56 @@
 # [API and Examples](doc/api.md)
 
 # Overview
-
 ### Every OnlineStat is a Type
-
-There are two ways of creating an OnlineStat:
-
-1. Create "empty" object and add data
-2. Create object with data
-
 ```julia
 o = Mean()
-fit!(o, y)
-
-o = Mean(y)
 ```
 
 ### All OnlineStats can be updated
-
-*Note*: `fit!(o, y)` is a cleaner way to write `for yi in y; fit!(o, yi); end`
-
 ```julia
-y1 = randn(100)
-y2 = randn(100)
-
-o = Variance()
-fit!(o, y1)
-fit!(o, y2)
-nobs(o) # number of observations == 200
+y = randn(100)
+fit!(o, y)
 ```
 
 
-
-### New data can be weighted differently
-
+### Different weighting schemes can be applied to new data
 ```julia
-o = Mean(EqualWeight())
-o2 = Variance(y, ExponentialWeight(.1))
-o3 = QuantileMM(y, LearningRate(.6))
+o = Mean(EqualWeight())  # the default
+o2 = Mean(ExponentialWeight(.1))
 ```
-
-- `EqualWeight()`
-    - All observations are weighted equally.  Weight at update `t` is `1 / t`.
-
-- `BoundedExponentialWeight(minstep::Real)`, `BoundedExponentialWeight(lookback::Integer)`
-    - Use equal weight until weights reach `minstep = 2 / (lookback + 1)`, then hold constant.  Weight at update `t` is `max(minstep, 1 / t)`.
-
-- `ExponentialWeight(λ::Real)`, `ExponentialWeight(lookback::Integer)`
-    - True exponential weighting.  Each update weight is constant `λ = 2 / (lookback + 1)`
-
-- `LearningRate(r)`
-    - `r` should be in (0.5, 1].
-    - For stochastic approximation methods.  Weight at update `t` is `1 / t^r`.
 
 ### OnlineStats share a common interface
-
 - `value(o)`
     - the associated value of an OnlineStat
 - `nobs(o)`
     - the number of observations seen
 
 
-# Advanced Usage
+# What Can OnlineStats Estimate?
+### Summary Statistics
+- Mean: `Mean`, `Means`
+- Variance: `Variance`, `Variances`
+- Quantiles: `QuantileMM`, `QuantileSGD`
+- Covariance Matrix: `CovMatrix`
+- Maximum and Minimum:  `Extrema`
+- Skewness and Kurtosis:  `Moments`
+- Sum/Differences:  `Sum`, `Sums`, `Diff`, `Diffs`
 
-### New data can be updated in batches
+### Density Estimation
+- For `typeof(D) in [Beta, Categorical, Cauchy, Gamma, LogNormal, Normal, Multinomial, MvNormal]`
+    - `distributionfit(D, data)`
+- Gaussian Mixtures: `NormalMix`
 
-Batch updates have an effect on convergence for stochastic approximation methods.
-```julia
-y = randn(100_000)
-o = QuantileMM(tau = [.25, .75])  # Online MM algorithm for quantiles
-fit!(o, y, 10)  # update in batches of size 10
-```
+### Predictive Modeling
+- Linear Regression: `LinReg`, `StatLearn`
+- Logistic Regression: `StatLearn`
+- Poisson Regression: `StatLearn`
+- Support Vector Machines: `StatLearn`
+- Quantile Regression: `StatLearn`
+- Huber Loss Regression: `StatLearn`
+- L1 Loss Regression: `StatLearn`
 
-### Weights can be overridden
-
-Users can provide a vector of weights along with the input:
-```julia
-y = randn(1000)
-weights = rand(1000)
-
-o = Mean()
-fit!(o, y, weights)
-```
-
-Or a single weight to be used for each update:
-```julia
-weight = rand()
-o = Mean()
-fit!(o, y, weight)
-```
+### Experimental Features
+- K-Means clustering: `KMeans`
+- Bootstrapping: `BernoulliBootstrap`, `PoissonBootstrap`
+- Approximate count of distinct elements: `HyperLogLog`
