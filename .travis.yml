@@ -6,7 +6,7 @@ julia:
   - release
   - nightly
 matrix:
-  - allow_failures:
+  allow_failures:
     - julia: nightly
 notifications:
   email: true
