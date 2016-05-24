@@ -10,7 +10,7 @@ std(o)
 ```
 """
 type NormalMix{W<:Weight} <: DistributionStat{ScalarInput}
-    value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal}
+    value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal{Float64}}
     s1::VecF
     s2::VecF
     s3::VecF
@@ -20,7 +20,7 @@ type NormalMix{W<:Weight} <: DistributionStat{ScalarInput}
     weight::W
 end
 function NormalMix(k::Integer, wgt::Weight = LearningRate();
-        start = Ds.MixtureModel(Ds.Normal[Ds.Normal(j-1, 10) for j in 1:k])
+        start = Ds.MixtureModel(Ds.Normal{Float64}[Ds.Normal(j-1, 10) for j in 1:k])
     )
     NormalMix(
         start,
@@ -49,14 +49,15 @@ function Base.show(io::IO, o::NormalMix)
     print_value_and_nobs(io, o)
 end
 function value(o::NormalMix)
-    try
-        o.value = Ds.MixtureModel(map((u,v) -> Ds.Normal(u, sqrt(v)), o.μ, o.σ2), o.s1)
-    catch
-        println(sqrt(o.σ2))
-        println(sqrt(o.μ))
-        println(sqrt(o.s1))
-        error("Algorithm possibly diverging, nobs = $(nobs(o))")
-    end
+    # try
+        vec = map((u,v) -> Ds.Normal{Float64}(u, sqrt(v)), o.μ, o.σ2)
+        o.value = Ds.MixtureModel(vec, o.s1)
+    # catch
+    #     println(sqrt(o.σ2))
+    #     println(o.μ)
+    #     println(o.s1)
+    #     error("Algorithm possibly diverging, nobs = $(nobs(o))")
+    # end
 end
 function _fit!(o::NormalMix, y::Real, γ::Float64)
     k = length(o.μ)

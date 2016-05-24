@@ -113,7 +113,7 @@ facts(@title "Distributions") do
         @fact std(o) --> roughly(std(y), .5)
         @fact length(componentwise_pdf(o, 0.5)) --> 3
         @fact ncomponents(o) --> 3
-        @fact typeof(component(o, 1)) == Normal --> true
+        @fact typeof(component(o, 1)) == Normal{Float64} --> true
         @fact length(probs(o)) --> 3
         @fact pdf(o, randn()) > 0 --> true
         @fact 0 < cdf(o, randn()) < 1 --> true
