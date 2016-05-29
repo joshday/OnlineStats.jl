@@ -20,16 +20,17 @@ facts(@title "Modeling") do
         x = randn(n, p)
         β = collect(1.:p)
         y = x * β + randn(n)
-        o = LinReg(x, y)
+        o = LinReg(x, y, intercept = false)
         @fact coef(o) --> roughly(x \ y)
-        o2 = LinReg(10)
+        o2 = LinReg(10, intercept = false)
         fit!(o2, x[1:500, :], y[1:500], 500)
         fit!(o2, x[501:1000, :], y[501:1000], 1)
         @fact coef(o) --> roughly(coef(o2), .5)
 
         l = lm(x, y)
         @fact predict(l, x) --> roughly(predict(o, x))
-        @fact predict(l, vec(x[1, :])') --> roughly([predict(o, vec(x[1, :]))])
+        xi = randn(p)
+        @fact predict(l, xi') --> roughly([predict(o, xi)])
         @fact loss(o, x, y) --> roughly(0.5 * mean(abs2(y - x*coef(o))))
 
         ltab = coeftable(l)
@@ -43,7 +44,7 @@ facts(@title "Modeling") do
         @fact stderr(o)[1:5] --> roughly(stderr(l)[1:5], .001)
         @fact confint(o)[1:5] --> roughly(confint(l)[1:5], .001)
 
-        @fact coef(LinReg(10)) --> zeros(10)
+        @fact coef(LinReg(10, intercept = false)) --> zeros(10)
     end
 
     # context(@subtitle "Penalty") do

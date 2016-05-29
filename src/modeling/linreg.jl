@@ -1,61 +1,64 @@
- """
-Linear regression with optional regularization.
-
-```julia
-LinReg(x::Matrix, y::Vector)
-```
-
-Examples:
-```julia
-using  StatsBase
-n, p = 100_000, 10
-x = randn(n, p)
-y = x * collect(1.:p) + randn(n)
-```
-
-Methods for `LinReg`:
-```julia
-o = LinReg(x, y)
-coef(o)
-predict(o, x)
-confint(o, .95)
-vcov(o)
-stderr(o)
-coeftable(o)
-using Plots; coefplot(o)
-```
-"""
-type LinReg{W<:Weight} <: OnlineStat{XYInput}
-    value::VecF
-    c::CovMatrix{W}  # Cov([X y])
-    s::MatF          # "Swept" version of [X y]' [X y]
+type LinReg{W <: Weight} <: OnlineStat{XYInput}
+	β0::Float64
+	β::VecF
+	A::MatF
+	S::MatF  # Placeholder for swept version of A
+	intercept::Bool
+	weight::W
 end
-nobs(o::LinReg) = nobs(o.c)
-function LinReg(p::Integer, wgt::Weight = EqualWeight())
-    o = LinReg(zeros(p), CovMatrix(p + 1, wgt), zeros(p + 1, p + 1))
+function LinReg(p::Integer, wgt::Weight = EqualWeight(); intercept::Bool = true)
+	d = p + 2
+    o = LinReg(0.0, zeros(p), zeros(d, d), zeros(d, d), intercept, wgt)
+	o.A[1, 1] = 1.0
+	o
 end
-function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight())
-    o = LinReg(size(x, 2), wgt)
+function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight(); kw...)
+    o = LinReg(size(x, 2), wgt; kw...)
     fit!(o, x, y, size(x, 1))
     o
 end
-
-updatecounter!(o::LinReg, n2::Int) = updatecounter!(o.c, n2)
-weight(o::LinReg, n2::Int) = weight(o.c, n2)
-_fit!(o::LinReg, x::AVec, y::Real, γ::Float64) = _fit!(o.c, vcat(x, y), γ)
-_fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64) = _fitbatch!(o.c, hcat(x, y), γ)
+# fitting methods don't create the coefficient vector.
+# only "sufficient statistics" are updated.  coef(o) calculates the estimate.
+function _fit!(o::LinReg, x::AVec, y::Real, γ::Float64)
+	_fitbatch!(o, x', [y], γ)
+end
+function _fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
+	n2, p = size(x)
+	rng = 2:p + 1
+	# updates look like (1 - γ) * A + γ * x'x / n2
+	γ1 = γ / n2
+	γ2 = 1.0 - γ
+	# update x'x
+ 	BLAS.syrk!('U', 'T', γ1, x, γ2, sub(o.A, rng, rng))
+	# update x'y
+	BLAS.gemv!('T', γ1, x, y, γ2, slice(o.A, rng, p + 2))
+	# update 1'x
+	smooth!(sub(o.A, 1, rng), mean(x, 1), γ)
+	# update y'y
+	o.A[end, end] = smooth(o.A[end, end], sumabs2(y), γ1)
+	# update 1'y
+	o.A[1, end] = smooth(o.A[1, end], sum(y), γ1)
+end
 value(o::LinReg) = coef(o)
 
 
+#---------------------------------------------------------------------------# methods
 function coef(o::LinReg)
+	swp = (1 + !o.intercept):length(o.β) + 1  # indices to sweep on
     if nobs(o) > 0
-        copy!(o.s, o.c.A)
-        sweep!(o.s, 1:length(o.value))
-        copy!(o.value, o.s[1:end-1, end])
+        copy!(o.S, o.A)
+        sweep!(o.S, swp)
+        copy!(o.β, o.S[2:length(o.β) + 1, end])
+		o.β0 = o.S[1, end]
     end
-    o.value
+	if o.intercept
+		return vcat(o.β0, o.β)
+	else
+		return o.β
+	end
 end
-mse(o::LinReg) = o.s[end, end] * nobs(o) / (nobs(o) - size(o.s, 1))
+# mse is only correct when coef(o) is used before
+mse(o::LinReg) = o.S[end, end] * nobs(o) / (nobs(o) - length(o.β) - o.intercept)
 function StatsBase.coeftable(o::LinReg)
     β = coef(o)
     p = length(β)
@@ -74,20 +77,28 @@ function StatsBase.confint(o::LinReg, level::Real = 0.95)
     hcat(β, β) + mult * [1. -1.]
 end
 function StatsBase.vcov(o::LinReg)
-    value(o)
-    -mse(o) * o.s[1:end-1, 1:end-1] / nobs(o)
+    coef(o)
+	rng = (1 + !o.intercept):length(o.β) + 1
+    -mse(o) * o.S[rng, rng] / nobs(o)
  end
-
 StatsBase.stderr(o::LinReg) = sqrt(diag(StatsBase.vcov(o)))
-
-# predict for vector
-predict(o::LinReg, x::AVec) = dot(x, coef(o))
-predict(o::LinReg, x::AMat) = x * coef(o)
-
-# loss
+predict(o::LinReg, x::AVec) = o.β0 * o.intercept + dot(x, o.β)
+function predict(o::LinReg, x::AMat)
+	η = x * o.β
+	if o.intercept
+		β0 = o.β0
+		for i in eachindex(η)
+			@inbounds η[i] += β0
+		end
+	end
+	return η
+end
 function loss(o::LinReg, x, y)
     0.5 * mean(abs2(y - predict(o, x)))
 end
+
+
+
 
 # # coef for Ridge
 # function coef(o::LinReg, pen::RidgePenalty)
