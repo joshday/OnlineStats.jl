@@ -1,5 +1,6 @@
 module ModelingTest
 using TestSetup, OnlineStats, FactCheck, GLM
+import OnlineStats: add_deriv, _j
 
 facts(@title "Modeling") do
     context(@subtitle "sweep! operator") do
@@ -47,32 +48,32 @@ facts(@title "Modeling") do
         @fact coef(LinReg(10, intercept = false)) --> zeros(10)
     end
 
-    # context(@subtitle "Penalty") do
-    #     NoPenalty()
-    #     LassoPenalty(.1)
-    #     RidgePenalty(.1)
-    #     p = ElasticNetPenalty(.1, .5)
-    #     p2 = SCADPenalty(.1)
-    #
-    #     β = randn(5)
-    #     @fact _j(NoPenalty(), β) --> 0.0
-    #     @fact _j(LassoPenalty(.1), β) --> .1 * sumabs(β)
-    #     @fact _j(RidgePenalty(.1), β) --> 0.5 * .1 * sumabs2(β)
-    #     @fact _j(p, β) --> .1 * (p.α * sumabs(β) + (1 - p.α) * 0.5 * sumabs2(β))
-    #     @fact _j(p2, .01) --> .1 *.01
-    #
-    #     p3 = SCADPenalty(.2)
-    #     g = randn()
-    #     βj = randn()
-    #     λ = rand()
-    #     @fact add_deriv(NoPenalty(), g, βj) --> g
-    #     @fact add_deriv(RidgePenalty(λ), g, βj) --> g + λ * βj
-    #     @fact add_deriv(LassoPenalty(λ), g, βj) --> g + λ * sign(βj)
-    #     @fact add_deriv(p, g, βj) --> g + p.λ * (p.α * sign(βj) + (1 - p.α) * βj)
-    #     @fact add_deriv(p3, g, .1) --> g + .2
-    #     @fact add_deriv(p3, g, .2) --> g + max(3.7 * .2 - .2, 0.0) / (3.7 - 1.0)
-    #     @fact add_deriv(p3, g, 20) --> g
-    # end
+    context(@subtitle "Penalty") do
+        NoPenalty()
+        LassoPenalty(.1)
+        RidgePenalty(.1)
+        p = ElasticNetPenalty(.1, .5)
+        p2 = SCADPenalty(.1)
+
+        β = randn(5)
+        @fact _j(NoPenalty(), β) --> 0.0
+        @fact _j(LassoPenalty(.1), β) --> .1 * sumabs(β)
+        @fact _j(RidgePenalty(.1), β) --> 0.5 * .1 * sumabs2(β)
+        @fact _j(p, β) --> .1 * (p.α * sumabs(β) + (1 - p.α) * 0.5 * sumabs2(β))
+        @fact _j(p2, .01) --> .1 *.01
+
+        p3 = SCADPenalty(.2)
+        g = randn()
+        βj = randn()
+        λ = rand()
+        @fact add_deriv(NoPenalty(), g, βj) --> g
+        @fact add_deriv(RidgePenalty(λ), g, βj) --> g + λ * βj
+        @fact add_deriv(LassoPenalty(λ), g, βj) --> g + λ * sign(βj)
+        @fact add_deriv(p, g, βj) --> g + p.λ * (p.α * sign(βj) + (1 - p.α) * βj)
+        @fact add_deriv(p3, g, .1) --> g + .2
+        @fact add_deriv(p3, g, .2) --> g + max(3.7 * .2 - .2, 0.0) / (3.7 - 1.0)
+        @fact add_deriv(p3, g, 20) --> g
+    end
 
     context(@subtitle "QuantReg") do
         n, p = 10000, 10

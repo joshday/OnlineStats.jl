@@ -3,11 +3,11 @@ abstract Algorithm
 abstract ModelDefinition
 abstract GLMDef <: ModelDefinition
 
-immutable L2Regression <: GLMDef end
-immutable L1Regression <: ModelDefinition end
-immutable LogisticRegression <: GLMDef end
-immutable PoissonRegression <: GLMDef end
-immutable QuantileRegression <: ModelDefinition
+immutable L2Regression          <: GLMDef end
+immutable L1Regression          <: ModelDefinition end
+immutable LogisticRegression    <: GLMDef end
+immutable PoissonRegression     <: GLMDef end
+immutable QuantileRegression    <: ModelDefinition
     τ::Float64
     function QuantileRegression(τ::Real = .5)
         @assert 0 < τ < 1

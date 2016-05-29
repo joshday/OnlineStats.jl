@@ -102,7 +102,7 @@ end
 
 # # coef for Ridge
 # function coef(o::LinReg, pen::RidgePenalty)
-#     copy!(o.s, o.c.A)
+#     copy!(o.S, o.A)
 #     for j in 1:length(o.value)
 #         o.s[j] += pen.λ
 #     end
