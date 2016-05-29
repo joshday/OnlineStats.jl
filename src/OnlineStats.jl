@@ -4,8 +4,6 @@ import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
 import Requires
-# using SparseRegression
-# import SparseRegression: loss
 
 export
     OnlineStat,
@@ -338,6 +336,7 @@ include("modeling/penalty.jl")
 include("modeling/statlearn.jl")
 include("modeling/statlearnextensions.jl")
 include("modeling/linreg.jl")
+include("modeling/linreg2.jl")
 include("modeling/quantreg.jl")
 include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
@@ -347,3 +346,4 @@ Requires.@require Plots include("plots.jl")
 
 
 end # module
+O = OnlineStats
