@@ -299,12 +299,15 @@ function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
     end
 end
 # Rank 1 update of symmetric matrix: (1 - γ) * A + γ * x * x'
-# Only upper triangle is updated...I was having trouble with BLAS.syr!
-function rank1_smooth!(A::AMat, x::AVec, γ::Real)
-    @assert size(A, 1) == size(A, 2)
-    for j in 1:size(A, 2), i in 1:j
-        @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
-    end
+# function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
+#     @assert size(A, 1) == size(A, 2)
+#     for j in 1:size(A, 2), i in 1:j
+#         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
+#     end
+# end
+function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
+    scale!(A, 1.0 - γ)
+    BLAS.syr!('U', γ, x, A)
 end
 
 

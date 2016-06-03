@@ -16,20 +16,26 @@
 # Overview
 ### Every OnlineStat is a Type
 ```julia
+using OnlineStats
 o = Mean()
 ```
 
 ### All OnlineStats can be updated
 ```julia
 y = randn(100)
+y2 = randn(100)
 
 # update Mean
 for yi in y
     fit!(o, yi)
 end
+for yi in y2
+    fit!(o, yi)
+end
 
 # or more simply:
 fit!(o, y)
+fit!(o, y2)
 ```
 
 ### OnlineStats share a common interface
@@ -53,8 +59,8 @@ type rely on stochastic approximation.
 - Sum/Differences:  `Sum`, `Sums`, `Diff`, `Diffs`
 
 ### Density Estimation
-- For `typeof(D) in [Beta, Categorical, Cauchy, Gamma, LogNormal, Normal, Multinomial, MvNormal]`
-    - `distributionfit(D, data)`
+- `distributionfit(D, data)`
+    - For `D in [Beta, Categorical, Cauchy, Gamma, LogNormal, Normal, Multinomial, MvNormal]`
 - Gaussian Mixtures: `NormalMix`
 
 ### Predictive Modeling
