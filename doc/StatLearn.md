@@ -56,41 +56,6 @@ o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
 **Note**: The order of of `Weight`, `Algorithm`, `ModelDefinition`, and `Penalty` arguments don't matter.
 
 
-### TracePlot helps you try out learning rates and batch sizes.
-
-[Plots.jl](https://github.com/tbreloff/Plots.jl) allows OnlineStats.jl to implement
-plot methods for a variety of plotting packages.
-
-```julia
-using Plots
-gadfly()  # use Gadfly for plotting
-
-o = StatLearn(p, LearningRate(.6))  # empty object, p predictors
-tr = TracePlot(o)
-fit!(tr, x1, y1)  # Each call to fit adds a point/points to the trace plot
-...
-fit!(tr, xn, yn)
-plot(tr)
-
-coefplot(o)  # visualize coefficients
-```
-
-
-### CompareTracePlot helps you look at competing models
-
-```julia
-o1 = StatLearn(p, SGD())
-o2 = StatLearn(p, AdaGrad())
-o3 = StatLearn(p, AdaDelta())
-
-myloss(o) = loss(o, xtest, ytest)  # Function argument must return a scalar
-tr = CompareTracePlot(collect(o1, o2, o3), myloss)  
-fit!(tr, x1, y1)
-...
-fit!(tr, xn, yn)
-plot(tr)
-```
-
 
 ### Regularization parameters can be tuned automatically
 
@@ -104,19 +69,3 @@ cv = StatLearnCV(o, xtest, ytest)
 fit!(cv, x, y)
 coef(o)
 ```
-
-
-### Sparsity can be enforced in the coefficients
-Because of noisy stochastic gradients, setting coefficients to zero in the on-line
-setting is difficult (`RDA` works well for this in many cases).  An alternative
-is to create a scheme which sets coefficients to zero once they are "close enough to zero".
-
-```julia
-o = StatLearn(p, MMGrad())
-sp = StatLearnSparse(o, HardThreshold(burnin, threshold))
-fit!(sp, x, y)
-coef(o)
-```
-
-For a `HardThreshold`, after `burnin` observations have been seen, any coefficient
-less than `threshold` in absolute value will be set to zero.

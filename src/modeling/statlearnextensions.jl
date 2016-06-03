@@ -1,63 +1,3 @@
-#------------------------------------------------------------# Enforced Sparsity
-abstract AbstractSparsity
-
-immutable HardThreshold <: AbstractSparsity
-    burnin::Int
-    ϵ::Float64
-end
-function HardThreshold(;burnin::Integer = 1000, threshold::Real = .01)
-    @assert burnin > 0
-    @assert threshold > 0
-    HardThreshold(Int(burnin), Float64(threshold))
-end
-
-"""
-Enforce sparsity on a `StatLearn` object.  Currently, the only option is
-`HardThreshold`, which after `burnin` observations, any coefficient less than
-`threshold` is set to 0.
-
-```julia
-StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
-fit!(o, x, y)
-```
-"""
-type StatLearnSparse{S <: AbstractSparsity} <: OnlineStat{XYInput}
-    o::StatLearn
-    s::S
-end
-function StatLearnSparse(o::StatLearn, s::AbstractSparsity = HardThreshold())
-    StatLearnSparse(o, s)
-end
-function Base.show(io::IO, o::StatLearnSparse)
-    printheader(io, "StatLearnSparse")
-    print_item(io, "nonzero", mean(o.o.β .!= 0.0))
-    show(o.o)
-end
-nobs(o::StatLearnSparse) = nobs(o.o)
-value(o::StatLearnSparse) = value(o.o)
-coef(o::StatLearnSparse) = coef(o.o)
-function _fit!(o::StatLearnSparse, x::AVec, y::Real, γ::Float64)
-    _fit!(o.o, x, y, γ)
-    make_sparse!(o.o, o.s)
-end
-function fitbatch!(o::StatLearnSparse, x::AMat, y::AVec)
-    _fitbatch!(o.o, x, y, γ)
-    make_sparse!(o.o, o.s)
-end
-
-
-function make_sparse!(o::StatLearn, s::HardThreshold)
-    if nobs(o) > s.burnin
-        for j in 1:length(o.β)
-            if abs(o.β[j]) < s.ϵ
-                o.β[j] = 0.0
-            end
-        end
-    end
-end
-
-
-
 #-------------------------------------------------------------# Cross Validation
 """
 `StatLearnCV(o::StatLearn, xtest, ytest)`
@@ -91,16 +31,16 @@ function _fit!(o::StatLearnCV, x::AVec, y::Real, γ::Float64)
     end
     o
 end
-function _fit!(o::StatLearnCV, x::AMat, y::AVec, γ::Float64)
-    if nobs(o) < o.burnin
-        _fit!(o.o, x, y, γ)
-    else
-        tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
-    end
-    o
-end
+# function _fit!(o::StatLearnCV, x::AMat, y::AVec, γ::Float64)
+#     if nobs(o) < o.burnin
+#         _fit!(o.o, x, y, γ)
+#     else
+#         tuneλ!(o.o, x, y, γ, o.xtest, o.ytest)
+#     end
+#     o
+# end
 
-# TODO: fitbatch!
+
 function tuneλ!{A<:Algorithm, M<:ModelDefinition}(
         o::StatLearn{A, M, NoPenalty}, x, y, γ, xtest, ytest
     )

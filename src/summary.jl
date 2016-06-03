@@ -1,12 +1,13 @@
 #------------------------------------------------------------------------------# Mean
 """
-Univariate mean.
+Mean of a single series.
 
 ```julia
-o = Mean(y, EqualWeight())
-o = Mean(y)
-fit!(o, y2)
-mean(o)
+y = randn(100)
+o = Mean()
+fit!(o, y)
+mean(o)  # return the mean
+center(o, 0.5)  # returns 0.5 - mean(o)
 ```
 """
 type Mean{W <: Weight} <: OnlineStat{ScalarInput}
@@ -27,9 +28,9 @@ center(o::Mean, x::Real) = x - mean(o)
 Means of multiple series, similar to `mean(x, 1)`.
 
 ```julia
-o = Means(x, EqualWeight())
-o = Means(x)
-fit!(o, x2)
+x = randn(1000, 5)
+o = Means(5)
+fit!(o, x)
 mean(o)
 ```
 """

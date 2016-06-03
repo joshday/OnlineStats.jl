@@ -1,3 +1,18 @@
+"""
+Analytical Linear Regression.
+
+With `EqualWeight`, this is equivalent to offline linear regression.
+```
+using OnlineStats, StatsBase
+o = LinReg(x, y, wgt = EqualWeight())
+coef(o)
+coeftable(o)
+vcov(o)
+stderr(o)
+predict(o, x)
+confint(o, .95)
+```
+"""
 type LinReg{W <: Weight} <: OnlineStat{XYInput}
 	β0::Float64
 	β::VecF
@@ -19,6 +34,7 @@ function LinReg(x::AMat, y::AVec, wgt::Weight = EqualWeight(); kw...)
 end
 # fitting methods don't create the coefficient vector.
 # only "sufficient statistics" are updated.  coef(o) calculates the estimate.
+# TODO: make singleton version better
 function _fit!(o::LinReg, x::AVec, y::Real, γ::Float64)
 	_fitbatch!(o, x', [y], γ)
 end
@@ -99,7 +115,7 @@ end
 
 
 
-
+# TODO: get penalized estimates
 # # coef for Ridge
 # function coef(o::LinReg, pen::RidgePenalty)
 #     copy!(o.S, o.A)
