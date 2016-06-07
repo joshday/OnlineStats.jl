@@ -3,7 +3,7 @@ module OnlineStats
 import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
-import Requires
+import RecipesBase
 
 export
     OnlineStat,
@@ -299,16 +299,17 @@ function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
     end
 end
 # Rank 1 update of symmetric matrix: (1 - γ) * A + γ * x * x'
-# function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
-#     @assert size(A, 1) == size(A, 2)
-#     for j in 1:size(A, 2), i in 1:j
-#         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
-#     end
-# end
 function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
-    scale!(A, 1.0 - γ)
-    BLAS.syr!('U', γ, x, A)
+    @assert size(A, 1) == size(A, 2)
+    for j in 1:size(A, 2), i in 1:j
+        @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
+    end
 end
+# Why doesn't this work?  Tested with CovMatrix
+# function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
+#     scale!(A, 1.0 - γ)
+#     BLAS.syr!('U', γ, x, A)
+# end
 
 
 row(x::AMat, i::Integer) = slice(x, i, :)
@@ -344,7 +345,7 @@ include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")
 include("multivariate/kmeans.jl")
-Requires.@require Plots include("plots.jl")
+include("plots.jl")
 
 
 end # module
