@@ -62,29 +62,21 @@ end
 
 #------------------------------------------------------------------------------# fit!
 """
-`fit!(o::OnlineStat, input...)`
-
-Include more data for an OnlineStat.
-
-There are multiple `fit!` methods for each OnlineStat.
-
-- Adding an `Integer` after the input arguments will perform minibatch updates.
+Update an OnlineStat with more data.  Additional arguments after the input data
+provide extra control over how the updates are done.
 
 ```
 y = randn(100)
 o = Mean()
-fit!(o, y, 10)
-```
 
-- Adding a `Float64` after the input arguments will override the weight
+fit!(o, y)      # standard usage
 
-```julia
-y = randn(100)
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
 wts = rand(100)
-
-o = Mean()
-fit!(o, y, .1)   # Use weight of .1 for each update
-fit!(o, y, wts)  # Update the Mean with y[i] using wts[i]
+fit!(o, y, wts) # update observation i using wts[i]
 ```
 """
 ############ single observation
@@ -273,10 +265,8 @@ _fitbatch!(o, args...) = (warn("no fitbatch! method for $(typeof(o))"); _fit!(o,
 The associated value of an OnlineStat.
 
 ```
-o1 = Mean()
-o2 = Variance()
-value(o1)
-value(o2)
+o = Mean()
+value(o)
 ```
 """
 value(o::OnlineStat) = o.value

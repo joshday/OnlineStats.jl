@@ -72,7 +72,7 @@ type LearningRate <: StochasticWeight
     λ::Float64
     function LearningRate(r::Real = 0.5, λ::Real = 0.0)
         @assert 0 < r < 1
-        @assert λ > 0
+        @assert λ >= 0
         new(0, 0, r, λ)
     end
 end
@@ -92,7 +92,11 @@ type LearningRate2 <: StochasticWeight
     nups::Int
     c::Float64
     λ::Float64
-    LearningRate2(c::Real = 0.5, λ = 0.0) = new(0, 0, c, λ)
+    function LearningRate2(c::Real = 0.5, λ = 0.0)
+        @assert λ >= 0
+        @assert c > 0
+        new(0, 0, c, λ)
+    end
 end
 
 

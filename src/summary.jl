@@ -52,10 +52,8 @@ center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 Univariate variance.
 
 ```julia
-o = Variance(y, EqualWeight())
+y = randn(100)
 o = Variance(y)
-fit!(o, y2)
-
 mean(o)
 var(o)
 std(o)
