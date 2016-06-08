@@ -6,7 +6,10 @@ abstract StochasticWeight <: BatchWeight
 
 #-----------------------------------------------------------------------# EqualWeight
 """
-`EqualWeight()`.  All observations weighted equally.
+One of the `Weight` types.  Observations are weighted equally.  For analytical
+updates, the online algorithm will give results equal to the offline version.
+
+- `EqualWeight()`
 """
 type EqualWeight <: BatchWeight
     nobs::Int
@@ -17,9 +20,11 @@ end
 
 #-----------------------------------------------------------------# ExponentialWeight
 """
-`ExponentialWeight(λ::Float64)`, `ExponentialWeight(lookback::Int)`
+One of the `Weight` types.  Updates are performed with a constant weight
+`λ = 2 / (1 + lookback)`.
 
-Weights are held constant at `λ = 2 / (1 + lookback)`.
+- `ExponentialWeight(λ::Float64)`
+- `ExponentialWeight(lookback::Int)`
 """
 type ExponentialWeight <: Weight
     nobs::Int
@@ -34,9 +39,11 @@ end
 
 #----------------------------------------------------------------# BoundedEqualWeight
 """
-`BoundedEqualWeight(λ::Float64)`, `BoundedEqualWeight(lookback::Int)`
+One of the `Weight` types.  Uses `EqualWeight` until reaching `λ = 2 / (1 + lookback)`,
+then weights are held constant.
 
-Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
+- `BoundedEqualWeight(λ::Float64)`
+- `BoundedEqualWeight(lookback::Int)`
 """
 type BoundedEqualWeight <: Weight
     nobs::Int
@@ -51,24 +58,34 @@ end
 
 #----------------------------------------------------------------------# LearningRate
 """
-`LearningRate(r = 0.6, λ = 0.0)`.
+One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic
+approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
+`KMeans`).  The weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, they are
+held consant.  Compare to `LearningRate2`.
 
-Weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate2`.
+- `LearningRate(r = 0.5, λ = 0.0)`
 """
 type LearningRate <: StochasticWeight
     nobs::Int
     nups::Int
     r::Float64
     λ::Float64
-    LearningRate(r::Real = 0.5, λ::Real = 0.0) = new(0, 0, r, λ)
+    function LearningRate(r::Real = 0.5, λ::Real = 0.0)
+        @assert 0 < r < 1
+        @assert λ > 0
+        new(0, 0, r, λ)
+    end
 end
 
 
 #---------------------------------------------------------------------# LearningRate2
 """
-`LearningRate2(c = 0.5, λ = 0.0)`.
+One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic
+approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
+`KMeans`).  The weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach
+`λ`, they are held consant.  Compare to `LearningRate`.
 
-Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate`.
+- `LearningRate2(c = 0.5, λ = 0.0)`
 """
 type LearningRate2 <: StochasticWeight
     nobs::Int
@@ -88,7 +105,7 @@ updatecounter!(w::Weight, n2::Int = 1)              = (w.nobs += n2)
 updatecounter!(w::StochasticWeight, n2::Int = 1)    = (w.nobs += n2; w.nups += 1)
 updatecounter!(o::OnlineStat, n2::Int = 1) = updatecounter!(o.weight, n2)
 
-# After updatecounter!, get the weight
+# Get weight for update of size n2, typically immediately after updatecounter!
 weight(w::EqualWeight, n2::Int = 1)         = n2 / w.nobs
 weight(w::BoundedEqualWeight, n2::Int = 1)  = max(w.λ, n2 / w.nobs)
 weight(w::ExponentialWeight, n2::Int = 1)   = w.λ
