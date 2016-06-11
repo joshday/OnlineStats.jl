@@ -54,18 +54,3 @@ o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
 ```
 
 **Note**: The order of of `Weight`, `Algorithm`, `ModelDefinition`, and `Penalty` arguments don't matter.
-
-
-
-### Regularization parameters can be tuned automatically
-
-Given a test dataset, `StatLearnCV` attempts to find the optimal regularization
-parameter `λ` which minimizes the `ModelDefinition` loss on the test data (cross validation).  
-This works wonders for highly correlated predictors.
-
-```julia
-o = StatLearn(p, AdaDelta(), LassoPenalty(.5))
-cv = StatLearnCV(o, xtest, ytest)
-fit!(cv, x, y)
-coef(o)
-```

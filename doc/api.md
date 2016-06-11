@@ -1,7 +1,7 @@
-<!--- This file was generated at 2016-06-11T16:45:50.  Do not edit by hand --->
+<!--- This file was generated at 2016-06-11T17:33:08.  Do not edit by hand --->
 # API
 
-# BernoulliBootstrap
+## BernoulliBootstrap
 `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
 
 Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
@@ -13,26 +13,26 @@ BernoulliBootstrap(Mean(), mean, 1000)
 ```
 
 [Top](#api)
-# BiasMatrix
+## BiasMatrix
 Adda bias/intercept term to a matrix on the fly without creating or copying data:
 
   * `BiasMatrix(rand(10,5))` is roughly equivalent to `hcat(rand(10,5), ones(10))`
 
 [Top](#api)
-# BiasVector
+## BiasVector
 Add a bias/intercept term to a vector on the fly without creating or copying data:
 
   * `BiasVector(rand(10))` is roughly equivalent to `vcat(rand(10), 1.0)`
 
 [Top](#api)
-# BoundedEqualWeight
+## BoundedEqualWeight
 One of the `Weight` types.  Uses `EqualWeight` until reaching `λ = 2 / (1 + lookback)`, then weights are held constant.
 
   * `BoundedEqualWeight(λ::Float64)`
   * `BoundedEqualWeight(lookback::Int)`
 
 [Top](#api)
-# CovMatrix
+## CovMatrix
 Covariance matrix, similar to `cov(x)`.
 
 ```julia
@@ -47,7 +47,7 @@ var(o)
 ```
 
 [Top](#api)
-# Diff
+## Diff
 Track the last value and the last difference.
 
 ```julia
@@ -56,7 +56,7 @@ o = Diff(y)
 ```
 
 [Top](#api)
-# Diffs
+## Diffs
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 
 ```julia
@@ -65,20 +65,20 @@ o = Diffs(y)
 ```
 
 [Top](#api)
-# EqualWeight
+## EqualWeight
 One of the `Weight` types.  Observations are weighted equally.  For analytical updates, the online algorithm will give results equal to the offline version.
 
   * `EqualWeight()`
 
 [Top](#api)
-# ExponentialWeight
+## ExponentialWeight
 One of the `Weight` types.  Updates are performed with a constant weight `λ = 2 / (1 + lookback)`.
 
   * `ExponentialWeight(λ::Float64)`
   * `ExponentialWeight(lookback::Int)`
 
 [Top](#api)
-# Extrema
+## Extrema
 Extrema (maximum and minimum).
 
 ```julia
@@ -88,7 +88,7 @@ extrema(o)
 ```
 
 [Top](#api)
-# FitCategorical
+## FitCategorical
 Find the proportions for each unique input.  Categories are sorted by proportions. Ignores `Weight`.
 
 ```julia
@@ -96,7 +96,7 @@ o = FitCategorical(y)
 ```
 
 [Top](#api)
-# HyperLogLog
+## HyperLogLog
 `HyperLogLog(b)`
 
 Approximate count of distinct elements.  `HyperLogLog` differs from other OnlineStats in that any input to `fit!(o::HyperLogLog, input)` is considered a singleton.  Thus, a vector of inputs must be done by:
@@ -109,7 +109,7 @@ end
 ```
 
 [Top](#api)
-# KMeans
+## KMeans
 Approximate K-Means clustering of multivariate data.
 
 ```julia
@@ -118,19 +118,19 @@ value(o)
 ```
 
 [Top](#api)
-# LearningRate
+## LearningRate
 One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and `KMeans`).  The weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, they are held consant.  Compare to `LearningRate2`.
 
   * `LearningRate(r = 0.5, λ = 0.0)`
 
 [Top](#api)
-# LearningRate2
+## LearningRate2
 One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and `KMeans`).  The weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, they are held consant.  Compare to `LearningRate`.
 
   * `LearningRate2(c = 0.5, λ = 0.0)`
 
 [Top](#api)
-# LinReg
+## LinReg
 Analytical Linear Regression.
 
 With `EqualWeight`, this is equivalent to offline linear regression.
@@ -147,7 +147,7 @@ confint(o, .95)
 ```
 
 [Top](#api)
-# Mean
+## Mean
 Mean of a single series.
 
 ```julia
@@ -159,7 +159,7 @@ center(o, 0.5)  # returns 0.5 - mean(o)
 ```
 
 [Top](#api)
-# Means
+## Means
 Means of multiple series, similar to `mean(x, 1)`.
 
 ```julia
@@ -170,7 +170,7 @@ mean(o)
 ```
 
 [Top](#api)
-# Moments
+## Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
 ```julia
@@ -186,7 +186,7 @@ StatsBase.kurtosis(o)
 ```
 
 [Top](#api)
-# NormalMix
+## NormalMix
 Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword argument specifying the initial parameters.
 
 ```julia
@@ -197,11 +197,11 @@ std(o)
 ```
 
 [Top](#api)
-# QuantReg
+## QuantReg
 Online MM Algorithm for Quantile Regression.
 
 [Top](#api)
-# QuantileMM
+## QuantileMM
 Approximate quantiles via an online MM algorithm.  Typically more accurate than `QuantileSGD`.
 
 ```julia
@@ -211,7 +211,7 @@ fit!(o, y2)
 ```
 
 [Top](#api)
-# QuantileSGD
+## QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 
 ```julia
@@ -221,7 +221,7 @@ fit!(o, y2)
 ```
 
 [Top](#api)
-# StatLearn
+## StatLearn
 Online statistical learning algorithms.
 
   * `StatLearn(p)`
@@ -266,7 +266,7 @@ StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
 ```
 
 [Top](#api)
-# Sum
+## Sum
 Track the running sum.  Ignores `Weight`.
 
 ```julia
@@ -275,7 +275,7 @@ o = Sum(y)
 ```
 
 [Top](#api)
-# Sums
+## Sums
 Track the running sum for multiple series.  Ignores `Weight`.
 
 ```julia
@@ -284,19 +284,19 @@ o = Sums(y)
 ```
 
 [Top](#api)
-# TwoWayInteractionMatrix
+## TwoWayInteractionMatrix
 Add second-order interaction terms on the fly without creating or copying data:
 
   * `TwoWayInteractionMatrix(rand(n, p))` "adds" the `binomial(p, 2)` interaction terms to each row
 
 [Top](#api)
-# TwoWayInteractionVector
+## TwoWayInteractionVector
 Add second-order interaction terms on the fly without creating or copying data:
 
   * `TwoWayInteractionVector(rand(p))` "adds" the `binomial(p, 2)` interaction terms
 
 [Top](#api)
-# Variance
+## Variance
 Univariate variance.
 
 ```julia
@@ -308,7 +308,7 @@ std(o)
 ```
 
 [Top](#api)
-# Variances
+## Variances
 Variances of a multiple series, similar to `var(x, 1)`.
 
 ```julia
@@ -322,7 +322,7 @@ std(o)
 ```
 
 [Top](#api)
-# fit!
+## fit!
 Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
 
 ```
@@ -340,7 +340,7 @@ fit!(o, y, wts) # update observation i using wts[i]
 ```
 
 [Top](#api)
-# fitdistribution
+## fitdistribution
 Estimate the parameters of a distribution.
 
 ```julia
@@ -367,7 +367,7 @@ cov(o)
 ```
 
 [Top](#api)
-# map_rows
+## map_rows
 Perform operations on data in blocks.
 
 `map_rows(f::Function, b::Integer, data...)`
@@ -396,13 +396,13 @@ display(o)
 ```
 
 [Top](#api)
-# nobs
+## nobs
 nobs(obj::StatisticalModel)
 
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
 [Top](#api)
-# sweep!
+## sweep!
 `sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
 Symmetric sweep operator of the matrix `A` on element `k`.  `A` is overwritten. `inv = true` will perform the inverse sweep.  Only the upper triangle is read and swept.
@@ -417,7 +417,7 @@ sweep!(xtx, 1, true)
 ```
 
 [Top](#api)
-# value
+## value
 The associated value of an OnlineStat.
 
 ```

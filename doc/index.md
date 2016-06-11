@@ -1,13 +1,16 @@
 # OnlineStats.jl
 
+---
+
 **OnlineStats** is a Julia package which provides online algorithms for statistical models.
 
 Online algorithms are well suited for streaming data or when data is too large to hold in memory.
 
 Observations are processed one at a time and all **algorithms use O(1) memory**.
 
+---
 
-# Overview
+## Overview
 ### Every OnlineStat is a Type
 ```julia
 using OnlineStats
@@ -38,8 +41,9 @@ fit!(o, y2)
 - `nobs(o)`
     - the number of observations seen
 
+---
 
-# What Can OnlineStats Do?
+## What Can OnlineStats Do?
 While many estimates can be calculated analytically with an online algorithm, several
 type rely on stochastic approximation.
 
@@ -66,8 +70,7 @@ type rely on stochastic approximation.
 - Huber Loss Regression: `StatLearn`
 - L1 Loss Regression: `StatLearn`
 
-### Experimental Features
+### Other
 - K-Means clustering: `KMeans`
 - Bootstrapping: `BernoulliBootstrap`, `PoissonBootstrap`
 - Approximate count of distinct elements: `HyperLogLog`
-- Visualizing value of OnlineStats: `TracePlot`, `CompareTracePlot`
