@@ -3,7 +3,7 @@ module OnlineStats
 import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
-using RecipesBase
+import RecipesBase
 
 export
     OnlineStat,
@@ -28,7 +28,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, cost, center, standardize, fitdistribution, classify
+    loss, cost, center, standardize, fitdistribution, classify, map_rows
 
 #-----------------------------------------------------------------------------# types
 abstract Input
