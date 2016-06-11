@@ -3,7 +3,7 @@ import Plots
 export coefplot, TracePlot, CompareTracePlot
 
 
-RecipesBase.@recipe function plot(o::OnlineStat{XYInput}, args...)
+RecipesBase.@recipe function plot(o::OnlineStat{XYInput})
     β = coef(o)
     nonzero = collect(β .== 0)
     mylegend = length(unique(nonzero)) > 1

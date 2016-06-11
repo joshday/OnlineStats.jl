@@ -295,7 +295,7 @@ function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end
 end
-# Why doesn't this work?  Tested with CovMatrix
+# # Why doesn't this work?  Tested with CovMatrix
 # function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
 #     scale!(A, 1.0 - γ)
 #     BLAS.syr!('U', γ, x, A)
