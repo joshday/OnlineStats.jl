@@ -1,5 +1,3 @@
-import Plots
-
 export coefplot, TracePlot, CompareTracePlot
 
 

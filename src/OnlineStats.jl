@@ -3,7 +3,7 @@ module OnlineStats
 import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
-import RecipesBase
+using RecipesBase
 
 export
     OnlineStat,
