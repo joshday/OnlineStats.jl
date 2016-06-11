@@ -13,7 +13,7 @@ export
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, LinReg, QuantReg, NormalMix,
-    StatLearn, StatLearnSparse, HardThreshold, StatLearnCV,
+    StatLearn,
     KMeans, BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
@@ -28,7 +28,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, cost, center, standardize, fitdistribution, classify, map_rows
+    loss, cost, center, fitdistribution, classify, map_rows
 
 #-----------------------------------------------------------------------------# types
 abstract Input

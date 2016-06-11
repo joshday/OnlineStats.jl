@@ -1,41 +1,5 @@
-<!--- This file was generated at 2016-04-14T15:18:55.  Do not edit by hand --->
-# API for OnlineStats
-
-# Table of Contents
-
-- [<pre>BernoulliBootstrap                                      Bootstrap{ScalarInput}</pre>](#bernoullibootstrap)
-- [<pre>BoundedEqualWeight                                      Weight</pre>](#boundedequalweight)
-- [<pre>CovMatrix                                               OnlineStat{VectorInput}</pre>](#covmatrix)
-- [<pre>Diff                                                    OnlineStat{ScalarInput}</pre>](#diff)
-- [<pre>Diffs                                                   OnlineStat{VectorInput}</pre>](#diffs)
-- [<pre>EqualWeight                                             BatchWeight</pre>](#equalweight)
-- [<pre>ExponentialWeight                                       Weight</pre>](#exponentialweight)
-- [<pre>Extrema                                                 OnlineStat{ScalarInput}</pre>](#extrema)
-- [<pre>FitCategorical                                          DistributionStat{ScalarInput}</pre>](#fitcategorical)
-- [<pre>HyperLogLog                                             OnlineStat{I<:Input}</pre>](#hyperloglog)
-- [<pre>KMeans                                                  OnlineStat{VectorInput}</pre>](#kmeans)
-- [<pre>LearningRate                                            StochasticWeight</pre>](#learningrate)
-- [<pre>LearningRate2                                           StochasticWeight</pre>](#learningrate2)
-- [<pre>LinReg                                                  OnlineStat{XYInput}</pre>](#linreg)
-- [<pre>Mean                                                    OnlineStat{ScalarInput}</pre>](#mean)
-- [<pre>Means                                                   OnlineStat{VectorInput}</pre>](#means)
-- [<pre>Moments                                                 OnlineStat{ScalarInput}</pre>](#moments)
-- [<pre>NormalMix                                               DistributionStat{ScalarInput}</pre>](#normalmix)
-- [<pre>QuantReg                                                OnlineStat{XYInput}</pre>](#quantreg)
-- [<pre>QuantileMM                                              OnlineStat{ScalarInput}</pre>](#quantilemm)
-- [<pre>QuantileSGD                                             OnlineStat{ScalarInput}</pre>](#quantilesgd)
-- [<pre>StatLearn                                               OnlineStat{XYInput}</pre>](#statlearn)
-- [<pre>StatLearnCV                                             OnlineStat{XYInput}</pre>](#statlearncv)
-- [<pre>StatLearnSparse                                         OnlineStat{XYInput}</pre>](#statlearnsparse)
-- [<pre>Sum                                                     OnlineStat{ScalarInput}</pre>](#sum)
-- [<pre>Sums                                                    OnlineStat{VectorInput}</pre>](#sums)
-- [<pre>Variance                                                OnlineStat{ScalarInput}</pre>](#variance)
-- [<pre>Variances                                               OnlineStat{VectorInput}</pre>](#variances)
-- [<pre>fit!                                                    Function</pre>](#fit!)
-- [<pre>fitdistribution                                         Function</pre>](#fitdistribution)
-- [<pre>nobs                                                    Function</pre>](#nobs)
-- [<pre>sweep!                                                  Function</pre>](#sweep!)
-- [<pre>value                                                   Function</pre>](#value)
+<!--- This file was generated at 2016-06-11T16:45:50.  Do not edit by hand --->
+# API
 
 # BernoulliBootstrap
 `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
@@ -48,13 +12,26 @@ Example:
 BernoulliBootstrap(Mean(), mean, 1000)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
+# BiasMatrix
+Adda bias/intercept term to a matrix on the fly without creating or copying data:
+
+  * `BiasMatrix(rand(10,5))` is roughly equivalent to `hcat(rand(10,5), ones(10))`
+
+[Top](#api)
+# BiasVector
+Add a bias/intercept term to a vector on the fly without creating or copying data:
+
+  * `BiasVector(rand(10))` is roughly equivalent to `vcat(rand(10), 1.0)`
+
+[Top](#api)
 # BoundedEqualWeight
-`BoundedEqualWeight(λ::Float64)`, `BoundedEqualWeight(lookback::Int)`
+One of the `Weight` types.  Uses `EqualWeight` until reaching `λ = 2 / (1 + lookback)`, then weights are held constant.
 
-Use equal weights until reaching `λ = 2 / (1 + lookback)`, then hold constant.
+  * `BoundedEqualWeight(λ::Float64)`
+  * `BoundedEqualWeight(lookback::Int)`
 
-[Top](#table-of-contents)
+[Top](#api)
 # CovMatrix
 Covariance matrix, similar to `cov(x)`.
 
@@ -69,7 +46,7 @@ mean(o)
 var(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # Diff
 Track the last value and the last difference.
 
@@ -78,7 +55,7 @@ o = Diff()
 o = Diff(y)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # Diffs
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 
@@ -87,17 +64,20 @@ o = Diffs()
 o = Diffs(y)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # EqualWeight
-`EqualWeight()`.  All observations weighted equally.
+One of the `Weight` types.  Observations are weighted equally.  For analytical updates, the online algorithm will give results equal to the offline version.
 
-[Top](#table-of-contents)
+  * `EqualWeight()`
+
+[Top](#api)
 # ExponentialWeight
-`ExponentialWeight(λ::Float64)`, `ExponentialWeight(lookback::Int)`
+One of the `Weight` types.  Updates are performed with a constant weight `λ = 2 / (1 + lookback)`.
 
-Weights are held constant at `λ = 2 / (1 + lookback)`.
+  * `ExponentialWeight(λ::Float64)`
+  * `ExponentialWeight(lookback::Int)`
 
-[Top](#table-of-contents)
+[Top](#api)
 # Extrema
 Extrema (maximum and minimum).
 
@@ -107,7 +87,7 @@ fit!(o, y2)
 extrema(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # FitCategorical
 Find the proportions for each unique input.  Categories are sorted by proportions. Ignores `Weight`.
 
@@ -115,7 +95,7 @@ Find the proportions for each unique input.  Categories are sorted by proportion
 o = FitCategorical(y)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # HyperLogLog
 `HyperLogLog(b)`
 
@@ -128,7 +108,7 @@ for yi in y
 end
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # KMeans
 Approximate K-Means clustering of multivariate data.
 
@@ -137,80 +117,59 @@ o = KMeans(y, 3, LearningRate())
 value(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # LearningRate
-`LearningRate(r = 0.6, λ = 0.0)`.
+One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and `KMeans`).  The weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, they are held consant.  Compare to `LearningRate2`.
 
-Weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate2`.
+  * `LearningRate(r = 0.5, λ = 0.0)`
 
-[Top](#table-of-contents)
+[Top](#api)
 # LearningRate2
-`LearningRate2(c = 0.5, λ = 0.0)`.
+One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and `KMeans`).  The weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, they are held consant.  Compare to `LearningRate`.
 
-Weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, hold weights constant.  Compare to `LearningRate`.
+  * `LearningRate2(c = 0.5, λ = 0.0)`
 
-[Top](#table-of-contents)
+[Top](#api)
 # LinReg
-Linear regression with optional regularization.
+Analytical Linear Regression.
 
-```julia
-LinReg(x::Matrix, y::Vector, pen::Penalty = NoPenalty())
+With `EqualWeight`, this is equivalent to offline linear regression.
+
 ```
-
-Examples:
-
-```julia
-using  StatsBase
-n, p = 100_000, 10
-x = randn(n, p)
-y = x * collect(1.:p) + randn(n)
-```
-
-Methods for `LinReg{NoPenalty}`:
-
-```julia
-o = LinReg(x, y)  # NoPenalty() by default
+using OnlineStats, StatsBase
+o = LinReg(x, y, wgt = EqualWeight())
 coef(o)
-predict(o, x)
-confint(o, .95)
+coeftable(o)
 vcov(o)
 stderr(o)
-coeftable(o)
-using Plots; coefplot(o)
+predict(o, x)
+confint(o, .95)
 ```
 
-Get estimate for a different penalty:
-
-```
-coef(o, RidgePenalty(.1))
-coef(o, LassoPenalty(.1))
-coef(o, ElasticNetPenalty(.1, .5))
-coef(o, SCADPenalty(.1, 3.7))
-```
-
-[Top](#table-of-contents)
+[Top](#api)
 # Mean
-Univariate mean.
+Mean of a single series.
 
 ```julia
-o = Mean(y, EqualWeight())
-o = Mean(y)
-fit!(o, y2)
-mean(o)
+y = randn(100)
+o = Mean()
+fit!(o, y)
+mean(o)  # return the mean
+center(o, 0.5)  # returns 0.5 - mean(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # Means
 Means of multiple series, similar to `mean(x, 1)`.
 
 ```julia
-o = Means(x, EqualWeight())
-o = Means(x)
-fit!(o, x2)
+x = randn(1000, 5)
+o = Means(5)
+fit!(o, x)
 mean(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
@@ -226,7 +185,7 @@ StatsBase.skewness(o)
 StatsBase.kurtosis(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # NormalMix
 Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword argument specifying the initial parameters.
 
@@ -237,11 +196,11 @@ var(o)
 std(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # QuantReg
 Online MM Algorithm for Quantile Regression.
 
-[Top](#table-of-contents)
+[Top](#api)
 # QuantileMM
 Approximate quantiles via an online MM algorithm.  Typically more accurate than `QuantileSGD`.
 
@@ -251,7 +210,7 @@ o = QuantileMM(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 
@@ -261,7 +220,7 @@ o = QuantileSGD(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # StatLearn
 Online statistical learning algorithms.
 
@@ -306,28 +265,7 @@ StatLearn(x, y, MMGrad(), LearningRate(.5))
 StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
 ```
 
-[Top](#table-of-contents)
-# StatLearnCV
-`StatLearnCV(o::StatLearn, xtest, ytest)`
-
-Automatically tune the regularization parameter λ for `o` by minimizing loss on test data `xtest`, `ytest`.
-
-```julia
-sl = StatLearn(size(x, 2), LassoPenalty(.1))
-o = StatLearnCV(sl, xtest, ytest)
-fit!(o, x, y)
-```
-
-[Top](#table-of-contents)
-# StatLearnSparse
-Enforce sparsity on a `StatLearn` object.  Currently, the only option is `HardThreshold`, which after `burnin` observations, any coefficient less than `threshold` is set to 0.
-
-```julia
-StatLearnSparse(StatLearn(size(x,2)), HardThreshold(burnin = 1000, threshold = .01))
-fit!(o, x, y)
-```
-
-[Top](#table-of-contents)
+[Top](#api)
 # Sum
 Track the running sum.  Ignores `Weight`.
 
@@ -336,7 +274,7 @@ o = Sum()
 o = Sum(y)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # Sums
 Track the running sum for multiple series.  Ignores `Weight`.
 
@@ -345,21 +283,31 @@ o = Sums()
 o = Sums(y)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
+# TwoWayInteractionMatrix
+Add second-order interaction terms on the fly without creating or copying data:
+
+  * `TwoWayInteractionMatrix(rand(n, p))` "adds" the `binomial(p, 2)` interaction terms to each row
+
+[Top](#api)
+# TwoWayInteractionVector
+Add second-order interaction terms on the fly without creating or copying data:
+
+  * `TwoWayInteractionVector(rand(p))` "adds" the `binomial(p, 2)` interaction terms
+
+[Top](#api)
 # Variance
 Univariate variance.
 
 ```julia
-o = Variance(y, EqualWeight())
+y = randn(100)
 o = Variance(y)
-fit!(o, y2)
-
 mean(o)
 var(o)
 std(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # Variances
 Variances of a multiple series, similar to `var(x, 1)`.
 
@@ -373,34 +321,25 @@ var(o)
 std(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # fit!
-`fit!(o::OnlineStat, input...)`
-
-Include more data for an OnlineStat.
-
-There are multiple `fit!` methods for each OnlineStat.
-
-  * Adding an `Integer` after the input arguments will perform minibatch updates.
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
 
 ```
 y = randn(100)
 o = Mean()
-fit!(o, y, 10)
-```
 
-  * Adding a `Float64` after the input arguments will override the weight
+fit!(o, y)      # standard usage
 
-```julia
-y = randn(100)
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
 wts = rand(100)
-
-o = Mean()
-fit!(o, y, .1)   # Use weight of .1 for each update
-fit!(o, y, wts)  # Update the Mean with y[i] using wts[i]
+fit!(o, y, wts) # update observation i using wts[i]
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # fitdistribution
 Estimate the parameters of a distribution.
 
@@ -427,13 +366,42 @@ std(o)
 cov(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
+# map_rows
+Perform operations on data in blocks.
+
+`map_rows(f::Function, b::Integer, data...)`
+
+This function iteratively feeds the `f` blocks of `b` observations from `data`. The most common usage is with `do` blocks:
+
+```julia
+# Example 1
+y = randn(50)
+o = Variance()
+map_rows(10, y) do yi
+    fit!(o, yi)
+    println("Updated with another batch!")
+end
+display(o)
+
+# Example 2
+x = randn(100, 5)
+y = randn(100)
+o = LinReg(x, y)
+map_rows(10, x, y) do xi, yi
+    fit!(o, xi, yi)
+    println("Updated with another batch!")
+end
+display(o)
+```
+
+[Top](#api)
 # nobs
 nobs(obj::StatisticalModel)
 
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
-[Top](#table-of-contents)
+[Top](#api)
 # sweep!
 `sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
@@ -448,15 +416,13 @@ sweep!(xtx, 1)
 sweep!(xtx, 1, true)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)
 # value
 The associated value of an OnlineStat.
 
 ```
-o1 = Mean()
-o2 = Variance()
-value(o1)
-value(o2)
+o = Mean()
+value(o)
 ```
 
-[Top](#table-of-contents)
+[Top](#api)

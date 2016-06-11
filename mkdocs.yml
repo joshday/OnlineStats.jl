@@ -1,0 +1,10 @@
+site_name: OnlineStats.jl
+
+
+pages:
+- Home: index.md
+- API: api.md
+
+docs_dir: 'doc'
+
+theme: 'mkdocs'
