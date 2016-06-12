@@ -5,6 +5,7 @@ site_author: Josh Day
 
 pages:
     - Home: index.md
+    - Weighting: weight.md
     - Predictive Modeling: StatLearn.md
     - API/Examples: api.md
 
@@ -24,3 +25,8 @@ extra:
 markdown_extensions:
     - admonition
     - codehilite(css_class=code)
+
+extra_javascript: [
+     'mathjax-config.js',
+     'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML'
+]

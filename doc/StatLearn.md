@@ -1,8 +1,9 @@
 # StatLearn
 
-Approximate solutions to statistical learning problems using online algorithms.  `StatLearn` has extremely fast fitting times.
+Approximate solutions to statistical learning problems using online algorithms.  `StatLearn` has extremely fast fitting times.  For `p` features, updates are O(p).
 
-## StatLearn is parameterized by three types:
+
+## StatLearn is parameterized by three main types:
 
 ### ModelDefinition
 - `L2Regression()`
@@ -16,7 +17,7 @@ Approximate solutions to statistical learning problems using online algorithms. 
 - `QuantileRegression(τ)`
     - Model conditional quantiles
 - `SVMLike()`
-    - With `NoPenalty`, this is a perceptron.  With `RidgePenalty`, this is a support vector machine.
+    - For data in {-1, 1}.  With `NoPenalty`, this is a perceptron.  With `RidgePenalty`, this is a support vector machine.
 - `HuberRegression(δ)`
     - Robust Huber loss
 
@@ -49,8 +50,9 @@ Using mini-batches, gradient estimates are less noisy.  The trade-off,
 of course, is that fewer updates occur.
 
 ```julia
-o1 = StatLearn(x, y, SGD(), LearningRate(.6))  # batch size = 1
-o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())     # batch size = 10
+o1 = StatLearn(x, y, SGD(), LearningRate(.6))      # batch size = 1
+o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())  # batch size = 10
 ```
-
-**Note**: The order of of `Weight`, `Algorithm`, `ModelDefinition`, and `Penalty` arguments don't matter.
+!!! note
+    Any order of `Weight`, `Algorithm`, `ModelDefinition`, and `Penalty` arguments are
+    accepted by `StatLearn`.

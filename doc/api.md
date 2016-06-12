@@ -1,4 +1,4 @@
-<!--- Generated at 2016-06-11T19:56:47.  Don't edit --->
+<!--- Generated at 2016-06-11T22:00:44.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -136,10 +136,11 @@ Mean of a single series.
 
 ```julia
 y = randn(100)
+
 o = Mean()
 fit!(o, y)
-mean(o)  # return the mean
-center(o, 0.5)  # returns 0.5 - mean(o)
+
+o = Mean(y)
 ```
 
 ## Means

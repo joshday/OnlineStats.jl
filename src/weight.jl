@@ -111,7 +111,7 @@ updatecounter!(o::OnlineStat, n2::Int = 1) = updatecounter!(o.weight, n2)
 
 # Get weight for update of size n2, typically immediately after updatecounter!
 weight(w::EqualWeight, n2::Int = 1)         = n2 / w.nobs
-weight(w::BoundedEqualWeight, n2::Int = 1)  = max(w.λ, n2 / w.nobs)
+weight(w::BoundedEqualWeight, n2::Int = 1)  = nobs(w) == 0 ? 1.0 : max(w.λ, n2 / w.nobs)
 weight(w::ExponentialWeight, n2::Int = 1)   = w.λ
 weight(w::LearningRate, n2::Int = 1)        = max(w.λ, exp(-w.r * log(w.nups)))
 weight(w::LearningRate2, n2::Int = 1)       = max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
