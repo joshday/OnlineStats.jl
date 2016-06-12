@@ -4,8 +4,8 @@ Perform operations on data in blocks.
 
 `map_rows(f::Function, b::Integer, data...)`
 
-This function iteratively feeds the `f` blocks of `b` observations from `data`.
-The most common usage is with `do` blocks:
+This function iteratively feeds blocks of `data` of size `b` observations to the
+function `f`.  The most common usage is with `do` blocks:
 
 ```julia
 # Example 1
@@ -15,7 +15,6 @@ map_rows(10, y) do yi
     fit!(o, yi)
     println("Updated with another batch!")
 end
-display(o)
 
 # Example 2
 x = randn(100, 5)
@@ -25,7 +24,6 @@ map_rows(10, x, y) do xi, yi
     fit!(o, xi, yi)
     println("Updated with another batch!")
 end
-display(o)
 ```
 """
 function map_rows(f::Function, b::Integer, data...)

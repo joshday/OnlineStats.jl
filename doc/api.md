@@ -1,4 +1,4 @@
-<!--- This file was generated at 2016-06-11T17:33:08.  Do not edit by hand --->
+<!--- Generated at 2016-06-11T19:56:47.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -12,26 +12,22 @@ Example:
 BernoulliBootstrap(Mean(), mean, 1000)
 ```
 
-[Top](#api)
 ## BiasMatrix
 Adda bias/intercept term to a matrix on the fly without creating or copying data:
 
   * `BiasMatrix(rand(10,5))` is roughly equivalent to `hcat(rand(10,5), ones(10))`
 
-[Top](#api)
 ## BiasVector
 Add a bias/intercept term to a vector on the fly without creating or copying data:
 
   * `BiasVector(rand(10))` is roughly equivalent to `vcat(rand(10), 1.0)`
 
-[Top](#api)
 ## BoundedEqualWeight
 One of the `Weight` types.  Uses `EqualWeight` until reaching `λ = 2 / (1 + lookback)`, then weights are held constant.
 
   * `BoundedEqualWeight(λ::Float64)`
   * `BoundedEqualWeight(lookback::Int)`
 
-[Top](#api)
 ## CovMatrix
 Covariance matrix, similar to `cov(x)`.
 
@@ -46,7 +42,6 @@ mean(o)
 var(o)
 ```
 
-[Top](#api)
 ## Diff
 Track the last value and the last difference.
 
@@ -55,7 +50,6 @@ o = Diff()
 o = Diff(y)
 ```
 
-[Top](#api)
 ## Diffs
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 
@@ -64,20 +58,17 @@ o = Diffs()
 o = Diffs(y)
 ```
 
-[Top](#api)
 ## EqualWeight
 One of the `Weight` types.  Observations are weighted equally.  For analytical updates, the online algorithm will give results equal to the offline version.
 
   * `EqualWeight()`
 
-[Top](#api)
 ## ExponentialWeight
 One of the `Weight` types.  Updates are performed with a constant weight `λ = 2 / (1 + lookback)`.
 
   * `ExponentialWeight(λ::Float64)`
   * `ExponentialWeight(lookback::Int)`
 
-[Top](#api)
 ## Extrema
 Extrema (maximum and minimum).
 
@@ -87,7 +78,6 @@ fit!(o, y2)
 extrema(o)
 ```
 
-[Top](#api)
 ## FitCategorical
 Find the proportions for each unique input.  Categories are sorted by proportions. Ignores `Weight`.
 
@@ -95,7 +85,6 @@ Find the proportions for each unique input.  Categories are sorted by proportion
 o = FitCategorical(y)
 ```
 
-[Top](#api)
 ## HyperLogLog
 `HyperLogLog(b)`
 
@@ -108,7 +97,6 @@ for yi in y
 end
 ```
 
-[Top](#api)
 ## KMeans
 Approximate K-Means clustering of multivariate data.
 
@@ -117,19 +105,16 @@ o = KMeans(y, 3, LearningRate())
 value(o)
 ```
 
-[Top](#api)
 ## LearningRate
 One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and `KMeans`).  The weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, they are held consant.  Compare to `LearningRate2`.
 
   * `LearningRate(r = 0.5, λ = 0.0)`
 
-[Top](#api)
 ## LearningRate2
 One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and `KMeans`).  The weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach `λ`, they are held consant.  Compare to `LearningRate`.
 
   * `LearningRate2(c = 0.5, λ = 0.0)`
 
-[Top](#api)
 ## LinReg
 Analytical Linear Regression.
 
@@ -146,7 +131,6 @@ predict(o, x)
 confint(o, .95)
 ```
 
-[Top](#api)
 ## Mean
 Mean of a single series.
 
@@ -158,7 +142,6 @@ mean(o)  # return the mean
 center(o, 0.5)  # returns 0.5 - mean(o)
 ```
 
-[Top](#api)
 ## Means
 Means of multiple series, similar to `mean(x, 1)`.
 
@@ -169,7 +152,6 @@ fit!(o, x)
 mean(o)
 ```
 
-[Top](#api)
 ## Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
@@ -185,7 +167,6 @@ StatsBase.skewness(o)
 StatsBase.kurtosis(o)
 ```
 
-[Top](#api)
 ## NormalMix
 Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword argument specifying the initial parameters.
 
@@ -196,11 +177,9 @@ var(o)
 std(o)
 ```
 
-[Top](#api)
 ## QuantReg
 Online MM Algorithm for Quantile Regression.
 
-[Top](#api)
 ## QuantileMM
 Approximate quantiles via an online MM algorithm.  Typically more accurate than `QuantileSGD`.
 
@@ -210,7 +189,6 @@ o = QuantileMM(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
-[Top](#api)
 ## QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 
@@ -220,7 +198,6 @@ o = QuantileSGD(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
-[Top](#api)
 ## StatLearn
 Online statistical learning algorithms.
 
@@ -265,7 +242,6 @@ StatLearn(x, y, MMGrad(), LearningRate(.5))
 StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
 ```
 
-[Top](#api)
 ## Sum
 Track the running sum.  Ignores `Weight`.
 
@@ -274,7 +250,6 @@ o = Sum()
 o = Sum(y)
 ```
 
-[Top](#api)
 ## Sums
 Track the running sum for multiple series.  Ignores `Weight`.
 
@@ -283,19 +258,16 @@ o = Sums()
 o = Sums(y)
 ```
 
-[Top](#api)
 ## TwoWayInteractionMatrix
 Add second-order interaction terms on the fly without creating or copying data:
 
   * `TwoWayInteractionMatrix(rand(n, p))` "adds" the `binomial(p, 2)` interaction terms to each row
 
-[Top](#api)
 ## TwoWayInteractionVector
 Add second-order interaction terms on the fly without creating or copying data:
 
   * `TwoWayInteractionVector(rand(p))` "adds" the `binomial(p, 2)` interaction terms
 
-[Top](#api)
 ## Variance
 Univariate variance.
 
@@ -307,7 +279,6 @@ var(o)
 std(o)
 ```
 
-[Top](#api)
 ## Variances
 Variances of a multiple series, similar to `var(x, 1)`.
 
@@ -321,7 +292,6 @@ var(o)
 std(o)
 ```
 
-[Top](#api)
 ## fit!
 Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
 
@@ -339,7 +309,6 @@ wts = rand(100)
 fit!(o, y, wts) # update observation i using wts[i]
 ```
 
-[Top](#api)
 ## fitdistribution
 Estimate the parameters of a distribution.
 
@@ -366,13 +335,12 @@ std(o)
 cov(o)
 ```
 
-[Top](#api)
 ## map_rows
 Perform operations on data in blocks.
 
 `map_rows(f::Function, b::Integer, data...)`
 
-This function iteratively feeds the `f` blocks of `b` observations from `data`. The most common usage is with `do` blocks:
+This function iteratively feeds blocks of `data` of size `b` observations to the function `f`.  The most common usage is with `do` blocks:
 
 ```julia
 # Example 1
@@ -382,7 +350,6 @@ map_rows(10, y) do yi
     fit!(o, yi)
     println("Updated with another batch!")
 end
-display(o)
 
 # Example 2
 x = randn(100, 5)
@@ -392,16 +359,13 @@ map_rows(10, x, y) do xi, yi
     fit!(o, xi, yi)
     println("Updated with another batch!")
 end
-display(o)
 ```
 
-[Top](#api)
 ## nobs
 nobs(obj::StatisticalModel)
 
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
-[Top](#api)
 ## sweep!
 `sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`
 
@@ -416,7 +380,6 @@ sweep!(xtx, 1)
 sweep!(xtx, 1, true)
 ```
 
-[Top](#api)
 ## value
 The associated value of an OnlineStat.
 
@@ -425,4 +388,3 @@ o = Mean()
 value(o)
 ```
 
-[Top](#api)

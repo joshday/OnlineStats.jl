@@ -1,6 +1,5 @@
 # OnlineStats.jl
 
----
 
 **OnlineStats** is a Julia package which provides online algorithms for statistical models.
 
@@ -20,26 +19,20 @@ o = Mean()
 ### All OnlineStats can be updated
 ```julia
 y = randn(100)
-y2 = randn(100)
 
-# update Mean
 for yi in y
-    fit!(o, yi)
-end
-for yi in y2
-    fit!(o, yi)
+    fit!(o, y)
 end
 
 # or more simply:
 fit!(o, y)
-fit!(o, y2)
 ```
 
 ### OnlineStats share a common interface
-- `value(o)`
-    - the associated value of an OnlineStat
-- `nobs(o)`
-    - the number of observations seen
+```julia
+value(o)  # associated value of an OnlineStat
+nobs(o)   # number of observations used
+```
 
 ---
 
@@ -48,7 +41,7 @@ While many estimates can be calculated analytically with an online algorithm, se
 type rely on stochastic approximation.
 
 ### Summary Statistics
-- Mean: `Mean`, `Means`
+- Mean: [`Mean`](../api/#mean), `Means`
 - Variance: `Variance`, `Variances`
 - Quantiles: `QuantileMM`, `QuantileSGD`
 - Covariance Matrix: `CovMatrix`

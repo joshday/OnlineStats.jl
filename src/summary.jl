@@ -4,10 +4,11 @@ Mean of a single series.
 
 ```julia
 y = randn(100)
+
 o = Mean()
 fit!(o, y)
-mean(o)  # return the mean
-center(o, 0.5)  # returns 0.5 - mean(o)
+
+o = Mean(y)
 ```
 """
 type Mean{W <: Weight} <: OnlineStat{ScalarInput}

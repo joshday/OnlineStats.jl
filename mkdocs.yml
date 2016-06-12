@@ -5,8 +5,22 @@ site_author: Josh Day
 
 pages:
     - Home: index.md
-    - API: api.md
+    - Predictive Modeling: StatLearn.md
+    - API/Examples: api.md
 
 docs_dir: 'doc'
 
-theme: 'mkdocs'
+theme: 'material'
+
+extra:
+    palette:
+        primary: 'indigo'
+    author:
+        github: 'joshday'
+    # font:
+    #     text: 'Roboto'
+    #     code: 'Hack'
+
+markdown_extensions:
+    - admonition
+    - codehilite(css_class=code)
