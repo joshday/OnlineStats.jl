@@ -1,131 +1,120 @@
 module DistributionsTest
+using OnlineStats, Distributions, BaseTestNext
+srand(02082016)
 
-using TestSetup, OnlineStats, FactCheck, Distributions
-srand(02082016)  # today's date...removes nondeterministic NormalMix algorithm divergence.
+@testset "Distributions" begin
+@testset "fitdistribution" begin
+    y = rand(Beta(), 100)
+    fitdistribution(Beta, y)
 
-facts(@title "Distributions") do
-    context(@subtitle "fitdistribution") do
-        y = rand(Beta(), 100)
-        fitdistribution(Beta, y)
+    y = rand(Categorical([.2, .2, .2, .4]), 100)
+    fitdistribution(Categorical, y)
 
-        y = rand(Categorical([.2, .2, .2, .4]), 100)
-        fitdistribution(Categorical, y)
+    y = rand(Cauchy(), 100)
+    fitdistribution(Cauchy, y)
 
-        y = rand(Cauchy(), 100)
-        fitdistribution(Cauchy, y)
+    y = rand(Gamma(2, 6), 100)
+    fitdistribution(Gamma, y)
 
-        y = rand(Gamma(2, 6), 100)
-        fitdistribution(Gamma, y)
+    y = randn(100)
+    fitdistribution(Normal, y)
 
-        y = randn(100)
-        fitdistribution(Normal, y)
+    x = rand(10)
+    y = rand(Multinomial(5, x/sum(x)), 100)'
+    fitdistribution(Multinomial, y)
 
-        x = rand(10)
-        y = rand(Multinomial(5, x/sum(x)), 100)'
-        fitdistribution(Multinomial, y)
+    y = rand(MvNormal(zeros(4), diagm(ones(4))), 100)'
+    fitdistribution(MvNormal, y)
+end
+@testset "Beta" begin
+    y = rand(Beta(), 100)
+    o = FitBeta(y)
+    d = fit(Beta, y)
+    @test mean(o)       ≈ mean(d)
+    @test var(o)        ≈ var(d)
+    @test params(o)[1]  ≈ params(d)[1]
+    @test params(o)[2]  ≈ params(d)[2]
+    @test nobs(o)       ≈ 100
+end
+@testset "Categorical" begin
+    y = rand(Categorical([.2, .2, .2, .4]), 1000)
+    o = FitCategorical(y)
+    @test ncategories(o) == 4
 
-        y = rand(MvNormal(zeros(4), diagm(ones(4))), 100)'
-        fitdistribution(MvNormal, y)
-    end
+    y = rand(Bool, 1000)
+    o = FitCategorical(y)
+    @test ncategories(o) == 2
 
-    context(@subtitle "Beta") do
-        y = rand(Beta(), 100)
-        o = FitBeta(y)
-        d = fit(Beta, y)
+    y = rand([:a, :b, :c, :d, :e, :f, :g], 1000)
+    o = FitCategorical(y)
+    @test ncategories(o) == 7
+end
+@testset "Cauchy" begin
+    y = rand(Cauchy(), 10000)
+    o = FitCauchy(y, LearningRate())
+    fit!(o, y)
+    @test_approx_eq_eps params(o)[1] 0.0 0.1
+    @test_approx_eq_eps params(o)[2] 1.0 0.1
+    @test nobs(o) == 2 * 10000
+end
+@testset "Gamma" begin
+    y = rand(Gamma(2, 6), 100)
+    o = FitGamma(y)
+    @test mean(o) ≈ mean(y)
+end
+@testset "LogNormal" begin
+    y = rand(LogNormal(), 100)
+    o = FitLogNormal(y)
+    @test_approx_eq_eps mean(o) mean(y) .1
+end
+@testset "Normal" begin
+    y = randn(100)
+    o = FitNormal(y)
+    @test mean(o) ≈ mean(y)
+    @test std(o) ≈ std(y)
+    @test var(o) ≈ var(y)
+end
+@testset "Multinomial" begin
+    x = rand(10)
+    y = rand(Multinomial(5, x/sum(x)), 100)'
+    o = FitMultinomial(y)
+    @test mean(o) ≈ vec(mean(y, 1))
+    @test nobs(o) == 100
+end
+@testset "MvNormal" begin
+    y = rand(MvNormal(zeros(4), diagm(ones(4))), 100)'
+    o = FitMvNormal(y)
+    @test mean(o) ≈ vec(mean(y, 1))
+    @test var(o) ≈ vec(var(y, 1))
+    @test std(o) ≈ vec(std(y, 1))
+    @test cov(o) ≈ cov(y)
+    @test nobs(o) == 100
+end
+@testset "NormalMix" begin
+    d = MixtureModel(Normal, [(0,1), (2,3), (4,5)])
+    y = rand(d, 50_000)
+    o = NormalMix(y, 3)
 
-        @fact mean(o) --> roughly(mean(d))
-        @fact var(o) --> roughly(var(d))
-        @fact params(o)[1] --> roughly(params(d)[1])
-        @fact params(o)[2] --> roughly(params(d)[2])
-        @fact nobs(o) --> 100
-    end
+    fit!(o, y)
+    fit!(o, y, 10)
+    @test_approx_eq_eps mean(o) mean(y) .5
+    @test_approx_eq_eps var(o)  var(y)  .5
+    @test_approx_eq_eps std(o)  std(y)  .5
+    @test length(componentwise_pdf(o, 0.5)) == 3
+    @test ncomponents(o) == 3
+    @test typeof(component(o, 1)) == Normal{Float64}
+    @test length(probs(o)) == 3
+    @test pdf(o, randn()) > 0
+    @test 0 < cdf(o, randn()) < 1
+    @test value(o) == o.value
+    @test_approx_eq_eps quantile(o, [.25, .5, .75]) quantile(y, [.25, .5, .75]) .5
+    quantile(o, collect(.01:.01:.99))
 
-    context(@subtitle "Categorical") do
-        y = rand(Categorical([.2, .2, .2, .4]), 1000)
-        o = FitCategorical(y)
-        @fact ncategories(o) --> 4
-
-        y = rand(Bool, 1000)
-        o = FitCategorical(y)
-        @fact ncategories(o) --> 2
-
-        y = rand([:a, :b, :c, :d, :e, :f, :g], 1000)
-        o = FitCategorical(y)
-        @fact ncategories(o) --> 7
-    end
-
-    context(@subtitle "Cauchy") do
-        y = rand(Cauchy(), 10000)
-        o = FitCauchy(y, LearningRate())
-        fit!(o, y)
-        @fact params(o)[1] --> roughly(0.0, .1)
-        @fact params(o)[2] --> roughly(1.0, .1)
-        @fact nobs(o) --> 2 * 10000
-    end
-
-    context(@subtitle "Gamma") do
-        y = rand(Gamma(2, 6), 100)
-        o = FitGamma(y)
-        @fact mean(o) --> roughly(mean(y))
-    end
-
-    context(@subtitle "LogNormal") do
-        y = rand(LogNormal(), 100)
-        o = FitLogNormal(y)
-        @fact mean(o) --> roughly(mean(y), .5)
-    end
-
-    context(@subtitle "Normal") do
-        y = randn(100)
-        o = FitNormal(y)
-        @fact mean(o) --> roughly(mean(y))
-        @fact std(o) --> roughly(std(y))
-        @fact var(o) --> roughly(var(y))
-    end
-
-    context(@subtitle "Multinomial") do
-        x = rand(10)
-        y = rand(Multinomial(5, x/sum(x)), 100)'
-        o = FitMultinomial(y)
-        @fact mean(o) --> roughly(vec(mean(y, 1)))
-        @fact nobs(o) --> 100
-    end
-
-    context(@subtitle "MvNormal") do
-        y = rand(MvNormal(zeros(4), diagm(ones(4))), 100)'
-        o = FitMvNormal(y)
-        @fact mean(o) --> roughly(vec(mean(y, 1)))
-        @fact var(o) --> roughly(vec(var(y, 1)))
-        @fact std(o) --> roughly(vec(std(y, 1)))
-        @fact cov(o) --> roughly(cov(y))
-        @fact nobs(o) --> 100
-    end
-
-    context(@subtitle "NormalMix") do
-        d = MixtureModel(Normal, [(0,1), (2,3), (4,5)])
-        y = rand(d, 50_000)
-        o = NormalMix(y, 3)
-
-        fit!(o, y)
-        fit!(o, y, 10)
-        @fact mean(o) --> roughly(mean(y), .5)
-        @fact var(o) --> roughly(var(y), 5)
-        @fact std(o) --> roughly(std(y), .5)
-        @fact length(componentwise_pdf(o, 0.5)) --> 3
-        @fact ncomponents(o) --> 3
-        @fact typeof(component(o, 1)) == Normal{Float64} --> true
-        @fact length(probs(o)) --> 3
-        @fact pdf(o, randn()) > 0 --> true
-        @fact 0 < cdf(o, randn()) < 1 --> true
-        @fact value(o) --> o.value
-        @fact quantile(o, [.25, .5, .75]) --> roughly(quantile(y, [.25, .5, .75]), 2.)
-        quantile(o, collect(.01:.01:.99))
-
-        fit!(o, y, 1)
-        fit!(o, y, 2)
-        fit!(o, y, 5)
-        NormalMix(3, y)
-    end
+    fit!(o, y, 1)
+    fit!(o, y, 2)
+    fit!(o, y, 5)
+    NormalMix(3, y)
+end
 end
 
 end#module

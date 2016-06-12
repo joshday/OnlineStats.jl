@@ -324,7 +324,7 @@ Perform operations on data in blocks.
 
 `map_rows(f::Function, b::Integer, data...)`
 
-This function iteratively feeds blocks of `data` of size `b` observations to the
+This function iteratively feeds `data` in blocks of `b` observations to the
 function `f`.  The most common usage is with `do` blocks:
 
 ```julia
@@ -367,4 +367,3 @@ include("plots.jl")
 
 
 end # module
-O = OnlineStats

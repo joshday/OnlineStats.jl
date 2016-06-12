@@ -1,16 +1,12 @@
 module MessyOutput
-# tests for show methods or things that print
-# This keeps the other tests look more organized
-
-
-using TestSetup, OnlineStats, FactCheck, Distributions
+using OnlineStats, BaseTestNext, Distributions
 
 x = randn(500)
 x1 = randn(500)
 x2 = randn(501)
 xs = hcat(x1, x)
 
-facts(@title "Show Methods") do
+@testset "show methods" begin
     display(Mean(x))
     display(Means(xs))
     display(Variance(x))
@@ -29,7 +25,34 @@ facts(@title "Show Methods") do
 
     display(BernoulliBootstrap(Mean(), mean, 1000))
 
-    println()
+    @testset "Full Factorial of Combinations" begin
+        n, p = 500, 5
+        x = randn(n, p)
+        β = collect(linspace(-1, 1, p))
+        β_with_intercept = vcat(0.0, β)
+        xβ = x*β
+        alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), RDA(), MMGrad()]
+        pen = [NoPenalty(), RidgePenalty(.1), LassoPenalty(.1), ElasticNetPenalty(.1, .5)]
+        mod = [
+            L2Regression(), L1Regression(), LogisticRegression(),
+            PoissonRegression(), QuantileRegression(), SVMLike(), HuberRegression()
+        ]
+
+        generate(::L2Regression, xβ) = xβ + randn(size(xβ, 1))
+        generate(::L1Regression, xβ) = xβ + randn(size(xβ, 1))
+        generate(::LogisticRegression, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
+        generate(::PoissonRegression, xβ) = [rand(Poisson(exp(η))) for η in xβ]
+        generate(::QuantileRegression, xβ) = xβ + randn(size(xβ, 1))
+        generate(::SVMLike, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
+        generate(::HuberRegression, xβ) = xβ + randn(size(xβ, 1))
+
+        for a in alg, p in pen, m in mod
+            y = generate(m, xβ)
+            println("    > $a, $p, $m")
+            StatLearn(x, y, m, a, p)
+            StatLearn(x, y, 10, m, a, p)
+        end
+    end
 end
 
 end#module
