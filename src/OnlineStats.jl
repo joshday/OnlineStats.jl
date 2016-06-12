@@ -3,7 +3,7 @@ module OnlineStats
 import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
-import RecipesBase
+using RecipesBase
 
 export
     OnlineStat,
@@ -318,7 +318,35 @@ Base.copy(o::OnlineStat) = deepcopy(o)
 # epsilon used in special cases to avoid dividing by 0, etc.
 const _ϵ = 1e-8
 
+#--------------------------------------------------------------------------# map_rows
+"""
+Perform operations on data in blocks.
 
+`map_rows(f::Function, b::Integer, data...)`
+
+This function iteratively feeds blocks of `data` of size `b` observations to the
+function `f`.  The most common usage is with `do` blocks:
+
+```julia
+# Example 1
+y = randn(50)
+o = Variance()
+map_rows(10, y) do yi
+    fit!(o, yi)
+    println("Updated with another batch!")
+end
+```
+"""
+function map_rows(f::Function, b::Integer, data...)
+    n = size(data[1], 1)
+    i = 1
+    while i <= n
+        rng = i:min(i + b - 1, n)
+        batch_data = map(x -> rows(x, rng), data)
+        f(batch_data...)
+        i += b
+    end
+end
 
 #----------------------------------------------------------------------# source files
 include("weight.jl")

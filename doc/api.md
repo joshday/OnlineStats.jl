@@ -1,4 +1,4 @@
-<!--- Generated at 2016-06-11T22:00:44.  Don't edit --->
+<!--- Generated at 2016-06-12T10:04:48.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -349,15 +349,6 @@ y = randn(50)
 o = Variance()
 map_rows(10, y) do yi
     fit!(o, yi)
-    println("Updated with another batch!")
-end
-
-# Example 2
-x = randn(100, 5)
-y = randn(100)
-o = LinReg(x, y)
-map_rows(10, x, y) do xi, yi
-    fit!(o, xi, yi)
     println("Updated with another batch!")
 end
 ```

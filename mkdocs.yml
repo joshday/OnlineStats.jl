@@ -1,4 +1,4 @@
-site_name: OnlineStats.jl
+site_name: OnlineStats.jl 0.6
 site_url: https://joshday.github.io/OnlineStats.jl/
 site_description: Online Statistics for Julia
 site_author: Josh Day
@@ -18,13 +18,12 @@ extra:
         primary: 'indigo'
     author:
         github: 'joshday'
-    # font:
-    #     text: 'Roboto'
-    #     code: 'Hack'
 
 markdown_extensions:
     - admonition
     - codehilite(css_class=code)
+    - mdx_math:
+        enable_dollar_delimiter: True 
 
 extra_javascript: [
      'mathjax-config.js',

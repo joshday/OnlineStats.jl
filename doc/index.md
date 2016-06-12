@@ -41,7 +41,7 @@ While many estimates can be calculated analytically with an online algorithm, se
 type rely on stochastic approximation.
 
 ### Summary Statistics
-- Mean: [`Mean`](../api/#mean), `Means`
+- Mean: `Mean`, `Means`
 - Variance: `Variance`, `Variances`
 - Quantiles: `QuantileMM`, `QuantileSGD`
 - Covariance Matrix: `CovMatrix`

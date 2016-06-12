@@ -1,9 +1,17 @@
 # StatLearn
 
-Approximate solutions to statistical learning problems using online algorithms.  `StatLearn` has extremely fast fitting times.  For `p` features, updates are O(p).
+Approximate solutions to statistical learning problems using online algorithms.  `StatLearn` has extremely fast fitting times.  Number of operations per update is linear with respect to the number of parameters.
 
+`StatLearn` provides multiple algorithms for problems of the form
 
-## StatLearn is parameterized by three main types:
+$$\frac{1}{T}\sum_{t=1}^T f_t(\beta) + \lambda \; g(\beta),$$
+
+where $f_t$ is the loss at time/update $t$, $g$ is a penalty/regularization term, and $\lambda$ is the regularization parameter.
+
+## StatLearn is parameterized by three main types
+
+!!! note
+    The idea is to use `Algorithm` to solve problems of the form `ModelDefinition + Penalty`.
 
 ### ModelDefinition
 - `L2Regression()`
