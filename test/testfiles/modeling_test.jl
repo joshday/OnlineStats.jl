@@ -42,6 +42,10 @@ end
 
     @test coef(LinReg(10, intercept = false)) == zeros(10)
     @test coef(LinReg(10)) == zeros(11)
+
+    o = LinReg(10)
+    @test coef(o) == value(o)
+    predict(o, randn(100, 10)) == zeros(100)
 end
 @testset "Penalties" begin
     NoPenalty()
@@ -68,6 +72,11 @@ end
     @test add_deriv(p3, g, .1) == g + .2
     @test add_deriv(p3, g, .2) == g + max(3.7 * .2 - .2, 0.0) / (3.7 - 1.0)
     @test add_deriv(p3, g, 20) == g
+
+    β = randn(5)
+    β2 = copy(β)
+    OnlineStats.prox!(LassoPenalty(.1), β, .5)
+    @test β[1] == OnlineStats.prox(LassoPenalty(.1), β2[1], .5)
 end
 @testset "QuantReg" begin
     n, p = 10000, 10

@@ -19,11 +19,10 @@ xs = hcat(x1, x)
     display(QuantReg(5))
     display(KMeans(5, 4))
     display(NormalMix(4))
-
     display(FitCategorical())
     display(FitBeta())
-
     display(BernoulliBootstrap(Mean(), mean, 1000))
+    display(SCADPenalty(.1))
 
     @testset "Full Factorial of Combinations" begin
         n, p = 500, 5
