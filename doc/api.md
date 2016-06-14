@@ -1,4 +1,4 @@
-<!--- Generated at 2016-06-12T10:04:48.  Don't edit --->
+<!--- Generated at 2016-06-13T22:00:07.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -341,7 +341,7 @@ Perform operations on data in blocks.
 
 `map_rows(f::Function, b::Integer, data...)`
 
-This function iteratively feeds blocks of `data` of size `b` observations to the function `f`.  The most common usage is with `do` blocks:
+This function iteratively feeds `data` in blocks of `b` observations to the function `f`.  The most common usage is with `do` blocks:
 
 ```julia
 # Example 1

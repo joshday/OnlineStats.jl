@@ -1,11 +1,15 @@
-site_name: OnlineStats.jl 0.6
+site_name: OnlineStats.jl
 site_url: https://joshday.github.io/OnlineStats.jl/
 site_description: Online Statistics for Julia
 site_author: Josh Day
 
+repo_name: 'GitHub'
+repo_url: 'https://github.com/joshday/OnlineStats.jl'
+
 pages:
     - Home: index.md
     - Weighting: weight.md
+    - Callbacks: callback.md
     - Predictive Modeling: StatLearn.md
     - API/Examples: api.md
 
@@ -16,14 +20,17 @@ theme: 'material'
 extra:
     palette:
         primary: 'indigo'
+        accent: 'blue'
     author:
         github: 'joshday'
+    version: 0.6.0
+
 
 markdown_extensions:
     - admonition
     - codehilite(css_class=code)
     - mdx_math:
-        enable_dollar_delimiter: True 
+        enable_dollar_delimiter: True
 
 extra_javascript: [
      'mathjax-config.js',
