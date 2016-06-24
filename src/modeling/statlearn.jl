@@ -1,4 +1,5 @@
 #---------------------------------------------------------------------# ModelDefinition
+include("penalty.jl")
 abstract Algorithm
 abstract ModelDefinition
 abstract GLMDef <: ModelDefinition

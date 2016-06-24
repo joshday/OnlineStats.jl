@@ -2,6 +2,7 @@ module OnlineStats
 
 import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
+import SparseRegression; Sp = SparseRegression
 import Distributions; Ds = Distributions
 using RecipesBase
 
@@ -353,10 +354,9 @@ include("weight.jl")
 include("summary.jl")
 include("distributions.jl")
 include("normalmix.jl")
-include("modeling/sweep.jl")
-include("modeling/penalty.jl")
-include("modeling/statlearn.jl")
-include("modeling/statlearnextensions.jl")
+# include("modeling/sweep.jl")
+include("modeling/statlearn2.jl")
+# include("modeling/statlearnextensions.jl")
 include("modeling/linreg.jl")
 include("modeling/quantreg.jl")
 include("modeling/bias.jl")
@@ -367,3 +367,4 @@ include("plots.jl")
 
 
 end # module
+O = OnlineStats
