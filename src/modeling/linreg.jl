@@ -109,7 +109,7 @@ function predict(o::LinReg, x::AMat)
 	end
 	return η
 end
-function loss(o::LinReg, x, y)
+function Sp.loss(o::LinReg, x, y)
     0.5 * mean(abs2(y - predict(o, x)))
 end
 

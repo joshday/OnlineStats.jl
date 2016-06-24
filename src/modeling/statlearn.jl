@@ -64,6 +64,7 @@ function StatLearn(x::AMat, y::AVec, b::Integer, args...; kw...)
 end
 
 
+
 function Base.show(io::IO, o::StatLearn)
     # TODO
     printheader(io, "StatLearn")
@@ -78,15 +79,22 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "Weight", typeof(o.weight))
     print_item(io, "Nobs", nobs(o))
 end
+
 coef(o::StatLearn) = o.intercept ? vcat(o.β0, o.β) : o.β
+predict(o::StatLearn, x) = predict(o.model, xβ(o, x))
 
 xβ(o::StatLearn, x::AVec) = o.β0 + dot(o.β, x)
 xβ(o::StatLearn, x::AMat) = o.β0 + x * o.β
 
-loss(o::StatLearn, x::AVec, y::Real) = loss(o.model, y, xβ(o))
-loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o))
-cost(o::StatLearn, x::AVec, y::Real) = loss(o.model, y, xβ(o)) + Sp.penalty(o.penalty, o.β)
-cost(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o)) + Sp.penalty(o.penalty, o.β)
+Sp.loss(o::StatLearn, x::AVec, y::Real) = Sp.loss(o.model, y, xβ(o, x))
+Sp.loss(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x))
+cost(o::StatLearn, x::AVec, y::Real) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penalty(o.penalty, o.β)
+cost(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penalty(o.penalty, o.β)
+
+
+
+
+
 
 
 penalty_adjust!(::Algorithm, P, λ, β, ηγ) = Sp.prox!(P, β, ηγ * λ)
@@ -126,8 +134,6 @@ function gradient_update!(::AdaGrad2, β, H, j, ηγg)
 end
 
 
-
-
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     β, H, A, M, P = o.β, o.H, o.algorithm, o.model, o.penalty
@@ -147,8 +153,6 @@ function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     penalty_adjust!(A, P, o.λ, β, ηγ)
     o
 end
-
-
 
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
     β, H, A, M, P = o.β, o.H, o.algorithm, o.model, o.penalty

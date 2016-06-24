@@ -1,5 +1,5 @@
 module MessyOutput
-using OnlineStats, BaseTestNext, Distributions, SparseRegression
+using OnlineStats, BaseTestNext, Distributions
 
 x = randn(500)
 x1 = randn(500)
@@ -47,8 +47,8 @@ xs = hcat(x1, x)
         for a in alg, p in pen, m in mod
             y = generate(m, xβ)
             println("    > $a, $p, $m")
-            StatLearn(x, y, m, a, p)
-            StatLearn(x, y, 10, m, a, p)
+            StatLearn(x, y, m, a, p, lambda = .1)
+            StatLearn(x, y, 10, m, a, p, lambda = .1)
         end
     end
 end
