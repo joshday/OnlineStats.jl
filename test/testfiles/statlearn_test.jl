@@ -22,8 +22,8 @@ end
     β = collect(linspace(-1, 1, p))
     β_with_intercept = vcat(0.0, β)
     xβ = x*β
-    alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), RDA(), MMGrad()]
-    pen = [NoPenalty(), RidgePenalty(.1), LassoPenalty(.1), ElasticNetPenalty(.1, .5)]
+    alg = [SGD(), AdaGrad(), AdaGrad2()] #, AdaDelta(), RDA(), MMGrad()]
+    pen = [NoPenalty(), RidgePenalty(), LassoPenalty(), ElasticNetPenalty(.5)]
     mod = [
         L2Regression(), L1Regression(), LogisticRegression(),
         PoissonRegression(), QuantileRegression(), SVMLike(), HuberRegression()
@@ -37,15 +37,6 @@ end
     generate(::SVMLike, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
     generate(::HuberRegression, xβ) = xβ + randn(size(xβ, 1))
 
-    # moved to messy_output_test
-    # @testset "Full Factorial of Combinations" begin
-    #     for a in alg, p in pen, m in mod
-    #         y = generate(m, xβ)
-    #         println("    > $a, $p, $m")
-    #         StatLearn(x, y, m, a, p)
-    #         StatLearn(x, y, 10, m, a, p)
-    #     end
-    # end
     @testset "methods" begin
         y = x*β + randn(n)
         o = StatLearn(x, y)

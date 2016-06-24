@@ -1,5 +1,5 @@
 module MessyOutput
-using OnlineStats, BaseTestNext, Distributions
+using OnlineStats, BaseTestNext, Distributions, SparseRegression
 
 x = randn(500)
 x1 = randn(500)
@@ -22,7 +22,6 @@ xs = hcat(x1, x)
     display(FitCategorical())
     display(FitBeta())
     display(BernoulliBootstrap(Mean(), mean, 1000))
-    display(SCADPenalty(.1))
 
     @testset "Full Factorial of Combinations" begin
         n, p = 500, 5
@@ -30,14 +29,14 @@ xs = hcat(x1, x)
         β = collect(linspace(-1, 1, p))
         β_with_intercept = vcat(0.0, β)
         xβ = x*β
-        alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), RDA(), MMGrad()]
-        pen = [NoPenalty(), RidgePenalty(.1), LassoPenalty(.1), ElasticNetPenalty(.1, .5)]
+        alg = [SGD(), AdaGrad(), AdaGrad2()] #, AdaDelta(), RDA(), MMGrad()]
+        pen = [NoPenalty(), RidgePenalty(), LassoPenalty(), ElasticNetPenalty(.5)]
         mod = [
-            L2Regression(), L1Regression(), LogisticRegression(),
-            PoissonRegression(), QuantileRegression(), SVMLike(), HuberRegression()
+            LinearRegression(), L1Regression(), LogisticRegression(),
+            PoissonRegression(), QuantileRegression(.5), SVMLike(), HuberRegression(2.)
         ]
 
-        generate(::L2Regression, xβ) = xβ + randn(size(xβ, 1))
+        generate(::LinearRegression, xβ) = xβ + randn(size(xβ, 1))
         generate(::L1Regression, xβ) = xβ + randn(size(xβ, 1))
         generate(::LogisticRegression, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
         generate(::PoissonRegression, xβ) = [rand(Poisson(exp(η))) for η in xβ]
