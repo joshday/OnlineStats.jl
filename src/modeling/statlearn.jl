@@ -100,9 +100,8 @@ cost(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penal
 penalty_adjust!(::Algorithm, P, λ, β, ηγ) = Sp.prox!(P, β, ηγ * λ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
-update_β0!(o::StatLearn{SGD}, ηγ, g, ηγg) = (o.β0 -= ηγg)
-function update_H!(o::StatLearn{SGD}, H, j, g, hγ) end
-gradient_update!(::SGD, β, H, j, ηγg) = (@inbounds β[j] -= ηγg)
+updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg) = (o.β0 -= ηγg)
+updateβ!(o::StatLearn{SGD}, β, H, j, γ, ηγ, gx, ηγgx) = (@inbounds β[j] -= ηγgx)
 function penalty_adjust!(::SGD, P, λ, β, ηγ)
     for j in eachindex(β)
         @inbounds β[j] += ηγ * Sp.deriv(P, β[j], λ)
@@ -110,54 +109,51 @@ function penalty_adjust!(::SGD, P, λ, β, ηγ)
 end
 #---------------------------------------------------------------------------# AdaGrad
 immutable AdaGrad <: Algorithm end
-function update_β0!(o::StatLearn{AdaGrad}, ηγ, g, ηγg)
+function updateβ0!(o::StatLearn{AdaGrad}, γ, ηγ, g, ηγg)
     o.H0 = smooth(o.H0, g * g, 1 / nups(o.weight))
     o.β0 -= ηγg / sqrt(o.H0)
 end
-function update_H!(o::StatLearn{AdaGrad}, H, j, g, γ)
-    @inbounds H[j] = smooth(H[j], g * g, 1 / nups(o.weight))
+function updateβ!(o::StatLearn{AdaGrad}, β, H, j, γ, ηγ, gx, ηγgx)
+    @inbounds H[j] = smooth(H[j], gx * gx, 1 / nups(o.weight))
+    @inbounds β[j] -= ηγgx / sqrt(H[j])
 end
-function gradient_update!(::AdaGrad, β, H, j, ηγg)
-    @inbounds β[j] -= ηγg / sqrt(H[j])
-end
+
 #--------------------------------------------------------------------------# AdaGrad2
 immutable AdaGrad2 <: Algorithm end
-function update_β0!(o::StatLearn{AdaGrad2}, ηγ, g, ηγg)
-    o.H0 = smooth(o.H0, g * g, 1 / nups(o.weight))
+function updateβ0!(o::StatLearn{AdaGrad2}, γ, ηγ, g, ηγg)
+    o.H0 = smooth(o.H0, g * g, γ)
     o.β0 -= ηγg / sqrt(o.H0)
 end
-function update_H!(o::StatLearn{AdaGrad2}, H, j, g, γ)
-    @inbounds H[j] = smooth(H[j], g * g, γ)
-end
-function gradient_update!(::AdaGrad2, β, H, j, ηγg)
-    @inbounds β[j] -= ηγg / sqrt(H[j])
+function updateβ!(o::StatLearn{AdaGrad2}, β, H, j, γ, ηγ, gx, ηγgx)
+    @inbounds H[j] = smooth(H[j], gx * gx, γ)
+    @inbounds β[j] -= ηγgx / sqrt(H[j])
 end
 
 
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
-    β, H, A, M, P = o.β, o.H, o.algorithm, o.model, o.penalty
+    η, β, H, A, M, P = o.η, o.β, o.H, o.algorithm, o.model, o.penalty
     @assert length(β) == length(x) "Wrong dimensions"
-    ηγ = o.η * γ
+    ηγ = η * γ
     xb = dot(x, β) + o.β0
     g = SparseRegression.lossderiv(M, y, xb)
     ηγg = ηγ * g
     if o.intercept
-        update_β0!(o, ηγ, g, ηγg)
+        updateβ0!(o, γ, ηγ, g, ηγg)
     end
     for j in eachindex(β)
-        Δ = ηγg * x[j]
-        update_H!(o, H, j, g, γ)
-        gradient_update!(A, β, H, j, Δ)
+        gx = g * x[j]
+        ηγgx = ηγ * gx
+        updateβ!(o, β, H, j, γ, ηγ, gx, ηγgx)
     end
     penalty_adjust!(A, P, o.λ, β, ηγ)
     o
 end
 
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
-    β, H, A, M, P = o.β, o.H, o.algorithm, o.model, o.penalty
+    η, β, H, A, M, P = o.η, o.β, o.H, o.algorithm, o.model, o.penalty
     @assert length(β) == size(x, 2) "Wrong dimensions."
-    ηγ = o.η * γ
+    ηγ = η * γ
     xb = x * β
     gvec = zeros(size(x, 1))
     for i in eachindex(gvec)
@@ -166,18 +162,18 @@ function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::
     if o.intercept
         g = mean(gvec)
         ηγg = ηγ * g
-        update_β0!(o, ηγ, g, ηγg)
+        updateβ0!(o, γ, ηγ, g, ηγg)
     end
     for j in eachindex(β)
-        g = batch_g(sub(x, :, j), gvec)
-        update_H!(o, H, j, g, γ)
-        gradient_update!(A, β, H, j, ηγ * g)
+        gx = batch_gx(sub(x, :, j), gvec)
+        ηγgx = ηγ * gx
+        updateβ!(o, β, H, j, γ, ηγ, gx, ηγgx)
     end
     penalty_adjust!(A, P, o.λ, β, ηγ)
     o
 end
 
-function batch_g(xj::AVec, g::AVec)
+function batch_gx(xj::AVec, g::AVec)
     v = 0.0
     n = length(xj)
     for i in eachindex(xj)
