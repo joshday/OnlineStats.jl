@@ -37,12 +37,12 @@ using OnlineStats, BaseTestNext
         fit!(o, randn(100, 2), randn(100), .1)
         @test nobs(o) == 300
     end
-    @testset "map_rows" begin
+    @testset "maprows" begin
         o = Mean()
         o2 = Mean()
         y = randn(100)
         fit!(o, y)
-        map_rows(10, y) do yi
+        maprows(10, y) do yi
             fit!(o2, yi)
         end
         @test mean(o) == mean(o2)

@@ -368,10 +368,10 @@ std(o)
 cov(o)
 ```
 
-## map_rows
+## maprows
 Perform operations on data in blocks.
 
-`map_rows(f::Function, b::Integer, data...)`
+`maprows(f::Function, b::Integer, data...)`
 
 This function iteratively feeds `data` in blocks of `b` observations to the function `f`.  The most common usage is with `do` blocks:
 
@@ -379,7 +379,7 @@ This function iteratively feeds `data` in blocks of `b` observations to the func
 # Example 1
 y = randn(50)
 o = Variance()
-map_rows(10, y) do yi
+maprows(10, y) do yi
     fit!(o, yi)
     println("Updated with another batch!")
 end

@@ -29,7 +29,7 @@ export
     replicates, HyperLogLog,
     # methods
     value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, cost, center, fitdistribution, classify, map_rows
+    loss, cost, center, fitdistribution, classify, maprows
 
 #-----------------------------------------------------------------------------# types
 abstract Input
@@ -319,11 +319,11 @@ Base.copy(o::OnlineStat) = deepcopy(o)
 # epsilon used in special cases to avoid dividing by 0, etc.
 const _ϵ = 1e-8
 
-#--------------------------------------------------------------------------# map_rows
+#--------------------------------------------------------------------------# maprows
 """
 Perform operations on data in blocks.
 
-`map_rows(f::Function, b::Integer, data...)`
+`maprows(f::Function, b::Integer, data...)`
 
 This function iteratively feeds `data` in blocks of `b` observations to the
 function `f`.  The most common usage is with `do` blocks:
@@ -332,13 +332,13 @@ function `f`.  The most common usage is with `do` blocks:
 # Example 1
 y = randn(50)
 o = Variance()
-map_rows(10, y) do yi
+maprows(10, y) do yi
     fit!(o, yi)
     println("Updated with another batch!")
 end
 ```
 """
-function map_rows(f::Function, b::Integer, data...)
+function maprows(f::Function, b::Integer, data...)
     n = size(data[1], 1)
     i = 1
     while i <= n
@@ -366,4 +366,5 @@ include("plots.jl")
 
 
 end # module
+
 O = OnlineStats

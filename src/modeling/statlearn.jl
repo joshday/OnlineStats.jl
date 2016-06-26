@@ -100,40 +100,17 @@ cost(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penal
 penalty_adjust!(::Algorithm, P, λ, β, ηγ) = Sp.prox!(P, β, ηγ * λ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
-updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg) = (o.β0 -= ηγg)
-updateβ!(o::StatLearn{SGD}, β, H, j, γ, ηγ, gx, ηγgx) = (@inbounds β[j] -= ηγgx)
-function penalty_adjust!(::SGD, P, λ, β, ηγ)
-    for j in eachindex(β)
-        @inbounds β[j] += ηγ * Sp.deriv(P, β[j], λ)
-    end
+function updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg)
+    o.β0 -= ηγg
 end
-#---------------------------------------------------------------------------# AdaGrad
-immutable AdaGrad <: Algorithm end
-function updateβ0!(o::StatLearn{AdaGrad}, γ, ηγ, g, ηγg)
-    o.H0 = smooth(o.H0, g * g, 1 / nups(o.weight))
-    o.β0 -= ηγg / sqrt(o.H0)
-end
-function updateβ!(o::StatLearn{AdaGrad}, β, H, j, γ, ηγ, gx, ηγgx)
-    @inbounds H[j] = smooth(H[j], gx * gx, 1 / nups(o.weight))
-    @inbounds β[j] -= ηγgx / sqrt(H[j])
-end
-
-#--------------------------------------------------------------------------# AdaGrad2
-immutable AdaGrad2 <: Algorithm end
-function updateβ0!(o::StatLearn{AdaGrad2}, γ, ηγ, g, ηγg)
-    o.H0 = smooth(o.H0, g * g, γ)
-    o.β0 -= ηγg / sqrt(o.H0)
-end
-function updateβ!(o::StatLearn{AdaGrad2}, β, H, j, γ, ηγ, gx, ηγgx)
-    @inbounds H[j] = smooth(H[j], gx * gx, γ)
-    @inbounds β[j] -= ηγgx / sqrt(H[j])
+function updateβ!(o::StatLearn{SGD}, β, H, j, γ, ηγ, gx, ηγgx)
+    @inbounds β[j] -= ηγgx
 end
 
 
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     η, β, H, A, M, P = o.η, o.β, o.H, o.algorithm, o.model, o.penalty
-    @assert length(β) == length(x) "Wrong dimensions"
     ηγ = η * γ
     xb = dot(x, β) + o.β0
     g = SparseRegression.lossderiv(M, y, xb)
@@ -152,7 +129,6 @@ end
 
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
     η, β, H, A, M, P = o.η, o.β, o.H, o.algorithm, o.model, o.penalty
-    @assert length(β) == size(x, 2) "Wrong dimensions."
     ηγ = η * γ
     xb = x * β
     gvec = zeros(size(x, 1))

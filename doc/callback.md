@@ -1,17 +1,17 @@
 # Callbacks
 
-While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a `map_rows` function.
+While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a `maprows` function.
 
-`map_rows(f::Function, b::Integer, data...)`
+`maprows(f::Function, b::Integer, data...)`
 
-`map_rows` works similar to `Base.map`, but passes the arguments to the function in batches of size `b`.  It is best used with Julia's do block syntax.
+`maprows` works similar to `Base.map`, but passes the arguments to the function in batches of size `b`.  It is best used with Julia's do block syntax.
 
 ## Example 1
 ### Input
 ```julia
 y = randn(100)
 o = Mean()
-map_rows(20, y) do yi
+maprows(20, y) do yi
     fit!(o, yi)
     info("value of mean is $(mean(o))")
 end
@@ -35,7 +35,7 @@ o = QuantileMM(LearningRate(.7), tau = [.25, .5, .75])
 
 plt = plot([0], zeros(3, 1))       # initialize plot
 
-map_rows(50, y) do yi              # for each batch of 50 observations
+maprows(50, y) do yi              # for each batch of 50 observations
     fit!(o, yi, 5)                 # fit in minibatches of 5
     push!(plt, nobs(o), value(o))  # Add a value to the plot
 end
@@ -56,7 +56,7 @@ y = x * β + randn(1000)
 
 o = LinReg(5)
 
-map_rows(100, x, y) do xi, yi
+maprows(100, x, y) do xi, yi
     fit!(o, xi, yi)
     info("You have fit $(nobs(o)) observations")
 end
