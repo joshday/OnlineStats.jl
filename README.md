@@ -13,3 +13,5 @@
 
 
 # [Documentation](https://joshday.github.io/OnlineStats.jl/)
+
+### [JuliaCon 2016 Slides](https://github.com/joshday/OnlineStats_JuliaCon2016/blob/master/OnlineStats%20JuliaCon2016.ipynb)
