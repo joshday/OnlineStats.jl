@@ -66,7 +66,6 @@ end
 
 
 function Base.show(io::IO, o::StatLearn)
-    # TODO
     printheader(io, "StatLearn")
     o.intercept && print_item(io, "Bias", o.β0)
     print_item(io, "β", o.β)
@@ -97,7 +96,7 @@ cost(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penal
 
 
 
-penalty_adjust!(::Algorithm, P, λ, β, ηγ) = Sp.prox!(P, β, ηγ * λ)
+penalty_adjust!(o::StatLearn, ηγ) = Sp.prox!(o.penalty, o.β, ηγ * o.λ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
 function updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg)
@@ -123,7 +122,9 @@ function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
         ηγgx = ηγ * gx
         updateβ!(o, β, H, j, γ, ηγ, gx, ηγgx)
     end
-    penalty_adjust!(A, P, o.λ, β, ηγ)
+    if typeof(o.penalty) != NoPenalty
+        penalty_adjust!(o, ηγ)
+    end
     o
 end
 
