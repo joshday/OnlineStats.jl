@@ -1,5 +1,3 @@
-using SparseRegression
-
 #-------------------------------------------------------------------------# StatLearn
 type StatLearn{
         A <: Algorithm,
@@ -12,9 +10,14 @@ type StatLearn{
     β::VecF         # coefficients, β[:, i] = βᵢ
     intercept::Bool # should β0 be estimated?
     η::Float64      # constant part of learning rate
-    λ::Float64      # lambdas to use
-    H0::Float64     # "second order" info for intercept
-    H::VecF         # diagonal matrix of "second order" info
+    λ::Float64      # regularization parameter
+
+    # Storage
+    a0::Float64
+    b0::Float64
+    a::VecF
+    b::VecF
+
     algorithm::A    # determines how updates work
     model::M        # model definition
     penalty::P      # type of penalty
@@ -26,11 +29,11 @@ function _StatLearn(p::Integer, wgt::Weight;
         penalty::Penalty = NoPenalty(),
         algorithm::Algorithm = SGD(),
         intercept::Bool = true,
-        lambda::Float64 = 0.0
+        lambda::Real = 0.0
     )
     o = StatLearn(
-        0.0, zeros(p), intercept, eta, lambda, 1.0, ones(p), algorithm, model,
-        penalty, wgt
+        0.0, zeros(p), intercept, Float64(eta), Float64(lambda), _ϵ, _ϵ , _ϵ * ones(p),
+        _ϵ * ones(p), algorithm, model, penalty, wgt
     )
     o
 end
@@ -85,10 +88,10 @@ predict(o::StatLearn, x) = predict(o.model, xβ(o, x))
 xβ(o::StatLearn, x::AVec) = o.β0 + dot(o.β, x)
 xβ(o::StatLearn, x::AMat) = o.β0 + x * o.β
 
-Sp.loss(o::StatLearn, x::AVec, y::Real) = Sp.loss(o.model, y, xβ(o, x))
-Sp.loss(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x))
-cost(o::StatLearn, x::AVec, y::Real) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penalty(o.penalty, o.β)
-cost(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penalty(o.penalty, o.β)
+loss(o::StatLearn, x::AVec, y::Real) = loss(o.model, y, xβ(o, x))
+loss(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o, x))
+cost(o::StatLearn, x::AVec, y::Real) = loss(o.model, y, xβ(o, x)) + penalty(o.penalty, o.β)
+cost(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o, x)) + penalty(o.penalty, o.β)
 
 
 
@@ -96,23 +99,61 @@ cost(o::StatLearn, x::AMat, y::AVec) = Sp.loss(o.model, y, xβ(o, x)) + Sp.penal
 
 
 
-penalty_adjust!(o::StatLearn, ηγ) = Sp.prox!(o.penalty, o.β, ηγ * o.λ)
+penalty_adjust!(o::StatLearn, ηγ) = prox!(o.penalty, o.β, ηγ * o.λ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
 function updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg)
     o.β0 -= ηγg
 end
-function updateβ!(o::StatLearn{SGD}, β, H, j, γ, ηγ, gx, ηγgx)
+function updateβ!(o::StatLearn{SGD}, β, j, γ, ηγ, gx, ηγgx)
     @inbounds β[j] -= ηγgx
 end
+
+#---------------------------------------------------------------------------# AdaGrad
+immutable AdaGrad <: Algorithm end
+function updateβ0!(o::StatLearn{AdaGrad}, γ, ηγ, g, ηγg)
+    o.a0 = smooth(o.a0, g * g, 1 / nups(o.weight))
+    o.β0 -= ηγg / sqrt(o.a0)
+end
+function updateβ!(o::StatLearn{AdaGrad}, β, j, γ, ηγ, gx, ηγgx)
+    @inbounds o.a[j] = smooth(o.a[j], gx * gx, 1 / nups(o.weight))
+    @inbounds β[j] -= ηγgx / sqrt(o.a[j])
+end
+
+#--------------------------------------------------------------------------# AdaGrad2
+immutable AdaGrad2 <: Algorithm end
+function updateβ0!(o::StatLearn{AdaGrad2}, γ, ηγ, g, ηγg)
+    o.a0 = smooth(o.a0, g * g, γ)
+    o.β0 -= ηγg / sqrt(o.a0)
+end
+function updateβ!(o::StatLearn{AdaGrad2}, β, j, γ, ηγ, gx, ηγgx)
+    @inbounds o.a[j] = smooth(o.a[j], gx * gx, γ)
+    @inbounds β[j] -= ηγgx / sqrt(o.a[j])
+end
+
+
+
+# #-------------------------------------------------------------------------------# OMM
+# # Apparently this is equivalent to SGD...
+# immutable OMM <: Algorithm end
+# function updateβ0!(o::StatLearn{OMM}, γ, ηγ, g, ηγg)
+#     o.a0 = smooth(o.a0, g, γ)
+#     o.b0 = smooth(o.b0, o.β0, γ)
+#     o.β0 = o.b0 - o.η * o.a0
+# end
+# function updateβ!(o::StatLearn{OMM}, β, j, γ, ηγ, gx, ηγgx)
+#     @inbounds o.a[j] = smooth(o.a[j], gx, γ)
+#     @inbounds o.b[j] = smooth(o.b[j], o.β[j], γ)
+#     @inbounds β[j] = o.b[j] - o.η * o.a[j]
+# end
 
 
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
-    η, β, H, A, M, P = o.η, o.β, o.H, o.algorithm, o.model, o.penalty
+    η, β, A, M, P = o.η, o.β, o.algorithm, o.model, o.penalty
     ηγ = η * γ
     xb = dot(x, β) + o.β0
-    g = SparseRegression.lossderiv(M, y, xb)
+    g = lossderiv(M, y, xb)
     ηγg = ηγ * g
     if o.intercept
         updateβ0!(o, γ, ηγ, g, ηγg)
@@ -120,21 +161,19 @@ function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     for j in eachindex(β)
         gx = g * x[j]
         ηγgx = ηγ * gx
-        updateβ!(o, β, H, j, γ, ηγ, gx, ηγgx)
+        updateβ!(o, β, j, γ, ηγ, gx, ηγgx)
     end
-    if typeof(o.penalty) != NoPenalty
-        penalty_adjust!(o, ηγ)
-    end
+    penalty_adjust!(o, ηγ)
     o
 end
 
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
-    η, β, H, A, M, P = o.η, o.β, o.H, o.algorithm, o.model, o.penalty
+    η, β, A, M, P = o.η, o.β, o.algorithm, o.model, o.penalty
     ηγ = η * γ
     xb = x * β
     gvec = zeros(size(x, 1))
     for i in eachindex(gvec)
-        @inbounds gvec[i] = SparseRegression.lossderiv(o.model, y[i], xb[i])
+        @inbounds gvec[i] = lossderiv(o.model, y[i], xb[i])
     end
     if o.intercept
         g = mean(gvec)
@@ -144,9 +183,9 @@ function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::
     for j in eachindex(β)
         gx = batch_gx(sub(x, :, j), gvec)
         ηγgx = ηγ * gx
-        updateβ!(o, β, H, j, γ, ηγ, gx, ηγgx)
+        updateβ!(o, β, j, γ, ηγ, gx, ηγgx)
     end
-    penalty_adjust!(A, P, o.λ, β, ηγ)
+    penalty_adjust!(o, ηγ)
     o
 end
 
