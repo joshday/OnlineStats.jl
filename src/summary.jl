@@ -22,6 +22,7 @@ function _fitbatch!{W <: BatchWeight}(o::Mean{W}, y::AVec, γ::Float64)
 end
 Base.mean(o::Mean) = value(o)
 center(o::Mean, x::Real) = x - mean(o)
+_merge!(o::Mean, o2::Mean, γ) = _fit!(o, mean(o2), γ)
 
 
 #-----------------------------------------------------------------------------# Means
@@ -46,6 +47,7 @@ function _fitbatch!{W <: BatchWeight}(o::Means{W}, y::AMat, γ::Float64)
 end
 Base.mean(o::Means) = value(o)
 center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
+_merge!(o::Means, o2::Means, γ) = _fit!(o, mean(o2), γ)
 
 
 #--------------------------------------------------------------------------# Variance
