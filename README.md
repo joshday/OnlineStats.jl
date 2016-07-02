@@ -15,3 +15,5 @@
 ## [Docs](https://joshday.github.io/OnlineStats.jl/)
 
 ### [JuliaCon 2016 Slides](https://github.com/joshday/OnlineStats_JuliaCon2016/blob/master/OnlineStats%20JuliaCon2016.ipynb)
+
+### [JuliaCon 2016 Video](https://www.youtube.com/watch?v=3PpleRjaqeQ)
