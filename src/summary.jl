@@ -82,6 +82,11 @@ function StatsBase.zscore(o::Variance, x::Real)
     σ = std(o)
     σ == 0.0 ? 1.0 : center(o, x) / σ
 end
+function _merge!(o::Variance, o2::Variance, γ)
+    δ = mean(o2) - mean(o)
+    o.value = smooth(o.value, o2.value, γ) + δ ^ 2 * γ * (1.0 - γ)
+    o.μ = smooth(o.μ, o2.μ, γ)
+end
 
 
 #-------------------------------------------------------------------------# Variances
