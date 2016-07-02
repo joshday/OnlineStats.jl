@@ -19,12 +19,6 @@ end
     β = collect(linspace(-1, 1, p))
     β_with_intercept = vcat(0.0, β)
     xβ = x*β
-    alg = [SGD(), AdaGrad(), AdaGrad2()] #, AdaDelta(), RDA(), MMGrad()]
-    pen = [NoPenalty(), RidgePenalty(), LassoPenalty(), ElasticNetPenalty(.5)]
-    mod = [
-        LinearRegression(), L1Regression(), LogisticRegression(),
-        PoissonRegression(), QuantileRegression(.7), SVMLike(), HuberRegression(4.)
-    ]
 
     generate(::LinearRegression, xβ) = xβ + randn(size(xβ, 1))
     generate(::L1Regression, xβ) = xβ + randn(size(xβ, 1))

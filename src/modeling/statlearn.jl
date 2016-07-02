@@ -13,10 +13,10 @@ type StatLearn{
     λ::Float64      # regularization parameter
 
     # Storage
-    a0::Float64
-    b0::Float64
-    a::VecF
-    b::VecF
+    H0::Float64
+    G0::Float64
+    H::VecF
+    G::VecF
 
     algorithm::A    # determines how updates work
     model::M        # model definition
@@ -31,10 +31,8 @@ function _StatLearn(p::Integer, wgt::Weight;
         intercept::Bool = true,
         lambda::Real = 0.0
     )
-    o = StatLearn(
-        0.0, zeros(p), intercept, Float64(eta), Float64(lambda), _ϵ, _ϵ , _ϵ * ones(p),
-        _ϵ * ones(p), algorithm, model, penalty, wgt
-    )
+    o = StatLearn(0.0, zeros(p), intercept, Float64(eta), Float64(lambda), _ϵ, _ϵ,
+        _ϵ * ones(p), _ϵ * ones(p), algorithm, model, penalty, wgt)
     o
 end
 function StatLearn(p::Integer, args...; kw...)
@@ -112,23 +110,44 @@ end
 #---------------------------------------------------------------------------# AdaGrad
 immutable AdaGrad <: Algorithm end
 function updateβ0!(o::StatLearn{AdaGrad}, γ, ηγ, g, ηγg)
-    o.a0 = smooth(o.a0, g * g, 1 / nups(o.weight))
-    o.β0 -= ηγg / sqrt(o.a0)
+    o.H0 = smooth(o.H0, g * g, 1 / nups(o.weight))
+    o.β0 -= ηγg / sqrt(o.H0)
 end
 function updateβ!(o::StatLearn{AdaGrad}, β, j, γ, ηγ, gx, ηγgx)
-    @inbounds o.a[j] = smooth(o.a[j], gx * gx, 1 / nups(o.weight))
-    @inbounds β[j] -= ηγgx / sqrt(o.a[j])
+    @inbounds o.H[j] = smooth(o.H[j], gx * gx, 1 / nups(o.weight))
+    @inbounds β[j] -= ηγgx / sqrt(o.H[j])
 end
 
 #--------------------------------------------------------------------------# AdaGrad2
 immutable AdaGrad2 <: Algorithm end
 function updateβ0!(o::StatLearn{AdaGrad2}, γ, ηγ, g, ηγg)
-    o.a0 = smooth(o.a0, g * g, γ)
-    o.β0 -= ηγg / sqrt(o.a0)
+    o.H0 = smooth(o.H0, g * g, γ)
+    o.β0 -= ηγg / sqrt(o.H0)
 end
 function updateβ!(o::StatLearn{AdaGrad2}, β, j, γ, ηγ, gx, ηγgx)
-    @inbounds o.a[j] = smooth(o.a[j], gx * gx, γ)
-    @inbounds β[j] -= ηγgx / sqrt(o.a[j])
+    @inbounds o.H[j] = smooth(o.H[j], gx * gx, γ)
+    @inbounds β[j] -= ηγgx / sqrt(o.H[j])
+end
+
+#--------------------------------------------------------------------------# AdaDelta
+immutable AdaDelta <: Algorithm
+    ρ::Float64
+    function AdaDelta(ρ::Real = .001)
+        @assert 0 < ρ < 1
+        new(ρ)
+    end
+end
+function updateβ0!(o::StatLearn{AdaDelta}, γ, ηγ, g, ηγg)
+    o.H0 = smooth(o.H0, g * g, o.algorithm.ρ)
+    Δ = sqrt(o.G0 / o.H0) * g
+    o.β0 -= Δ
+    o.G0 = smooth(o.G0, Δ * Δ, o.algorithm.ρ)
+end
+function updateβ!(o::StatLearn{AdaDelta}, β, j, γ, ηγ, gx, ηγgx)
+    @inbounds o.H[j] = smooth(o.H[j], gx * gx, o.algorithm.ρ)
+    Δ = sqrt(o.G[j] / o.H[j]) * gx
+    @inbounds o.β[j] -= Δ
+    @inbounds o.G[j] = smooth(o.G[j], Δ * Δ, o.algorithm.ρ)
 end
 
 
@@ -137,14 +156,14 @@ end
 # # Apparently this is equivalent to SGD...
 # immutable OMM <: Algorithm end
 # function updateβ0!(o::StatLearn{OMM}, γ, ηγ, g, ηγg)
-#     o.a0 = smooth(o.a0, g, γ)
-#     o.b0 = smooth(o.b0, o.β0, γ)
-#     o.β0 = o.b0 - o.η * o.a0
+#     o.H0 = smooth(o.H0, g, γ)
+#     o.G0 = smooth(o.G0, o.β0, γ)
+#     o.β0 = o.G0 - o.η * o.H0
 # end
 # function updateβ!(o::StatLearn{OMM}, β, j, γ, ηγ, gx, ηγgx)
-#     @inbounds o.a[j] = smooth(o.a[j], gx, γ)
-#     @inbounds o.b[j] = smooth(o.b[j], o.β[j], γ)
-#     @inbounds β[j] = o.b[j] - o.η * o.a[j]
+#     @inbounds o.H[j] = smooth(o.H[j], gx, γ)
+#     @inbounds o.G[j] = smooth(o.G[j], o.β[j], γ)
+#     @inbounds β[j] = o.G[j] - o.η * o.H[j]
 # end
 
 
