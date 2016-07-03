@@ -132,10 +132,7 @@ end
 #--------------------------------------------------------------------------# AdaDelta
 immutable AdaDelta <: Algorithm
     ρ::Float64
-    function AdaDelta(ρ::Real = .001)
-        @assert 0 < ρ < 1
-        new(ρ)
-    end
+    AdaDelta(ρ::Real = .001) = new(ρ)
 end
 function updateβ0!(o::StatLearn{AdaDelta}, γ, ηγ, g, ηγg)
     o.H0 = smooth(o.H0, g * g, o.algorithm.ρ)
@@ -148,6 +145,27 @@ function updateβ!(o::StatLearn{AdaDelta}, β, j, γ, ηγ, gx, ηγgx)
     Δ = sqrt(o.G[j] / o.H[j]) * gx
     @inbounds o.β[j] -= Δ
     @inbounds o.G[j] = smooth(o.G[j], Δ * Δ, o.algorithm.ρ)
+end
+
+#------------------------------------------------------------------------------# ADAM
+immutable ADAM <: Algorithm
+    m1::Float64
+    m2::Float64
+    ADAM(m1::Real = .01, m2::Real = .01) = new(m1, m2)
+end
+function updateβ0!(o::StatLearn{ADAM}, γ, ηγ, g, ηγg)
+    m1, m2, nups = o.algorithm.m1, o.algorithm.m2, o.weight.nups
+    ratio = sqrt(1.0 - m2 ^ nups) / (1.0 - m1 ^ nups)
+    o.H0 = smooth(o.H0, g, m1)
+    o.G0 = smooth(o.G0, g * g, m2)
+    o.β0 -= ηγ * ratio * o.H0 / sqrt(o.G0)
+end
+function updateβ!(o::StatLearn{ADAM}, β, j, γ, ηγ, gx, ηγgx)
+    m1, m2, nups = o.algorithm.m1, o.algorithm.m2, o.weight.nups
+    ratio = sqrt(1.0 - m2 ^ nups) / (1.0 - m1 ^ nups)
+    o.H[j] = smooth(o.H[j], gx, m1)
+    o.G[j] = smooth(o.G[j], gx * gx, m2)
+    o.β[j] -= ηγ * ratio * o.H[j] / sqrt(o.G[j])
 end
 
 
