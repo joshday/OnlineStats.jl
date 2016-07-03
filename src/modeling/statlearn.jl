@@ -100,12 +100,8 @@ cost(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o, x)) + penalty(o.p
 penalty_adjust!(o::StatLearn, ηγ) = prox!(o.penalty, o.β, ηγ * o.λ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
-function updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg)
-    o.β0 -= ηγg
-end
-function updateβ!(o::StatLearn{SGD}, β, j, γ, ηγ, gx, ηγgx)
-    @inbounds β[j] -= ηγgx
-end
+updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg) = (o.β0 -= ηγg)
+updateβ!(o::StatLearn{SGD}, β, j, γ, ηγ, gx, ηγgx) = (@inbounds β[j] -= ηγgx)
 
 #---------------------------------------------------------------------------# AdaGrad
 immutable AdaGrad <: Algorithm end
@@ -166,6 +162,20 @@ function updateβ!(o::StatLearn{ADAM}, β, j, γ, ηγ, gx, ηγgx)
     o.H[j] = smooth(o.H[j], gx, m1)
     o.G[j] = smooth(o.G[j], gx * gx, m2)
     o.β[j] -= ηγ * ratio * o.H[j] / sqrt(o.G[j])
+end
+
+#--------------------------------------------------------------------------# Momentum
+immutable Momentum <: Algorithm
+    α::Float64
+    Momentum(a::Real = .1) = new(a)
+end
+function updateβ0!(o::StatLearn{Momentum}, γ, ηγ, g, ηγg)
+    o.H0 = smooth(o.H0, g, o.algorithm.α)
+    o.β0 -= ηγ * o.H0
+end
+function updateβ!(o::StatLearn{Momentum}, β, j, γ, ηγ, gx, ηγgx)
+    o.H[j] = smooth(o.H[j], gx, o.algorithm.α)
+    o.β[j] -= ηγ * o.H[j]
 end
 
 
