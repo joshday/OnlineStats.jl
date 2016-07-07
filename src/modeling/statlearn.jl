@@ -79,6 +79,7 @@ end
 
 coef(o::StatLearn) = o.intercept ? vcat(o.β0, o.β) : o.β
 predict(o::StatLearn, x) = predict(o.model, xβ(o, x))
+classify(o::StatLearn, x) = classify(o.model, xβ(o, x))
 
 xβ(o::StatLearn, x::AVec) = o.β0 + dot(o.β, x)
 xβ(o::StatLearn, x::AMat) = o.β0 + x * o.β
@@ -268,12 +269,8 @@ function cvfit!(o::StatLearn, x, y, xtest, ytest, arg = 1)
     loss_o = loss(o, xtest, ytest)
     loss_l = loss(l, xtest, ytest)
     lossmin = minimum([loss_h, loss_o, loss_l])
-    if loss_o == lossmin
-    elseif loss_l == lossmin
-        _copy!(o, l)
-    else
-        _copy!(o, h)
-    end
+    loss_l == lossmin && _copy!(o, l)
+    loss_h == lossmin && _copy!(o, h)
     o
 end
 function _copy!(o::StatLearn, o2::StatLearn)
