@@ -242,13 +242,28 @@ function batch_gx(xj::AVec, g::AVec)
     v / n
 end
 
-function cvfit!(o::StatLearn, x, y, xtest, ytest)
+
+"""
+`fit!` and update the tuning parameter for a `StatLearn` object.
+
+`cvfit!(o::StatLearn, x, y, xtest, ytest)`
+
+For regularization parameter `λ` and next weight `γ`, the updated `λ` will be one of:
+
+- `λ + γ`
+- `λ`
+- `max(λ - γ, 0)`
+
+The choice depends on which results in the smallest loss on the test set `(xtest, ytest)`.
+"""
+function cvfit!(o::StatLearn, x, y, xtest, ytest, arg = 1)
     @assert typeof(o.penalty) != NoPenalty
+    γ = weight(o, size(x, 1))
     h = copy(o); h.penalty = typeof(h.penalty)(o.penalty.λ + γ)
     l = copy(o); l.penalty = typeof(l.penalty)(max(o.penalty.λ - γ, 0.0))
-    fit!(h, x, y)
-    fit!(o, x, y)
-    fit!(l, x, y)
+    fit!(h, x, y, arg)
+    fit!(o, x, y, arg)
+    fit!(l, x, y, arg)
     loss_h = loss(h, xtest, ytest)
     loss_o = loss(o, xtest, ytest)
     loss_l = loss(l, xtest, ytest)
