@@ -1,3 +1,5 @@
+# Temporary definitions until JuliaML stuff matures
+
 abstract Algorithm
 
 
@@ -117,67 +119,66 @@ predict(m::HuberRegression, η::Real) = η
 
 
 
-
+# ========================================================================= # Penalty
 abstract Penalty
-# New Penalties need a:
-#   - Constructor
-#   - one line show method
-#   - penalty method
-#   - prox method prox_{s * λ * penalty}(βj)
 #------------------------------------------------------------------# abstract methods
-# c = step * λ (step size * regularization parameter)
-function prox!(p::Penalty, β::VecF, c::Float64)
+function prox!(p::Penalty, β::VecF, step::Float64)
     for j in eachindex(β)
-        @inbounds β[j] = prox(p, β[j], c)
+        @inbounds β[j] = prox(p, β[j], step)
     end
 end
-# if λs are not constant
-function prox!(p::Penalty, β::VecF, c::VecF)
+# if step different for each element
+function prox!(p::Penalty, β::VecF, step::VecF)
     for j in eachindex(β)
-        @inbounds β[j] = prox(p, β[j], c[j])
+        @inbounds β[j] = prox(p, β[j], step[j])
     end
 end
-
+function value(p::Penalty, β::VecF)
+    v = zeros(β)
+    for j in eachindex(v)
+        @inbounds v[j] = value(p, β[j])
+    end
+    v
+end
 #-------------------------------------------------------------------------# NoPenalty
 immutable NoPenalty <: Penalty end
-Base.show(io::IO, p::NoPenalty) = print(io, "NoPenalty")
-penalty(p::NoPenalty, β::VecF, λ::Float64) = 0.0
-prox(p::NoPenalty, βj::Float64, c::Float64) = βj
-deriv(p::NoPenalty, βj::Float64, λ::Float64) = 0.0
-
+value(p::NoPenalty, β::Float64) = 0.0
+deriv(p::NoPenalty, βj::Float64) = 0.0
+prox(p::NoPenalty, βj::Float64, s::Float64) = βj
 #----------------------------------------------------------------------# RidgePenalty
-immutable RidgePenalty <: Penalty end
-Base.show(io::IO, p::RidgePenalty) = print(io, "RidgePenalty")
-penalty(p::RidgePenalty, β::VecF, λ::Float64) = 0.5 * λ * sumabs2(β)
-prox(p::RidgePenalty, βj::Float64, c::Float64) = βj / (1.0 + c)
-deriv(p::RidgePenalty, βj::Float64, λ::Float64) = λ * βj
-
+immutable RidgePenalty <: Penalty
+    λ::Float64
+    RidgePenalty(λ::Real) = (@assert λ >= 0; new(λ))
+end
+value(p::RidgePenalty, β::VecF) = 0.5 * p.λ * sumabs2(β)
+deriv(p::RidgePenalty, βj::Float64) = p.λ * βj
+prox(p::RidgePenalty, βj::Float64, s::Float64) = βj / (1.0 + s * p.λ)
 #----------------------------------------------------------------------# LassoPenalty
-immutable LassoPenalty <: Penalty end
-Base.show(io::IO, p::LassoPenalty) = print(io, "LassoPenalty")
-penalty(p::LassoPenalty, β::VecF, λ::Float64) = λ * sumabs(β)
-prox(p::LassoPenalty, βj::Float64, c::Float64) = sign(βj) * max(abs(βj) - c, 0.0)
-deriv(p::LassoPenalty, βj::Float64, λ::Float64) = λ * sign(βj)
-
+immutable LassoPenalty <: Penalty
+    λ::Float64
+    LassoPenalty(λ::Real) = (@assert λ >= 0; new(λ))
+end
+value(p::LassoPenalty, β::VecF) = p.λ * sumabs(β)
+prox(p::LassoPenalty, βj::Float64, s::Float64) = sign(βj) * max(abs(βj) - s * p.λ, 0.0)
+deriv(p::LassoPenalty, βj::Float64) = p.λ * sign(βj)
 #-----------------------------------------------------------------# ElasticNetPenalty
 immutable ElasticNetPenalty <: Penalty
-    a::Float64
-    function ElasticNetPenalty(a::Real = .5)
-        @assert a != 0 "Use RidgePenalty instead"
-        @assert a != 1 "Use LassoPenalty instead"
-        @assert 0 < a < 1
-        new(a)
+    λ::Float64
+    a::Float64  # proportion of Lasso
+    function ElasticNetPenalty(λ::Real, a::Real = .9)
+        @assert λ >= 0
+        @assert 0 <= a <= 1
+        new(λ, a)
     end
 end
-Base.show(io::IO, p::ElasticNetPenalty) = print(io, "ElasticNetPenalty (α = $(p.a))")
-function penalty(p::ElasticNetPenalty, β::VecF, λ::Float64)
-    λ * (p.a * sumabs(β) + (1. - p.a) * 0.5 * sumabs2(β))
+function value(p::ElasticNetPenalty, β::VecF)
+    p.λ * (p.a * sumabs(β) + (1. - p.a) * 0.5 * sumabs2(β))
 end
-function prox(p::ElasticNetPenalty, βj::Float64, c::Float64)
-    sign(βj) * max(abs(βj) - c * p.a, 0.0) / (1.0 + c * (1.0 - p.a))
+function prox(p::ElasticNetPenalty, βj::Float64, s::Float64)
+    sign(βj) * max(abs(βj) - s * p.λ * p.a, 0.0) / (1.0 + s * p.λ * (1.0 - p.a))
 end
-function deriv(p::ElasticNetPenalty, βj::Float64, λ::Float64)
-    p.a * deriv(LassoPenalty(), βj, λ) + (1 - p.a) * deriv(RidgePenalty(), βj, λ)
+function deriv(p::ElasticNetPenalty, βj::Float64)
+    p.a * deriv(LassoPenalty(p.λ), βj) + (1 - p.a) * deriv(RidgePenalty(p.λ), βj)
 end
 
 #----------------------------------------------------------------------# SCADPenalty

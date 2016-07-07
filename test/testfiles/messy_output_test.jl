@@ -30,7 +30,7 @@ xs = hcat(x1, x)
         β_with_intercept = vcat(0.0, β)
         xβ = x*β
         alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), ADAM()] #, RDA(), MMGrad()]
-        pen = [NoPenalty(), RidgePenalty(), LassoPenalty(), ElasticNetPenalty(.5)]
+        pen = [NoPenalty(), RidgePenalty(.1), LassoPenalty(.1), ElasticNetPenalty(.1, .5)]
         mod = [
             LinearRegression(), L1Regression(), LogisticRegression(),
             PoissonRegression(), QuantileRegression(.5), SVMLike(), HuberRegression(2.)

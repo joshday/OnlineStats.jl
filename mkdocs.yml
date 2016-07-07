@@ -14,6 +14,7 @@ pages:
     - API/Examples: api.md
 
 docs_dir: 'doc'
+site_dir: 'doc/site'
 
 theme: 'material'
 

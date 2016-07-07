@@ -10,7 +10,6 @@ type StatLearn{
     β::VecF         # coefficients, β[:, i] = βᵢ
     intercept::Bool # should β0 be estimated?
     η::Float64      # constant part of learning rate
-    λ::Float64      # regularization parameter
 
     # Storage
     H0::Float64
@@ -29,9 +28,8 @@ function _StatLearn(p::Integer, wgt::Weight;
         penalty::Penalty = NoPenalty(),
         algorithm::Algorithm = SGD(),
         intercept::Bool = true,
-        lambda::Real = 0.0
     )
-    o = StatLearn(0.0, zeros(p), intercept, Float64(eta), Float64(lambda), _ϵ, _ϵ,
+    o = StatLearn(0.0, zeros(p), intercept, Float64(eta), _ϵ, _ϵ,
         _ϵ * ones(p), _ϵ * ones(p), algorithm, model, penalty, wgt)
     o
 end
@@ -72,7 +70,6 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "β", o.β)
     print_item(io, "Model", o.model)
     print_item(io, "Penalty", o.penalty)
-    print_item(io, "λ", o.λ)
     print_item(io, "Algorithm", o.algorithm)
     print_item(io, "η", o.η)
     print_item(io, "Intercept", o.intercept)
@@ -97,7 +94,7 @@ cost(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o, x)) + penalty(o.p
 
 
 
-penalty_adjust!(o::StatLearn, ηγ) = prox!(o.penalty, o.β, ηγ * o.λ)
+penalty_adjust!(o::StatLearn, ηγ) = prox!(o.penalty, o.β, ηγ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
 updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg) = (o.β0 -= ηγg)
