@@ -46,7 +46,7 @@ xs = hcat(x1, x)
 
         for a in alg, p in pen, m in mod
             y = generate(m, xβ)
-            println("    > $a, $p, $m")
+            println(replace("    > $a, $p, $m", "OnlineStats.", ""))
             StatLearn(x, y, m, a, p)
             StatLearn(x, y, 10, m, a, p)
         end
