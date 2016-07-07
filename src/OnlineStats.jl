@@ -61,6 +61,17 @@ function Base.show(io::IO, o::OnlineStat)
 end
 
 #------------------------------------------------------------------------------# fit!
+#=
+There are so many fit methods because
+   - Each method actually needs three implementations (ScalarInput, VectorInput, XYInput)
+   - methods:
+       - singleton
+       - batch
+       - singleton + float
+       - batch + float
+       - batch + vector of floats
+       - batch + integer
+=#
 """
 Update an OnlineStat with more data.  Additional arguments after the input data
 provide extra control over how the updates are done.
@@ -141,7 +152,7 @@ end
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, w::AVec)
     @assert length(y) == length(w)
     for i in eachindex(y)
-        fit!(o, y[i], w[i])
+        fit!(o, row(y, i), w[i])
     end
     o
 end

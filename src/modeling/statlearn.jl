@@ -192,6 +192,7 @@ end
 # end
 
 
+
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     η, β = o.η, o.β
@@ -232,7 +233,6 @@ function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::
     penalty_adjust!(o, ηγ)
     o
 end
-
 function batch_gx(xj::AVec, g::AVec)
     v = 0.0
     n = length(xj)
@@ -240,4 +240,29 @@ function batch_gx(xj::AVec, g::AVec)
         @inbounds v += xj[i] * g[i]
     end
     v / n
+end
+
+function cvfit!(o::StatLearn, x, y, xtest, ytest)
+    @assert typeof(o.penalty) != NoPenalty
+    h = copy(o); h.penalty = typeof(h.penalty)(o.penalty.λ + γ)
+    l = copy(o); l.penalty = typeof(l.penalty)(max(o.penalty.λ - γ, 0.0))
+    fit!(h, x, y)
+    fit!(o, x, y)
+    fit!(l, x, y)
+    loss_h = loss(h, xtest, ytest)
+    loss_o = loss(o, xtest, ytest)
+    loss_l = loss(l, xtest, ytest)
+    lossmin = minimum([loss_h, loss_o, loss_l])
+    if loss_o == lossmin
+    elseif loss_l == lossmin
+        _copy!(o, l)
+    else
+        _copy!(o, h)
+    end
+    o
+end
+function _copy!(o::StatLearn, o2::StatLearn)
+    o.β0 = o2.β0
+    o.β[:] = o2.β
+    o.penalty = o2.penalty
 end
