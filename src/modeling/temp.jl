@@ -41,6 +41,7 @@ function classify!(m::BivariateModel, storage::Vector, η::Vector)
         @inbounds storage[i] = classify(m, η[i])
     end
 end
+classify(m::BivariateModel, η::Vector) = classify!(m, zeros(length(η)), η)
 
 
 #------------------------------------------------------------------# LinearRegression
