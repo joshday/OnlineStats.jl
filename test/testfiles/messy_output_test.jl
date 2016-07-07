@@ -47,8 +47,8 @@ xs = hcat(x1, x)
         for a in alg, p in pen, m in mod
             y = generate(m, xβ)
             println("    > $a, $p, $m")
-            StatLearn(x, y, m, a, p, lambda = .1)
-            StatLearn(x, y, 10, m, a, p, lambda = .1)
+            StatLearn(x, y, m, a, p)
+            StatLearn(x, y, 10, m, a, p)
         end
     end
 end

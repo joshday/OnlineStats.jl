@@ -136,7 +136,7 @@ end
 function updateβ!(o::StatLearn{AdaDelta}, β, j, γ, ηγ, gx, ηγgx)
     @inbounds o.H[j] = smooth(o.H[j], gx * gx, o.algorithm.ρ)
     Δ = sqrt(o.G[j] / o.H[j]) * gx
-    @inbounds o.β[j] -= Δ
+    @inbounds β[j] -= Δ
     @inbounds o.G[j] = smooth(o.G[j], Δ * Δ, o.algorithm.ρ)
 end
 
@@ -158,7 +158,7 @@ function updateβ!(o::StatLearn{ADAM}, β, j, γ, ηγ, gx, ηγgx)
     ratio = sqrt(1.0 - m2 ^ nups) / (1.0 - m1 ^ nups)
     o.H[j] = smooth(o.H[j], gx, m1)
     o.G[j] = smooth(o.G[j], gx * gx, m2)
-    o.β[j] -= ηγ * ratio * o.H[j] / sqrt(o.G[j])
+    β[j] -= ηγ * ratio * o.H[j] / sqrt(o.G[j])
 end
 
 #--------------------------------------------------------------------------# Momentum
@@ -172,7 +172,7 @@ function updateβ0!(o::StatLearn{Momentum}, γ, ηγ, g, ηγg)
 end
 function updateβ!(o::StatLearn{Momentum}, β, j, γ, ηγ, gx, ηγgx)
     o.H[j] = smooth(o.H[j], gx, o.algorithm.α)
-    o.β[j] -= ηγ * o.H[j]
+    β[j] -= ηγ * o.H[j]
 end
 
 
@@ -194,10 +194,10 @@ end
 
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
-    η, β, A, M, P = o.η, o.β, o.algorithm, o.model, o.penalty
+    η, β = o.η, o.β
     ηγ = η * γ
     xb = dot(x, β) + o.β0
-    g = lossderiv(M, y, xb)
+    g = lossderiv(o.model, y, xb)
     ηγg = ηγ * g
     if o.intercept
         updateβ0!(o, γ, ηγ, g, ηγg)
@@ -212,7 +212,7 @@ function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
 end
 
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
-    η, β, A, M, P = o.η, o.β, o.algorithm, o.model, o.penalty
+    η, β = o.η, o.β
     ηγ = η * γ
     xb = x * β
     gvec = zeros(size(x, 1))
