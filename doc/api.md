@@ -1,4 +1,4 @@
-<!--- Generated at 2016-06-15T22:17:50.  Don't edit --->
+<!--- Generated at 2016-07-08T11:36:51.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -131,6 +131,9 @@ predict(o, x)
 confint(o, .95)
 ```
 
+## LogisticRegression
+For data in {0, 1}
+
 ## Mean
 Mean of a single series.
 
@@ -199,49 +202,8 @@ o = QuantileSGD(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
-## StatLearn
-Online statistical learning algorithms.
-
-  * `StatLearn(p)`
-  * `StatLearn(x, y)`
-  * `StatLearn(x, y, b)`
-
-The model is defined by:
-
-#### `ModelDefinition`
-
-  * `L2Regression()`     - Squared error loss.  Default.
-  * `L1Regression()`     - Absolute loss
-  * `LogisticRegression()`     - Model for data in {0, 1}
-  * `PoissonRegression()`     - Model count data {0, 1, 2, 3, ...}
-  * `QuantileRegression(τ)`     - Model conditional quantiles
-  * `SVMLike()`     - For data in {-1, 1}.  Perceptron with `NoPenalty`. SVM with `RidgePenalty`.
-  * `HuberRegression(δ)`     - Robust Huber loss
-
-#### `Penalty`
-
-  * `NoPenalty()`     - No penalty.  Default.
-  * `RidgePenalty(λ)`     - Ridge regularization: `dot(β, β)`
-  * `LassoPenalty(λ)`     - Lasso regularization: `sumabs(β)`
-  * `ElasticNetPenalty(λ, α)`     - Ridge/LASSO weighted average.  `α = 0` is Ridge, `α = 1` is LASSO.
-  * `SCADPenalty(λ, a = 3.7)`     - Smoothly clipped absolute deviation penalty.  Essentially LASSO with less bias     for larger coefficients.
-
-#### `Algorithm`
-
-  * `SGD()`     - Stochastic gradient descent.  Default.
-  * `AdaGrad()`     - Adaptive gradient method. Ignores `Weight`.
-  * `AdaDelta()`     - Extension of AdaGrad.  Ignores `Weight`.
-  * `RDA()`     - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
-  * `MMGrad()`     - Experimental online MM gradient method.
-
-**Note:** The order of the `ModelDefinition`, `Penalty`, and `Algorithm` arguments don't matter.
-
-```julia
-StatLearn(x, y)
-StatLearn(x, y, AdaGrad())
-StatLearn(x, y, MMGrad(), LearningRate(.5))
-StatLearn(x, y, 10, LearningRate(.7), RDA(), SVMLike(), RidgePenalty(.1))
-```
+## SVMLike
+For data in {-1, 1}
 
 ## Sum
 Track the running sum.  Ignores `Weight`.
@@ -294,38 +256,6 @@ std(o)
 ```
 
 ## fit!
-Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
-
-```
-y = randn(100)
-o = Mean()
-
-fit!(o, y)      # standard usage
-
-fit!(o, y, 10)  # update in minibatches of size 10
-
-fit!(o, y, .1)  # update using weight .1 for each observation
-
-wts = rand(100)
-fit!(o, y, wts) # update observation i using wts[i]
-```
-
-Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
-
-```
-y = randn(100)
-o = Mean()
-
-fit!(o, y)      # standard usage
-
-fit!(o, y, 10)  # update in minibatches of size 10
-
-fit!(o, y, .1)  # update using weight .1 for each observation
-
-wts = rand(100)
-fit!(o, y, wts) # update observation i using wts[i]
-```
-
 Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
 
 ```

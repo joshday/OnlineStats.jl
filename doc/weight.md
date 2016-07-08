@@ -3,10 +3,7 @@
 OnlineStats are parameterized by a `Weight` type that determines the influence of the
 next observation.  The `Weight` is always the last argument of the constructor.
 
-```julia
-# Example
-o = CovMatrix(10, EqualWeight())
-```
+![](images/weights.png)
 
 ## Weight Types
 

@@ -4,7 +4,7 @@ While an OnlineStat is being updated, you may wish to perform an action like pri
 
 `maprows(f::Function, b::Integer, data...)`
 
-`maprows` works similar to `Base.map`, but passes the arguments to the function in batches of size `b`.  It is best used with Julia's do block syntax.
+`maprows` works similar to `Base.mapslices`, but maps `b` rows at a time.  It is best used with Julia's do block syntax.
 
 ## Example 1
 ### Input
