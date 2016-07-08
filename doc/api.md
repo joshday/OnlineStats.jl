@@ -1,4 +1,4 @@
-<!--- Generated at 2016-07-08T11:36:51.  Don't edit --->
+<!--- Generated at 2016-07-08T11:44:59.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -256,6 +256,22 @@ std(o)
 ```
 
 ## fit!
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
+
+```
+y = randn(100)
+o = Mean()
+
+fit!(o, y)      # standard usage
+
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
+wts = rand(100)
+fit!(o, y, wts) # update observation i using wts[i]
+```
+
 Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
 
 ```
