@@ -66,13 +66,12 @@ end
 
 function Base.show(io::IO, o::StatLearn)
     printheader(io, "StatLearn")
-    o.intercept && print_item(io, "Bias", o.β0)
+    o.intercept && print_item(io, "Intercept", o.β0)
     print_item(io, "β", o.β)
     print_item(io, "Model", o.model)
     print_item(io, "Penalty", o.penalty)
     print_item(io, "Algorithm", o.algorithm)
     print_item(io, "η", o.η)
-    print_item(io, "Intercept", o.intercept)
     print_item(io, "Weight", typeof(o.weight))
     print_item(io, "Nobs", nobs(o))
 end
