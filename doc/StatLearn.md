@@ -42,14 +42,15 @@ where $f_t$ is the loss at time/update $t$, $g$ is a penalty/regularization term
 ### Algorithm
 - `SGD()`
     - Stochastic gradient descent.  Default.
+- `Momentum(α = .1)`
+    - SGD with momentum.
 - `AdaGrad()`
     - Adaptive gradient method. Ignores `Weight`.
-- `AdaDelta()`
+- `AdaDelta(ρ = .001)`
     - Essentially AdaGrad with momentum and altered Hessian approximation.  Ignores `Weight`.
-- `RDA()`
-    - Regularized dual averaging with ADAGRAD.  Ignores `Weight`.
-- `MMGrad()`
-    - Experimental online MM gradient method.
+- `ADAM(m1 = .01, m2 = .01)`
+    - `m1` is "momentum" for first moment of update
+    - `m2` is "momentum" for second moment
 
 
 ## Learning rates and batch sizes matter
