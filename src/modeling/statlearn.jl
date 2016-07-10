@@ -94,11 +94,12 @@ cost(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o, x)) + penalty(o.p
 
 
 
-penalty_adjust!(o::StatLearn, ηγ) = prox!(o.penalty, o.β, ηγ)
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
 updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg) = (o.β0 -= ηγg)
-updateβ!(o::StatLearn{SGD}, β, j, γ, ηγ, gx, ηγgx) = (@inbounds β[j] -= ηγgx)
+function updateβ!(o::StatLearn{SGD}, P, β, j, γ, ηγ, gx, ηγgx)
+    @inbounds β[j] -= ηγ * (gx + deriv(P, β[j]))
+end
 
 #---------------------------------------------------------------------------# AdaGrad
 immutable AdaGrad <: Algorithm end
@@ -106,9 +107,10 @@ function updateβ0!(o::StatLearn{AdaGrad}, γ, ηγ, g, ηγg)
     o.H0 = smooth(o.H0, g * g, 1 / nups(o.weight))
     o.β0 -= ηγg / sqrt(o.H0)
 end
-function updateβ!(o::StatLearn{AdaGrad}, β, j, γ, ηγ, gx, ηγgx)
+function updateβ!(o::StatLearn{AdaGrad}, P, β, j, γ, ηγ, gx, ηγgx)
     @inbounds o.H[j] = smooth(o.H[j], gx * gx, 1 / nups(o.weight))
-    @inbounds β[j] -= ηγgx / sqrt(o.H[j])
+    @inbounds step = ηγ / sqrt(o.H[j])
+    @inbounds β[j] = prox(P, β[j] - step * gx, step)
 end
 
 #--------------------------------------------------------------------------# AdaGrad2
@@ -117,9 +119,10 @@ function updateβ0!(o::StatLearn{AdaGrad2}, γ, ηγ, g, ηγg)
     o.H0 = smooth(o.H0, g * g, γ)
     o.β0 -= ηγg / sqrt(o.H0)
 end
-function updateβ!(o::StatLearn{AdaGrad2}, β, j, γ, ηγ, gx, ηγgx)
+function updateβ!(o::StatLearn{AdaGrad2}, P, β, j, γ, ηγ, gx, ηγgx)
     @inbounds o.H[j] = smooth(o.H[j], gx * gx, γ)
-    @inbounds β[j] -= ηγgx / sqrt(o.H[j])
+    @inbounds step = ηγ / sqrt(o.H[j])
+    @inbounds β[j] = prox(P, β[j] - step * gx, step)
 end
 
 #--------------------------------------------------------------------------# AdaDelta
@@ -133,10 +136,11 @@ function updateβ0!(o::StatLearn{AdaDelta}, γ, ηγ, g, ηγg)
     o.β0 -= Δ
     o.G0 = smooth(o.G0, Δ * Δ, o.algorithm.ρ)
 end
-function updateβ!(o::StatLearn{AdaDelta}, β, j, γ, ηγ, gx, ηγgx)
+function updateβ!(o::StatLearn{AdaDelta}, P, β, j, γ, ηγ, gx, ηγgx)
     @inbounds o.H[j] = smooth(o.H[j], gx * gx, o.algorithm.ρ)
-    Δ = sqrt(o.G[j] / o.H[j]) * gx
-    @inbounds β[j] -= Δ
+    @inbounds step = sqrt(o.G[j] / o.H[j])
+    @inbounds β[j] = prox(P, β[j] - step * gx, step)
+    Δ = step * gx
     @inbounds o.G[j] = smooth(o.G[j], Δ * Δ, o.algorithm.ρ)
 end
 
@@ -153,26 +157,28 @@ function updateβ0!(o::StatLearn{ADAM}, γ, ηγ, g, ηγg)
     o.G0 = smooth(o.G0, g * g, m2)
     o.β0 -= ηγ * ratio * o.H0 / sqrt(o.G0)
 end
-function updateβ!(o::StatLearn{ADAM}, β, j, γ, ηγ, gx, ηγgx)
+function updateβ!(o::StatLearn{ADAM}, P, β, j, γ, ηγ, gx, ηγgx)
     m1, m2, nups = o.algorithm.m1, o.algorithm.m2, o.weight.nups
     ratio = sqrt(1.0 - m2 ^ nups) / (1.0 - m1 ^ nups)
-    o.H[j] = smooth(o.H[j], gx, m1)
-    o.G[j] = smooth(o.G[j], gx * gx, m2)
-    β[j] -= ηγ * ratio * o.H[j] / sqrt(o.G[j])
+    @inbounds o.H[j] = smooth(o.H[j], gx, m1)
+    @inbounds o.G[j] = smooth(o.G[j], gx * gx, m2)
+    @inbounds step = ηγ * ratio / sqrt(o.G[j])
+    @inbounds β[j] = prox(P, β[j] - step * o.H[j], step)
 end
 
 #--------------------------------------------------------------------------# Momentum
 immutable Momentum <: Algorithm
     α::Float64
-    Momentum(a::Real = .1) = new(a)
+    Momentum(α::Real = .1) = new(α)
 end
 function updateβ0!(o::StatLearn{Momentum}, γ, ηγ, g, ηγg)
     o.H0 = smooth(o.H0, g, o.algorithm.α)
     o.β0 -= ηγ * o.H0
 end
-function updateβ!(o::StatLearn{Momentum}, β, j, γ, ηγ, gx, ηγgx)
-    o.H[j] = smooth(o.H[j], gx, o.algorithm.α)
-    β[j] -= ηγ * o.H[j]
+function updateβ!(o::StatLearn{Momentum}, P, β, j, γ, ηγ, gx, ηγgx)
+    @inbounds o.H[j] = smooth(o.H[j], gx, o.algorithm.α)
+    @inbounds β[j] -= ηγ * o.H[j]
+    @inbounds β[j] -= ηγ * (gx + deriv(P, β[j]))
 end
 
 
@@ -195,7 +201,7 @@ end
 
 #---------------------------------------------------------------------------# fitting
 function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
-    η, β = o.η, o.β
+    η, β, P = o.η, o.β, o.penalty
     ηγ = η * γ
     xb = dot(x, β) + o.β0
     g = lossderiv(o.model, y, xb)
@@ -206,14 +212,13 @@ function _fit!{T <: Real}(o::StatLearn, x::AVec{T}, y::Real, γ::Float64)
     for j in eachindex(β)
         gx = g * x[j]
         ηγgx = ηγ * gx
-        updateβ!(o, β, j, γ, ηγ, gx, ηγgx)
+        updateβ!(o, P, β, j, γ, ηγ, gx, ηγgx)
     end
-    penalty_adjust!(o, ηγ)
     o
 end
 
 function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::Float64)
-    η, β = o.η, o.β
+    η, β, P = o.η, o.β, o.penalty
     ηγ = η * γ
     xb = x * β
     gvec = zeros(size(x, 1))
@@ -228,9 +233,8 @@ function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::
     for j in eachindex(β)
         gx = batch_gx(sub(x, :, j), gvec)
         ηγgx = ηγ * gx
-        updateβ!(o, β, j, γ, ηγ, gx, ηγgx)
+        updateβ!(o, P, β, j, γ, ηγ, gx, ηγgx)
     end
-    penalty_adjust!(o, ηγ)
     o
 end
 function batch_gx(xj::AVec, g::AVec)
