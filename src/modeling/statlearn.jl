@@ -66,7 +66,7 @@ end
 
 function Base.show(io::IO, o::StatLearn)
     printheader(io, "StatLearn")
-    o.intercept && print_item(io, "Intercept", o.β0)``
+    o.intercept && print_item(io, "Intercept", o.β0)
     print_item(io, "β", o.β)
     print_item(io, "Model", o.model)
     print_item(io, "Penalty", o.penalty)

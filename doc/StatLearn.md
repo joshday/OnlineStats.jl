@@ -65,3 +65,10 @@ o2 = StatLearn(x, y, 10, LearningRate(.6), SGD())  # batch size = 10
 !!! note
     Any order of `Weight`, `Algorithm`, `ModelDefinition`, and `Penalty` arguments are
     accepted by `StatLearn`.
+
+
+# Extensions
+
+## StatLearnCV
+
+TODO

@@ -72,7 +72,6 @@ function tuneλ!(o::StatLearn, x, y, γ, xtest, ytest)
         o.algorithm = o_h.algorithm
         o.penalty.λ = o_h.penalty.λ
     end
-
 end
 nobs(o::StatLearnCV) = nobs(o.o)
 nups(o::StatLearnCV) = nups(o.o)
