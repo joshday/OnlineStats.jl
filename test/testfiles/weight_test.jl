@@ -1,6 +1,6 @@
 module WeightTest
 
-using TestSetup, OnlineStats, BaseTestNext
+using TestSetup, OnlineStats, Base.Test
 O = OnlineStats
 
 @testset "Weighting" begin

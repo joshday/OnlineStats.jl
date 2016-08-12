@@ -45,11 +45,11 @@ function _fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
 	γ1 = γ / n2
 	γ2 = 1.0 - γ
 	# update x'x
- 	BLAS.syrk!('U', 'T', γ1, x, γ2, sub(o.A, rng, rng))
+ 	BLAS.syrk!('U', 'T', γ1, x, γ2, view(o.A, rng, rng))
 	# update x'y
-	BLAS.gemv!('T', γ1, x, y, γ2, slice(o.A, rng, p + 2))
+	BLAS.gemv!('T', γ1, x, y, γ2, view(o.A, rng, p + 2))
 	# update 1'x
-	smooth!(sub(o.A, 1, rng), mean(x, 1), γ)
+	smooth!(view(o.A, 1:1, rng), mean(x, 1), γ)
 	# update y'y
 	o.A[end, end] = smooth(o.A[end, end], sumabs2(y), γ1)
 	# update 1'y

@@ -231,7 +231,7 @@ function _fitbatch!{T<:Real, S<:Real}(o::StatLearn, x::AMat{T}, y::AVec{S}, γ::
         updateβ0!(o, γ, ηγ, g, ηγg)
     end
     for j in eachindex(β)
-        gx = batch_gx(sub(x, :, j), gvec)
+        gx = batch_gx(view(x, :, j), gvec)
         ηγgx = ηγ * gx
         updateβ!(o, P, β, j, γ, ηγ, gx, ηγgx)
     end

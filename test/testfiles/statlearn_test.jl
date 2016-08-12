@@ -1,5 +1,5 @@
 module StatLearnTest
-using OnlineStats, Distributions, BaseTestNext
+using OnlineStats, Distributions, Base.Test
 
 function linearmodeldata(n, p, corr = 0)
     # linear model data with correlated predictors

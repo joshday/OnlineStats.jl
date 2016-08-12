@@ -1,5 +1,5 @@
 module ModelingTest
-using OnlineStats, GLM, BaseTestNext
+using OnlineStats, GLM, Base.Test
 
 @testset "Modeling" begin
 @testset "LinReg" begin

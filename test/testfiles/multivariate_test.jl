@@ -1,5 +1,5 @@
 module MultivariateTest
-using OnlineStats, BaseTestNext
+using OnlineStats, Base.Test
 
 @testset "Multivariate" begin
 @testset "KMeans" begin

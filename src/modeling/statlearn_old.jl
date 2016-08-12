@@ -274,7 +274,7 @@ function _updatebatchβ!(o::StatLearn{SGD}, g::AVec, x::AMat, y::AVec, ŷ::AVec
     step = o.η * γ
     o.intercept && setβ0!(o, step, mean(g))
     for j in eachindex(o.β)
-        gj = batch_g(sub(x, :, j), g)
+        gj = batch_g(view(x, :, j), g)
         Δ = add_deriv(o.penalty, gj, o.β[j])
         o.β[j] = o.β[j] - step * Δ
     end
@@ -298,7 +298,7 @@ function _updatebatchβ!(o::StatLearn{FOBOS}, g::AVec, x::AMat, y::AVec, ŷ::AV
     step = γ * o.η
     o.intercept && setβ0!(o, step, mean(g))
     for j in eachindex(o.β)
-        gj = batch_g(sub(x, :, j), g)
+        gj = batch_g(view(x, :, j), g)
         o.β[j] = prox(o.penalty, o.β[j] - step * gj, step)
     end
 end
@@ -345,7 +345,7 @@ function _updatebatchβ!(o::StatLearn{SGD2}, g::AVec, x::AMat, y::AVec, ŷ::AVe
             v += denom(o.model, g[i], x[i, j], y[i], ŷ[i])
         end
         v /= n
-        gx = batch_g(sub(x, :, j), g)
+        gx = batch_g(view(x, :, j), g)
         alg.d[j] = smooth(alg.d[j], v / n, γ)
         step = ηγ / (alg.d[j] + _ϵ)
         o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
@@ -392,7 +392,7 @@ function _updatebatchβ!(o::StatLearn{AdaGrad}, g::AVec, x::AMat, y::AVec, ŷ::
         setβ0!(o, step, gbar)
     end
     for j in eachindex(o.β)
-        gx = batch_g(sub(x, :, j), g)
+        gx = batch_g(view(x, :, j), g)
         alg.g[j] = smooth(alg.g[j], gx * gx, w)
         step = ηγ / (sqrt(alg.g[j]) + _ϵ)
         o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
@@ -433,7 +433,7 @@ function _updatebatchβ!(o::StatLearn{AdaGrad2}, g::AVec, x::AMat, y::AVec, ŷ:
         setβ0!(o, step, gbar)
     end
     for j in eachindex(o.β)
-        gx = batch_g(sub(x, :, j), g)
+        gx = batch_g(view(x, :, j), g)
         alg.g[j] = smooth(alg.g[j], gx * gx, γ)
         step = ηγ / (sqrt(alg.g[j]) + _ϵ)
         o.β[j] = prox(o.penalty, o.β[j] - step * gx, step)
@@ -483,7 +483,7 @@ function _updatebatchβ!(o::StatLearn{AdaDelta}, g::AVec, x::AMat, y::AVec, ŷ:
         alg.Δ0 = smooth(alg.Δ0, Δ * Δ, alg.ρ)
     end
     for j in eachindex(o.β)
-        gx = batch_g(sub(x, :, j), g)
+        gx = batch_g(view(x, :, j), g)
         alg.g[j] = smooth(alg.g[j], gx * gx, alg.ρ)
         step = sqrt((alg.Δ0 + alg.ϵ) / (alg.g[j] + alg.ϵ))
         Δ = step * gx
@@ -541,7 +541,7 @@ function _updatebatchβ!(o::StatLearn{ADAM}, g, x, y, ŷ, γ)
         o.β0 -= step * alg.m0
     end
     for j in eachindex(o.β)
-        gx = batch_g(sub(x, :, j), g)
+        gx = batch_g(view(x, :, j), g)
         alg.m[j] = (1. - β1) * alg.m[j] + β1 * gx
         alg.v[j] = (1. - β2) * alg.v[j] + β2 * gx * gx
         step = ηγ * bias / (sqrt(alg.v[j]) + _ϵ)

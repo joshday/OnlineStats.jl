@@ -286,13 +286,13 @@ unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
 
 # for updating
 smooth(m::Float64, v::Real, γ::Float64) = (1.0 - γ) * m + γ * v
-function smooth!{T<:Real}(m::VecF, v::AVec{T}, γ::Float64)
+function smooth!(m::AVec, v::AVec, γ::Float64)
     for i in eachindex(v)
         @inbounds m[i] = smooth(m[i], v[i], γ)
     end
 end
 subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
-function smooth!(avg::AbstractMatrix, v::AbstractMatrix, λ::Float64)
+function smooth!(avg::AMat, v::AMat, λ::Float64)
     n, p = size(avg)
     @assert size(avg) == size(v)
     for j in 1:p, i in 1:n
@@ -313,12 +313,12 @@ end
 # end
 
 
-row(x::AMat, i::Integer) = slice(x, i, :)
+row(x::AMat, i::Integer) = view(x, i, :)
 row(x::AVec, i::Integer) = x[i]
-rows(x::AMat, rs::AVec{Int}) = sub(x, rs, :)
-rows(x::AVec, rs::AVec{Int}) = sub(x, rs)
-col(x::AMat, i::Integer) = slice(x, :, i)
-cols(x::AMat, rs::AVec{Int}) = sub(x, :, rs)
+rows(x::AMat, rs::AVec{Int}) = view(x, rs, :)
+rows(x::AVec, rs::AVec{Int}) = view(x, rs)
+col(x::AMat, i::Integer) = view(x, :, i)
+cols(x::AMat, rs::AVec{Int}) = view(x, :, rs)
 
 nrows(x::AMat) = size(x, 1)
 ncols(x::AMat) = size(x, 2)

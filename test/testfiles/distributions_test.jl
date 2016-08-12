@@ -1,5 +1,5 @@
 module DistributionsTest
-using OnlineStats, Distributions, BaseTestNext
+using OnlineStats, Distributions, Base.Test
 srand(02082016)
 
 @testset "Distributions" begin

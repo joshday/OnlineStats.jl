@@ -143,7 +143,7 @@ Base.var(b::Bootstrap{VectorInput}) = vec(var(cached_state(b),2))
 replicates(b::Bootstrap) = copy(b.replicates)
 
 # Assumes a and b are independent.
-function Base.(:-)(a::Bootstrap{ScalarInput}, b::Bootstrap{ScalarInput})
+function Base.:-(a::Bootstrap{ScalarInput}, b::Bootstrap{ScalarInput})
     return FrozenBootstrap(cached_state(a) - cached_state(b), nobs(a) + nobs(b))
 end
 

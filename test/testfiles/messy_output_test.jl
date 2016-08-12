@@ -1,5 +1,5 @@
 module MessyOutput
-using OnlineStats, BaseTestNext, Distributions
+using OnlineStats, Base.Test, Distributions
 
 x = randn(500)
 x1 = randn(500)

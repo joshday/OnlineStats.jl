@@ -1,5 +1,5 @@
 module FitMethodsTest
-using OnlineStats, BaseTestNext
+using OnlineStats, Base.Test
 
 @testset "fit! methods" begin
     @testset "Single Observation" begin

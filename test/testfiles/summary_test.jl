@@ -1,6 +1,6 @@
 module SummaryTest
 
-using OnlineStats, StatsBase, BaseTestNext
+using OnlineStats, StatsBase, Base.Test
 
 x = randn(500)
 x1 = randn(500)
