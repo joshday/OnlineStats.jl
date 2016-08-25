@@ -22,6 +22,7 @@ xs = hcat(x1, x)
     display(FitCategorical())
     display(FitBeta())
     display(BernoulliBootstrap(Mean(), mean, 1000))
+    display(StatLearn(4))
 
     @testset "Full Factorial of Combinations" begin
         n, p = 500, 5
