@@ -142,6 +142,13 @@ function StatsBase.zscore{T<:Real}(o::Variances, x::AMat{T})
     end
     StatsBase.zscore(x, mean(o)', σs')
 end
+function _merge!(o::Variances, o2::Variances, γ)
+    δ = mean(o2) - mean(o)
+    for i in eachindex(o.value)
+        o.value[i] = smooth(o.value[i], o2.value[i], γ) + δ[i] ^ 2 * γ * (1.0 - γ)
+        o.μ[i] = smooth(o.μ[i], o2.μ[i], γ)
+    end
+end
 
 
 #-------------------------------------------------------------------------# CovMatrix

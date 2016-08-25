@@ -326,21 +326,28 @@ ncols(x::AMat) = size(x, 2)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
-# Merge only allowed for EqualWeight
-Base.merge(o::OnlineStat, o2::OnlineStat) = merge!(copy(o), o2)
-function Base.merge!(o1::OnlineStat, o2::OnlineStat)
-    @assert typeof(o1) == typeof(o2)
-    @assert typeof(o1.weight) == EqualWeight
-    updatecounter!(o1, nobs(o2))
-    _merge!(o1, o2, weight(o1, nobs(o2)))
-    o
+#-----------------------------------------------------------------------------# merge
+Base.merge(o::OnlineStat, o2::OnlineStat, arg) = merge!(copy(o), o2, arg)
+
+function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
+    @assert typeof(o) == typeof(o2)
+    updatecounter!(o, nobs(o2))
+    if method == :append
+        _merge!(o, o2, weight(o, nobs(o2)))
+    elseif method == :mean
+        _merge!(o, o2, 0.5 * (weight(o) + weight(o2)))
+    elseif method == :singleton
+        _merge!(o, o2, weight(o))
+    end
 end
+
+
 
 
 # epsilon used in special cases to avoid dividing by 0, etc.
 const _ϵ = 1e-8
 
-#--------------------------------------------------------------------------# maprows
+#---------------------------------------------------------------------------# maprows
 """
 Perform operations on data in blocks.
 

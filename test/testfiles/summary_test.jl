@@ -27,6 +27,13 @@ xs = hcat(x1, x)
     fit!(o2, xs)
     @test mean(o) ≈ mean(o2)
     @test center(o, vec(xs[1, :])) == vec(xs[1, :]) - mean(o)
+
+    o = Mean(x1)
+    o2 = Mean(x2)
+    merge!(o, o2)
+    @test mean(o) ≈ mean(vcat(x1, x2))
+    merge!(o, o2, :mean)
+    merge!(o, o2, :singleton)
 end
 @testset "Variance / Variances" begin
     o = Variance(x1)
@@ -39,6 +46,10 @@ end
     @test var(o)            == value(o)
     @test center(o, x[1])   == x[1] - mean(o)
     @test zscore(o, x[1])   == (x[1] - mean(o)) / std(o)
+    o = Variance(x1)
+    o2 = Variance(x2)
+    merge!(o, o2)
+    @test var(o) ≈ var(vcat(x1, x2))
 
     o = Variances(xs)
     @test var(o) ≈ vec(var(xs, 1))
@@ -51,6 +62,11 @@ end
     @test center(o, vec(xs[1, :])) == vec(xs[1, :]) - mean(o)
     @test zscore(o, vec(xs[1, :])) == (vec(xs[1, :]) - mean(o)) ./ std(o)
     @test zscore(Variances(5), ones(5)) == ones(5)
+
+    o = Variances(xs)
+    o2 = Variances(xs)
+    merge!(o, o2)
+    @test var(o) ≈ vec(var(vcat(xs, xs), 1))
 end
 @testset "CovMatrix" begin
     o = CovMatrix(xs)
