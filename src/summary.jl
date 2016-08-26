@@ -239,6 +239,10 @@ function _fit!(o::Extrema, y::Real, γ::Float64)
 end
 Base.extrema(o::Extrema) = (o.min, o.max)
 value(o::Extrema) = extrema(o)
+function _merge!(o::Extrema, o2::Extrema, γ::Float64)
+    o.min = min(o.min, o2.min)
+    o.max = max(o.max, o2.max)
+end
 
 
 #-----------------------------------------------------------------------# QuantileSGD

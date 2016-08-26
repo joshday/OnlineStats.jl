@@ -95,6 +95,11 @@ end
     o2 = Extrema()
     fit!(o2, x1)
     @test extrema(o) == extrema(o2)
+
+    o = Extrema(x1)
+    o2 = Extrema(x2)
+    merge!(o, o2)
+    @test extrema(o) == extrema(vcat(x1, x2))
 end
 @testset "QuantileSGD / QuantileMM" begin
     o = QuantileSGD(x1)
