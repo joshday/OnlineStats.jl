@@ -142,7 +142,7 @@ function StatsBase.zscore{T<:Real}(o::Variances, x::AMat{T})
     end
     StatsBase.zscore(x, mean(o)', σs')
 end
-function _merge!(o::Variances, o2::Variances, γ)
+function _merge!(o::Variances, o2::Variances, γ::Float64)
     δ = mean(o2) - mean(o)
     for i in eachindex(o.value)
         o.value[i] = smooth(o.value[i], o2.value[i], γ) + δ[i] ^ 2 * γ * (1.0 - γ)
@@ -208,6 +208,10 @@ function Base.cor(o::CovMatrix)
     scale!(o.cormat, v)
     scale!(v, o.cormat)
     o.cormat
+end
+function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
+    smooth!(o.A, o2.A, γ)
+    smooth!(o.B, o2.B, γ)
 end
 
 

@@ -83,6 +83,11 @@ end
     @test var(o) ≈ vec(var(xs, 1))
     @test std(o) ≈ vec(std(xs, 1))
     fit!(o2, xs, 1)
+
+    o = CovMatrix(xs)
+    o2 = CovMatrix(xs)
+    merge!(o, o2)
+    @test cov(o) ≈ cov(vcat(xs, xs))
 end
 @testset "Extrema" begin
     o = Extrema(x1)
