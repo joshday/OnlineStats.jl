@@ -327,7 +327,12 @@ ncols(x::AMat) = size(x, 2)
 Base.copy(o::OnlineStat) = deepcopy(o)
 
 #-----------------------------------------------------------------------------# merge
-Base.merge(o::OnlineStat, o2::OnlineStat, arg) = merge!(copy(o), o2, arg)
+function Base.merge(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
+    merge!(copy(o), o2, method)
+end
+function Base.merge(o::OnlineStat, o2::OnlineStat, wt::Float64)
+    merge!(copy(o), o2, wt)
+end
 
 function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
     @assert typeof(o) == typeof(o2)
@@ -339,6 +344,14 @@ function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
     elseif method == :singleton
         _merge!(o, o2, weight(o))
     end
+    o
+end
+
+function Base.merge!(o::OnlineStat, o2::OnlineStat, wt::Float64)
+    @assert typeof(o) == typeof(o2)
+    updatecounter!(o, nobs(o2))
+    _merge!(o, o2, wt)
+    o
 end
 
 
