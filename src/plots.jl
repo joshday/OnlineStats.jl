@@ -2,7 +2,6 @@
 @recipe function f(o::OnlineStat{XYInput})
     β = coef(o)
     nonzero = collect(β .== 0)
-    mylegend = length(unique(nonzero)) > 1
     x = 1:length(β)
     try
         if o.intercept  # if intercept, make indices start at 0
@@ -10,7 +9,7 @@
         end
     end
     seriestype --> :scatter
-    legend --> mylegend
+    legend --> length(unique(nonzero)) > 1
     group --> nonzero
     label --> ["Nonzero" "Zero"]
     ylabel --> "Value"

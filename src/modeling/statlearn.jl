@@ -7,7 +7,7 @@ type StatLearn{
     } <: OnlineStat{XYInput}
 
     β0::Float64     # intercepts
-    β::VecF         # coefficients, β[:, i] = βᵢ
+    β::VecF         # coefficients
     intercept::Bool # should β0 be estimated?
     η::Float64      # constant part of learning rate
 

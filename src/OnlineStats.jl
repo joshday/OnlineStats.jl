@@ -408,5 +408,3 @@ include("plots.jl")
 
 
 end # module
-
-O = OnlineStats
