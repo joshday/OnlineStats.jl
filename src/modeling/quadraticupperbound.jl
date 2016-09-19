@@ -1,15 +1,17 @@
 # Online MM algorithm via quadratic upper bound
 # Majorizing function: f(u) + ∇f(u)'(Θ - u) + .5 * (Θ - u)'H(Θ - u)
-# Q_t(Θ) = g'Θ + Θ'HΘ/2 + Θ'Hu + c
-# Θ_t = inv(H) * (Hu - g)
+# Q_t(Θ) = (Θ' * A * Θ) + (b' * Θ) + c
+# Where:
+#   A = (1 - γ) * A + γ * H
+#   b = (1 - γ) * b + γ * (∇f(Θ) - H * Θ)
+
+
 immutable MMQuadUpBound
-    g::VecF
-    H::MatF
-    Hu::VecF
+    A::MatF
+    b::VecF
 end
-function fit!(o::MMQuadUpBound, g, H, Hu, γ)
-    smooth!(o.g, g, γ)
-    smooth!(o.H, H, γ)
-    smooth!(o.Hu, Hu, γ)
+function fit!(o::MMQuadUpBound, A, b, γ)
+    smooth!(o.A, A, γ)
+    smooth!(o.b, b, γ)
 end
-value(o::MMQuadUpBound) = o.H \ (o.Hu - o.g)
+value(o::MMQuadUpBound) = o.A \ o.b
