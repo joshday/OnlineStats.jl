@@ -40,7 +40,7 @@ function _fit!(o::LinReg, x::AVec, y::Real, γ::Float64)
 end
 function _fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
 	n2, p = size(x)
-	rng = 2:p + 1
+	rng = 2:(p + 1)
 	# updates look like (1 - γ) * A + γ * x'x / n2
 	γ1 = γ / n2
 	γ2 = 1.0 - γ
@@ -48,12 +48,14 @@ function _fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
  	BLAS.syrk!('U', 'T', γ1, x, γ2, view(o.A, rng, rng))
 	# update x'y
 	BLAS.gemv!('T', γ1, x, y, γ2, view(o.A, rng, p + 2))
-	# update 1'x
-	smooth!(view(o.A, 1:1, rng), mean(x, 1), γ)
 	# update y'y
 	o.A[end, end] = smooth(o.A[end, end], sumabs2(y), γ1)
-	# update 1'y
-	o.A[1, end] = smooth(o.A[1, end], sum(y), γ1)
+    if o.intercept
+        # update 1'x
+    	smooth!(view(o.A, 1:1, rng), mean(x, 1), γ)
+    	# update 1'y
+    	o.A[1, end] = smooth(o.A[1, end], sum(y), γ1)
+    end
 end
 value(o::LinReg) = coef(o)
 

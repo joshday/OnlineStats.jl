@@ -34,13 +34,13 @@ using OnlineStats, GLM, Base.Test
     @test coef(o) == value(o)
     predict(o, randn(100, 10)) == zeros(100)
 end
-@testset "QuantReg" begin
+@testset "QuantRegMM" begin
     n, p = 10000, 10
     x = randn(n, p)
     β = collect(1.:p)
     y = x * β + randn(n)
 
-    o = QuantReg(x, y)
+    o = QuantRegMM(x, y)
     fit!(o, x, y, 10)
 
     @test coef(o) == value(o)

@@ -1,5 +1,5 @@
 "Online MM Algorithm for Quantile Regression."
-type QuantReg{W <: Weight} <: OnlineStat{XYInput}
+type QuantRegMM{W <: Weight} <: OnlineStat{XYInput}
     β::VecF
     τ::Float64
     XWX::MatF
@@ -7,23 +7,23 @@ type QuantReg{W <: Weight} <: OnlineStat{XYInput}
     A::MatF  # memory placeholder
     weight::W
 end
-function QuantReg(p::Integer, τ::Real = 0.5, wgt::Weight = LearningRate())
-    QuantReg(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt)
+function QuantRegMM(p::Integer, τ::Real = 0.5, wgt::Weight = LearningRate())
+    QuantRegMM(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt)
 end
-function QuantReg(x::AMat, y::AVec, τ::Real = 0.5, wgt::Weight = LearningRate())
-    o = QuantReg(size(x, 2), τ, wgt)
+function QuantRegMM(x::AMat, y::AVec, τ::Real = 0.5, wgt::Weight = LearningRate())
+    o = QuantRegMM(size(x, 2), τ, wgt)
     fit!(o, x, y)
     o
 end
-value(o::QuantReg) = coef(o)
-coef(o::QuantReg) = o.β
-function Base.show(io::IO, o::QuantReg)
-    printheader(io, "QuantReg")
+value(o::QuantRegMM) = coef(o)
+coef(o::QuantRegMM) = o.β
+function Base.show(io::IO, o::QuantRegMM)
+    printheader(io, "QuantRegMM")
     print_item(io, "value", value(o))
     print_item(io, "τ", o.τ)
     print_item(io, "nobs", nobs(o))
 end
-function _fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real, γ::Float64)
+function _fit!{T<:Real}(o::QuantRegMM, x::AVec{T}, y::Real, γ::Float64)
     w = _ϵ + abs(y - dot(x, o.β))
     u = y / w + 2.0 * o.τ - 1.0
     for j in 1:length(o.β)
@@ -40,7 +40,7 @@ function _fit!{T<:Real}(o::QuantReg, x::AVec{T}, y::Real, γ::Float64)
     catch warn("System is singular.  β not updated.")
     end
 end
-function _fitbatch!{T<:Real}(o::QuantReg, x::AMat{T}, y::AVec, γ::Float64)
+function _fitbatch!{T<:Real}(o::QuantRegMM, x::AMat{T}, y::AVec, γ::Float64)
     n, p = size(x)
 
     w = 1 ./ (_ϵ + abs(y - x * o.β))
