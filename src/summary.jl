@@ -513,47 +513,29 @@ end
 
 #----------------------------------------------------------# convenience constructors
 for nm in [:Mean, :Variance, :Moments]
-    eval(parse(
-        """
+    @eval begin
         function $nm{T <: Real}(y::AVec{T}, wgt::Weight = EqualWeight(); kw...)
             o = $nm(wgt; kw...)
             fit!(o, y)
             o
         end
-        """
-    ))
+    end
 end
 for nm in [:QuantileSGD, :QuantileMM]
-    eval(parse(
-        """
+    @eval begin
         function $nm{T <: Real}(y::AVec{T}, wgt::Weight = LearningRate(); kw...)
             o = $nm(wgt; kw...)
             fit!(o, y)
             o
         end
-        """
-    ))
+    end
 end
-for nm in [:Means, :CovMatrix]
-    eval(parse(
-        """
+for nm in [:Means, :Variances, :CovMatrix]
+    @eval begin
         function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
             o = $nm(size(y, 2), wgt)
             fit!(o, y, size(y, 1))
             o
         end
-        """
-    ))
-end
-# Variances does not have a _fitbatch! method
-for nm in [:Variances]
-    eval(parse(
-        """
-        function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
-            o = $nm(size(y, 2), wgt)
-            fit!(o, y)
-            o
-        end
-        """
-    ))
+    end
 end
