@@ -263,8 +263,8 @@ end
 function QuantileSGD(wgt::StochasticWeight = LearningRate();
         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
     )
-    for i in 1:length(tau)
-        @assert 0 < tau[i] < 1
+    for τ in tau
+        @assert 0 < τ < 1
     end
     QuantileSGD(value, tau, wgt)
 end
@@ -315,8 +315,8 @@ function QuantileMM(wgt::Weight = LearningRate();
         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
     )
     p = length(tau)
-    for i in 1:p
-        @assert 0 < tau[i] < 1
+    for τ in tau
+        @assert 0 < τ < 1
     end
     QuantileMM(value, tau, zeros(p), zeros(p), 0.0, wgt)
 end
@@ -350,22 +350,35 @@ function Base.show(io::IO, o::QuantileMM)
     print_value_and_nobs(io, o)
 end
 
-# #----------------------------------------------------------------# QuantileExperiment
-#
-# type QuantileExperiment <: OnlineStat{ScalarInput}
-#     value::VecF
-#     τ::VecF
-#     weight::EqualWeight
-# end
-# function QuantileMM(wgt::Weight = LearningRate();
-#         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
-#     )
-#     p = length(tau)
-#     for i in 1:p
-#         @assert 0 < tau[i] < 1
-#     end
-#     QuantileMM(value, tau, zeros(p), zeros(p), 0.0, wgt)
-# end
+
+#-------------------------------------------------------------------# OrderStatistics
+"""
+```julia
+o = OrderStatistics(p)
+```
+
+An idea I don't know the complete use for.  The Idea:
+
+- Load `p` points into memory
+- sort them and update the value with the online mean
+"""
+type OrderStatistics <: OnlineStat{ScalarInput}
+    value::VecF
+    buffer::VecF
+    weight::EqualWeight
+end
+OrderStatistics(p::Integer) = OrderStatistics(zeros(p), zeros(p), EqualWeight())
+function _fit!(o::OrderStatistics, y::Real, γ::Float64)
+    p = length(o.value)
+    i = (nobs(o) % p) + 1
+    o.buffer[i] = y
+    if i == p
+        sort!(o.buffer)
+        nreps = div(nobs(o), p - 1)
+        smooth!(o.value, o.buffer, 1 / nreps)
+    end
+    o
+end
 
 
 #---------------------------------------------------------------------------# Moments
@@ -547,7 +560,7 @@ for nm in [:QuantileSGD, :QuantileMM]
         end
     end
 end
-for nm in [:Means, :Variances, :CovMatrix]
+for nm in [:Means, :CovMatrix]
     @eval begin
         function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
             o = $nm(size(y, 2), wgt)
