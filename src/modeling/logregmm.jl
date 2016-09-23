@@ -5,12 +5,13 @@
 # b is stochastic average of ∇f(Θ) - .25 * X'X * Θ
 type LogRegMM{W <: Weight} <: OnlineStat{XYInput}
 	β::VecF
-    A::MatF
+    H::Matrix{Float64}  # Storage
+    A::Matrix{Float64}
     b::VecF
     weight::W
 end
 function LogRegMM(p::Integer, wt::Weight = LearningRate())
-    LogRegMM(zeros(p), zeros(p, p), zeros(p), wt)
+    LogRegMM(zeros(p), zeros(p, p), zeros(p, p), zeros(p), wt)
 end
 function LogRegMM(x::AMat, y::AVec, wt::Weight = LearningRate())
     o = LogRegMM(size(x, 2), wt)
@@ -24,7 +25,8 @@ function Base.show(io::IO, o::LogRegMM)
 end
 
 function _fit!(o::LogRegMM, x::AVec, y::Real, γ::Float64)
-    H = x * x' / 4
+    BLAS.syrk!('U', 'N', γ, x / 2., 1.0 - γ, o.H)
+    H = Symmetric(o.H)
     smooth!(o.A, H, γ)
     smooth!(o.b, (y - predict(o, x)) * x + H * o.β, γ)
     try
@@ -36,7 +38,7 @@ end
 
 value(o::LogRegMM) = coef(o)
 coef(o::LogRegMM) = o.β
-
-
-predict(o::LogRegMM, x::AVec) = predict(LogisticRegression(), dot(x, o.β))
-predict(o::LogRegMM, x::AMat) = predict(LogisticRegression(), x * o.β)
+linpred(o::LogRegMM, x::AVec) = dot(x, o.β)
+linpred(o::LogRegMM, x::AMat) = x * o.β
+predict(o::LogRegMM, x) = predict(LogisticRegression(), linpred(o, x))
+loss(o::LogRegMM, x, y) = loss(LogisticRegression(), y, linpred(o, x))
