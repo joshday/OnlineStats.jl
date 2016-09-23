@@ -33,7 +33,7 @@ y = randn(10_000)
 
 o = QuantileMM(LearningRate(.7), tau = [.25, .5, .75])
 
-plt = plot([0], zeros(3, 1))       # initialize plot
+plt = plot(zeros(1, 3), zeros(1, 3))       # initialize plot
 
 maprows(50, y) do yi              # for each batch of 50 observations
     fit!(o, yi, 5)                 # fit in minibatches of 5
@@ -43,7 +43,7 @@ end
 display(plt)
 ```
 ### Output
-![](images/example2.png)
+![](https://cloud.githubusercontent.com/assets/8075494/18796290/978802e2-8196-11e6-8097-b65b722376fc.png)
 
 
 ## Example 3

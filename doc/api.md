@@ -1,4 +1,4 @@
-<!--- Generated at 2016-09-23T10:39:52.839.  Don't edit --->
+<!--- Generated at 2016-09-23T14:04:32.152.  Don't edit --->
 # API
 
 ## ADAM
@@ -408,6 +408,7 @@ type OnlineStats.LogRegMM{W<:OnlineStats.Weight} <: OnlineStats.OnlineStat{Onlin
 H      :: Array{Float64,2}
 A      :: Array{Float64,2}
 b      :: Array{Float64,1}
+η      :: Float64
 weight :: W<:OnlineStats.Weight
 ```
 
@@ -771,11 +772,11 @@ No documentation found.
 coef(obj::StatsBase.StatisticalModel) at /Users/joshday/.julia/v0.5/StatsBase/src/statmodels.jl:5
 coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
 coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
-coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:40
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
 coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
 coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
 coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
-coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:40
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
 coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
 ```
 
@@ -900,7 +901,7 @@ loss(m::OnlineStats.HuberRegression, y::Real, η::Real) at /Users/joshday/.julia
 loss(o::OnlineStats.StatLearn, x::AbstractArray{T<:Any,1}, y::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:86
 loss(o::OnlineStats.StatLearn, x::AbstractArray{T<:Any,2}, y::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:87
 loss(o::OnlineStats.LinReg, x, y) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:115
-loss(o::OnlineStats.LogRegMM, x, y) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
+loss(o::OnlineStats.LogRegMM, x, y) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:48
 ```
 
 ## maprows
@@ -953,12 +954,12 @@ predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5
 predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
 predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
 predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
-predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:43
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:47
 predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
 predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
 predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
 predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
-predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:43
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:47
 ```
 
 ## replicates

@@ -59,7 +59,7 @@ type rely on stochastic approximation.
 - Logistic Regression: `StatLearn`
 - Poisson Regression: `StatLearn`
 - Support Vector Machines: `StatLearn`
-- Quantile Regression: `StatLearn`, `QuantReg`
+- Quantile Regression: `StatLearn`, `QuantRegMM`
 - Huber Loss Regression: `StatLearn`
 - L1 Loss Regression: `StatLearn`
 
