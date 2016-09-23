@@ -350,6 +350,23 @@ function Base.show(io::IO, o::QuantileMM)
     print_value_and_nobs(io, o)
 end
 
+# #----------------------------------------------------------------# QuantileExperiment
+#
+# type QuantileExperiment <: OnlineStat{ScalarInput}
+#     value::VecF
+#     τ::VecF
+#     weight::EqualWeight
+# end
+# function QuantileMM(wgt::Weight = LearningRate();
+#         tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
+#     )
+#     p = length(tau)
+#     for i in 1:p
+#         @assert 0 < tau[i] < 1
+#     end
+#     QuantileMM(value, tau, zeros(p), zeros(p), 0.0, wgt)
+# end
+
 
 #---------------------------------------------------------------------------# Moments
 """
@@ -535,6 +552,15 @@ for nm in [:Means, :Variances, :CovMatrix]
         function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
             o = $nm(size(y, 2), wgt)
             fit!(o, y, size(y, 1))
+            o
+        end
+    end
+end
+for nm in [:Variances]
+    @eval begin
+        function $nm{T <: Real}(y::AMat{T}, wgt::Weight = EqualWeight())
+            o = $nm(size(y, 2), wgt)
+            fit!(o, y)
             o
         end
     end
