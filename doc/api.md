@@ -1,5 +1,74 @@
-<!--- Generated at 2016-07-08T11:44:59.  Don't edit --->
+<!--- Generated at 2016-09-23T10:39:52.839.  Don't edit --->
 # API
+
+## ADAM
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.ADAM <: OnlineStats.Algorithm
+```
+
+**Fields:**
+
+```
+m1 :: Float64
+m2 :: Float64
+```
+
+## AdaDelta
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.AdaDelta <: OnlineStats.Algorithm
+```
+
+**Fields:**
+
+```
+ρ :: Float64
+```
+
+## AdaGrad
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.AdaGrad <: OnlineStats.Algorithm
+```
+
+## AdaGrad2
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.AdaGrad2 <: OnlineStats.Algorithm
+```
+
+## Algorithm
+No documentation found.
+
+**Summary:**
+
+```
+abstract OnlineStats.Algorithm <: Any
+```
+
+**Subtypes:**
+
+```
+OnlineStats.ADAM
+OnlineStats.AdaDelta
+OnlineStats.AdaGrad
+OnlineStats.AdaGrad2
+OnlineStats.Momentum
+OnlineStats.SGD
+```
 
 ## BernoulliBootstrap
 `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
@@ -58,6 +127,22 @@ o = Diffs()
 o = Diffs(y)
 ```
 
+## ElasticNetPenalty
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.ElasticNetPenalty <: OnlineStats.Penalty
+```
+
+**Fields:**
+
+```
+λ :: Float64
+a :: Float64
+```
+
 ## EqualWeight
 One of the `Weight` types.  Observations are weighted equally.  For analytical updates, the online algorithm will give results equal to the offline version.
 
@@ -78,11 +163,154 @@ fit!(o, y2)
 extrema(o)
 ```
 
+## FitBeta
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitBeta{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.ScalarInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.Beta
+var   :: OnlineStats.Variance{W<:OnlineStats.Weight}
+```
+
 ## FitCategorical
 Find the proportions for each unique input.  Categories are sorted by proportions. Ignores `Weight`.
 
 ```julia
 o = FitCategorical(y)
+```
+
+## FitCauchy
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitCauchy{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.ScalarInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.Cauchy
+q     :: OnlineStats.QuantileMM{W<:OnlineStats.Weight}
+```
+
+## FitGamma
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitGamma{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.ScalarInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.Gamma{T<:Real}
+var   :: OnlineStats.Variance{W<:OnlineStats.Weight}
+```
+
+## FitLogNormal
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitLogNormal{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.ScalarInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.LogNormal
+var   :: OnlineStats.Variance{W<:OnlineStats.Weight}
+```
+
+## FitMultinomial
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitMultinomial{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.VectorInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.Multinomial
+means :: OnlineStats.Means{W<:OnlineStats.Weight}
+```
+
+## FitMvNormal
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitMvNormal{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.VectorInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.MvNormal{T<:Real,Cov<:PDMats.AbstractPDMat,Mean<:Union{Array{T,1},Distributions.ZeroVector}}
+cov   :: OnlineStats.CovMatrix{W<:OnlineStats.Weight}
+```
+
+## FitNormal
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.FitNormal{W<:OnlineStats.Weight} <: OnlineStats.DistributionStat{OnlineStats.ScalarInput}
+```
+
+**Fields:**
+
+```
+value :: Distributions.Normal{T<:Real}
+var   :: OnlineStats.Variance{W<:OnlineStats.Weight}
+```
+
+## FrozenBootstrap
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.FrozenBootstrap <: OnlineStats.Bootstrap{OnlineStats.ScalarInput}
+```
+
+**Fields:**
+
+```
+cached_state :: Array{Float64,1}
+n            :: Int64
+```
+
+## HuberRegression
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.HuberRegression <: OnlineStats.Model
+```
+
+**Fields:**
+
+```
+δ :: Float64
 ```
 
 ## HyperLogLog
@@ -103,6 +331,30 @@ Approximate K-Means clustering of multivariate data.
 ```julia
 o = KMeans(y, 3, LearningRate())
 value(o)
+```
+
+## L1Regression
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.L1Regression <: OnlineStats.Model
+```
+
+## LassoPenalty
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.LassoPenalty <: OnlineStats.Penalty
+```
+
+**Fields:**
+
+```
+λ :: Float64
 ```
 
 ## LearningRate
@@ -131,6 +383,34 @@ predict(o, x)
 confint(o, .95)
 ```
 
+## LinearRegression
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.LinearRegression <: OnlineStats.Model
+```
+
+## LogRegMM
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.LogRegMM{W<:OnlineStats.Weight} <: OnlineStats.OnlineStat{OnlineStats.XYInput}
+```
+
+**Fields:**
+
+```
+β      :: Array{Float64,1}
+H      :: Array{Float64,2}
+A      :: Array{Float64,2}
+b      :: Array{Float64,1}
+weight :: W<:OnlineStats.Weight
+```
+
 ## LogisticRegression
 For data in {0, 1}
 
@@ -156,6 +436,26 @@ fit!(o, x)
 mean(o)
 ```
 
+## Model
+No documentation found.
+
+**Summary:**
+
+```
+abstract OnlineStats.Model <: Any
+```
+
+**Subtypes:**
+
+```
+OnlineStats.BivariateModel
+OnlineStats.HuberRegression
+OnlineStats.L1Regression
+OnlineStats.LinearRegression
+OnlineStats.PoissonRegression
+OnlineStats.QuantileRegression
+```
+
 ## Moments
 Univariate, first four moments.  Provides `mean`, `var`, `skewness`, `kurtosis`
 
@@ -171,6 +471,15 @@ StatsBase.skewness(o)
 StatsBase.kurtosis(o)
 ```
 
+## NoPenalty
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.NoPenalty <: OnlineStats.Penalty
+```
+
 ## NormalMix
 Normal Mixture of `k` components via an online EM algorithm.  `start` is a keyword argument specifying the initial parameters.
 
@@ -181,7 +490,82 @@ var(o)
 std(o)
 ```
 
-## QuantReg
+## OnlineStat
+No documentation found.
+
+**Summary:**
+
+```
+abstract OnlineStats.OnlineStat{I<:OnlineStats.Input} <: Any
+```
+
+**Subtypes:**
+
+```
+OnlineStats.Bootstrap{I<:OnlineStats.Input}
+OnlineStats.CovMatrix{W<:OnlineStats.Weight}
+OnlineStats.Diffs{T<:Real}
+OnlineStats.Diff{T<:Real}
+OnlineStats.DistributionStat{I<:OnlineStats.Input}
+OnlineStats.Extrema
+OnlineStats.HyperLogLog
+OnlineStats.KMeans{W<:OnlineStats.Weight}
+OnlineStats.LinReg{W<:OnlineStats.Weight}
+OnlineStats.LogRegMM{W<:OnlineStats.Weight}
+OnlineStats.Means{W<:OnlineStats.Weight}
+OnlineStats.Mean{W<:OnlineStats.Weight}
+OnlineStats.Moments{W<:OnlineStats.Weight}
+OnlineStats.QuantRegMM{W<:OnlineStats.Weight}
+OnlineStats.QuantileMM{W<:OnlineStats.Weight}
+OnlineStats.QuantileSGD{W<:OnlineStats.StochasticWeight}
+OnlineStats.StatLearn{A<:OnlineStats.Algorithm,M<:OnlineStats.Model,P<:OnlineStats.Penalty,W<:OnlineStats.StochasticWeight}
+OnlineStats.Sums{T<:Real}
+OnlineStats.Sum{T<:Real}
+OnlineStats.Variances{W<:OnlineStats.Weight}
+OnlineStats.Variance{W<:OnlineStats.Weight}
+```
+
+## Penalty
+No documentation found.
+
+**Summary:**
+
+```
+abstract OnlineStats.Penalty <: Any
+```
+
+**Subtypes:**
+
+```
+OnlineStats.ElasticNetPenalty
+OnlineStats.LassoPenalty
+OnlineStats.NoPenalty
+OnlineStats.RidgePenalty
+```
+
+## PoissonBootstrap
+No documentation found.
+
+`OnlineStats.PoissonBootstrap` is a `Function`.
+
+```
+# 4 methods for generic function "PoissonBootstrap":
+PoissonBootstrap{T<:OnlineStats.ScalarInput}(o::OnlineStats.OnlineStat{T}, f::Function) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:63
+PoissonBootstrap{T<:OnlineStats.ScalarInput}(o::OnlineStats.OnlineStat{T}, f::Function, r::Int64) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:63
+PoissonBootstrap{T<:OnlineStats.VectorInput}(o::OnlineStats.OnlineStat{T}, f::Function) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:76
+PoissonBootstrap{T<:OnlineStats.VectorInput}(o::OnlineStats.OnlineStat{T}, f::Function, r::Int64) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:76
+```
+
+## PoissonRegression
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.PoissonRegression <: OnlineStats.Model
+```
+
+## QuantRegMM
 Online MM Algorithm for Quantile Regression.
 
 ## QuantileMM
@@ -193,6 +577,21 @@ o = QuantileMM(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
+## QuantileRegression
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.QuantileRegression <: OnlineStats.Model
+```
+
+**Fields:**
+
+```
+τ :: Float64
+```
+
 ## QuantileSGD
 Approximate quantiles via stochastic gradient descent.
 
@@ -202,8 +601,58 @@ o = QuantileSGD(y, tau = [.25, .5, .75])
 fit!(o, y2)
 ```
 
+## RidgePenalty
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.RidgePenalty <: OnlineStats.Penalty
+```
+
+**Fields:**
+
+```
+λ :: Float64
+```
+
+## SGD
+No documentation found.
+
+**Summary:**
+
+```
+immutable OnlineStats.SGD <: OnlineStats.Algorithm
+```
+
 ## SVMLike
 For data in {-1, 1}
+
+## StatLearn
+No documentation found.
+
+**Summary:**
+
+```
+type OnlineStats.StatLearn{A<:OnlineStats.Algorithm,M<:OnlineStats.Model,P<:OnlineStats.Penalty,W<:OnlineStats.StochasticWeight} <: OnlineStats.OnlineStat{OnlineStats.XYInput}
+```
+
+**Fields:**
+
+```
+β0        :: Float64
+β         :: Array{Float64,1}
+intercept :: Bool
+η         :: Float64
+H0        :: Float64
+G0        :: Float64
+H         :: Array{Float64,1}
+G         :: Array{Float64,1}
+algorithm :: A<:OnlineStats.Algorithm
+model     :: M<:OnlineStats.Model
+penalty   :: P<:OnlineStats.Penalty
+weight    :: W<:OnlineStats.StochasticWeight
+```
 
 ## Sum
 Track the running sum.  Ignores `Weight`.
@@ -224,7 +673,9 @@ o = Sums(y)
 ## TwoWayInteractionMatrix
 Add second-order interaction terms on the fly without creating or copying data:
 
-  * `TwoWayInteractionMatrix(rand(n, p))` "adds" the `binomial(p, 2)` interaction terms to each row
+  * `TwoWayInteractionMatrix(rand(n, p))` "adds" the `binomial(p, 2)` interaction terms
+
+to each row
 
 ## TwoWayInteractionVector
 Add second-order interaction terms on the fly without creating or copying data:
@@ -253,6 +704,116 @@ fit!(o, x2)
 mean(o)
 var(o)
 std(o)
+```
+
+## Weight
+No documentation found.
+
+**Summary:**
+
+```
+abstract OnlineStats.Weight <: Any
+```
+
+**Subtypes:**
+
+```
+OnlineStats.BatchWeight
+OnlineStats.BoundedEqualWeight
+OnlineStats.ExponentialWeight
+```
+
+## cached_state
+No documentation found.
+
+`OnlineStats.cached_state` is a `Function`.
+
+```
+# 3 methods for generic function "cached_state":
+cached_state(b::OnlineStats.FrozenBootstrap) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:103
+cached_state(b::OnlineStats.Bootstrap{OnlineStats.ScalarInput}) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:116
+cached_state(b::OnlineStats.Bootstrap{OnlineStats.VectorInput}) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:125
+```
+
+## center
+No documentation found.
+
+`OnlineStats.center` is a `Function`.
+
+```
+# 4 methods for generic function "center":
+center(o::OnlineStats.Mean, x::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/summary.jl:24
+center{T<:Real}(o::OnlineStats.Means, x::AbstractArray{T,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/summary.jl:49
+center(o::OnlineStats.Variance, x::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/summary.jl:80
+center{T<:Real}(o::OnlineStats.Variances, x::AbstractArray{T,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/summary.jl:126
+```
+
+## classify
+No documentation found.
+
+`OnlineStats.classify` is a `Function`.
+
+```
+# 4 methods for generic function "classify":
+classify(m::OnlineStats.BivariateModel, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:45
+classify(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:69
+classify(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:99
+classify(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:81
+```
+
+## coef
+No documentation found.
+
+`StatsBase.coef` is a `Function`.
+
+```
+# 9 methods for generic function "coef":
+coef(obj::StatsBase.StatisticalModel) at /Users/joshday/.julia/v0.5/StatsBase/src/statmodels.jl:5
+coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
+coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:40
+coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
+coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
+coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:40
+coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
+```
+
+## cost
+No documentation found.
+
+`OnlineStats.cost` is a `Function`.
+
+```
+# 2 methods for generic function "cost":
+cost(o::OnlineStats.StatLearn, x::AbstractArray{T<:Any,1}, y::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:88
+cost(o::OnlineStats.StatLearn, x::AbstractArray{T<:Any,2}, y::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:89
+```
+
+## fit
+No documentation found.
+
+`StatsBase.fit` is a `Function`.
+
+```
+# 17 methods for generic function "fit":
+fit(::Type{Distributions.Binomial}, data::Tuple{Int64,AbstractArray}) at /Users/joshday/.julia/v0.5/Distributions/src/univariate/discrete/binomial.jl:191
+fit(::Type{Distributions.Binomial}, data::Tuple{Int64,AbstractArray}, w::AbstractArray{Float64,N<:Any}) at /Users/joshday/.julia/v0.5/Distributions/src/univariate/discrete/binomial.jl:192
+fit(::Type{Distributions.Categorical}, data::Tuple{Int64,AbstractArray}) at /Users/joshday/.julia/v0.5/Distributions/src/univariate/discrete/categorical.jl:272
+fit(::Type{Distributions.Categorical}, data::Tuple{Int64,AbstractArray}, w::AbstractArray{Float64,N<:Any}) at /Users/joshday/.julia/v0.5/Distributions/src/univariate/discrete/categorical.jl:273
+fit{T<:Real}(::Type{Distributions.Beta}, x::AbstractArray{T,N<:Any}) at /Users/joshday/.julia/v0.5/Distributions/src/univariate/continuous/beta.jl:114
+fit{T<:Real}(::Type{Distributions.Cauchy}, x::AbstractArray{T,N<:Any}) at /Users/joshday/.julia/v0.5/Distributions/src/univariate/continuous/cauchy.jl:91
+fit(::Type{StatsBase.Histogram}, v::AbstractArray{T<:Any,1}; closed, nbins) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:165
+fit(::Type{StatsBase.Histogram}, v::AbstractArray{T<:Any,1}, edg::AbstractArray{T<:Any,1}; closed) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:163
+fit(::Type{StatsBase.Histogram}, v::AbstractArray{T<:Any,1}, wv::StatsBase.WeightVec; closed, nbins) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:170
+fit{W}(::Type{StatsBase.Histogram}, v::AbstractArray{T<:Any,1}, wv::StatsBase.WeightVec{W,Vec<:AbstractArray{T<:Real,1}}, edg::AbstractArray{T<:Any,1}; closed) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:168
+fit{N}(::Type{StatsBase.Histogram}, vs::Tuple{Vararg{AbstractArray{T<:Any,1},N}}, edges::Tuple{Vararg{AbstractArray{T<:Any,1},N}}; closed) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:202
+fit{N}(::Type{StatsBase.Histogram}, vs::Tuple{Vararg{AbstractArray{T<:Any,1},N}}; closed, nbins) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:204
+fit{N}(::Type{StatsBase.Histogram}, vs::Tuple{Vararg{AbstractArray{T<:Any,1},N}}, wv::StatsBase.WeightVec; closed, nbins) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:209
+fit{N,W}(::Type{StatsBase.Histogram}, vs::Tuple{Vararg{AbstractArray{T<:Any,1},N}}, wv::StatsBase.WeightVec{W,Vec<:AbstractArray{T<:Real,1}}, edges::Tuple{Vararg{AbstractArray{T<:Any,1},N}}; closed) at /Users/joshday/.julia/v0.5/StatsBase/src/hist.jl:207
+fit(obj::StatsBase.StatisticalModel, data...) at /Users/joshday/.julia/v0.5/StatsBase/src/statmodels.jl:46
+fit{D<:Distributions.Distribution{F<:Distributions.VariateForm,S<:Distributions.ValueSupport}}(dt::Type{D}, x) at /Users/joshday/.julia/v0.5/Distributions/src/genericfit.jl:14
+fit{D<:Distributions.Distribution{F<:Distributions.VariateForm,S<:Distributions.ValueSupport}}(dt::Type{D}, args...) at /Users/joshday/.julia/v0.5/Distributions/src/genericfit.jl:15
 ```
 
 ## fit!
@@ -314,6 +875,34 @@ std(o)
 cov(o)
 ```
 
+## kurtosis
+```
+kurtosis(v, [wv::WeightVec], m=mean(v))
+```
+
+Compute the excess kurtosis of a real-valued array `v`, optionally specifying a weighting vector `wv` and a center `m`.
+
+## loss
+No documentation found.
+
+`OnlineStats.loss` is a `Function`.
+
+```
+# 12 methods for generic function "loss":
+loss(m::OnlineStats.Model, y::Array{T<:Any,1}, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:25
+loss(m::OnlineStats.LinearRegression, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:53
+loss(m::OnlineStats.L1Regression, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:59
+loss(m::OnlineStats.LogisticRegression, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:66
+loss(m::OnlineStats.PoissonRegression, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:89
+loss(m::OnlineStats.SVMLike, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:96
+loss(m::OnlineStats.QuantileRegression, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:104
+loss(m::OnlineStats.HuberRegression, y::Real, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:113
+loss(o::OnlineStats.StatLearn, x::AbstractArray{T<:Any,1}, y::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:86
+loss(o::OnlineStats.StatLearn, x::AbstractArray{T<:Any,2}, y::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:87
+loss(o::OnlineStats.LinReg, x, y) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:115
+loss(o::OnlineStats.LogRegMM, x, y) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
+```
+
 ## maprows
 Perform operations on data in blocks.
 
@@ -332,9 +921,62 @@ end
 ```
 
 ## nobs
+```
 nobs(obj::StatisticalModel)
+```
 
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
+
+## predict
+No documentation found.
+
+`StatsBase.predict` is a `Function`.
+
+```
+# 25 methods for generic function "predict":
+predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
+predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
+predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
+predict(m::OnlineStats.PoissonRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:91
+predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:98
+predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
+predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
+predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
+predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
+predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
+predict(m::OnlineStats.PoissonRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:91
+predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:98
+predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
+predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
+predict(obj::StatsBase.RegressionModel) at /Users/joshday/.julia/v0.5/StatsBase/src/statmodels.jl:153
+predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
+predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:43
+predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
+predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:43
+```
+
+## replicates
+No documentation found.
+
+`OnlineStats.replicates` is a `Function`.
+
+```
+# 1 method for generic function "replicates":
+replicates(b::OnlineStats.Bootstrap) at /Users/joshday/.julia/v0.5/OnlineStats/src/streamstats/bootstrap.jl:143
+```
+
+## skewness
+```
+skewness(v, [wv::WeightVec], m=mean(v))
+```
+
+Compute the standardized skewness of a real-valued array `v`, optionally specifying a weighting vector `wv` and a center `m`.
 
 ## sweep!
 `sweep!(A, k, inv = false)`, `sweep!(A, k, v, inv = false)`

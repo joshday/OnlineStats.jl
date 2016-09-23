@@ -13,7 +13,7 @@ export
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, LinReg, LogRegMM, QuantRegMM, NormalMix,
-    StatLearn, StatLearnCV,
+    StatLearn,
     KMeans, BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
