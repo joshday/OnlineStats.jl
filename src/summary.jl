@@ -357,10 +357,8 @@ end
 o = OrderStatistics(p)
 ```
 
-An idea I don't know the complete use for.  The Idea:
-
-- Load `p` points into memory
-- sort them and update the value with the online mean
+Ignores Weight.  Track the online mean of order statistics (sorted data from smallest
+to largest).  For every batch of `p` observations, sort the points and update the mean.
 """
 type OrderStatistics <: OnlineStat{ScalarInput}
     value::VecF
@@ -370,12 +368,13 @@ end
 OrderStatistics(p::Integer) = OrderStatistics(zeros(p), zeros(p), EqualWeight())
 function _fit!(o::OrderStatistics, y::Real, γ::Float64)
     p = length(o.value)
+    buffer = o.buffer
     i = (nobs(o) % p) + 1
-    o.buffer[i] = y
+    @inbounds buffer[i] = y
     if i == p
-        sort!(o.buffer)
+        sort!(buffer)
         nreps = div(nobs(o), p - 1)
-        smooth!(o.value, o.buffer, 1 / nreps)
+        smooth!(o.value, buffer, 1 / nreps)
     end
     o
 end

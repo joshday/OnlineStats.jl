@@ -1,4 +1,4 @@
-<!--- Generated at 2016-09-23T14:04:32.152.  Don't edit --->
+<!--- Generated at 2016-09-24T14:04:50.893.  Don't edit --->
 # API
 
 ## ADAM
@@ -516,6 +516,7 @@ OnlineStats.LogRegMM{W<:OnlineStats.Weight}
 OnlineStats.Means{W<:OnlineStats.Weight}
 OnlineStats.Mean{W<:OnlineStats.Weight}
 OnlineStats.Moments{W<:OnlineStats.Weight}
+OnlineStats.OrderStatistics
 OnlineStats.QuantRegMM{W<:OnlineStats.Weight}
 OnlineStats.QuantileMM{W<:OnlineStats.Weight}
 OnlineStats.QuantileSGD{W<:OnlineStats.StochasticWeight}
@@ -768,8 +769,24 @@ No documentation found.
 `StatsBase.coef` is a `Function`.
 
 ```
-# 9 methods for generic function "coef":
+# 25 methods for generic function "coef":
 coef(obj::StatsBase.StatisticalModel) at /Users/joshday/.julia/v0.5/StatsBase/src/statmodels.jl:5
+coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
+coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
+coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
+coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
+coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
+coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
+coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
+coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
+coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
+coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
+coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
+coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
+coef(o::OnlineStats.QuantRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/quantregmm.jl:19
 coef(o::OnlineStats.StatLearn) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:79
 coef(o::OnlineStats.LinReg) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:65
 coef(o::OnlineStats.LogRegMM) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:44
@@ -818,6 +835,70 @@ fit{D<:Distributions.Distribution{F<:Distributions.VariateForm,S<:Distributions.
 ```
 
 ## fit!
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
+
+```
+y = randn(100)
+o = Mean()
+
+fit!(o, y)      # standard usage
+
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
+wts = rand(100)
+fit!(o, y, wts) # update observation i using wts[i]
+```
+
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
+
+```
+y = randn(100)
+o = Mean()
+
+fit!(o, y)      # standard usage
+
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
+wts = rand(100)
+fit!(o, y, wts) # update observation i using wts[i]
+```
+
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
+
+```
+y = randn(100)
+o = Mean()
+
+fit!(o, y)      # standard usage
+
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
+wts = rand(100)
+fit!(o, y, wts) # update observation i using wts[i]
+```
+
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
+
+```
+y = randn(100)
+o = Mean()
+
+fit!(o, y)      # standard usage
+
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
+wts = rand(100)
+fit!(o, y, wts) # update observation i using wts[i]
+```
+
 Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
 
 ```
@@ -934,7 +1015,35 @@ No documentation found.
 `StatsBase.predict` is a `Function`.
 
 ```
-# 25 methods for generic function "predict":
+# 73 methods for generic function "predict":
+predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
+predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
+predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
+predict(m::OnlineStats.PoissonRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:91
+predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:98
+predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
+predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
+predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
+predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
+predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
+predict(m::OnlineStats.PoissonRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:91
+predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:98
+predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
+predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
+predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
+predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
+predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
+predict(m::OnlineStats.PoissonRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:91
+predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:98
+predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
+predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
+predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
+predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
+predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
+predict(m::OnlineStats.PoissonRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:91
+predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:98
+predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
+predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
 predict(m::OnlineStats.LinearRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:55
 predict(m::OnlineStats.L1Regression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:61
 predict(m::OnlineStats.LogisticRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:68
@@ -950,6 +1059,26 @@ predict(m::OnlineStats.SVMLike, η::Real) at /Users/joshday/.julia/v0.5/OnlineSt
 predict(m::OnlineStats.QuantileRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:108
 predict(m::OnlineStats.HuberRegression, η::Real) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:120
 predict(obj::StatsBase.RegressionModel) at /Users/joshday/.julia/v0.5/StatsBase/src/statmodels.jl:153
+predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
+predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:47
+predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
+predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:47
+predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
+predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:47
+predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
+predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103
+predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,2}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:105
+predict(o::OnlineStats.LogRegMM, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/logregmm.jl:47
 predict(m::OnlineStats.Model, η::Array{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/temp.jl:35
 predict(o::OnlineStats.StatLearn, x) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/statlearn.jl:80
 predict(o::OnlineStats.LinReg, x::AbstractArray{T<:Any,1}) at /Users/joshday/.julia/v0.5/OnlineStats/src/modeling/linreg.jl:103

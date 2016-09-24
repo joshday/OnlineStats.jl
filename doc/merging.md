@@ -18,14 +18,14 @@ o2 = Mean(y2)
 
 # Treat o2 as a new batch of data.  Essentially:
 # o1 = Mean(y1); fit!(o1, y2)
-merge!(o1, o2 :append)
+merge!(o1, o2, :append)
 
 # Use weighted average based on nobs of each OnlineStat
-merge!(o1, o2 :mean)
+merge!(o1, o2, :mean)
 
 # Treat o2 as a single observation.  Essentially:
 # o1 = Mean(y1); fit!(o1, mean(y2))
-merge!(o1, o2 :singleton)
+merge!(o1, o2, :singleton)
 
 # Provide the ratio of influence o2 should have.
 w = .5
