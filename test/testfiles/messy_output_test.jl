@@ -33,7 +33,7 @@ xs = hcat(x1, x)
         alg = [SGD(), AdaGrad(), AdaGrad2(), AdaDelta(), ADAM()] #, RDA(), MMGrad()]
         pen = [NoPenalty(), RidgePenalty(.1), LassoPenalty(.1), ElasticNetPenalty(.1, .5)]
         mod = [
-            LinearRegression(), L1Regression(), LogisticRegression(),
+            LinearRegression(), L1Regression(), LogisticRegression(), GDWDLike(1.0),
             PoissonRegression(), QuantileRegression(.5), SVMLike(), HuberRegression(2.)
         ]
 
@@ -43,6 +43,7 @@ xs = hcat(x1, x)
         generate(::PoissonRegression, xβ) = [rand(Poisson(exp(η))) for η in xβ]
         generate(::QuantileRegression, xβ) = xβ + randn(size(xβ, 1))
         generate(::SVMLike, xβ) = [rand(Bernoulli(1 / (1 + exp(-η)))) for η in xβ]
+        generate(::GDWDLike, η) = generate(SVMLike(), η)
         generate(::HuberRegression, xβ) = xβ + randn(size(xβ, 1))
 
         for a in alg, p in pen, m in mod

@@ -20,7 +20,7 @@ export
     # Penalties
     Penalty, NoPenalty, RidgePenalty, LassoPenalty, ElasticNetPenalty,
     # ModelDefinition and Algorithm
-    Model, LinearRegression, L1Regression, LogisticRegression,
+    Model, LinearRegression, L1Regression, LogisticRegression, GDWDLike,
     PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
     Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, ADAM,
     # streamstats

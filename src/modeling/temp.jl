@@ -91,12 +91,38 @@ lossderiv(m::PoissonRegression, y::Real, η::Real) = -y + exp(η)
 predict(m::PoissonRegression, η::Real) = exp(η)
 
 #---------------------------------------------------------------------------# SVMLike
-"For data in {-1, 1}"
+"Loss for Support Vector Machines.  Use with data in {-1, 1}"
 immutable SVMLike <: BivariateModel end
 loss(m::SVMLike, y::Real, η::Real) = max(0.0, 1.0 - y * η)
 lossderiv(m::SVMLike, y::Real, η::Real) = 1.0 < y * η ? 0.0 : -y
 predict(m::SVMLike, η::Real) = η
 classify(m::SVMLike, η::Real) = sign(η)
+
+#--------------------------------------------------------------------------# GDWDLike
+"Loss for Generalized Distance Weighted Discrimination.  Use with data in {-1, 1}"
+immutable GDWDLike <: BivariateModel q::Float64 end
+GDWDLike(q::Real = 1.0) = GWDWLike(q)
+function loss(m::GDWDLike, y::Real, η::Real)
+    q = m.q
+    u = y * η
+    if u < q / (q + 1)
+        return y * (1.0 - u)
+    else
+        return y * (q ^ q / (u ^ q * (q + 1) ^ (q + 1)))
+    end
+end
+function lossderiv(m::GDWDLike, y::Real, η::Real)
+    q = m.q
+    u = y * η
+    if u < q / (q + 1)
+        return -y
+    else
+        return - (q / (u * (q + 1))) ^ (q + 1)
+    end
+end
+predict(m::GDWDLike, η::Real) = η
+classify(m::GDWDLike, η::Real) = sign(η)
+
 
 #----------------------------------------------------------------# QuantileRegression
 immutable QuantileRegression <: Model τ::Float64 end
