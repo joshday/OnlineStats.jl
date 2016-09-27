@@ -32,10 +32,11 @@ function _fit!(o::LogRegMM, x::AVec, y::Real, γ::Float64)
     H = Symmetric(o.H)
     smooth!(o.A, H, γ)
     smooth!(o.b, (y - predict(o, x)) * x + H * o.β, γ)
-    # try
-    #     o.β = o.A \ o.b
-    # end
-    o.β = o.β + γ * inv(o.H) * (y - predict(o, x)) * x
+    try
+        o.β = o.A \ o.b
+    end
+    # "wrong" version that seems to work better
+    # o.β = o.β + γ * inv(o.H) * (y - predict(o, x)) * x
 end
 
 

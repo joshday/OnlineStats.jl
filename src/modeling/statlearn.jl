@@ -91,9 +91,6 @@ cost(o::StatLearn, x::AMat, y::AVec) = loss(o.model, y, xβ(o, x)) + penalty(o.p
 
 
 
-
-
-
 #-------------------------------------------------------------------------------# SGD
 immutable SGD <: Algorithm end
 updateβ0!(o::StatLearn{SGD}, γ, ηγ, g, ηγg) = (o.β0 -= ηγg)

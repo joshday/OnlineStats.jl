@@ -1,4 +1,10 @@
-"Online MM Algorithm for Quantile Regression."
+"""
+Online MM Algorithm for Quantile Regression
+
+```julia
+o = QuantReg(p, 0.7)  # fit conditional 0.7 quantile for `p` predictors
+```
+"""
 type QuantRegMM{W <: Weight} <: OnlineStat{XYInput}
     β::VecF
     τ::Float64
@@ -6,17 +12,22 @@ type QuantRegMM{W <: Weight} <: OnlineStat{XYInput}
     Xu::VecF
     A::MatF  # memory placeholder
     weight::W
+    verbose::Bool   # warn when system is singular
 end
-function QuantRegMM(p::Integer, τ::Real = 0.5, wgt::Weight = LearningRate())
-    QuantRegMM(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt)
+function QuantRegMM(p::Integer, τ::Real = 0.5, wgt::Weight = LearningRate();
+        warn::Bool = true
+    )
+    QuantRegMM(zeros(p), Float64(τ), zeros(p, p), zeros(p), zeros(p, p), wgt, warn)
 end
-function QuantRegMM(x::AMat, y::AVec, τ::Real = 0.5, wgt::Weight = LearningRate())
-    o = QuantRegMM(size(x, 2), τ, wgt)
+function QuantRegMM(x::AMat, y::AVec, τ::Real = 0.5, wgt::Weight = LearningRate(); kw...)
+    o = QuantRegMM(size(x, 2), τ, wgt; kw...)
     fit!(o, x, y)
     o
 end
 value(o::QuantRegMM) = coef(o)
 coef(o::QuantRegMM) = o.β
+loss(o::QuantRegMM, x::AVec, y::Real) = loss(QuantileRegression(o.τ), y, dot(x, o.β))
+loss(o::QuantRegMM, x::AMat, y::AVec) = loss(QuantileRegression(o.τ), y, x * o.β)
 function Base.show(io::IO, o::QuantRegMM)
     printheader(io, "QuantRegMM")
     print_item(io, "value", value(o))
@@ -37,7 +48,7 @@ function _fit!{T<:Real}(o::QuantRegMM, x::AVec{T}, y::Real, γ::Float64)
     copy!(o.A, o.XWX)
 
     try LAPACK.sysv!('U', o.A, o.β)
-    catch warn("System is singular.  β not updated.")
+    catch o.verbose && warn("System is singular.  β not updated.")
     end
 end
 function _fitbatch!{T<:Real}(o::QuantRegMM, x::AMat{T}, y::AVec, γ::Float64)
