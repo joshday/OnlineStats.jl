@@ -2,7 +2,8 @@
 Online MM Algorithm for Quantile Regression
 
 ```julia
-o = QuantReg(p, 0.7)  # fit conditional 0.7 quantile for `p` predictors
+# fit conditional 0.7 quantile for `p` predictors
+o = QuantRegMM(p, 0.7, wt = LearningRate())
 ```
 """
 type QuantRegMM{W <: Weight} <: OnlineStat{XYInput}
