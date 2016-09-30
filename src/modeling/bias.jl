@@ -3,8 +3,8 @@ Add a bias/intercept term to a vector on the fly without creating or copying dat
 
 - `BiasVector(rand(10))` is roughly equivalent to `vcat(rand(10), 1.0)`
 """
-immutable BiasVector{A<:AVecF} <: AVecF
-  vec::A
+immutable BiasVector{A <: AVecF} <: AVecF
+    vec::A
 end
 
 Base.length(v::BiasVector) = length(v.vec) + 1
@@ -17,8 +17,8 @@ Adda bias/intercept term to a matrix on the fly without creating or copying data
 
 - `BiasMatrix(rand(10,5))` is roughly equivalent to `hcat(rand(10,5), ones(10))`
 """
-immutable BiasMatrix{A<:AMatF} <: AMatF
-  mat::A
+immutable BiasMatrix{A <: AMatF} <: AMatF
+    mat::A
 end
 
 Base.length(m::BiasMatrix) = length(m.mat) + nrows(m.mat)

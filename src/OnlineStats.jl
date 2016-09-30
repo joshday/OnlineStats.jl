@@ -285,20 +285,18 @@ StatsBase.nobs(o::OnlineStat) = nobs(o.weight)
 unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
 
 # for updating
-smooth(m::Float64, v::Real, γ::Float64) = (1.0 - γ) * m + γ * v
-function smooth!(m::AVec, v::AVec, γ::Float64)
+smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)
+
+function smooth!(m::AbstractArray, v::AbstractArray, γ::Float64)
+    # assumes both arrays have linear indexing
+    @assert length(m) == length(v)
     for i in eachindex(v)
         @inbounds m[i] = smooth(m[i], v[i], γ)
     end
 end
+
 subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
-function smooth!(avg::AMat, v::AMat, λ::Float64)
-    n, p = size(avg)
-    @assert size(avg) == size(v)
-    for j in 1:p, i in 1:n
-        @inbounds avg[i,j] = smooth(avg[i, j], v[i, j], λ)
-    end
-end
+
 # Rank 1 update of symmetric matrix: (1 - γ) * A + γ * x * x'
 function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
     @assert size(A, 1) == size(A, 2)
@@ -306,7 +304,7 @@ function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end
 end
-# # Why doesn't this work?  Tested with CovMatrix
+# This fails in CovMatrix test?
 # function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
 #     scale!(A, 1.0 - γ)
 #     BLAS.syr!('U', γ, x, A)
@@ -322,7 +320,6 @@ cols(x::AMat, rs::AVec{Int}) = view(x, :, rs)
 
 nrows(x::AMat) = size(x, 1)
 ncols(x::AMat) = size(x, 2)
-
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
