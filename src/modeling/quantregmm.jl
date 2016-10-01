@@ -47,10 +47,15 @@ function _fit!{T<:Real}(o::QuantRegMM, x::AVec{T}, y::Real, γ::Float64)
     end
     o.β = copy(o.Xu)
     copy!(o.A, o.XWX)
-
-    try LAPACK.sysv!('U', o.A, o.β)
-    catch o.verbose && warn("System is singular.  β not updated.")
+    for i in 1:size(o.A, 1)
+        @inbounds o.A[i, i] += _ϵ  # Force matrix to be invertible?
     end
+
+    # try
+        LAPACK.sysv!('U', o.A, o.β)
+    # catch
+    #     o.verbose && warn("System is singular.  β not updated.")
+    # end
 end
 function _fitbatch!{T<:Real}(o::QuantRegMM, x::AMat{T}, y::AVec, γ::Float64)
     n, p = size(x)
