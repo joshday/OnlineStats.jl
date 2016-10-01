@@ -100,9 +100,9 @@ classify(m::SVMLike, η::Real) = sign(η)
 
 #--------------------------------------------------------------------------# GDWDLike
 "Loss for Generalized Distance Weighted Discrimination.  Use with data in {-1, 1}"
-immutable GDWDLike <: BivariateModel q::Float64 end
-GDWDLike(q::Real = 1.0) = GWDWLike(q)
-function loss(m::GDWDLike, y::Real, η::Real)
+immutable DWDLike <: BivariateModel q::Float64 end
+DWDLike(q::Real = 1.0) = GWDWLike(q)
+function loss(m::DWDLike, y::Real, η::Real)
     q = m.q
     u = y * η
     if u < q / (q + 1)
@@ -111,7 +111,7 @@ function loss(m::GDWDLike, y::Real, η::Real)
         return y * (q ^ q / (u ^ q * (q + 1) ^ (q + 1)))
     end
 end
-function lossderiv(m::GDWDLike, y::Real, η::Real)
+function lossderiv(m::DWDLike, y::Real, η::Real)
     q = m.q
     u = y * η
     if u < q / (q + 1)
@@ -120,8 +120,8 @@ function lossderiv(m::GDWDLike, y::Real, η::Real)
         return - (q / (u * (q + 1))) ^ (q + 1)
     end
 end
-predict(m::GDWDLike, η::Real) = η
-classify(m::GDWDLike, η::Real) = sign(η)
+predict(m::DWDLike, η::Real) = η
+classify(m::DWDLike, η::Real) = sign(η)
 
 
 #----------------------------------------------------------------# QuantileRegression
