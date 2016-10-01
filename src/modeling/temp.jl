@@ -98,7 +98,7 @@ lossderiv(m::SVMLike, y::Real, η::Real) = 1.0 < y * η ? 0.0 : -y
 predict(m::SVMLike, η::Real) = η
 classify(m::SVMLike, η::Real) = sign(η)
 
-#--------------------------------------------------------------------------# GDWDLike
+#--------------------------------------------------------------------------# DWDLike
 "Loss for Generalized Distance Weighted Discrimination.  Use with data in {-1, 1}"
 immutable DWDLike <: BivariateModel q::Float64 end
 DWDLike(q::Real = 1.0) = GWDWLike(q)
