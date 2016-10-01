@@ -17,3 +17,13 @@
     xlabel --> "Index of Coefficient Vector"
     x, β
 end
+
+#-------------------------------------------------------------------------# NormalMix
+@recipe function f(o::NormalMix)
+    fvec = Function[x -> Ds.pdf(o, x)]
+    probs = Ds.probs(o)
+    for j in 1:Ds.ncomponents(o)
+        push!(fvec, x -> Ds.pdf(Ds.component(o, j), x) * probs[j])
+    end
+    fvec , mean(o) - 5.0 * std(o), mean(o) + 5.0 * std(o)
+end

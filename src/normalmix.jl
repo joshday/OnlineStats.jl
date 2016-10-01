@@ -38,6 +38,7 @@ NormalMix(k::Integer, y::AVec, wgt::Weight = LearningRate(); kw...) = NormalMix(
 Ds.componentwise_pdf(o::NormalMix, y) = Ds.componentwise_pdf(value(o), y)
 Ds.ncomponents(o::NormalMix) = Ds.ncomponents(value(o))
 Ds.component(o::NormalMix, j) = Ds.component(value(o), j)
+Ds.components(o::NormalMix) = Ds.components(value(o))
 Ds.probs(o::NormalMix) = Ds.probs(value(o))
 Ds.pdf(o::NormalMix, y) = Ds.pdf(value(o), y)
 Ds.cdf(o::NormalMix, y) = Ds.cdf(value(o), y)
