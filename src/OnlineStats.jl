@@ -12,8 +12,8 @@ export
     BoundedEqualWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    Diff, Diffs, Sum, Sums, CovMatrix, LinReg, LogRegMM, QuantRegMM, NormalMix,
-    StatLearn,
+    Diff, Diffs, Sum, Sums, CovMatrix, LinReg, LinRegMM, LogRegMM, QuantRegMM,
+    NormalMix, StatLearn,
     KMeans, BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,

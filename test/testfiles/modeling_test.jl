@@ -8,11 +8,11 @@ using OnlineStats, GLM, Base.Test
     β = collect(1.:p)
     y = x * β + randn(n)
     o = LinReg(x, y, intercept = false)
-    @test coef(o) ≈ x \ y
+    @test coef(o)[2] ≈ x \ y
     o2 = LinReg(10, intercept = false)
     fit!(o2, x[1:500, :], y[1:500], 500)
     fit!(o2, x[501:1000, :], y[501:1000], 1)
-    @test_approx_eq_eps coef(o) coef(o2) .5
+    @test_approx_eq_eps coef(o)[2] coef(o2)[2] .5
 
     # vs. GLM
     l = lm(x, y)
@@ -27,8 +27,8 @@ using OnlineStats, GLM, Base.Test
     @test_approx_eq_eps stderr(o)[1:5]  stderr(l)[1:5]  .1
     @test_approx_eq_eps confint(o)[1:5] confint(l)[1:5] .1
 
-    @test coef(LinReg(10, intercept = false)) == zeros(10)
-    @test coef(LinReg(10)) == zeros(11)
+    @test coef(LinReg(10, intercept = false))[2] == zeros(10)
+    @test vcat(coef(LinReg(10))...) == zeros(11)
 
     o = LinReg(10)
     @test coef(o) == value(o)

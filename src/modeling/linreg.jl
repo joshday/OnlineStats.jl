@@ -16,6 +16,7 @@ end
 
 predict(o::LinRegMM, x::AVec) = o.β0 + dot(o.β, x)
 predict(o::LinRegMM, x::AMat) = o.β0 + x * o.β
+loss(o::LinRegMM, x::AMat, y::AVec) = (r = y - predict(o,x); 0.5 * dot(r, r))
 
 function _fit!(o::LinRegMM, x::AVec, y::Real, γ::Float64)
     p = size(o.β)
@@ -93,10 +94,10 @@ value(o::LinReg) = coef(o)
 
 #---------------------------------------------------------------------------# methods
 function coef(o::LinReg)
-	swp = (1 + !o.intercept):length(o.β) + 1  # indices to sweep on
+	rng = (1 + !o.intercept):(length(o.β) + 1)  # indices to sweep on
     if nobs(o) > 0
         copy!(o.S, o.A)
-        sweep!(o.S, swp)
+        sweep!(o.S, rng)
         copy!(o.β, o.S[2:length(o.β) + 1, end])
 		o.β0 = o.S[1, end]
     end
@@ -110,25 +111,27 @@ end
 # mse is only correct when coef(o) is used before
 mse(o::LinReg) = o.S[end, end] * nobs(o) / (nobs(o) - length(o.β) - o.intercept)
 function StatsBase.coeftable(o::LinReg)
-    β = coef(o)
+    rng = (2 - o.intercept):2
+    β = vcat(coef(o)[rng]...)
     p = length(β)
     se = StatsBase.stderr(o)
     ts = β ./ se
     StatsBase.CoefTable(
         [β se ts Ds.ccdf(Ds.FDist(1, nobs(o) - p), abs2(ts))],
         ["Estimate","Std.Error","t value", "Pr(>|t|)"],
-        ["x$i" for i = 1:p],
+        ["x$i" for i = (1:p) - o.intercept],
         4
     )
 end
 function StatsBase.confint(o::LinReg, level::Real = 0.95)
-    β = coef(o)
+    rng = (2 - o.intercept):2
+    β = vcat(coef(o)[rng]...)
     mult = StatsBase.stderr(o) * quantile(Ds.TDist(nobs(o) - length(β) - 1), (1. - level) / 2.)
     hcat(β, β) + mult * [1. -1.]
 end
 function StatsBase.vcov(o::LinReg)
     coef(o)
-	rng = (1 + !o.intercept):length(o.β) + 1
+	rng = (1 + !o.intercept):(length(o.β) + 1)
     -mse(o) * o.S[rng, rng] / nobs(o)
  end
 StatsBase.stderr(o::LinReg) = sqrt(diag(StatsBase.vcov(o)))
