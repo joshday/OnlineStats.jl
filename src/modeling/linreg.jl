@@ -1,3 +1,34 @@
+# Frank Wolfe-like online MM update using αj = xj^2 / sumabs2(x)
+type LinRegMM{W <: Weight} <: OnlineStat{XYInput}
+    β0::Float64
+    β::VecF
+    intercept::Bool
+    weight::W
+end
+function LinRegMM(p::Integer, wt::Weight = LearningRate(); intercept::Bool = true)
+    LinRegMM(0.0, zeros(p), intercept, wt)
+end
+function LinRegMM(x::AMat, y::AVec, wt::Weight = LearningRate(); kw...)
+    o = LinRegMM(size(x, 2), wt; kw...)
+    fit!(o, x, y)
+    o
+end
+
+predict(o::LinRegMM, x::AVec) = o.β0 + dot(o.β, x)
+predict(o::LinRegMM, x::AMat) = o.β0 + x * o.β
+
+function _fit!(o::LinRegMM, x::AVec, y::Real, γ::Float64)
+    p = size(o.β)
+    r = (y - predict(o, x)) / (dot(x, x) + o.intercept)
+    if o.intercept
+        o.β0 = smooth(o.β0, o.β0 + 1.0 * r, γ)
+    end
+    for j in eachindex(o.β)
+        @inbounds o.β[j] = smooth(o.β[j], o.β[j] + x[j] * r, γ)
+    end
+end
+
+
 """
 Analytical Linear Regression.
 
@@ -69,11 +100,12 @@ function coef(o::LinReg)
         copy!(o.β, o.S[2:length(o.β) + 1, end])
 		o.β0 = o.S[1, end]
     end
-	if o.intercept
-		return vcat(o.β0, o.β)
-	else
-		return o.β
-	end
+	# if o.intercept
+	# 	return vcat(o.β0, o.β)
+	# else
+	# 	return o.β
+	# end
+    o.β0, o.β
 end
 # mse is only correct when coef(o) is used before
 mse(o::LinReg) = o.S[end, end] * nobs(o) / (nobs(o) - length(o.β) - o.intercept)
