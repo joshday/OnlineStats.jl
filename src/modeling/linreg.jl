@@ -16,10 +16,9 @@ end
 
 predict(o::LinRegMM, x::AVec) = o.β0 + dot(o.β, x)
 predict(o::LinRegMM, x::AMat) = o.β0 + x * o.β
-loss(o::LinRegMM, x::AMat, y::AVec) = (r = y - predict(o,x); 0.5 * dot(r, r))
+loss(o::LinRegMM, x::AMat, y::AVec) = loss(LinearRegression(), y, predict(o, x))
 
 function _fit!(o::LinRegMM, x::AVec, y::Real, γ::Float64)
-    p = size(o.β)
     r = (y - predict(o, x)) / (dot(x, x) + o.intercept)
     if o.intercept
         o.β0 = smooth(o.β0, o.β0 + 1.0 * r, γ)
@@ -28,6 +27,16 @@ function _fit!(o::LinRegMM, x::AVec, y::Real, γ::Float64)
         @inbounds o.β[j] = smooth(o.β[j], o.β[j] + x[j] * r, γ)
     end
 end
+function _fitbatch!(o::LinRegMM, x::AMat, y::AVec, γ::Float64)
+    r = (y - predict(o, x)) ./ (mapslices(sumabs2, x, 2) + o.intercept)
+    if o.intercept
+        o.β0 = smooth(o.β0, o.β0 + 1.0 * mean(r), γ)
+    end
+    for j in eachindex(o.β)
+        o.β[j] = smooth(o.β[j], o.β[j] + mean(r .* view(x, :, j)), γ)
+    end
+end
+
 
 
 """
