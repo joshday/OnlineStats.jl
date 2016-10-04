@@ -4,6 +4,8 @@ import StatsBase
 import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
 import Distributions; Ds = Distributions
 using RecipesBase
+using LearnBase
+importall LearnBase
 
 export
     OnlineStat,

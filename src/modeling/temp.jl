@@ -148,10 +148,7 @@ predict(m::HuberRegression, η::Real) = η
 
 
 
-
-
-# ========================================================================= # Penalty
-abstract Penalty
+# ======================================================================= # Penalties
 #------------------------------------------------------------------# abstract methods
 function prox!(p::Penalty, β::VecF, step::Float64)
     for j in eachindex(β)
