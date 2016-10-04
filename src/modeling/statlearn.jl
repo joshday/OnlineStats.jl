@@ -110,58 +110,6 @@ function updateβ!(o::StatLearn{AdaGrad}, P, β, j, γ, ηγ, gx, ηγgx)
     @inbounds β[j] = prox(P, β[j] - step * gx, step)
 end
 
-# #-----------------------------------------------------------------------# FullAdaGrad
-# """
-# Experimental!  Slow!
-# """
-# type FullAdaGrad <: Algorithm
-#     G::MatF
-#     A::MatF     # buffer
-#     FullAdaGrad() = new(zeros(0, 0))
-# end
-# function _fit!{T <: Real}(o::StatLearn{FullAdaGrad}, x::AVec{T}, y::Real, γ::Float64)
-#     intercept = o.intercept
-#     if nobs(o) == 1
-#         d = length(x) + intercept
-#         o.algorithm.G = zeros(d, d)
-#         o.algorithm.A = zeros(d, d)
-#         o.H = zeros(d)
-#     end
-#     η, β, P = o.η, o.β, o.penalty
-#     ηγ = η * γ
-#     xb = dot(x, β) + o.β0
-#     g = lossderiv(o.model, y, xb)
-#     ηγg = ηγ * g
-#
-#     rng = (1:length(β)) + intercept
-#     w = g ^ 2 / nups(o.weight)
-#     BLAS.syr!('U', w, x, view(o.algorithm.G, rng, rng))
-#     smooth!(view(o.algorithm.G, 1, rng), x, w)
-#     if intercept
-#         o.algorithm.G[1] = smooth(o.algorithm.G[1], 1.0, w)
-#         o.H[1] = 1.0
-#     end
-#     o.H[rng] = x
-#     for j in eachindex(o.H)
-#         @inbounds o.H[j] *= g
-#     end
-#
-#     copy!(o.algorithm.A, o.algorithm.G ^ 2)
-#     for j in size(o.algorithm.A)
-#         o.algorithm.A[j, j] += .001 * nobs(o)
-#     end
-#     try LAPACK.sysv!('U', o.algorithm.A, o.H)
-#         if intercept
-#             o.β0 -= ηγ * o.H[1]
-#         end
-#         for j in eachindex(o.β)
-#             o.β[j] -= ηγ * o.H[j + intercept]
-#         end
-#     catch
-#         warn("Singular!")
-#     end
-# end
-
 #--------------------------------------------------------------------------# AdaGrad2
 immutable AdaGrad2 <: Algorithm end
 function updateβ0!(o::StatLearn{AdaGrad2}, γ, ηγ, g, ηγg)

@@ -16,6 +16,7 @@ type EqualWeight <: BatchWeight
     EqualWeight() = new(0)
     EqualWeight(n::Int) = new(n)
 end
+Base.show(io::IO, w::EqualWeight) = print("EqualWeight: γ = 1 / t")
 
 
 #-----------------------------------------------------------------# ExponentialWeight
@@ -35,7 +36,7 @@ type ExponentialWeight <: Weight
     end
     ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
 end
-
+Base.show(io::IO, w::ExponentialWeight) = print("ExponentialWeight: γ = $(w.λ)")
 
 #----------------------------------------------------------------# BoundedEqualWeight
 """
@@ -53,6 +54,9 @@ type BoundedEqualWeight <: Weight
             new(0, λ)
     end
     BoundedEqualWeight(lookback::Integer) = BoundedEqualWeight(2.0 / (lookback + 1))
+end
+function Base.show(io::IO, w::BoundedEqualWeight)
+    print("BoundedEqualWeight: γ = max(1 / t, $(w.λ))")
 end
 
 
@@ -76,6 +80,9 @@ type LearningRate <: StochasticWeight
         new(0, 0, r, λ)
     end
 end
+function Base.show(io::IO, w::LearningRate)
+    print("LearningRate: γ = max(1 / t ^ $(w.r), $(w.λ))")
+end
 
 
 #---------------------------------------------------------------------# LearningRate2
@@ -97,6 +104,9 @@ type LearningRate2 <: StochasticWeight
         @assert c > 0
         new(0, 0, c, λ)
     end
+end
+function Base.show(io::IO, w::LearningRate2)
+    print("LearningRate2: γ = max(1 / (1 + c * (t-1)), $(w.λ))")
 end
 
 
