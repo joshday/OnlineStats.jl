@@ -42,6 +42,7 @@ getλmax(o::FastGLM, x) = error("FastGLM is only for LinearRegression and Logist
 getλmax(o::FastGLM{LinearRegression}, x::AVec) = svdfact(x').S[1]
 getλmax(o::FastGLM{LogisticRegression}, x::AVec) = .25 * svdfact(x').S[1]
 getλmax(o::FastGLM{PoissonRegression}, x::AVec) = predict(o, x) * svdfact(x').S[1]
+# getλmax(o::FastGLM{DWDLike}, x::AVec) = 
 
 
 function _fit!(o::FastGLM, x::AVec, y::Real, γ::Float64)
