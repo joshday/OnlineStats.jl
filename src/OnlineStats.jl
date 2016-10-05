@@ -9,6 +9,8 @@ importall LearnBase
 
 export
     OnlineStat,
+    # Input
+    ScalarInput, VectorInput, XYInput,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     BoundedEqualWeight,
