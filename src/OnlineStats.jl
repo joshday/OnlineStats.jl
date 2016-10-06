@@ -31,8 +31,7 @@ export
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,
     # methods
-    value, fit, fit!, nobs, skewness, kurtosis, sweep!, coef, predict,
-    loss, cost, center, fitdistribution, classify, maprows
+    value, fit, fit!, nobs, skewness, kurtosis, center, fitdistribution, maprows
 
 #-----------------------------------------------------------------------------# types
 abstract Input
@@ -397,12 +396,10 @@ include("weight.jl")
 include("summary.jl")
 include("distributions.jl")
 include("normalmix.jl")
-include("modeling/xyinput.jl")
 # include("modeling/temp.jl")
 # include("modeling/statlearn.jl")
-include("modeling/linreg.jl")
-# include("modeling/fastglm.jl")
-include("modeling/quantregmm.jl")
+# include("modeling/linreg.jl")
+# include("modeling/quantregmm.jl")
 include("modeling/bias.jl")
 include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")

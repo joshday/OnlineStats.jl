@@ -13,10 +13,10 @@ using OnlineStats, Base.Test
         fit!(o, randn(2), rand())
         @test nobs(o) == 2
 
-        o = LinReg(2)
-        fit!(o, randn(2), randn())
-        fit!(o, randn(2), randn(), rand())
-        @test nobs(o) == 2
+        # o = LinReg(2)
+        # fit!(o, randn(2), randn())
+        # fit!(o, randn(2), randn(), rand())
+        # @test nobs(o) == 2
     end
     @testset "Multiple Observations" begin
         o = Mean()
@@ -31,11 +31,11 @@ using OnlineStats, Base.Test
         fit!(o, randn(100, 2), .1)
         @test nobs(o) == 300
 
-        o = LinReg(2)
-        fit!(o, randn(100, 2), randn(100))
-        fit!(o, randn(100, 2), randn(100), rand(100))
-        fit!(o, randn(100, 2), randn(100), .1)
-        @test nobs(o) == 300
+        # o = LinReg(2)
+        # fit!(o, randn(100, 2), randn(100))
+        # fit!(o, randn(100, 2), randn(100), rand(100))
+        # fit!(o, randn(100, 2), randn(100), .1)
+        # @test nobs(o) == 300
     end
     @testset "maprows" begin
         o = Mean()
