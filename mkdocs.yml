@@ -10,7 +10,6 @@ pages:
     - Home: index.md
     - Weighting: weight.md
     - Callbacks: callback.md
-    - Predictive Modeling: StatLearn.md
     - Merging: merging.md
     - API/Examples: api.md
 
