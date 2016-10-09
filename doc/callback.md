@@ -44,34 +44,3 @@ display(plt)
 ```
 ### Output
 ![](https://cloud.githubusercontent.com/assets/8075494/18796290/978802e2-8196-11e6-8097-b65b722376fc.png)
-
-
-## Example 3
-
-### Input
-```julia
-x = randn(1000, 5)
-β = collect(1.:5)
-y = x * β + randn(1000)
-
-o = LinReg(5)
-
-maprows(100, x, y) do xi, yi
-    fit!(o, xi, yi)
-    info("You have fit $(nobs(o)) observations")
-end
-```
-
-### Output
-```
-INFO: You have fit 100 observations
-INFO: You have fit 200 observations
-INFO: You have fit 300 observations
-INFO: You have fit 400 observations
-INFO: You have fit 500 observations
-INFO: You have fit 600 observations
-INFO: You have fit 700 observations
-INFO: You have fit 800 observations
-INFO: You have fit 900 observations
-INFO: You have fit 1000 observations
-```

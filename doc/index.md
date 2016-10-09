@@ -55,13 +55,7 @@ type rely on stochastic approximation.
 - Gaussian Mixtures: `NormalMix`
 
 ### Predictive Modeling
-- Linear Regression: `LinReg`, `StatLearn`
-- Logistic Regression: `StatLearn`
-- Poisson Regression: `StatLearn`
-- Support Vector Machines: `StatLearn`
-- Quantile Regression: `StatLearn`, `QuantRegMM`
-- Huber Loss Regression: `StatLearn`
-- L1 Loss Regression: `StatLearn`
+- See OnlineStatsModels.jl
 
 ### Other
 - K-Means clustering: `KMeans`
