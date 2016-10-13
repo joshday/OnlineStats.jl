@@ -170,38 +170,28 @@ type CovMatrix{W <: Weight} <: OnlineStat{VectorInput}
     value::MatF
     cormat::MatF
     A::MatF  # X'X / n
-    B::VecF  # X * 1' / n (column means)
+    b::VecF  # X * 1' / n (column means)
     weight::W
 end
 function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
     CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt)
 end
 function _fit!(o::CovMatrix, x::AVec, γ::Float64)
-    rank1_smooth!(o.A, x, γ)
-    smooth!(o.B, x, γ)
+    smooth!(o.b, x, γ)
+    smooth_syr!(o.A, x, γ)
     o
 end
 function _fitbatch!(o::CovMatrix, x::AMat, γ::Float64)
-    n2 = size(x, 1)
-    smooth!(o.B, vec(mean(x, 1)), γ)
-    BLAS.syrk!('U', 'T', γ / n2, x, 1.0 - γ, o.A)
-    o
+    smooth!(o.b, mean(x, 1), γ)
+    smooth_syrk!(o.A, x, γ)
 end
 function value(o::CovMatrix)
-    copy!(o.value, unbias(o) * (o.A - BLAS.syrk('U', 'N', 1.0, o.B)))
-    _covfill!(o.value)
-    o.value
+    o.value = unbias(o) * full(Symmetric((o.A - o.b * o.b')))
 end
-function _covfill!(A::MatF)  # fill in lower triangle
-    p = size(A, 1)
-    for j in 1:p, i in j+1:p
-        @inbounds A[i, j] = A[j, i]
-    end
-end
-Base.mean(o::CovMatrix) = o.B
+Base.mean(o::CovMatrix) = o.b
 Base.cov(o::CovMatrix) = value(o)
 Base.var(o::CovMatrix) = diag(value(o))
-Base.std(o::CovMatrix) = [sqrt(x) for x in var(o) ]
+Base.std(o::CovMatrix) = sqrt(var(o))
 function Base.cor(o::CovMatrix)
     copy!(o.cormat, value(o))
     v = 1.0 ./ sqrt(diag(o.cormat))
@@ -211,7 +201,7 @@ function Base.cor(o::CovMatrix)
 end
 function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
     smooth!(o.A, o2.A, γ)
-    smooth!(o.B, o2.B, γ)
+    smooth!(o.b, o2.b, γ)
 end
 
 

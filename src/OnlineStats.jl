@@ -301,15 +301,24 @@ end
 subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
 
 # Rank 1 update of symmetric matrix: (1 - γ) * A + γ * x * x'
-function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
-    @assert size(A, 1) == size(A, 2)
+function smooth_syr!(A::AMat, x::AVec, γ::Float64)
+    @assert size(A, 1) == length(x)
     for j in 1:size(A, 2), i in 1:j
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end
 end
-# This fails in CovMatrix test?
-# function rank1_smooth!(A::AMat, x::AVec, γ::Float64)
-#     scale!(A, 1.0 - γ)
+function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
+    BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
+end
+
+
+# # This fails because of bug in BLAS.syr!
+# function smooth_syr!(A::MatF, x::AVec, γ::Float64)
+#     @assert size(A, 1) == length(x)
+#     γ2 = 1.0 - γ
+#     for j in 1:size(A, 1), i in 1:j
+#         A[i, j] *= γ2
+#     end
 #     BLAS.syr!('U', γ, x, A)
 # end
 
