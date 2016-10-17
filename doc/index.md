@@ -21,7 +21,7 @@ o = Mean()
 y = randn(100)
 
 for yi in y
-    fit!(o, y)
+    fit!(o, yi)
 end
 
 # or more simply:
