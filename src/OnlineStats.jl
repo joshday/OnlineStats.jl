@@ -16,17 +16,12 @@ export
     BoundedEqualWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    Diff, Diffs, Sum, Sums, CovMatrix, LinReg, LinRegMM, LogRegMM, QuantRegMM,
-    NormalMix, StatLearn,
-    KMeans, BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
+    Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans,
+    # add an interecept term or two way interactions
+    BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
+    # distributions
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
     FitMultinomial, FitMvNormal,
-    # Penalties
-    Penalty, NoPenalty, RidgePenalty, LassoPenalty, ElasticNetPenalty,
-    # ModelDefinition and Algorithm
-    Model, LinearRegression, L1Regression, LogisticRegression, DWDLike,
-    PoissonRegression, QuantileRegression, SVMLike, HuberRegression,
-    Algorithm, SGD, AdaGrad, AdaGrad2, AdaDelta, ADAM,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,

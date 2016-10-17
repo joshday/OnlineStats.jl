@@ -55,7 +55,7 @@ type rely on stochastic approximation.
 - Gaussian Mixtures: `NormalMix`
 
 ### Predictive Modeling
-- See OnlineStatsModels.jl
+- See [OnlineStatsModels.jl](https://github.com/joshday/OnlineStatsModels.jl)
 
 ### Other
 - K-Means clustering: `KMeans`
