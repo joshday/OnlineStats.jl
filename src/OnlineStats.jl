@@ -16,7 +16,7 @@ export
     BoundedEqualWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
-    Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans,
+    Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans, OrderStatistics,
     # add an interecept term or two way interactions
     BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     # distributions

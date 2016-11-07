@@ -356,6 +356,10 @@ type OrderStatistics <: OnlineStat{ScalarInput}
     weight::EqualWeight
 end
 OrderStatistics(p::Integer) = OrderStatistics(zeros(p), zeros(p), EqualWeight())
+function OrderStatistics(p::Integer, y::AVec)
+    o = OrderStatistics(p)
+    fit!(o, y)
+end
 function _fit!(o::OrderStatistics, y::Real, γ::Float64)
     p = length(o.value)
     buffer = o.buffer
