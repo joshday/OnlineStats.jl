@@ -17,6 +17,7 @@ export
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans, OrderStatistics,
+    BradleyTerryModel,
     # add an intercept term or two way interactions
     BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     # distributions
@@ -404,6 +405,7 @@ include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")
 include("multivariate/kmeans.jl")
 include("multivariate/bias.jl")
+include("multivariate/bradleyterry.jl")
 include("plots.jl")
 
 
