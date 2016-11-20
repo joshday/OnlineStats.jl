@@ -17,11 +17,11 @@ export
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans, OrderStatistics,
-    # add an interecept term or two way interactions
+    # add an intercept term or two way interactions
     BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     # distributions
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
-    FitMultinomial, FitMvNormal,
+    FitMultinomial, FitMvNormal, FitDirichletMultinomial,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,

@@ -174,17 +174,68 @@ type FitMultinomial{W<:Weight} <: DistributionStat{VectorInput}
     value::Ds.Multinomial
     means::Means{W}
 end
-function FitMultinomial(p::Integer, wgt::Weight = EqualWeight)
-    FitMultinomial(Ds.Multinomial(p, ones(p) / p), Means(p, wgt))
+function FitMultinomial(p::Integer, wgt::Weight = EqualWeight())
+    FitMultinomial(Ds.Multinomial(1, ones(p) / p), Means(p, wgt))
 end
 nobs(o::FitMultinomial) = nobs(o.means)
 _fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64) = _fit!(o.means, y, γ)
 function value(o::FitMultinomial)
     m = mean(o.means)
-    o.value = Ds.Multinomial(round(Int, sum(m)), m / sum(m))
+    if nobs(o) > 0
+        o.value = Ds.Multinomial(round(Int, sum(m)), m / sum(m))
+    end
+    o.value
 end
 updatecounter!(o::FitMultinomial, n2::Int = 1) = updatecounter!(o.means, n2)
 weight(o::FitMultinomial, n2::Int = 1) = weight(o.means, n2)
+
+
+#--------------------------------------------------------------# DirichletMultinomial
+"""
+Dirichlet-Multinomial estimation using Type 1 Online MM.
+"""
+type FitDirichletMultinomial <: DistributionStat{VectorInput}
+    α::VecF
+    s::Matrix{Int}  # s_{jk}:   (max(x*) - 1) × p
+    r::Vector{Int}  # r_k:      (m* - 1) × 1
+    weight::EqualWeight
+    function FitDirichletMultinomial(p::Integer, wt::Weight = EqualWeight())
+        new(ones(p), zeros(Int, 0, p), zeros(Int, 0), EqualWeight())
+    end
+end
+value(o::FitDirichletMultinomial) = o.α
+function update!(o::FitDirichletMultinomial)
+    # denominator
+    sumα = sum(o.α)
+    denom = sum(o.r ./ (sumα + collect(0:length(o.r) - 1)))
+    # numerator and update parameter
+    for j in 1:size(o.s, 2)
+        αj = o.α[j]
+        sj = o.s[:, j]
+        num = αj * sum(sj ./ (αj + collect(0:length(sj) - 1)))
+        o.α[j] = num / denom
+    end
+end
+
+function _fit!(o::FitDirichletMultinomial, y::AVec, γ::Float64)
+    m = round(Int, sum(y))
+    maxy = round(Int, maximum(y))
+    if length(o.r) < m
+        o.r = vcat(o.r, zeros(Int, m - length(o.r) - 1))
+    end
+    if size(o.s, 1) < maxy
+        o.s = vcat(o.s, zeros(Int, maxy - size(o.s, 1) - 1, size(o.s, 2)))
+    end
+    for j in 1:(m - 1)
+        o.r[j] += 1
+    end
+    for j in eachindex(y)
+        for i in 1:(round(Int, y[j]) - 1)
+            o.s[i, j] += 1
+        end
+    end
+    nobs(o) > 100 && update!(o)
+end
 
 
 
@@ -229,7 +280,7 @@ function FitCauchy{T<:Real}(y::AVec{T}, wgt::Weight = LearningRate())
     o
 end
 
-for nm in [:FitMultinomial, :FitMvNormal]
+for nm in [:FitMultinomial, :FitMvNormal, :FitDirichletMultinomial]
     eval(parse("""
         function $nm{T<:Real}(y::AMat{T}, wgt::Weight = EqualWeight())
             o = $nm(size(y, 2), wgt)
