@@ -6,6 +6,7 @@ abstract DistributionStat{I<:Input} <: OnlineStat{I}
 Base.mean(d::DistributionStat) = mean(value(d))
 Base.var(d::DistributionStat) = var(value(d))
 Base.std(d::DistributionStat) = std(value(d))
+Base.rand(d::DistributionStat, args...) = rand(value(d), args...)
 Ds.params(o::DistributionStat) = Ds.params(value(o))
 Ds.ncategories(o::DistributionStat) = Ds.ncategories(value(o))
 Base.cov(o::DistributionStat) = cov(value(o))
