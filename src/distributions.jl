@@ -48,9 +48,9 @@ type FitCategorical{T<:Any} <: DistributionStat{ScalarInput}
     d::Dict{T, Int}
     nobs::Int
 end
-FitCategorical() = FitCategorical(Ds.Categorical(1), Dict{Any, Int}(), 0)
+FitCategorical(T::DataType = Any) = FitCategorical(Ds.Categorical(1), Dict{T, Int}(), 0)
 function FitCategorical(y)
-    o = FitCategorical()
+    o = FitCategorical(eltype(y))
     fit!(o, y)
     o
 end
@@ -77,21 +77,25 @@ function fit!{T <: Union{AbstractString, Symbol}}(o::FitCategorical, y::AVec{T})
 end
 
 sortpairs(o::FitCategorical) = sort(collect(o.d), by = x -> 1 / x[2])
+# function Base.sort!(o::FitCategorical)
+#     if nobs(o) > 0
+#         sortedpairs = sortpairs(o)
+#         counts = zeros(length(sortedpairs))
+#         for i in 1:length(sortedpairs)
+#             counts[i] = sortedpairs[i][2]
+#         end
+#         o.value = Ds.Categorical(counts / sum(counts))
+#     end
+# end
 function value(o::FitCategorical)
-    if nobs(o) !== 0
-        sortedpairs = sortpairs(o)
-        counts = zeros(length(sortedpairs))
-        for i in 1:length(sortedpairs)
-            counts[i] = sortedpairs[i][2]
-        end
-        o.value = Ds.Categorical(counts / sum(counts))
+    if nobs(o) > 0
+        o.value = Ds.Categorical(collect(values(o.d)) ./ nobs(o))
     end
 end
 function Base.show(io::IO, o::FitCategorical)
-    printheader(io, "FitCategorical ($(length(o.d)) levels)")
+    printheader(io, "FitCategorical")
     print_item(io, "value", value(o))
-    sortedpairs = sortpairs(o)
-    print_item(io, "labels", [sortedpairs[i][1] for i in 1:length(sortedpairs)])
+    print_item(io, "labels", keys(o.d))
     print_item(io, "nobs", nobs(o))
 end
 updatecounter!(o::FitCategorical, n2::Int = 1) = (o.nobs += n2)

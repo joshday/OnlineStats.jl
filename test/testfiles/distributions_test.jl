@@ -39,6 +39,7 @@ end
 @testset "Categorical" begin
     y = rand(Categorical([.2, .2, .2, .4]), 1000)
     o = FitCategorical(y)
+    @test typeof(o) == FitCategorical{Int64}
     @test ncategories(o) == 4
 
     y = rand(Bool, 1000)
