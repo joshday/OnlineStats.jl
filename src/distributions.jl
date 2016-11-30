@@ -196,51 +196,19 @@ weight(o::FitMultinomial, n2::Int = 1) = weight(o.means, n2)
 
 
 #--------------------------------------------------------------# DirichletMultinomial
-"""
-Dirichlet-Multinomial estimation using Type 1 Online MM.
-"""
-type FitDirichletMultinomial <: DistributionStat{VectorInput}
-    α::VecF
-    s::Matrix{Int}  # s_{jk}:   (max(x*) - 1) × p
-    r::Vector{Int}  # r_k:      (m* - 1) × 1
-    weight::EqualWeight
-    function FitDirichletMultinomial(p::Integer, wt::Weight = EqualWeight())
-        new(ones(p), zeros(Int, 0, p), zeros(Int, 0), EqualWeight())
-    end
-end
-value(o::FitDirichletMultinomial) = o.α
-function update!(o::FitDirichletMultinomial)
-    # denominator
-    sumα = sum(o.α)
-    denom = sum(o.r ./ (sumα + collect(0:length(o.r) - 1)))
-    # numerator and update parameter
-    for j in 1:size(o.s, 2)
-        αj = o.α[j]
-        sj = o.s[:, j]
-        num = αj * sum(sj ./ (αj + collect(0:length(sj) - 1)))
-        o.α[j] = num / denom
-    end
-end
+# TODO
+# """
+# Dirichlet-Multinomial estimation using Type 1 Online MM.
+# """
+# type FitDirichletMultinomial{T <: Real} <: DistributionStat{VectorInput}
+#     value::Ds.DirichletMultinomial{T}
+#     suffstats::DirichletMultinomialStats
+#     weight::EqualWeight
+#     function FitDirichletMultinomial(p::Integer, wt::Weight = EqualWeight())
+#         new(Ds.DirichletMultinomial(1, p), EqualWeight())
+#     end
+# end
 
-function _fit!(o::FitDirichletMultinomial, y::AVec, γ::Float64)
-    m = round(Int, sum(y))
-    maxy = round(Int, maximum(y))
-    if length(o.r) < m
-        o.r = vcat(o.r, zeros(Int, m - length(o.r) - 1))
-    end
-    if size(o.s, 1) < maxy
-        o.s = vcat(o.s, zeros(Int, maxy - size(o.s, 1) - 1, size(o.s, 2)))
-    end
-    for j in 1:(m - 1)
-        o.r[j] += 1
-    end
-    for j in eachindex(y)
-        for i in 1:(round(Int, y[j]) - 1)
-            o.s[i, j] += 1
-        end
-    end
-    nobs(o) > 100 && update!(o)
-end
 
 
 
