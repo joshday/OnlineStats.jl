@@ -89,7 +89,7 @@ end
     merge!(o, o2)
     @test cov(o) ≈ cov(vcat(xs, xs))
 end
-@testset "Extrema" begin
+@testset "Extrema/Extremas" begin
     o = Extrema(x1)
     @test extrema(o) == extrema(x1)
     o2 = Extrema()
@@ -100,6 +100,17 @@ end
     o2 = Extrema(x2)
     merge!(o, o2)
     @test extrema(o) == extrema(vcat(x1, x2))
+
+    o = Extremas(2)
+    fit!(o, xs)
+    @test extrema(o) == vec(extrema(xs, 1))
+
+    o = Extremas(xs)
+    o2 = Extremas(2)
+    fit!(o2, xs)
+    @test extrema(o) == extrema(o2)
+    merge!(o, o2)
+    @test extrema(o) == extrema(o2)
 end
 @testset "QuantileSGD / QuantileMM" begin
     o = QuantileSGD(x1)
