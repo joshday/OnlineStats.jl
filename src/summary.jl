@@ -228,11 +228,53 @@ function _fit!(o::Extrema, y::Real, γ::Float64)
     o
 end
 Base.extrema(o::Extrema) = (o.min, o.max)
+Base.minimum(o::Extrema) = o.min
+Base.maximum(o::Extrema) = o.max
 value(o::Extrema) = extrema(o)
 function _merge!(o::Extrema, o2::Extrema, γ::Float64)
     o.min = min(o.min, o2.min)
     o.max = max(o.max, o2.max)
 end
+
+
+#---------------------------------------------------------------------------# Extremas
+"""
+Extremas (maximum and minimum) of multiple series.
+
+```julia
+x = rand(1000,5)
+o = Extremas(5)
+fit!(o, x)
+extrema(o)
+```
+"""
+type Extremas <: OnlineStat{VectorInput}
+    min::VecF
+    max::VecF
+    weight::EqualWeight
+    Extremas(p::Int) = new(zeros(p)+Inf, zeros(p)-Inf, EqualWeight())
+    Extremas{T<:Real}(y::AMat{T}) = new(squeeze(minimum(y,1),1), squeeze(maximum(y,1),1),
+                                        EqualWeight(size(y,1)))
+end
+function _fit!(o::Extremas, y::AVec, γ::Float64)
+    for i in 1:length(y)
+        o.min[i] = min(o.min[i], y[i])
+        o.max[i] = max(o.max[i], y[i])
+    end
+    o
+end
+Base.extrema(o::Extremas) = [(min,max) for (min,max) in zip(o.min,o.max)]
+Base.minimum(o::Extremas) = o.min
+Base.maximum(o::Extremas) = o.max
+value(o::Extremas) = extrema(o)
+function _merge!(o::Extremas, o2::Extremas, γ::Float64)
+    @assert length(o.min)==length(o2.min)
+    for i in 1:length(o.min)
+        o.min[i] = min(o.min[i], o2.min[i])
+        o.max[i] = max(o.max[i], o2.max[i])
+    end
+end
+
 
 
 #-----------------------------------------------------------------------# QuantileSGD
