@@ -1,4 +1,4 @@
-<!--- Generated at 2016-10-17T15:44:40.921.  Don't edit --->
+<!--- Generated at 2016-12-19T14:38:39.483.  Don't edit --->
 # API
 
 ## BernoulliBootstrap
@@ -78,6 +78,16 @@ fit!(o, y2)
 extrema(o)
 ```
 
+## Extremas
+Extremas (maximum and minimum) of multiple series.
+
+```julia
+x = rand(1000,5)
+o = Extremas(5)
+fit!(o, x)
+extrema(o)
+```
+
 ## FitBeta
 No documentation found.
 
@@ -115,6 +125,17 @@ type OnlineStats.FitCauchy{W<:OnlineStats.Weight} <: OnlineStats.DistributionSta
 ```
 value :: Distributions.Cauchy{T<:Real}
 q     :: OnlineStats.QuantileMM{W<:OnlineStats.Weight}
+```
+
+## FitDirichletMultinomial
+No documentation found.
+
+`OnlineStats.FitDirichletMultinomial` is a `Function`.
+
+```
+# 2 methods for generic function "FitDirichletMultinomial":
+FitDirichletMultinomial{T<:Real}(y::AbstractArray{T,2}) at none:2
+FitDirichletMultinomial{T<:Real}(y::AbstractArray{T,2}, wgt::OnlineStats.Weight) at none:2
 ```
 
 ## FitGamma
@@ -308,6 +329,7 @@ OnlineStats.Diffs{T<:Real}
 OnlineStats.Diff{T<:Real}
 OnlineStats.DistributionStat{I<:OnlineStats.Input}
 OnlineStats.Extrema
+OnlineStats.Extremas
 OnlineStats.HyperLogLog
 OnlineStats.KMeans{W<:OnlineStats.Weight}
 OnlineStats.Means{W<:OnlineStats.Weight}
@@ -321,6 +343,13 @@ OnlineStats.Sum{T<:Real}
 OnlineStats.Variances{W<:OnlineStats.Weight}
 OnlineStats.Variance{W<:OnlineStats.Weight}
 ```
+
+## OrderStatistics
+```julia
+o = OrderStatistics(p)
+```
+
+Ignores Weight.  Track the online mean of order statistics (sorted data from smallest to largest).  For every batch of `p` observations, sort the points and update the mean.
 
 ## PoissonBootstrap
 No documentation found.
@@ -533,6 +562,22 @@ wts = rand(100)
 fit!(o, y, wts) # update observation i using wts[i]
 ```
 
+Update an OnlineStat with more data.  Additional arguments after the input data provide extra control over how the updates are done.
+
+```
+y = randn(100)
+o = Mean()
+
+fit!(o, y)      # standard usage
+
+fit!(o, y, 10)  # update in minibatches of size 10
+
+fit!(o, y, .1)  # update using weight .1 for each observation
+
+wts = rand(100)
+fit!(o, y, wts) # update observation i using wts[i]
+```
+
 ## fitdistribution
 Estimate the parameters of a distribution.
 
@@ -608,6 +653,13 @@ skewness(v, [wv::WeightVec], m=mean(v))
 Compute the standardized skewness of a real-valued array `v`, optionally specifying a weighting vector `wv` and a center `m`.
 
 ## value
+The associated value of an OnlineStat.
+
+```
+o = Mean()
+value(o)
+```
+
 The associated value of an OnlineStat.
 
 ```
