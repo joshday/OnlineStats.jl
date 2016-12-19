@@ -17,7 +17,6 @@ export
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, Extremas, QuantileSGD, QuantileMM, Moments,
     Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans, OrderStatistics,
-    BradleyTerryModel,
     # add an intercept term or two way interactions
     BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     # distributions
