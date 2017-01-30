@@ -20,6 +20,8 @@ end
 
 #-------------------------------------------------------------------------# NormalMix
 @recipe function f(o::NormalMix)
+    linestyle --> hcat(:solid, fill(:dash, 1, Ds.ncomponents(o)))
+    w --> 2
     fvec = Function[x -> Ds.pdf(o, x)]
     probs = Ds.probs(o)
     for j in 1:Ds.ncomponents(o)
