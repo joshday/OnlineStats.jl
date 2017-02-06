@@ -83,6 +83,7 @@ end
     @test nobs(o) == 100
 end
 @testset "MvNormal" begin
+    ## constructor using a vector of values
     y = rand(MvNormal(zeros(4), diagm(ones(4))), 100)'
     o = FitMvNormal(y)
     @test mean(o) ≈ vec(mean(y, 1))
@@ -90,6 +91,20 @@ end
     @test std(o) ≈ vec(std(y, 1))
     @test cov(o) ≈ cov(y)
     @test nobs(o) == 100
+
+    ## empty costructor 
+    z = MvNormal([1, 2], 3)
+    o = FitMvNormal(size(z)[1])
+    N = 100000
+    for _ in 1:N
+        fit!(o, rand(z))
+    end
+    z2 = value(o)
+    # tolerances are generous, but there is a small probability that this
+    # stochastic test will fail occasionally. in that case, rerun.
+    @test nobs(o) == N
+    @test isapprox(mean(z2), mean(z), atol=0.1)
+    @test isapprox(var(z2), var(z), atol=0.1)
 end
 @testset "NormalMix" begin
     d = MixtureModel(Normal, [(0,1), (2,3), (4,5)])
