@@ -217,7 +217,7 @@ type FitMvNormal{W<:Weight} <: DistributionStat{VectorInput}
     value::Ds.MvNormal
     cov::CovMatrix{W}
 end
-function FitMvNormal(p::Integer, wgt::Weight = EqualWeight)
+function FitMvNormal(p::Integer, wgt::Weight = EqualWeight())
     FitMvNormal(Ds.MvNormal(zeros(p), eye(p)), CovMatrix(p, wgt))
 end
 nobs(o::FitMvNormal) = nobs(o.cov)
