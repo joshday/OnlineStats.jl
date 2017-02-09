@@ -221,7 +221,7 @@ function FitMvNormal(p::Integer, wgt::Weight = EqualWeight())
     FitMvNormal(Ds.MvNormal(zeros(p), eye(p)), CovMatrix(p, wgt))
 end
 nobs(o::FitMvNormal) = nobs(o.cov)
-Base.std(d::FitMvNormal) = sqrt(var(d))  # No std() method from Distributions?
+Base.std(d::FitMvNormal) = sqrt.(var(d))  # No std() method from Distributions?
 _fit!{T<:Real}(o::FitMvNormal, y::AVec{T}, γ::Float64) = _fit!(o.cov, y, γ)
 function value(o::FitMvNormal)
     c = cov(o.cov)

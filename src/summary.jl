@@ -120,7 +120,7 @@ function _fit!(o::Variances, y::AVec, γ::Float64)
     end
 end
 Base.var(o::Variances) = value(o)
-Base.std(o::Variances) = sqrt(value(o))
+Base.std(o::Variances) = sqrt.(value(o))
 Base.mean(o::Variances) = o.μ
 value(o::Variances) = nobs(o) < 2 ? zeros(o.value) : o.value * unbias(o)
 center{T<:Real}(o::Variances, x::AVec{T}) = x - mean(o)
@@ -191,10 +191,10 @@ end
 Base.mean(o::CovMatrix) = o.b
 Base.cov(o::CovMatrix) = value(o)
 Base.var(o::CovMatrix) = diag(value(o))
-Base.std(o::CovMatrix) = sqrt(var(o))
+Base.std(o::CovMatrix) = sqrt.(var(o))
 function Base.cor(o::CovMatrix)
     copy!(o.cormat, value(o))
-    v = 1.0 ./ sqrt(diag(o.cormat))
+    v = 1.0 ./ sqrt.(diag(o.cormat))
     scale!(o.cormat, v)
     scale!(v, o.cormat)
     o.cormat
@@ -447,7 +447,7 @@ function _fit!(o::Moments, y::Real, γ::Float64)
 end
 Base.mean(o::Moments) = value(o)[1]
 Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
-Base.std(o::Moments) = sqrt(var(o))
+Base.std(o::Moments) = sqrt.(var(o))
 function StatsBase.skewness(o::Moments)
     v = value(o)
     (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5

@@ -36,7 +36,7 @@ for yi in y
 end
 ```
 """
-type HyperLogLog <: OnlineStat
+type HyperLogLog{I <: Input} <: OnlineStat{I}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
@@ -62,7 +62,7 @@ function HyperLogLog(b::Integer)
 
     altmask = ~mask
 
-    return HyperLogLog(m, M, mask, altmask, 0)
+    return HyperLogLog{Input}(m, M, mask, altmask, 0)
 end
 
 function Base.show(io::IO, counter::HyperLogLog)
