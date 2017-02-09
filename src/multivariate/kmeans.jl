@@ -37,7 +37,7 @@ function _fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
     d, k = size(o.value)
     @assert length(x) == d
     for j in 1:k
-        o.v[j] = sumabs2(x - col(o.value, j))
+        o.v[j] = sum(abs2, x - col(o.value, j))
     end
     kstar = indmin(o.v)
     for i in 1:d
@@ -49,7 +49,7 @@ function _fitbatch!{T<:Real}(o::KMeans, x::AMat{T}, γ::Float64)
     @assert size(x, 2) == d
     x̄ = vec(mean(x, 1))
     for j in 1:k
-        o.v[j] = sumabs2(x̄ - col(o.value, j))
+        o.v[j] = sum(abs2, x̄ - col(o.value, j))
     end
     kstar = indmin(o.v)
     for i in 1:d

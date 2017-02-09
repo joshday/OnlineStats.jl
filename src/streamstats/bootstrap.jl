@@ -25,7 +25,7 @@ end
 
 function BernoulliBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
     replicates = OnlineStat{T}[copy(o) for i in 1:r]
-    cached_state = Array(Float64, r)
+    cached_state = Array{Float64}(r)
     return BernoulliBootstrap(replicates, cached_state, f, 0, true)
 end
 
@@ -61,7 +61,7 @@ type ScalarPoissonBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInp
 end
 function PoissonBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
     replicates = OnlineStat{T}[copy(o) for i in 1:r]
-    cached_state = Array(Float64, r)
+    cached_state = Array{Float64}(r)
     ScalarPoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
@@ -74,7 +74,7 @@ type VectorPoissonBootstrap{S <: OnlineStat{VectorInput}} <: Bootstrap{VectorInp
 end
 function PoissonBootstrap{T <: VectorInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
     replicates = OnlineStat{T}[copy(o) for i in 1:r]
-    cached_state = Array(Float64, length(value(o)), r)
+    cached_state = Array{Float64}(length(value(o)), r)
     VectorPoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
