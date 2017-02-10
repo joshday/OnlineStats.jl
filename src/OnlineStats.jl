@@ -341,6 +341,9 @@ end
 
 function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
     @assert typeof(o) == typeof(o2)
+    if nobs(o2) == 0
+        return o
+    end
     updatecounter!(o, nobs(o2))
     if method == :append
         _merge!(o, o2, weight(o, nobs(o2)))
