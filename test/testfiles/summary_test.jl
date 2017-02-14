@@ -34,6 +34,12 @@ xs = hcat(x1, x)
     @test mean(o) ≈ mean(vcat(x1, x2))
     merge!(o, o2, :mean)
     merge!(o, o2, :singleton)
+
+    o3 = Mean(Float64[])
+    o4 = Mean(Float64[])
+
+    @test mean(merge(o3, o4)) == 0.0
+
 end
 @testset "Variance / Variances" begin
     o = Variance(x1)
@@ -88,6 +94,12 @@ end
     o2 = CovMatrix(xs)
     merge!(o, o2)
     @test cov(o) ≈ cov(vcat(xs, xs))
+
+    o3 = CovMatrix(zeros(0, 5))
+    o4 = CovMatrix(zeros(0, 5))
+
+    @test value(merge(o3, o4)) == zeros(5,5)
+
 end
 @testset "Extrema/Extremas" begin
     o = Extrema(x1)
