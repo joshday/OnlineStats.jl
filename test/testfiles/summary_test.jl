@@ -95,8 +95,8 @@ end
     merge!(o, o2)
     @test cov(o) ≈ cov(vcat(xs, xs))
 
-    o3 = CovMatrix(zeros(0, 5))
-    o4 = CovMatrix(zeros(0, 5))
+    o3 = CovMatrix(5)
+    o4 = CovMatrix(5)
 
     @test value(merge(o3, o4)) == zeros(5,5)
 
