@@ -1,5 +1,5 @@
 """
-Approximate K-Means clustering of multivariate data.
+Approximate K-Means clustering of multivariate data via stochastic gradient descent.
 
 ```julia
 o = KMeans(y, 3, LearningRate())
