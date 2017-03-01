@@ -1,7 +1,7 @@
 #----------------------------------------------------------------------------# Weight
-abstract Weight
-abstract BatchWeight <: Weight  # only BatchWeight types work for fitting by batch
-abstract StochasticWeight <: BatchWeight
+abstract type Weight end
+abstract type BatchWeight <: Weight end
+abstract type StochasticWeight <: BatchWeight end
 
 
 #-----------------------------------------------------------------------# EqualWeight
@@ -63,7 +63,7 @@ end
 #----------------------------------------------------------------------# LearningRate
 """
 One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic
-approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
+approximation (`QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
 `KMeans`).  The weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, they are
 held consant.  Compare to `LearningRate2`.
 
@@ -88,7 +88,7 @@ end
 #---------------------------------------------------------------------# LearningRate2
 """
 One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic
-approximation (`StatLearn`, `QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
+approximation (`QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
 `KMeans`).  The weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach
 `λ`, they are held consant.  Compare to `LearningRate`.
 

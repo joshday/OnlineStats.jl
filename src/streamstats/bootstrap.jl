@@ -1,4 +1,4 @@
-abstract Bootstrap{I <: Input} <: OnlineStat{I}
+abstract type Bootstrap{I <: Input} <: OnlineStat{I} end
 nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
 updatecounter!(b::Bootstrap, n2::Int) = (b.n += n2)

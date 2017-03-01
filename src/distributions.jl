@@ -2,7 +2,7 @@
 # _fit! methods should only update "sufficient statistics"
 # value methods should create the distribution
 
-abstract DistributionStat{I<:Input} <: OnlineStat{I}
+abstract type DistributionStat{I<:Input} <: OnlineStat{I} end
 Base.mean(d::DistributionStat) = mean(value(d))
 Base.var(d::DistributionStat) = var(value(d))
 Base.std(d::DistributionStat) = std(value(d))

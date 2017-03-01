@@ -1,5 +1,4 @@
 module MakeOnlineStatsDocs
-reload("OnlineStats")
 using OnlineStats
 
 rootdir = Pkg.dir("OnlineStats")

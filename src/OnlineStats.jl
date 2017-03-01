@@ -29,19 +29,19 @@ export
     value, fit, fit!, nobs, skewness, kurtosis, center, fitdistribution, maprows
 
 #-----------------------------------------------------------------------------# types
-abstract Input
-abstract ScalarInput    <: Input  # observation = scalar
-abstract VectorInput    <: Input  # observation = vector
-abstract XYInput        <: Input  # observation = (x, y) pair
+abstract type  Input end
+abstract type  ScalarInput    <: Input end  # observation = scalar
+abstract type  VectorInput    <: Input end  # observation = vector
+abstract type  XYInput        <: Input end  # observation = (x, y) pair
 
-abstract OnlineStat{I <: Input}
+abstract type  OnlineStat{I <: Input} end
 
-typealias VecF      Vector{Float64}
-typealias MatF      Matrix{Float64}
-typealias AVec{T}   AbstractVector{T}
-typealias AMat{T}   AbstractMatrix{T}
-typealias AVecF     AVec{Float64}
-typealias AMatF     AMat{Float64}
+const VecF      = Vector{Float64}
+const MatF      = Matrix{Float64}
+const AVec{T}   = AbstractVector{T}
+const AMat{T}   = AbstractMatrix{T}
+const AVecF     = AVec{Float64}
+const AMatF     = AMat{Float64}
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
