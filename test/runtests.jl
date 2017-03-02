@@ -1,16 +1,9 @@
-module TestSetup
-    export @title, @subtitle
-
-    macro title(s)
-        return :("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ " * $s)
-    end
-    macro subtitle(s)
-        return :("████████████████████████████████████████████████ " * $s)
-    end
-end
-
 module OnlineStatsTest
+    info("Show methods")
     include("testfiles/messy_output_test.jl")
+
+    println("\n")
+    info("███████████████████████████████████ Actual Tests Begin Here")
     include("testfiles/fit_methods_test.jl")
     include("testfiles/multivariate_test.jl")
     include("testfiles/summary_test.jl")

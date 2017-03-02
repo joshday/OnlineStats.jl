@@ -140,8 +140,8 @@ end
     @test mean(o) ≈ mean(x1)
     @test var(o) ≈ var(x1)
     @test std(o) ≈ std(x1)
-    @test_approx_eq_eps skewness(o) skewness(x1) .01
-    @test_approx_eq_eps kurtosis(o) kurtosis(x1) .1
+    @test skewness(o) ≈ skewness(x1) atol=.01
+    @test kurtosis(o) ≈ kurtosis(x1) atol=.1
 end
 @testset "Diff / Diffs" begin
     Diff()

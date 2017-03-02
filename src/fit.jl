@@ -46,14 +46,14 @@ function fit!(o::OnlineStat{ScalarInput}, y::AVec)
 end
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, w::Real)
     for i in eachindex(y)
-        fit!(o, y[i], w)
+        @inbounds fit!(o, y[i], w)
     end
     o
 end
 function fit!(o::OnlineStat{ScalarInput}, y::AVec, w::AVec)
     @assert length(y) == length(w)
     for i in eachindex(y)
-        fit!(o, row(y, i), w[i])
+        @inbounds fit!(o, row(y, i), w[i])
     end
     o
 end
@@ -106,7 +106,7 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, w::AVec)
     n2 = nrows(y)
     @assert n2 == length(w)
     for i in 1:n2
-        fit!(o, row(y, i), w[i])
+        @inbounds fit!(o, row(y, i), w[i])
     end
     o
 end

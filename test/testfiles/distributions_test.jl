@@ -54,8 +54,8 @@ end
     y = rand(Cauchy(), 10000)
     o = FitCauchy(y, LearningRate())
     fit!(o, y)
-    @test_approx_eq_eps params(o)[1] 0.0 0.1
-    @test_approx_eq_eps params(o)[2] 1.0 0.1
+    @test params(o)[1] ≈ 0.0 atol=0.1
+    @test params(o)[2] ≈ 1.0 atol=0.1
     @test nobs(o) == 2 * 10000
 end
 @testset "Gamma" begin
@@ -66,7 +66,7 @@ end
 @testset "LogNormal" begin
     y = rand(LogNormal(), 100)
     o = FitLogNormal(y)
-    @test_approx_eq_eps mean(o) mean(y) .1
+    @test mean(o) ≈ mean(y) atol=.1
 end
 @testset "Normal" begin
     y = randn(100)
@@ -92,7 +92,7 @@ end
     @test cov(o) ≈ cov(y)
     @test nobs(o) == 100
 
-    ## empty costructor 
+    ## empty costructor
     z = MvNormal([1, 2], 3)
     o = FitMvNormal(size(z)[1])
     N = 100000
@@ -113,9 +113,9 @@ end
 
     fit!(o, y)
     fit!(o, y, 10)
-    @test_approx_eq_eps mean(o) mean(y) .5
-    @test_approx_eq_eps var(o)  var(y)  .5
-    @test_approx_eq_eps std(o)  std(y)  .5
+    @test mean(o) ≈ mean(y) atol=.5
+    @test var(o)  ≈ var(y)  atol=.5
+    @test std(o)  ≈ std(y)  atol=.5
     @test length(componentwise_pdf(o, 0.5)) == 3
     @test ncomponents(o) == 3
     @test typeof(component(o, 1)) == Normal{Float64}
@@ -123,7 +123,7 @@ end
     @test pdf(o, randn()) > 0
     @test 0 < cdf(o, randn()) < 1
     @test value(o) == o.value
-    @test_approx_eq_eps quantile(o, [.25, .5, .75]) quantile(y, [.25, .5, .75]) .5
+    @test quantile(o, [.25, .5, .75]) ≈ quantile(y, [.25, .5, .75]) atol=.5
     quantile(o, collect(.01:.01:.99))
 
     fit!(o, y, 1)

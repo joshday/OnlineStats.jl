@@ -13,7 +13,7 @@ xs = hcat(x1, x)
     for yi in y
         fit!(o, yi)
     end
-    @test_approx_eq_eps value(o) 2 .5
+    @test value(o) ≈ 2 atol=.5
 end
 @testset "Bootstrap" begin
     @testset "BernoulliBootstrap" begin
