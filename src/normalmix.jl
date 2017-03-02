@@ -34,7 +34,9 @@ function NormalMix(y::AVec, k::Integer, wgt::Weight = LearningRate(); kw...)
     fit!(o, y)
     o
 end
-NormalMix(k::Integer, y::AVec, wgt::Weight = LearningRate(); kw...) = NormalMix(y, k, wgt; kw...)
+function NormalMix(k::Integer, y::AVec, wgt::Weight = LearningRate(); kw...)
+    NormalMix(y, k, wgt; kw...)
+end
 Ds.componentwise_pdf(o::NormalMix, y) = Ds.componentwise_pdf(value(o), y)
 Ds.ncomponents(o::NormalMix) = Ds.ncomponents(value(o))
 Ds.component(o::NormalMix, j) = Ds.component(value(o), j)
@@ -140,69 +142,3 @@ function Base.quantile{T<:Real}(o::NormalMix, τ::Vector{T};
     )
     Float64[quantile(o, τ[j]; start = start[j], kw...) for j in 1:length(τ)]
 end
-
-
-
-# #-----------------------------------------------------------------# Multivariate
-# type MvNormalMix{W<:Weight} <: OnlineStat
-#     value::Ds.MixtureModel{Ds.Multivariate, Ds.Continuous, Ds.MvNormal}
-#     s1::VecF
-#     s2::MatF
-#     s3::Array{Float64, 3}
-#     w::VecF
-#     μ::MatF
-#     V::Array{Float64, 3}
-#     weight::W
-#     n::Int
-#     nups::Int
-# end
-# function MvNormalMix(p::Integer, k::Integer, wgt::Weight = LearningRate();
-#         start = Ds.MixtureModel(Ds.MvNormal[Ds.MvNormal(ones(p) + j, 10 * eye(p)) for j in 1:k])
-#     )
-#     V = zeros(p, p, k)
-#     # for j in 1:k
-#     #     V[:, :, j] = cov(Ds.component(start, j))
-#     # end
-#
-#     MvNormalMix(start,
-#         ones(k) / k, zeros(p, k), zeros(p, p, k),  # s1, s2, s3
-#         zeros(k), zeros(p, k), V,            # w, μ, V
-#         wgt, 0, 0
-#     )
-# end
-# function MvNormalMix{T<:Real}(y::AMat{T}, k::Integer, wgt::Weight = LearningRate(); kw...)
-#     o = MvNormalMix(size(y, 2), k, wgt; kw...)
-#     fit!(o, y)
-#     o
-# end
-#
-# function fit!{T<:Real}(o::MvNormalMix, y::AVec{T})
-#     k = length(o.w)
-#     γ = weight!(o, 1)
-#     for j in 1:k
-#         o.w[j] = o.s1[j] * Ds.pdf(Ds.component(o.value, j), y)
-#     end
-#     sum1 = sum(o.w)
-#     for j in 1:k
-#         o.w[j] /= sum1
-#         o.s1[j] = smooth(o.s1[j], o.w[j], γ)
-#         smooth!(o.s2[:, j], o.w[j] * y, γ)
-#         smooth!(o.s3[:, :, j], o.w[j] * y * y', γ)
-#
-#         o.μ[:, j] = o.s2[j] / o.s1[j]
-#         o.V[:, :, j] = (o.s3[:, :, j] - o.s2[j] * o.s2[j]' / o.s1[j]) / o.s1[j]
-#     end
-#
-#     sum2 = sum(o.s1)
-#     for j in 1:k
-#         o.s1[j] /= sum2
-#     end
-#
-#     o.value = Ds.MixtureModel(
-#         Ds.MvNormal[
-#             Ds.MvNormal(o.μ[:,j], o.V[:,:,j] + .001 * eye(length(o.μ[:,j]))) for j in 1:k
-#         ],
-#         o.s1 / sum(o.s1)
-#     )
-# end
-#

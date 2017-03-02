@@ -1,7 +1,8 @@
-# DistributionStat objects
+# For DistributionStat objects
 # _fit! methods should only update "sufficient statistics"
 # value methods should create the distribution
 
+#--------------------------------------------------------------# common
 abstract type DistributionStat{I<:Input} <: OnlineStat{I} end
 Base.mean(d::DistributionStat) = mean(value(d))
 Base.var(d::DistributionStat) = var(value(d))

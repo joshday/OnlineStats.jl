@@ -10,23 +10,23 @@ importall LearnBase
 export
     OnlineStat,
     # Input
-    ScalarInput, VectorInput, XYInput,
+    Input, ScalarInput, VectorInput, XYInput,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     BoundedEqualWeight,
     # <: OnlineStat
     Mean, Means, Variance, Variances, Extrema, Extremas, QuantileSGD, QuantileMM, Moments,
-    Diff, Diffs, Sum, Sums, CovMatrix, NormalMix, KMeans, OrderStatistics,
+    Diff, Diffs, Sum, Sums, CovMatrix, KMeans, OrderStatistics,
     # add an intercept term or two way interactions
     BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
     # distributions
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
-    FitMultinomial, FitMvNormal, FitDirichletMultinomial,
+    FitMultinomial, FitMvNormal, FitDirichletMultinomial, NormalMix,
     # streamstats
     BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
     replicates, HyperLogLog,
     # methods
-    value, fit, fit!, nobs, skewness, kurtosis, center, fitdistribution, maprows
+    value, fit, fit!, nobs, skewness, kurtosis, fitdistribution, center, maprows
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
@@ -187,7 +187,6 @@ include("streamstats/bootstrap.jl")
 include("streamstats/hyperloglog.jl")
 include("multivariate/kmeans.jl")
 include("multivariate/bias.jl")
-include("multivariate/bradleyterry.jl")
 include("plots.jl")
 
 

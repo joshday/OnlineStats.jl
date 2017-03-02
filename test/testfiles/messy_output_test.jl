@@ -1,5 +1,5 @@
 module MessyOutput
-using OnlineStats, Base.Test, Distributions
+using OnlineStats, Base.Test
 
 x = randn(500)
 x1 = randn(500)
@@ -17,9 +17,6 @@ xs = hcat(x1, x)
     display(QuantileMM(x))
     display(Moments(x))
     display(KMeans(5, 4))
-    display(NormalMix(4))
-    display(FitCategorical())
-    display(FitBeta())
     display(BernoulliBootstrap(Mean(), mean, 1000))
 end
 
