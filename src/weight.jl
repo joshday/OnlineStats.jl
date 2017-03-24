@@ -4,10 +4,12 @@ Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
 nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups)
 weight(o::AbstractStats, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
 nextweight(o::AbstractStats, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
+
 #--------------------------------------------------------------------# EqualWeight
 struct EqualWeight <: Weight end
 show_weight(w::EqualWeight) = "γ = 1 / t"
 weight(w::EqualWeight, n::Int, n2::Int, nups::Int) = n2 / n
+
 #--------------------------------------------------------------------# ExponentialWeight
 struct ExponentialWeight <: Weight
     λ::Float64
@@ -16,6 +18,7 @@ struct ExponentialWeight <: Weight
 end
 show_weight(w::ExponentialWeight) = "γ = $(w.λ)"
 weight(w::ExponentialWeight, n::Int, n2::Int, nups::Int) = w.λ
+
 #--------------------------------------------------------------------# BoundedEqualWeight
 struct BoundedEqualWeight <: Weight
     λ::Float64
@@ -24,6 +27,7 @@ struct BoundedEqualWeight <: Weight
 end
 show_weight(w::BoundedEqualWeight) = "γ = max(1 / t, $(w.λ))"
 weight(w::BoundedEqualWeight, n::Int, n2::Int, nups::Int) = max(n2 / n, λ)
+
 #--------------------------------------------------------------------# LearningRate
 struct LearningRate <: Weight
     λ::Float64
@@ -32,6 +36,7 @@ struct LearningRate <: Weight
 end
 show_weight(w::LearningRate) = "γ = max(1 / t ^ $(w.r), $(w.λ))"
 weight(w::LearningRate, n::Int, n2::Int, nups::Int) = max(w.λ, exp(-w.r * log(nups)))
+
 #--------------------------------------------------------------------# LearningRate2
 struct LearningRate2 <: Weight
     c::Float64
