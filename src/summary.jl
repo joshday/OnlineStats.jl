@@ -207,32 +207,7 @@ function _fit!{T<:Real}(o::Diffs{T}, x::AVec{T}, γ::Float64)
     o
 end
 
-#-------------------------------------------------------------------# Sum/Sums
-"""
-Track the running sum.  Ignores `Weight`.
 
-```julia
-o = Sum()
-o = Sum(y)
-```
-"""
-type Sum{T <: Real} <: OnlineStat{ScalarInput}
-    sum::T
-    weight::EqualWeight
-end
-Sum() = Sum(0.0, EqualWeight())
-Sum{T<:Real}(::Type{T}) = Sum(zero(T), EqualWeight())
-Sum{T<:Real}(x::AVec{T}) = (o = Sum(T); fit!(o, x); o)
-value(o::Sum) = o.sum
-Base.sum(o::Sum) = o.sum
-function _fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64)
-    v = convert(T, x)
-    o.sum += v
-end
-function _fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64)
-    v = round(T, x)
-    o.sum += v
-end
 
 """
 Track the running sum for multiple series.  Ignores `Weight`.

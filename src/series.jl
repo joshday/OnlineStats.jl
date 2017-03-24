@@ -1,3 +1,4 @@
+# TODO: check arguments, error handling
 struct Series{STATS <: Tuple, T}
     obs::STATS
     id::T
