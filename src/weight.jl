@@ -1,14 +1,35 @@
 #----------------------------------------------------------------------------# Weight
 abstract type Weight end
-nextweight(w::Weight, n::Int, n2::Int) = weight(w, n + n2, n2)
+Base.show(io::IO, w::Weight) = print(io, name(w))
+nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups)
 
-weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, o.nobs, n2)
-nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight, o.nobs, n2)
+
+weight(o::AbstractStats, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
+nextweight(o::AbstractStats, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
+
 
 struct EqualWeight <: Weight end
-Base.show(io::IO, w::EqualWeight) = print("EqualWeight: γ = 1 / t")
-weight(w::EqualWeight, n::Int, n2::Int) = n2 / n
+Base.show(io::IO, w::EqualWeight) = print(io, "EqualWeight: γ = 1 / t")
+weight(w::EqualWeight, n::Int, n2::Int, nups::Int) = n2 / n
 
+
+
+struct ExponentialWeight <: Weight
+    λ::Float64
+    ExponentialWeight(λ::Real = 0.1) = new(λ)
+end
+Base.show(io::IO, w::ExponentialWeight) = print(io, "EqualWeight: γ = $(w.λ)")
+weight(w::ExponentialWeight, n::Int, n2::Int, nups::Int) = w.λ
+
+
+
+struct LearningRate <: Weight
+    λ::Float64
+    r::Float64
+    LearningRate(r::Real = .6, λ::Real = 0.0) = new(λ, r)
+end
+Base.show(io::IO, w::LearningRate) = print(io, "LearningRate: γ = max(1 / t ^ $(w.r), $(w.λ))")
+weight(w::LearningRate, n::Int, n2::Int, nups::Int) = max(w.λ, exp(-w.r * log(nups)))
 
 
 #
@@ -125,7 +146,7 @@ weight(w::EqualWeight, n::Int, n2::Int) = n2 / n
 # # increase nobs by the number of new observations
 # updatecounter!(w::Weight, n2::Int = 1)              = (w.nobs += n2)
 # updatecounter!(w::StochasticWeight, n2::Int = 1)    = (w.nobs += n2; w.nups += 1)
-# updatecounter!(o::AbstractSeries, n2::Int = 1) = updatecounter!(o.weight, n2)
+# updatecounter!(o::AbstractStats, n2::Int = 1) = updatecounter!(o.weight, n2)
 #
 # # Get weight for update of size n2, typically immediately after updatecounter!
 # weight(w::EqualWeight, n2::Int = 1)         = n2 / w.nobs
@@ -133,10 +154,10 @@ weight(w::EqualWeight, n::Int, n2::Int) = n2 / n
 # weight(w::ExponentialWeight, n2::Int = 1)   = w.λ
 # weight(w::LearningRate, n2::Int = 1)        = max(w.λ, exp(-w.r * log(w.nups)))
 # weight(w::LearningRate2, n2::Int = 1)       = max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
-# weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, n2)
+# weight(o::AbstractStats, n2::Int = 1) = weight(o.weight, n2)
 #
 #
 # nextweight(w::EqualWeight, n2::Int = 1)         = n2 / (w.nobs + n2)
 # nextweight(w::BoundedEqualWeight, n2::Int = 1)  = nobs(w)==0 ? 1.0 : max(w.λ, n2/(w.nobs+n2))
 # nextweight(w::ExponentialWeight, n2::Int = 1)   = w.λ
-# nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight)
+# nextweight(o::AbstractStats, n2::Int = 1) = nextweight(o.weight)

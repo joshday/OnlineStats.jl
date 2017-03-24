@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------# fit!
 # There are so many fit methods because
-#    - Each method needs three implementations (ScalarInput, VectorInput, XYInput)
+#    - Each method needs two implementations (ScalarInput, VectorInput)
 #    - methods:
 #        - singleton
 #        - batch
@@ -124,59 +124,6 @@ function fit!(o::OnlineStat{VectorInput}, y::AMat, b::Integer)
             updatecounter!(o, bsize)
             γ = weight(o, bsize)
             _fitbatch!(o, rows(y, rng), γ)
-            i += b
-        end
-    end
-    o
-end
-
-#---------------------------------------------------------------------------# XYInput
-function fit!{T <: Real}(o::OnlineStat{XYInput}, x::AVec{T}, y::Real)
-    updatecounter!(o)
-    γ = weight(o)
-    _fit!(o, x, y, γ)
-    o
-end
-function fit!{T <: Real}(o::OnlineStat{XYInput}, x::AVec{T}, y::Real, γ::Float64)
-    updatecounter!(o)
-    _fit!(o, x, y, γ)
-    o
-end
-function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec)
-    @assert size(x, 1) == length(y)
-    for i in eachindex(y)
-        fit!(o, row(x, i), row(y, i))
-    end
-    o
-end
-function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, w::Real)
-    @assert size(x, 1) == length(y)
-    for i in eachindex(y)
-        fit!(o, row(x, i), row(y, i), w)
-    end
-    o
-end
-function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, w::AVec)
-    @assert size(x, 1) == length(y) == length(w)
-    for i in eachindex(y)
-        fit!(o, row(x, i), row(y, i), w[i])
-    end
-    o
-end
-function fit!(o::OnlineStat{XYInput}, x::AMat, y::AVec, b::Integer)
-    b = Int(b)
-    n = length(y)
-    0 < b <= n || warn("batch size larger than data size")
-    if b == 1
-        fit!(o, x, y)
-    else
-        i = 1
-        while i <= n
-            rng = i:min(i + b - 1, n)
-            bsize = length(rng)
-            updatecounter!(o, bsize)
-            γ = weight(o, bsize)
-            _fitbatch!(o, rows(x, rng), rows(y, rng), γ)
             i += b
         end
     end

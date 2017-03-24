@@ -13,32 +13,37 @@ end
 export
     OnlineStat,
     # Input
-    Input, ScalarInput, VectorInput, XYInput,
+    Input, ScalarInput, VectorInput,
+    Series, Stats,
     # Weight
-    Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
-    BoundedEqualWeight,
+    EqualWeight, ExponentialWeight, LearningRate,
+    # functions
+    maprows,
     # <: OnlineStat
-    Mean, Means, Variance, Variances, Extrema, Extremas, QuantileSGD, QuantileMM, Moments,
-    Diff, Diffs, Sum, Sums, CovMatrix, KMeans, OrderStatistics,
-    # add an intercept term or two way interactions
-    BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
-    # distributions
-    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
-    FitMultinomial, FitMvNormal, FitDirichletMultinomial, NormalMix,
-    # streamstats
-    BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
-    replicates, HyperLogLog,
-    # methods
-    value, fit, fit!, nobs, skewness, kurtosis, fitdistribution, center, maprows
+    Mean, Variance, Extrema, OrderStatistics, Moments
+    # Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
+    # BoundedEqualWeight,
+    # # <: OnlineStat
+    # Mean, Means, Variance, Variances, Extrema, Extremas, QuantileSGD, QuantileMM, Moments,
+    # Diff, Diffs, Sum, Sums, CovMatrix, KMeans, OrderStatistics,
+    # # add an intercept term or two way interactions
+    # BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
+    # # distributions
+    # FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
+    # FitMultinomial, FitMvNormal, FitDirichletMultinomial, NormalMix,
+    # # streamstats
+    # BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
+    # replicates, HyperLogLog,
+    # # methods
+    # value, fit, fit!, nobs, skewness, kurtosis, fitdistribution, center, maprows
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
 abstract type ScalarInput    <: Input end  # observation = scalar
 abstract type VectorInput    <: Input end  # observation = vector
-abstract type XYInput        <: Input end  # observation = (x, y) pair
 
 abstract type OnlineStat{I <: Input} end
-abstract type AbstractSeries end
+abstract type AbstractStats end
 
 const VecF      = Vector{Float64}
 const MatF      = Matrix{Float64}
@@ -188,7 +193,5 @@ include("series.jl")
 # include("streamstats/hyperloglog.jl")
 # include("multivariate/kmeans.jl")
 # include("multivariate/bias.jl")
-# include("plots.jl")
-
 
 end # module

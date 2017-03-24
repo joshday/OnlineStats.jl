@@ -1,29 +1,49 @@
-#--------------------------------------------------------------------# Series
-mutable struct Series{STATS <: Tuple, W <: Weight} <: AbstractSeries
+struct Series{STATS <: Tuple, T}
+    obs::STATS
+    id::T
+end
+Series(args...; id = :x) = Series(args, id)
+function Base.show(io::IO, o::Series)
+    printheader(io, "Series: $(o.id)($(length(o.obs)))\n")
+    for s in o.obs
+        show(io, s)
+    end
+end
+
+#--------------------------------------------------------------------# Stats
+mutable struct Stats{OS <: Tuple, W <: Weight} <: AbstractStats
     weight::W
-    stats::STATS
+    stats::OS
     nobs::Int
     nups::Int
 end
-Series(wt::Weight, args...) = Series(wt, args, 0, 0)
-Series(args...; weight::Weight = EqualWeight()) = Series(weight, args, 0, 0)
-function Base.show(io::IO, o::Series)
-    printheader(io, "Series of $(typeof(o.weight))\n")
+Stats(wt::Weight, args...) = Stats(wt, args, 0, 0)
+Stats(args...; weight::Weight = EqualWeight()) = Stats(weight, args, 0, 0)
+function Stats(y::AVec, args...; weight::Weight = EqualWeight())
+    o = Stats(weight, args...)
+    fit!(o, y)
+    o
+end
+function Base.show(io::IO, o::Stats)
+    printheader(io, "Stats with ")
+    print_with_color(:light_cyan, io, o.weight)
+    println(io)
     for s in o.stats
         print_item(io, name(s), value(s))
     end
 end
+value(o::Stats) = o.stats
 
-updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
+updatecounter!(o::Stats, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 
-function fit!(o::Series, y::Real, γ::Float64 = nextweight(o))
+function fit!(o::Stats, y::Real, γ::Float64 = nextweight(o))
     updatecounter!(o)
     for stat in o.stats
         fit!(stat, y, γ)
     end
     o
 end
-function fit!(o::Series, y::AVec)
+function fit!(o::Stats, y::AVec)
     for yi in y
         fit!(o, yi)
     end
@@ -44,7 +64,7 @@ value(o::Mean) = o.μ
 mutable struct Variance <: OnlineStat{ScalarInput}
     σ²::Float64
     μ::Float64
-    Variance() = Variance(0.0, 0.0)
+    Variance() = new(0.0, 0.0)
 end
 function fit!(o::Variance, y::Real, γ::Float64)
     μ = o.μ
@@ -83,4 +103,27 @@ function fit!(o::OrderStatistics, y::Real, γ::Float64)
         smooth!(o.value, buffer, 1 / nreps)
     end
     o
+end
+
+#--------------------------------------------------------------------# Moments
+type Moments <: OnlineStat{ScalarInput}
+    value::VecF
+    Moments() = new(zeros(4))
+end
+function fit!(o::Moments, y::Real, γ::Float64)
+    @inbounds o.value[1] = smooth(o.value[1], y, γ)
+    @inbounds o.value[2] = smooth(o.value[2], y * y, γ)
+    @inbounds o.value[3] = smooth(o.value[3], y * y * y, γ)
+    @inbounds o.value[4] = smooth(o.value[4], y * y * y * y, γ)
+end
+Base.mean(o::Moments) = value(o)[1]
+Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
+Base.std(o::Moments) = sqrt.(var(o))
+function StatsBase.skewness(o::Moments)
+    v = value(o)
+    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
+end
+function StatsBase.kurtosis(o::Moments)
+    v = value(o)
+    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
 end
