@@ -180,38 +180,7 @@ end
 
 
 
-#------------------------------------------------------------------------# Diff/Diffs
-"""
-Track the last value and the last difference.
-
-```julia
-o = Diff()
-o = Diff(y)
-```
-"""
-type Diff{T <: Real} <: OnlineStat{ScalarInput}
-    diff::T
-    lastval::T
-    weight::EqualWeight
-end
-Diff() = Diff(0.0, 0.0, EqualWeight())
-Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T), EqualWeight())
-Diff{T<:Real}(x::AVec{T}) = (o = Diff(T); fit!(o, x); o)
-value(o::Diff) = o.diff
-Base.last(o::Diff) = o.lastval
-Base.diff(o::Diff) = o.diff
-function _fit!{T<:AbstractFloat}(o::Diff{T}, x::Real, γ::Float64)
-    v = convert(T, x)
-    o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
-    o.lastval = v
-end
-function _fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
-    v = round(T, x)
-    o.diff = (nobs(o) == 0 ? zero(T) : v - last(o))
-    o.lastval = v
-end
-
-
+#------------------------------------------------------------------------# Diffs
 """
 Track the last value and the last difference for multiple series.  Ignores `Weight`.
 

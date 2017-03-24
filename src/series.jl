@@ -219,3 +219,19 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
     o.diff = v - last(o)
     o.lastval = v
 end
+
+#--------------------------------------------------------------------# Sum
+type Sum{T <: Real} <: OnlineStat{ScalarInput}
+    sum::T
+end
+Sum() = Sum(0.0)
+Sum{T<:Real}(::Type{T}) = Sum(zero(T), EqualWeight())
+Base.sum(o::Sum) = o.sum
+function fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64)
+    v = convert(T, x)
+    o.sum += v
+end
+function fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64)
+    v = round(T, x)
+    o.sum += v
+end
