@@ -104,7 +104,7 @@ cached_state(b::FrozenBootstrap) = copy(b.cached_state)
 
 #-----------------------------------------------------------------------# Common
 function Base.show(io::IO, b::Bootstrap)
-    printheader(io, string(typeof(b)))
+    header(io, string(typeof(b)))
     print_item(io, "Boostrap of", typeof(b.replicates[1]))
     print_item(io, "function", b.f)
     print_item(io, "nreplicates", length(b.replicates))

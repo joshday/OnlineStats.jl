@@ -48,7 +48,7 @@ Base.mean(o::NormalMix) = mean(value(o))
 Base.var(o::NormalMix) = var(value(o))
 Base.std(o::NormalMix) = std(value(o))
 function Base.show(io::IO, o::NormalMix)
-    printheader(io, "NormalMix (k = $(Ds.ncomponents(o)))")
+    header(io, "NormalMix (k = $(Ds.ncomponents(o)))")
     print_value_and_nobs(io, o)
 end
 function value(o::NormalMix)

@@ -1,7 +1,7 @@
 #--------------------------------------------------------------------# Weight
 abstract type Weight end
 Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
-nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups)
+nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups + 1)
 weight(o::AbstractStats, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
 nextweight(o::AbstractStats, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
 
@@ -34,7 +34,7 @@ struct LearningRate <: Weight
     r::Float64
     LearningRate(r::Real = .6, λ::Real = 0.0) = new(λ, r)
 end
-show_weight(w::LearningRate) = "γ = max(1 / t ^ $(w.r), $(w.λ))"
+show_weight(w::LearningRate) = "γ = max(t ^ -$(w.r), $(w.λ))"
 weight(w::LearningRate, n::Int, n2::Int, nups::Int) = max(w.λ, exp(-w.r * log(nups)))
 
 #--------------------------------------------------------------------# LearningRate2
@@ -43,7 +43,7 @@ struct LearningRate2 <: Weight
     λ::Float64
     LearningRate2(c::Real = 0.5, λ::Real = 0.0) = new(c, λ)
 end
-show_weight(w::LearningRate2) = "γ = max(1 / (1 + c * (t-1)), $(w.λ))"
+show_weight(w::LearningRate2) = "γ = max(inv(1 + c * (t - 1)), $(w.λ))"
 function weight(w::LearningRate2, n::Int, n2::Int, nups::Int)
-    max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
+    max(w.λ, 1.0 / (1.0 + w.c * (nups - 1)))
 end

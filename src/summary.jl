@@ -1,30 +1,3 @@
-#------------------------------------------------------------------------------# Mean
-"""
-Mean of a single series.
-
-```julia
-y = randn(100)
-
-o = Mean()
-fit!(o, y)
-
-o = Mean(y)
-```
-"""
-type Mean{W <: Weight} <: OnlineStat{ScalarInput}
-    value::Float64
-    weight::W
-end
-Mean(wt::Weight = EqualWeight()) = Mean(0.0, wt)
-_fit!(o::Mean, y::Real, γ::Float64) = (o.value = smooth(o.value, y, γ))
-function _fitbatch!{W <: BatchWeight}(o::Mean{W}, y::AVec, γ::Float64)
-    o.value = smooth(o.value, mean(y), γ)
-end
-Base.mean(o::Mean) = value(o)
-center(o::Mean, x::Real) = x - mean(o)
-_merge!(o::Mean, o2::Mean, γ) = _fit!(o, mean(o2), γ)
-
-
 #-----------------------------------------------------------------------------# Means
 """
 Means of multiple series, similar to `mean(x, 1)`.
@@ -48,46 +21,6 @@ end
 Base.mean(o::Means) = value(o)
 center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
 _merge!(o::Means, o2::Means, γ) = _fit!(o, mean(o2), γ)
-
-
-#--------------------------------------------------------------------------# Variance
-"""
-Univariate variance.
-
-```julia
-y = randn(100)
-o = Variance(y)
-mean(o)
-var(o)
-std(o)
-```
-"""
-type Variance{W <: Weight} <: OnlineStat{ScalarInput}
-    value::Float64
-    μ::Float64
-    weight::W
-end
-Variance(wgt::Weight = EqualWeight()) = Variance(0.0, 0.0, wgt)
-function _fit!(o::Variance, y::Real, γ::Float64)
-    μ = o.μ
-    o.μ = smooth(o.μ, y, γ)
-    o.value = smooth(o.value, (y - o.μ) * (y - μ), γ)
-end
-Base.var(o::Variance) = value(o)
-Base.std(o::Variance) = sqrt(var(o))
-Base.mean(o::Variance) = o.μ
-value(o::Variance) = nobs(o) < 2 ? 0.0 : o.value * unbias(o)
-center(o::Variance, x::Real) = x - mean(o)
-function StatsBase.zscore(o::Variance, x::Real)
-    σ = std(o)
-    σ == 0.0 ? 1.0 : center(o, x) / σ
-end
-function _merge!(o::Variance, o2::Variance, γ)
-    δ = mean(o2) - mean(o)
-    o.value = smooth(o.value, o2.value, γ) + δ ^ 2 * γ * (1.0 - γ)
-    o.μ = smooth(o.μ, o2.μ, γ)
-end
-
 
 #-------------------------------------------------------------------------# Variances
 """
@@ -205,38 +138,6 @@ function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
 end
 
 
-#---------------------------------------------------------------------------# Extrema
-"""
-Extrema (maximum and minimum).
-
-```julia
-o = Extrema(y)
-fit!(o, y2)
-extrema(o)
-```
-"""
-type Extrema <: OnlineStat{ScalarInput}
-    min::Float64
-    max::Float64
-    weight::EqualWeight
-    Extrema() = new(Inf, -Inf, EqualWeight())
-    Extrema{T<:Real}(y::AVec{T}) = new(minimum(y), maximum(y), EqualWeight(length(y)))
-end
-function _fit!(o::Extrema, y::Real, γ::Float64)
-    o.min = min(o.min, y)
-    o.max = max(o.max, y)
-    o
-end
-Base.extrema(o::Extrema) = (o.min, o.max)
-Base.minimum(o::Extrema) = o.min
-Base.maximum(o::Extrema) = o.max
-value(o::Extrema) = extrema(o)
-function _merge!(o::Extrema, o2::Extrema, γ::Float64)
-    o.min = min(o.min, o2.min)
-    o.max = max(o.max, o2.max)
-end
-
-
 #---------------------------------------------------------------------------# Extremas
 """
 Extremas (maximum and minimum) of multiple series.
@@ -276,50 +177,6 @@ function _merge!(o::Extremas, o2::Extremas, γ::Float64)
 end
 
 
-
-#-----------------------------------------------------------------------# QuantileSGD
-"""
-Approximate quantiles via stochastic gradient descent.
-
-```julia
-o = QuantileSGD(y, LearningRate())
-o = QuantileSGD(y, tau = [.25, .5, .75])
-fit!(o, y2)
-```
-"""
-type QuantileSGD{W <: StochasticWeight} <: OnlineStat{ScalarInput}
-    value::VecF
-    τ::VecF
-    weight::W
-end
-function QuantileSGD(wgt::StochasticWeight = LearningRate();
-        tau::VecF = [0.25, 0.5, 0.75], value::VecF = zeros(length(tau))
-    )
-    for τ in tau
-        @assert 0 < τ < 1
-    end
-    QuantileSGD(value, tau, wgt)
-end
-function _fit!(o::QuantileSGD, y::Float64, γ::Float64)
-    @inbounds for i in 1:length(o.τ)
-        v = Float64(y < o.value[i]) - o.τ[i]
-        o.value[i] = subgrad(o.value[i], γ, v)
-    end
-end
-function _fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
-    n2 = length(y)
-    γ = γ / n2
-    @inbounds for yi in y
-        for i in 1:length(o.τ)
-            v = Float64(yi < o.value[i]) - o.τ[i]
-            o.value[i] = subgrad(o.value[i], γ, v)
-        end
-    end
-end
-function Base.show(io::IO, o::QuantileSGD)
-    printheader(io, "QuantileSGD, τ = $(o.τ)")
-    print_value_and_nobs(io, o)
-end
 
 
 #------------------------------------------------------------------------# QuantileMM
@@ -378,7 +235,7 @@ function _fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
     o
 end
 function Base.show(io::IO, o::QuantileMM)
-    printheader(io, "QuantileMM, τ = $(o.τ)")
+    header(io, "QuantileMM, τ = $(o.τ)")
     print_value_and_nobs(io, o)
 end
 
@@ -457,7 +314,7 @@ function StatsBase.kurtosis(o::Moments)
     (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
 end
 function Base.show(io::IO, o::Moments)
-    printheader(io, "Moments")
+    header(io, "Moments")
     print_item(io, "mean", mean(o))
     print_item(io, "var", var(o))
     print_item(io, "skewness", skewness(o))

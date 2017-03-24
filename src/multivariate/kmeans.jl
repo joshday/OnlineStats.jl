@@ -27,7 +27,7 @@ function KMeans{T<:Real}(x::AMat{T}, k::Integer, b::Integer, wgt::Weight = Learn
     o
 end
 function Base.show(io::IO, o::KMeans)
-    printheader(io, "KMeans")
+    header(io, "KMeans")
     print_item(io, "value", value(o))
     print_item(io, "K", size(o.v, 2))
     print_item(io, "nobs", nobs(o))

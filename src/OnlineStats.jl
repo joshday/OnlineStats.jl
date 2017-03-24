@@ -20,7 +20,7 @@ export
     # functions
     maprows,
     # <: OnlineStat
-    Mean, Variance, Extrema, OrderStatistics, Moments
+    Mean, Variance, Extrema, OrderStatistics, Moments, QuantileSGD, QuantileMM
     # Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # BoundedEqualWeight,
     # # <: OnlineStat
@@ -55,10 +55,12 @@ const AMatF     = AMat{Float64}
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
 
-printheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
+header(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
+subheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "  ■ $s")
 
-function print_item(io::IO, name::AbstractString, value)
-    println(io, "  >" * @sprintf("%12s", name * ": "), value)
+function print_item(io::IO, name::AbstractString, value, newline=true)
+    print(io, "  >" * @sprintf("%15s", name * ": "), value)
+    newline && println(io)
 end
 
 showfields(o::OnlineStat) = fieldnames(o)
@@ -78,25 +80,20 @@ end
 
 #---------------------------------------------------------------------------# helpers
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
+StatsBase.nobs(o::AbstractStats) = o.nobs
+nups(o::AbstractStats) = o.nups
+unbias(o::AbstractStats) = nobs(o) / (nobs(o) - 1)
 
 
-StatsBase.nobs(o::OnlineStat) = nobs(o.weight)
-unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
 
-# for updating
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)
-
 function smooth!(m::AbstractArray, v::AbstractArray, γ::Float64)
-    # assumes both arrays have linear indexing
-    @assert length(m) == length(v)
+    length(m) == length(v) || throw(DimensionMismatch())
     for i in eachindex(v)
         @inbounds m[i] = smooth(m[i], v[i], γ)
     end
 end
-
 subgrad(m::Float64, γ::Float64, g::Real) = m - γ * g
-
-# Rank 1 update of symmetric matrix: (1 - γ) * A + γ * x * x'
 function smooth_syr!(A::AMat, x::AVec, γ::Float64)
     @assert size(A, 1) == length(x)
     for j in 1:size(A, 2), i in 1:j

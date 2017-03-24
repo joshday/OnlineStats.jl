@@ -94,7 +94,7 @@ function value(o::FitCategorical)
     end
 end
 function Base.show(io::IO, o::FitCategorical)
-    printheader(io, "FitCategorical")
+    header(io, "FitCategorical")
     print_item(io, "value", value(o))
     print_item(io, "labels", keys(o.d))
     print_item(io, "nobs", nobs(o))
