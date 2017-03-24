@@ -16,7 +16,7 @@ export
     Input, ScalarInput, VectorInput,
     Series, Stats,
     # Weight
-    EqualWeight, ExponentialWeight, LearningRate,
+    EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
     maprows,
     # <: OnlineStat

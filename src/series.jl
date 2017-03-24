@@ -4,7 +4,7 @@ struct Series{STATS <: Tuple, T}
 end
 Series(args...; id = :x) = Series(args, id)
 function Base.show(io::IO, o::Series)
-    printheader(io, "Series: $(o.id)($(length(o.obs)))\n")
+    printheader(io, "Series: $(o.id) ($(length(o.obs)))\n")
     for s in o.obs
         show(io, s)
     end

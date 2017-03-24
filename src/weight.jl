@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------# Weight
 abstract type Weight end
-Base.show(io::IO, w::Weight) = print(io, name(w) * show_weight(w))
+Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
 nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups)
 weight(o::AbstractStats, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
 nextweight(o::AbstractStats, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
@@ -14,7 +14,7 @@ struct ExponentialWeight <: Weight
     ExponentialWeight(λ::Real = 0.1) = new(λ)
     ExponentialWeight(lookback::Integer) = new(2 / (lookback + 1))
 end
-show_weight(w::EqualWeight) = "γ = $(w.λ)"
+show_weight(w::ExponentialWeight) = "γ = $(w.λ)"
 weight(w::ExponentialWeight, n::Int, n2::Int, nups::Int) = w.λ
 #--------------------------------------------------------------------# BoundedEqualWeight
 struct BoundedEqualWeight <: Weight
