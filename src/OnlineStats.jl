@@ -1,11 +1,14 @@
 module OnlineStats
 
 import StatsBase
-import StatsBase: nobs, fit, fit!, skewness, kurtosis, coef, predict
-import Distributions; Ds = Distributions
-using RecipesBase
+importall StatsBase
 using LearnBase
 importall LearnBase
+
+# Reexport LearnBase
+for pkg in [:LearnBase]
+    eval(Expr(:toplevel, Expr(:export, setdiff(names(eval(pkg)), [pkg])...)))
+end
 
 export
     OnlineStat,
@@ -45,7 +48,7 @@ const AMatF     = AMat{Float64}
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
-printheader(io::IO, s::AbstractString) = println(io, "■ $s")
+printheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s\n")
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end
@@ -97,15 +100,11 @@ function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
     BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
 end
 
-row(x::AMat, i::Integer) = view(x, i, :)
-row(x::AVec, i::Integer) = x[i]
-rows(x::AMat, rs::AVec{Int}) = view(x, rs, :)
-rows(x::AVec, rs::AVec{Int}) = view(x, rs)
-col(x::AMat, i::Integer) = view(x, :, i)
-cols(x::AMat, rs::AVec{Int}) = view(x, :, rs)
+getobs(x::AMat, i::Integer) = view(x, i, :)
+getobs(y::AVec, i::Integer) = y[i]
+getobs(x::AMat, rng::AVec) = view(x, rng, :)
+getobs(y::AVec, rng::AVec) = view(y, rng)
 
-nrows(x::AMat) = size(x, 1)
-ncols(x::AMat) = size(x, 2)
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
@@ -179,15 +178,17 @@ end
 
 #----------------------------------------------------------------------# source files
 include("weight.jl")
-include("fit.jl")
-include("summary.jl")
-include("distributions.jl")
-include("normalmix.jl")
-include("streamstats/bootstrap.jl")
-include("streamstats/hyperloglog.jl")
-include("multivariate/kmeans.jl")
-include("multivariate/bias.jl")
-include("plots.jl")
+include("series.jl")
+
+# include("fit.jl")
+# include("summary.jl")
+# include("distributions.jl")
+# include("normalmix.jl")
+# include("streamstats/bootstrap.jl")
+# include("streamstats/hyperloglog.jl")
+# include("multivariate/kmeans.jl")
+# include("multivariate/bias.jl")
+# include("plots.jl")
 
 
 end # module
