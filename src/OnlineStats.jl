@@ -54,12 +54,17 @@ const AMatF     = AMat{Float64}
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
+
 printheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
+
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end
+
+showfields(o::OnlineStat) = fieldnames(o)
+
 function Base.show(io::IO, o::OnlineStat)
-    nms = fieldnames(o)
+    nms = showfields(o)
     print(io, name(o))
     print(io, "(")
     for nm in nms
@@ -71,17 +76,10 @@ end
 
 
 
-
 #---------------------------------------------------------------------------# helpers
-"""
-The associated value of an OnlineStat.
+value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 
-```
-o = Mean()
-value(o)
-```
-"""
-value(o::OnlineStat) = o.value
+
 StatsBase.nobs(o::OnlineStat) = nobs(o.weight)
 unbias(o::OnlineStat) = nobs(o) / (nobs(o) - 1)
 

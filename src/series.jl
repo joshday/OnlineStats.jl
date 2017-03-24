@@ -58,7 +58,6 @@ mutable struct Mean <: OnlineStat{ScalarInput}
     Mean() = new(0.0)
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
-value(o::Mean) = o.μ
 
 #--------------------------------------------------------------------# Variance
 mutable struct Variance <: OnlineStat{ScalarInput}
@@ -71,7 +70,6 @@ function fit!(o::Variance, y::Real, γ::Float64)
     o.μ = smooth(o.μ, y, γ)
     o.σ² = smooth(o.σ², (y - o.μ) * (y - μ), γ)
 end
-value(o::Variance) = o.σ²
 
 #--------------------------------------------------------------------# Extrema
 mutable struct Extrema <: OnlineStat{ScalarInput}
@@ -90,7 +88,7 @@ value(o::Extrema) = (o.min, o.max)
 mutable struct OrderStatistics <: OnlineStat{ScalarInput}
     value::VecF
     buffer::VecF
-    OrderStatistics(p::Integer) = new(zeros(p), zeros(p), EqualWeight())
+    OrderStatistics(p::Integer) = new(zeros(p), zeros(p))
 end
 function fit!(o::OrderStatistics, y::Real, γ::Float64)
     p = length(o.value)
@@ -104,17 +102,18 @@ function fit!(o::OrderStatistics, y::Real, γ::Float64)
     end
     o
 end
+showfields(o::OrderStatistics) = [:value]
 
 #--------------------------------------------------------------------# Moments
 type Moments <: OnlineStat{ScalarInput}
-    value::VecF
+    m::VecF
     Moments() = new(zeros(4))
 end
 function fit!(o::Moments, y::Real, γ::Float64)
-    @inbounds o.value[1] = smooth(o.value[1], y, γ)
-    @inbounds o.value[2] = smooth(o.value[2], y * y, γ)
-    @inbounds o.value[3] = smooth(o.value[3], y * y * y, γ)
-    @inbounds o.value[4] = smooth(o.value[4], y * y * y * y, γ)
+    @inbounds o.m[1] = smooth(o.m[1], y, γ)
+    @inbounds o.m[2] = smooth(o.m[2], y * y, γ)
+    @inbounds o.m[3] = smooth(o.m[3], y * y * y, γ)
+    @inbounds o.m[4] = smooth(o.m[4], y * y * y * y, γ)
 end
 Base.mean(o::Moments) = value(o)[1]
 Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
