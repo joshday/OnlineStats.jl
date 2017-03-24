@@ -38,6 +38,7 @@ abstract type VectorInput    <: Input end  # observation = vector
 abstract type XYInput        <: Input end  # observation = (x, y) pair
 
 abstract type OnlineStat{I <: Input} end
+abstract type AbstractSeries end
 
 const VecF      = Vector{Float64}
 const MatF      = Matrix{Float64}
@@ -48,11 +49,20 @@ const AMatF     = AMat{Float64}
 
 #---------------------------------------------------------------------# printing
 name(o) = replace(string(typeof(o)), "OnlineStats.", "")
-printheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s\n")
+printheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end
-Base.show(io::IO, o::OnlineStat) = print(io, name(o) * "($(value(o)))")
+function Base.show(io::IO, o::OnlineStat)
+    nms = fieldnames(o)
+    print(io, name(o))
+    print(io, "(")
+    for nm in nms
+        print(io, "$nm = $(getfield(o, nm))")
+        nm != nms[end] && print(io, ", ")
+    end
+    print(io, ")")
+end
 
 
 

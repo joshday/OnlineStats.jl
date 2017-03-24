@@ -402,7 +402,7 @@ function OrderStatistics(p::Integer, y::AVec)
     o = OrderStatistics(p)
     fit!(o, y)
 end
-function _fit!(o::OrderStatistics, y::Real, γ::Float64)
+function fit!(o::OrderStatistics, y::Real, γ::Float64)
     p = length(o.value)
     buffer = o.buffer
     i = (nobs(o) % p) + 1
