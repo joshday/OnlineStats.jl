@@ -52,14 +52,8 @@ printheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ 
 function print_item(io::IO, name::AbstractString, value)
     println(io, "  >" * @sprintf("%12s", name * ": "), value)
 end
-function print_value_and_nobs(io::IO, o::OnlineStat)
-    print_item(io, "value", value(o))
-    print_item(io, "nobs", nobs(o))
-end
-function Base.show(io::IO, o::OnlineStat)
-    printheader(io, name(o))
-    print_value_and_nobs(io, o)
-end
+Base.show(io::IO, o::OnlineStat) = print(io, name(o) * "($(value(o)))")
+
 
 
 
@@ -100,10 +94,6 @@ function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
     BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
 end
 
-getobs(x::AMat, i::Integer) = view(x, i, :)
-getobs(y::AVec, i::Integer) = y[i]
-getobs(x::AMat, rng::AVec) = view(x, rng, :)
-getobs(y::AVec, rng::AVec) = view(y, rng)
 
 
 Base.copy(o::OnlineStat) = deepcopy(o)

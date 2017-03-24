@@ -1,25 +1,33 @@
-
-struct WeightGroup{W <: Weight, STATS <: Tuple}
+struct Stats{T <: OnlineStat, W <: Weight}
     weight::W
-    stats::STATS
-end
-WeightGroup(wt::Weight = EqualWeight(), args...) = WeightGroup(wt, args)
-
-
-struct Mean value::Float64 end
-fit(o::Mean, y::Real, γ::Float64) = smooth(o.value, y, γ)
-
-struct Stats{T}
     stats::Vector{T}
 end
-
-function fit!(o::Stats, y::Real, γ::Float64)
-    o.stats[1] = fit(o.stats[1], y, γ)
-    o
+function Base.show(io::IO, o::Stats)
+    printheader(io, name(o))
+    for s in o.stats
+        println(io, s)
+    end
 end
-function fit!(o::Stats, y::AVec, γ::Float64)
-    for yi in y
-        fit!(o, yi, γ)
+
+function fit!(o::Stats, y::Real)
+    updatecounter!(o.weight)
+    γ = weight(o.weight)
+    for i in eachindex(o.stats)
+        @inbounds o.stats[i] = fit(o.stats[i], y, γ)
     end
     o
 end
+function fit!(o::Stats, y::AVec)
+    for yi in y
+        fit!(o, yi)
+    end
+    o
+end
+
+
+
+struct Mean <: OnlineStat{ScalarInput}
+    value::Float64
+    Mean(μ::Real = 0.0) = new(μ)
+end
+fit(o::Mean, y::Real, γ::Float64) = Mean(smooth(o.value, y, γ))
