@@ -199,3 +199,23 @@ function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
     end
     o
 end
+
+#--------------------------------------------------------------------# Diff
+type Diff{T <: Real} <: OnlineStat{ScalarInput}
+    diff::T
+    lastval::T
+end
+Diff() = Diff(0.0, 0.0)
+Diff{T<:Real}(::Type{T}) = Diff(zero(T), zero(T))
+Base.last(o::Diff) = o.lastval
+Base.diff(o::Diff) = o.diff
+function fit!{T<:AbstractFloat}(o::Diff{T}, x::Real, γ::Float64)
+    v = convert(T, x)
+    o.diff = v - last(o)
+    o.lastval = v
+end
+function fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
+    v = round(T, x)
+    o.diff = v - last(o)
+    o.lastval = v
+end
