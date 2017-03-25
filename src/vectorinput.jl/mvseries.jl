@@ -1,4 +1,4 @@
-mutable struct MVStats{OS <: Tuple, W <: Weight} <: AbstractStats
+mutable struct MVStats{OS <: Tuple, W <: Weight} <: AbstractSeries
     weight::W
     stats::OS
     nobs::Int

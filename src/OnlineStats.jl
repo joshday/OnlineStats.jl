@@ -11,40 +11,26 @@ for pkg in [:LearnBase]
 end
 
 export
-    OnlineStat,
-    # Input
-    Input, ScalarInput, VectorInput,
     Series, Stats,
     # Weight
     EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
-    maprows,
+    maprows, nups,
     # <: OnlineStat
     Mean, Variance, Extrema, OrderStatistics, Moments, QuantileSGD, QuantileMM
-    # Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2,
-    # BoundedEqualWeight,
-    # # <: OnlineStat
-    # Mean, Means, Variance, Variances, Extrema, Extremas, QuantileSGD, QuantileMM, Moments,
-    # Diff, Diffs, Sum, Sums, CovMatrix, KMeans, OrderStatistics,
-    # # add an intercept term or two way interactions
-    # BiasVector, BiasMatrix, TwoWayInteractionVector, TwoWayInteractionMatrix,
-    # # distributions
-    # FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal,
-    # FitMultinomial, FitMvNormal, FitDirichletMultinomial, NormalMix,
-    # # streamstats
-    # BernoulliBootstrap, PoissonBootstrap, FrozenBootstrap, cached_state,
-    # replicates, HyperLogLog,
-    # # methods
-    # value, fit, fit!, nobs, skewness, kurtosis, fitdistribution, center, maprows
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
 abstract type ScalarInput    <: Input end  # observation = scalar
 abstract type VectorInput    <: Input end  # observation = vector
+Base.show(io::IO, o::Input) = print(io, replace(string(o), "OnlineStats.", ""))
 
 abstract type OnlineStat{I <: Input} end
-abstract type AbstractStats end
 
+"AbstractSeries: Subtypes have fields: stats, weight, nobs, nups, id"
+abstract type AbstractSeries end
+
+const AA        = AbstractArray
 const VecF      = Vector{Float64}
 const MatF      = Matrix{Float64}
 const AVec{T}   = AbstractVector{T}
@@ -56,10 +42,8 @@ include("show.jl")
 
 
 #---------------------------------------------------------------------------# helpers
+input_type{I <: Input}(o::OnlineStat{I}) = I
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
-StatsBase.nobs(o::AbstractStats) = o.nobs
-nups(o::AbstractStats) = o.nups
-unbias(o::AbstractStats) = nobs(o) / (nobs(o) - 1)
 
 
 
@@ -108,7 +92,7 @@ Base.copy(o::OnlineStat) = deepcopy(o)
 #     end
 #     o
 # end
-#
+
 # function Base.merge!(o::OnlineStat, o2::OnlineStat, wt::Float64)
 #     @assert typeof(o) == typeof(o2)
 #     updatecounter!(o, nobs(o2))
@@ -120,7 +104,7 @@ Base.copy(o::OnlineStat) = deepcopy(o)
 
 
 # epsilon used in special cases to avoid dividing by 0, etc.
-const _ϵ = 1e-8
+const ϵ = 1e-8
 
 #---------------------------------------------------------------------------# maprows
 """
@@ -156,14 +140,7 @@ end
 #----------------------------------------------------------------------# source files
 include("weight.jl")
 include("series.jl")
-include("mvseries.jl")
+# include("mvseries.jl")
 
-
-# include("distributions.jl")
-# include("normalmix.jl")
-# include("streamstats/bootstrap.jl")
-# include("streamstats/hyperloglog.jl")
-# include("multivariate/kmeans.jl")
-# include("multivariate/bias.jl")
 
 end # module

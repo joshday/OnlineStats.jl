@@ -1,80 +1,68 @@
-struct Series{STATS <: Tuple, T}
-    obs::STATS
-    id::T
-end
-function Series(args...; id = :unlabeled)
-    for arg in args
-        isa(arg, Stats) ||
-            throw(ArgumentError("arguments must be Stats"))
-        input_type(arg) == ScalarInput ||
-            throw(ArgumentError("$arg is not <: OnlineStat{ScalarInput}"))
-    end
-    Series(args, id)
-end
-function Base.show(io::IO, o::Series)
-    header(io, "Series(nstats = $(length(o.obs))): $(o.id)\n")
-    for s in o.obs
-        show(io, s)
-        println(io)
-    end
-end
-function fit!(o::Series, args...)
-    for stat in o.obs
-        fit!(stat, args...)
-    end
-    o
-end
-
-fit(o::OnlineStat{ScalarInput}, y::AVec) = Stats(y, o)
-fit(o::OnlineStat{ScalarInput}, y::AVec, wt::Weight) = Stats(y, o; weight = wt)
-
-#--------------------------------------------------------------------# Stats
-"""
-A collection of statistics using the same weighting scheme
-"""
-mutable struct Stats{OS <: Tuple, W <: Weight} <: AbstractStats
+mutable struct Series{I, W <: Weight, O <: Tuple} <: AbstractSeries
     weight::W
-    stats::OS
+    stats::O
     nobs::Int
     nups::Int
+    id::Symbol
+    function Series{I, W, O}(weight::W, stats::O, nobs::Int, nups::Int, id::Symbol) where
+            {I <: Input, W <: Weight, O <: Tuple}
+        all(x -> input_type(x) == I, stats) ||
+            throw(ArgumentError("Input types don't all match $I"))
+        new{I, W, O}(weight, stats, nobs, nups, id)
+    end
 end
-Stats(wt::Weight, args...) = Stats(wt, args, 0, 0)
-Stats(args...; weight::Weight = EqualWeight()) = Stats(weight, args, 0, 0)
-function Stats(y::AVec, args...; weight::Weight = EqualWeight())
-    o = Stats(weight, args...)
+function Series{W, O}(weight::W, stats::O, nobs::Int, nups::Int, id::Symbol)
+    I = input_type(stats[1])
+    Series{I, W, O}(weight, stats, nobs, nups, id)
+end
+
+
+Series(id::Symbol, wt::Weight, stats...) = Series(wt, stats, 0, 0, id)
+Series(wt::Weight, id::Symbol, stats...) = Series(wt, stats, 0, 0, id)
+
+function Series(stats...; weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
+     Series(weight, stats, 0, 0, id)
+ end
+
+function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
+    o = Series(weight, id, args...)
     fit!(o, y)
     o
 end
-
-
-function Base.show(io::IO, o::AbstractStats)
-    subheader(io, "$(name(o, false))(nobs = $(nobs(o))) | ")
-    print_with_color(:light_cyan, io, o.weight)
-    println(io)
+value(o::Series) = o.stats
+nobs(o::Series) = o.nobs
+nups(o::Series) = o.nups
+unbias(o::Series) = nobs(o) / (nobs(o) - 1)
+function Base.show{I}(io::IO, o::Series{I})
+    header(io, "$(name(o, false)) | $I | id: $(o.id)\n")
+    subheader(io, "weight: $(o.weight)\n")
+    subheader(io, "nobs:   $(o.nobs)\n")
     n = length(o.stats)
     for i in 1:n
         s = o.stats[i]
         print_item(io, name(s), value(s), i != n)
     end
 end
-value(o::AbstractStats) = o.stats
-updatecounter!(o::AbstractStats, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
+updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 
 
-function fit!(o::Stats, y::Real, γ::Float64 = nextweight(o))
+#-------------------------------------------------------------------------# ScalarInput
+function fit!(o::Series{ScalarInput}, y::Real, γ::Float64 = nextweight(o))
     updatecounter!(o)
     for stat in o.stats
         fit!(stat, y, γ)
     end
     o
 end
-function fit!(o::Stats, y::AVec)
+function fit!(o::Series{ScalarInput}, y::AVec)
     for yi in y
         fit!(o, yi)
     end
     o
 end
 
+fit(o::OnlineStat{ScalarInput}, y::AVec) = Series(y, o)
+fit(o::OnlineStat{ScalarInput}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
 
 
 #--------------------------------------------------------------------# Mean
@@ -83,6 +71,7 @@ mutable struct Mean <: OnlineStat{ScalarInput}
     Mean() = new(0.0)
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
+_merge!(o::Mean, o2::Mean, γ) = _fit!(o, mean(o2), γ)
 
 #--------------------------------------------------------------------# Variance
 mutable struct Variance <: OnlineStat{ScalarInput}
@@ -94,6 +83,11 @@ function fit!(o::Variance, y::Real, γ::Float64)
     μ = o.μ
     o.μ = smooth(o.μ, y, γ)
     o.σ² = smooth(o.σ², (y - o.μ) * (y - μ), γ)
+end
+function _merge!(o::Variance, o2::Variance, γ)
+    δ = mean(o2) - mean(o)
+    o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
+    o.μ = smooth(o.μ, o2.μ, γ)
 end
 
 #--------------------------------------------------------------------# Extrema
