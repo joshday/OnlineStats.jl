@@ -26,6 +26,9 @@ function fit!(o::MVStats, y::AMat)
     o
 end
 
+fit(o::OnlineStat{VectorInput}, y::AMat) = MVStats(y, o)
+fit(o::OnlineStat{VectorInput}, y::AMat, wt::Weight) = MVStats(y, o; weight = wt)
+
 #-------------------------------------------------------------------------# CovMatrix
 struct CovMatrix <: OnlineStat{VectorInput}
     value::MatF
@@ -59,10 +62,32 @@ function Base.cor(o::CovMatrix)
     scale!(v, o.cormat)
     o.cormat
 end
-# function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
-#     smooth!(o.A, o2.A, γ)
-#     smooth!(o.b, o2.b, γ)
-# end
+function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
+    smooth!(o.A, o2.A, γ)
+    smooth!(o.b, o2.b, γ)
+end
+
+
+#-------------------------------------------------------------------------# MV
+struct MV{T, OS <: Tuple} <: OnlineStat{VectorInput}
+    stats::OS
+end
+function MV(args...)
+    T = typeof(args[1])
+    all(x -> typeof(x) == T, args) || throw(ArgumentError("arguments must be same type"))
+    MV{T, typeof(args)}(args)
+end
+MV(p::Integer, o::OnlineStat{ScalarInput}) = MV([copy(o) for i in 1:p]...)
+function Base.show(io::IO, o::MV)
+    print(io, name(o, false))
+    printfields(io, o)
+end
+function fit!(o::MV, y::AVec, γ::Float64)
+    for (j, yi) in enumerate(y)
+        fit!(o.stats[j], yi, γ)
+    end
+    o
+end
 
 # #-----------------------------------------------------------------------------# Means
 # type Means <: OnlineStat{VectorInput}

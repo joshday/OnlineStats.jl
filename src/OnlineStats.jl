@@ -52,30 +52,7 @@ const AMat{T}   = AbstractMatrix{T}
 const AVecF     = AVec{Float64}
 const AMatF     = AMat{Float64}
 
-#---------------------------------------------------------------------# printing
-name(o) = replace(string(typeof(o)), "OnlineStats.", "")
-
-header(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
-subheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "  ■ $s")
-
-function print_item(io::IO, name::AbstractString, value, newline=true)
-    print(io, "  >" * @sprintf("%15s", name * ": "), value)
-    newline && println(io)
-end
-
-showfields(o::OnlineStat) = fieldnames(o)
-
-function Base.show(io::IO, o::OnlineStat)
-    nms = showfields(o)
-    print(io, name(o))
-    print(io, "(")
-    for nm in nms
-        print(io, "$nm = $(getfield(o, nm))")
-        nm != nms[end] && print(io, ", ")
-    end
-    print(io, ")")
-end
-
+include("show.jl")
 
 
 #---------------------------------------------------------------------------# helpers
@@ -108,36 +85,36 @@ end
 
 Base.copy(o::OnlineStat) = deepcopy(o)
 
-#-----------------------------------------------------------------------------# merge
-function Base.merge(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
-    merge!(copy(o), o2, method)
-end
-function Base.merge(o::OnlineStat, o2::OnlineStat, wt::Float64)
-    merge!(copy(o), o2, wt)
-end
-
-function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
-    @assert typeof(o) == typeof(o2)
-    if nobs(o2) == 0
-        return o
-    end
-    updatecounter!(o, nobs(o2))
-    if method == :append
-        _merge!(o, o2, weight(o, nobs(o2)))
-    elseif method == :mean
-        _merge!(o, o2, 0.5 * (weight(o) + weight(o2)))
-    elseif method == :singleton
-        _merge!(o, o2, weight(o))
-    end
-    o
-end
-
-function Base.merge!(o::OnlineStat, o2::OnlineStat, wt::Float64)
-    @assert typeof(o) == typeof(o2)
-    updatecounter!(o, nobs(o2))
-    _merge!(o, o2, wt)
-    o
-end
+# #-----------------------------------------------------------------------------# merge
+# function Base.merge(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
+#     merge!(copy(o), o2, method)
+# end
+# function Base.merge(o::OnlineStat, o2::OnlineStat, wt::Float64)
+#     merge!(copy(o), o2, wt)
+# end
+#
+# function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
+#     @assert typeof(o) == typeof(o2)
+#     if nobs(o2) == 0
+#         return o
+#     end
+#     updatecounter!(o, nobs(o2))
+#     if method == :append
+#         _merge!(o, o2, weight(o, nobs(o2)))
+#     elseif method == :mean
+#         _merge!(o, o2, 0.5 * (weight(o) + weight(o2)))
+#     elseif method == :singleton
+#         _merge!(o, o2, weight(o))
+#     end
+#     o
+# end
+#
+# function Base.merge!(o::OnlineStat, o2::OnlineStat, wt::Float64)
+#     @assert typeof(o) == typeof(o2)
+#     updatecounter!(o, nobs(o2))
+#     _merge!(o, o2, wt)
+#     o
+# end
 
 
 
@@ -181,8 +158,7 @@ include("weight.jl")
 include("series.jl")
 include("mvseries.jl")
 
-# include("fit.jl")
-# include("summary.jl")
+
 # include("distributions.jl")
 # include("normalmix.jl")
 # include("streamstats/bootstrap.jl")

@@ -48,7 +48,7 @@ end
 
 
 function Base.show(io::IO, o::AbstractStats)
-    subheader(io, "Stats(nobs = $(nobs(o))) | ")
+    subheader(io, "$(name(o, false))(nobs = $(nobs(o))) | ")
     print_with_color(:light_cyan, io, o.weight)
     println(io)
     n = length(o.stats)
@@ -127,7 +127,7 @@ function fit!(o::OrderStatistics, y::Real, γ::Float64)
     end
     o
 end
-showfields(o::OrderStatistics) = [:value]
+fields_to_show(o::OrderStatistics) = [:value]
 
 #--------------------------------------------------------------------# Moments
 type Moments <: OnlineStat{ScalarInput}
@@ -186,7 +186,7 @@ mutable struct QuantileMM <: OnlineStat{ScalarInput}
     o::Float64
     QuantileMM(τ::VecF = [.25, .5, .75]) = new(zeros(τ), τ, zeros(τ), zeros(τ), 0.0)
 end
-showfields(o::QuantileMM) = [:value, :τ]
+fields_to_show(o::QuantileMM) = [:value, :τ]
 function fit!(o::QuantileMM, y::Real, γ::Float64)
     o.o = smooth(o.o, 1.0, γ)
     @inbounds for j in 1:length(o.τ)
