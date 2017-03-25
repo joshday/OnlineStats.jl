@@ -81,3 +81,16 @@ end
 
 fit(o::OnlineStat{ScalarInput}, y::AVec) = Series(y, o)
 fit(o::OnlineStat{ScalarInput}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
+
+#-------------------------------------------------------------------------# VectorInput
+function fit!(o::Series{VectorInput}, y::AVec, γ::Float64 = nextweight(o))
+    updatecounter!(o)
+    map(stat -> fit!(stat, y, γ), o.stats)
+    o
+end
+function fit!(o::Series{VectorInput}, y::AMat)
+    for i in 1:size(y, 1)
+        fit!(o, view(y, i, :))
+    end
+    o
+end

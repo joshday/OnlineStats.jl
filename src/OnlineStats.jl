@@ -17,7 +17,8 @@ export
     # functions
     maprows, nups,
     # <: OnlineStat
-    Mean, Variance, Extrema, OrderStatistics, Moments, QuantileSGD, QuantileMM
+    Mean, Variance, Extrema, OrderStatistics, Moments, QuantileSGD, QuantileMM,
+    MV
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
@@ -141,6 +142,7 @@ end
 include("weight.jl")
 include("series.jl")
 include("scalarinput/summary.jl")
+include("vectorinput/mv.jl")
 
 
 end # module
