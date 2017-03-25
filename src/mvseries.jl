@@ -88,16 +88,3 @@ function fit!(o::MV, y::AVec, γ::Float64)
     end
     o
 end
-
-# #-----------------------------------------------------------------------------# Means
-# type Means <: OnlineStat{VectorInput}
-#     value::VecF
-# end
-# Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt)
-# _fit!(o::Means, y::AVec, γ::Float64) = smooth!(o.value, y, γ)
-# function _fitbatch!{W <: BatchWeight}(o::Means{W}, y::AMat, γ::Float64)
-#     smooth!(o.value, row(mean(y, 1), 1), γ)
-# end
-# Base.mean(o::Means) = value(o)
-# center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
-# _merge!(o::Means, o2::Means, γ) = _fit!(o, mean(o2), γ)
