@@ -1,9 +1,16 @@
-# TODO: check arguments, error handling
 struct Series{STATS <: Tuple, T}
     obs::STATS
     id::T
 end
-Series(args...; id = :unlabeled) = Series(args, id)
+function Series(args...; id = :unlabeled)
+    for arg in args
+        isa(arg, Stats) ||
+            throw(ArgumentError("arguments must be Stats"))
+        input_type(arg) == ScalarInput ||
+            throw(ArgumentError("$arg is not <: OnlineStat{ScalarInput}"))
+    end
+    Series(args, id)
+end
 function Base.show(io::IO, o::Series)
     header(io, "Series(nstats = $(length(o.obs))): $(o.id)\n")
     for s in o.obs
@@ -22,6 +29,9 @@ fit(o::OnlineStat{ScalarInput}, y::AVec) = Stats(y, o)
 fit(o::OnlineStat{ScalarInput}, y::AVec, wt::Weight) = Stats(y, o; weight = wt)
 
 #--------------------------------------------------------------------# Stats
+"""
+A collection of statistics using the same weighting scheme
+"""
 mutable struct Stats{OS <: Tuple, W <: Weight} <: AbstractStats
     weight::W
     stats::OS
@@ -35,7 +45,9 @@ function Stats(y::AVec, args...; weight::Weight = EqualWeight())
     fit!(o, y)
     o
 end
-function Base.show(io::IO, o::Stats)
+
+
+function Base.show(io::IO, o::AbstractStats)
     subheader(io, "Stats(nobs = $(nobs(o))) | ")
     print_with_color(:light_cyan, io, o.weight)
     println(io)
@@ -45,9 +57,9 @@ function Base.show(io::IO, o::Stats)
         print_item(io, name(s), value(s), i != n)
     end
 end
-value(o::Stats) = o.stats
+value(o::AbstractStats) = o.stats
+updatecounter!(o::AbstractStats, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 
-updatecounter!(o::Stats, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 
 function fit!(o::Stats, y::Real, γ::Float64 = nextweight(o))
     updatecounter!(o)

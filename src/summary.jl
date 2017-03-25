@@ -1,26 +1,4 @@
-#-----------------------------------------------------------------------------# Means
-"""
-Means of multiple series, similar to `mean(x, 1)`.
 
-```julia
-x = randn(1000, 5)
-o = Means(5)
-fit!(o, x)
-mean(o)
-```
-"""
-type Means{W <: Weight} <: OnlineStat{VectorInput}
-    value::VecF
-    weight::W
-end
-Means(p::Int, wgt::Weight = EqualWeight()) = Means(zeros(p), wgt)
-_fit!(o::Means, y::AVec, γ::Float64) = smooth!(o.value, y, γ)
-function _fitbatch!{W <: BatchWeight}(o::Means{W}, y::AMat, γ::Float64)
-    smooth!(o.value, row(mean(y, 1), 1), γ)
-end
-Base.mean(o::Means) = value(o)
-center{T<:Real}(o::Means, x::AVec{T}) = x - mean(o)
-_merge!(o::Means, o2::Means, γ) = _fit!(o, mean(o2), γ)
 
 #-------------------------------------------------------------------------# Variances
 """
@@ -84,58 +62,7 @@ function _merge!(o::Variances, o2::Variances, γ::Float64)
 end
 
 
-#-------------------------------------------------------------------------# CovMatrix
-"""
-Covariance matrix, similar to `cov(x)`.
 
-```julia
-o = CovMatrix(x, EqualWeight())
-o = CovMatrix(x)
-fit!(o, x2)
-
-cor(o)
-cov(o)
-mean(o)
-var(o)
-```
-"""
-type CovMatrix{W <: Weight} <: OnlineStat{VectorInput}
-    value::MatF
-    cormat::MatF
-    A::MatF  # X'X / n
-    b::VecF  # X * 1' / n (column means)
-    weight::W
-end
-function CovMatrix(p::Integer, wgt::Weight = EqualWeight())
-    CovMatrix(zeros(p, p), zeros(p,p), zeros(p, p), zeros(p), wgt)
-end
-function _fit!(o::CovMatrix, x::AVec, γ::Float64)
-    smooth!(o.b, x, γ)
-    smooth_syr!(o.A, x, γ)
-    o
-end
-function _fitbatch!(o::CovMatrix, x::AMat, γ::Float64)
-    smooth!(o.b, mean(x, 1), γ)
-    smooth_syrk!(o.A, x, γ)
-end
-function value(o::CovMatrix)
-    o.value = unbias(o) * full(Symmetric((o.A - o.b * o.b')))
-end
-Base.mean(o::CovMatrix) = o.b
-Base.cov(o::CovMatrix) = value(o)
-Base.var(o::CovMatrix) = diag(value(o))
-Base.std(o::CovMatrix) = sqrt.(var(o))
-function Base.cor(o::CovMatrix)
-    copy!(o.cormat, value(o))
-    v = 1.0 ./ sqrt.(diag(o.cormat))
-    scale!(o.cormat, v)
-    scale!(v, o.cormat)
-    o.cormat
-end
-function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
-    smooth!(o.A, o2.A, γ)
-    smooth!(o.b, o2.b, γ)
-end
 
 
 #---------------------------------------------------------------------------# Extremas

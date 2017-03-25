@@ -179,6 +179,7 @@ end
 #----------------------------------------------------------------------# source files
 include("weight.jl")
 include("series.jl")
+include("mvseries.jl")
 
 # include("fit.jl")
 # include("summary.jl")
