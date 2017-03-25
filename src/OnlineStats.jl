@@ -140,7 +140,7 @@ end
 #----------------------------------------------------------------------# source files
 include("weight.jl")
 include("series.jl")
-# include("mvseries.jl")
+include("scalarinput/summary.jl")
 
 
 end # module
