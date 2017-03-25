@@ -18,9 +18,8 @@ function Base.show{T}(io::IO, o::MV{T})
 end
 function fit!(o::MV, y::AVec, γ::Float64)
     stats = o.stats
-    # map((stats, yi) -> fit!(stats, yi, γ), stats, y)
     for (i, yi) in enumerate(y)
-        fit!(stats[i], yi, γ)
+        @inbounds fit!(stats[i], yi, γ)
     end
     o
 end

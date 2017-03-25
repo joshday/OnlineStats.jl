@@ -4,6 +4,8 @@ import StatsBase
 importall StatsBase
 using LearnBase
 importall LearnBase
+import Distributions
+Ds = Distributions
 
 # Reexport LearnBase
 for pkg in [:LearnBase]
@@ -18,7 +20,7 @@ export
     maprows, nups,
     # <: OnlineStat
     Mean, Variance, Extrema, OrderStatistics, Moments, QuantileSGD, QuantileMM,
-    MV
+    MV, CovMatrix
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
@@ -143,6 +145,8 @@ include("weight.jl")
 include("series.jl")
 include("scalarinput/summary.jl")
 include("vectorinput/mv.jl")
+include("vectorinput/covmatrix.jl")
+include("distributions.jl")
 
 
 end # module

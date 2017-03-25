@@ -22,6 +22,9 @@ function _merge!(o::Variance, o2::Variance, γ)
     o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)
 end
+Base.mean(o::Variance) = o.μ
+Base.var(o::Variance) = o.σ²
+Base.std(o::Variance) = sqrt(var(o))
 
 #--------------------------------------------------------------------# Extrema
 mutable struct Extrema <: OnlineStat{ScalarInput}

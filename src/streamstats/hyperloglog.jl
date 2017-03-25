@@ -1,9 +1,5 @@
 # Mostly copy/pasted from StreamStats.jl
 
-# v0.4 updates from
-# https://github.com/PalladiumConsulting/StreamStats.jl/blob/master/src/hyper_log_log.jl
-
-
 hash32(d::Any) = hash(d) % UInt32
 maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add
 ρ(s::UInt32) = UInt32(leading_zeros(s)) + 0x00000001
