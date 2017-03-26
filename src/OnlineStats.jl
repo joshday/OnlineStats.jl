@@ -55,10 +55,9 @@ include("show.jl")
 _io{I, O}(o::OnlineStat{I, O}) = I, O
 _io{I, O}(o::OnlineStat{I, O}, i::Integer) = _io(o)[i]
 
-
-
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 value(o::OnlineStat, nobs::Integer) = value(o)
+Base.copy(o::OnlineStat) = deepcopy(o)
 unbias(nobs::Integer) = nobs / (nobs - 1)
 
 
@@ -81,39 +80,36 @@ function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
 end
 
 
+#-----------------------------------------------------------------------------# merge
+function Base.merge(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
+    merge!(copy(o), o2, method)
+end
+function Base.merge(o::OnlineStat, o2::OnlineStat, wt::Float64)
+    merge!(copy(o), o2, wt)
+end
 
-Base.copy(o::OnlineStat) = deepcopy(o)
+function Base.merge!(o::OnlineStat, o2::OnlineStat, n2::Integer, method::Symbol = :append)
+    @assert typeof(o) == typeof(o2)
+    if n2 == 0
+        return o
+    end
+    updatecounter!(o, n2)
+    if method == :append
+        _merge!(o, o2, weight(o, n2))
+    elseif method == :mean
+        _merge!(o, o2, 0.5 * (weight(o) + weight(o2)))
+    elseif method == :singleton
+        _merge!(o, o2, weight(o))
+    end
+    o
+end
 
-# #-----------------------------------------------------------------------------# merge
-# function Base.merge(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
-#     merge!(copy(o), o2, method)
-# end
-# function Base.merge(o::OnlineStat, o2::OnlineStat, wt::Float64)
-#     merge!(copy(o), o2, wt)
-# end
-#
-# function Base.merge!(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
-#     @assert typeof(o) == typeof(o2)
-#     if nobs(o2) == 0
-#         return o
-#     end
-#     updatecounter!(o, nobs(o2))
-#     if method == :append
-#         _merge!(o, o2, weight(o, nobs(o2)))
-#     elseif method == :mean
-#         _merge!(o, o2, 0.5 * (weight(o) + weight(o2)))
-#     elseif method == :singleton
-#         _merge!(o, o2, weight(o))
-#     end
-#     o
-# end
-
-# function Base.merge!(o::OnlineStat, o2::OnlineStat, wt::Float64)
-#     @assert typeof(o) == typeof(o2)
-#     updatecounter!(o, nobs(o2))
-#     _merge!(o, o2, wt)
-#     o
-# end
+function Base.merge!(o::OnlineStat, o2::OnlineStat, n2::Integer, wt::Float64)
+    @assert typeof(o) == typeof(o2)
+    updatecounter!(o, n2)
+    _merge!(o, o2, wt)
+    o
+end
 
 
 
@@ -156,8 +152,8 @@ end
 include("weight.jl")
 include("series.jl")
 include("scalarinput/summary.jl")
-# include("vectorinput/mv.jl")
-# include("vectorinput/covmatrix.jl")
+include("vectorinput/mv.jl")
+include("vectorinput/covmatrix.jl")
 # include("distributions.jl")
 
 

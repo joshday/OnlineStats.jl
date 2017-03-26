@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------# MV
-struct MV{T} <: OnlineStat{VectorIn}
+struct MV{T} <: OnlineStat{VectorIn, VectorOut}
     stats::Vector{T}
 end
 MV(args...) = MV(collect(args))

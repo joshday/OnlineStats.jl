@@ -30,6 +30,7 @@ function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :un
     o
 end
 value(o::Series) = o.stats
+value(o::Series, i::Integer) = value(o)[i]
 nobs(o::Series) = o.nobs
 nups(o::Series) = o.nups
 unbias(o::Series) = nobs(o) / (nobs(o) - 1)
@@ -95,3 +96,6 @@ function fit!(o::Series{VectorIn}, y::AMat)
     end
     o
 end
+
+fit(o::OnlineStat{VectorIn}, y::AMat) = Series(y, o)
+fit(o::OnlineStat{VectorIn}, y::AMat, wt::Weight) = Series(y, o; weight = wt)
