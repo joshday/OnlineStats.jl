@@ -38,6 +38,7 @@ Base.show(io::IO, o::OnlineIO) = print(io, name(o))
 
 abstract type OnlineStat{I <: Input, O <: Output} end
 
+abstract type AbstractSeries end
 
 const AA        = AbstractArray
 const VecF      = Vector{Float64}
