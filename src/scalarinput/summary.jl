@@ -41,7 +41,7 @@ function fit!(o::Extrema, y::Real, γ::Float64)
 end
 value(o::Extrema) = (o.min, o.max)
 
-#--------------------------------------------------------------------# OrderStatistics
+#--------------------------------------------------------------------# OrderStats
 mutable struct OrderStats <: OnlineStat{NumberIn, VectorOut}
     value::VecF
     buffer::VecF

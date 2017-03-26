@@ -29,7 +29,7 @@ function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :un
     fit!(o, y)
     o
 end
-value(o::Series) = o.stats
+value(o::Series) = map(value, o.stats)
 value(o::Series, i::Integer) = value(o)[i]
 nobs(o::Series) = o.nobs
 nups(o::Series) = o.nups
