@@ -52,10 +52,14 @@ include("show.jl")
 
 
 #---------------------------------------------------------------------------# helpers
-input_type{I <: Input}(o::OnlineStat{I}) = I
+_io{I, O}(o::OnlineStat{I, O}) = I, O
+_io{I, O}(o::OnlineStat{I, O}, i::Integer) = _io(o)[i]
+
+
+
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 value(o::OnlineStat, nobs::Integer) = value(o)
-
+unbias(nobs::Integer) = nobs / (nobs - 1)
 
 
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)

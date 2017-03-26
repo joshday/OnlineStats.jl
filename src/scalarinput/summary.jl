@@ -8,7 +8,7 @@ _merge!(o::Mean, o2::Mean, γ) = fit!(o, mean(o2), γ)
 
 #--------------------------------------------------------------------# Variance
 mutable struct Variance <: OnlineStat{NumberIn, NumberOut}
-    σ²::Float64
+    σ²::Float64     # unbiased variance
     μ::Float64
     Variance() = new(0.0, 0.0)
 end
@@ -22,7 +22,7 @@ function _merge!(o::Variance, o2::Variance, γ)
     o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)
 end
-value(o::Variance, nobs::Integer) = (nobs / (nobs - 1)) * o.σ²
+value(o::Variance, nobs::Integer) = o.σ² * unbias(nobs)
 Base.mean(o::Variance) = o.μ
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
@@ -41,24 +41,27 @@ end
 value(o::Extrema) = (o.min, o.max)
 
 #--------------------------------------------------------------------# OrderStatistics
-mutable struct OrderStatistics <: OnlineStat{NumberIn, VectorOut}
+mutable struct OrderStats <: OnlineStat{NumberIn, VectorOut}
     value::VecF
     buffer::VecF
-    OrderStatistics(p::Integer) = new(zeros(p), zeros(p))
+    i::Int
+    nreps::Int
+    OrderStats(p::Integer) = new(zeros(p), zeros(p), 0, 0)
 end
-function fit!(o::OrderStatistics, y::Real, γ::Float64)
+function fit!(o::OrderStats, y::Real, γ::Float64)
     p = length(o.value)
     buffer = o.buffer
-    i = (nobs(o) % p) + 1
-    @inbounds buffer[i] = y
-    if i == p
+    o.i += 1
+    buffer[o.i] = y
+    if o.i == p
         sort!(buffer)
-        nreps = div(nobs(o), p - 1)
-        smooth!(o.value, buffer, 1 / nreps)
+        o.nreps += 1
+        o.i = 0
+        smooth!(o.value, buffer, 1 / o.nreps)
     end
     o
 end
-fields_to_show(o::OrderStatistics) = [:value]
+fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
 type Moments <: OnlineStat{NumberIn, VectorOut}

@@ -6,13 +6,13 @@ mutable struct Series{I, W <: Weight, O <: Tuple} <: AbstractSeries
     id::Symbol
     function Series{I, W, O}(weight::W, stats::O, nobs::Int, nups::Int, id::Symbol) where
             {I <: Input, W <: Weight, O <: Tuple}
-        all(x -> input_type(x) == I, stats) ||
+        all(x -> _io(x, 1) == I, stats) ||
             throw(ArgumentError("Input types don't all match $I"))
         new{I, W, O}(weight, stats, nobs, nups, id)
     end
 end
 function Series{W, O}(weight::W, stats::O, nobs::Int, nups::Int, id::Symbol)
-    I = input_type(stats[1])
+    I = _io(stats[1], 1)
     Series{I, W, O}(weight, stats, nobs, nups, id)
 end
 
