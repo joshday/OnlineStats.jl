@@ -20,7 +20,7 @@ export
     maprows, nups,
     # <: OnlineStat
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
-    MV, CovMatrix
+    MV, CovMatrix, KMeans
 
 #-----------------------------------------------------------------------------# types
 abstract type OnlineIO end

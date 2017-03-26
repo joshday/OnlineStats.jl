@@ -106,7 +106,7 @@ end
 
 
 #------------------------------------------------------------------------# Gamma
-# method of moments, TODO: look at Distributions for MLE
+# method of moments. TODO: look at Distributions for MLE
 struct FitGamma <: DistributionStat{NumberIn}
     var::Variance
 end
@@ -161,107 +161,19 @@ function value(o::FitMultinomial, nobs::Integer)
 end
 
 
-# #--------------------------------------------------------------# DirichletMultinomial
-# # TODO
-# # """
-# # Dirichlet-Multinomial estimation using Type 1 Online MM.
-# # """
-# # type FitDirichletMultinomial{T <: Real} <: DistributionStat{VectorIn}
-# #     value::Ds.DirichletMultinomial{T}
-# #     suffstats::DirichletMultinomialStats
-# #     weight::EqualWeight
-# #     function FitDirichletMultinomial(p::Integer, wt::Weight = EqualWeight())
-# #         new(Ds.DirichletMultinomial(1, p), EqualWeight())
-# #     end
-# # end
-#
-#
-#
-#
-# #---------------------------------------------------------------------# MvNormal
-# type FitMvNormal{W<:Weight} <: DistributionStat{VectorIn}
-#     value::Ds.MvNormal
-#     cov::CovMatrix{W}
-# end
-# function FitMvNormal(p::Integer, wgt::Weight = EqualWeight())
-#     FitMvNormal(Ds.MvNormal(zeros(p), eye(p)), CovMatrix(p, wgt))
-# end
-# nobs(o::FitMvNormal) = nobs(o.cov)
-# Base.std(d::FitMvNormal) = sqrt.(var(d))  # No std() method from Distributions?
-# _fit!{T<:Real}(o::FitMvNormal, y::AVec{T}, γ::Float64) = _fit!(o.cov, y, γ)
-# function value(o::FitMvNormal)
-#     c = cov(o.cov)
-#     if isposdef(c)
-#         o.value = Ds.MvNormal(mean(o.cov), c)
-#     else
-#         warn("Covariance not positive definite.  More data needed.")
-#     end
-# end
-# updatecounter!(o::FitMvNormal, n2::Int = 1) = updatecounter!(o.cov, n2)
-# weight(o::FitMvNormal, n2::Int = 1) = weight(o.cov, n2)
-#
-#
-#
-# #---------------------------------------------------------------------# convenience constructors
-# for nm in [:FitBeta, :FitGamma, :FitLogNormal, :FitNormal]
-#     eval(parse("""
-#         function $nm{T<:Real}(y::AVec{T}, wgt::Weight = EqualWeight())
-#             o = $nm(wgt)
-#             fit!(o, y)
-#             o
-#         end
-#     """))
-# end
-#
-# function FitCauchy{T<:Real}(y::AVec{T}, wgt::Weight = LearningRate())
-#     o = FitCauchy(wgt)
-#     fit!(o, y)
-#     o
-# end
-#
-# for nm in [:FitMultinomial, :FitMvNormal, :FitDirichletMultinomial]
-#     eval(parse("""
-#         function $nm{T<:Real}(y::AMat{T}, wgt::Weight = EqualWeight())
-#             o = $nm(size(y, 2), wgt)
-#             fit!(o, y)
-#             o
-#         end
-#     """))
-# end
-#
-# for nm in[:Beta, :Categorical, :Cauchy, :Gamma, :LogNormal, :Normal, :Multinomial, :MvNormal]
-#     eval(parse("""
-#         fitdistribution(::Type{Ds.$nm}, args...) = Fit$nm(args...)
-#     """))
-# end
-#
-#
-#
-# #--------------------------------------------------------------# fitdistribution docs
-# """
-# Estimate the parameters of a distribution.
-#
-# ```julia
-# using Distributions
-# # Univariate distributions
-# o = fitdistribution(Beta, y)
-# o = fitdistribution(Categorical, y)  # ignores Weight
-# o = fitdistribution(Cauchy, y)
-# o = fitdistribution(Gamma, y)
-# o = fitdistribution(LogNormal, y)
-# o = fitdistribution(Normal, y)
-# mean(o)
-# var(o)
-# std(o)
-# params(o)
-#
-# # Multivariate distributions
-# o = fitdistribution(Multinomial, x)
-# o = fitdistribution(MvNormal, x)
-# mean(o)
-# var(o)
-# std(o)
-# cov(o)
-# ```
-# """
-# fitdistribution
+#---------------------------------------------------------------------# MvNormal
+mutable struct FitMvNormal<: DistributionStat{VectorIn}
+    cov::CovMatrix
+    FitMvNormal(p::Integer) = new(CovMatrix(p))
+end
+dim(o::FitMvNormal) = size(o.cov.value, 1)
+fit!{T<:Real}(o::FitMvNormal, y::AVec{T}, γ::Float64) = fit!(o.cov, y, γ)
+function value(o::FitMvNormal)
+    c = cov(o.cov)
+    if isposdef(c)
+        return Ds.MvNormal(mean(o.cov), c)
+    else
+        warn("Covariance not positive definite.  More data needed.")
+        return Ds.MvNormal(zeros(dim(o)), eye(dim(o)))
+    end
+end
