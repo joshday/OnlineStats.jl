@@ -112,28 +112,27 @@ function value(o::FitCauchy, nobs::Integer)
     end
     o.value
 end
-#ϵ
-#
-# #------------------------------------------------------------------------# Gamma
-# # method of moments, TODO: look at Distributions for MLE
-# type FitGamma{W<:Weight} <: DistributionStat{ScalarInput}
-#     value::Ds.Gamma
-#     var::Variance{W}
-# end
-# FitGamma(wgt::Weight = EqualWeight()) = FitGamma(Ds.Gamma(), Variance(wgt))
-# _fit!(o::FitGamma, y::Real, γ::Float64) = _fit!(o.var, y, γ)
-# nobs(o::FitGamma) = nobs(o.var)
-# function value(o::FitGamma)
-#     m = mean(o.var)
-#     v = var(o.var)
-#     θ = v / m
-#     α = m / θ
-#     if nobs(o) > 1
-#         o.value = Ds.Gamma(α, θ)
-#     end
-# end
-# updatecounter!(o::FitGamma, n2::Int = 1) = updatecounter!(o.var, n2)
-# weight(o::FitGamma, n2::Int = 1) = weight(o.var, n2)
+
+
+#------------------------------------------------------------------------# Gamma
+# method of moments, TODO: look at Distributions for MLE
+type FitGamma <: DistributionStat{ScalarInput}
+    value::Ds.Gamma
+    var::Variance
+end
+FitGamma() = FitGamma(Ds.Gamma(), Variance())
+fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
+nobs(o::FitGamma) = nobs(o.var)
+function value(o::FitGamma, nobs::Integer)
+    if nobs > 1
+        m = mean(o.var)
+        v = var(o.var)
+        θ = v / m
+        α = m / θ
+        o.value = Ds.Gamma(α, θ)
+    end
+    o.value
+end
 #
 #
 # #-----------------------------------------------------------------------# LogNormal
