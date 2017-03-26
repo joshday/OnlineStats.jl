@@ -9,7 +9,7 @@ var(o)
 std(o)
 ```
 """
-type NormalMix{W<:Weight} <: DistributionStat{ScalarInput}
+type NormalMix{W<:Weight} <: DistributionStat{NumberIn}
     value::Ds.MixtureModel{Ds.Univariate, Ds.Continuous, Ds.Normal{Float64}}
     s1::VecF
     s2::VecF

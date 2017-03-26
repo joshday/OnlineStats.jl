@@ -11,7 +11,7 @@ Base.rand(d::DistributionStat, args...) = rand(value(d), args...)
 
 
 #--------------------------------------------------------------# Beta
-mutable struct FitBeta <: DistributionStat{ScalarInput}
+mutable struct FitBeta <: DistributionStat{NumberIn}
     value::Ds.Beta
     var::Variance
 end
@@ -39,7 +39,7 @@ end
 # o = FitCategorical(y)
 # ```
 # """
-# type FitCategorical{T<:Any} <: DistributionStat{ScalarInput}
+# type FitCategorical{T<:Any} <: DistributionStat{NumberIn}
 #     value::Ds.Categorical
 #     d::Dict{T, Int}
 #     nobs::Int
@@ -100,7 +100,7 @@ end
 #
 #
 #------------------------------------------------------------------# Cauchy
-type FitCauchy <: DistributionStat{ScalarInput}
+type FitCauchy <: DistributionStat{NumberIn}
     value::Ds.Cauchy
     q::QuantileMM
 end
@@ -116,7 +116,7 @@ end
 
 #------------------------------------------------------------------------# Gamma
 # method of moments, TODO: look at Distributions for MLE
-type FitGamma <: DistributionStat{ScalarInput}
+type FitGamma <: DistributionStat{NumberIn}
     value::Ds.Gamma
     var::Variance
 end
@@ -136,7 +136,7 @@ end
 #
 #
 # #-----------------------------------------------------------------------# LogNormal
-# type FitLogNormal{W<:Weight} <: DistributionStat{ScalarInput}
+# type FitLogNormal{W<:Weight} <: DistributionStat{NumberIn}
 #     value::Ds.LogNormal
 #     var::Variance{W}
 # end
@@ -153,7 +153,7 @@ end
 #
 #
 # #-----------------------------------------------------------------------# Normal
-# type FitNormal{W<:Weight} <: DistributionStat{ScalarInput}
+# type FitNormal{W<:Weight} <: DistributionStat{NumberIn}
 #     value::Ds.Normal
 #     var::Variance{W}
 # end
@@ -170,7 +170,7 @@ end
 #
 #
 # #-----------------------------------------------------------------------# Multinomial
-# type FitMultinomial{W<:Weight} <: DistributionStat{VectorInput}
+# type FitMultinomial{W<:Weight} <: DistributionStat{VectorIn}
 #     value::Ds.Multinomial
 #     means::Means{W}
 # end
@@ -195,7 +195,7 @@ end
 # # """
 # # Dirichlet-Multinomial estimation using Type 1 Online MM.
 # # """
-# # type FitDirichletMultinomial{T <: Real} <: DistributionStat{VectorInput}
+# # type FitDirichletMultinomial{T <: Real} <: DistributionStat{VectorIn}
 # #     value::Ds.DirichletMultinomial{T}
 # #     suffstats::DirichletMultinomialStats
 # #     weight::EqualWeight
@@ -208,7 +208,7 @@ end
 #
 #
 # #---------------------------------------------------------------------# MvNormal
-# type FitMvNormal{W<:Weight} <: DistributionStat{VectorInput}
+# type FitMvNormal{W<:Weight} <: DistributionStat{VectorIn}
 #     value::Ds.MvNormal
 #     cov::CovMatrix{W}
 # end

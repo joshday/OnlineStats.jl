@@ -34,7 +34,8 @@ nobs(o::Series) = o.nobs
 nups(o::Series) = o.nups
 unbias(o::Series) = nobs(o) / (nobs(o) - 1)
 function Base.show{I}(io::IO, o::Series{I})
-    header(io, "$(name(o, false)) | $I | id: $(o.id)\n")
+    header(io, "$(name(o))\n")
+    subheader(io, "id:     $(o.id)\n")
     subheader(io, "weight: $(o.weight)\n")
     subheader(io, "nobs:   $(o.nobs)\n")
     n = length(o.stats)
@@ -46,32 +47,32 @@ end
 updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 
 
-#-------------------------------------------------------------------------# ScalarInput
-function fit!(o::Series{ScalarInput}, y::Real, γ::Float64 = nextweight(o))
+#-------------------------------------------------------------------------# NumberIn
+function fit!(o::Series{NumberIn}, y::Real, γ::Float64 = nextweight(o))
     updatecounter!(o)
     map(stat -> fit!(stat, y, γ), o.stats)
     o
 end
-function fit!(o::Series{ScalarInput}, y::AVec)
+function fit!(o::Series{NumberIn}, y::AVec)
     for yi in y
         fit!(o, yi)
     end
     o
 end
-function fit!(o::Series{ScalarInput}, y::AVec, b::Integer)
+function fit!(o::Series{NumberIn}, y::AVec, b::Integer)
     maprows(b, y) do yi
         fitbatch!(o, yi)
     end
     o
 end
 fitbatch!(o::Series, yi) = fit!(o, yi)
-function fit!(o::Series{ScalarInput}, y::AVec, γ::Float64)
+function fit!(o::Series{NumberIn}, y::AVec, γ::Float64)
     for yi in y
         fit!(o, yi, γ)
     end
     o
 end
-function fit!(o::Series{ScalarInput}, y::AVec, γ::AVecF)
+function fit!(o::Series{NumberIn}, y::AVec, γ::AVecF)
     length(y) == length(γ) || throw(DimensionMismatch())
     for (yi, γi) in zip(y, γ)
         fit!(o, yi, γi)
@@ -79,16 +80,16 @@ function fit!(o::Series{ScalarInput}, y::AVec, γ::AVecF)
     o
 end
 
-fit(o::OnlineStat{ScalarInput}, y::AVec) = Series(y, o)
-fit(o::OnlineStat{ScalarInput}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
+fit(o::OnlineStat{NumberIn}, y::AVec) = Series(y, o)
+fit(o::OnlineStat{NumberIn}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
 
-#-------------------------------------------------------------------------# VectorInput
-function fit!(o::Series{VectorInput}, y::AVec, γ::Float64 = nextweight(o))
+#-------------------------------------------------------------------------# VectorIn
+function fit!(o::Series{VectorIn}, y::AVec, γ::Float64 = nextweight(o))
     updatecounter!(o)
     map(stat -> fit!(stat, y, γ), o.stats)
     o
 end
-function fit!(o::Series{VectorInput}, y::AMat)
+function fit!(o::Series{VectorIn}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, view(y, i, :))
     end

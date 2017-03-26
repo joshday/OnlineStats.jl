@@ -6,7 +6,7 @@ o = KMeans(y, 3, LearningRate())
 value(o)
 ```
 """
-type KMeans{W<:Weight} <: OnlineStat{VectorInput}
+type KMeans{W<:Weight} <: OnlineStat{VectorIn}
     value::MatF
     v::VecF
     weight::W
