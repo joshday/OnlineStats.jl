@@ -155,6 +155,7 @@ include("series.jl")
 include("scalarinput/summary.jl")
 include("vectorinput/mv.jl")
 include("vectorinput/covmatrix.jl")
+include("vectorinput/kmeans.jl")
 include("distributions.jl")
 
 

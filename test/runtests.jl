@@ -16,6 +16,7 @@ using OnlineStats, Base.Test
     MV(5, Sum())
     CovMatrix(4)
     Series(Mean(), Variance())
+    Series(randn(100), Mean(), Variance())
     Series(CovMatrix(4), MV(4, Mean()))
     @test_throws ArgumentError Series(CovMatrix(4), Mean())
 end

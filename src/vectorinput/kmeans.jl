@@ -6,12 +6,9 @@ o = KMeans(y, 3, LearningRate())
 value(o)
 ```
 """
-type KMeans{W<:Weight} <: OnlineStat{VectorIn}
+type KMeans <: OnlineStat{VectorIn}
     value::MatF
     v::VecF
-    weight::W
-    n::Int
-    nups::Int
 end
 function KMeans(d::Integer, k::Integer, wgt::Weight = LearningRate())
     KMeans(randn(d, k), zeros(k), wgt, 0, 0)
