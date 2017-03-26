@@ -24,7 +24,7 @@ end
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
         s = fit(o, randn(100))
-        @test value(o) == value(s, 1)
+        @test value(o, 100) == value(s, 1)
     end
 end
 @testset "fit: VectorIn" begin

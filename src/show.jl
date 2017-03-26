@@ -10,8 +10,13 @@ header(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
 
 subheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "  ■ $s")
 
-function print_item(io::IO, name::AbstractString, value, newline=true)
+function print_item(io::IO, name::AbstractString, value::Union{Real, AVec}, newline=true)
     print(io, "  >" * @sprintf("%15s", name * " | "), value)
+    newline && println(io)
+end
+function print_item(io::IO, name::AbstractString, value::AMat, newline=true)
+    print(io, "  >" * @sprintf("%15s", name * " |\n"))
+    show(io, value)
     newline && println(io)
 end
 
