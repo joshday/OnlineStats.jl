@@ -80,7 +80,7 @@ function _fit!(o::NormalMix, y::Real, γ::Float64)
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
         o.s1[j] /= sum2
-        if o.σ2[j] <= _ϵ
+        if o.σ2[j] <= ϵ
             o.σ2 = ones(k)
         end
     end
@@ -117,7 +117,7 @@ function _fitbatch!{T<:Real}(o::NormalMix, y::AVec{T}, γ::Float64)
         o.μ[j] = o.s2[j] / o.s1[j]
         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
         o.s1[j] /= sum2
-        if o.σ2[j] <= _ϵ
+        if o.σ2[j] <= ϵ
             o.σ2 = ones(k)
         end
     end

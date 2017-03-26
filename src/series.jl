@@ -40,7 +40,7 @@ function Base.show{I}(io::IO, o::Series{I})
     n = length(o.stats)
     for i in 1:n
         s = o.stats[i]
-        print_item(io, name(s), value(s), i != n)
+        print_item(io, name(s), value(s, nobs(o)), i != n)
     end
 end
 updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)

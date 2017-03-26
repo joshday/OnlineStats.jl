@@ -1,11 +1,11 @@
 module OnlineStats
 
-import StatsBase
+using StatsBase, LearnBase
 importall StatsBase
-using LearnBase
 importall LearnBase
 import Distributions
 Ds = Distributions
+import StaticArrays
 
 # Reexport LearnBase
 for pkg in [:LearnBase]
@@ -47,6 +47,7 @@ include("show.jl")
 #---------------------------------------------------------------------------# helpers
 input_type{I <: Input}(o::OnlineStat{I}) = I
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
+value(o::OnlineStat, nobs::Integer) = value(o)
 
 
 

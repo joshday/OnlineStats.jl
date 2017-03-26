@@ -16,15 +16,16 @@ mutable struct FitBeta <: DistributionStat{ScalarInput}
     var::Variance
 end
 FitBeta() = FitBeta(Ds.Beta(), Variance())
-fit!(o::FitBeta, y::Real, γ::Float64) = _fit!(o.var, y, γ)
-function value(o::FitBeta)
-    if nobs(o) > 1
+fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
+function value(o::FitBeta, nobs::Integer)
+    if nobs > 1
         m = mean(o.var)
         v = var(o.var)
         α = m * (m * (1 - m) / v - 1)
         β = (1 - m) * (m * (1 - m) / v - 1)
         o.value = Ds.Beta(α, β)
     end
+    o.value
 end
 
 
@@ -98,20 +99,20 @@ end
 # nobs(o::FitCategorical) = o.nobs
 #
 #
-# #------------------------------------------------------------------# Cauchy
-# type FitCauchy{W<:Weight} <: DistributionStat{ScalarInput}
-#     value::Ds.Cauchy
-#     q::QuantileMM{W}
-# end
-# FitCauchy(wgt::Weight = LearningRate()) = FitCauchy(Ds.Cauchy(), QuantileMM(wgt))
-# _fit!(o::FitCauchy, y::Real, γ::Float64) = _fit!(o.q, y, γ)
-# nobs(o::FitCauchy) = nobs(o.q)
-# function value(o::FitCauchy)
-#     o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
-# end
-# updatecounter!(o::FitCauchy, n2::Int = 1) = updatecounter!(o.q, n2)
-# weight(o::FitCauchy, n2::Int = 1) = weight(o.q, n2)
-#
+#------------------------------------------------------------------# Cauchy
+type FitCauchy <: DistributionStat{ScalarInput}
+    value::Ds.Cauchy
+    q::QuantileMM
+end
+FitCauchy() = FitCauchy(Ds.Cauchy(), QuantileMM())
+fit!(o::FitCauchy, y::Real, γ::Float64) = fit!(o.q, y, γ)
+function value(o::FitCauchy, nobs::Integer)
+    if nobs > 1
+        o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
+    end
+    o.value
+end
+#ϵ
 #
 # #------------------------------------------------------------------------# Gamma
 # # method of moments, TODO: look at Distributions for MLE

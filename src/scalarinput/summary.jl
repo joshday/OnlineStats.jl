@@ -22,8 +22,9 @@ function _merge!(o::Variance, o2::Variance, γ)
     o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)
 end
+value(o::Variance, nobs::Integer) = (nobs / (nobs - 1)) * o.σ²
 Base.mean(o::Variance) = o.μ
-Base.var(o::Variance) = o.σ²
+Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 
 #--------------------------------------------------------------------# Extrema
@@ -120,7 +121,7 @@ fields_to_show(o::QuantileMM) = [:value, :τ]
 function fit!(o::QuantileMM, y::Real, γ::Float64)
     o.o = smooth(o.o, 1.0, γ)
     @inbounds for j in 1:length(o.τ)
-        w::Float64 = 1.0 / (abs(y - o.value[j]) + _ϵ)
+        w::Float64 = 1.0 / (abs(y - o.value[j]) + ϵ)
         o.s[j] = smooth(o.s[j], w * y, γ)
         o.t[j] = smooth(o.t[j], w, γ)
         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
