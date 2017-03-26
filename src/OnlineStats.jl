@@ -15,7 +15,7 @@ end
 export
     Series, Stats,
     # Weight
-    EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
+    Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
     maprows, nups,
     # <: OnlineStat
