@@ -13,7 +13,7 @@ for pkg in [:LearnBase]
 end
 
 export
-    Series, Stats,
+    Series,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
