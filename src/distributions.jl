@@ -1,7 +1,3 @@
-# For DistributionStat objects
-# fit! methods should only update "sufficient statistics"
-# value methods should create the distribution
-
 #--------------------------------------------------------------# common
 const DistributionStat{I} = OnlineStat{I, DistributionOut}
 for f in [:mean, :var, :std, :params, :ncategories, :cov]
