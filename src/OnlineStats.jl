@@ -50,7 +50,6 @@ const AMatF     = AMat{Float64}
 
 include("show.jl")
 
-
 #---------------------------------------------------------------------------# helpers
 _io{I, O}(o::OnlineStat{I, O}) = I, O
 _io{I, O}(o::OnlineStat{I, O}, i::Integer) = _io(o)[i]

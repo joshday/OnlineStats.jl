@@ -1,3 +1,5 @@
+# TODO: merge
+
 mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
     weight::W
     stats::O
