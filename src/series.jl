@@ -29,16 +29,16 @@ function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :un
     fit!(o, y)
     o
 end
-value(o::Series) = map(value, o.stats)
+value(o::Series) = map(x -> value(x, o.nobs), o.stats)
 value(o::Series, i::Integer) = value(o)[i]
 nobs(o::Series) = o.nobs
 nups(o::Series) = o.nups
 unbias(o::Series) = nobs(o) / (nobs(o) - 1)
 function Base.show{I}(io::IO, o::Series{I})
     header(io, "$(name(o))\n")
-    subheader(io, "id:     $(o.id)\n")
-    subheader(io, "weight: $(o.weight)\n")
-    subheader(io, "nobs:   $(o.nobs)\n")
+    subheader(io, "         id | $(o.id)\n")
+    subheader(io, "     weight | $(o.weight)\n")
+    subheader(io, "       nobs | $(o.nobs)\n")
     n = length(o.stats)
     for i in 1:n
         s = o.stats[i]
