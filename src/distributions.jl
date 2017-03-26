@@ -3,7 +3,7 @@
 # value methods should create the distribution
 
 #--------------------------------------------------------------# common
-abstract type DistributionStat{I<:Input} <: OnlineStat{I} end
+const DistributionStat{I} = OnlineStat{I, DistributionOut}
 for f in [:mean, :var, :std, :params, :ncategories, :cov]
     @eval Ds.$f(d::DistributionStat) = $f(value(d))
 end
@@ -11,11 +11,10 @@ Base.rand(d::DistributionStat, args...) = rand(value(d), args...)
 
 
 #--------------------------------------------------------------# Beta
-mutable struct FitBeta <: DistributionStat{NumberIn}
-    value::Ds.Beta
+struct FitBeta <: DistributionStat{NumberIn}
     var::Variance
+    FitBeta() = new(Variance())
 end
-FitBeta() = FitBeta(Ds.Beta(), Variance())
 fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
 function value(o::FitBeta, nobs::Integer)
     if nobs > 1
@@ -23,33 +22,25 @@ function value(o::FitBeta, nobs::Integer)
         v = var(o.var)
         α = m * (m * (1 - m) / v - 1)
         β = (1 - m) * (m * (1 - m) / v - 1)
-        o.value = Ds.Beta(α, β)
+        return Ds.Beta(α, β)
+    else
+        return Ds.Beta()
     end
-    o.value
 end
 
 
-# #------------------------------------------------------------------# Categorical
-# # Ignores weight
-# """
-# Find the proportions for each unique input.  Categories are sorted by proportions.
-# Ignores `Weight`.
-#
-# ```julia
-# o = FitCategorical(y)
-# ```
-# """
-# type FitCategorical{T<:Any} <: DistributionStat{NumberIn}
-#     value::Ds.Categorical
-#     d::Dict{T, Int}
-#     nobs::Int
-# end
-# FitCategorical(T::DataType = Any) = FitCategorical(Ds.Categorical(1), Dict{T, Int}(), 0)
-# function FitCategorical(y)
-#     o = FitCategorical(eltype(y))
-#     fit!(o, y)
-#     o
-# end
+#------------------------------------------------------------------# Categorical
+struct FitCategorical{T<:Any} <: DistributionStat{NumberIn}
+    d::Dict{T, Int}
+    FitCategorical{T}() where T<:Any = new(Dict{T, Int}())
+end
+function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
+    haskey(o.d, y) ? (o.d[y] += 1) : (o.d[y] = 1)
+end
+function value(o::FitCategorical, nobs::Integer)
+    nobs > 0 ? Ds.Categorical(collect(values(o.d)) ./ nobs) : Ds.Categorical(1)
+end
+Base.keys(o::FitCategorical) = keys(o.d)
 # function _fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol}, γ::Float64)
 #     if haskey(o.d, y)
 #         o.d[y] += 1
@@ -100,27 +91,26 @@ end
 #
 #
 #------------------------------------------------------------------# Cauchy
-type FitCauchy <: DistributionStat{NumberIn}
-    value::Ds.Cauchy
+struct FitCauchy <: DistributionStat{NumberIn}
     q::QuantileMM
 end
-FitCauchy() = FitCauchy(Ds.Cauchy(), QuantileMM())
+FitCauchy() = FitCauchy(QuantileMM())
 fit!(o::FitCauchy, y::Real, γ::Float64) = fit!(o.q, y, γ)
 function value(o::FitCauchy, nobs::Integer)
     if nobs > 1
-        o.value = Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
+        return Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
+    else
+        return Ds.Cauchy()
     end
-    o.value
 end
 
 
 #------------------------------------------------------------------------# Gamma
 # method of moments, TODO: look at Distributions for MLE
-type FitGamma <: DistributionStat{NumberIn}
-    value::Ds.Gamma
+struct FitGamma <: DistributionStat{NumberIn}
     var::Variance
 end
-FitGamma() = FitGamma(Ds.Gamma(), Variance())
+FitGamma() = FitGamma(Variance())
 fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
 nobs(o::FitGamma) = nobs(o.var)
 function value(o::FitGamma, nobs::Integer)
@@ -129,67 +119,48 @@ function value(o::FitGamma, nobs::Integer)
         v = var(o.var)
         θ = v / m
         α = m / θ
-        o.value = Ds.Gamma(α, θ)
+        return Ds.Gamma(α, θ)
+    else
+        return Ds.Gamma()
     end
-    o.value
 end
-#
-#
-# #-----------------------------------------------------------------------# LogNormal
-# type FitLogNormal{W<:Weight} <: DistributionStat{NumberIn}
-#     value::Ds.LogNormal
-#     var::Variance{W}
-# end
-# FitLogNormal(wgt::Weight = EqualWeight()) = FitLogNormal(Ds.LogNormal(), Variance(wgt))
-# nobs(o::FitLogNormal) = nobs(o.var)
-# _fit!(o::FitLogNormal, y::Real, γ::Float64) = _fit!(o.var, log(y), γ)
-# function value(o::FitLogNormal)
-#     if nobs(o) > 1
-#         o.value = Ds.LogNormal(mean(o.var), std(o.var))
-#     end
-# end
-# updatecounter!(o::FitLogNormal, n2::Int = 1) = updatecounter!(o.var, n2)
-# weight(o::FitLogNormal, n2::Int = 1) = weight(o.var, n2)
-#
-#
-# #-----------------------------------------------------------------------# Normal
-# type FitNormal{W<:Weight} <: DistributionStat{NumberIn}
-#     value::Ds.Normal
-#     var::Variance{W}
-# end
-# FitNormal(wgt::Weight = EqualWeight()) = FitNormal(Ds.Normal(), Variance(wgt))
-# nobs(o::FitNormal) = nobs(o.var)
-# _fit!(o::FitNormal, y::Real, γ::Float64) = _fit!(o.var, y, γ)
-# function value(o::FitNormal)
-#     if nobs(o) > 1
-#         o.value = Ds.Normal(mean(o.var), std(o.var))
-#     end
-# end
-# updatecounter!(o::FitNormal, n2::Int = 1) = updatecounter!(o.var, n2)
-# weight(o::FitNormal, n2::Int = 1) = weight(o.var, n2)
-#
-#
-# #-----------------------------------------------------------------------# Multinomial
-# type FitMultinomial{W<:Weight} <: DistributionStat{VectorIn}
-#     value::Ds.Multinomial
-#     means::Means{W}
-# end
-# function FitMultinomial(p::Integer, wgt::Weight = EqualWeight())
-#     FitMultinomial(Ds.Multinomial(1, ones(p) / p), Means(p, wgt))
-# end
-# nobs(o::FitMultinomial) = nobs(o.means)
-# _fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64) = _fit!(o.means, y, γ)
-# function value(o::FitMultinomial)
-#     m = mean(o.means)
-#     if nobs(o) > 0
-#         o.value = Ds.Multinomial(round(Int, sum(m)), m / sum(m))
-#     end
-#     o.value
-# end
-# updatecounter!(o::FitMultinomial, n2::Int = 1) = updatecounter!(o.means, n2)
-# weight(o::FitMultinomial, n2::Int = 1) = weight(o.means, n2)
-#
-#
+
+
+#-----------------------------------------------------------------------# LogNormal
+struct FitLogNormal <: DistributionStat{NumberIn}
+    var::Variance
+    FitLogNormal() = new(Variance())
+end
+fit!(o::FitLogNormal, y::Real, γ::Float64) = fit!(o.var, log(y), γ)
+function value(o::FitLogNormal, nobs::Integer)
+    nobs > 1 ? Ds.LogNormal(mean(o.var), std(o.var)) : Ds.LogNormal()
+end
+
+
+#-----------------------------------------------------------------------# Normal
+struct FitNormal <: DistributionStat{NumberIn}
+    var::Variance
+    FitNormal() = new(Variance())
+end
+fit!(o::FitNormal, y::Real, γ::Float64) = fit!(o.var, y, γ)
+function value(o::FitNormal, nobs::Integer)
+    nobs > 1 ? Ds.Normal(mean(o.var), std(o.var)) : Ds.Normal()
+end
+
+
+#-----------------------------------------------------------------------# Multinomial
+type FitMultinomial <: DistributionStat{VectorIn}
+    mvmean::MV{Mean}
+    FitMultinomial(p::Integer) = new(MV(p, Mean()))
+end
+fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64) = fit!(o.mvmean, y, γ)
+function value(o::FitMultinomial, nobs::Integer)
+    m = value(o.mvmean)
+    p = length(o.mvmean.stats)
+    nobs > 0 ? Ds.Multinomial(p, m / sum(m)) : Ds.Multinomial(p, ones(p) / p)
+end
+
+
 # #--------------------------------------------------------------# DirichletMultinomial
 # # TODO
 # # """

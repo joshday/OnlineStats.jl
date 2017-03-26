@@ -1,4 +1,4 @@
-mutable struct Series{I, W <: Weight, O <: Tuple} <: AbstractSeries
+mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
     weight::W
     stats::O
     nobs::Int

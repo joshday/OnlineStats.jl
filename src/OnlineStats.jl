@@ -30,9 +30,10 @@ abstract type NumberIn <: Input end  # observation = scalar
 abstract type VectorIn <: Input end  # observation = vector
 
 abstract type Output <: OnlineIO end
-abstract type NumberOut <: Output end
-abstract type VectorOut <: Output end
-abstract type MatrixOut <: Output end
+abstract type NumberOut         <: Output end
+abstract type VectorOut         <: Output end
+abstract type MatrixOut         <: Output end
+abstract type DistributionOut   <: Output end
 Base.show(io::IO, o::OnlineIO) = print(io, name(o))
 
 abstract type OnlineStat{I <: Any, O <: Any} end
@@ -154,7 +155,7 @@ include("series.jl")
 include("scalarinput/summary.jl")
 include("vectorinput/mv.jl")
 include("vectorinput/covmatrix.jl")
-# include("distributions.jl")
+include("distributions.jl")
 
 
 end # module
