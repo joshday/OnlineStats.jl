@@ -43,3 +43,13 @@ function Base.show(io::IO, o::OnlineStat)
     end
     print(io, ")")
 end
+# function Base.show{I, MatrixOut}(io::IO, o::OnlineStat{I, MatrixOut})
+#     nms = fields_to_show(o)
+#     print(io, name(o))
+#     print(io, "(")
+#     for nm in nms
+#         print(io, "$nm = $(getfield(o, nm))")
+#         nm != nms[end] && print(io, ", ")
+#     end
+#     print(io, ")")
+# end

@@ -1,55 +1,36 @@
-"""
-Approximate K-Means clustering of multivariate data via stochastic gradient descent.
-
-```julia
-o = KMeans(y, 3, LearningRate())
-value(o)
-```
-"""
-type KMeans <: OnlineStat{VectorIn}
-    value::MatF
-    v::VecF
-end
-function KMeans(d::Integer, k::Integer, wgt::Weight = LearningRate())
-    KMeans(randn(d, k), zeros(k), wgt, 0, 0)
-end
-function KMeans{T<:Real}(x::AMat{T}, k::Integer, wgt::Weight = LearningRate())
-    o = KMeans(size(x, 2), k, wgt)
-    fit!(o, x)
-    o
-end
-function KMeans{T<:Real}(x::AMat{T}, k::Integer, b::Integer, wgt::Weight = LearningRate())
-    o = KMeans(size(x, 2), k, wgt)
-    fit!(o, x, b)
-    o
-end
-function Base.show(io::IO, o::KMeans)
-    header(io, "KMeans")
-    print_item(io, "value", value(o))
-    print_item(io, "K", size(o.v, 2))
-    print_item(io, "nobs", nobs(o))
-end
-
-function _fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
-    d, k = size(o.value)
-    @assert length(x) == d
-    for j in 1:k
-        o.v[j] = sum(abs2, x - col(o.value, j))
-    end
-    kstar = indmin(o.v)
-    for i in 1:d
-        o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
-    end
-end
-function _fitbatch!{T<:Real}(o::KMeans, x::AMat{T}, γ::Float64)
-    d, k = size(o.value)
-    @assert size(x, 2) == d
-    x̄ = vec(mean(x, 1))
-    for j in 1:k
-        o.v[j] = sum(abs2, x̄ - col(o.value, j))
-    end
-    kstar = indmin(o.v)
-    for i in 1:d
-        o.value[i, kstar] = smooth(o.value[i, kstar], x̄[i], γ)
-    end
-end
+# """
+# Approximate K-Means clustering of multivariate data via stochastic gradient descent.
+#
+# ```julia
+# o = KMeans(y, 3, LearningRate())
+# value(o)
+# ```
+# """
+# type KMeans <: OnlineStat{VectorIn, MatrixOut}
+#     value::MatF
+#     v::VecF
+#     KMeans(p::Integer, k::Integer) = new(randn(p, k), zeros(k))
+# end
+# function fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
+#     d, k = size(o.value)
+#     @assert length(x) == d
+#     for j in 1:k
+#         o.v[j] = sum(abs2, x - col(o.value, j))
+#     end
+#     kstar = indmin(o.v)
+#     for i in 1:d
+#         o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
+#     end
+# end
+# function _fitbatch!{T<:Real}(o::KMeans, x::AMat{T}, γ::Float64)
+#     d, k = size(o.value)
+#     @assert size(x, 2) == d
+#     x̄ = vec(mean(x, 1))
+#     for j in 1:k
+#         o.v[j] = sum(abs2, x̄ - col(o.value, j))
+#     end
+#     kstar = indmin(o.v)
+#     for i in 1:d
+#         o.value[i, kstar] = smooth(o.value[i, kstar], x̄[i], γ)
+#     end
+# end
