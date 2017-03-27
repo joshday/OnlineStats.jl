@@ -24,7 +24,7 @@ struct BoundedEqualWeight <: Weight
     BoundedEqualWeight(lookback::Integer) = new(2 / (lookback + 1))
 end
 show_weight(w::BoundedEqualWeight) = "γ = max(1 / t, $(w.λ))"
-weight(w::BoundedEqualWeight, n::Int, n2::Int, nups::Int) = max(n2 / n, λ)
+weight(w::BoundedEqualWeight, n::Int, n2::Int, nups::Int) = max(n2 / n, w.λ)
 
 #--------------------------------------------------------------------# LearningRate
 struct LearningRate <: Weight

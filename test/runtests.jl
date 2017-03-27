@@ -1,6 +1,23 @@
 module OnlineStatsTest
 using OnlineStats, Base.Test
 
+@testset "Weights" begin
+    w1 = EqualWeight()
+    w2 = ExponentialWeight()
+    w3 = BoundedEqualWeight()
+    w4 = LearningRate()
+
+    for w in [w1, w3, w4]
+        @test OnlineStats.weight(w, 1, 1, 1) == 1
+    end
+    for i in 1:10
+        @test OnlineStats.weight(w1, i, 1, i) == 1 / i
+        @test OnlineStats.weight(w2, i, 1, i) == w2.λ
+        @test OnlineStats.weight(w3, i, 1, i) == 1 / i
+        @test OnlineStats.weight(w4, i, 1, i) ≈ i ^ -w4.r
+    end
+    @test OnlineStats.weight(w3, 1_000_000, 1, 1_000_000) == w3.λ
+end
 
 @testset "Constructors" begin
     Mean()
