@@ -79,17 +79,23 @@ function fit!(o::Moments, y::Real, γ::Float64)
     @inbounds o.m[3] = smooth(o.m[3], y * y * y, γ)
     @inbounds o.m[4] = smooth(o.m[4], y * y * y * y, γ)
 end
-# Base.mean(o::Moments) = value(o)[1]
-# Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
-# Base.std(o::Moments) = sqrt.(var(o))
-# function StatsBase.skewness(o::Moments)
-#     v = value(o)
-#     (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
-# end
-# function StatsBase.kurtosis(o::Moments)
-#     v = value(o)
-#     (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
-# end
+fields_to_show(o::Moments) = [:m]
+Base.mean(o::Moments) = o.m[1]
+Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
+Base.std(o::Moments) = sqrt.(var(o))
+function StatsBase.skewness(o::Moments)
+    v = value(o)
+    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
+end
+function StatsBase.kurtosis(o::Moments)
+    v = value(o)
+    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+end
+function Base.merge!(o1::Moments, o2::Moments, γ::Float64)
+    smooth!(o1.m, o2.m, γ)
+    o1.nobs += o2.nobs
+    o1
+end
 
 #--------------------------------------------------------------------# QuantileSGD
 struct QuantileSGD <: OnlineStat{ScalarIn, VectorOut}
@@ -177,7 +183,7 @@ mutable struct Sum{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
     sum::T
 end
 Sum() = Sum(0.0)
-Sum{T<:Real}(::Type{T}) = Sum(zero(T), EqualWeight())
+Sum{T<:Real}(::Type{T}) = Sum(zero(T))
 Base.sum(o::Sum) = o.sum
 function fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64)
     v = convert(T, x)

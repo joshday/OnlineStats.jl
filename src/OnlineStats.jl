@@ -8,7 +8,7 @@ Ds = Distributions
 import StaticArrays
 
 # Reexport LearnBase
-for pkg in [:LearnBase]
+for pkg in [:LearnBase, :StatsBase]
     eval(Expr(:toplevel, Expr(:export, setdiff(names(eval(pkg)), [pkg])...)))
 end
 
@@ -17,7 +17,7 @@ export
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
-    maprows, nups,
+    maprows, nups, stats,
     # <: OnlineStat
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans
