@@ -34,6 +34,7 @@ abstract type ScalarOut         <: Output end
 abstract type VectorOut         <: Output end
 abstract type MatrixOut         <: Output end
 abstract type DistributionOut   <: Output end
+abstract type UnknownOut        <: Output end
 
 abstract type OnlineStat{I <: Input, O <: Output} end
 
@@ -57,8 +58,6 @@ Base.copy(o::OnlineStat) = deepcopy(o)
 Base.merge{T <: OnlineStat}(o::T, o2::T, wt::Float64) = merge!(copy(o), o2, wt)
 unbias(nobs::Integer) = nobs / (nobs - 1)
 
-
-
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)
 function smooth!(m::AbstractArray, v::AbstractArray, γ::Float64)
     length(m) == length(v) || throw(DimensionMismatch())
@@ -77,29 +76,9 @@ function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
     BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
 end
 
-
-# epsilon used in special cases to avoid dividing by 0, etc.
-const ϵ = 1e-8
+const ϵ = 1e-8  # epsilon used in special cases to avoid dividing by 0, etc.
 
 #---------------------------------------------------------------------------# maprows
-"""
-Perform operations on data in blocks.
-
-`maprows(f::Function, b::Integer, data...)`
-
-This function iteratively feeds `data` in blocks of `b` observations to the
-function `f`.  The most common usage is with `do` blocks:
-
-```julia
-# Example 1
-y = randn(50)
-o = Variance()
-maprows(10, y) do yi
-    fit!(o, yi)
-    println("Updated with another batch!")
-end
-```
-"""
 function maprows(f::Function, b::Integer, data...)
     n = size(data[1], 1)
     i = 1

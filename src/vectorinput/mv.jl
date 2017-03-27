@@ -21,7 +21,7 @@ end
 function fit!(o::MV, y::AVec, γ::Float64)
     stats = o.stats
     for (i, yi) in enumerate(y)
-        @inbounds fit!(stats[i], yi, γ)
+        fit!(stats[i], yi, γ)
     end
     o
 end

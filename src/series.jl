@@ -1,5 +1,3 @@
-# TODO: merge
-
 mutable struct Series{I <: Input, W <: Weight, O <: Tuple}
     weight::W
     stats::O

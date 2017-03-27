@@ -145,7 +145,7 @@ end
 
 
 #-----------------------------------------------------------------------# Multinomial
-type FitMultinomial <: DistributionStat{VectorIn}
+struct FitMultinomial <: DistributionStat{VectorIn}
     mvmean::MV{Mean}
     FitMultinomial(p::Integer) = new(MV(p, Mean()))
 end
@@ -158,7 +158,7 @@ end
 
 
 #---------------------------------------------------------------------# MvNormal
-mutable struct FitMvNormal<: DistributionStat{VectorIn}
+struct FitMvNormal<: DistributionStat{VectorIn}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end

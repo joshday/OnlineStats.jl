@@ -65,7 +65,7 @@ end
 fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
-type Moments <: OnlineStat{ScalarIn, VectorOut}
+mutable struct Moments <: OnlineStat{ScalarIn, VectorOut}
     m::VecF
     Moments() = new(zeros(4))
 end
@@ -149,7 +149,7 @@ function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
 end
 
 #--------------------------------------------------------------------# Diff
-type Diff{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct Diff{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
     diff::T
     lastval::T
 end
@@ -169,7 +169,7 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
 end
 
 #--------------------------------------------------------------------# Sum
-type Sum{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct Sum{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
     sum::T
 end
 Sum() = Sum(0.0)

@@ -32,7 +32,7 @@ for yi in y
 end
 ```
 """
-type HyperLogLog{I <: Input} <: OnlineStat{I}
+mutable struct HyperLogLog{I <: Input} <: OnlineStat{I}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
