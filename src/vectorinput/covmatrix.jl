@@ -31,7 +31,7 @@ function Base.cor(o::CovMatrix)
     scale!(v, o.cormat)
     o.cormat
 end
-function _merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
+function merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
     smooth!(o.A, o2.A, γ)
     smooth!(o.b, o2.b, γ)
 end
