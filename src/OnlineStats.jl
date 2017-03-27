@@ -24,16 +24,16 @@ export
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
+Base.show(io::IO, o::Input) = print(io, name(o))
 abstract type NumberIn <: Input end  # observation = scalar
 abstract type VectorIn <: Input end  # observation = vector
 
 abstract type Output end
+Base.show(io::IO, o::Output) = print(io, name(o))
 abstract type NumberOut         <: Output end
 abstract type VectorOut         <: Output end
 abstract type MatrixOut         <: Output end
 abstract type DistributionOut   <: Output end
-Base.show(io::IO, o::Input) = print(io, name(o))
-Base.show(io::IO, o::Output) = print(io, name(o))
 
 abstract type OnlineStat{I <: Input, O <: Output} end
 
@@ -54,7 +54,9 @@ _io{I, O}(o::OnlineStat{I, O}, i::Integer) = _io(o)[i]
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 value(o::OnlineStat, nobs::Integer) = value(o)
 Base.copy(o::OnlineStat) = deepcopy(o)
+Base.merge{T <: OnlineStat}(o::T, o2::T, wt::Float64) = merge!(copy(o), o2, wt)
 unbias(nobs::Integer) = nobs / (nobs - 1)
+
 
 
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)
@@ -74,40 +76,6 @@ end
 function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
     BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
 end
-
-
-#-----------------------------------------------------------------------------# merge
-function Base.merge(o::OnlineStat, o2::OnlineStat, method::Symbol = :append)
-    merge!(copy(o), o2, method)
-end
-function Base.merge(o::OnlineStat, o2::OnlineStat, wt::Float64)
-    merge!(copy(o), o2, wt)
-end
-
-function Base.merge!(o::OnlineStat, o2::OnlineStat, n2::Integer, method::Symbol = :append)
-    @assert typeof(o) == typeof(o2)
-    if n2 == 0
-        return o
-    end
-    updatecounter!(o, n2)
-    if method == :append
-        _merge!(o, o2, weight(o, n2))
-    elseif method == :mean
-        _merge!(o, o2, 0.5 * (weight(o) + weight(o2)))
-    elseif method == :singleton
-        _merge!(o, o2, weight(o))
-    end
-    o
-end
-
-function Base.merge!(o::OnlineStat, o2::OnlineStat, n2::Integer, wt::Float64)
-    @assert typeof(o) == typeof(o2)
-    updatecounter!(o, n2)
-    _merge!(o, o2, wt)
-    o
-end
-
-
 
 
 # epsilon used in special cases to avoid dividing by 0, etc.

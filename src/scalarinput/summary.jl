@@ -5,7 +5,7 @@ mutable struct Mean <: OnlineStat{NumberIn, NumberOut}
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
 Base.mean(o::Mean) = value(o)
-_merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, mean(o2), γ)
+Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, mean(o2), γ)
 
 #--------------------------------------------------------------------# Variance
 mutable struct Variance <: OnlineStat{NumberIn, NumberOut}
@@ -18,7 +18,7 @@ function fit!(o::Variance, y::Real, γ::Float64)
     o.μ = smooth(o.μ, y, γ)
     o.σ² = smooth(o.σ², (y - o.μ) * (y - μ), γ)
 end
-function _merge!(o::Variance, o2::Variance, γ::Float64)
+function Base.merge!(o::Variance, o2::Variance, γ::Float64)
     δ = mean(o2) - mean(o)
     o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)

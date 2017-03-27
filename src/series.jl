@@ -31,6 +31,7 @@ function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :un
     fit!(o, y)
     o
 end
+
 value(o::Series) = map(x -> value(x, o.nobs), o.stats)
 value(o::Series, i::Integer) = value(o)[i]
 nobs(o::Series) = o.nobs
@@ -50,6 +51,32 @@ end
 updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 weight(o::Series, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
 nextweight(o::Series, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
+Base.copy(o::Series) = deepcopy(o)
+
+#-------------------------------------------------------------------------# merge
+function Base.merge{T <: Series}(o::T, o2::T, method::Symbol = :append)
+    merge!(copy(o), o2)
+end
+function Base.merge!{T <: Series}(o::T, o2::T, method::Symbol = :append)
+    n2 = nobs(o2)
+    n2 == 0 && return o
+    p = length(o.stats)
+    for i in 1:p
+        stat1 = o.stats[i]
+        stat2 = o2.stats[i]
+        if method == :append
+            merge!(stat1, stat2, nextweight(o, n2))
+        elseif method == :mean
+            merge!(stat1, stat2, (weight(o) + weight(o2)))
+        elseif method == :singleton
+            merge!(stat1, stat2, nextweight(o))
+        else
+            throw(ArgumentError("method must be :append, :mean, or :singleton"))
+        end
+    end
+    updatecounter!(o, n2)
+    o
+end
 
 #-------------------------------------------------------------------------# NumberIn
 function fit!(o::Series{NumberIn}, y::Real, γ::Float64 = nextweight(o))
