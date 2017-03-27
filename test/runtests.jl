@@ -8,6 +8,7 @@ info("Messy output for test coverage")
     println(Series(Mean()))
     println(OrderStats(5))
     println(Moments())
+    println(QuantileMM)
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
@@ -121,6 +122,7 @@ end
     @testset "QuantileMM/QuantileSGD" begin
         o = Series(y1, QuantileMM(.1, .2, .3), QuantileSGD(.4, .5))
         o = Series(y1, QuantileMM(), QuantileSGD(); weight = LearningRate())
+        fit!(o, y2, 5)
     end
     @testset "Moments" begin
         x = randn(10_000)
@@ -128,6 +130,7 @@ end
         o = stats(s, 1)
         @test mean(o)       ≈ mean(x)       atol = 1e-4
         @test var(o)        ≈ var(x)        atol = 1e-4
+        @test std(o)        ≈ std(x)        atol = 1e-4
         @test skewness(o)   ≈ skewness(x)   atol = 1e-3
         @test kurtosis(o)   ≈ kurtosis(x)   atol = 1e-3
 
