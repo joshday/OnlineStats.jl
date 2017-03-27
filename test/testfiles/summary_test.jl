@@ -17,102 +17,22 @@ y = vcat(y1, y2)
 
     o3 = merge(o, o2)
     @test value(o3, 1) ≈ mean(y)
-    @test mean(o3.stats[1]) ≈ mean(y)
 end
-# @testset "Variance / Variances" begin
-#     o = Variance(x1)
-#     @test var(o) ≈ var(x1)
-#     o = Variance()
-#     fit!(o, x1)
-#     @test var(o)            ≈ var(x1)
-#     @test std(o)            ≈ std(x1)
-#     @test mean(o)           ≈ mean(x1)
-#     @test var(o)            == value(o)
-#     @test center(o, x[1])   == x[1] - mean(o)
-#     @test zscore(o, x[1])   == (x[1] - mean(o)) / std(o)
-#     o = Variance(x1)
-#     o2 = Variance(x2)
-#     merge!(o, o2)
-#     @test var(o) ≈ var(vcat(x1, x2))
-#
-#     o = Variances(xs)
-#     @test var(o) ≈ vec(var(xs, 1))
-#     @test mean(o) ≈ vec(mean(xs, 1))
-#     @test std(o) ≈ vec(std(xs, 1))
-#     @test var(o) == value(o)
-#     o2 = Variances(2)
-#     fit!(o2, xs)
-#     @test var(o) ≈ var(o2)
-#     @test center(o, vec(xs[1, :])) == vec(xs[1, :]) - mean(o)
-#     @test zscore(o, vec(xs[1, :])) == (vec(xs[1, :]) - mean(o)) ./ std(o)
-#     @test zscore(Variances(5), ones(5)) == ones(5)
-#
-#     o = Variances(xs)
-#     o2 = Variances(xs)
-#     merge!(o, o2)
-#     @test var(o) ≈ vec(var(vcat(xs, xs), 1))
-# end
-# @testset "CovMatrix" begin
-#     o = CovMatrix(xs)
-#     @test cov(o) ≈ cov(xs)
-#     @test cor(o) ≈ cor(xs)
-#
-#     o2 = CovMatrix(2)
-#     fit!(o2, xs)
-#     @test cov(o) ≈ cov(o2)
-#     @test cor(o) ≈ cor(o2)
-#     @test value(o) ≈ value(o2)
-#     @test mean(o) ≈ mean(o2)
-#     @test mean(o2) ≈ vec(mean(xs, 1))
-#     @test var(o) ≈ vec(var(xs, 1))
-#     @test std(o) ≈ vec(std(xs, 1))
-#     fit!(o2, xs, 1)
-#
-#     o = CovMatrix(xs)
-#     o2 = CovMatrix(xs)
-#     merge!(o, o2)
-#     @test cov(o) ≈ cov(vcat(xs, xs))
-#
-#     o3 = CovMatrix(5)
-#     o4 = CovMatrix(5)
-#
-#     @test value(merge(o3, o4)) == zeros(5,5)
-#
-# end
-# @testset "Extrema/Extremas" begin
-#     o = Extrema(x1)
-#     @test extrema(o) == extrema(x1)
-#     @test minimum(o) == minimum(x1)
-#     @test maximum(o) == maximum(x1)
-#     o2 = Extrema()
-#     fit!(o2, x1)
-#     @test extrema(o) == extrema(o2)
-#
-#     o = Extrema(x1)
-#     o2 = Extrema(x2)
-#     merge!(o, o2)
-#     @test extrema(o) == extrema(vcat(x1, x2))
-#
-#     o = Extremas(2)
-#     fit!(o, xs)
-#     @test extrema(o) == vec(extrema(xs, 1))
-#     @test minimum(o) == vec(minimum(xs,1))
-#     @test maximum(o) == vec(maximum(xs,1))
-#
-#     o = Extremas(xs)
-#     o2 = Extremas(2)
-#     fit!(o2, xs)
-#     @test extrema(o) == extrema(o2)
-#     merge!(o, o2)
-#     @test extrema(o) == extrema(o2)
-# end
-# @testset "QuantileSGD / QuantileMM" begin
-#     o = QuantileSGD(x1)
-#     fit!(o, x2, 2)
-#
-#     o = QuantileMM(x1)
-#     fit!(o, x2, 2)
-# end
+@testset "Variance" begin
+    o = fit(Variance(), y1)
+    @test value(o, 1) ≈ var(y1)
+end
+@testset "Extrema" begin
+    o = fit(Extrema(), y1)
+    @test value(o, 1) == extrema(y1)
+end
+@testset "QuantileMM/QuantileSGD" begin
+    o = Series(y1, QuantileMM(), QuantileSGD(); weight = LearningRate())
+end
+@testset "Moments" begin
+    x = randn(10_000)
+    o = fit(Moments(), x)
+end
 # @testset "Moments" begin
 #     o = Moments(x1)
 #     @test mean(o) ≈ mean(x1)

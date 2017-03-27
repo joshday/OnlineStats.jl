@@ -4,8 +4,7 @@ mutable struct Mean <: OnlineStat{ScalarIn, ScalarOut}
     Mean() = new(0.0)
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
-Base.mean(o::Mean) = value(o)
-Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, mean(o2), γ)
+Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
 
 #--------------------------------------------------------------------# Variance
 mutable struct Variance <: OnlineStat{ScalarIn, ScalarOut}
@@ -19,14 +18,11 @@ function fit!(o::Variance, y::Real, γ::Float64)
     o.σ² = smooth(o.σ², (y - o.μ) * (y - μ), γ)
 end
 function Base.merge!(o::Variance, o2::Variance, γ::Float64)
-    δ = mean(o2) - mean(o)
+    δ = o2.μ - o.μ
     o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)
 end
 value(o::Variance, nobs::Integer) = o.σ² * unbias(nobs)
-Base.mean(o::Variance) = o.μ
-Base.var(o::Variance) = value(o)
-Base.std(o::Variance) = sqrt(var(o))
 
 #--------------------------------------------------------------------# Extrema
 mutable struct Extrema <: OnlineStat{ScalarIn, VectorOut}
@@ -75,17 +71,17 @@ function fit!(o::Moments, y::Real, γ::Float64)
     @inbounds o.m[3] = smooth(o.m[3], y * y * y, γ)
     @inbounds o.m[4] = smooth(o.m[4], y * y * y * y, γ)
 end
-Base.mean(o::Moments) = value(o)[1]
-Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
-Base.std(o::Moments) = sqrt.(var(o))
-function StatsBase.skewness(o::Moments)
-    v = value(o)
-    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
-end
-function StatsBase.kurtosis(o::Moments)
-    v = value(o)
-    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
-end
+# Base.mean(o::Moments) = value(o)[1]
+# Base.var(o::Moments) = (value(o)[2] - value(o)[1] ^ 2) * unbias(o)
+# Base.std(o::Moments) = sqrt.(var(o))
+# function StatsBase.skewness(o::Moments)
+#     v = value(o)
+#     (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
+# end
+# function StatsBase.kurtosis(o::Moments)
+#     v = value(o)
+#     (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+# end
 
 #--------------------------------------------------------------------# QuantileSGD
 struct QuantileSGD <: OnlineStat{ScalarIn, VectorOut}
