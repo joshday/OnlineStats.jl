@@ -33,5 +33,15 @@ end
         @test value(o) == value(s, 1)
     end
 end
+@testset "merge" begin
+    y1 = randn(100)
+    y2 = randn(100)
+    y = vcat(y1, y2)
+    o = Series(y1, Mean(), Variance())
+    o2 = Series(y2, Mean(), Variance())
+    merge!(o, o2)
+    @test value(o, 1) ≈ mean(y)
+    @test value(o, 2) ≈ var(y)
+end
 
 end
