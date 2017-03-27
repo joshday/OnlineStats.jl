@@ -29,6 +29,8 @@ function Base.merge!(o::Variance, o2::Variance, γ::Float64)
 end
 value(o::Variance) = o.σ2 * unbias(o)
 Base.var(o::Variance) = value(o)
+Base.std(o::Variance) = sqrt(var(o))
+Base.mean(o::Variance) = o.μ
 
 #--------------------------------------------------------------------# Extrema
 mutable struct Extrema <: OnlineStat{ScalarIn, VectorOut}

@@ -12,8 +12,8 @@ struct FitBeta <: DistributionStat{ScalarIn}
     FitBeta() = new(Variance())
 end
 fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function value(o::FitBeta, nobs::Integer)
-    if nobs > 1
+function value(o::FitBeta)
+    if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
         α = m * (m * (1 - m) / v - 1)
@@ -26,15 +26,18 @@ end
 
 
 #------------------------------------------------------------------# Categorical
-struct FitCategorical{T<:Any} <: DistributionStat{ScalarIn}
+mutable struct FitCategorical{T<:Any} <: DistributionStat{ScalarIn}
     d::Dict{T, Int}
-    FitCategorical{T}() where T<:Any = new(Dict{T, Int}())
+    nobs::Int
+    FitCategorical{T}() where T<:Any = new(Dict{T, Int}(), 0)
 end
+FitCategorical(t::Type) = FitCategorical{t}()
 function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
+    o.nobs += 1
     haskey(o.d, y) ? (o.d[y] += 1) : (o.d[y] = 1)
 end
-function value(o::FitCategorical, nobs::Integer)
-    nobs > 0 ? Ds.Categorical(collect(values(o.d)) ./ nobs) : Ds.Categorical(1)
+function value(o::FitCategorical)
+    o.nobs > 0 ? Ds.Categorical(collect(values(o.d)) ./ o.nobs) : Ds.Categorical(1)
 end
 Base.keys(o::FitCategorical) = keys(o.d)
 # function _fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol}, γ::Float64)
@@ -87,13 +90,14 @@ Base.keys(o::FitCategorical) = keys(o.d)
 #
 #
 #------------------------------------------------------------------# Cauchy
-struct FitCauchy <: DistributionStat{ScalarIn}
+mutable struct FitCauchy <: DistributionStat{ScalarIn}
     q::QuantileMM
+    nobs::Int
+    FitCauchy() = new(QuantileMM(), 0)
 end
-FitCauchy() = FitCauchy(QuantileMM())
-fit!(o::FitCauchy, y::Real, γ::Float64) = fit!(o.q, y, γ)
-function value(o::FitCauchy, nobs::Integer)
-    if nobs > 1
+fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
+function value(o::FitCauchy)
+    if o.nobs > 1
         return Ds.Cauchy(o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1]))
     else
         return Ds.Cauchy()
@@ -109,8 +113,8 @@ end
 FitGamma() = FitGamma(Variance())
 fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
 nobs(o::FitGamma) = nobs(o.var)
-function value(o::FitGamma, nobs::Integer)
-    if nobs > 1
+function value(o::FitGamma)
+    if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
         θ = v / m
@@ -128,8 +132,8 @@ struct FitLogNormal <: DistributionStat{ScalarIn}
     FitLogNormal() = new(Variance())
 end
 fit!(o::FitLogNormal, y::Real, γ::Float64) = fit!(o.var, log(y), γ)
-function value(o::FitLogNormal, nobs::Integer)
-    nobs > 1 ? Ds.LogNormal(mean(o.var), std(o.var)) : Ds.LogNormal()
+function value(o::FitLogNormal)
+    o.var.nobs > 1 ? Ds.LogNormal(mean(o.var), std(o.var)) : Ds.LogNormal()
 end
 
 
@@ -139,21 +143,22 @@ struct FitNormal <: DistributionStat{ScalarIn}
     FitNormal() = new(Variance())
 end
 fit!(o::FitNormal, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function value(o::FitNormal, nobs::Integer)
-    nobs > 1 ? Ds.Normal(mean(o.var), std(o.var)) : Ds.Normal()
+function value(o::FitNormal)
+    o.var.nobs > 1 ? Ds.Normal(mean(o.var), std(o.var)) : Ds.Normal()
 end
 
 
 #-----------------------------------------------------------------------# Multinomial
-struct FitMultinomial <: DistributionStat{VectorIn}
+mutable struct FitMultinomial <: DistributionStat{VectorIn}
     mvmean::MV{Mean}
-    FitMultinomial(p::Integer) = new(MV(p, Mean()))
+    nobs::Int
+    FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
 end
 fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64) = fit!(o.mvmean, y, γ)
 function value(o::FitMultinomial, nobs::Integer)
     m = value(o.mvmean)
     p = length(o.mvmean.stats)
-    nobs > 0 ? Ds.Multinomial(p, m / sum(m)) : Ds.Multinomial(p, ones(p) / p)
+    o.nobs > 0 ? Ds.Multinomial(p, m / sum(m)) : Ds.Multinomial(p, ones(p) / p)
 end
 
 

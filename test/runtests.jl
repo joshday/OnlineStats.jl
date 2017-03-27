@@ -1,5 +1,5 @@
 module OnlineStatsTest
-using OnlineStats, Base.Test
+using OnlineStats, Base.Test, Distributions
 
 @testset "Weights" begin
     w1 = EqualWeight()
@@ -148,5 +148,62 @@ end
         @test sum(o) ≈ sum(y)
     end
 end # summary
+
+@testset "Distributions" begin
+    @testset "FitBeta" begin
+        d = Beta(3, 5)
+        y = rand(d, 1000)
+        o = FitBeta()
+        s = Series(y, o)
+        @test mean(o) ≈ mean(y)
+        @test var(o) ≈ var(y)
+        @test std(o) ≈ std(y)
+        @test params(o) == params(value(o))
+    end
+    @testset "FitCategorical" begin
+        y = rand(1:5, 1000)
+        o = FitCategorical(Int)
+        s = Series(y, o)
+        myfit = fit(Categorical, y)
+        pr = probs(value(o))
+        for i in eachindex(pr)
+            @test pr[i] in probs(myfit)
+        end
+    end
+    @testset "FitCauchy" begin
+        d = Cauchy()
+        y = rand(d, 10_000)
+        o = FitCauchy()
+        s = Series(y, o; weight = LearningRate())
+        myfit = fit(Cauchy, y)
+        θ = params(value(o))
+        @test params(value(o))[1] ≈ params(myfit)[1] atol = .1
+        @test params(value(o))[2] ≈ params(myfit)[2] atol = .1
+    end
+    @testset "FitGamma" begin
+        d = Gamma(5, 1)
+        y = rand(d, 10_000)
+        o = FitGamma()
+        s = Series(y, o)
+        myfit = fit(Gamma, y)
+        @test mean(o)   ≈ mean(myfit)   atol=.01
+        @test var(o)    ≈ var(myfit)    atol=.1
+        @test std(o)    ≈ std(myfit)    atol=.1
+    end
+    @testset "FitLogNormal" begin
+        d = LogNormal()
+        y = rand(d, 1000)
+        o = FitLogNormal()
+        s = Series(y, o)
+        myfit = fit(LogNormal, y)
+        @test mean(o) ≈ mean(myfit)
+        @test var(o) ≈ var(myfit)
+        @test std(o) ≈ std(myfit)
+    end
+    @testset "FitMultinomial" begin
+    end
+    @testset "FitMvNormal" begin
+    end
+end
 
 end

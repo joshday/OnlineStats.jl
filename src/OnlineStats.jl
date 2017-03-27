@@ -20,7 +20,9 @@ export
     maprows, nups, stats,
     # <: OnlineStat
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
-    MV, CovMatrix, KMeans
+    MV, CovMatrix, KMeans,
+    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
+    FitMvNormal
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
