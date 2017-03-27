@@ -1,6 +1,29 @@
 module OnlineStatsTest
 using OnlineStats, Base.Test, Distributions
 
+info("Messy output for test coverage")
+@testset "show" begin
+    show(OnlineStats.ScalarIn)
+    show(OnlineStats.ScalarOut)
+    @testset "maprows" begin
+        s = Series(Mean(), Variance())
+        println()
+        maprows(10, randn(100)) do yi
+            fit!(s, yi)
+            print("$(nobs(s)), ")
+        end
+        println()
+        @test nobs(s) == 100
+    end
+end
+
+
+
+println()
+println()
+info("TESTS BEGIN HERE")
+
+
 @testset "Weights" begin
     w1 = EqualWeight()
     w2 = ExponentialWeight()
@@ -61,9 +84,8 @@ end
     merge!(o, o2)
     @test value(o, 1) ≈ mean(y)
     @test value(o, 2) ≈ var(y)
+    merge(Mean(), Mean(), .1)
 end
-
-
 
 @testset "Summary" begin
     y1 = randn(500)

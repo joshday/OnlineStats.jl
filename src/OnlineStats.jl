@@ -80,6 +80,9 @@ end
 const ϵ = 1e-8  # epsilon used in special cases to avoid dividing by 0, etc.
 
 #---------------------------------------------------------------------------# maprows
+rows(x::AVec, rng) = view(x, rng)
+rows(x::AMat, rng) = view(x, rng, :)
+
 function maprows(f::Function, b::Integer, data...)
     n = size(data[1], 1)
     i = 1
