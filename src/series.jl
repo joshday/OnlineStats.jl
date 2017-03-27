@@ -1,6 +1,6 @@
 # TODO: merge
 
-mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
+mutable struct Series{I <: Input, W <: Weight, O <: Tuple}
     weight::W
     stats::O
     nobs::Int
@@ -48,7 +48,8 @@ function Base.show{I}(io::IO, o::Series{I})
     end
 end
 updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
-
+weight(o::Series, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
+nextweight(o::Series, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
 
 #-------------------------------------------------------------------------# NumberIn
 function fit!(o::Series{NumberIn}, y::Real, γ::Float64 = nextweight(o))

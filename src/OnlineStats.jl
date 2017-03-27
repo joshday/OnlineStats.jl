@@ -23,22 +23,19 @@ export
     MV, CovMatrix, KMeans
 
 #-----------------------------------------------------------------------------# types
-abstract type OnlineIO end
-
-abstract type Input <: OnlineIO end
+abstract type Input end
 abstract type NumberIn <: Input end  # observation = scalar
 abstract type VectorIn <: Input end  # observation = vector
 
-abstract type Output <: OnlineIO end
+abstract type Output end
 abstract type NumberOut         <: Output end
 abstract type VectorOut         <: Output end
 abstract type MatrixOut         <: Output end
 abstract type DistributionOut   <: Output end
-Base.show(io::IO, o::OnlineIO) = print(io, name(o))
+Base.show(io::IO, o::Input) = print(io, name(o))
+Base.show(io::IO, o::Output) = print(io, name(o))
 
 abstract type OnlineStat{I <: Input, O <: Output} end
-
-abstract type AbstractSeries end
 
 const AA        = AbstractArray
 const VecF      = Vector{Float64}
