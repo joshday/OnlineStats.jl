@@ -5,6 +5,7 @@ info("Messy output for test coverage")
 @testset "show" begin
     show(OnlineStats.ScalarIn)
     show(OnlineStats.ScalarOut)
+    show(Series(Mean()))
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
@@ -67,12 +68,16 @@ end
               QuantileMM(), Diff(), Sum()]
         s = Series(randn(100), o)
         @test value(o) == value(s, 1)
+        @test value(s) == tuple(value(o))
+        @test typeof(stats(s)) == Tuple{typeof(o)}
     end
 end
 @testset "Series{VectorIn}" begin
     for o in [MV(5, Mean()), MV(5, Variance()), CovMatrix(5)]
         s = Series(randn(100, 5), o)
         @test value(o) == value(s, 1)
+        @test value(s) == tuple(value(o))
+        @test typeof(stats(s)) == Tuple{typeof(o)}
     end
 end
 @testset "Series merge" begin
