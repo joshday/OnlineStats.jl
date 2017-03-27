@@ -20,7 +20,7 @@ using OnlineStats, Base.Test
     Series(CovMatrix(4), MV(4, Mean()))
     @test_throws ArgumentError Series(CovMatrix(4), Mean())
 end
-@testset "fit: NumberIn" begin
+@testset "fit: ScalarIn" begin
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
         s = fit(o, randn(100))

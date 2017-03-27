@@ -15,7 +15,7 @@ Example:
 BernoulliBootstrap(Mean(), mean, 1000)
 ```
 """
-type BernoulliBootstrap{S <: OnlineStat{NumberIn}} <: Bootstrap{NumberIn}
+type BernoulliBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn}
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
     f::Function                      # function to generate state. Ex: mean, var, std
@@ -23,7 +23,7 @@ type BernoulliBootstrap{S <: OnlineStat{NumberIn}} <: Bootstrap{NumberIn}
     cache_is_dirty::Bool
 end
 
-function BernoulliBootstrap{T <: NumberIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
+function BernoulliBootstrap{T <: ScalarIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
     replicates = OnlineStat{T}[copy(o) for i in 1:r]
     cached_state = Array{Float64}(r)
     return BernoulliBootstrap(replicates, cached_state, f, 0, true)
@@ -52,14 +52,14 @@ Example:
 PoissonBootstrap(Mean(), mean, 1000)
 ```
 """
-type ScalarPoissonBootstrap{S <: OnlineStat{NumberIn}} <: Bootstrap{NumberIn}
+type ScalarPoissonBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn}
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
     f::Function
     n::Int                          # number of observations
     cache_is_dirty::Bool
 end
-function PoissonBootstrap{T <: NumberIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
+function PoissonBootstrap{T <: ScalarIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
     replicates = OnlineStat{T}[copy(o) for i in 1:r]
     cached_state = Array{Float64}(r)
     ScalarPoissonBootstrap(replicates, cached_state, f, 0, true)
@@ -94,7 +94,7 @@ end
 #--------------------------------------------------------------# FrozenBootstrap
 # "Frozen bootstraps object are generated when two bootstrap distributions are combined
 #  e.g., if they are differenced."
-immutable FrozenBootstrap <: Bootstrap{NumberIn}
+immutable FrozenBootstrap <: Bootstrap{ScalarIn}
     cached_state::Vector{Float64}  # cache of replicate states
     n::Int                          # number of observations
 end
@@ -112,7 +112,7 @@ function Base.show(io::IO, b::Bootstrap)
 end
 
 # update cached_state' states if necessary and return their values
-function cached_state(b::Bootstrap{NumberIn})
+function cached_state(b::Bootstrap{ScalarIn})
     if b.cache_is_dirty
         for i in 1:length(b.replicates)
             b.cached_state[i] = b.f(b.replicates[i])
@@ -131,9 +131,9 @@ function cached_state(b::Bootstrap{VectorIn})
     return b.cached_state
 end
 
-Base.mean(b::Bootstrap{NumberIn}) = mean(cached_state(b))
-Base.std(b::Bootstrap{NumberIn}) = std(cached_state(b))
-Base.var(b::Bootstrap{NumberIn}) = var(cached_state(b))
+Base.mean(b::Bootstrap{ScalarIn}) = mean(cached_state(b))
+Base.std(b::Bootstrap{ScalarIn}) = std(cached_state(b))
+Base.var(b::Bootstrap{ScalarIn}) = var(cached_state(b))
 
 Base.mean(b::Bootstrap{VectorIn}) = vec(mean(cached_state(b),2))
 Base.std(b::Bootstrap{VectorIn}) = vec(std(cached_state(b),2))
@@ -143,13 +143,13 @@ Base.var(b::Bootstrap{VectorIn}) = vec(var(cached_state(b),2))
 replicates(b::Bootstrap) = copy(b.replicates)
 
 # Assumes a and b are independent.
-function Base.:-(a::Bootstrap{NumberIn}, b::Bootstrap{NumberIn})
+function Base.:-(a::Bootstrap{ScalarIn}, b::Bootstrap{ScalarIn})
     return FrozenBootstrap(cached_state(a) - cached_state(b), nobs(a) + nobs(b))
 end
 
 
 
-function StatsBase.confint(b::Bootstrap{NumberIn}, coverageprob = 0.95, method=:quantile)
+function StatsBase.confint(b::Bootstrap{ScalarIn}, coverageprob = 0.95, method=:quantile)
     states = cached_state(b)
     # If any NaN, return NaN, NaN
     if any(isnan, states)

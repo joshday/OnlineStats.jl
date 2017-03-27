@@ -7,7 +7,7 @@ Base.rand(d::DistributionStat, args...) = rand(value(d), args...)
 
 
 #--------------------------------------------------------------# Beta
-struct FitBeta <: DistributionStat{NumberIn}
+struct FitBeta <: DistributionStat{ScalarIn}
     var::Variance
     FitBeta() = new(Variance())
 end
@@ -26,7 +26,7 @@ end
 
 
 #------------------------------------------------------------------# Categorical
-struct FitCategorical{T<:Any} <: DistributionStat{NumberIn}
+struct FitCategorical{T<:Any} <: DistributionStat{ScalarIn}
     d::Dict{T, Int}
     FitCategorical{T}() where T<:Any = new(Dict{T, Int}())
 end
@@ -87,7 +87,7 @@ Base.keys(o::FitCategorical) = keys(o.d)
 #
 #
 #------------------------------------------------------------------# Cauchy
-struct FitCauchy <: DistributionStat{NumberIn}
+struct FitCauchy <: DistributionStat{ScalarIn}
     q::QuantileMM
 end
 FitCauchy() = FitCauchy(QuantileMM())
@@ -103,7 +103,7 @@ end
 
 #------------------------------------------------------------------------# Gamma
 # method of moments. TODO: look at Distributions for MLE
-struct FitGamma <: DistributionStat{NumberIn}
+struct FitGamma <: DistributionStat{ScalarIn}
     var::Variance
 end
 FitGamma() = FitGamma(Variance())
@@ -123,7 +123,7 @@ end
 
 
 #-----------------------------------------------------------------------# LogNormal
-struct FitLogNormal <: DistributionStat{NumberIn}
+struct FitLogNormal <: DistributionStat{ScalarIn}
     var::Variance
     FitLogNormal() = new(Variance())
 end
@@ -134,7 +134,7 @@ end
 
 
 #-----------------------------------------------------------------------# Normal
-struct FitNormal <: DistributionStat{NumberIn}
+struct FitNormal <: DistributionStat{ScalarIn}
     var::Variance
     FitNormal() = new(Variance())
 end

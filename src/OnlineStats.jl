@@ -25,12 +25,12 @@ export
 #-----------------------------------------------------------------------------# types
 abstract type Input end
 Base.show(io::IO, o::Input) = print(io, name(o))
-abstract type NumberIn <: Input end  # observation = scalar
+abstract type ScalarIn <: Input end  # observation = scalar
 abstract type VectorIn <: Input end  # observation = vector
 
 abstract type Output end
 Base.show(io::IO, o::Output) = print(io, name(o))
-abstract type NumberOut         <: Output end
+abstract type ScalarOut         <: Output end
 abstract type VectorOut         <: Output end
 abstract type MatrixOut         <: Output end
 abstract type DistributionOut   <: Output end

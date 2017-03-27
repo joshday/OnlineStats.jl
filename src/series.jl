@@ -78,32 +78,32 @@ function Base.merge!{T <: Series}(o::T, o2::T, method::Symbol = :append)
     o
 end
 
-#-------------------------------------------------------------------------# NumberIn
-function fit!(o::Series{NumberIn}, y::Real, γ::Float64 = nextweight(o))
+#-------------------------------------------------------------------------# ScalarIn
+function fit!(o::Series{ScalarIn}, y::Real, γ::Float64 = nextweight(o))
     updatecounter!(o)
     map(stat -> fit!(stat, y, γ), o.stats)
     o
 end
-function fit!(o::Series{NumberIn}, y::AVec)
+function fit!(o::Series{ScalarIn}, y::AVec)
     for yi in y
         fit!(o, yi)
     end
     o
 end
-function fit!(o::Series{NumberIn}, y::AVec, b::Integer)
+function fit!(o::Series{ScalarIn}, y::AVec, b::Integer)
     maprows(b, y) do yi
         fitbatch!(o, yi)
     end
     o
 end
 fitbatch!(o::Series, yi) = fit!(o, yi)
-function fit!(o::Series{NumberIn}, y::AVec, γ::Float64)
+function fit!(o::Series{ScalarIn}, y::AVec, γ::Float64)
     for yi in y
         fit!(o, yi, γ)
     end
     o
 end
-function fit!(o::Series{NumberIn}, y::AVec, γ::AVecF)
+function fit!(o::Series{ScalarIn}, y::AVec, γ::AVecF)
     length(y) == length(γ) || throw(DimensionMismatch())
     for (yi, γi) in zip(y, γ)
         fit!(o, yi, γi)
@@ -111,8 +111,8 @@ function fit!(o::Series{NumberIn}, y::AVec, γ::AVecF)
     o
 end
 
-fit(o::OnlineStat{NumberIn}, y::AVec) = Series(y, o)
-fit(o::OnlineStat{NumberIn}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
+fit(o::OnlineStat{ScalarIn}, y::AVec) = Series(y, o)
+fit(o::OnlineStat{ScalarIn}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
 
 #-------------------------------------------------------------------------# VectorIn
 function fit!(o::Series{VectorIn}, y::AVec, γ::Float64 = nextweight(o))
