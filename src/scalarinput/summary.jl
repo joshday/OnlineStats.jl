@@ -132,6 +132,7 @@ mutable struct QuantileMM <: OnlineStat{ScalarIn, VectorOut}
     t::VecF
     o::Float64
     QuantileMM(τ::VecF = [.25, .5, .75]) = new(zeros(τ), τ, zeros(τ), zeros(τ), 0.0)
+    QuantileMM(args...) = QuantileMM(collect(args))
 end
 fields_to_show(o::QuantileMM) = [:value, :τ]
 function fit!(o::QuantileMM, y::Real, γ::Float64)

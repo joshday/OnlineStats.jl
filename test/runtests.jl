@@ -5,7 +5,9 @@ info("Messy output for test coverage")
 @testset "show" begin
     show(OnlineStats.ScalarIn)
     show(OnlineStats.ScalarOut)
-    show(Series(Mean()))
+    println(Series(Mean()))
+    println(OrderStats(5))
+    println(Moments())
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
@@ -106,6 +108,7 @@ end
 
         o3 = merge(o1, o2)
         @test value(o3, 1) ≈ mean(y)
+        @test mean(stats(o3, 1)) ≈ mean(y)
     end
     @testset "Variance" begin
         o1 = Series(y1, Variance())
@@ -116,6 +119,7 @@ end
         @test value(o, 1) == extrema(y1)
     end
     @testset "QuantileMM/QuantileSGD" begin
+        o = Series(y1, QuantileMM(.1, .2, .3), QuantileSGD(.4, .5))
         o = Series(y1, QuantileMM(), QuantileSGD(); weight = LearningRate())
     end
     @testset "Moments" begin
