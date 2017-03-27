@@ -18,6 +18,8 @@ using OnlineStats, Base.Test
     Series(Mean(), Variance())
     Series(randn(100), Mean(), Variance())
     Series(CovMatrix(4), MV(4, Mean()))
+    Series(:myid, EqualWeight(), Mean())
+    Series(EqualWeight(), :myid, Variance())
     @test_throws ArgumentError Series(CovMatrix(4), Mean())
 end
 @testset "fit: ScalarIn" begin
@@ -43,5 +45,7 @@ end
     @test value(o, 1) ≈ mean(y)
     @test value(o, 2) ≈ var(y)
 end
+
+include("testfiles/summary_test.jl")
 
 end
