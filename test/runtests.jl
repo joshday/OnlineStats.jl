@@ -22,20 +22,20 @@ using OnlineStats, Base.Test
     Series(EqualWeight(), :myid, Variance())
     @test_throws ArgumentError Series(CovMatrix(4), Mean())
 end
-@testset "fit: ScalarIn" begin
+@testset "Series{ScalarIn}" begin
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
-        s = fit(o, randn(100))
-        @test value(o, 100) == value(s, 1)
-    end
-end
-@testset "fit: VectorIn" begin
-    for o in [MV(5, Mean()), MV(5, Variance()), CovMatrix(5)]
-        s = fit(o, randn(100, 5))
+        s = Series(randn(100), o)
         @test value(o) == value(s, 1)
     end
 end
-@testset "merge" begin
+@testset "Series{VectorIn}" begin
+    for o in [MV(5, Mean()), MV(5, Variance()), CovMatrix(5)]
+        s = Series(randn(100, 5), o)
+        @test value(o) == value(s, 1)
+    end
+end
+@testset "Series merge" begin
     y1 = randn(100)
     y2 = randn(100)
     y = vcat(y1, y2)

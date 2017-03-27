@@ -5,24 +5,30 @@ mutable struct Mean <: OnlineStat{ScalarIn, ScalarOut}
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
 Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
+Base.mean(o::Mean) = o.μ
 
 #--------------------------------------------------------------------# Variance
 mutable struct Variance <: OnlineStat{ScalarIn, ScalarOut}
-    σ²::Float64     # unbiased variance
+    σ2::Float64     # biased variance
     μ::Float64
-    Variance() = new(0.0, 0.0)
+    nobs::Int
+    Variance() = new(0.0, 0.0, 0)
 end
 function fit!(o::Variance, y::Real, γ::Float64)
     μ = o.μ
+    o.nobs += 1
     o.μ = smooth(o.μ, y, γ)
-    o.σ² = smooth(o.σ², (y - o.μ) * (y - μ), γ)
+    o.σ2 = smooth(o.σ2, (y - o.μ) * (y - μ), γ)
 end
 function Base.merge!(o::Variance, o2::Variance, γ::Float64)
+    o.nobs += o2.nobs
     δ = o2.μ - o.μ
-    o.σ² = smooth(o.σ², o2.σ², γ) + δ ^ 2 * γ * (1.0 - γ)
+    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)
+    o
 end
-value(o::Variance, nobs::Integer) = o.σ² * unbias(nobs)
+value(o::Variance) = o.σ2 * unbias(o)
+Base.var(o::Variance) = value(o)
 
 #--------------------------------------------------------------------# Extrema
 mutable struct Extrema <: OnlineStat{ScalarIn, VectorOut}
@@ -63,9 +69,11 @@ fields_to_show(o::OrderStats) = [:value]
 #--------------------------------------------------------------------# Moments
 mutable struct Moments <: OnlineStat{ScalarIn, VectorOut}
     m::VecF
-    Moments() = new(zeros(4))
+    nobs::Int
+    Moments() = new(zeros(4), 0)
 end
 function fit!(o::Moments, y::Real, γ::Float64)
+    o.nobs += 1
     @inbounds o.m[1] = smooth(o.m[1], y, γ)
     @inbounds o.m[2] = smooth(o.m[2], y * y, γ)
     @inbounds o.m[3] = smooth(o.m[3], y * y * y, γ)

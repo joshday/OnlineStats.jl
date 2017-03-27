@@ -53,10 +53,9 @@ _io{I, O}(o::OnlineStat{I, O}) = I, O
 _io{I, O}(o::OnlineStat{I, O}, i::Integer) = _io(o)[i]
 
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
-value(o::OnlineStat, nobs::Integer) = value(o)
 Base.copy(o::OnlineStat) = deepcopy(o)
 Base.merge{T <: OnlineStat}(o::T, o2::T, wt::Float64) = merge!(copy(o), o2, wt)
-unbias(nobs::Integer) = nobs / (nobs - 1)
+unbias(o) = o.nobs / (o.nobs - 1)
 
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)
 function smooth!(m::AbstractArray, v::AbstractArray, γ::Float64)

@@ -8,22 +8,22 @@ y = vcat(y1, y2)
 
 @testset "Summary" begin
 @testset "Mean" begin
-    o = fit(Mean(), y1)
-    @test value(o, 1) ≈ mean(y1)
-    @test nobs(o) == 500
+    o1 = Series(y1, Mean())
+    @test value(o1, 1) ≈ mean(y1)
+    @test nobs(o1) == 500
 
     o2 = Series(y2, Mean())
     @test value(o2, 1) ≈ mean(y2)
 
-    o3 = merge(o, o2)
+    o3 = merge(o1, o2)
     @test value(o3, 1) ≈ mean(y)
 end
 @testset "Variance" begin
-    o = fit(Variance(), y1)
-    @test value(o, 1) ≈ var(y1)
+    o1 = Series(y1, Variance())
+    @test value(o1, 1) ≈ var(y1)
 end
 @testset "Extrema" begin
-    o = fit(Extrema(), y1)
+    o = Series(y1, Extrema())
     @test value(o, 1) == extrema(y1)
 end
 @testset "QuantileMM/QuantileSGD" begin
@@ -31,7 +31,7 @@ end
 end
 @testset "Moments" begin
     x = randn(10_000)
-    o = fit(Moments(), x)
+    o = Series(x, Moments())
 end
 # @testset "Moments" begin
 #     o = Moments(x1)

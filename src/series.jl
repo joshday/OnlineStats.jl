@@ -30,11 +30,14 @@ function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :un
     o
 end
 
-value(o::Series) = map(x -> value(x, o.nobs), o.stats)
-value(o::Series, i::Integer) = value(o)[i]
+stats(o::Series) = o.stats
+stats(o::Series, i::Integer) = o.stats[i]
+
+value(o::Series) = value.(stats(o))
+value(o::Series, i::Integer) = value(stats(o, i))
+
 nobs(o::Series) = o.nobs
 nups(o::Series) = o.nups
-unbias(o::Series) = nobs(o) / (nobs(o) - 1)
 function Base.show{I}(io::IO, o::Series{I})
     header(io, "$(name(o))\n")
     subheader(io, "         id | $(o.id)\n")
@@ -43,7 +46,7 @@ function Base.show{I}(io::IO, o::Series{I})
     n = length(o.stats)
     for i in 1:n
         s = o.stats[i]
-        print_item(io, name(s), value(s, nobs(o)), i != n)
+        print_item(io, name(s), value(s), i != n)
     end
 end
 updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
@@ -109,9 +112,6 @@ function fit!(o::Series{ScalarIn}, y::AVec, γ::AVecF)
     o
 end
 
-fit(o::OnlineStat{ScalarIn}, y::AVec) = Series(y, o)
-fit(o::OnlineStat{ScalarIn}, y::AVec, wt::Weight) = Series(y, o; weight = wt)
-
 #-------------------------------------------------------------------------# VectorIn
 function fit!(o::Series{VectorIn}, y::AVec, γ::Float64 = nextweight(o))
     updatecounter!(o)
@@ -124,6 +124,3 @@ function fit!(o::Series{VectorIn}, y::AMat)
     end
     o
 end
-
-fit(o::OnlineStat{VectorIn}, y::AMat) = Series(y, o)
-fit(o::OnlineStat{VectorIn}, y::AMat, wt::Weight) = Series(y, o; weight = wt)
