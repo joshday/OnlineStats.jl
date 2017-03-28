@@ -1,4 +1,13 @@
-mutable struct Series{I <: Input, W <: Weight, O <: Tuple}
+"""
+AbstractSeries:  "Managers" for a group or single OnlineStat
+
+Subtypes should:
+- Be first parameterized by I <: Input
+- Have fields `weight::Weight`, `nobs::Int`, `nups::Int`, and `id::Symbol`
+"""
+abstract type AbstractSeries end
+
+mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
     weight::W
     stats::O
     nobs::Int
@@ -28,8 +37,8 @@ stats(o::Series, i::Integer) = o.stats[i]
 value(o::Series) = value.(stats(o))
 value(o::Series, i::Integer) = value(stats(o, i))
 
-nobs(o::Series) = o.nobs
-nups(o::Series) = o.nups
+nobs(o::AbstractSeries) = o.nobs
+nups(o::AbstractSeries) = o.nups
 function Base.show{I}(io::IO, o::Series{I})
     header(io, "$(name(o))\n")
     subheader(io, "         id | $(o.id)\n")
@@ -41,10 +50,10 @@ function Base.show{I}(io::IO, o::Series{I})
         print_item(io, name(s), value(s), i != n)
     end
 end
-updatecounter!(o::Series, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
-weight(o::Series, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
-nextweight(o::Series, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
-Base.copy(o::Series) = deepcopy(o)
+updatecounter!(o::AbstractSeries, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
+weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
+nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
+Base.copy(o::AbstractSeries) = deepcopy(o)
 
 #-------------------------------------------------------------------------# merge
 function Base.merge{T <: Series}(o::T, o2::T, method::Symbol = :append)
