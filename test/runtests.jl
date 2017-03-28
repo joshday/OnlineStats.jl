@@ -251,5 +251,10 @@ end # summary
         @test ncomponents(o) == 3
     end
 end
+@testset "HyperLogLog" begin
+    o = HyperLogLog(10)
+    s = Series(rand(1:100, 10_000), o)
+    @test 90 < value(o) < 110
+end
 
 end

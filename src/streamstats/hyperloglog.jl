@@ -1,5 +1,4 @@
 # Mostly copy/pasted from StreamStats.jl
-
 hash32(d::Any) = hash(d) % UInt32
 maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add
 ρ(s::UInt32) = UInt32(leading_zeros(s)) + 0x00000001
@@ -19,97 +18,65 @@ function α(m::UInt32)
 end
 
 """
-`HyperLogLog(b)`
+    HyperLogLog(b)
 
-Approximate count of distinct elements.  `HyperLogLog` differs from other OnlineStats
-in that any input to `fit!(o::HyperLogLog, input)` is considered a singleton.  Thus,
-a vector of inputs must be done by:
-
-```julia
-o = HyperLogLog(4)
-for yi in y
-    fit!(o, yi)
-end
-```
+Approximate count of distinct elements
 """
-mutable struct HyperLogLog{I <: Input} <: OnlineStat{I}
+mutable struct HyperLogLog <: OnlineStat{ScalarIn, ScalarOut}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
     altmask::UInt32
-    n::Int
-end
-
-function HyperLogLog(b::Integer)
-    if !(4 <= b <= 16)
-        throw(ArgumentError("b must be an Integer between 4 and 16"))
-    end
-
-    m = 0x00000001 << b
-
-    M = zeros(UInt32, m)
-
-    mask = 0x00000000
-    for i in 1:(b - 1)
+    function HyperLogLog(b::Integer)
+        if !(4 <= b <= 16)
+            throw(ArgumentError("b must be an Integer between 4 and 16"))
+        end
+        m = 0x00000001 << b
+        M = zeros(UInt32, m)
+        mask = 0x00000000
+        for i in 1:(b - 1)
+            mask |= 0x00000001
+            mask <<= 1
+        end
         mask |= 0x00000001
-        mask <<= 1
+        altmask = ~mask
+        new(m, M, mask, altmask)
     end
-    mask |= 0x00000001
-
-    altmask = ~mask
-
-    return HyperLogLog{Input}(m, M, mask, altmask, 0)
 end
-
 function Base.show(io::IO, counter::HyperLogLog)
-    @printf(io, "A HyperLogLog counter w/ %d registers", Int(counter.m))
+    @printf(io, "HyperLogLog(%d registers)", Int(counter.m))
     return
 end
 
-function fit!(counter::HyperLogLog, v::Any)
+function fit!(o::HyperLogLog, v::Any, γ::Float64)
     x = hash32(v)
-    j = maskadd32(x, counter.mask, 0x00000001)
-    w = x & counter.altmask
-    counter.M[j] = max(counter.M[j], ρ(w))
-    counter.n += 1
-    return
+    j = maskadd32(x, o.mask, 0x00000001)
+    w = x & o.altmask
+    o.M[j] = max(o.M[j], ρ(w))
+    o
 end
 
-nobs(o::HyperLogLog) = o.n
-
-function value(counter::HyperLogLog)
+function value(o::HyperLogLog)
     S = 0.0
-
-    for j in 1:counter.m
-        S += 1 / (2^counter.M[j])
+    for j in 1:o.m
+        S += 1 / (2 ^ o.M[j])
     end
-
     Z = 1 / S
-
-    E = α(counter.m) * toUInt(counter.m)^2 * Z
-
-    if E <= 5//2 * counter.m
+    E = α(o.m) * toUInt(o.m) ^ 2 * Z
+    if E <= 5//2 * o.m
         V = 0
-        for j in 1:counter.m
-            V += toInt(counter.M[j] == 0x00000000)
+        for j in 1:o.m
+            V += toInt(o.M[j] == 0x00000000)
         end
         if V != 0
-            E_star = counter.m * log(counter.m / V)
+            E_star = o.m * log(o.m / V)
         else
             E_star = E
         end
-    elseif E <= 1//30 * 2^32
+    elseif E <= 1//30 * 2 ^ 32
         E_star = E
     else
-        E_star = -2^32 * log(1 - E / (2^32))
+        E_star = -2 ^ 32 * log(1 - E / (2 ^ 32))
     end
-
     return E_star
 end
-
-# TODO: Figure out details here
-# function confint(counter::HyperLogLog)
-#     e = estimate(counter)
-#     delta = e * 1.04 / sqrt(counter.m)
-#     return e - delta, e + delta
-# end
