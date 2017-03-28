@@ -238,6 +238,13 @@ end # summary
     end
     @testset "FitMvNormal" begin
     end
+    @testset "NormalMix" begin
+        d = MixtureModel([Normal(), Normal(1,2), Normal(2, 3)])
+        y = rand(d, 1000)
+        o = NormalMix(3)
+        s = Series(y, o)
+        fit!(s, y, 10)
+    end
 end
 
 end

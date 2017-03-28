@@ -22,7 +22,7 @@ export
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
-    FitMvNormal
+    FitMvNormal, NormalMix
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end
@@ -103,6 +103,8 @@ include("vectorinput/mv.jl")
 include("vectorinput/covmatrix.jl")
 include("vectorinput/kmeans.jl")
 include("distributions.jl")
+include("scalarinput/normalmix.jl")
+
 
 
 end # module
