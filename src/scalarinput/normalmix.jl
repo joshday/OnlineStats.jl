@@ -71,6 +71,7 @@ function fit!(o::NormalMix, y, γ::Float64)
     end
     o
 end
+fitbatch!(o::NormalMix, y::AVec, γ::Float64) = fit!(o, y, γ)
 
 
 # # Quantiles via Newton's method.  Starting values based on Normal distribution.

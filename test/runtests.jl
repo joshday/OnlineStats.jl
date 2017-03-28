@@ -268,8 +268,15 @@ end
     o = CovMatrix(5)
     s = Series(x, o)
     fit!(s, x, 10)
+    OnlineStats.fitbatch!(o, x, .1)
 
-    OnlineStats.fitbatch!(o, x)
+    o = CovMatrix(5)
+    s = Series(o)
+    fit!(s, x, 10)
+    @test mean(o) ≈ vec(mean(x, 1))
+    @test var(o) ≈ vec(var(x, 1))
+    @test cov(o) ≈ cov(x) atol=.001
+    @test cor(o) ≈ cor(x) atol=.001
 end
 
 end
