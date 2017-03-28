@@ -8,7 +8,8 @@ info("Messy output for test coverage")
     println(Series(Mean()))
     println(OrderStats(5))
     println(Moments())
-    println(QuantileMM)
+    println(QuantileMM())
+    println(NormalMix(2))
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
@@ -56,6 +57,7 @@ end
     QuantileMM()
     Diff()
     Sum()
+    NormalMix(5)
     MV(5, Mean())
     MV(5, Sum())
     CovMatrix(4)
@@ -123,6 +125,11 @@ end
         o = Series(y1, QuantileMM(.1, .2, .3), QuantileSGD(.4, .5))
         o = Series(y1, QuantileMM(), QuantileSGD(); weight = LearningRate())
         fit!(o, y2, 5)
+
+        o = QuantileMM()
+        OnlineStats.fitbatch!(o, randn(10), .1)
+        o = QuantileSGD()
+        OnlineStats.fitbatch!(o, randn(10), .1)
     end
     @testset "Moments" begin
         x = randn(10_000)
