@@ -32,6 +32,7 @@ value(o::Variance) = o.σ2 * unbias(o)
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
+nobs(o::Variance) = o.nobs
 
 #--------------------------------------------------------------------# Extrema
 mutable struct Extrema <: OnlineStat{ScalarIn, VectorOut}

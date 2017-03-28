@@ -6,8 +6,10 @@ info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
     println(Bootstrap(100, Mean(), mean, Bernoulli()))
+    println(OnlineStats.name(Moments(), false))
     println(OnlineStats.ScalarIn)
     println(OnlineStats.ScalarOut)
+    println(Mean())
     println(OrderStats(5))
     println(Moments())
     println(QuantileMM())
@@ -208,16 +210,24 @@ end
 end # summary
 
 @testset "Distributions" begin
-    @testset "FitBeta" begin
-        d = Beta(3, 5)
-        y = rand(d, 1000)
-        o = FitBeta()
-        s = Series(y, o)
-        @test mean(o) ≈ mean(y)
-        @test var(o) ≈ var(y)
-        @test std(o) ≈ std(y)
-        @test params(o) == params(value(o))
+    function test_distribution(o::OnlineStat, d; wt = EqualWeight(), tol = 1e-4)
+        @testset "$(OnlineStats.name(o)) Params" begin
+            y = rand(d(), 10_000)
+            s = Series(y, o; weight = wt)
+            myfit = fit(d, y)
+            for i in 1:length(params(myfit))
+                @test params(o)[i] ≈ params(myfit)[i] atol = tol
+            end
+            mean(o)
+            var(o)
+            std(o)
+        end
     end
+    test_distribution(FitBeta(), Beta)
+    test_distribution(FitCauchy(), Cauchy, tol = .2, wt = LearningRate())
+    test_distribution(FitGamma(), Gamma, tol = .1)
+    test_distribution(FitNormal(), Normal)
+
     @testset "FitCategorical" begin
         y = rand(1:5, 1000)
         o = FitCategorical(Int)
@@ -227,36 +237,9 @@ end # summary
         for i in eachindex(pr)
             @test pr[i] in probs(myfit)
         end
-    end
-    @testset "FitCauchy" begin
-        d = Cauchy()
-        y = rand(d, 10_000)
-        o = FitCauchy()
-        s = Series(y, o; weight = LearningRate())
-        myfit = fit(Cauchy, y)
-        θ = params(value(o))
-        @test params(value(o))[1] ≈ params(myfit)[1] atol = .1
-        @test params(value(o))[2] ≈ params(myfit)[2] atol = .1
-    end
-    @testset "FitGamma" begin
-        d = Gamma(5, 1)
-        y = rand(d, 10_000)
-        o = FitGamma()
-        s = Series(y, o)
-        myfit = fit(Gamma, y)
-        @test mean(o)   ≈ mean(myfit)   atol=.01
-        @test var(o)    ≈ var(myfit)    atol=.1
-        @test std(o)    ≈ std(myfit)    atol=.1
-    end
-    @testset "FitLogNormal" begin
-        d = LogNormal()
-        y = rand(d, 1000)
-        o = FitLogNormal()
-        s = Series(y, o)
-        myfit = fit(LogNormal, y)
-        @test mean(o) ≈ mean(myfit)
-        @test var(o) ≈ var(myfit)
-        @test std(o) ≈ std(myfit)
+        for i in 1:5
+            @test i in keys(o)
+        end
     end
     @testset "FitMultinomial" begin
     end
