@@ -1,24 +1,27 @@
 #-------------------------------------------------------------------------# CovMatrix
-struct CovMatrix <: OnlineStat{VectorIn, MatrixOut}
+mutable struct CovMatrix <: OnlineStat{VectorIn, MatrixOut}
     value::MatF
     cormat::MatF
     A::MatF  # X'X / n
     b::VecF  # X * 1' / n (column means)
-end
-function CovMatrix(p::Integer)
-    CovMatrix(zeros(p, p), zeros(p, p), zeros(p, p), zeros(p))
+    nobs::Int
+    CovMatrix(p::Integer) = new(zeros(p, p), zeros(p, p), zeros(p, p), zeros(p), 0)
 end
 function fit!(o::CovMatrix, x::AVec, γ::Float64)
     smooth!(o.b, x, γ)
     smooth_syr!(o.A, x, γ)
+    o.nobs += 1
     o
 end
 function fitbatch!(o::CovMatrix, x::AMat, γ::Float64)
     smooth!(o.b, mean(x, 1), γ)
     smooth_syrk!(o.A, x, γ)
+    o.nobs += size(x, 1)
+    o
 end
 function value(o::CovMatrix)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
+    scale!(o.value, unbias(o))
 end
 Base.mean(o::CovMatrix) = o.b
 Base.cov(o::CovMatrix) = value(o)
