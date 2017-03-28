@@ -14,6 +14,10 @@ info("Messy output for test coverage")
     println(NormalMix(2))
     println(MV(2, Mean()))
     println(HyperLogLog(5))
+    for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
+              LearningRate2()]
+        println(w)
+    end
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
@@ -37,6 +41,7 @@ info("TESTS BEGIN HERE")
     w2 = ExponentialWeight()
     w3 = BoundedEqualWeight()
     w4 = LearningRate()
+    w5 = LearningRate2()
 
     for w in [w1, w3, w4]
         @test OnlineStats.weight(w, 1, 1, 1) == 1
@@ -46,8 +51,12 @@ info("TESTS BEGIN HERE")
         @test OnlineStats.weight(w2, i, 1, i) == w2.λ
         @test OnlineStats.weight(w3, i, 1, i) == 1 / i
         @test OnlineStats.weight(w4, i, 1, i) ≈ i ^ -w4.r
+        @test OnlineStats.weight(w5, i, 1, i) ≈ 1 / (1 + w5.c * (i-1))
     end
     @test OnlineStats.weight(w3, 1_000_000, 1, 1_000_000) == w3.λ
+
+    ExponentialWeight(100)
+    BoundedEqualWeight(100)
 end
 
 @testset "Constructors" begin
