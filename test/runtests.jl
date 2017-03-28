@@ -11,6 +11,7 @@ info("Messy output for test coverage")
     println(QuantileMM())
     println(NormalMix(2))
     println(MV(2, Mean()))
+    println(HyperLogLog(5))
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
@@ -261,8 +262,14 @@ end # summary
 end
 @testset "HyperLogLog" begin
     o = HyperLogLog(10)
-    s = Series(rand(1:100, 10_000), o)
-    @test 90 < value(o) < 110
+    for d in 4:16
+        o = HyperLogLog(d)
+        @test value(o) == 0.0
+        s = Series(o)
+        fit!(s, rand(1:10, 1000))
+        @test 8 < value(o) < 12
+    end
+    @test_throws Exception HyperLogLog(1)
 end
 @testset "CovMatrix" begin
     x = randn(100, 5)
