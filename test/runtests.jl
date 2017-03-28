@@ -244,6 +244,7 @@ end # summary
         o = NormalMix(3)
         s = Series(y, o)
         fit!(s, y, 10)
+        @show s
     end
 end
 

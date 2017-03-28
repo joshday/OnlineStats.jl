@@ -18,7 +18,6 @@ end
 function Base.show(io::IO, o::NormalMix)
     k = length(o.s1)
     print(io, "NormalMix (k = $k)")
-
     π = Ds.probs(o)
     c = Ds.components(o)
     for j in 1:k
@@ -29,10 +28,12 @@ function value(o::NormalMix)
     vec = map((u,v) -> Ds.Normal{Float64}(u, sqrt(v)), o.μ, o.σ2)
     return Ds.MixtureModel(vec, o.s1)
 end
+
 Ds.componentwise_pdf(o::NormalMix, y) = Ds.componentwise_pdf(value(o), y)
 Ds.ncomponents(o::NormalMix) = Ds.ncomponents(value(o))
 Ds.component(o::NormalMix, j) = Ds.component(value(o), j)
 Ds.components(o::NormalMix) = Ds.components(value(o))
+
 function fit!(o::NormalMix, y::Real, γ::Float64)
     k = length(o.μ)
     for j in 1:k
@@ -57,43 +58,44 @@ function fit!(o::NormalMix, y::Real, γ::Float64)
     end
     o
 end
-function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T}, γ::Float64)
-    n = length(y)
-    k = length(o.μ)
-    s1 = copy(o.s1)
-    s2 = copy(o.s2)
-    s3 = copy(o.s3)
 
-    for yi in y
-        for j in 1:k
-            σinv = 1.0 / sqrt(o.σ2[j])
-            o.w[j] = s1[j] * σinv * exp(-.5 * σinv * σinv * (yi - o.μ[j]) ^ 2)
-        end
-        sum1 = sum(o.w)
-        for j in 1:k
-            o.w[j] /= sum1
-            if yi == y[1]
-                o.s1[j] = smooth(o.s1[j], o.w[j] / n, γ)
-                o.s2[j] = smooth(o.s2[j], o.w[j] * yi / n, γ)
-                o.s3[j] = smooth(o.s3[j], o.w[j] * yi * yi / n, γ)
-            else
-                o.s1[j] += γ * o.w[j] / n
-                o.s2[j] += γ * o.w[j] * yi / n
-                o.s3[j] += γ * o.w[j] * yi * yi / n
-            end
-        end
-    end
-    sum2 = sum(o.s1)
-    for j in 1:k
-        o.μ[j] = o.s2[j] / o.s1[j]
-        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
-        o.s1[j] /= sum2
-        if o.σ2[j] <= ϵ
-            o.σ2 = ones(k)
-        end
-    end
-    o
-end
+# function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T}, γ::Float64)
+#     n = length(y)
+#     k = length(o.μ)
+#     s1 = copy(o.s1)
+#     s2 = copy(o.s2)
+#     s3 = copy(o.s3)
+#
+#     for yi in y
+#         for j in 1:k
+#             σinv = 1.0 / sqrt(o.σ2[j])
+#             o.w[j] = s1[j] * σinv * exp(-.5 * σinv * σinv * (yi - o.μ[j]) ^ 2)
+#         end
+#         sum1 = sum(o.w)
+#         for j in 1:k
+#             o.w[j] /= sum1
+#             if yi == y[1]
+#                 o.s1[j] = smooth(o.s1[j], o.w[j] / n, γ)
+#                 o.s2[j] = smooth(o.s2[j], o.w[j] * yi / n, γ)
+#                 o.s3[j] = smooth(o.s3[j], o.w[j] * yi * yi / n, γ)
+#             else
+#                 o.s1[j] += γ * o.w[j] / n
+#                 o.s2[j] += γ * o.w[j] * yi / n
+#                 o.s3[j] += γ * o.w[j] * yi * yi / n
+#             end
+#         end
+#     end
+#     sum2 = sum(o.s1)
+#     for j in 1:k
+#         o.μ[j] = o.s2[j] / o.s1[j]
+#         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
+#         o.s1[j] /= sum2
+#         if o.σ2[j] <= ϵ
+#             o.σ2 = ones(k)
+#         end
+#     end
+#     o
+# end
 
 
 # # Quantiles via Newton's method.  Starting values based on Normal distribution.
