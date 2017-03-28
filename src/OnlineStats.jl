@@ -7,7 +7,7 @@ import Distributions
 Ds = Distributions
 import StaticArrays
 
-# Reexport LearnBase
+# Reexport LearnBase and StatsBase
 for pkg in [:LearnBase, :StatsBase]
     eval(Expr(:toplevel, Expr(:export, setdiff(names(eval(pkg)), [pkg])...)))
 end
@@ -24,7 +24,7 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal, NormalMix,
     # StreamStats
-    HyperLogLog
+    HyperLogLog, Bootstrap, cached_state, replicates
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end

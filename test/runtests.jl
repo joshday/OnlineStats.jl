@@ -1,10 +1,11 @@
 module OnlineStatsTest
 using OnlineStats, Base.Test, Distributions
 
+#-----------------------------------------------------------# coverage for show() methods
 info("Messy output for test coverage")
 @testset "show" begin
-    show(OnlineStats.ScalarIn)
-    show(OnlineStats.ScalarOut)
+    println(OnlineStats.ScalarIn)
+    println(OnlineStats.ScalarOut)
     println(Series(Mean()))
     println(OrderStats(5))
     println(Moments())
@@ -29,8 +30,7 @@ end
 println()
 println()
 info("TESTS BEGIN HERE")
-
-
+#--------------------------------------------------------------------------------# TESTS
 @testset "Weights" begin
     w1 = EqualWeight()
     w2 = ExponentialWeight()
@@ -285,6 +285,20 @@ end
     @test var(o) ≈ vec(var(x, 1))
     @test cov(o) ≈ cov(x) atol=.001
     @test cor(o) ≈ cor(x) atol=.001
+end
+@testset "Bootstrap" begin
+    y = randn(1000)
+    b = Bootstrap(100, Mean(), mean, Poisson())
+    fit!(b, y)
+    @test replicates(b) == b.replicates
+    @test b.cache_is_dirty
+    cached_state(b)
+    @test !b.cache_is_dirty
+
+    mean(b)
+    std(b)
+    var(b)
+    confint(b)
 end
 
 end
