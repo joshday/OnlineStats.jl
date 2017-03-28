@@ -13,18 +13,19 @@ for pkg in [:LearnBase, :StatsBase]
 end
 
 export
-    Series,
+    # AbstractSeries
+    Series, Bootstrap,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
-    maprows, nups, stats,
+    maprows, nups, stats, cached_state, replicates,
     # <: OnlineStat
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans,
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal, NormalMix,
     # StreamStats
-    HyperLogLog, Bootstrap, cached_state, replicates
+    HyperLogLog
 
 #-----------------------------------------------------------------------------# types
 abstract type Input end

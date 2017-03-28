@@ -124,6 +124,10 @@ end
         o3 = merge(o1, o2)
         @test value(o3, 1) ≈ mean(y)
         @test mean(stats(o3, 1)) ≈ mean(y)
+
+        s = Series(Mean())
+        fit!(s, y1, 10)
+        @test mean(stats(s, 1)) ≈ mean(y1)
     end
     @testset "Variance" begin
         o1 = Series(y1, Variance())
