@@ -4,9 +4,10 @@ using OnlineStats, Base.Test, Distributions
 #-----------------------------------------------------------# coverage for show() methods
 info("Messy output for test coverage")
 @testset "show" begin
+    println(Series(Mean()))
+    println(Bootstrap(100, Mean(), mean, Bernoulli()))
     println(OnlineStats.ScalarIn)
     println(OnlineStats.ScalarOut)
-    println(Series(Mean()))
     println(OrderStats(5))
     println(Moments())
     println(QuantileMM())
@@ -299,6 +300,10 @@ end
     std(b)
     var(b)
     confint(b)
+
+    y = randn(1000)
+    b = Bootstrap(100, Mean(), mean, Bernoulli())
+    fit!(b, y)
 end
 
 end

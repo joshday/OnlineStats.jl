@@ -1,8 +1,6 @@
-const Dist = Distributions.UnivariateDistribution
-
 mutable struct Bootstrap{
         I <: Input,
-        D <: Dist,
+        D,
         O <: OnlineStat{I},
         F <: Function,
         W <: Weight,
@@ -20,7 +18,7 @@ mutable struct Bootstrap{
     cache_is_dirty::Bool
 
 end
-function Bootstrap{I<:Input}(nreps::Int, o::OnlineStat{I}, f::Function, d::Dist;
+function Bootstrap{I<:Input}(nreps::Int, o::OnlineStat{I}, f::Function, d;
                              weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
      replicates = [copy(o) for i in 1:nreps]
      cached_state = f.(replicates)
@@ -92,7 +90,6 @@ function fit!(b::Bootstrap{ScalarIn}, y::AVec)
 end
 
 #---------------------------------------------------------------------# update_replicates!
-# based on second parameter, the distribution
 function update_replicates!{D <: Ds.Bernoulli}(b::Bootstrap{ScalarIn, D}, y, γ::Float64)
     foreach(b.replicates) do r
         rand() > 0.5 && (fit!(r, y, γ); fit!(r, y, γ))
