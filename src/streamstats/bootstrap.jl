@@ -1,4 +1,4 @@
-abstract type Bootstrap{I <: Input} <: OnlineStat{I} end
+abstract type Bootstrap{I <: Input, O <: Output} <: OnlineStat{I, O} end
 nobs(b::Bootstrap) = b.n
 value(b::Bootstrap) = b.replicates
 updatecounter!(b::Bootstrap, n2::Int) = (b.n += n2)
@@ -15,7 +15,7 @@ Example:
 BernoulliBootstrap(Mean(), mean, 1000)
 ```
 """
-type BernoulliBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn}
+type BernoulliBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn, UnknownOut}
     replicates::Vector{S}            # replicates of base stat
     cached_state::Vector{Float64}    # cache of replicate states
     f::Function                      # function to generate state. Ex: mean, var, std
@@ -52,7 +52,7 @@ Example:
 PoissonBootstrap(Mean(), mean, 1000)
 ```
 """
-type ScalarPoissonBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn}
+type ScalarPoissonBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn, UnknownOut}
     replicates::Vector{S}           # replicates of base stat
     cached_state::Vector{Float64}  # cache of replicate states
     f::Function
@@ -65,7 +65,7 @@ function PoissonBootstrap{T <: ScalarIn}(o::OnlineStat{T}, f::Function, r::Int =
     ScalarPoissonBootstrap(replicates, cached_state, f, 0, true)
 end
 
-type VectorPoissonBootstrap{S <: OnlineStat{VectorIn}} <: Bootstrap{VectorIn}
+type VectorPoissonBootstrap{S <: OnlineStat{VectorIn}} <: Bootstrap{VectorIn, UnknownOut}
     replicates::Vector{S}           # replicates of base stat
     cached_state::Matrix{Float64}  # cache of replicate states
     f::Function
@@ -94,7 +94,7 @@ end
 #--------------------------------------------------------------# FrozenBootstrap
 # "Frozen bootstraps object are generated when two bootstrap distributions are combined
 #  e.g., if they are differenced."
-immutable FrozenBootstrap <: Bootstrap{ScalarIn}
+immutable FrozenBootstrap <: Bootstrap{ScalarIn, UnknownOut}
     cached_state::Vector{Float64}  # cache of replicate states
     n::Int                          # number of observations
 end

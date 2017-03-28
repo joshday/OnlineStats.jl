@@ -4,28 +4,20 @@ mutable struct Series{I <: Input, W <: Weight, O <: Tuple}
     nobs::Int
     nups::Int
     id::Symbol
-    function Series{I, W, O}(weight::W, stats::O, nobs::Int, nups::Int, id::Symbol) where
-            {I <: Input, W <: Weight, O <: Tuple}
-        all(x -> _io(x, 1) == I, stats) ||
-            throw(ArgumentError("Input types don't all match $I"))
-        new{I, W, O}(weight, stats, nobs, nups, id)
-    end
 end
-function Series{W, O}(weight::W, stats::O, nobs::Int, nups::Int, id::Symbol)
+function Series{W<:Weight, O<:Tuple,}(wt::W, stats::O, id::Symbol)
     I = _io(stats[1], 1)
-    Series{I, W, O}(weight, stats, nobs, nups, id)
+    all(x -> _io(x, 1) == I, stats) || throw(ArgumentError("Input types are not all $I"))
+    Series{I, W, O}(wt, stats, 0, 0, id)
 end
 
-
-Series(id::Symbol, wt::Weight, stats...) = Series(wt, stats, 0, 0, id)
-Series(wt::Weight, id::Symbol, stats...) = Series(wt, stats, 0, 0, id)
-
+Series(id::Symbol, wt::Weight, stats...) = Series(wt, stats, id)
+Series(wt::Weight, id::Symbol, stats...) = Series(wt, stats, id)
 function Series(stats...; weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
-     Series(weight, stats, 0, 0, id)
- end
-
-function Series(y::AA, args...; weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
-    o = Series(weight, id, args...)
+    Series(weight, stats, id)
+end
+function Series(y::AA, stats...; weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
+    o = Series(weight, id, stats...)
     fit!(o, y)
     o
 end
