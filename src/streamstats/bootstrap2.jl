@@ -69,7 +69,7 @@ function StatsBase.confint(b::Bootstrap{ScalarIn}, coverageprob = 0.95, method =
             norm_approx = Ds.Normal(mean(states), std(states))
             return (quantile(norm_approx, α / 2), quantile(norm_approx, 1 - α / 2))
         else
-            error("method $method not recognized.  use :quantile or :normal")
+            throw(ArgumentError("$method not recognized.  Use :quantile or :normal"))
         end
     end
 end

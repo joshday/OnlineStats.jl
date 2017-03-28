@@ -14,6 +14,7 @@ info("Messy output for test coverage")
     println(NormalMix(2))
     println(MV(2, Mean()))
     println(HyperLogLog(5))
+    println(KMeans(5,3))
     for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
               LearningRate2()]
         println(w)
@@ -299,6 +300,21 @@ end
     @test var(o) ≈ vec(var(x, 1))
     @test cov(o) ≈ cov(x) atol=.001
     @test cor(o) ≈ cor(x) atol=.001
+    @test std(o) ≈ vec(std(x, 1))
+
+    x2 = randn(101, 5)
+    o2 = CovMatrix(5)
+    s2 = Series(o2)
+    fit!(s2, x2, 10)
+    merge!(s, s2)
+    @test nobs(s) == 201
+    @test cov(o) ≈ cov(vcat(x, x2))
+end
+@testset "KMeans" begin
+    x = randn(100, 3)
+    o = KMeans(3, 5)
+    s = Series(x, o)
+    fit!(s, x, 5)
 end
 @testset "Bootstrap" begin
     y = randn(1000)
@@ -313,6 +329,10 @@ end
     std(b)
     var(b)
     confint(b)
+    confint(b, .9, :normal)
+    @test_throws ArgumentError confint(b, .9, :badarg)
+    b.cached_state[1] = NaN
+    @test all(isnan, confint(b))
 
     y = randn(1000)
     b = Bootstrap(100, Mean(), mean, Bernoulli())
