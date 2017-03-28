@@ -10,6 +10,7 @@ info("Messy output for test coverage")
     println(OnlineStats.ScalarIn)
     println(OnlineStats.ScalarOut)
     println(Mean())
+    OnlineStats.printfields(STDOUT, Mean())
     println(OrderStats(5))
     println(Moments())
     println(QuantileMM())
@@ -209,25 +210,26 @@ end
     end
 end # summary
 
+
+
 @testset "Distributions" begin
-    function test_distribution(o::OnlineStat, d; wt = EqualWeight(), tol = 1e-4)
-        @testset "$(OnlineStats.name(o)) Params" begin
-            y = rand(d(), 10_000)
+    @testset "Distribution params" begin
+        function testdist(d::Symbol, wt = EqualWeight(), tol = 1e-4)
+            y = @eval rand($d(), 10_000)
+            o = @eval $(Symbol(:Fit, d))()
+            @test value(o) == @eval($d())
             s = Series(y, o; weight = wt)
-            myfit = fit(d, y)
-            for i in 1:length(params(myfit))
+            fit!(s, y)
+            myfit = @eval fit($d, $y)
+            for i in 1:length(params(o))
                 @test params(o)[i] ≈ params(myfit)[i] atol = tol
             end
-            mean(o)
-            var(o)
-            std(o)
         end
+        testdist(:Beta)
+        testdist(:Cauchy, LearningRate(), .1)
+        testdist(:Gamma, EqualWeight(), .1)
+        testdist(:Normal)
     end
-    test_distribution(FitBeta(), Beta)
-    test_distribution(FitCauchy(), Cauchy, tol = .2, wt = LearningRate())
-    test_distribution(FitGamma(), Gamma, tol = .1)
-    test_distribution(FitNormal(), Normal)
-
     @testset "FitCategorical" begin
         y = rand(1:5, 1000)
         o = FitCategorical(Int)
@@ -242,8 +244,20 @@ end # summary
         end
     end
     @testset "FitMultinomial" begin
+        y = rand(Multinomial(10, ones(5) / 5), 1000)
+        myfit = fit(Multinomial, y)
+        o = FitMultinomial(5)
+        @test params(value(o)) == (1, ones(5) / 5)
+        s = Series(o)
+        fit!(s, y')
+        @test probs(o) ≈ probs(myfit)
     end
     @testset "FitMvNormal" begin
+        y = rand(MvNormal(zeros(3), eye(3)), 1000)
+        myfit = fit(MvNormal, y)
+        o = FitMvNormal(3)
+        s = Series(y', o)
+        @test mean(o) ≈ mean(myfit)
     end
     @testset "NormalMix" begin
         d = MixtureModel([Normal(), Normal(1,2), Normal(2, 3)])

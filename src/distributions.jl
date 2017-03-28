@@ -157,11 +157,15 @@ mutable struct FitMultinomial <: DistributionStat{VectorIn}
     nobs::Int
     FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
 end
-fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64) = fit!(o.mvmean, y, γ)
-function value(o::FitMultinomial, nobs::Integer)
-    m = value(o.mvmean)
+function fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64)
+    o.nobs += 1
+    fit!(o.mvmean, y, γ)
+    o
+end
+function value(o::FitMultinomial)
+    m = value.(value(o.mvmean))
     p = length(o.mvmean.stats)
-    o.nobs > 0 ? Ds.Multinomial(p, m / sum(m)) : Ds.Multinomial(p, ones(p) / p)
+    o.nobs > 0 ? Ds.Multinomial(1, m / sum(m)) : Ds.Multinomial(1, ones(p) / p)
 end
 
 
