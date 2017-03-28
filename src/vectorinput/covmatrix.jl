@@ -37,4 +37,6 @@ end
 function Base.merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
     smooth!(o.A, o2.A, γ)
     smooth!(o.b, o2.b, γ)
+    o.nobs += o2.nobs
+    o
 end

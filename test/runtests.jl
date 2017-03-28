@@ -10,6 +10,7 @@ info("Messy output for test coverage")
     println(Moments())
     println(QuantileMM())
     println(NormalMix(2))
+    println(MV(2, Mean()))
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         println()
