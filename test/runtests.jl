@@ -263,5 +263,13 @@ end
     s = Series(rand(1:100, 10_000), o)
     @test 90 < value(o) < 110
 end
+@testset "CovMatrix" begin
+    x = randn(100, 5)
+    o = CovMatrix(5)
+    s = Series(x, o)
+    fit!(s, x, 10)
+
+    OnlineStats.fitbatch!(o, x)
+end
 
 end

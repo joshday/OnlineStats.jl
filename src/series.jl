@@ -94,11 +94,13 @@ function fit!(o::Series{ScalarIn}, y::AVec)
 end
 function fit!(o::Series{ScalarIn}, y::AVec, b::Integer)
     maprows(b, y) do yi
-        fitbatch!(o, yi)
+        bi = length(yi)
+        updatecounter!(o, length(bi))
+        γ = weight(o, bi)
+        map(stat -> fitbatch!(stat, y, γ), o.stats)
     end
     o
 end
-fitbatch!(o::Series, yi) = fit!(o, yi)
 function fit!(o::Series{ScalarIn}, y::AVec, γ::Float64)
     for yi in y
         fit!(o, yi, γ)
@@ -122,6 +124,13 @@ end
 function fit!(o::Series{VectorIn}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, view(y, i, :))
+    end
+    o
+end
+function fit!(o::Series{VectorIn}, y::AMat, b::Integer)
+    maprows(b, y) do yi
+        updatecounter!(o, size(yi, 1))
+        fitbatch!(o, yi, weight(o))
     end
     o
 end

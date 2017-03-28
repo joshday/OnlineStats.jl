@@ -4,6 +4,7 @@ mutable struct Mean <: OnlineStat{ScalarIn, ScalarOut}
     Mean() = new(0.0)
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
+fitbatch!(o::Mean, y::AVec, γ::Float64) = (o.μ = smooth(o.μ, mean(y), γ))
 Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
 Base.mean(o::Mean) = o.μ
 
