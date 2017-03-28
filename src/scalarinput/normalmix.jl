@@ -1,3 +1,7 @@
+"""
+    NormalMix(k)
+    NormalMix(k, init_data)
+"""
 mutable struct NormalMix <: DistributionStat{ScalarIn}
     s1::VecF
     s2::VecF
@@ -5,14 +9,18 @@ mutable struct NormalMix <: DistributionStat{ScalarIn}
     w::VecF
     μ::VecF
     σ2::VecF
-    function NormalMix(k::Integer)
+    function NormalMix(k::Integer, μ::VecF, σ2::VecF)
         s1 = ones(k) / k
         s2 = zeros(k)
         s3 = zeros(k)
         w = zeros(k)
-        μ = collect(1.:k)
-        σ2 = fill(10.0, k)
         new(s1, s2, s3, w, μ, σ2)
+    end
+    NormalMix(k::Integer) = NormalMix(k, collect(linspace(-10, 10, k)), fill(10.0, k))
+    function NormalMix(k::Integer, train::VecF)
+        μ = quantile(train, collect(linspace(0, 1, k + 2))[2:(end - 1)])
+        σ2 = fill(var(train), k)
+        NormalMix(k, μ, σ2)
     end
 end
 function Base.show(io::IO, o::NormalMix)
@@ -25,77 +33,38 @@ function Base.show(io::IO, o::NormalMix)
     end
 end
 function value(o::NormalMix)
+    for j in eachindex(o.μ)
+        o.μ[j] = o.s2[j] / o.s1[j]
+        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
+    end
+    scale!(o.s1, inv(sum(o.s1)))
     vec = map((u,v) -> Ds.Normal{Float64}(u, sqrt(v)), o.μ, o.σ2)
     return Ds.MixtureModel(vec, o.s1)
 end
 
-Ds.componentwise_pdf(o::NormalMix, y) = Ds.componentwise_pdf(value(o), y)
-Ds.ncomponents(o::NormalMix) = Ds.ncomponents(value(o))
+for f in [:component_type, :ncomponents, :components]
+    @eval Ds.$f(o::NormalMix) = Ds.$f(value(o))
+end
 Ds.component(o::NormalMix, j) = Ds.component(value(o), j)
-Ds.components(o::NormalMix) = Ds.components(value(o))
 
-function fit!(o::NormalMix, y::Real, γ::Float64)
-    k = length(o.μ)
-    for j in 1:k
-        σinv = 1.0 / sqrt(o.σ2[j])
-        o.w[j] = o.s1[j] * σinv * exp(-.5 * σinv * σinv * (y - o.μ[j]) ^ 2)
+
+function get_w!(o::NormalMix, y)
+    for j in eachindex(o.μ)
+        o.w[j] = o.s1[j] * mean(Ds.pdf(Ds.Normal(o.μ[j], sqrt(o.σ2[j])), y))
     end
-    sum1 = sum(o.w)
-    for j in 1:k
-        o.w[j] /= sum1
+    scale!(o.w, inv(sum(o.w)))
+end
+
+# Works also for fitbatch! default definition
+function fit!(o::NormalMix, y, γ::Float64)
+    get_w!(o, y)
+    for j in eachindex(o.s1)
         o.s1[j] = smooth(o.s1[j], o.w[j], γ)
-        o.s2[j] = smooth(o.s2[j], o.w[j] * y, γ)
-        o.s3[j] = smooth(o.s3[j], o.w[j] * y * y, γ)
-    end
-    sum2 = sum(o.s1)
-    for j in 1:k
-        o.μ[j] = o.s2[j] / o.s1[j]
-        o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
-        o.s1[j] /= sum2
-        if o.σ2[j] <= ϵ
-            o.σ2 = ones(k)
-        end
+        o.s2[j] = smooth(o.s2[j], o.w[j] * mean(y), γ)
+        o.s3[j] = smooth(o.s3[j], o.w[j] * mean(y .* y), γ)
     end
     o
 end
-
-# function fitbatch!{T<:Real}(o::NormalMix, y::AVec{T}, γ::Float64)
-#     n = length(y)
-#     k = length(o.μ)
-#     s1 = copy(o.s1)
-#     s2 = copy(o.s2)
-#     s3 = copy(o.s3)
-#
-#     for yi in y
-#         for j in 1:k
-#             σinv = 1.0 / sqrt(o.σ2[j])
-#             o.w[j] = s1[j] * σinv * exp(-.5 * σinv * σinv * (yi - o.μ[j]) ^ 2)
-#         end
-#         sum1 = sum(o.w)
-#         for j in 1:k
-#             o.w[j] /= sum1
-#             if yi == y[1]
-#                 o.s1[j] = smooth(o.s1[j], o.w[j] / n, γ)
-#                 o.s2[j] = smooth(o.s2[j], o.w[j] * yi / n, γ)
-#                 o.s3[j] = smooth(o.s3[j], o.w[j] * yi * yi / n, γ)
-#             else
-#                 o.s1[j] += γ * o.w[j] / n
-#                 o.s2[j] += γ * o.w[j] * yi / n
-#                 o.s3[j] += γ * o.w[j] * yi * yi / n
-#             end
-#         end
-#     end
-#     sum2 = sum(o.s1)
-#     for j in 1:k
-#         o.μ[j] = o.s2[j] / o.s1[j]
-#         o.σ2[j] = (o.s3[j] - o.s2[j] ^ 2 / o.s1[j]) / o.s1[j]
-#         o.s1[j] /= sum2
-#         if o.σ2[j] <= ϵ
-#             o.σ2 = ones(k)
-#         end
-#     end
-#     o
-# end
 
 
 # # Quantiles via Newton's method.  Starting values based on Normal distribution.

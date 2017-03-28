@@ -241,10 +241,14 @@ end # summary
     @testset "NormalMix" begin
         d = MixtureModel([Normal(), Normal(1,2), Normal(2, 3)])
         y = rand(d, 1000)
-        o = NormalMix(3)
+        o = NormalMix(3, y)
         s = Series(y, o)
         fit!(s, y, 10)
-        @show s
+        components(o)
+        @test isa(component(o, 1), Normal)
+        component(o, 2)
+        component(o, 3)
+        @test ncomponents(o) == 3
     end
 end
 

@@ -1,12 +1,12 @@
 #--------------------------------------------------------------# common
 const DistributionStat{I} = OnlineStat{I, DistributionOut}
-for f in [:mean, :var, :std, :params, :ncategories, :cov, :probs]
+for f in [:mean, :var, :std, :params, :ncategories, :cov, :probs, :rand]
     @eval Ds.$f(d::DistributionStat) = Ds.$f(value(d))
 end
-for f in [:pdf, :cdf]
-    @eval Ds.$f(d::DistributionStat, y) = Ds.$f(value(d), y)
+for f in [:pdf, :cdf, :logpdf, :rand!]
+    @eval Ds.$f(d::DistributionStat, arg) = Ds.$f(value(d), arg)
 end
-Base.rand(d::DistributionStat, args...) = rand(value(d), args...)
+
 
 
 #--------------------------------------------------------------# Beta
