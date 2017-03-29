@@ -1,128 +1,86 @@
-#----------------------------------------------------------------------------# Weight
+#--------------------------------------------------------------------# Weight
 abstract type Weight end
-abstract type BatchWeight <: Weight end
-abstract type StochasticWeight <: BatchWeight end
+Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
+nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups + 1)
 
-
-#-----------------------------------------------------------------------# EqualWeight
+#--------------------------------------------------------------------# EqualWeight
 """
-One of the `Weight` types.  Observations are weighted equally.  For analytical
-updates, the online algorithm will give results equal to the offline version.
+EqualWeight <: Weight.  Equally-weighted observations.
 
-- `EqualWeight()`
+    - Singleton weight at observation `t` is `γ = 1 / t`
+
+    EqualWeight()
 """
-type EqualWeight <: BatchWeight
-    nobs::Int
-    EqualWeight() = new(0)
-    EqualWeight(n::Int) = new(n)
-end
-Base.show(io::IO, w::EqualWeight) = print("EqualWeight: γ = 1 / t")
+struct EqualWeight <: Weight end
+show_weight(w::EqualWeight) = "γ = 1 / t"
+weight(w::EqualWeight, n::Int, n2::Int, nups::Int) = n2 / n
 
-
-#-----------------------------------------------------------------# ExponentialWeight
+#--------------------------------------------------------------------# ExponentialWeight
 """
-One of the `Weight` types.  Updates are performed with a constant weight
-`λ = 2 / (1 + lookback)`.
+ExponentialWeight <: Weight.  Exponentially-weighted observations (constant weight).
 
-- `ExponentialWeight(λ::Float64)`
-- `ExponentialWeight(lookback::Int)`
+    - Singleton weight at observation `t` is `γ = λ`
+
+    ExponentialWeight(λ::Real = 0.1)
+    ExponentialWeight(lookback::Integer)
 """
-type ExponentialWeight <: Weight
-    nobs::Int
+struct ExponentialWeight <: Weight
     λ::Float64
-    function ExponentialWeight(λ::Real = 1.0)
-            @assert 0 <= λ <= 1
-            new(0, λ)
-    end
-    ExponentialWeight(lookback::Integer) = ExponentialWeight(2.0 / (lookback + 1))
+    ExponentialWeight(λ::Real = 0.1) = new(λ)
+    ExponentialWeight(lookback::Integer) = new(2 / (lookback + 1))
 end
-Base.show(io::IO, w::ExponentialWeight) = print("ExponentialWeight: γ = $(w.λ)")
+show_weight(w::ExponentialWeight) = "γ = $(w.λ)"
+weight(w::ExponentialWeight, n::Int, n2::Int, nups::Int) = w.λ
 
-#----------------------------------------------------------------# BoundedEqualWeight
+#--------------------------------------------------------------------# BoundedEqualWeight
 """
-One of the `Weight` types.  Uses `EqualWeight` until reaching `λ = 2 / (1 + lookback)`,
-then weights are held constant.
+BoundedEqualWeight <: Weight.  Use EqualWeight until threshold `λ` is hit, then hold constant.
 
-- `BoundedEqualWeight(λ::Float64)`
-- `BoundedEqualWeight(lookback::Int)`
+    - Singleton weight at observation `t` is `γ = max(1 / t, λ)`
+
+    BoundedEqualWeight(λ::Real = 0.1)
+    BoundedEqualWeight(lookback::Integer)
 """
-type BoundedEqualWeight <: Weight
-    nobs::Int
+struct BoundedEqualWeight <: Weight
     λ::Float64
-    function BoundedEqualWeight(λ::Real = 1.0)
-            @assert 0 <= λ <= 1
-            new(0, λ)
-    end
-    BoundedEqualWeight(lookback::Integer) = BoundedEqualWeight(2.0 / (lookback + 1))
+    BoundedEqualWeight(λ::Real = 0.1) = new(λ)
+    BoundedEqualWeight(lookback::Integer) = new(2 / (lookback + 1))
 end
-function Base.show(io::IO, w::BoundedEqualWeight)
-    print("BoundedEqualWeight: γ = max(1 / t, $(w.λ))")
-end
+show_weight(w::BoundedEqualWeight) = "γ = max(1 / t, $(w.λ))"
+weight(w::BoundedEqualWeight, n::Int, n2::Int, nups::Int) = max(n2 / n, w.λ)
 
-
-#----------------------------------------------------------------------# LearningRate
+#--------------------------------------------------------------------# LearningRate
 """
-One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic
-approximation (`QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
-`KMeans`).  The weight at update `t` is `1 / t ^ r`.  When weights reach `λ`, they are
-held consant.  Compare to `LearningRate2`.
+LearningRate <: Weight.  Mainly for stochastic approximation types (`QuantileSGD`,
+`QuantileMM`, etc.).  Decreases at a "slow" rate until threshold λ is reached.
 
-- `LearningRate(r = 0.5, λ = 0.0)`
+    - Singleton weight at observation `t` is `γ = max(1 / t ^ r, λ)`
+
+    LearningRate(r = .6, λ = 0.0)
 """
-type LearningRate <: StochasticWeight
-    nobs::Int
-    nups::Int
+struct LearningRate <: Weight
+    λ::Float64
     r::Float64
-    λ::Float64
-    function LearningRate(r::Real = 0.5, λ::Real = 0.0)
-        @assert 0 < r <= 1
-        @assert λ >= 0
-        new(0, 0, r, λ)
-    end
+    LearningRate(r::Real = .6, λ::Real = 0.0) = new(λ, r)
 end
-function Base.show(io::IO, w::LearningRate)
-    print("LearningRate: γ = max(1 / t ^ $(w.r), $(w.λ))")
-end
+show_weight(w::LearningRate) = "γ = max(t ^ -$(w.r), $(w.λ))"
+weight(w::LearningRate, n::Int, n2::Int, nups::Int) = max(w.λ, exp(-w.r * log(nups)))
 
-
-#---------------------------------------------------------------------# LearningRate2
+#--------------------------------------------------------------------# LearningRate2
 """
-One of the `Weight` types.  It's primary use is for the OnlineStats that use stochastic
-approximation (`QuantReg`, `QuantileMM`, `QuantileSGD`, `NormalMix`, and
-`KMeans`).  The weight at update `t` is `1 / (1 + c * (t - 1))`.  When weights reach
-`λ`, they are held consant.  Compare to `LearningRate`.
+LearningRate2 <: Weight.  Mainly for stochastic approximation types (`QuantileSGD`,
+`QuantileMM`, etc.).  Decreases at a "slow" rate until threshold λ is reached.
 
-- `LearningRate2(c = 0.5, λ = 0.0)`
+    - Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
+
+    LearningRate2(c = .5, λ = 0.0)
 """
-type LearningRate2 <: StochasticWeight
-    nobs::Int
-    nups::Int
+struct LearningRate2 <: Weight
     c::Float64
     λ::Float64
-    function LearningRate2(c::Real = 0.5, λ = 0.0)
-        @assert λ >= 0
-        @assert c > 0
-        new(0, 0, c, λ)
-    end
+    LearningRate2(c::Real = 0.5, λ::Real = 0.0) = new(c, λ)
 end
-function Base.show(io::IO, w::LearningRate2)
-    print("LearningRate2: γ = max(1 / (1 + c * (t-1)), $(w.λ))")
+show_weight(w::LearningRate2) = "γ = max(inv(1 + $(w.c) * (t - 1)), $(w.λ))"
+function weight(w::LearningRate2, n::Int, n2::Int, nups::Int)
+    max(w.λ, 1.0 / (1.0 + w.c * (nups - 1)))
 end
-
-
-#---------------------------------------------------------------------------# methods
-StatsBase.nobs(w::Weight) = w.nobs
-nups(w::StochasticWeight) = w.nups
-
-# increase nobs by the number of new observations
-updatecounter!(w::Weight, n2::Int = 1)              = (w.nobs += n2)
-updatecounter!(w::StochasticWeight, n2::Int = 1)    = (w.nobs += n2; w.nups += 1)
-updatecounter!(o::OnlineStat, n2::Int = 1) = updatecounter!(o.weight, n2)
-
-# Get weight for update of size n2, typically immediately after updatecounter!
-weight(w::EqualWeight, n2::Int = 1)         = n2 / w.nobs
-weight(w::BoundedEqualWeight, n2::Int = 1)  = nobs(w) == 0 ? 1.0 : max(w.λ, n2 / w.nobs)
-weight(w::ExponentialWeight, n2::Int = 1)   = w.λ
-weight(w::LearningRate, n2::Int = 1)        = max(w.λ, exp(-w.r * log(w.nups)))
-weight(w::LearningRate2, n2::Int = 1)       = max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
-weight(o::OnlineStat, n2::Int = 1) = weight(o.weight, n2)

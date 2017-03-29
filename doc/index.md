@@ -36,6 +36,8 @@ nobs(o)   # number of observations used
 
 ---
 
+---
+
 ## What Can OnlineStats Do?
 While many estimates can be calculated analytically with an online algorithm, several
 type rely on stochastic approximation.
