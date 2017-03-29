@@ -1,6 +1,16 @@
+"""
+Online statistical bootstrapping.
+
+    using Distributions
+    # create a `Bootstrap` with:
+    # - 1000 replicates of `o = Mean()
+    # - the state created from `value(o)`
+    # - double-or-nothing `Bernoulli()` bootstrap method
+    Bootstrap(1000, Mean(), value, Bernoulli())
+"""
 mutable struct Bootstrap{
         I,  # Input type
-        D,  # Bootstrap type (Distribution)
+        D,  # Bootstrap type (Distribution or other?)
         O <: OnlineStat{I},
         F <: Function,
         W <: Weight,

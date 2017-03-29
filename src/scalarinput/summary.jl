@@ -1,4 +1,9 @@
 #--------------------------------------------------------------------# Mean
+"""
+Univariate Mean
+
+    s = Series(randn(100), Mean())
+"""
 mutable struct Mean <: OnlineStat{0, 0}
     μ::Float64
     Mean() = new(0.0)
@@ -9,6 +14,11 @@ Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
 Base.mean(o::Mean) = o.μ
 
 #--------------------------------------------------------------------# Variance
+"""
+Univariate Variance
+
+    s = Series(randn(100), Variance())
+"""
 mutable struct Variance <: OnlineStat{0, 0}
     σ2::Float64     # biased variance
     μ::Float64
@@ -36,6 +46,11 @@ Base.mean(o::Variance) = o.μ
 nobs(o::Variance) = o.nobs
 
 #--------------------------------------------------------------------# Extrema
+"""
+Maximum and minimum
+
+    s = Series(randn(100), Extrema())
+"""
 mutable struct Extrema <: OnlineStat{0, 1}
     min::Float64
     max::Float64
@@ -49,6 +64,12 @@ end
 value(o::Extrema) = (o.min, o.max)
 
 #--------------------------------------------------------------------# OrderStats
+"""
+Mean of order statistics for batches of size `b`
+
+    b = 5
+    s = Series(randn(100), OrderStats(b))
+"""
 mutable struct OrderStats <: OnlineStat{0, 1}
     value::VecF
     buffer::VecF
@@ -72,6 +93,11 @@ end
 fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
+"""
+First four non-central moments
+
+    s = Series(randn(100), Moments())
+"""
 mutable struct Moments <: OnlineStat{0, 1}
     m::VecF
     nobs::Int
@@ -103,6 +129,11 @@ function Base.merge!(o1::Moments, o2::Moments, γ::Float64)
 end
 
 #--------------------------------------------------------------------# QuantileSGD
+"""
+Approximate quantiles via stochastic gradient descent
+
+    s = Series(randn(10_000), QuantileSGD(); weight = LearningRate())
+"""
 struct QuantileSGD <: OnlineStat{0, 1}
     value::VecF
     τ::VecF
@@ -127,6 +158,11 @@ function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
 end
 
 #--------------------------------------------------------------------# QuantileSGD
+"""
+Approximate quantiles via an online MM algorithm
+
+    s = Series(randn(10_000), QuantileMM(); weight = LearningRate())
+"""
 mutable struct QuantileMM <: OnlineStat{0, 1}
     value::VecF
     τ::VecF
@@ -165,6 +201,11 @@ function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
 end
 
 #--------------------------------------------------------------------# Diff
+"""
+Track the difference and the last value
+
+    s = Series(randn(100), Diff())
+"""
 mutable struct Diff{T <: Real} <: OnlineStat{0, 0}
     diff::T
     lastval::T
@@ -185,6 +226,11 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
 end
 
 #--------------------------------------------------------------------# Sum
+"""
+Track the overall sum
+
+    s = Series(randn(100), Sum())
+"""
 mutable struct Sum{T <: Real} <: OnlineStat{0, 0}
     sum::T
 end

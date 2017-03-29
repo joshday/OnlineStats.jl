@@ -18,9 +18,11 @@ function α(m::UInt32)
 end
 
 """
-    HyperLogLog(b)
-
 Approximate count of distinct elements
+
+    b = 12
+    o = HyperLogLog(b) # 4 ≤ b ≤ 16
+    s = Series(rand(1:10, 1000), o)
 """
 mutable struct HyperLogLog <: OnlineStat{0, 0}
     m::UInt32
@@ -28,9 +30,7 @@ mutable struct HyperLogLog <: OnlineStat{0, 0}
     mask::UInt32
     altmask::UInt32
     function HyperLogLog(b::Integer)
-        if !(4 <= b <= 16)
-            throw(ArgumentError("b must be an Integer between 4 and 16"))
-        end
+        !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
         m = 0x00000001 << b
         M = zeros(UInt32, m)
         mask = 0x00000000
@@ -44,8 +44,7 @@ mutable struct HyperLogLog <: OnlineStat{0, 0}
     end
 end
 function Base.show(io::IO, counter::HyperLogLog)
-    @printf(io, "HyperLogLog(%d registers)", Int(counter.m))
-    return
+    print(io, "HyperLogLog($(counter.m) registers, estimate = $(value(counter)))")
 end
 
 function fit!(o::HyperLogLog, v::Any, γ::Float64)

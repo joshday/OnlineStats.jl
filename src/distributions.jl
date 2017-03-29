@@ -10,6 +10,13 @@ end
 
 
 #--------------------------------------------------------------# Beta
+"""
+Online parameter estimate of a Beta distribution (Method of Moments)
+
+    using Distributions
+    y = rand(Beta(3, 5), 1000)
+    s = Series(y, FitBeta())
+"""
 struct FitBeta <: DistributionStat{0}
     var::Variance
     FitBeta() = new(Variance())
@@ -93,6 +100,13 @@ Base.keys(o::FitCategorical) = keys(o.d)
 #
 #
 #------------------------------------------------------------------# Cauchy
+"""
+Online parameter estimate of a Cauchy distribution
+
+    using Distributions
+    y = rand(Cauchy(0, 10), 10_000)
+    s = Series(y, FitCauchy(); weight = LearningRate())
+"""
 mutable struct FitCauchy <: DistributionStat{0}
     q::QuantileMM
     nobs::Int
@@ -109,6 +123,13 @@ end
 
 
 #------------------------------------------------------------------------# Gamma
+"""
+Online parameter estimate of a Gamma distribution (Method of Moments)
+
+    using Distributions
+    y = rand(Gamma(5, 1), 1000)
+    s = Series(y, FitGamma())
+"""
 # method of moments. TODO: look at Distributions for MLE
 struct FitGamma <: DistributionStat{0}
     var::Variance
@@ -129,6 +150,13 @@ end
 
 
 #-----------------------------------------------------------------------# LogNormal
+"""
+Online parameter estimate of a LogNormal distribution (MLE)
+
+    using Distributions
+    y = rand(LogNormal(3, 4), 1000)
+    s = Series(y, FitLogNormal())
+"""
 struct FitLogNormal <: DistributionStat{0}
     var::Variance
     FitLogNormal() = new(Variance())
@@ -140,6 +168,13 @@ end
 
 
 #-----------------------------------------------------------------------# Normal
+"""
+Online parameter estimate of a Normal distribution (MLE)
+
+    using Distributions
+    y = rand(Normal(-3, 4), 1000)
+    s = Series(y, FitNormal())
+"""
 struct FitNormal <: DistributionStat{0}
     var::Variance
     FitNormal() = new(Variance())
@@ -169,6 +204,13 @@ end
 
 
 #---------------------------------------------------------------------# MvNormal
+"""
+Online parameter estimate of a MvNormal distribution (MLE)
+
+    using Distributions
+    y = rand(MvNormal(zeros(3), eye(3)), 1000)
+    s = Series(y', FitMvNormal(3))
+"""
 struct FitMvNormal<: DistributionStat{1}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))

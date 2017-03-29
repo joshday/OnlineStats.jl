@@ -1,6 +1,13 @@
 """
+Univariate mixture of gaussians.
+- Constructor can optionally take
+- a small batch of data to come up with smarter initial values
+- Initial vectors for means, variances, and component probabilities
+
     NormalMix(k)
     NormalMix(k, init_data)
+    NormalMix(k, μ, σ2, π)
+
 """
 mutable struct NormalMix <: DistributionStat{0}
     s1::VecF
@@ -10,8 +17,7 @@ mutable struct NormalMix <: DistributionStat{0}
     μ::VecF
     σ2::VecF
     nobs::Int
-    function NormalMix(k::Integer, μ::VecF, σ2::VecF)
-        s1 = ones(k) / k
+    function NormalMix(k::Integer, μ::VecF, σ2::VecF, s1 = ones(k) / k)
         s2 = zeros(k)
         s3 = zeros(k)
         w = zeros(k)

@@ -95,9 +95,8 @@ function Base.show{I}(io::IO, o::Series{I})
     abstractseries_print(io, o)
     n = length(o.stats)
     for i in 1:n
-        print(io, "  > ")
-        print(io, o.stats[i])
-        i != n && println(io)
+        s = o.stats[i]
+        print_item(io, name(s), value(s), i != n)
     end
 end
 function abstractseries_print(io::IO, o::AbstractSeries)
