@@ -115,7 +115,6 @@ struct FitGamma <: DistributionStat{0}
 end
 FitGamma() = FitGamma(Variance())
 fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
-nobs(o::FitGamma) = nobs(o.var)
 function value(o::FitGamma)
     if o.var.nobs > 1
         m = mean(o.var)
@@ -182,6 +181,6 @@ function value(o::FitMvNormal)
         return Ds.MvNormal(mean(o.cov), c)
     else
         warn("Covariance not positive definite.  More data needed.")
-        return Ds.MvNormal(zeros(dim(o)), eye(dim(o)))
+        return Ds.MvNormal(zeros(length(o)), eye(length(o)))
     end
 end

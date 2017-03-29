@@ -10,7 +10,7 @@ header(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
 subheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "  ■ $s")
 
 function print_item(io::IO, name::AbstractString, value, newline=true)
-    print(io, "  >" * @sprintf("%15s", name * " | "), value)
+    print(io, "  >" * @sprintf("%18s", name * " | "), value)
     newline && println(io)
 end
 

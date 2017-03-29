@@ -269,6 +269,7 @@ end # summary
         myfit = fit(MvNormal, y)
         o = FitMvNormal(3)
         @test length(o) == 3
+        @test params(value(o))[1] == zeros(3)
         s = Series(y', o)
         @test mean(o) ≈ mean(myfit)
     end

@@ -31,21 +31,19 @@ function Bootstrap{I}(nreps::Int, o::OnlineStat{I}, f::Function, d;
 end
 
 function Base.show(io::IO, o::Bootstrap)
-    header(io, "$(name(o))\n")
-    subheader(io, "         id | $(o.id)\n")
-    subheader(io, "     weight | $(o.weight)\n")
-    subheader(io, "       nobs | $(o.nobs)\n")
+    abstractseries_print(io, o)
     print_item(io, "Stat", o.stat)
     print_item(io, "n reps", length(o.replicates))
+    print_item(io, "cached_state", summary(o.cached_state))
     print_item(io, "Function", o.f)
 
     s = replace(string(typeof(o.d)), "Distributions.", "")
     s = replace(s, r"\{(.*)", "")
-    print_item(io, "Dist", s)
+    print_item(io, "Boot Method", s, false)
 end
 
 replicates(b::Bootstrap) = b.replicates
-function cached_state(b::Bootstrap{0})
+function cached_state(b::Bootstrap)
     if b.cache_is_dirty
         b.cached_state .= b.f.(b.replicates)
         b.cache_is_dirty = false

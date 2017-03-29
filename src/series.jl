@@ -92,20 +92,19 @@ value(o::Series, i::Integer) = value(stats(o, i))
 nobs(o::AbstractSeries) = o.nobs
 nups(o::AbstractSeries) = o.nups
 function Base.show{I}(io::IO, o::Series{I})
-    header(io, "$(name(o))\n")
-    subheader(io, "$(o.id) | $(o.nobs) | $(o.weight)\n")
-    # subheader(io, "         id | $(o.id)\n")
-    # subheader(io, "     weight | $(o.weight)\n")
-    # subheader(io, "       nobs | $(o.nobs)\n")
+    abstractseries_print(io, o)
     n = length(o.stats)
     for i in 1:n
         print(io, "  > ")
         print(io, o.stats[i])
         i != n && println(io)
-        # s = o.stats[i]
-        # print_item(io, name(s), value(s), i != n)
     end
 end
+function abstractseries_print(io::IO, o::AbstractSeries)
+    header(io, "$(name(o))\n")
+    subheader(io, "$(o.id) | $(o.nobs) | $(o.weight)\n")
+end
+
 updatecounter!(o::AbstractSeries, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
 nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
