@@ -27,6 +27,7 @@ export
     HyperLogLog
 
 #-----------------------------------------------------------------------------# types
+# 0 = scalar, 1 = vector, 2 = matrix, -1 = unkown, or Ds.Distribution
 abstract type OnlineStat{INDIM, OUTDIM} end
 
 const AA        = AbstractArray
@@ -94,7 +95,7 @@ include("vectorinput/kmeans.jl")
 include("distributions.jl")
 include("scalarinput/normalmix.jl")
 include("streamstats/hyperloglog.jl")
-include("streamstats/bootstrap2.jl")
+include("streamstats/bootstrap.jl")
 
 
 

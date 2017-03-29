@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------# Weight
 abstract type Weight end
-Base.show(io::IO, w::Weight) = print(io, name(w) * "( " * show_weight(w) * " )")
+Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
 nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups + 1)
 
 #--------------------------------------------------------------------# EqualWeight
