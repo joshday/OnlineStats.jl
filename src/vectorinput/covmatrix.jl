@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------# CovMatrix
-mutable struct CovMatrix <: OnlineStat{VectorIn, MatrixOut}
+mutable struct CovMatrix <: OnlineStat{1, 2}
     value::MatF
     cormat::MatF
     A::MatF  # X'X / n

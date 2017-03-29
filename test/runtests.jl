@@ -7,8 +7,6 @@ info("Messy output for test coverage")
     println(Series(Mean()))
     println(Bootstrap(100, Mean(), mean, Bernoulli()))
     println(OnlineStats.name(Moments(), false))
-    println(OnlineStats.ScalarIn)
-    println(OnlineStats.ScalarOut)
     println(Mean())
     println(OrderStats(5))
     println(Moments())
@@ -83,7 +81,7 @@ end
     Series(EqualWeight(), :myid, Variance())
     @test_throws ArgumentError Series(CovMatrix(4), Mean())
 end
-@testset "Series{ScalarIn}" begin
+@testset "Series{0}" begin
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
         s = Series(randn(100), o)
@@ -102,7 +100,7 @@ end
         @test_throws DimensionMismatch fit!(s, randn(100), rand(5))
     end
 end
-@testset "Series{VectorIn}" begin
+@testset "Series{1}" begin
     for o in [MV(5, Mean()), MV(5, Variance()), CovMatrix(5)]
         s = Series(randn(100, 5), o)
         @test value(o) == value(s, 1)

@@ -1,168 +1,105 @@
-# abstract type Bootstrap{I <: Input, O <: Output} <: OnlineStat{I, O} end
-# nobs(b::Bootstrap) = b.n
-# value(b::Bootstrap) = b.replicates
-# updatecounter!(b::Bootstrap, n2::Int) = (b.n += n2)
-# weight(b::Bootstrap, n2::Int) = 0.0
-#
-# #-----------------------------------------------------------# BernoulliBootstrap
-# """
-# `BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
-#
-# Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
-#
-# Example:
-# ```julia
-# BernoulliBootstrap(Mean(), mean, 1000)
-# ```
-# """
-# type BernoulliBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn, UnknownOut}
-#     replicates::Vector{S}            # replicates of base stat
-#     cached_state::Vector{Float64}    # cache of replicate states
-#     f::Function                      # function to generate state. Ex: mean, var, std
-#     n::Int                           # number of observations
-#     cache_is_dirty::Bool
-# end
-#
-# function BernoulliBootstrap{T <: ScalarIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
-#     replicates = OnlineStat{T}[copy(o) for i in 1:r]
-#     cached_state = Array{Float64}(r)
-#     return BernoulliBootstrap(replicates, cached_state, f, 0, true)
-# end
-#
-#
-# function _fit!(b::BernoulliBootstrap, x::Real, γ::Float64)
-#     for replicate in b.replicates
-#         if rand() > 0.5
-#             fit!(replicate, x)
-#             fit!(replicate, x)
-#         end
-#     end
-#     b.cache_is_dirty = true
-#     b
-# end
-#
-# #-------------------------------------------------------------# PoissonBootstrap
-# """
-# `PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
-#
-# Create a poisson bootstrap using `r` replicates of `o` for estimate `f(o)`
-#
-# Example:
-# ```julia
-# PoissonBootstrap(Mean(), mean, 1000)
-# ```
-# """
-# type ScalarPoissonBootstrap{S <: OnlineStat{ScalarIn}} <: Bootstrap{ScalarIn, UnknownOut}
-#     replicates::Vector{S}           # replicates of base stat
-#     cached_state::Vector{Float64}  # cache of replicate states
-#     f::Function
-#     n::Int                          # number of observations
-#     cache_is_dirty::Bool
-# end
-# function PoissonBootstrap{T <: ScalarIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
-#     replicates = OnlineStat{T}[copy(o) for i in 1:r]
-#     cached_state = Array{Float64}(r)
-#     ScalarPoissonBootstrap(replicates, cached_state, f, 0, true)
-# end
-#
-# type VectorPoissonBootstrap{S <: OnlineStat{VectorIn}} <: Bootstrap{VectorIn, UnknownOut}
-#     replicates::Vector{S}           # replicates of base stat
-#     cached_state::Matrix{Float64}  # cache of replicate states
-#     f::Function
-#     n::Int                          # number of observations
-#     cache_is_dirty::Bool
-# end
-# function PoissonBootstrap{T <: VectorIn}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
-#     replicates = OnlineStat{T}[copy(o) for i in 1:r]
-#     cached_state = Array{Float64}(length(value(o)), r)
-#     VectorPoissonBootstrap(replicates, cached_state, f, 0, true)
-# end
-#
-# const unitPoissonDist = Ds.Poisson(1)
-# function _fit!(b::Union{ScalarPoissonBootstrap, VectorPoissonBootstrap},
-#         x::Union{Real,Vector}, γ::Float64)
-#     for replicate in b.replicates
-#         for repetition in 1:rand(unitPoissonDist)
-#             fit!(replicate, x)
-#         end
-#     end
-#     b.cache_is_dirty = true
-#     b
-# end
-#
-#
-# #--------------------------------------------------------------# FrozenBootstrap
-# # "Frozen bootstraps object are generated when two bootstrap distributions are combined
-# #  e.g., if they are differenced."
-# immutable FrozenBootstrap <: Bootstrap{ScalarIn, UnknownOut}
-#     cached_state::Vector{Float64}  # cache of replicate states
-#     n::Int                          # number of observations
-# end
-#
-# # "Return the value of interest for each of the `OnlineStat` replicates"
-# cached_state(b::FrozenBootstrap) = copy(b.cached_state)
-#
-# #-----------------------------------------------------------------------# Common
-# function Base.show(io::IO, b::Bootstrap)
-#     header(io, string(typeof(b)))
-#     print_item(io, "Boostrap of", typeof(b.replicates[1]))
-#     print_item(io, "function", b.f)
-#     print_item(io, "nreplicates", length(b.replicates))
-#     print_item(io, "nobs", nobs(b))
-# end
-#
-# # update cached_state' states if necessary and return their values
-# function cached_state(b::Bootstrap{ScalarIn})
-#     if b.cache_is_dirty
-#         for i in 1:length(b.replicates)
-#             b.cached_state[i] = b.f(b.replicates[i])
-#         end
-#         b.cache_is_dirty = false
-#     end
-#     return b.cached_state
-# end
-# function cached_state(b::Bootstrap{VectorIn})
-#     if b.cache_is_dirty
-#         for i in 1:length(b.replicates)
-#             b.cached_state[:,i] = b.f(b.replicates[i])
-#         end
-#         b.cache_is_dirty = false
-#     end
-#     return b.cached_state
-# end
-#
-# Base.mean(b::Bootstrap{ScalarIn}) = mean(cached_state(b))
-# Base.std(b::Bootstrap{ScalarIn}) = std(cached_state(b))
-# Base.var(b::Bootstrap{ScalarIn}) = var(cached_state(b))
-#
-# Base.mean(b::Bootstrap{VectorIn}) = vec(mean(cached_state(b),2))
-# Base.std(b::Bootstrap{VectorIn}) = vec(std(cached_state(b),2))
-# Base.var(b::Bootstrap{VectorIn}) = vec(var(cached_state(b),2))
-#
-#
-# replicates(b::Bootstrap) = copy(b.replicates)
-#
-# # Assumes a and b are independent.
-# function Base.:-(a::Bootstrap{ScalarIn}, b::Bootstrap{ScalarIn})
-#     return FrozenBootstrap(cached_state(a) - cached_state(b), nobs(a) + nobs(b))
-# end
-#
-#
-#
-# function StatsBase.confint(b::Bootstrap{ScalarIn}, coverageprob = 0.95, method=:quantile)
-#     states = cached_state(b)
-#     # If any NaN, return NaN, NaN
-#     if any(isnan, states)
-#         return (NaN, NaN)
-#     else
-#         α = 1 - coverageprob
-#         if method == :quantile
-#             return (quantile(states, α / 2), quantile(states, 1 - α / 2))
-#         elseif method == :normal
-#             norm_approx = Ds.Normal(mean(states), std(states))
-#             return (quantile(norm_approx, α / 2), quantile(norm_approx, 1 - α / 2))
-#         else
-#             error("method $method not recognized.  use :quantile or :normal")
-#         end
-#     end
-# end
+mutable struct Bootstrap{
+        I,  # Input type
+        D,  # Bootstrap type (Distribution)
+        O <: OnlineStat{I},
+        F <: Function,
+        W <: Weight,
+        T <: AbstractArray
+    } <: AbstractSeries
+    weight::W
+    nobs::Int
+    nups::Int
+    id::Symbol
+    stat::O
+    replicates::Vector{O}
+    cached_state::T
+    f::F
+    d::D
+    cache_is_dirty::Bool
+
+end
+function Bootstrap{I}(nreps::Int, o::OnlineStat{I}, f::Function, d;
+                             weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
+     replicates = [copy(o) for i in 1:nreps]
+     cached_state = f.(replicates)
+     D = typeof(d)
+     O = typeof(o)
+     F = typeof(f)
+     W = typeof(weight)
+     T = typeof(cached_state)
+     Bootstrap{I,D,O,F,W,T}(weight, 0, 0, id, o, replicates, cached_state, f, d, false)
+end
+
+function Base.show(io::IO, o::Bootstrap)
+    header(io, "$(name(o))\n")
+    subheader(io, "         id | $(o.id)\n")
+    subheader(io, "     weight | $(o.weight)\n")
+    subheader(io, "       nobs | $(o.nobs)\n")
+    print_item(io, "Stat", o.stat)
+    print_item(io, "n reps", length(o.replicates))
+    print_item(io, "Function", o.f)
+
+    s = replace(string(typeof(o.d)), "Distributions.", "")
+    s = replace(s, r"\{(.*)", "")
+    print_item(io, "Dist", s)
+end
+
+replicates(b::Bootstrap) = b.replicates
+function cached_state(b::Bootstrap{0})
+    if b.cache_is_dirty
+        b.cached_state .= b.f.(b.replicates)
+        b.cache_is_dirty = false
+    end
+    return b.cached_state
+end
+Base.mean(b::Bootstrap{0}) = mean(cached_state(b))
+Base.std(b::Bootstrap{0}) = std(cached_state(b))
+Base.var(b::Bootstrap{0}) = var(cached_state(b))
+
+function StatsBase.confint(b::Bootstrap{0}, coverageprob = 0.95, method = :quantile)
+    states = cached_state(b)
+    # If any NaN, return NaN, NaN
+    if any(isnan, states)
+        return (NaN, NaN)
+    else
+        α = 1 - coverageprob
+        if method == :quantile
+            return (quantile(states, α / 2), quantile(states, 1 - α / 2))
+        elseif method == :normal
+            norm_approx = Ds.Normal(mean(states), std(states))
+            return (quantile(norm_approx, α / 2), quantile(norm_approx, 1 - α / 2))
+        else
+            throw(ArgumentError("$method not recognized.  Use :quantile or :normal"))
+        end
+    end
+end
+
+#-------------------------------------------------------------------------# fit!
+function fit!(b::Bootstrap{0}, y::Real, γ::Float64 = nextweight(b))
+    updatecounter!(b)
+    fit!(b.stat, y, γ)
+    update_replicates!(b, y, γ)
+    b.cache_is_dirty = true
+    b
+end
+function fit!(b::Bootstrap{0}, y::AVec)
+    for yi in y
+        fit!(b, yi)
+    end
+    b
+end
+
+#---------------------------------------------------------------------# update_replicates!
+function update_replicates!{D <: Ds.Bernoulli}(b::Bootstrap{0, D}, y, γ::Float64)
+    foreach(b.replicates) do r
+        rand() > 0.5 && (fit!(r, y, γ); fit!(r, y, γ))
+    end
+end
+
+function update_replicates!{D <: Ds.Poisson}(b::Bootstrap{0, D}, y, γ::Float64)
+    foreach(b.replicates) do r
+        for k in 1:rand(Ds.Poisson())
+            fit!(r, y, γ)
+        end
+    end
+end

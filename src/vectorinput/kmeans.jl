@@ -1,4 +1,4 @@
-mutable struct KMeans <: OnlineStat{VectorIn, MatrixOut}
+mutable struct KMeans <: OnlineStat{1, 2}
     value::MatF
     v::VecF
     KMeans(p::Integer, k::Integer) = new(randn(p, k), zeros(k))

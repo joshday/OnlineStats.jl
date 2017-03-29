@@ -2,7 +2,7 @@
     NormalMix(k)
     NormalMix(k, init_data)
 """
-mutable struct NormalMix <: DistributionStat{ScalarIn}
+mutable struct NormalMix <: DistributionStat{0}
     s1::VecF
     s2::VecF
     s3::VecF

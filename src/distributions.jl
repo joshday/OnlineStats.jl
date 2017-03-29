@@ -1,5 +1,5 @@
 #--------------------------------------------------------------# common
-const DistributionStat{I} = OnlineStat{I, DistributionOut}
+const DistributionStat{I} = OnlineStat{I, Ds.Distribution}
 for f in [:mean, :var, :std, :params, :ncategories, :cov, :probs, :rand]
     @eval Ds.$f(d::DistributionStat) = Ds.$f(value(d))
 end
@@ -10,7 +10,7 @@ end
 
 
 #--------------------------------------------------------------# Beta
-struct FitBeta <: DistributionStat{ScalarIn}
+struct FitBeta <: DistributionStat{0}
     var::Variance
     FitBeta() = new(Variance())
 end
@@ -29,7 +29,7 @@ end
 
 
 #------------------------------------------------------------------# Categorical
-mutable struct FitCategorical{T<:Any} <: DistributionStat{ScalarIn}
+mutable struct FitCategorical{T<:Any} <: DistributionStat{0}
     d::Dict{T, Int}
     nobs::Int
     FitCategorical{T}() where T<:Any = new(Dict{T, Int}(), 0)
@@ -93,7 +93,7 @@ Base.keys(o::FitCategorical) = keys(o.d)
 #
 #
 #------------------------------------------------------------------# Cauchy
-mutable struct FitCauchy <: DistributionStat{ScalarIn}
+mutable struct FitCauchy <: DistributionStat{0}
     q::QuantileMM
     nobs::Int
     FitCauchy() = new(QuantileMM(), 0)
@@ -110,7 +110,7 @@ end
 
 #------------------------------------------------------------------------# Gamma
 # method of moments. TODO: look at Distributions for MLE
-struct FitGamma <: DistributionStat{ScalarIn}
+struct FitGamma <: DistributionStat{0}
     var::Variance
 end
 FitGamma() = FitGamma(Variance())
@@ -130,7 +130,7 @@ end
 
 
 #-----------------------------------------------------------------------# LogNormal
-struct FitLogNormal <: DistributionStat{ScalarIn}
+struct FitLogNormal <: DistributionStat{0}
     var::Variance
     FitLogNormal() = new(Variance())
 end
@@ -141,7 +141,7 @@ end
 
 
 #-----------------------------------------------------------------------# Normal
-struct FitNormal <: DistributionStat{ScalarIn}
+struct FitNormal <: DistributionStat{0}
     var::Variance
     FitNormal() = new(Variance())
 end
@@ -152,7 +152,7 @@ end
 
 
 #-----------------------------------------------------------------------# Multinomial
-mutable struct FitMultinomial <: DistributionStat{VectorIn}
+mutable struct FitMultinomial <: DistributionStat{1}
     mvmean::MV{Mean}
     nobs::Int
     FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
@@ -170,7 +170,7 @@ end
 
 
 #---------------------------------------------------------------------# MvNormal
-struct FitMvNormal<: DistributionStat{VectorIn}
+struct FitMvNormal<: DistributionStat{1}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end

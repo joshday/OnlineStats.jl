@@ -2,7 +2,6 @@
 AbstractSeries:  "Managers" for a group or single OnlineStat
 
 Subtypes should:
-- Be first parameterized by I <: Input
 - Have fields `weight::Weight`, `nobs::Int`, `nups::Int`, and `id::Symbol`
 """
 abstract type AbstractSeries end
@@ -60,7 +59,7 @@ v, m = stats(o) # tuple of OnlineStats
 v = stats(o, 1) # get the first stat
 ```
 """
-mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
+mutable struct Series{I, W <: Weight, O <: Tuple} <: AbstractSeries
     weight::W
     stats::O
     nobs::Int
@@ -69,7 +68,7 @@ mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
 end
 function Series{W<:Weight, O<:Tuple,}(wt::W, stats::O, id::Symbol)
     I = _io(stats[1], 1)
-    all(x -> _io(x, 1) == I, stats) || throw(ArgumentError("Input types are not all $I"))
+    all(x -> _io(x, 1) == I, stats) || throw(ArgumentError("Input dimension mismatch"))
     Series{I, W, O}(wt, stats, 0, 0, id)
 end
 
@@ -135,19 +134,19 @@ function Base.merge!{T <: Series}(o::T, o2::T, method::Symbol = :append)
     o
 end
 
-#-------------------------------------------------------------------------# ScalarIn
-function fit!(o::Series{ScalarIn}, y::Real, γ::Float64 = nextweight(o))
+#-------------------------------------------------------------------------# InputDim: 0
+function fit!(o::Series{0}, y::Real, γ::Float64 = nextweight(o))
     updatecounter!(o)
     map(stat -> fit!(stat, y, γ), o.stats)
     o
 end
-function fit!(o::Series{ScalarIn}, y::AVec)
+function fit!(o::Series{0}, y::AVec)
     for yi in y
         fit!(o, yi)
     end
     o
 end
-function fit!(o::Series{ScalarIn}, y::AVec, b::Integer)
+function fit!(o::Series{0}, y::AVec, b::Integer)
     maprows(b, y) do yi
         bi = length(yi)
         updatecounter!(o, bi)
@@ -156,13 +155,13 @@ function fit!(o::Series{ScalarIn}, y::AVec, b::Integer)
     end
     o
 end
-function fit!(o::Series{ScalarIn}, y::AVec, γ::Float64)
+function fit!(o::Series{0}, y::AVec, γ::Float64)
     for yi in y
         fit!(o, yi, γ)
     end
     o
 end
-function fit!(o::Series{ScalarIn}, y::AVec, γ::AVecF)
+function fit!(o::Series{0}, y::AVec, γ::AVecF)
     length(y) == length(γ) || throw(DimensionMismatch())
     for (yi, γi) in zip(y, γ)
         fit!(o, yi, γi)
@@ -170,19 +169,19 @@ function fit!(o::Series{ScalarIn}, y::AVec, γ::AVecF)
     o
 end
 
-#-------------------------------------------------------------------------# VectorIn
-function fit!(o::Series{VectorIn}, y::AVec, γ::Float64 = nextweight(o))
+#-------------------------------------------------------------------------# InputDim: 1
+function fit!(o::Series{1}, y::AVec, γ::Float64 = nextweight(o))
     updatecounter!(o)
     map(stat -> fit!(stat, y, γ), o.stats)
     o
 end
-function fit!(o::Series{VectorIn}, y::AMat)
+function fit!(o::Series{1}, y::AMat)
     for i in 1:size(y, 1)
         fit!(o, view(y, i, :))
     end
     o
 end
-function fit!(o::Series{VectorIn}, y::AMat, b::Integer)
+function fit!(o::Series{1}, y::AMat, b::Integer)
     maprows(b, y) do yi
         bi = size(yi, 1)
         updatecounter!(o, bi)

@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------# Mean
-mutable struct Mean <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct Mean <: OnlineStat{0, 0}
     μ::Float64
     Mean() = new(0.0)
 end
@@ -9,7 +9,7 @@ Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
 Base.mean(o::Mean) = o.μ
 
 #--------------------------------------------------------------------# Variance
-mutable struct Variance <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct Variance <: OnlineStat{0, 0}
     σ2::Float64     # biased variance
     μ::Float64
     nobs::Int
@@ -36,7 +36,7 @@ Base.mean(o::Variance) = o.μ
 nobs(o::Variance) = o.nobs
 
 #--------------------------------------------------------------------# Extrema
-mutable struct Extrema <: OnlineStat{ScalarIn, VectorOut}
+mutable struct Extrema <: OnlineStat{0, 1}
     min::Float64
     max::Float64
     Extrema() = new(Inf, -Inf)
@@ -49,7 +49,7 @@ end
 value(o::Extrema) = (o.min, o.max)
 
 #--------------------------------------------------------------------# OrderStats
-mutable struct OrderStats <: OnlineStat{ScalarIn, VectorOut}
+mutable struct OrderStats <: OnlineStat{0, 1}
     value::VecF
     buffer::VecF
     i::Int
@@ -72,7 +72,7 @@ end
 fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
-mutable struct Moments <: OnlineStat{ScalarIn, VectorOut}
+mutable struct Moments <: OnlineStat{0, 1}
     m::VecF
     nobs::Int
     Moments() = new(zeros(4), 0)
@@ -103,7 +103,7 @@ function Base.merge!(o1::Moments, o2::Moments, γ::Float64)
 end
 
 #--------------------------------------------------------------------# QuantileSGD
-struct QuantileSGD <: OnlineStat{ScalarIn, VectorOut}
+struct QuantileSGD <: OnlineStat{0, 1}
     value::VecF
     τ::VecF
     QuantileSGD(τ::VecF = [0.25, 0.5, 0.75]) = new(zeros(τ), τ)
@@ -127,7 +127,7 @@ function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
 end
 
 #--------------------------------------------------------------------# QuantileSGD
-mutable struct QuantileMM <: OnlineStat{ScalarIn, VectorOut}
+mutable struct QuantileMM <: OnlineStat{0, 1}
     value::VecF
     τ::VecF
     # "sufficient statistics"
@@ -165,7 +165,7 @@ function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
 end
 
 #--------------------------------------------------------------------# Diff
-mutable struct Diff{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct Diff{T <: Real} <: OnlineStat{0, 0}
     diff::T
     lastval::T
 end
@@ -185,7 +185,7 @@ function fit!{T<:Integer}(o::Diff{T}, x::Real, γ::Float64)
 end
 
 #--------------------------------------------------------------------# Sum
-mutable struct Sum{T <: Real} <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct Sum{T <: Real} <: OnlineStat{0, 0}
     sum::T
 end
 Sum() = Sum(0.0)

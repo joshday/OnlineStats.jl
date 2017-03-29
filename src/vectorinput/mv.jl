@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------# MV
-struct MV{T} <: OnlineStat{VectorIn, VectorOut}
+struct MV{T} <: OnlineStat{1, -1}
     stats::Vector{T}
 end
 
-MV(p::Integer, o::OnlineStat{ScalarIn}) = MV([copy(o) for i in 1:p])
+MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
 
 function Base.show{T}(io::IO, o::MV{T})
     s = name(o, true) * "("

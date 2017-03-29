@@ -22,7 +22,7 @@ end
 
 Approximate count of distinct elements
 """
-mutable struct HyperLogLog <: OnlineStat{ScalarIn, ScalarOut}
+mutable struct HyperLogLog <: OnlineStat{0, 0}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
