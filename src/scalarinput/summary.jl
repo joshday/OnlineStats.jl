@@ -15,6 +15,7 @@ mutable struct Variance <: OnlineStat{ScalarIn, ScalarOut}
     nobs::Int
     Variance() = new(0.0, 0.0, 0)
 end
+fields_to_show(o::Variance) = [:σ2, :μ]
 function fit!(o::Variance, y::Real, γ::Float64)
     μ = o.μ
     o.nobs += 1

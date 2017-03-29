@@ -23,6 +23,7 @@ function value(o::CovMatrix)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
     scale!(o.value, unbias(o))
 end
+Base.length(o::CovMatrix) = length(o.b)
 Base.mean(o::CovMatrix) = o.b
 Base.cov(o::CovMatrix) = value(o)
 Base.var(o::CovMatrix) = diag(value(o))

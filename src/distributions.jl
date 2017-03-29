@@ -174,7 +174,7 @@ struct FitMvNormal<: DistributionStat{VectorIn}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end
-dim(o::FitMvNormal) = size(o.cov.value, 1)
+Base.length(o::FitMvNormal) = length(o.cov)
 fit!{T<:Real}(o::FitMvNormal, y::AVec{T}, γ::Float64) = fit!(o.cov, y, γ)
 function value(o::FitMvNormal)
     c = cov(o.cov)

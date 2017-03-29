@@ -7,6 +7,59 @@ Subtypes should:
 """
 abstract type AbstractSeries end
 
+
+"""
+### Series
+
+Manager for a collection of OnlineStats (`stats...`).  `Series` tracks values necessary for
+updating an OnlineStat (number of observations, weight, etc.)
+
+```julia
+Series(id, weight, stats...)
+Series(weight, id, stats...)
+Series(stats...; weight = EqualWeight(), id = :unlabeled)
+Series(datavector, stats...; weight = EqualWeight(), id = :unlabeled)
+```
+
+#### Examples
+- Updating
+```julia
+y1 = randn(100)
+y2 = randn(100)
+
+s = Series(Variance())
+
+fit!(s, y1)
+fit!(s, y2)
+
+value(s)
+```
+
+- Merging
+```julia
+y1 = randn(100)
+y2 = randn(100)
+
+s1 = Series(y1, Mean(), Variance())
+s2 = Series(y2, Mean(), Variance())
+
+merge!(s1, s2)
+
+value(s1)
+nobs(s1)
+```
+
+- Methods
+```julia
+o = Series(randn(1000), Variance(), Moments())
+
+value(o)        # tuple of values
+value(o, 1)     # value from 1st stat (Variance)
+
+v, m = stats(o) # tuple of OnlineStats
+v = stats(o, 1) # get the first stat
+```
+"""
 mutable struct Series{I <: Input, W <: Weight, O <: Tuple} <: AbstractSeries
     weight::W
     stats::O
@@ -41,13 +94,17 @@ nobs(o::AbstractSeries) = o.nobs
 nups(o::AbstractSeries) = o.nups
 function Base.show{I}(io::IO, o::Series{I})
     header(io, "$(name(o))\n")
-    subheader(io, "         id | $(o.id)\n")
-    subheader(io, "     weight | $(o.weight)\n")
-    subheader(io, "       nobs | $(o.nobs)\n")
+    subheader(io, "$(o.id) | $(o.nobs) | $(o.weight)\n")
+    # subheader(io, "         id | $(o.id)\n")
+    # subheader(io, "     weight | $(o.weight)\n")
+    # subheader(io, "       nobs | $(o.nobs)\n")
     n = length(o.stats)
     for i in 1:n
-        s = o.stats[i]
-        print_item(io, name(s), value(s), i != n)
+        print(io, "  > ")
+        print(io, o.stats[i])
+        i != n && println(io)
+        # s = o.stats[i]
+        # print_item(io, name(s), value(s), i != n)
     end
 end
 updatecounter!(o::AbstractSeries, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
@@ -56,9 +113,7 @@ nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.
 Base.copy(o::AbstractSeries) = deepcopy(o)
 
 #-------------------------------------------------------------------------# merge
-function Base.merge{T <: Series}(o::T, o2::T, method::Symbol = :append)
-    merge!(copy(o), o2)
-end
+Base.merge{T <: Series}(o::T, o2::T, method::Symbol = :append) = merge!(copy(o), o2, method)
 function Base.merge!{T <: Series}(o::T, o2::T, method::Symbol = :append)
     n2 = nobs(o2)
     n2 == 0 && return o

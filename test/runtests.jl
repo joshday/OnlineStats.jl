@@ -10,7 +10,6 @@ info("Messy output for test coverage")
     println(OnlineStats.ScalarIn)
     println(OnlineStats.ScalarOut)
     println(Mean())
-    OnlineStats.printfields(STDOUT, Mean())
     println(OrderStats(5))
     println(Moments())
     println(QuantileMM())
@@ -88,9 +87,19 @@ end
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
         s = Series(randn(100), o)
+        @test nups(s) == 100
         @test value(o) == value(s, 1)
         @test value(s) == tuple(value(o))
         @test typeof(stats(s)) == Tuple{typeof(o)}
+
+        s = Series(Mean())
+        fit!(s, randn(100), 10)
+        @test nups(s) == 10
+        @test nobs(s) == 100
+
+        fit!(s, randn(100), .01)
+        fit!(s, randn(100), rand(100))
+        @test_throws DimensionMismatch fit!(s, randn(100), rand(5))
     end
 end
 @testset "Series{VectorIn}" begin
@@ -107,9 +116,13 @@ end
     y = vcat(y1, y2)
     o = Series(y1, Mean(), Variance())
     o2 = Series(y2, Mean(), Variance())
-    merge!(o, o2)
-    @test value(o, 1) ≈ mean(y)
-    @test value(o, 2) ≈ var(y)
+    o3 = merge(o, o2)
+    @test value(o3, 1) ≈ mean(y)
+    @test value(o3, 2) ≈ var(y)
+
+    merge(o, o2, :mean)
+    merge(o, o2, :singleton)
+    @test_throws ArgumentError merge(o, o2, :not_a_real_method)
     merge(Mean(), Mean(), .1)
 end
 
@@ -228,6 +241,7 @@ end # summary
         testdist(:Beta)
         testdist(:Cauchy, LearningRate(), .1)
         testdist(:Gamma, EqualWeight(), .1)
+        testdist(:LogNormal)
         testdist(:Normal)
     end
     @testset "FitCategorical" begin
@@ -256,6 +270,7 @@ end # summary
         y = rand(MvNormal(zeros(3), eye(3)), 1000)
         myfit = fit(MvNormal, y)
         o = FitMvNormal(3)
+        @test length(o) == 3
         s = Series(y', o)
         @test mean(o) ≈ mean(myfit)
     end
