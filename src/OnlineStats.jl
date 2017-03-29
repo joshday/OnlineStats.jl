@@ -5,7 +5,6 @@ importall StatsBase
 importall LearnBase
 import Distributions
 Ds = Distributions
-import StaticArrays
 
 # Reexport LearnBase and StatsBase
 for pkg in [:LearnBase, :StatsBase]
