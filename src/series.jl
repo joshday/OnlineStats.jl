@@ -4,7 +4,7 @@ AbstractSeries:  "Managers" for a group or single OnlineStat
 Subtypes should:
 - Have fields `weight::Weight`, `nobs::Int`, `nups::Int`, and `id::Symbol`
 """
-abstract type AbstractSeries end
+abstract type AbstractSeries{INPUTDIM} end
 
 
 """
@@ -101,9 +101,10 @@ function Base.show{I}(io::IO, o::Series{I})
 end
 function abstractseries_print(io::IO, o::AbstractSeries)
     header(io, "$(name(o))\n")
-    subheader(io, "$(o.id) | $(o.nobs) | $(o.weight)\n")
+    subheader(io, "$(o.id) | nobs = $(o.nobs)\n")
 end
 
+weight!(o::AbstractSeries, n2::Int = 1) = (updatecounter!(o, n2); weight(o, n2))
 updatecounter!(o::AbstractSeries, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
 weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
 nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
@@ -133,58 +134,69 @@ function Base.merge!{T <: Series}(o::T, o2::T, method::Symbol = :append)
 end
 
 #-------------------------------------------------------------------------# InputDim: 0
-function fit!(o::Series{0}, y::Real, γ::Float64 = nextweight(o))
-    updatecounter!(o)
-    map(stat -> fit!(stat, y, γ), o.stats)
-    o
-end
-function fit!(o::Series{0}, y::AVec)
-    for yi in y
-        fit!(o, yi)
-    end
-    o
-end
-function fit!(o::Series{0}, y::AVec, b::Integer)
-    maprows(b, y) do yi
-        bi = length(yi)
-        updatecounter!(o, bi)
-        γ = weight(o, bi)
-        map(stat -> fitbatch!(stat, yi, γ), o.stats)
-    end
-    o
-end
-function fit!(o::Series{0}, y::AVec, γ::Float64)
-    for yi in y
-        fit!(o, yi, γ)
-    end
-    o
-end
-function fit!(o::Series{0}, y::AVec, γ::AVecF)
-    length(y) == length(γ) || throw(DimensionMismatch())
-    for (yi, γi) in zip(y, γ)
-        fit!(o, yi, γi)
-    end
-    o
-end
-
-#-------------------------------------------------------------------------# InputDim: 1
-function fit!(o::Series{1}, y::AVec, γ::Float64 = nextweight(o))
-    updatecounter!(o)
-    map(stat -> fit!(stat, y, γ), o.stats)
-    o
-end
-function fit!(o::Series{1}, y::AMat)
-    for i in 1:size(y, 1)
-        fit!(o, view(y, i, :))
-    end
-    o
-end
-function fit!(o::Series{1}, y::AMat, b::Integer)
-    maprows(b, y) do yi
-        bi = size(yi, 1)
-        updatecounter!(o, bi)
-        γ = weight(o, bi)
-        map(stat -> fitbatch!(stat, yi, γ), o.stats)
-    end
-    o
-end
+# function fit!(o::Series{0}, y::Real, γ::Float64 = nextweight(o))
+#     updatecounter!(o)
+#     map(stat -> fit!(stat, y, γ), o.stats)
+#     o
+# end
+# function fit!(o::Series{0}, y::AVec)
+#     for yi in y
+#         fit!(o, yi)
+#     end
+#     o
+# end
+# function fit!(o::Series{0}, y::AVec, b::Integer)
+#     maprows(b, y) do yi
+#         bi = length(yi)
+#         γ = weight!(o, bi)
+#         map(stat -> fitbatch!(stat, yi, γ), o.stats)
+#     end
+#     o
+# end
+# function fit!(o::Series{0}, y::AVec, γ::Float64)
+#     for yi in y
+#         fit!(o, yi, γ)
+#     end
+#     o
+# end
+# function fit!(o::Series{0}, y::AVec, γ::AVecF)
+#     length(y) == length(γ) || throw(DimensionMismatch())
+#     for (yi, γi) in zip(y, γ)
+#         fit!(o, yi, γi)
+#     end
+#     o
+# end
+#
+# #-------------------------------------------------------------------------# InputDim: 1
+# function fit!(o::Series{1}, y::AVec, γ::Float64 = nextweight(o))
+#     updatecounter!(o)
+#     map(stat -> fit!(stat, y, γ), o.stats)
+#     o
+# end
+# function fit!(o::Series{1}, y::AMat)
+#     for i in 1:size(y, 1)
+#         fit!(o, view(y, i, :))
+#     end
+#     o
+# end
+# function fit!(o::Series{1}, y::AMat, γ::Float64)
+#     for i in 1:size(y, 1)
+#         fit!(o, view(y, i, :), γ)
+#     end
+#     o
+# end
+# function fit!(o::Series{1}, y::AMat, γ::AVec)
+#     for i in 1:size(y, 1)
+#         fit!(o, view(y, i, :), γ[i])
+#     end
+#     o
+# end
+# function fit!(o::Series{1}, y::AMat, b::Integer)
+#     maprows(b, y) do yi
+#         bi = size(yi, 1)
+#         updatecounter!(o, bi)
+#         γ = weight(o, bi)
+#         map(stat -> fitbatch!(stat, yi, γ), o.stats)
+#     end
+#     o
+# end

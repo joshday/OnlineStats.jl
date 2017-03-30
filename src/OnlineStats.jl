@@ -27,7 +27,7 @@ export
     HyperLogLog
 
 #-----------------------------------------------------------------------------# types
-# 0 = scalar, 1 = vector, 2 = matrix, -1 = unkown, or Ds.Distribution
+# 0 = scalar, 1 = vector, 2 = matrix, -1 = unknown, or Ds.Distribution
 abstract type OnlineStat{INDIM, OUTDIM} end
 
 const AA        = AbstractArray
