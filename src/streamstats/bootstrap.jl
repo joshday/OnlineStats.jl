@@ -30,6 +30,9 @@ for (T, I) in [(:Bootstrap, 0), (:MvBootstrap, 1)]
             T = typeof(cached_state)
             $T{D,O,F,W,T}(weight, 0, 0, id, o, replicates, cached_state, f, d, false)
         end
+        function $T(o::OnlineStat, nreps::Int = 100, d = Ds.Bernoulli(), f::Function = value)
+            $T(nreps, o, f, d)
+        end
         function show_series(io, o::$T)
             print_item(io, "stat", o.o)
             print_item(io, "cached_state", summary(o.cached_state))
@@ -58,12 +61,13 @@ for (T, I) in [(:Bootstrap, 0), (:MvBootstrap, 1)]
             end
             return b.cached_state
         end
+        Base.mean(b::$T) = mean(cached_state(b))
+        Base.std(b::$T) = std(cached_state(b))
+        Base.var(b::$T) = var(cached_state(b))
     end
 end
 
-Base.mean(b::Bootstrap) = mean(cached_state(b))
-Base.std(b::Bootstrap) = std(cached_state(b))
-Base.var(b::Bootstrap) = var(cached_state(b))
+
 
 function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
     states = cached_state(b)
