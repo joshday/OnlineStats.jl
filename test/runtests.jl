@@ -5,7 +5,7 @@ using OnlineStats, Base.Test, Distributions
 info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
-    # println(Bootstrap(100, Mean(), mean, Bernoulli()))
+    println(Bootstrap(100, Mean(), mean, Bernoulli()))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
     println(OrderStats(5))
@@ -349,6 +349,10 @@ end
     y = randn(1000)
     b = Bootstrap(100, Mean(), mean, Bernoulli())
     fit!(b, y)
+
+    b = MvBootstrap(MV(5, Mean()))
+    fit!(b, randn(1000, 5))
 end
+
 
 end
