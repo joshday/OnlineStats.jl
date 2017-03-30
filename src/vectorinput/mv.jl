@@ -25,3 +25,5 @@ function fit!(o::MV, y::AVec, γ::Float64)
     end
     o
 end
+
+value(o::MV) = map(value, o.stats)
