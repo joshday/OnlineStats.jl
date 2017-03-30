@@ -2,7 +2,14 @@
 abstract type Weight end
 Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
 nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups + 1)
+
 default(::Type{Weight}, o::OnlineStat) = EqualWeight()
+function default(w::Type{Weight}, t::Tuple)
+    weight = default(Weight, t[1])
+    all(default.(Weight, t) .== weight) ||
+        throw(ArgumentError("Default weights differ.  Weight must be specified"))
+    weight
+end
 
 
 #--------------------------------------------------------------------# EqualWeight

@@ -41,8 +41,13 @@ const AMatF     = AMat{Float64}
 include("show.jl")
 
 #---------------------------------------------------------------------------# helpers
-_io{I, O}(o::OnlineStat{I, O}) = I, O
-_io{I, O}(o::OnlineStat{I, O}, i::Integer) = _io(o)[i]
+input{I, O}(o::OnlineStat{I, O}) = I
+output{I, O}(o::OnlineStat{I, O}) = O
+function input(t::Tuple)
+    I = input(t[1])
+    all(x -> input(x) == I, t) || throw(ArgumentError("Input dims must be $I"))
+    I
+end
 
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 Base.copy(o::OnlineStat) = deepcopy(o)
@@ -95,7 +100,7 @@ include("vectorinput/kmeans.jl")
 include("distributions.jl")
 include("scalarinput/normalmix.jl")
 include("streamstats/hyperloglog.jl")
-include("streamstats/bootstrap.jl")
+# include("streamstats/bootstrap.jl")
 
 
 
