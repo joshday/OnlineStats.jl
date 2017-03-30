@@ -13,7 +13,7 @@ end
 
 export
     # AbstractSeries
-    Series, Bootstrap,
+    Series, MvSeries, Bootstrap,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions

@@ -5,7 +5,7 @@ using OnlineStats, Base.Test, Distributions
 info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
-    println(Bootstrap(100, Mean(), mean, Bernoulli()))
+    # println(Bootstrap(100, Mean(), mean, Bernoulli()))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
     println(OrderStats(5))
@@ -61,27 +61,27 @@ info("TESTS BEGIN HERE")
 end
 
 @testset "Constructors" begin
-    Mean()
-    Variance()
-    Extrema()
-    OrderStats(100)
-    Moments()
-    QuantileSGD()
-    QuantileMM()
-    Diff()
-    Sum()
-    NormalMix(5)
-    MV(5, Mean())
-    MV(5, Sum())
-    CovMatrix(4)
-    Series(Mean(), Variance())
-    Series(randn(100), Mean(), Variance())
-    Series(CovMatrix(4), MV(4, Mean()))
-    Series(:myid, EqualWeight(), Mean())
-    Series(EqualWeight(), :myid, Variance())
+    @inferred Mean()
+    @inferred Variance()
+    @inferred Extrema()
+    @inferred OrderStats(100)
+    @inferred Moments()
+    @inferred QuantileSGD()
+    @inferred QuantileMM()
+    @inferred Diff()
+    @inferred Sum()
+    @inferred NormalMix(5)
+    @inferred MV(5, Mean())
+    @inferred MV(5, Sum())
+    @inferred CovMatrix(4)
+    @inferred Series(Mean(), Variance())
+    @inferred Series(randn(100), Mean(), Variance())
+    @inferred MvSeries(CovMatrix(4), MV(4, Mean()))
+    @inferred Series(:myid, EqualWeight(), Mean())
+    @inferred Series(EqualWeight(), :myid, Variance())
     @test_throws ArgumentError Series(CovMatrix(4), Mean())
 end
-@testset "Series{0}" begin
+@testset "Series" begin
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
         s = Series(randn(100), o)
@@ -100,9 +100,9 @@ end
         @test_throws DimensionMismatch fit!(s, randn(100), rand(5))
     end
 end
-@testset "Series{1}" begin
+@testset "MvSeries" begin
     for o in [MV(5, Mean()), MV(5, Variance()), CovMatrix(5)]
-        s = Series(randn(100, 5), o)
+        s = MvSeries(randn(100, 5), o)
         @test value(o) == value(s, 1)
         @test value(s) == tuple(value(o))
         @test typeof(stats(s)) == Tuple{typeof(o)}
@@ -260,7 +260,7 @@ end # summary
         myfit = fit(Multinomial, y)
         o = FitMultinomial(5)
         @test params(value(o)) == (1, ones(5) / 5)
-        s = Series(o)
+        s = MvSeries(o)
         fit!(s, y')
         @test probs(o) ≈ probs(myfit)
     end
@@ -270,7 +270,7 @@ end # summary
         o = FitMvNormal(3)
         @test length(o) == 3
         @test params(value(o))[1] == zeros(3)
-        s = Series(y', o)
+        s = MvSeries(y', o)
         @test mean(o) ≈ mean(myfit)
     end
     @testset "NormalMix" begin
@@ -300,12 +300,13 @@ end
 @testset "CovMatrix" begin
     x = randn(100, 5)
     o = CovMatrix(5)
-    s = Series(x, o)
+    s = MvSeries(x, o)
+    @test nobs(s) == 100
     fit!(s, x, 10)
     OnlineStats.fitbatch!(o, x, .1)
 
     o = CovMatrix(5)
-    s = Series(o)
+    s = MvSeries(o)
     fit!(s, x, 10)
     @test mean(o) ≈ vec(mean(x, 1))
     @test var(o) ≈ vec(var(x, 1))
@@ -315,7 +316,7 @@ end
 
     x2 = randn(101, 5)
     o2 = CovMatrix(5)
-    s2 = Series(o2)
+    s2 = MvSeries(o2)
     fit!(s2, x2, 10)
     merge!(s, s2)
     @test nobs(s) == 201
@@ -324,7 +325,7 @@ end
 @testset "KMeans" begin
     x = randn(100, 3)
     o = KMeans(3, 5)
-    s = Series(x, o)
+    s = MvSeries(x, o)
     fit!(s, x, 5)
 end
 @testset "Bootstrap" begin
