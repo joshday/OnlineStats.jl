@@ -38,11 +38,11 @@ println()
 info("TESTS BEGIN HERE")
 #--------------------------------------------------------------------------------# TESTS
 @testset "Weights" begin
-    w1 = EqualWeight()
-    w2 = ExponentialWeight()
-    w3 = BoundedEqualWeight()
-    w4 = LearningRate()
-    w5 = LearningRate2()
+    w1 = @inferred EqualWeight()
+    w2 = @inferred ExponentialWeight()
+    w3 = @inferred BoundedEqualWeight()
+    w4 = @inferred LearningRate()
+    w5 = @inferred LearningRate2()
 
     for w in [w1, w3, w4]
         @test OnlineStats.weight(w, 1, 1, 1) == 1
@@ -56,8 +56,8 @@ info("TESTS BEGIN HERE")
     end
     @test OnlineStats.weight(w3, 1_000_000, 1, 1_000_000) == w3.λ
 
-    ExponentialWeight(100)
-    BoundedEqualWeight(100)
+    @inferred ExponentialWeight(100)
+    @inferred BoundedEqualWeight(100)
 end
 
 @testset "Constructors" begin
@@ -84,13 +84,13 @@ end
 @testset "Series" begin
     for o in [Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
               QuantileMM(), Diff(), Sum()]
-        s = Series(randn(100), o)
+        s = @inferred Series(randn(100), o)
         @test nups(s) == 100
         @test value(o) == value(s, 1)
         @test value(s) == tuple(value(o))
         @test typeof(stats(s)) == Tuple{typeof(o)}
 
-        s = Series(Mean())
+        s = @inferred Series(Mean())
         fit!(s, randn(100), 10)
         @test nups(s) == 10
         @test nobs(s) == 100
@@ -102,7 +102,7 @@ end
 end
 @testset "MvSeries" begin
     for o in [MV(5, Mean()), MV(5, Variance()), CovMatrix(5)]
-        s = MvSeries(randn(100, 5), o)
+        s = @inferred MvSeries(randn(100, 5), o)
         @test value(o) == value(s, 1)
         @test value(s) == tuple(value(o))
         @test typeof(stats(s)) == Tuple{typeof(o)}
@@ -112,8 +112,8 @@ end
     y1 = randn(100)
     y2 = randn(100)
     y = vcat(y1, y2)
-    o = Series(y1, Mean(), Variance())
-    o2 = Series(y2, Mean(), Variance())
+    o = @inferred Series(y1, Mean(), Variance())
+    o2 = @inferred Series(y2, Mean(), Variance())
     o3 = merge(o, o2)
     @test value(o3, 1) ≈ mean(y)
     @test value(o3, 2) ≈ var(y)
@@ -121,7 +121,7 @@ end
     merge(o, o2, :mean)
     merge(o, o2, :singleton)
     @test_throws ArgumentError merge(o, o2, :not_a_real_method)
-    merge(Mean(), Mean(), .1)
+    @inferred merge(Mean(), Mean(), .1)
 end
 
 @testset "Summary" begin
@@ -129,31 +129,31 @@ end
     y2 = randn(501)
     y = vcat(y1, y2)
     @testset "Mean" begin
-        o1 = Series(y1, Mean())
+        o1 = @inferred Series(y1, Mean())
         @test value(o1, 1) ≈ mean(y1)
         @test nobs(o1) == 500
 
-        o2 = Series(y2, Mean())
+        o2 = @inferred Series(y2, Mean())
         @test value(o2, 1) ≈ mean(y2)
 
         o3 = merge(o1, o2)
         @test value(o3, 1) ≈ mean(y)
         @test mean(stats(o3, 1)) ≈ mean(y)
 
-        s = Series(Mean())
+        s = @inferred Series(Mean())
         fit!(s, y1, 10)
         @test mean(stats(s, 1)) ≈ mean(y1)
     end
     @testset "Variance" begin
-        o1 = Series(y1, Variance())
+        o1 = @inferred Series(y1, Variance())
         @test value(o1, 1) ≈ var(y1)
     end
     @testset "Extrema" begin
-        o = Series(y1, Extrema())
+        o = @inferred Series(y1, Extrema())
         @test value(o, 1) == extrema(y1)
     end
     @testset "QuantileMM/QuantileSGD" begin
-        o = Series(y1, QuantileMM(.1, .2, .3), QuantileSGD(.4, .5))
+        o = @inferred Series(y1, QuantileMM(.1, .2, .3), QuantileSGD(.4, .5))
         o = Series(y1, QuantileMM(), QuantileSGD(); weight = LearningRate())
         fit!(o, y2, 5)
 
@@ -164,7 +164,7 @@ end
     end
     @testset "Moments" begin
         x = randn(10_000)
-        s = Series(x, Moments())
+        s = @inferred Series(x, Moments())
         o = stats(s, 1)
         @test mean(o)       ≈ mean(x)       atol = 1e-4
         @test var(o)        ≈ var(x)        atol = 1e-4
@@ -180,7 +180,7 @@ end
         @test value(s, 1) ≈ value(Series(vcat(x, x2), Moments()), 1)
     end
     @testset "Diff" begin
-        Diff()
+        @inferred Diff()
         Diff(Float64)
         Diff(Float32)
         Diff(Int64)
@@ -193,7 +193,7 @@ end
         @test diff(o) == y[end] - y[end-1]
 
         y = rand(Int, 100)
-        s = Series(y, Diff(Int))
+        s = @inferred Series(y, Diff(Int))
         o = stats(s, 1)
         @test typeof(o) == Diff{Int}
         @test last(o) == y[end]

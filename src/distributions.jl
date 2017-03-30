@@ -197,7 +197,7 @@ function fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64)
     o
 end
 function value(o::FitMultinomial)
-    m = value.(value(o.mvmean))
+    m = value(o.mvmean)
     p = length(o.mvmean.stats)
     o.nobs > 0 ? Ds.Multinomial(1, m / sum(m)) : Ds.Multinomial(1, ones(p) / p)
 end
