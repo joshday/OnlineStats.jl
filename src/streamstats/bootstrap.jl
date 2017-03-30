@@ -1,3 +1,36 @@
+abstract type AbstractBootstrap{I} <: OnlineStatMeta{I} end
+function show_series(io, o::AbstractBootstrap)
+    print_item(io, "stat", o.o)
+    print_item(io, "cached_state", summary(o.cached_state))
+    print_item(io, "function", o.f)
+    s = replace(string(typeof(o.d)), "Distributions.", "")
+    s = replace(s, r"\{(.*)", "")
+    print_item(io, "boot method", s, false)
+end
+function update_replicates!(reps, d::Ds.Bernoulli, y, γ::Float64)
+    foreach(reps) do r
+        rand() > 0.5 && (fit!(r, y, γ); fit!(r, y, γ))
+    end
+end
+function update_replicates!(reps, d::Ds.Poisson, y, γ::Float64)
+    foreach(reps) do r
+        for k in 1:rand(Ds.Poisson())
+            fit!(r, y, γ)
+        end
+    end
+end
+replicates(b::AbstractBootstrap) = b.replicates
+function cached_state(b::AbstractBootstrap)
+    if b.cache_is_dirty
+        b.cached_state .= b.f.(b.replicates)
+        b.cache_is_dirty = false
+    end
+    return b.cached_state
+end
+Base.mean(b::AbstractBootstrap) = mean(cached_state(b))
+Base.std(b::AbstractBootstrap) = std(cached_state(b))
+Base.var(b::AbstractBootstrap) = var(cached_state(b))
+
 for (T, I) in [(:Bootstrap, 0), (:MvBootstrap, 1)]
     @eval begin
         mutable struct $T{
@@ -6,7 +39,7 @@ for (T, I) in [(:Bootstrap, 0), (:MvBootstrap, 1)]
                 F <: Function,
                 W <: Weight,
                 T <: AbstractArray
-            } <: AbstractSeries{$I}
+            } <: AbstractBootstrap{$I}
             weight::W
             nobs::Int
             nups::Int
@@ -33,37 +66,6 @@ for (T, I) in [(:Bootstrap, 0), (:MvBootstrap, 1)]
         function $T(o::OnlineStat, nreps::Int = 100, d = Ds.Bernoulli(), f::Function = value)
             $T(nreps, o, f, d)
         end
-        function show_series(io, o::$T)
-            print_item(io, "stat", o.o)
-            print_item(io, "cached_state", summary(o.cached_state))
-            print_item(io, "function", o.f)
-            s = replace(string(typeof(o.d)), "Distributions.", "")
-            s = replace(s, r"\{(.*)", "")
-            print_item(io, "boot method", s, false)
-        end
-        function update_replicates!{D <: Ds.Bernoulli}(b::$T{D}, y, γ::Float64)
-            foreach(b.replicates) do r
-                rand() > 0.5 && (fit!(r, y, γ); fit!(r, y, γ))
-            end
-        end
-        function update_replicates!{D <: Ds.Poisson}(b::$T{D}, y, γ::Float64)
-            foreach(b.replicates) do r
-                for k in 1:rand(Ds.Poisson())
-                    fit!(r, y, γ)
-                end
-            end
-        end
-        replicates(b::$T) = b.replicates
-        function cached_state(b::$T)
-            if b.cache_is_dirty
-                b.cached_state .= b.f.(b.replicates)
-                b.cache_is_dirty = false
-            end
-            return b.cached_state
-        end
-        Base.mean(b::$T) = mean(cached_state(b))
-        Base.std(b::$T) = std(cached_state(b))
-        Base.var(b::$T) = var(cached_state(b))
     end
 end
 
@@ -90,22 +92,12 @@ end
 #--------------------------------------------------------------------# Updates
 function singleton_update!(b::Bootstrap, y::Real, γ::Float64)
     fit!(b.o, y, γ)
-    update_replicates!(b, y, γ)
+    update_replicates!(b.replicates, b.d, y, γ)
     b.cache_is_dirty = true
 end
-# function batch_update!(b::Bootstrap, y::AVec, γ::Float64)
-#     fitbatch!(b.o, y, γ)
-#     update_replicates!(b, y, γ)
-#     b.cache_is_dirty = true
-# end
 
 function singleton_update!(b::MvBootstrap, y::AVec, γ::Float64)
     fit!(b.o, y, γ)
-    update_replicates!(b, y, γ)
+    update_replicates!(b.replicates, b.d, y, γ)
     b.cache_is_dirty = true
 end
-# function batch_update!(b::MvBootstrap, y::AMat, γ::Float64)
-#     fitbatch!(b.o, y, γ)
-#     update_replicates!(b, y, γ)
-#     b.cache_is_dirty = true
-# end

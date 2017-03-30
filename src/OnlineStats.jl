@@ -12,7 +12,7 @@ for pkg in [:LearnBase, :StatsBase]
 end
 
 export
-    # AbstractSeries
+    # OnlineStatMeta
     Series, MvSeries, Bootstrap, MvBootstrap,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
