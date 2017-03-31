@@ -11,7 +11,7 @@ end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
 fitbatch!(o::Mean, y::AVec, γ::Float64) = (o.μ = smooth(o.μ, mean(y), γ))
 Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
-Base.mean(o::Mean) = o.μ
+Base.mean(o::Mean) = value(o)
 
 #--------------------------------------------------------------------# Variance
 """
@@ -62,6 +62,7 @@ function fit!(o::Extrema, y::Real, γ::Float64)
     o
 end
 value(o::Extrema) = (o.min, o.max)
+Base.extrema(o::Extrema) = value(o)
 
 #--------------------------------------------------------------------# OrderStats
 """
