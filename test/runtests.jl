@@ -284,31 +284,12 @@ end
     s = Series(x, o)
     fit!(s, x, 5)
 end
-# @testset "Bootstrap" begin
-#     y = randn(1000)
-#     b = Bootstrap(100, Mean(), mean, Poisson())
-#     fit!(b, y)
-#     @test replicates(b) == b.replicates
-#     @test b.cache_is_dirty
-#     cached_state(b)
-#     @test !b.cache_is_dirty
-#
-#     mean(b)
-#     std(b)
-#     var(b)
-#     confint(b)
-#     confint(b, .9, :normal)
-#     @test_throws ArgumentError confint(b, .9, :badarg)
-#     b.cached_state[1] = NaN
-#     @test all(isnan, confint(b))
-#
-#     y = randn(1000)
-#     b = Bootstrap(100, Mean(), mean, Bernoulli())
-#     fit!(b, y)
-#
-#     b = MvBootstrap(MV(5, Mean()))
-#     fit!(b, randn(1000, 5))
-# end
+@testset "Bootstrap" begin
+    b = Bootstrap(Series(Mean()), 100, [0, 2])
+    fit!(b, randn(1000))
+    value(b)        # `fun` mapped to replicates
+    mean(value(b))  # mean
+end
 
 
 end

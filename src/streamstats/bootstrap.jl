@@ -1,78 +1,45 @@
-abstract type AbstractBootstrap{I} <: OnlineStatMeta{I} end
-function show_series(io, o::AbstractBootstrap)
-    print_item(io, "stat", o.o)
-    print_item(io, "cached_state", summary(o.cached_state))
-    print_item(io, "function", o.f)
-    s = replace(string(typeof(o.d)), "Distributions.", "")
-    s = replace(s, r"\{(.*)", "")
-    print_item(io, "boot method", s, false)
-end
-function update_replicates!(reps, d::Ds.Bernoulli, y, γ::Float64)
-    foreach(reps) do r
-        rand() > 0.5 && (fit!(r, y, γ); fit!(r, y, γ))
-    end
-end
-function update_replicates!(reps, d::Ds.Poisson, y, γ::Float64)
-    foreach(reps) do r
-        for k in 1:rand(Ds.Poisson())
-            fit!(r, y, γ)
-        end
-    end
-end
-replicates(b::AbstractBootstrap) = b.replicates
-function cached_state(b::AbstractBootstrap)
-    if b.cache_is_dirty
-        b.cached_state .= b.f.(b.replicates)
-        b.cache_is_dirty = false
-    end
-    return b.cached_state
-end
-Base.mean(b::AbstractBootstrap) = mean(cached_state(b))
-Base.std(b::AbstractBootstrap) = std(cached_state(b))
-Base.var(b::AbstractBootstrap) = var(cached_state(b))
+"""
+Online Statistical Bootstrap
 
-for (T, I) in [(:Bootstrap, 0), (:MvBootstrap, 1)]
-    @eval begin
-        mutable struct $T{
-                D,
-                O <: OnlineStat,
-                F <: Function,
-                W <: Weight,
-                T <: AbstractArray
-            } <: AbstractBootstrap{$I}
-            weight::W
-            nobs::Int
-            nups::Int
-            id::Symbol
-            o::O
-            replicates::Vector{O}
-            cached_state::T
-            f::F
-            d::D
-            cache_is_dirty::Bool
-        end
-        function $T(nreps::Int, o::OnlineStat, f::Function, d;
-                    weight::Weight = EqualWeight(), id::Symbol = :unlabeled)
-            _io(o, 1) == $I || throw(ArgumentError("Input dim must be $($I)"))
-            replicates = [copy(o) for i in 1:nreps]
-            cached_state = f.(replicates)
-            D = typeof(d)
-            O = typeof(o)
-            F = typeof(f)
-            W = typeof(weight)
-            T = typeof(cached_state)
-            $T{D,O,F,W,T}(weight, 0, 0, id, o, replicates, cached_state, f, d, false)
-        end
-        function $T(o::OnlineStat, nreps::Int = 100, d = Ds.Bernoulli(), f::Function = value)
-            $T(nreps, o, f, d)
-        end
-    end
+    Bootstrap(s::Series, nreps, d, fun = value)
+
+Create `nreps` replicates of the OnlineStat stored in `s`.  When `fit!` is called,
+each of the replicates will be updated `rand(d)` times.  Standard choices for `d` are `Distributions.Poisson()`, `[0, 2]`, etc.  `value(b)` returns `fun` mapped to the replicates.
+
+- Example
+```julia
+b = Bootstrap(Series(Mean()), 100, [0, 2])
+fit!(b, randn(1000))
+value(b)        # `fun` mapped to replicates
+mean(value(b))  # mean
+```
+"""
+mutable struct Bootstrap{I, D, O <: OnlineStat{I}, S <: Series{I, O}, F <: Function}
+    series::S
+    replicates::Vector{O}
+    f::F
+    d::D
 end
-
-
+function Bootstrap{I, O <:OnlineStat{I}}(s::Series{I, O}, nreps::Integer, d,
+                                         f::Function = value)
+    o = stats(s)
+    replicates = [deepcopy(o) for i in 1:nreps]
+    S, F, D = typeof(s), typeof(f), typeof(d)
+    Bootstrap{I, D, O, S, F}(s, replicates, f, d)
+end
+function Base.show(io::IO, b::Bootstrap)
+    header(io, name(b))
+    println(io)
+    print_item(io, "n replicates", length(b.replicates))
+    print_item(io, "function", b.f)
+    print_item(io, "boot method", b.d)
+    show(io, b.series)
+end
+value(b::Bootstrap) = b.f.(b.replicates)
+replicates(b::Bootstrap) = b.replicates
 
 function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
-    states = cached_state(b)
+    states = value(b)
     # If any NaN, return NaN, NaN
     if any(isnan, states)
         return (NaN, NaN)
@@ -89,15 +56,35 @@ function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method = :quantile
     end
 end
 
-#--------------------------------------------------------------------# Updates
-function singleton_update!(b::Bootstrap, y::Real, γ::Float64)
-    fit!(b.o, y, γ)
-    update_replicates!(b.replicates, b.d, y, γ)
-    b.cache_is_dirty = true
+#-----------------------------------------------------------------------# fit!
+function fit_replicates!(b::Bootstrap, yi)
+    γ = weight(b.series)
+    for r in b.replicates
+        for _ in 1:rand(b.d)
+            fit!(r, yi, γ)
+        end
+    end
 end
-
-function singleton_update!(b::MvBootstrap, y::AVec, γ::Float64)
-    fit!(b.o, y, γ)
-    update_replicates!(b.replicates, b.d, y, γ)
-    b.cache_is_dirty = true
+#-----------------------------------------------------------------------# Input: 0
+function fit!(b::Bootstrap{0}, y::Real)
+    fit!(b.series, y)
+    fit_replicates!(b, y)
+    b
+end
+function fit!(b::Bootstrap{0}, y::AVec)
+    for yi in y
+        fit!(b, yi)
+    end
+    b
+end
+#-----------------------------------------------------------------------# Input: 1
+function fit!(b::Bootstrap{1}, y::AVec)
+    fit!(b.series, y)
+    fit_replicates!(b, y)
+end
+function fit!(b::Bootstrap{1}, y::AMat)
+    for i in 1:size(y, 1)
+        fit!(b, view(y, i, :))
+    end
+    b
 end

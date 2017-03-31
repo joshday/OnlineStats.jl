@@ -100,7 +100,7 @@ include("vectorinput/kmeans.jl")
 include("distributions.jl")
 include("scalarinput/normalmix.jl")
 include("streamstats/hyperloglog.jl")
-# include("streamstats/bootstrap.jl")
+include("streamstats/bootstrap.jl")
 
 
 
