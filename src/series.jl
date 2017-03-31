@@ -129,17 +129,15 @@ Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1
 function Base.merge!{T <: Series}(s1::T, s2::T, method::Symbol = :append)
     n2 = nobs(s2)
     n2 == 0 && return s1
-    updatecounter!(s1, n2)
-    for (o1, o2) in zip(s1.stats, s2.stats)
-        if method == :append
-            merge!(o1, o2, nextweight(s1, n2))
-        elseif method == :mean
-            merge!(o1, o2, (weight(s1) + weight(s2)))
-        elseif method == :singleton
-            merge!(o1, o2, nextweight(s1))
-        else
-            throw(ArgumentError("method must be :append, :mean, or :singleton"))
-        end
+    if method == :append
+        merge!.(s1.stats, s2.stats, nextweight(s1, n2))
+    elseif method == :mean
+        merge!.(s1.stats, s2.stats, (weight(s1) + weight(s2)))
+    elseif method == :singleton
+        merge!.(s1.stats, s2.stats, nextweight(s1))
+    else
+        throw(ArgumentError("method must be :append, :mean, or :singleton"))
     end
+    updatecounter!(s1, n2)
     s1
 end

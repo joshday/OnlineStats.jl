@@ -18,16 +18,18 @@ info("Messy output for test coverage")
               LearningRate2()]
         println(w)
     end
-    # @testset "maprows" begin
-    #     s = Series(tuple(Mean(), Variance()))
-    #     println()
-    #     maprows(10, randn(100)) do yi
-    #         fit!(s, yi)
-    #         print("$(nobs(s)), ")
-    #     end
-    #     println()
-    #     @test nobs(s) == 100
-    # end
+    @testset "maprows" begin
+        s = Series(Mean(), Variance())
+        y = randn(100)
+        maprows(10, y) do yi
+            fit!(s, yi)
+            print("$(nobs(s)), ")
+        end
+        println()
+        @test nobs(s) == 100
+        @test value(s, 1) ≈ mean(y)
+        @test value(s, 2) ≈ var(y)
+    end
 end
 
 
@@ -62,6 +64,37 @@ end
 #-----------------------------------------------------------------------------# Series
 @testset "Series" begin
     @test_throws ArgumentError Series(Mean(), CovMatrix(3))
+    @testset "Type-stable Constructors" begin
+         @inferred Series(EqualWeight(), Mean(), Variance())
+         @inferred Series(EqualWeight(), Mean())
+         @inferred Series(Mean())
+         @inferred Series(Mean(), Variance())
+         @inferred Series((Mean(), Variance()))
+         @inferred Series(Mean(), LearningRate())
+         @inferred Series(randn(100), Mean(), Variance())
+         @inferred Series(randn(100), Mean())
+         @inferred Series(randn(100), EqualWeight(), Mean(), Variance())
+         @inferred Series(randn(100), EqualWeight(), Mean())
+    end
+    @testset "fit!" begin
+        s = Series(Mean(), Sum())
+        fit!(s, rand())
+        fit!(s, rand(99))
+        @test nobs(s) == 100
+        fit!(s, randn(100), .01)
+        fit!(s, randn(100), rand(100))
+        @test nobs(s) == 300
+        fit!(s, randn(100), 7)
+        @test nobs(s) == 400
+
+        s = Series(CovMatrix(3))
+        fit!(s, randn(3))
+        fit!(s, randn(99, 3))
+        fit!(s, randn(100, 3), .01)
+        fit!(s, randn(100, 3), rand(100))
+        fit!(s, randn(100, 3), 7)
+        @test nobs(s) == 400
+    end
 end
 @testset "Series{0}" begin
     for o in (Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
@@ -104,25 +137,25 @@ end
     end
 end
 
-# @testset "Series merge" begin
-#     y1 = randn(100)
-#     y2 = randn(100)
-#     y = vcat(y1, y2)
-#     o1 = @inferred Series(Mean(), Variance())
-#     o2 = @inferred Series(Mean(), Variance())
-#     fit!(o1, y1)
-#     fit!(o2, y2)
-#
-#     o3 = merge(o1, o2)
-#     @test value(o3, 1) ≈ mean(y)
-#     @test value(o3, 2) ≈ var(y)
-#
-#     merge(o1, o2, :mean)
-#     merge(o1, o2, :singleton)
-#     @test_throws ArgumentError merge(o1, o2, :not_a_real_method)
-#     @inferred merge(Mean(), Mean(), .1)
-# end
-#
+@testset "Series merge" begin
+    y1 = randn(100)
+    y2 = randn(100)
+    y = vcat(y1, y2)
+    o1 = @inferred Series(Mean(), Variance())
+    o2 = @inferred Series(Mean(), Variance())
+    fit!(o1, y1)
+    fit!(o2, y2)
+
+    o3 = merge(o1, o2)
+    @test value(o3, 1) ≈ mean(y)
+    @test value(o3, 2) ≈ var(y)
+
+    merge(o1, o2, :mean)
+    merge(o1, o2, :singleton)
+    @test_throws ArgumentError merge(o1, o2, :not_a_real_method)
+    @inferred merge(Mean(), Mean(), .1)
+end
+
 @testset "Summary" begin
     y1 = randn(500)
     y2 = randn(501)
