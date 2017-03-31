@@ -71,7 +71,6 @@ end
          @inferred Series(Mean())
          @inferred Series(Mean(), Variance())
          @inferred Series((Mean(), Variance()))
-         @inferred Series(Mean(), LearningRate())
          @inferred Series(randn(100), Mean(), Variance())
          @inferred Series(randn(100), Mean())
          @inferred Series(randn(100), EqualWeight(), Mean(), Variance())

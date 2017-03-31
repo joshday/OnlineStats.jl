@@ -37,9 +37,6 @@ Series(wt::Weight, s) = Series(wt, s)
 Series(s...) = Series(default(Weight, s), s)
 Series(s) = Series(default(Weight, s), s)
 
-Series(t::Tuple,      wt::Weight = default(Weight, t)) = Series(wt, t)
-Series(o::OnlineStat, wt::Weight = default(Weight, o)) = Series(wt, o)
-
 Series(y::AA, s...) = (o = Series(default(Weight, s), s); fit!(o, y))
 Series(y::AA, s) = (o = Series(default(Weight, s), s); fit!(o, y))
 
