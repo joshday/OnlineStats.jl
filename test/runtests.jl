@@ -161,6 +161,11 @@ end
     merge(o1, o2, :singleton)
     @test_throws ArgumentError merge(o1, o2, :not_a_real_method)
     @inferred merge(Mean(), Mean(), .1)
+
+    s1 = Series(y1, Moments())
+    s2 = Series(y2, Moments())
+    s3 = merge(s1, s2)
+    @test mean(s3.stats) ≈ mean(vcat(y1, y2))
 end
 
 moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
@@ -196,6 +201,8 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         @test std(o) ≈ std(y)
         @test kurtosis(o) ≈ kurtosis(y) atol = .1
         @test skewness(o) ≈ skewness(y) atol = .1
+
+        QuantileSGD(.4, .5)
     end
 end
 
