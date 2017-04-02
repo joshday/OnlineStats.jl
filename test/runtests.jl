@@ -8,6 +8,7 @@ info("Messy output for test coverage")
     println(Bootstrap(Series(Mean()), 100, Poisson()))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
+    println(Variance())
     println(OrderStats(5))
     println(Moments())
     println(QuantileMM())
@@ -182,6 +183,20 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         @test typeof(s.weight) == LearningRate
         fit!(s, y2, 7)
     end
+    @testset "Extra methods" begin
+        @test mean(Mean()) == 0.0
+        @test nobs(Variance()) == 0
+        @test extrema(Extrema()) == (Inf, -Inf)
+
+        y = randn(10000)
+        o = Moments()
+        s = Series(y, o)
+        @test mean(o) ≈ mean(y)
+        @test var(o) ≈ var(y)
+        @test std(o) ≈ std(y)
+        @test kurtosis(o) ≈ kurtosis(y) atol = .1
+        @test skewness(o) ≈ skewness(y) atol = .1
+    end
 end
 
 @testset "Distributions" begin
@@ -294,6 +309,8 @@ end
     fit!(b, randn(1000))
     value(b)        # `fun` mapped to replicates
     mean(value(b))  # mean
+    @test replicates(b) == b.replicates
+    confint(b)
 end
 
 
