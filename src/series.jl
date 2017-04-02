@@ -6,16 +6,14 @@ Subtypes should:
 """
 abstract type AbstractSeries end
 #----------------------------------------------------------------# AbstractSeries methods
-nobs(o::AbstractSeries) = o.nobs
-nups(o::AbstractSeries) = o.nups
-weight!(o::AbstractSeries, n2::Int = 1) = (updatecounter!(o, n2); weight(o, n2))
-updatecounter!(o::AbstractSeries, n2::Int = 1) = (o.nups += 1; o.nobs += n2)
-weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, o.nobs, n2, o.nups)
-nextweight(o::AbstractSeries, n2::Int = 1) = nextweight(o.weight, o.nobs, n2, o.nups)
+# helpers for weight
+for f in [:nobs, :nups, :weight, :weight!, :updatecounter!]
+    @eval $f(o::AbstractSeries, args...) = $f(o.weight, args...)
+end
 Base.copy(o::AbstractSeries) = deepcopy(o)
 function Base.show(io::IO, o::AbstractSeries)
     header(io, "$(name(o))\n")
-    subheader(io, "nobs = $(o.nobs)\n")
+    subheader(io, "weight = $(o.weight)\n")
     show_series(io, o)
 end
 show_series(io::IO, o::AbstractSeries) = print(io)
@@ -24,12 +22,10 @@ const _label = :unlabeled
 #----------------------------------------------------------------# Series
 mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
     weight::W
-    nobs::Int
-    nups::Int
     stats::OS
 end
 function Series(wt::Weight, S::Union{Tuple, OnlineStat})
-    Series{input(S), typeof(S), typeof(wt)}(wt, 0, 0, S)
+    Series{input(S), typeof(S), typeof(wt)}(wt, S)
 end
 Series(wt::Weight, s...) = Series(wt, s)
 Series(wt::Weight, s) = Series(wt, s)
@@ -54,7 +50,12 @@ stats(s::Series, i::Integer) = s.stats[i]
 
 Base.map(f::Function, o::OnlineStat) = f(o)
 #-----------------------------------------------------------------------# Series{0}
-function fit!(s::Series{0}, y::Real, γ::Float64 = nextweight(s))
+function fit!(s::Series{0}, y::Real)
+    γ = weight!(s)
+    map(s -> fit!(s, y, γ), s.stats)
+    s
+end
+function fit!(s::Series{0}, y::Real, γ::Float64)
     updatecounter!(s)
     map(s -> fit!(s, y, γ), s.stats)
     s
@@ -88,7 +89,12 @@ function fit!(s::Series{0}, y::AVec, b::Integer)
 end
 
 #-----------------------------------------------------------------------# Series{1}
-function fit!(s::Series{1}, y::AVec, γ::Float64 = nextweight(s))
+function fit!(s::Series{1}, y::AVec)
+    γ = weight!(s)
+    map(s -> fit!(s, y, γ), s.stats)
+    s
+end
+function fit!(s::Series{1}, y::AVec, γ::Float64)
     updatecounter!(s)
     map(s -> fit!(s, y, γ), s.stats)
     s
@@ -126,15 +132,15 @@ Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1
 function Base.merge!{T <: Series}(s1::T, s2::T, method::Symbol = :append)
     n2 = nobs(s2)
     n2 == 0 && return s1
+    updatecounter!(s1, n2)
     if method == :append
-        merge!.(s1.stats, s2.stats, nextweight(s1, n2))
+        merge!.(s1.stats, s2.stats, weight(s1, n2))
     elseif method == :mean
         merge!.(s1.stats, s2.stats, (weight(s1) + weight(s2)))
     elseif method == :singleton
-        merge!.(s1.stats, s2.stats, nextweight(s1))
+        merge!.(s1.stats, s2.stats, weight(s1))
     else
         throw(ArgumentError("method must be :append, :mean, or :singleton"))
     end
-    updatecounter!(s1, n2)
     s1
 end

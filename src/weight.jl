@@ -1,16 +1,27 @@
 #--------------------------------------------------------------------# Weight
 abstract type Weight end
-Base.show(io::IO, w::Weight) = print(io, name(w) * ": " * show_weight(w))
-nextweight(w::Weight, n::Int, n2::Int, nups::Int) = weight(w, n + n2, n2, nups + 1)
+Base.show(io::IO, w::Weight) = print(io, name(w) * "(nobs = $(w.nobs)): ")
+function Base.:(==){T <: Weight}(w1::T, w2::T)
+    nms = fieldnames(w1)
+    equal = true
+    for nm in nms
+        equal = getfield(w1, nm) == getfield(w2, nm)
+    end
+    return equal
+end
 
 default(::Type{Weight}, o::OnlineStat) = EqualWeight()
 function default(w::Type{Weight}, t::Tuple)
     weight = default(Weight, t[1])
-    all(default.(Weight, t) .== weight) ||
+    all(isa.(default.(Weight, t), typeof(weight))) ||
         throw(ArgumentError("Default weights differ.  Weight must be specified"))
     weight
 end
 
+nobs(w::Weight) = w.nobs
+nups(w::Weight) = w.nups
+updatecounter!(w::Weight, n2::Int = 1) = (w.nobs += n2; w.nups += 1;)
+weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
 
 #--------------------------------------------------------------------# EqualWeight
 """
@@ -20,9 +31,12 @@ EqualWeight <: Weight.  Equally-weighted observations.
 
     EqualWeight()
 """
-struct EqualWeight <: Weight end
-show_weight(w::EqualWeight) = "γ = 1 / t"
-weight(w::EqualWeight, n::Int, n2::Int, nups::Int) = n2 / n
+mutable struct EqualWeight <: Weight
+    nobs::Int
+    nups::Int
+    EqualWeight() = new(0, 0)
+end
+weight(w::EqualWeight, n2::Int = 1) = n2 / w.nobs
 
 #--------------------------------------------------------------------# ExponentialWeight
 """
@@ -33,13 +47,14 @@ ExponentialWeight <: Weight.  Exponentially-weighted observations (constant weig
     ExponentialWeight(λ::Real = 0.1)
     ExponentialWeight(lookback::Integer)
 """
-struct ExponentialWeight <: Weight
+mutable struct ExponentialWeight <: Weight
     λ::Float64
-    ExponentialWeight(λ::Real = 0.1) = new(λ)
-    ExponentialWeight(lookback::Integer) = new(2 / (lookback + 1))
+    nobs::Int
+    nups::Int
+    ExponentialWeight(λ::Real = 0.1) = new(λ, 0, 0)
+    ExponentialWeight(lookback::Integer) = new(2 / (lookback + 1), 0, 0)
 end
-show_weight(w::ExponentialWeight) = "γ = $(w.λ)"
-weight(w::ExponentialWeight, n::Int, n2::Int, nups::Int) = w.λ
+weight(w::ExponentialWeight, n2::Int = 1) = w.λ
 
 #--------------------------------------------------------------------# BoundedEqualWeight
 """
@@ -50,13 +65,14 @@ BoundedEqualWeight <: Weight.  Use EqualWeight until threshold `λ` is hit, then
     BoundedEqualWeight(λ::Real = 0.1)
     BoundedEqualWeight(lookback::Integer)
 """
-struct BoundedEqualWeight <: Weight
+mutable struct BoundedEqualWeight <: Weight
     λ::Float64
-    BoundedEqualWeight(λ::Real = 0.1) = new(λ)
-    BoundedEqualWeight(lookback::Integer) = new(2 / (lookback + 1))
+    nobs::Int
+    nups::Int
+    BoundedEqualWeight(λ::Real = 0.1) = new(λ, 0, 0)
+    BoundedEqualWeight(lookback::Integer) = new(2 / (lookback + 1), 0, 0)
 end
-show_weight(w::BoundedEqualWeight) = "γ = max(1 / t, $(w.λ))"
-weight(w::BoundedEqualWeight, n::Int, n2::Int, nups::Int) = max(n2 / n, w.λ)
+weight(w::BoundedEqualWeight, n2::Int = 1) = max(n2 / w.nobs, w.λ)
 
 #--------------------------------------------------------------------# LearningRate
 """
@@ -67,13 +83,14 @@ LearningRate <: Weight.  Mainly for stochastic approximation types (`QuantileSGD
 
     LearningRate(r = .6, λ = 0.0)
 """
-struct LearningRate <: Weight
+mutable struct LearningRate <: Weight
     λ::Float64
     r::Float64
-    LearningRate(r::Real = .6, λ::Real = 0.0) = new(λ, r)
+    nobs::Int
+    nups::Int
+    LearningRate(r::Real = .6, λ::Real = 0.0) = new(λ, r, 0, 0)
 end
-show_weight(w::LearningRate) = "γ = max(t ^ -$(w.r), $(w.λ))"
-weight(w::LearningRate, n::Int, n2::Int, nups::Int) = max(w.λ, exp(-w.r * log(nups)))
+weight(w::LearningRate, n2::Int = 1) = max(w.λ, exp(-w.r * log(w.nups)))
 
 #--------------------------------------------------------------------# LearningRate2
 """
@@ -84,12 +101,13 @@ LearningRate2 <: Weight.  Mainly for stochastic approximation types (`QuantileSG
 
     LearningRate2(c = .5, λ = 0.0)
 """
-struct LearningRate2 <: Weight
+mutable struct LearningRate2 <: Weight
     c::Float64
     λ::Float64
-    LearningRate2(c::Real = 0.5, λ::Real = 0.0) = new(c, λ)
+    nobs::Int
+    nups::Int
+    LearningRate2(c::Real = 0.5, λ::Real = 0.0) = new(c, λ, 0, 0)
 end
-show_weight(w::LearningRate2) = "γ = max(inv(1 + $(w.c) * (t - 1)), $(w.λ))"
-function weight(w::LearningRate2, n::Int, n2::Int, nups::Int)
-    max(w.λ, 1.0 / (1.0 + w.c * (nups - 1)))
+function weight(w::LearningRate2, n2::Int = 1)
+    max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
 end

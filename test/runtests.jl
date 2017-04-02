@@ -46,17 +46,18 @@ info("TESTS BEGIN HERE")
     w4 = @inferred LearningRate()
     w5 = @inferred LearningRate2()
 
-    for w in [w1, w3, w4]
-        @test OnlineStats.weight(w, 1, 1, 1) == 1
+    for w in [w1, w3, w4, w5]
+        @test OnlineStats.weight!(w, 1) == 1
     end
     for i in 1:10
-        @test OnlineStats.weight(w1, i, 1, i) == 1 / i
-        @test OnlineStats.weight(w2, i, 1, i) == w2.λ
-        @test OnlineStats.weight(w3, i, 1, i) == 1 / i
-        @test OnlineStats.weight(w4, i, 1, i) ≈ i ^ -w4.r
-        @test OnlineStats.weight(w5, i, 1, i) ≈ 1 / (1 + w5.c * (i-1))
+        @test OnlineStats.weight(w1) == 1 / i
+        @test OnlineStats.weight(w2) == w2.λ
+        @test OnlineStats.weight(w3) == 1 / i
+        @test OnlineStats.weight(w4) ≈ i ^ -w4.r
+        @test OnlineStats.weight(w5) ≈ 1 / (1 + w5.c * (i-1))
+        map(OnlineStats.updatecounter!, [w1, w2, w3, w4, w5])
     end
-    @test OnlineStats.weight(w3, 1_000_000, 1, 1_000_000) == w3.λ
+    # @test OnlineStats.weight(w3, 1_000_000, 1, 1_000_000) == w3.λ
 
     @inferred ExponentialWeight(100)
     @inferred BoundedEqualWeight(100)
