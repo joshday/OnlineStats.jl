@@ -203,6 +203,15 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         @test skewness(o) ≈ skewness(y) atol = .1
 
         QuantileSGD(.4, .5)
+
+        o = Diff(Int64)
+        @test typeof(o) == Diff{Int64}
+        fit!(o, 5, .1)
+
+        o = Sum(Int64)
+        @test sum(o) == 0
+        @test typeof(o) == Sum{Int64}
+        fit!(o, 5, .1)
     end
 end
 
