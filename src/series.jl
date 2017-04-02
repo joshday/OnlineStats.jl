@@ -7,9 +7,13 @@ Subtypes should:
 abstract type AbstractSeries end
 #----------------------------------------------------------------# AbstractSeries methods
 # helpers for weight
-for f in [:nobs, :nups, :weight, :weight!, :updatecounter!]
-    @eval $f(o::AbstractSeries, args...) = $f(o.weight, args...)
-end
+nobs(o::AbstractSeries) = nobs(o.weight)
+nups(o::AbstractSeries) = nups(o.weight)
+weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, n2)
+weight!(o::AbstractSeries, n2::Int = 1) = weight!(o.weight, n2)
+updatecounter!(o::AbstractSeries, n2::Int = 1) = updatecounter!(o.weight, n2)
+
+
 Base.copy(o::AbstractSeries) = deepcopy(o)
 function Base.show(io::IO, o::AbstractSeries)
     header(io, "$(name(o))\n")

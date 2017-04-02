@@ -5,6 +5,7 @@ using OnlineStats, Base.Test, Distributions
 info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
+    println(Bootstrap(Series(Mean()), 100, Poisson()))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
     println(OrderStats(5))
@@ -61,6 +62,10 @@ info("TESTS BEGIN HERE")
 
     @inferred ExponentialWeight(100)
     @inferred BoundedEqualWeight(100)
+
+    @test EqualWeight() == EqualWeight()
+    @test LearningRate() == LearningRate()
+    @test nups(EqualWeight()) == 0
 end
 #-----------------------------------------------------------------------------# Series
 @testset "Series" begin
