@@ -78,6 +78,17 @@ const ϵ = 1e-8  # epsilon used in special cases to avoid dividing by 0, etc.
 rows(x::AVec, rng) = view(x, rng)
 rows(x::AMat, rng) = view(x, rng, :)
 
+"""
+    maprows(f::Function, b::Integer, data...)
+
+Map rows of `data` in batches of size `b`.  Most usage is done through `do` blocks:
+
+    s = Series(Mean())
+    maprows(10, randn(100)) do yi
+        fit!(s, yi)
+        info("nobs: \$(nobs(s))")
+    end
+"""
 function maprows(f::Function, b::Integer, data...)
     n = size(data[1], 1)
     i = 1

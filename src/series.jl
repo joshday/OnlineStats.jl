@@ -24,6 +24,18 @@ show_series(io::IO, o::AbstractSeries) = print(io)
 const _label = :unlabeled
 
 #----------------------------------------------------------------# Series
+"""
+    Series(onlinestats...)
+    Series(weight, onlinestats...)
+    Series(data, onlinestats...)
+    Series(data, weight, onlinestats...)
+
+Manager for a collection of OnlineStats.
+
+    s = Series(Mean())
+    s = Series(ExponentialWeight(), Mean(), Variance())
+    s = Series(randn(100, 3), CovMatrix(3))
+"""
 mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
     weight::W
     stats::OS
