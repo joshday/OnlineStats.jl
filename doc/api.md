@@ -1,4 +1,4 @@
-<!--- Generated at 2017-04-11T11:52:34.445.  Don't edit --->
+<!--- Generated at 2017-04-11T12:03:33.807.  Don't edit --->
 
 # OnlineStats API
 
@@ -63,8 +63,6 @@ mean(value(b))  # mean
 ```
 
 [top](#contents)
----
-
 ## BoundedEqualWeight
 ```
 BoundedEqualWeight(λ::Real = 0.1)
@@ -75,8 +73,6 @@ BoundedEqualWeight(lookback::Integer)
   * Singleton weight at observation `t` is `γ = max(1 / t, λ)`
 
 [top](#contents)
----
-
 ## CovMatrix
 ```
 CovMatrix(d)
@@ -92,8 +88,6 @@ Series(y, CovMatrix(5))
 ```
 
 [top](#contents)
----
-
 ## Diff
 ```
 Diff()
@@ -109,8 +103,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## EqualWeight
 ```
 EqualWeight()
@@ -120,8 +112,6 @@ EqualWeight()
   * Singleton weight at observation `t` is `γ = 1 / t`
 
 [top](#contents)
----
-
 ## ExponentialWeight
 ```
 ExponentialWeight(λ::Real = 0.1)
@@ -132,8 +122,6 @@ ExponentialWeight(lookback::Integer)
   * Singleton weight at observation `t` is `γ = λ`
 
 [top](#contents)
----
-
 ## Extrema
 ```
 Extrema()
@@ -149,8 +137,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## FitBeta
 ```
 FitBeta()
@@ -167,8 +153,6 @@ s = Series(y, FitBeta())
 ```
 
 [top](#contents)
----
-
 ## FitCategorical
 No documentation found.
 
@@ -188,8 +172,6 @@ body :: Any
 ```
 
 [top](#contents)
----
-
 ## FitCauchy
 ```
 FitCauchy()
@@ -206,8 +188,6 @@ s = Series(y, FitCauchy())
 ```
 
 [top](#contents)
----
-
 ## FitGamma
 ```
 FitGamma()
@@ -224,8 +204,6 @@ s = Series(y, FitGamma())
 ```
 
 [top](#contents)
----
-
 ## FitLogNormal
 ```
 FitLogNormal()
@@ -242,8 +220,6 @@ s = Series(y, FitLogNormal())
 ```
 
 [top](#contents)
----
-
 ## FitMultinomial
 No documentation found.
 
@@ -261,8 +237,6 @@ nobs   :: Int64
 ```
 
 [top](#contents)
----
-
 ## FitMvNormal
 ```
 FitMvNormal(d)
@@ -279,8 +253,6 @@ s = Series(y', FitMvNormal(3))
 ```
 
 [top](#contents)
----
-
 ## FitNormal
 ```
 FitNormal()
@@ -297,8 +269,6 @@ s = Series(y, FitNormal())
 ```
 
 [top](#contents)
----
-
 ## HyperLogLog
 ```
 HyperLogLog(b)  # 4 ≤ b ≤ 16
@@ -313,8 +283,6 @@ s = Series(rand(1:10, 1000), HyperLogLog(12))
 ```
 
 [top](#contents)
----
-
 ## KMeans
 ```
 KMeans(p, k)
@@ -332,8 +300,6 @@ s = Series(y, LearningRate(.6), KMeans(1, 2))
 ```
 
 [top](#contents)
----
-
 ## LearningRate
 ```
 LearningRate(r = .6, λ = 0.0)
@@ -344,8 +310,6 @@ LearningRate(r = .6, λ = 0.0)
   * Singleton weight at observation `t` is `γ = max(1 / t ^ r, λ)`
 
 [top](#contents)
----
-
 ## LearningRate2
 ```
 LearningRate2(c = .5, λ = 0.0)
@@ -356,8 +320,6 @@ LearningRate2(c = .5, λ = 0.0)
   * Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
 
 [top](#contents)
----
-
 ## MV
 ```
 MV(p, o)
@@ -374,8 +336,6 @@ s = Series(y, o)
 ```
 
 [top](#contents)
----
-
 ## Mean
 ```
 Mean()
@@ -391,8 +351,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## Moments
 ```
 Moments()
@@ -408,8 +366,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## NormalMix
 ```
 NormalMix(k)
@@ -431,8 +387,6 @@ s = Series(rand(d, 100_000), NormalMix(2))
 ```
 
 [top](#contents)
----
-
 ## OnlineStat
 No documentation found.
 
@@ -452,8 +406,6 @@ body :: Any
 ```
 
 [top](#contents)
----
-
 ## OrderStats
 ```
 OrderStats(b)
@@ -469,8 +421,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## QuantileMM
 ```
 QuantileMM()
@@ -486,8 +436,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## QuantileSGD
 ```
 QuantileSGD()
@@ -503,8 +451,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## Series
 ```
 Series(onlinestats...)
@@ -522,8 +468,6 @@ s = Series(randn(100, 3), CovMatrix(3))
 ```
 
 [top](#contents)
----
-
 ## Sum
 ```
 Sum()
@@ -539,8 +483,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## Variance
 ```
 Variance()
@@ -556,8 +498,6 @@ value(s)
 ```
 
 [top](#contents)
----
-
 ## Weight
 No documentation found.
 
@@ -578,8 +518,6 @@ OnlineStats.LearningRate2
 ```
 
 [top](#contents)
----
-
 ## confint
 ```
 confint(b, coverageprob = .95, method = :quantile)
@@ -590,27 +528,7 @@ Return a confidence interval for a Bootstrap `b` by method
   * `:quantile`: use quantiles of `states = value(b)`
   * `:normal`: quantiles from gaussian approximation
 
-```
-confint(b, coverageprob = .95, method = :quantile)
-```
-
-Return a confidence interval for a Bootstrap `b` by method
-
-  * `:quantile`: use quantiles of `states = value(b)`
-  * `:normal`: quantiles from gaussian approximation
-
-```
-confint(b, coverageprob = .95, method = :quantile)
-```
-
-Return a confidence interval for a Bootstrap `b` by method
-
-  * `:quantile`: use quantiles of `states = value(b)`
-  * `:normal`: quantiles from gaussian approximation
-
 [top](#contents)
----
-
 ## fit!
 ```
 fit!(s, y)
@@ -620,8 +538,6 @@ fit!(s, y, w)
 Update a Series `s` with more data `y` and optional weighting `w`.
 
 [top](#contents)
----
-
 ## maprows
 ```
 maprows(f::Function, b::Integer, data...)
@@ -638,8 +554,6 @@ end
 ```
 
 [top](#contents)
----
-
 ## nobs
 ```
 nobs(obj::StatisticalModel)
@@ -648,14 +562,10 @@ nobs(obj::StatisticalModel)
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
 [top](#contents)
----
-
 ## nups
 Return the number of updates
 
 [top](#contents)
----
-
 ## replicates
 ```
 replicates(b)
@@ -664,21 +574,11 @@ replicates(b)
 Return the vector of replicates from Bootstrap `b`
 
 [top](#contents)
----
-
 ## stats
 Return the `stats` field of a Series.
 
 [top](#contents)
----
-
 ## value
 Map `value` to the `stats` field of a Series.
 
-Map `value` to the `stats` field of a Series.
-
-Map `value` to the `stats` field of a Series.
-
 [top](#contents)
----
-
