@@ -333,18 +333,18 @@ end
 
     o = CovMatrix(5)
     s = Series(o)
-    fit!(s, x, ObsDim.First())
+    fit!(s, x, ObsDim.Last())
     @test value(s) ≈ cov(x')
-    fit!(s, x, .1, ObsDim.First())
-    fit!(s, x, rand(1000), ObsDim.First())
+    fit!(s, x, .1, ObsDim.Last())
+    fit!(s, x, rand(1000), ObsDim.Last())
 
     o1 = CovMatrix(5)
     o2 = MV(5, Mean())
     s = Series(o1, o2)
-    fit!(s, x, ObsDim.First())
+    fit!(s, x, ObsDim.Last())
     @test value(s)[2] ≈ mean(x, 2)
-    fit!(s, x, .1, ObsDim.First())
-    fit!(s, x, rand(1000), ObsDim.First())
+    fit!(s, x, .1, ObsDim.Last())
+    fit!(s, x, rand(1000), ObsDim.Last())
 end
 
 

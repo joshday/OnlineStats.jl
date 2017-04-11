@@ -153,19 +153,19 @@ end
 
 
 #----------------------------------------------------------------# Series{1}, ObsDim=1
-function fit!(s::Series{1}, y::AMat, ::ObsDim.First)
+function fit!(s::Series{1}, y::AMat, ::ObsDim.Last)
     for i in 1:size(y, 2)
         fit!(s, view(y, :, i))
     end
     s
 end
-function fit!(s::Series{1}, y::AMat, γ::Float64, ::ObsDim.First)
+function fit!(s::Series{1}, y::AMat, γ::Float64, ::ObsDim.Last)
     for i in 1:size(y, 2)
         fit!(s, view(y, :, i), γ)
     end
     s
 end
-function fit!(s::Series{1}, y::AMat, γ::AVecF, ::ObsDim.First)
+function fit!(s::Series{1}, y::AMat, γ::AVecF, ::ObsDim.Last)
     for i in 1:size(y, 2)
         fit!(s, view(y, :, i), γ[i])
     end
