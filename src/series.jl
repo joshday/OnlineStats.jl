@@ -57,8 +57,11 @@ Series(y::AA, wt::Weight, s) = (o = Series(wt, s); fit!(o, y))
 
 show_series(io::IO, s::Series) = print_item.(io, name.(s.stats), value.(s.stats))
 
+"Map `value` to the `stats` field of a Series."
 value(s::Series) = map(value, s.stats)
 value(s::Series, i::Integer) = value(s.stats[i])
+
+"Return the `stats` field of a Series."
 stats(s::Series) = s.stats
 stats(s::Series, i::Integer) = s.stats[i]
 

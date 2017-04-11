@@ -1,8 +1,48 @@
-<!--- Generated at 2017-04-11T11:08:10.419.  Don't edit --->
-# API
+<!--- Generated at 2017-04-11T11:17:31.945.  Don't edit --->
 
-## Bootstrap
-```
+# OnlineStats API
+
+- [Bootstrap](#Bootstrap)
+- [BoundedEqualWeight](#BoundedEqualWeight)
+- [CovMatrix](#CovMatrix)
+- [Diff](#Diff)
+- [EqualWeight](#EqualWeight)
+- [ExponentialWeight](#ExponentialWeight)
+- [Extrema](#Extrema)
+- [FitBeta](#FitBeta)
+- [FitCategorical](#FitCategorical)
+- [FitCauchy](#FitCauchy)
+- [FitGamma](#FitGamma)
+- [FitLogNormal](#FitLogNormal)
+- [FitMultinomial](#FitMultinomial)
+- [FitMvNormal](#FitMvNormal)
+- [FitNormal](#FitNormal)
+- [HyperLogLog](#HyperLogLog)
+- [KMeans](#KMeans)
+- [LearningRate](#LearningRate)
+- [LearningRate2](#LearningRate2)
+- [MV](#MV)
+- [Mean](#Mean)
+- [Moments](#Moments)
+- [NormalMix](#NormalMix)
+- [OnlineStat](#OnlineStat)
+- [OrderStats](#OrderStats)
+- [QuantileMM](#QuantileMM)
+- [QuantileSGD](#QuantileSGD)
+- [Series](#Series)
+- [Sum](#Sum)
+- [Variance](#Variance)
+- [Weight](#Weight)
+- [confint](#confint)
+- [fit!](#fit!)
+- [maprows](#maprows)
+- [nobs](#nobs)
+- [nups](#nups)
+- [replicates](#replicates)
+- [stats](#stats)
+- [value](#value)
+## Bootstrap 
+ ```
 Bootstrap(s::Series, nreps, d, fun = value)
 ```
 
@@ -18,15 +58,15 @@ fit!(b, randn(1000))
 value(b)        # `fun` mapped to replicates
 mean(value(b))  # mean
 ```
-
-## BoundedEqualWeight
-BoundedEqualWeight(λ::Real = 0.1) BoundedEqualWeight(lookback::Integer)
+ 
+## BoundedEqualWeight 
+ BoundedEqualWeight(λ::Real = 0.1) BoundedEqualWeight(lookback::Integer)
 
   * Use EqualWeight until threshold `λ` is hit, then hold constant.
   * Singleton weight at observation `t` is `γ = max(1 / t, λ)`
-
-## CovMatrix
-```
+ 
+## CovMatrix 
+ ```
 CovMatrix(d)
 ```
 
@@ -38,9 +78,9 @@ Covariance Matrix of `d` variables.
 y = randn(100, 5)
 Series(y, CovMatrix(5))
 ```
-
-## Diff
-```
+ 
+## Diff 
+ ```
 Diff()
 ```
 
@@ -52,26 +92,26 @@ Track the difference and the last value.
 s = Series(randn(1000), Diff())
 value(s)
 ```
-
-## EqualWeight
-```
+ 
+## EqualWeight 
+ ```
 EqualWeight()
 ```
 
   * Equally weighted observations
   * Singleton weight at observation `t` is `γ = 1 / t`
-
-## ExponentialWeight
-```
+ 
+## ExponentialWeight 
+ ```
 ExponentialWeight(λ::Real = 0.1)
 ExponentialWeight(lookback::Integer)
 ```
 
   * Exponentially weighted observations (constant)
   * Singleton weight at observation `t` is `γ = λ`
-
-## Extrema
-```
+ 
+## Extrema 
+ ```
 Extrema()
 ```
 
@@ -83,9 +123,9 @@ Maximum and minimum.
 s = Series(randn(100), Extrema())
 value(s)
 ```
-
-## FitBeta
-```
+ 
+## FitBeta 
+ ```
 FitBeta()
 ```
 
@@ -98,9 +138,9 @@ using Distributions, OnlineStats
 y = rand(Beta(3, 5), 1000)
 s = Series(y, FitBeta())
 ```
-
-## FitCategorical
-No documentation found.
+ 
+## FitCategorical 
+ No documentation found.
 
 `OnlineStats.FitCategorical` is of type `UnionAll`.
 
@@ -116,9 +156,9 @@ struct UnionAll <: Type{T}
 var  :: TypeVar
 body :: Any
 ```
-
-## FitCauchy
-```
+ 
+## FitCauchy 
+ ```
 FitCauchy()
 ```
 
@@ -131,9 +171,9 @@ using Distributions
 y = rand(Cauchy(0, 10), 10_000)
 s = Series(y, FitCauchy())
 ```
-
-## FitGamma
-```
+ 
+## FitGamma 
+ ```
 FitGamma()
 ```
 
@@ -146,9 +186,9 @@ using Distributions
 y = rand(Gamma(5, 1), 1000)
 s = Series(y, FitGamma())
 ```
-
-## FitLogNormal
-```
+ 
+## FitLogNormal 
+ ```
 FitLogNormal()
 ```
 
@@ -161,9 +201,9 @@ using Distributions
 y = rand(LogNormal(3, 4), 1000)
 s = Series(y, FitLogNormal())
 ```
-
-## FitMultinomial
-No documentation found.
+ 
+## FitMultinomial 
+ No documentation found.
 
 **Summary:**
 
@@ -177,9 +217,9 @@ mutable struct OnlineStats.FitMultinomial <: OnlineStats.OnlineStat{1,Distributi
 mvmean :: OnlineStats.MV{OnlineStats.Mean}
 nobs   :: Int64
 ```
-
-## FitMvNormal
-```
+ 
+## FitMvNormal 
+ ```
 FitMvNormal(d)
 ```
 
@@ -192,9 +232,9 @@ using Distributions
 y = rand(MvNormal(zeros(3), eye(3)), 1000)
 s = Series(y', FitMvNormal(3))
 ```
-
-## FitNormal
-```
+ 
+## FitNormal 
+ ```
 FitNormal()
 ```
 
@@ -207,9 +247,9 @@ using Distributions
 y = rand(Normal(-3, 4), 1000)
 s = Series(y, FitNormal())
 ```
-
-## HyperLogLog
-```
+ 
+## HyperLogLog 
+ ```
 HyperLogLog(b)  # 4 ≤ b ≤ 16
 ```
 
@@ -220,9 +260,9 @@ Approximate count of distinct elements.
 ```
 s = Series(rand(1:10, 1000), HyperLogLog(12))
 ```
-
-## KMeans
-```
+ 
+## KMeans 
+ ```
 KMeans(p, k)
 ```
 
@@ -236,27 +276,27 @@ d = MixtureModel([Normal(0), Normal(5)])
 y = rand(d, 100_000, 1)
 s = Series(y, LearningRate(.6), KMeans(1, 2))
 ```
-
-## LearningRate
-```
+ 
+## LearningRate 
+ ```
 LearningRate(r = .6, λ = 0.0)
 ```
 
   * Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
   * Decreases at a "slow" rate until threshold `λ` is reached
   * Singleton weight at observation `t` is `γ = max(1 / t ^ r, λ)`
-
-## LearningRate2
-```
+ 
+## LearningRate2 
+ ```
 LearningRate2(c = .5, λ = 0.0)
 ```
 
   * Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
   * Decreases at a "slow" rate until threshold `λ` is reached
   * Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
-
-## MV
-```
+ 
+## MV 
+ ```
 MV(p, o)
 ```
 
@@ -269,9 +309,9 @@ y = randn(1000, 5)
 o = MV(5, Mean())
 s = Series(y, o)
 ```
-
-## Mean
-```
+ 
+## Mean 
+ ```
 Mean()
 ```
 
@@ -283,9 +323,9 @@ Univariate mean.
 s = Series(randn(100), Mean())
 value(s)
 ```
-
-## Moments
-```
+ 
+## Moments 
+ ```
 Moments()
 ```
 
@@ -297,9 +337,9 @@ First four non-central moments.
 s = Series(randn(1000), Moments(10))
 value(s)
 ```
-
-## NormalMix
-```
+ 
+## NormalMix 
+ ```
 NormalMix(k)
 NormalMix(k, init_data)
 NormalMix(k, μ, σ2, π)
@@ -317,9 +357,9 @@ using OnlineStats, Distributions
 d = MixtureModel([Normal(0,1), Normal(4,5)], [.4, .6])
 s = Series(rand(d, 100_000), NormalMix(2))
 ```
-
-## OnlineStat
-No documentation found.
+ 
+## OnlineStat 
+ No documentation found.
 
 `OnlineStats.OnlineStat` is of type `UnionAll`.
 
@@ -335,9 +375,9 @@ struct UnionAll <: Type{T}
 var  :: TypeVar
 body :: Any
 ```
-
-## OrderStats
-```
+ 
+## OrderStats 
+ ```
 OrderStats(b)
 ```
 
@@ -349,9 +389,9 @@ Average order statistics with batches of size `b`.
 s = Series(randn(1000), OrderStats(10))
 value(s)
 ```
-
-## QuantileMM
-```
+ 
+## QuantileMM 
+ ```
 QuantileMM()
 ```
 
@@ -363,9 +403,9 @@ Approximate quantiles via an online MM algorithm.
 s = Series(randn(1000), LearningRate(.7), QuantileMM())
 value(s)
 ```
-
-## QuantileSGD
-```
+ 
+## QuantileSGD 
+ ```
 QuantileSGD()
 ```
 
@@ -377,9 +417,9 @@ Approximate quantiles via stochastic gradient descent.
 s = Series(randn(1000), LearningRate(.7), QuantileSGD())
 value(s)
 ```
-
-## Series
-```
+ 
+## Series 
+ ```
 Series(onlinestats...)
 Series(weight, onlinestats...)
 Series(data, onlinestats...)
@@ -393,9 +433,9 @@ s = Series(Mean())
 s = Series(ExponentialWeight(), Mean(), Variance())
 s = Series(randn(100, 3), CovMatrix(3))
 ```
-
-## Sum
-```
+ 
+## Sum 
+ ```
 Sum()
 ```
 
@@ -407,9 +447,9 @@ Track the overall sum.
 s = Series(randn(1000), Sum())
 value(s)
 ```
-
-## Variance
-```
+ 
+## Variance 
+ ```
 Variance()
 ```
 
@@ -421,9 +461,9 @@ Univariate variance.
 s = Series(randn(100), Variance())
 value(s)
 ```
-
-## Weight
-No documentation found.
+ 
+## Weight 
+ No documentation found.
 
 **Summary:**
 
@@ -440,9 +480,9 @@ OnlineStats.ExponentialWeight
 OnlineStats.LearningRate
 OnlineStats.LearningRate2
 ```
-
-## confint
-No documentation found.
+ 
+## confint 
+ No documentation found.
 
 `StatsBase.confint` is a `Function`.
 
@@ -582,9 +622,9 @@ confint(b::OnlineStats.Bootstrap) in OnlineStats at /Users/joshday/.julia/v0.6/O
 confint(b::OnlineStats.Bootstrap, coverageprob) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:40
 confint(b::OnlineStats.Bootstrap, coverageprob, method) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:40
 ```
-
-## fit!
-No documentation found.
+ 
+## fit! 
+ No documentation found.
 
 `StatsBase.fit!` is a `Function`.
 
@@ -2417,9 +2457,9 @@ fit!(b::OnlineStats.Bootstrap{0,D,O,S,F} where F<:Function where S<:(OnlineStats
 fit!(b::OnlineStats.Bootstrap{1,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{1,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:80
 fit!(b::OnlineStats.Bootstrap{1,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{1,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,2} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:84
 ```
-
-## maprows
-```
+ 
+## maprows 
+ ```
 maprows(f::Function, b::Integer, data...)
 ```
 
@@ -2432,16 +2472,16 @@ maprows(10, randn(100)) do yi
     info("nobs: $(nobs(s))")
 end
 ```
-
-## nobs
-```
+ 
+## nobs 
+ ```
 nobs(obj::StatisticalModel)
 ```
 
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
-
-## nups
-No documentation found.
+ 
+## nups 
+ No documentation found.
 
 `OnlineStats.nups` is a `Function`.
 
@@ -2450,9 +2490,9 @@ No documentation found.
 nups(w::OnlineStats.Weight) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/weight.jl:22
 nups(o::OnlineStats.AbstractSeries) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:11
 ```
-
-## replicates
-No documentation found.
+ 
+## replicates 
+ No documentation found.
 
 `OnlineStats.replicates` is a `Function`.
 
@@ -2460,9 +2500,9 @@ No documentation found.
 # 1 method for generic function "replicates":
 replicates(b::OnlineStats.Bootstrap) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:37
 ```
-
-## stats
-No documentation found.
+ 
+## stats 
+ No documentation found.
 
 `OnlineStats.stats` is a `Function`.
 
@@ -2471,9 +2511,9 @@ No documentation found.
 stats(s::OnlineStats.Series) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:62
 stats(s::OnlineStats.Series, i::Integer) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:63
 ```
-
-## value
-No documentation found.
+ 
+## value 
+ No documentation found.
 
 `LearnBase.value` is a `Function`.
 
@@ -3308,4 +3348,4 @@ value(s::OnlineStats.Series) in OnlineStats at /Users/joshday/.julia/v0.6/Online
 value(s::OnlineStats.Series, i::Integer) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:61
 value(b::OnlineStats.Bootstrap) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:36
 ```
-
+ 

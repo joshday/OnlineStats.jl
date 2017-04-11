@@ -24,7 +24,7 @@ extra:
         accent: 'blue'
     author:
         github: 'joshday'
-    version: 0.6.0
+    version: 0.6.0+
 
 
 markdown_extensions:

@@ -36,6 +36,12 @@ end
 value(b::Bootstrap) = b.f.(b.replicates)
 replicates(b::Bootstrap) = b.replicates
 
+"""
+    confint(b, coverageprob = .95, method = :quantile)
+Return a confidence interval for a Bootstrap `b` by method
+- `:quantile`: use quantiles of `states = value(b)`
+- `:normal`: quantiles from gaussian approximation
+"""
 function confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
     states = value(b)
     # If any NaN, return NaN, NaN
