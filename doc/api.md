@@ -1,4 +1,4 @@
-<!--- Generated at 2017-04-11T12:03:33.807.  Don't edit --->
+<!--- Generated at 2017-04-11T12:34:37.337.  Don't edit --->
 
 # OnlineStats API
 
@@ -144,7 +144,7 @@ FitBeta()
 
 Online parameter estimate of a Beta distribution (Method of Moments)
 
-# Example
+### Example
 
 ```
 using Distributions, OnlineStats
