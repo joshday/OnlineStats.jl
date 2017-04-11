@@ -1,156 +1,43 @@
-abstract type Bootstrap{I <: Input} <: OnlineStat{I} end
-nobs(b::Bootstrap) = b.n
-value(b::Bootstrap) = b.replicates
-updatecounter!(b::Bootstrap, n2::Int) = (b.n += n2)
-weight(b::Bootstrap, n2::Int) = 0.0
-
-#-----------------------------------------------------------# BernoulliBootstrap
 """
-`BernoulliBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
+    Bootstrap(s::Series, nreps, d, fun = value)
 
-Create a double-or-nothing bootstrap using `r` replicates of `o` for estimate `f(o)`
+Online Statistical Bootstrapping.
 
-Example:
-```julia
-BernoulliBootstrap(Mean(), mean, 1000)
-```
+Create `nreps` replicates of the OnlineStat in Series `s`.  When `fit!` is called,
+each of the replicates will be updated `rand(d)` times.  Standard choices for `d` are `Distributions.Poisson()`, `[0, 2]`, etc.  `value(b)` returns `fun` mapped to the replicates.
+
+### Example
+    b = Bootstrap(Series(Mean()), 100, [0, 2])
+    fit!(b, randn(1000))
+    value(b)        # `fun` mapped to replicates
+    mean(value(b))  # mean
 """
-type BernoulliBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInput}
-    replicates::Vector{S}            # replicates of base stat
-    cached_state::Vector{Float64}    # cache of replicate states
-    f::Function                      # function to generate state. Ex: mean, var, std
-    n::Int                           # number of observations
-    cache_is_dirty::Bool
+mutable struct Bootstrap{I, D, O <: OnlineStat{I}, S <: Series{I, O}, F <: Function}
+    series::S
+    replicates::Vector{O}
+    f::F
+    d::D
 end
-
-function BernoulliBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
-    replicates = OnlineStat{T}[copy(o) for i in 1:r]
-    cached_state = Array{Float64}(r)
-    return BernoulliBootstrap(replicates, cached_state, f, 0, true)
+function Bootstrap{I, O <:OnlineStat{I}}(s::Series{I, O}, nreps::Integer, d,
+                                         f::Function = value)
+    o = stats(s)
+    replicates = [deepcopy(o) for i in 1:nreps]
+    S, F, D = typeof(s), typeof(f), typeof(d)
+    Bootstrap{I, D, O, S, F}(s, replicates, f, d)
 end
-
-
-function _fit!(b::BernoulliBootstrap, x::Real, γ::Float64)
-    for replicate in b.replicates
-        if rand() > 0.5
-            fit!(replicate, x)
-            fit!(replicate, x)
-        end
-    end
-    b.cache_is_dirty = true
-    b
-end
-
-#-------------------------------------------------------------# PoissonBootstrap
-"""
-`PoissonBootstrap(o::OnlineStat, f::Function, r::Int = 1000)`
-
-Create a poisson bootstrap using `r` replicates of `o` for estimate `f(o)`
-
-Example:
-```julia
-PoissonBootstrap(Mean(), mean, 1000)
-```
-"""
-type ScalarPoissonBootstrap{S <: OnlineStat{ScalarInput}} <: Bootstrap{ScalarInput}
-    replicates::Vector{S}           # replicates of base stat
-    cached_state::Vector{Float64}  # cache of replicate states
-    f::Function
-    n::Int                          # number of observations
-    cache_is_dirty::Bool
-end
-function PoissonBootstrap{T <: ScalarInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
-    replicates = OnlineStat{T}[copy(o) for i in 1:r]
-    cached_state = Array{Float64}(r)
-    ScalarPoissonBootstrap(replicates, cached_state, f, 0, true)
-end
-
-type VectorPoissonBootstrap{S <: OnlineStat{VectorInput}} <: Bootstrap{VectorInput}
-    replicates::Vector{S}           # replicates of base stat
-    cached_state::Matrix{Float64}  # cache of replicate states
-    f::Function
-    n::Int                          # number of observations
-    cache_is_dirty::Bool
-end
-function PoissonBootstrap{T <: VectorInput}(o::OnlineStat{T}, f::Function, r::Int = 1_000)
-    replicates = OnlineStat{T}[copy(o) for i in 1:r]
-    cached_state = Array{Float64}(length(value(o)), r)
-    VectorPoissonBootstrap(replicates, cached_state, f, 0, true)
-end
-
-const unitPoissonDist = Ds.Poisson(1)
-function _fit!(b::Union{ScalarPoissonBootstrap, VectorPoissonBootstrap},
-        x::Union{Real,Vector}, γ::Float64)
-    for replicate in b.replicates
-        for repetition in 1:rand(unitPoissonDist)
-            fit!(replicate, x)
-        end
-    end
-    b.cache_is_dirty = true
-    b
-end
-
-
-#--------------------------------------------------------------# FrozenBootstrap
-# "Frozen bootstraps object are generated when two bootstrap distributions are combined
-#  e.g., if they are differenced."
-immutable FrozenBootstrap <: Bootstrap{ScalarInput}
-    cached_state::Vector{Float64}  # cache of replicate states
-    n::Int                          # number of observations
-end
-
-# "Return the value of interest for each of the `OnlineStat` replicates"
-cached_state(b::FrozenBootstrap) = copy(b.cached_state)
-
-#-----------------------------------------------------------------------# Common
 function Base.show(io::IO, b::Bootstrap)
-    printheader(io, string(typeof(b)))
-    print_item(io, "Boostrap of", typeof(b.replicates[1]))
+    header(io, name(b))
+    println(io)
+    print_item(io, "n replicates", length(b.replicates))
     print_item(io, "function", b.f)
-    print_item(io, "nreplicates", length(b.replicates))
-    print_item(io, "nobs", nobs(b))
+    print_item(io, "boot method", b.d)
+    show(io, b.series)
 end
+value(b::Bootstrap) = b.f.(b.replicates)
+replicates(b::Bootstrap) = b.replicates
 
-# update cached_state' states if necessary and return their values
-function cached_state(b::Bootstrap{ScalarInput})
-    if b.cache_is_dirty
-        for i in 1:length(b.replicates)
-            b.cached_state[i] = b.f(b.replicates[i])
-        end
-        b.cache_is_dirty = false
-    end
-    return b.cached_state
-end
-function cached_state(b::Bootstrap{VectorInput})
-    if b.cache_is_dirty
-        for i in 1:length(b.replicates)
-            b.cached_state[:,i] = b.f(b.replicates[i])
-        end
-        b.cache_is_dirty = false
-    end
-    return b.cached_state
-end
-
-Base.mean(b::Bootstrap{ScalarInput}) = mean(cached_state(b))
-Base.std(b::Bootstrap{ScalarInput}) = std(cached_state(b))
-Base.var(b::Bootstrap{ScalarInput}) = var(cached_state(b))
-
-Base.mean(b::Bootstrap{VectorInput}) = vec(mean(cached_state(b),2))
-Base.std(b::Bootstrap{VectorInput}) = vec(std(cached_state(b),2))
-Base.var(b::Bootstrap{VectorInput}) = vec(var(cached_state(b),2))
-
-
-replicates(b::Bootstrap) = copy(b.replicates)
-
-# Assumes a and b are independent.
-function Base.:-(a::Bootstrap{ScalarInput}, b::Bootstrap{ScalarInput})
-    return FrozenBootstrap(cached_state(a) - cached_state(b), nobs(a) + nobs(b))
-end
-
-
-
-function StatsBase.confint(b::Bootstrap{ScalarInput}, coverageprob = 0.95, method=:quantile)
-    states = cached_state(b)
+function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
+    states = value(b)
     # If any NaN, return NaN, NaN
     if any(isnan, states)
         return (NaN, NaN)
@@ -162,7 +49,40 @@ function StatsBase.confint(b::Bootstrap{ScalarInput}, coverageprob = 0.95, metho
             norm_approx = Ds.Normal(mean(states), std(states))
             return (quantile(norm_approx, α / 2), quantile(norm_approx, 1 - α / 2))
         else
-            error("method $method not recognized.  use :quantile or :normal")
+            throw(ArgumentError("$method not recognized.  Use :quantile or :normal"))
         end
     end
+end
+
+#-----------------------------------------------------------------------# fit!
+function fit_replicates!(b::Bootstrap, yi)
+    γ = weight(b.series)
+    for r in b.replicates
+        for _ in 1:rand(b.d)
+            fit!(r, yi, γ)
+        end
+    end
+end
+#-----------------------------------------------------------------------# Input: 0
+function fit!(b::Bootstrap{0}, y::Real)
+    fit!(b.series, y)
+    fit_replicates!(b, y)
+    b
+end
+function fit!(b::Bootstrap{0}, y::AVec)
+    for yi in y
+        fit!(b, yi)
+    end
+    b
+end
+#-----------------------------------------------------------------------# Input: 1
+function fit!(b::Bootstrap{1}, y::AVec)
+    fit!(b.series, y)
+    fit_replicates!(b, y)
+end
+function fit!(b::Bootstrap{1}, y::AMat)
+    for i in 1:size(y, 1)
+        fit!(b, view(y, i, :))
+    end
+    b
 end
