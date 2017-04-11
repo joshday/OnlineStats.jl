@@ -1,13 +1,16 @@
 """
-Univariate mixture of gaussians.
-- Constructor can optionally take
-- a small batch of data to come up with smarter initial values
-- Initial vectors for means, variances, and component probabilities
-
     NormalMix(k)
     NormalMix(k, init_data)
     NormalMix(k, μ, σ2, π)
 
+Univariate mixture of gaussians.  Constructor can optionally take:
+- a small batch of data to come up with smarter initial values
+- Initial vectors for means, variances, and component probabilities
+
+### Example
+    using OnlineStats, Distributions
+    d = MixtureModel([Normal(0,1), Normal(4,5)], [.4, .6])
+    s = Series(rand(d, 100_000), NormalMix(2))
 """
 mutable struct NormalMix <: DistributionStat{0}
     s1::VecF

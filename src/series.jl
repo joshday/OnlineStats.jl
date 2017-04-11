@@ -30,7 +30,7 @@ const _label = :unlabeled
     Series(data, onlinestats...)
     Series(data, weight, onlinestats...)
 
-Manager for a collection of OnlineStats.
+Manager for an OnlineStat or tuple of OnlineStats.
 
     s = Series(Mean())
     s = Series(ExponentialWeight(), Mean(), Variance())

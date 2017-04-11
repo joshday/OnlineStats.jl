@@ -1,4 +1,12 @@
 #-------------------------------------------------------------------------# MV
+"""
+    MV(p, o)
+Track `p` univariate OnlineStats `o`
+# Example
+    y = randn(1000, 5)
+    o = MV(5, Mean())
+    s = Series(y, o)
+"""
 struct MV{T} <: OnlineStat{1, -1}
     stats::Vector{T}
 end

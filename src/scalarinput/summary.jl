@@ -1,8 +1,10 @@
 #--------------------------------------------------------------------# Mean
 """
-Univariate Mean
-
+    Mean()
+Univariate mean.
+### Example
     s = Series(randn(100), Mean())
+    value(s)
 """
 mutable struct Mean <: OnlineStat{0, 0}
     μ::Float64
@@ -15,9 +17,11 @@ Base.mean(o::Mean) = value(o)
 
 #--------------------------------------------------------------------# Variance
 """
-Univariate Variance
-
+    Variance()
+Univariate variance.
+### Example
     s = Series(randn(100), Variance())
+    value(s)
 """
 mutable struct Variance <: OnlineStat{0, 0}
     σ2::Float64     # biased variance
@@ -47,9 +51,11 @@ nobs(o::Variance) = o.nobs
 
 #--------------------------------------------------------------------# Extrema
 """
-Maximum and minimum
-
+    Extrema()
+Maximum and minimum.
+### Example
     s = Series(randn(100), Extrema())
+    value(s)
 """
 mutable struct Extrema <: OnlineStat{0, 1}
     min::Float64
@@ -66,10 +72,11 @@ Base.extrema(o::Extrema) = value(o)
 
 #--------------------------------------------------------------------# OrderStats
 """
-Mean of order statistics for batches of size `b`
-
-    b = 5
-    s = Series(randn(100), OrderStats(b))
+    OrderStats(b)
+Average order statistics with batches of size `b`.
+### Example
+    s = Series(randn(1000), OrderStats(10))
+    value(s)
 """
 mutable struct OrderStats <: OnlineStat{0, 1}
     value::VecF
@@ -95,9 +102,11 @@ fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
 """
-First four non-central moments
-
-    s = Series(randn(100), Moments())
+    Moments()
+First four non-central moments.
+### Example
+    s = Series(randn(1000), Moments(10))
+    value(s)
 """
 mutable struct Moments <: OnlineStat{0, 1}
     m::VecF
@@ -131,9 +140,11 @@ end
 
 #--------------------------------------------------------------------# QuantileSGD
 """
-Approximate quantiles via stochastic gradient descent
-
-    s = Series(randn(10_000), QuantileSGD(); weight = LearningRate())
+    QuantileSGD()
+Approximate quantiles via stochastic gradient descent.
+### Example
+    s = Series(randn(1000), LearningRate(.7), QuantileSGD())
+    value(s)
 """
 struct QuantileSGD <: OnlineStat{0, 1}
     value::VecF
@@ -159,11 +170,13 @@ function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
     end
 end
 
-#--------------------------------------------------------------------# QuantileSGD
+#--------------------------------------------------------------------# QuantileMM
 """
-Approximate quantiles via an online MM algorithm
-
-    s = Series(randn(10_000), QuantileMM(); weight = LearningRate())
+    QuantileMM()
+Approximate quantiles via an online MM algorithm.
+### Example
+    s = Series(randn(1000), LearningRate(.7), QuantileMM())
+    value(s)
 """
 mutable struct QuantileMM <: OnlineStat{0, 1}
     value::VecF
@@ -205,9 +218,11 @@ end
 
 #--------------------------------------------------------------------# Diff
 """
-Track the difference and the last value
-
-    s = Series(randn(100), Diff())
+    Diff()
+Track the difference and the last value.
+### Example
+    s = Series(randn(1000), Diff())
+    value(s)
 """
 mutable struct Diff{T <: Real} <: OnlineStat{0, 0}
     diff::T
@@ -230,9 +245,11 @@ end
 
 #--------------------------------------------------------------------# Sum
 """
-Track the overall sum
-
-    s = Series(randn(100), Sum())
+    Sum()
+Track the overall sum.
+### Example
+    s = Series(randn(1000), Sum())
+    value(s)
 """
 mutable struct Sum{T <: Real} <: OnlineStat{0, 0}
     sum::T

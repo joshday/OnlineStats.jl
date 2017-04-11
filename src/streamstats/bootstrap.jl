@@ -1,18 +1,16 @@
 """
-Online Statistical Bootstrap
-
     Bootstrap(s::Series, nreps, d, fun = value)
 
-Create `nreps` replicates of the OnlineStat stored in `s`.  When `fit!` is called,
+Online Statistical Bootstrapping.
+
+Create `nreps` replicates of the OnlineStat in Series `s`.  When `fit!` is called,
 each of the replicates will be updated `rand(d)` times.  Standard choices for `d` are `Distributions.Poisson()`, `[0, 2]`, etc.  `value(b)` returns `fun` mapped to the replicates.
 
-- Example
-```julia
-b = Bootstrap(Series(Mean()), 100, [0, 2])
-fit!(b, randn(1000))
-value(b)        # `fun` mapped to replicates
-mean(value(b))  # mean
-```
+### Example
+    b = Bootstrap(Series(Mean()), 100, [0, 2])
+    fit!(b, randn(1000))
+    value(b)        # `fun` mapped to replicates
+    mean(value(b))  # mean
 """
 mutable struct Bootstrap{I, D, O <: OnlineStat{I}, S <: Series{I, O}, F <: Function}
     series::S

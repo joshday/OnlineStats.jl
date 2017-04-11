@@ -25,11 +25,10 @@ weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
 
 #--------------------------------------------------------------------# EqualWeight
 """
-EqualWeight <: Weight.  Equally-weighted observations.
-
-    - Singleton weight at observation `t` is `γ = 1 / t`
-
     EqualWeight()
+
+- Equally weighted observations
+- Singleton weight at observation `t` is `γ = 1 / t`
 """
 mutable struct EqualWeight <: Weight
     nobs::Int
@@ -40,12 +39,11 @@ weight(w::EqualWeight, n2::Int = 1) = n2 / w.nobs
 
 #--------------------------------------------------------------------# ExponentialWeight
 """
-ExponentialWeight <: Weight.  Exponentially-weighted observations (constant weight).
-
-    - Singleton weight at observation `t` is `γ = λ`
-
     ExponentialWeight(λ::Real = 0.1)
     ExponentialWeight(lookback::Integer)
+
+- Exponentially weighted observations (constant)
+- Singleton weight at observation `t` is `γ = λ`
 """
 mutable struct ExponentialWeight <: Weight
     λ::Float64
@@ -58,12 +56,13 @@ weight(w::ExponentialWeight, n2::Int = 1) = w.λ
 
 #--------------------------------------------------------------------# BoundedEqualWeight
 """
-BoundedEqualWeight <: Weight.  Use EqualWeight until threshold `λ` is hit, then hold constant.
+BoundedEqualWeight(λ::Real = 0.1)
+BoundedEqualWeight(lookback::Integer)
 
-    - Singleton weight at observation `t` is `γ = max(1 / t, λ)`
+- Use EqualWeight until threshold `λ` is hit, then hold constant.
+- Singleton weight at observation `t` is `γ = max(1 / t, λ)`
 
-    BoundedEqualWeight(λ::Real = 0.1)
-    BoundedEqualWeight(lookback::Integer)
+
 """
 mutable struct BoundedEqualWeight <: Weight
     λ::Float64
@@ -76,12 +75,11 @@ weight(w::BoundedEqualWeight, n2::Int = 1) = max(n2 / w.nobs, w.λ)
 
 #--------------------------------------------------------------------# LearningRate
 """
-LearningRate <: Weight.  Mainly for stochastic approximation types (`QuantileSGD`,
-`QuantileMM`, etc.).  Decreases at a "slow" rate until threshold λ is reached.
-
-    - Singleton weight at observation `t` is `γ = max(1 / t ^ r, λ)`
-
     LearningRate(r = .6, λ = 0.0)
+
+- Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
+- Decreases at a "slow" rate until threshold `λ` is reached
+- Singleton weight at observation `t` is `γ = max(1 / t ^ r, λ)`
 """
 mutable struct LearningRate <: Weight
     λ::Float64
@@ -94,12 +92,11 @@ weight(w::LearningRate, n2::Int = 1) = max(w.λ, exp(-w.r * log(w.nups)))
 
 #--------------------------------------------------------------------# LearningRate2
 """
-LearningRate2 <: Weight.  Mainly for stochastic approximation types (`QuantileSGD`,
-`QuantileMM`, etc.).  Decreases at a "slow" rate until threshold λ is reached.
-
-    - Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
-
     LearningRate2(c = .5, λ = 0.0)
+
+- Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
+- Decreases at a "slow" rate until threshold `λ` is reached
+- Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
 """
 mutable struct LearningRate2 <: Weight
     c::Float64

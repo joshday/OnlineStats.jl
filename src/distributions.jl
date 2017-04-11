@@ -1,4 +1,7 @@
 #--------------------------------------------------------------# common
+"""
+OnlineStats for which `value` returns a distribution from Distributions.jl
+"""
 const DistributionStat{I} = OnlineStat{I, Ds.Distribution}
 for f in [:mean, :var, :std, :params, :ncategories, :cov, :probs, :rand]
     @eval Ds.$f(d::DistributionStat) = Ds.$f(value(d))
@@ -11,9 +14,10 @@ end
 
 #--------------------------------------------------------------# Beta
 """
+    FitBeta()
 Online parameter estimate of a Beta distribution (Method of Moments)
-
-    using Distributions
+# Example
+    using Distributions, OnlineStats
     y = rand(Beta(3, 5), 1000)
     s = Series(y, FitBeta())
 """
@@ -50,68 +54,23 @@ function value(o::FitCategorical)
     o.nobs > 0 ? Ds.Categorical(collect(values(o.d)) ./ o.nobs) : Ds.Categorical(1)
 end
 Base.keys(o::FitCategorical) = keys(o.d)
-# function _fit!(o::FitCategorical, y::Union{Real, AbstractString, Symbol}, γ::Float64)
-#     if haskey(o.d, y)
-#         o.d[y] += 1
-#     else
-#         o.d[y] = 1
-#     end
-#     o
-# end
-# # FitCategorical allows more than just Real input, so it needs special fit! methods
-# function fit!(o::FitCategorical, y::Union{AbstractString, Symbol})
-#     updatecounter!(o)
-#     γ = weight(o)
-#     _fit!(o, y, γ)
-#     o
-# end
-# function fit!{T <: Union{AbstractString, Symbol}}(o::FitCategorical, y::AVec{T})
-#     for yi in y
-#         fit!(o, yi)
-#     end
-#     o
-# end
-#
-# sortpairs(o::FitCategorical) = sort(collect(o.d), by = x -> 1 / x[2])
-# # function Base.sort!(o::FitCategorical)
-# #     if nobs(o) > 0
-# #         sortedpairs = sortpairs(o)
-# #         counts = zeros(length(sortedpairs))
-# #         for i in 1:length(sortedpairs)
-# #             counts[i] = sortedpairs[i][2]
-# #         end
-# #         o.value = Ds.Categorical(counts / sum(counts))
-# #     end
-# # end
-# function value(o::FitCategorical)
-#     if nobs(o) > 0
-#         o.value = Ds.Categorical(collect(values(o.d)) ./ nobs(o))
-#     end
-# end
-# function Base.show(io::IO, o::FitCategorical)
-#     header(io, "FitCategorical")
-#     print_item(io, "value", value(o))
-#     print_item(io, "labels", keys(o.d))
-#     print_item(io, "nobs", nobs(o))
-# end
-# updatecounter!(o::FitCategorical, n2::Int = 1) = (o.nobs += n2)
-# weight(o::FitCategorical, n2::Int = 1) = 0.0
-# nobs(o::FitCategorical) = o.nobs
-#
-#
+
+
 #------------------------------------------------------------------# Cauchy
 """
+    FitCauchy()
 Online parameter estimate of a Cauchy distribution
-
+### Example
     using Distributions
     y = rand(Cauchy(0, 10), 10_000)
-    s = Series(y, FitCauchy(); weight = LearningRate())
+    s = Series(y, FitCauchy())
 """
 mutable struct FitCauchy <: DistributionStat{0}
     q::QuantileMM
     nobs::Int
     FitCauchy() = new(QuantileMM(), 0)
 end
+default(::Type{Weight}, o::FitCauchy) = LearningRate()
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
 function value(o::FitCauchy)
     if o.nobs > 1
@@ -124,8 +83,9 @@ end
 
 #------------------------------------------------------------------------# Gamma
 """
+    FitGamma()
 Online parameter estimate of a Gamma distribution (Method of Moments)
-
+### Example
     using Distributions
     y = rand(Gamma(5, 1), 1000)
     s = Series(y, FitGamma())
@@ -151,8 +111,9 @@ end
 
 #-----------------------------------------------------------------------# LogNormal
 """
+    FitLogNormal()
 Online parameter estimate of a LogNormal distribution (MLE)
-
+### Example
     using Distributions
     y = rand(LogNormal(3, 4), 1000)
     s = Series(y, FitLogNormal())
@@ -169,8 +130,9 @@ end
 
 #-----------------------------------------------------------------------# Normal
 """
+    FitNormal()
 Online parameter estimate of a Normal distribution (MLE)
-
+### FitNormal()
     using Distributions
     y = rand(Normal(-3, 4), 1000)
     s = Series(y, FitNormal())
@@ -186,6 +148,7 @@ end
 
 
 #-----------------------------------------------------------------------# Multinomial
+# TODO: Allow each observation to have a different n
 mutable struct FitMultinomial <: DistributionStat{1}
     mvmean::MV{Mean}
     nobs::Int
@@ -205,8 +168,9 @@ end
 
 #---------------------------------------------------------------------# MvNormal
 """
-Online parameter estimate of a MvNormal distribution (MLE)
-
+    FitMvNormal(d)
+Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE)
+### Example
     using Distributions
     y = rand(MvNormal(zeros(3), eye(3)), 1000)
     s = Series(y', FitMvNormal(3))

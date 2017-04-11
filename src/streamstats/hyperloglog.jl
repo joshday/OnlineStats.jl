@@ -18,11 +18,10 @@ function α(m::UInt32)
 end
 
 """
-Approximate count of distinct elements
-
-    b = 12
-    o = HyperLogLog(b) # 4 ≤ b ≤ 16
-    s = Series(rand(1:10, 1000), o)
+    HyperLogLog(b)  # 4 ≤ b ≤ 16
+Approximate count of distinct elements.
+### Example
+    s = Series(rand(1:10, 1000), HyperLogLog(12))
 """
 mutable struct HyperLogLog <: OnlineStat{0, 0}
     m::UInt32
