@@ -8,6 +8,8 @@ abstract type AbstractSeries end
 #----------------------------------------------------------------# AbstractSeries methods
 # helpers for weight
 nobs(o::AbstractSeries) = nobs(o.weight)
+
+"Return the number of updates"
 nups(o::AbstractSeries) = nups(o.weight)
 weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, n2)
 weight!(o::AbstractSeries, n2::Int = 1) = weight!(o.weight, n2)
@@ -68,6 +70,11 @@ stats(s::Series, i::Integer) = s.stats[i]
 
 Base.map(f::Function, o::OnlineStat) = f(o)
 #-----------------------------------------------------------------------# Series{0}
+"""
+    fit!(s, y)
+    fit!(s, y, w)
+Update a Series `s` with more data `y` and optional weighting `w`.
+"""
 function fit!(s::Series{0}, y::Real)
     γ = weight!(s)
     map(s -> fit!(s, y, γ), s.stats)

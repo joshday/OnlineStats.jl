@@ -34,6 +34,11 @@ function Base.show(io::IO, b::Bootstrap)
     show(io, b.series)
 end
 value(b::Bootstrap) = b.f.(b.replicates)
+
+"""
+    replicates(b)
+Return the vector of replicates from Bootstrap `b`
+"""
 replicates(b::Bootstrap) = b.replicates
 
 """
