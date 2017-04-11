@@ -202,7 +202,9 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         @test kurtosis(o) ≈ kurtosis(y) atol = .1
         @test skewness(o) ≈ skewness(y) atol = .1
 
-        QuantileSGD(.4, .5)
+        o1 = QuantileSGD(.4, .5)
+        o2 = QuantileSGD(.4, .5)
+        merge!(o1, o2, .5)
 
         o = Diff(Int64)
         @test typeof(o) == Diff{Int64}
@@ -212,6 +214,13 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         @test sum(o) == 0
         @test typeof(o) == Sum{Int64}
         fit!(o, 5, .1)
+
+        y1 = randn(100)
+        y2 = randn(100)
+        s1 = Series(y1, Extrema())
+        s2 = Series(y2, Extrema())
+        merge!(s1, s2)
+        @test value(s1) == extrema(vcat(y1, y2))
     end
 end
 

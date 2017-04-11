@@ -67,6 +67,11 @@ function fit!(o::Extrema, y::Real, γ::Float64)
     o.max = max(o.max, y)
     o
 end
+function Base.merge!(o::Extrema, o2::Extrema, γ::Float64)
+    o.min = min(o.min, o2.min)
+    o.max = max(o.max, o2.max)
+    o
+end
 value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
 
@@ -159,6 +164,7 @@ function fit!(o::QuantileSGD, y::Float64, γ::Float64)
         @inbounds o.value[i] = subgrad(o.value[i], γ, v)
     end
 end
+# TODO: fix (this doesn't quite fit in batches, since o.value gets updated inside the loop)
 function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
     n2 = length(y)
     γ = γ / n2
@@ -168,6 +174,10 @@ function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
             @inbounds o.value[i] = subgrad(o.value[i], γ, v)
         end
     end
+end
+function Base.merge!(o::QuantileSGD, o2::QuantileSGD, γ::Float64)
+    o.τ == o2.τ || throw(ArgumentError("objects track different quantiles"))
+    smooth!(o.value, o2.value, γ)
 end
 
 #--------------------------------------------------------------------# QuantileMM
