@@ -56,8 +56,8 @@ weight(w::ExponentialWeight, n2::Int = 1) = w.λ
 
 #--------------------------------------------------------------------# BoundedEqualWeight
 """
-BoundedEqualWeight(λ::Real = 0.1)
-BoundedEqualWeight(lookback::Integer)
+    BoundedEqualWeight(λ::Real = 0.1)
+    BoundedEqualWeight(lookback::Integer)
 
 - Use EqualWeight until threshold `λ` is hit, then hold constant.
 - Singleton weight at observation `t` is `γ = max(1 / t, λ)`

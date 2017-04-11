@@ -1,4 +1,4 @@
-<!--- Generated at 2017-04-11T11:48:54.89.  Don't edit --->
+<!--- Generated at 2017-04-11T11:52:34.445.  Don't edit --->
 
 # OnlineStats API
 
@@ -66,7 +66,10 @@ mean(value(b))  # mean
 ---
 
 ## BoundedEqualWeight
-BoundedEqualWeight(λ::Real = 0.1) BoundedEqualWeight(lookback::Integer)
+```
+BoundedEqualWeight(λ::Real = 0.1)
+BoundedEqualWeight(lookback::Integer)
+```
 
   * Use EqualWeight until threshold `λ` is hit, then hold constant.
   * Singleton weight at observation `t` is `γ = max(1 / t, λ)`
@@ -596,98 +599,25 @@ Return a confidence interval for a Bootstrap `b` by method
   * `:quantile`: use quantiles of `states = value(b)`
   * `:normal`: quantiles from gaussian approximation
 
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
 [top](#contents)
 ---
 
 ## fit!
-No documentation found.
-
-`StatsBase.fit!` is a `Function`.
-
 ```
-# 81 methods for generic function "fit!":
-fit!(o::OnlineStats.Mean, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:13
-fit!(o::OnlineStats.Variance, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:34
-fit!(o::OnlineStats.Extrema, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:66
-fit!(o::OnlineStats.OrderStats, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:89
-fit!(o::OnlineStats.Moments, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:117
-fit!(o::OnlineStats.QuantileSGD, y::Float64, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:157
-fit!(o::OnlineStats.QuantileMM, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:194
-fit!(o::OnlineStats.CovMatrix, x::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/vectorinput/covmatrix.jl:18
-fit!(o::OnlineStats.KMeans, x::AbstractArray{T,1}, γ::Float64) where T<:Real in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/vectorinput/kmeans.jl:18
-fit!(o::OnlineStats.FitBeta, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:28
-fit!(o::OnlineStats.FitCauchy, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:74
-fit!(o::OnlineStats.FitGamma, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:98
-fit!(o::OnlineStats.FitLogNormal, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:125
-fit!(o::OnlineStats.FitNormal, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:144
-fit!(o::OnlineStats.FitMultinomial, y::AbstractArray{T,1}, γ::Float64) where T<:Real in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:158
-fit!(o::OnlineStats.FitMvNormal, y::AbstractArray{T,1}, γ::Float64) where T<:Real in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:183
-fit!(o::OnlineStats.NormalMix, y, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/normalmix.jl:74
-fit!(o::OnlineStats.HyperLogLog, v, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/hyperloglog.jl:50
-fit!(o::OnlineStats.Mean, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:13
-fit!(o::OnlineStats.Variance, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:34
-fit!(o::OnlineStats.Extrema, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:66
-fit!(o::OnlineStats.OrderStats, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:89
-fit!(o::OnlineStats.Moments, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:117
-fit!(o::OnlineStats.QuantileSGD, y::Float64, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:157
-fit!(o::OnlineStats.QuantileMM, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:194
-fit!(o::OnlineStats.CovMatrix, x::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/vectorinput/covmatrix.jl:18
-fit!(o::OnlineStats.KMeans, x::AbstractArray{T,1}, γ::Float64) where T<:Real in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/vectorinput/kmeans.jl:18
-fit!(o::OnlineStats.FitBeta, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:28
-fit!(o::OnlineStats.FitCauchy, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:74
-fit!(o::OnlineStats.FitGamma, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:98
-fit!(o::OnlineStats.FitLogNormal, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:125
-fit!(o::OnlineStats.FitNormal, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:144
-fit!(o::OnlineStats.FitMultinomial, y::AbstractArray{T,1}, γ::Float64) where T<:Real in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:158
-fit!(o::OnlineStats.FitMvNormal, y::AbstractArray{T,1}, γ::Float64) where T<:Real in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:183
-fit!(o::OnlineStats.NormalMix, y, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/normalmix.jl:74
-fit!(o::OnlineStats.HyperLogLog, v, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/hyperloglog.jl:50
-fit!(obj::StatsBase.StatisticalModel, data...) in StatsBase at /Users/joshday/.julia/v0.6/StatsBase/src/statmodels.jl:47
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::Real) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:72
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:77
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:82
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:88
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, γ::AbstractArray{Float64,1}) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:94
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, b::Integer) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:101
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:111
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:116
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:121
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:127
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T, γ::AbstractArray{Float64,1}) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:133
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T, b::Integer) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:139
-fit!(o::OnlineStats.Diff{T}, x::Real, γ::Float64) where T<:AbstractFloat in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:236
-fit!(o::OnlineStats.Diff{T}, x::Real, γ::Float64) where T<:Integer in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:241
-fit!(o::OnlineStats.Sum{T}, x::Real, γ::Float64) where T<:AbstractFloat in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:260
-fit!(o::OnlineStats.Sum{T}, x::Real, γ::Float64) where T<:Integer in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:261
-fit!(o::OnlineStats.MV, y::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/vectorinput/mv.jl:30
-fit!(o::OnlineStats.FitCategorical{T}, y::T, γ::Float64) where T in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:50
-fit!(b::OnlineStats.Bootstrap{0,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{0,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM) where D, y::Real) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:74
-fit!(b::OnlineStats.Bootstrap{0,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{0,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:79
-fit!(b::OnlineStats.Bootstrap{1,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{1,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:86
-fit!(b::OnlineStats.Bootstrap{1,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{1,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,2} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:90
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::Real) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:72
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::Real, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:77
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:82
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:88
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, γ::AbstractArray{Float64,1}) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:94
-fit!(s::OnlineStats.Series{0,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, b::Integer) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:101
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:111
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:116
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:121
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:127
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T, γ::AbstractArray{Float64,1}) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:133
-fit!(s::OnlineStats.Series{1,OS,W} where W<:OnlineStats.Weight where OS<:Union{OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM, Tuple}, y::AbstractArray{T,2} where T, b::Integer) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:139
-fit!(o::OnlineStats.Diff{T}, x::Real, γ::Float64) where T<:AbstractFloat in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:236
-fit!(o::OnlineStats.Diff{T}, x::Real, γ::Float64) where T<:Integer in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:241
-fit!(o::OnlineStats.Sum{T}, x::Real, γ::Float64) where T<:AbstractFloat in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:260
-fit!(o::OnlineStats.Sum{T}, x::Real, γ::Float64) where T<:Integer in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/scalarinput/summary.jl:261
-fit!(o::OnlineStats.MV, y::AbstractArray{T,1} where T, γ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/vectorinput/mv.jl:30
-fit!(o::OnlineStats.FitCategorical{T}, y::T, γ::Float64) where T in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/distributions.jl:50
-fit!(b::OnlineStats.Bootstrap{0,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{0,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM) where D, y::Real) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:74
-fit!(b::OnlineStats.Bootstrap{0,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{0,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{0,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:79
-fit!(b::OnlineStats.Bootstrap{1,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{1,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,1} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:86
-fit!(b::OnlineStats.Bootstrap{1,D,O,S,F} where F<:Function where S<:(OnlineStats.Series{1,O,W} where W<:OnlineStats.Weight) where O<:(OnlineStats.OnlineStat{1,OUTDIM} where OUTDIM) where D, y::AbstractArray{T,2} where T) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:90
+fit!(s, y)
+fit!(s, y, w)
 ```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
 
 [top](#contents)
 ---
@@ -721,28 +651,17 @@ Returns the number of independent observations on which the model was fitted. Be
 ---
 
 ## nups
-No documentation found.
-
-`OnlineStats.nups` is a `Function`.
-
-```
-# 2 methods for generic function "nups":
-nups(w::OnlineStats.Weight) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/weight.jl:22
-nups(o::OnlineStats.AbstractSeries) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/series.jl:11
-```
+Return the number of updates
 
 [top](#contents)
 ---
 
 ## replicates
-No documentation found.
-
-`OnlineStats.replicates` is a `Function`.
-
 ```
-# 1 method for generic function "replicates":
-replicates(b::OnlineStats.Bootstrap) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/streamstats/bootstrap.jl:37
+replicates(b)
 ```
+
+Return the vector of replicates from Bootstrap `b`
 
 [top](#contents)
 ---
@@ -754,6 +673,8 @@ Return the `stats` field of a Series.
 ---
 
 ## value
+Map `value` to the `stats` field of a Series.
+
 Map `value` to the `stats` field of a Series.
 
 Map `value` to the `stats` field of a Series.
