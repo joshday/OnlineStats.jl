@@ -124,11 +124,11 @@ fields_to_show(o::Moments) = [:m]
 Base.mean(o::Moments) = o.m[1]
 Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
 Base.std(o::Moments) = sqrt.(var(o))
-function StatsBase.skewness(o::Moments)
+function skewness(o::Moments)
     v = value(o)
     (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
 end
-function StatsBase.kurtosis(o::Moments)
+function kurtosis(o::Moments)
     v = value(o)
     (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
 end

@@ -57,13 +57,13 @@ $$\gamma_t = \text{max}\left(\lambda, \frac{1}{t^r}\right), \quad r \in [.5, 1]$
 
 ## Override the Weight
 
-You can override an OnlineStat's Weight with an additional argument to `fit!`.  
+You can override a Series' Weight with an additional argument to `fit!`.  
 
 ```julia
 y = randn(1000)
-o = Mean(EqualWeight())
-fit!(o, y, .01)  # use weight of .01 for each observation
+s = Series(EqualWeight(), Mean())
+fit!(s, y, .01)  # use weight of .01 for each observation
 
 wts = rand(1000)
-fit!(o, y, wts)  # use weight of wts[i] for observation y[i]
+fit!(s, y, wts)  # use weight of wts[i] for observation y[i]
 ```

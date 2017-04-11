@@ -5,6 +5,7 @@ rootdir = Pkg.dir("OnlineStats")
 
 #-------------------------------------------------------------------# Generate api.md
 api = rootdir * "/doc/api.md"
+touch(api)
 rm(api)
 touch(api)
 file = open(api, "r+")

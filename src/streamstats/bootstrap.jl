@@ -36,7 +36,7 @@ end
 value(b::Bootstrap) = b.f.(b.replicates)
 replicates(b::Bootstrap) = b.replicates
 
-function StatsBase.confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
+function confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
     states = value(b)
     # If any NaN, return NaN, NaN
     if any(isnan, states)

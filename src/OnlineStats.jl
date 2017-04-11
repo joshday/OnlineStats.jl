@@ -1,23 +1,19 @@
 module OnlineStats
 
-using StatsBase, LearnBase
-importall StatsBase
-importall LearnBase
+
+import StatsBase: nobs, fit!, skewness, kurtosis, confint
+import LearnBase: value
 import Distributions
 Ds = Distributions
 
-# Reexport LearnBase and StatsBase
-for pkg in [:LearnBase, :StatsBase]
-    eval(Expr(:toplevel, Expr(:export, setdiff(names(eval(pkg)), [pkg])...)))
-end
 
 export
     # OnlineStatMeta
-    Series, MvSeries, Bootstrap, MvBootstrap,
+    Series, Bootstrap,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
-    maprows, nups, stats, cached_state, replicates,
+    maprows, nups, stats, replicates, nobs, fit!, value, confint,
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans,
