@@ -21,7 +21,6 @@ function Base.show(io::IO, o::AbstractSeries)
     show_series(io, o)
 end
 show_series(io::IO, o::AbstractSeries) = print(io)
-const _label = :unlabeled
 
 #----------------------------------------------------------------# Series
 """
@@ -144,6 +143,7 @@ end
 
 #-------------------------------------------------------------------------# merge
 Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1), s2, method)
+Base.merge{T <: Series}(s1::T, s2::T, w::Float64) = merge!(copy(s1), s2, w)
 
 function Base.merge!{T <: Series}(s1::T, s2::T, method::Symbol = :append)
     n2 = nobs(s2)
@@ -158,5 +158,12 @@ function Base.merge!{T <: Series}(s1::T, s2::T, method::Symbol = :append)
     else
         throw(ArgumentError("method must be :append, :mean, or :singleton"))
     end
+    s1
+end
+function Base.merge!{T <: Series}(s1::T, s2::T, w::Float64)
+    n2 = nobs(s2)
+    n2 == 0 && return s1
+    updatecounter!(s1, n2)
+    merge!.(s1.stats, s2.stats, w)
     s1
 end

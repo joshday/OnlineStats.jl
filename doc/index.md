@@ -6,7 +6,7 @@ Online algorithms are well suited for streaming data or when data is too large t
 
 Observations are processed one at a time and all **algorithms use O(1) memory**.
 
-For v0.6 docs, click [here](https://github.com/joshday/OnlineStats.jl/tree/8686c286b5e775d2653b4226aac739a853abac4e/doc)
+**For OnlineStats v0.6 docs, click [here](https://github.com/joshday/OnlineStats.jl/tree/8686c286b5e775d2653b4226aac739a853abac4e/doc)**
 
 ---
 
@@ -34,6 +34,13 @@ end
 fit!(s, y)
 ```
 
+###
+```julia
+nobs(s)   # Number of observations
+stats(s)  # returns tuple of OnlineStats: (m, v)
+value(s)  # returns tuple of values: (value(m), value(v))
+```
+
 
 ---
 
@@ -41,19 +48,19 @@ fit!(s, y)
 While many estimates can be calculated analytically with an online algorithm, several
 type rely on stochastic approximation.
 
-| statistic/model                        | OnlineStat                  |
-|:---------------------------------------|:----------------------------|
-| mean                                   | `Mean`                      |
-| variance                               | `Variance`                  |
-| quantiles                              | `QuantileSGD`, `QuantileMM` |
-| max and min                            | `Extrema`                   |
-| skewness and kurtosis                  | `Moments`                   |
-| sum                                    | `Sum`                       |
-| difference                             | `Diff`                      |
-| covariance matrix                      | `CovMatrix`                 |
-| gaussian mixture                       | `NormalMix`                 |
-| k-means clustering                     | `KMeans`                    |
-| approximate count of distinct elements | `HyperLogLog`               |
+| statistic/model                        | OnlineStat                    |
+|:---------------------------------------|:------------------------------|
+| mean                                   | `Mean`, `Variance`, `Moments` |
+| variance                               | `Variance`, `Moments`         |
+| quantiles                              | `QuantileSGD`, `QuantileMM`   |
+| max and min                            | `Extrema`                     |
+| skewness and kurtosis                  | `Moments`                     |
+| sum                                    | `Sum`                         |
+| difference                             | `Diff`                        |
+| covariance matrix                      | `CovMatrix`                   |
+| gaussian mixture                       | `NormalMix`                   |
+| k-means clustering                     | `KMeans`                      |
+| approximate count of distinct elements | `HyperLogLog`                 |
 
 ## Parametric Distributions
 | distribution | OnlineStat       |

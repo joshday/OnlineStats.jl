@@ -1,33 +1,34 @@
-# Merging OnlineStats
+# Merging Series
 
-Some OnlineStat objects can be merged together.  The syntax for in-place merging is
+Two Series can be merged if they track the same OnlineStats and those OnlineStats are
+mergeable.  The syntax for in-place merging is
 
 ```julia
-merge!(o1, o2, arg)
+merge!(series1, series2, arg)
 ```
 
-Where `o1`/`o2` are OnlineStats of the same type and `arg` is used to determine how the value(s) from `o2` should be merged into `o1`.
+Where `series1`/`series2` are Series that contain the same OnlineStats and `arg` is used to determine how `series2` should be merged into `series1`.
 
 
 ```julia
+using OnlineStats
+
 y1 = randn(100)
 y2 = randn(100)
 
-o1 = Mean(y1)
-o2 = Mean(y2)
+s1 = Series(y1, Mean(), Variance())
+s2 = Series(y2, Mean(), Variance())
 
-# Treat o2 as a new batch of data.  Essentially:
-# o1 = Mean(y1); fit!(o1, y2)
-merge!(o1, o2, :append)
+# Treat s2 as a new batch of data.  Essentially:
+# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)
+merge!(s1, s2, :append)
 
-# Use weighted average based on nobs of each OnlineStat
-merge!(o1, o2, :mean)
+# Use weighted average based on nobs of each Series
+merge!(s1, s2, :mean)
 
-# Treat o2 as a single observation.  Essentially:
-# o1 = Mean(y1); fit!(o1, mean(y2))
-merge!(o1, o2, :singleton)
+# Treat s2 as a single observation.
+merge!(s1, s2, :singleton)
 
 # Provide the ratio of influence o2 should have.
-w = .5
-merge!(o1, o2, w)
+merge!(s1, s2, .5)
 ```

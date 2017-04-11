@@ -1,7 +1,7 @@
 # Weighting
 
 Series are parameterized by a `Weight` type that determines the influence of the
-next observation.  The `Weight` is always the last argument of the constructor.
+next observation.
 
 ![](https://cloud.githubusercontent.com/assets/8075494/18796073/9c844b30-8195-11e6-89a1-7ad9b4d891f2.png)
 

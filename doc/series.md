@@ -12,11 +12,12 @@ Series(ExponentialWeight(), Mean())
 Series(ExponentialWeight(), Mean(), Variance())
 
 y = randn(100)
+
 Series(y, Mean())
 Series(y, Mean(), Variance())
 
-Series(y, ExponentialWeight(), Mean())
-Series(y, ExponentialWeight(), Mean(), Variance())
+Series(y, ExponentialWeight(.01), Mean())
+Series(y, ExponentialWeight(.01), Mean(), Variance())
 ```
 
 ## Methods
@@ -24,6 +25,9 @@ Series(y, ExponentialWeight(), Mean(), Variance())
   - map `value` to each of the OnlineStats held by the Series
 - `stats(s)`
   - return the OnlineStat (if there's only one) or the tuple of OnlineStats held by the Series
+- `nobs(s)`
+  - the number of observations seen
+- `merge(s1, s2)` (See [Merging Documentation](merging.md))
 
 ## Updating
 There are multiple ways to update the OnlineStats in a Series
@@ -54,24 +58,8 @@ fit!(s, randn(100), rand(100))
 ```
 - Multiple observations, update in minibatches
   - Some OnlineStats perform differently when updated in minibatches, particularly those
-  that use stochastic approximation (`QuantileSGD`, `QuantileMM`, `FitCauchy`, etc.)
+  that use stochastic approximation (`QuantileSGD`, `QuantileMM`, `KMeans`, etc.)
 ```julia
-s = Series(Mean())
-fit!(s, randn(100), 7)
-```
-
-## Merging
-```julia
-s1 = Series(Mean(), Variance())
-s2 = Series(Mean(), Variance())
-
-y1, y2 = randn(100), randn(100)
-
-fit!(s1, y1)
-fit!(s2, y2)
-
-merge!(s1, s2)
-
-value(s1, 1) ≈ mean(vcat(y1, y2))
-value(s1, 2) ≈ var(vcat(y1, y2))
+s = Series(QuantileSGD())
+fit!(s, randn(1000), 7)
 ```
