@@ -1,4 +1,4 @@
-<!--- Generated at 2017-04-11T11:38:58.02.  Don't edit --->
+<!--- Generated at 2017-04-11T11:39:55.084.  Don't edit --->
 
 # OnlineStats API
 
@@ -42,7 +42,9 @@
 - [replicates](#replicates)
 - [stats](#stats)
 - [value](#value)
----## Bootstrap
+---
+
+## Bootstrap
 ```
 Bootstrap(s::Series, nreps, d, fun = value)
 ```
