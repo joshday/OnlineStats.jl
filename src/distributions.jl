@@ -16,7 +16,7 @@ end
 """
     FitBeta()
 Online parameter estimate of a Beta distribution (Method of Moments)
-# Example
+### Example
     using Distributions, OnlineStats
     y = rand(Beta(3, 5), 1000)
     s = Series(y, FitBeta())
