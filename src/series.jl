@@ -151,6 +151,28 @@ function fit!(s::Series{1}, y::AMat, b::Integer)
     s
 end
 
+
+#----------------------------------------------------------------# Series{1}, ObsDim=1
+function fit!(s::Series{1}, y::AMat, ::ObsDim.First)
+    for i in 1:size(y, 2)
+        fit!(s, view(y, :, i))
+    end
+    s
+end
+function fit!(s::Series{1}, y::AMat, γ::Float64, ::ObsDim.First)
+    for i in 1:size(y, 2)
+        fit!(s, view(y, :, i), γ)
+    end
+    s
+end
+function fit!(s::Series{1}, y::AMat, γ::AVecF, ::ObsDim.First)
+    for i in 1:size(y, 2)
+        fit!(s, view(y, :, i), γ[i])
+    end
+    s
+end
+
+
 #-------------------------------------------------------------------------# merge
 Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1), s2, method)
 Base.merge{T <: Series}(s1::T, s2::T, w::Float64) = merge!(copy(s1), s2, w)

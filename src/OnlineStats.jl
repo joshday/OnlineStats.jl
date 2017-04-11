@@ -2,7 +2,7 @@ module OnlineStats
 
 
 import StatsBase: nobs, fit!, skewness, kurtosis, confint
-import LearnBase: value
+import LearnBase: value, ObsDim
 import Distributions
 Ds = Distributions
 

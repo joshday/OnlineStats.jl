@@ -1,5 +1,5 @@
 module OnlineStatsTest
-using OnlineStats, Base.Test, Distributions
+using OnlineStats, Base.Test, Distributions, LearnBase
 
 #-----------------------------------------------------------# coverage for show() methods
 info("Messy output for test coverage")
@@ -302,8 +302,8 @@ end
     fit!(s, x, 10)
     @test mean(o) ≈ vec(mean(x, 1))
     @test var(o) ≈ vec(var(x, 1))
-    @test cov(o) ≈ cov(x) atol=.001
-    @test cor(o) ≈ cor(x) atol=.001
+    @test cov(o) ≈ cov(x)
+    @test cor(o) ≈ cor(x)
     @test std(o) ≈ vec(std(x, 1))
 
     x2 = randn(101, 5)
@@ -327,6 +327,24 @@ end
     mean(value(b))  # mean
     @test replicates(b) == b.replicates
     confint(b)
+end
+@testset "Observations in Columns" begin
+    x = randn(5, 1000)
+
+    o = CovMatrix(5)
+    s = Series(o)
+    fit!(s, x, ObsDim.First())
+    @test value(s) ≈ cov(x')
+    fit!(s, x, .1, ObsDim.First())
+    fit!(s, x, rand(1000), ObsDim.First())
+
+    o1 = CovMatrix(5)
+    o2 = MV(5, Mean())
+    s = Series(o1, o2)
+    fit!(s, x, ObsDim.First())
+    @test value(s)[2] ≈ mean(x, 2)
+    fit!(s, x, .1, ObsDim.First())
+    fit!(s, x, rand(1000), ObsDim.First())
 end
 
 
