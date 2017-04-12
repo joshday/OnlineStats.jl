@@ -152,7 +152,7 @@ function fit!(s::Series{1}, y::AMat, b::Integer)
 end
 
 
-#----------------------------------------------------------------# Series{1}, ObsDim=1
+#----------------------------------------------------------------# Series{1}, ObsDim=2
 function fit!(s::Series{1}, y::AMat, ::ObsDim.Last)
     for i in 1:size(y, 2)
         fit!(s, view(y, :, i))
