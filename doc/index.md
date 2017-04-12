@@ -45,8 +45,6 @@ value(s)  # returns tuple of values: (value(m), value(v))
 ---
 
 ## What Can OnlineStats Do?
-While many estimates can be calculated analytically with an online algorithm, several
-type rely on stochastic approximation.
 
 | statistic/model                        | OnlineStat                    |
 |:---------------------------------------|:------------------------------|
@@ -76,3 +74,6 @@ type rely on stochastic approximation.
 
 ## Other
 - Statistical bootstrap of an OnlineStat: `Bootstrap`
+
+!!! note
+    While many estimates can be calculated analytically with an online algorithm, several types rely on stochastic approximation: `QuantileSGD`, `QuantileMM`, `NormalMix`, `KMeans`, and `FitCauchy`

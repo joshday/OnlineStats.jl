@@ -70,17 +70,18 @@ stats(s::Series, i::Integer) = s.stats[i]
 
 Base.map(f::Function, o::OnlineStat) = f(o)
 #-----------------------------------------------------------------------# Series{0}
+const Singleton = Union{Real, Symbol, AbstractString}  # for FitCategorical/HyperLogLog
 """
     fit!(s, y)
     fit!(s, y, w)
 Update a Series `s` with more data `y` and optional weighting `w`.
 """
-function fit!(s::Series{0}, y::Real)
+function fit!(s::Series{0}, y::Singleton)
     γ = weight!(s)
     map(s -> fit!(s, y, γ), s.stats)
     s
 end
-function fit!(s::Series{0}, y::Real, γ::Float64)
+function fit!(s::Series{0}, y::Singleton, γ::Float64)
     updatecounter!(s)
     map(s -> fit!(s, y, γ), s.stats)
     s

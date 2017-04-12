@@ -255,6 +255,9 @@ end
         for i in 1:5
             @test i in keys(o)
         end
+
+        vals = ["small", "big"]
+        Series(rand(vals, 100), FitCategorical(String))
     end
     @testset "FitMultinomial" begin
         y = rand(Multinomial(10, ones(5) / 5), 1000)

@@ -1,4 +1,4 @@
-<!--- Generated at 2017-04-11T16:58:34.739.  Don't edit --->
+<!--- Generated at 2017-04-12T10:39:07.73.  Don't edit --->
 
 # OnlineStats API
 
@@ -154,21 +154,22 @@ s = Series(y, FitBeta())
 
 [top](#contents)
 ## FitCategorical
-No documentation found.
-
-`OnlineStats.FitCategorical` is of type `UnionAll`.
-
-**Summary:**
-
 ```
-struct UnionAll <: Type{T}
+FitCategorical(T)
 ```
 
-**Fields:**
+Fit a categorical distribution where the inputs are of type `T`.
+
+# Example
 
 ```
-var  :: TypeVar
-body :: Any
+using Distributions
+s = Series(rand(1:10, 1000), FitCategorical(Int))
+keys(stats(s))      # inputs (categories)
+probs(value(s))     # probability vector associated with keys
+
+vals = ["small", "medium", "large"]
+s = Series(rand(vals, 1000), FitCategorical(String))
 ```
 
 [top](#contents)
@@ -388,22 +389,17 @@ s = Series(rand(d, 100_000), NormalMix(2))
 
 [top](#contents)
 ## OnlineStat
-No documentation found.
-
-`OnlineStats.OnlineStat` is of type `UnionAll`.
-
-**Summary:**
-
 ```
-struct UnionAll <: Type{T}
+OnlineStat{I, O}
 ```
 
-**Fields:**
+Abstract type which provides input `I` and output `O` dimensions or object.
 
-```
-var  :: TypeVar
-body :: Any
-```
+  * 0 = scalar
+  * 1 = vector
+  * 2 = matrix
+  * -1 = unknown size
+  * Distribution
 
 [top](#contents)
 ## OrderStats
@@ -528,8 +524,269 @@ Return a confidence interval for a Bootstrap `b` by method
   * `:quantile`: use quantiles of `states = value(b)`
   * `:normal`: quantiles from gaussian approximation
 
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
 [top](#contents)
 ## fit!
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
 ```
 fit!(s, y)
 fit!(s, y, w)
@@ -579,6 +836,42 @@ Return the `stats` field of a Series.
 
 [top](#contents)
 ## value
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
 Map `value` to the `stats` field of a Series.
 
 [top](#contents)

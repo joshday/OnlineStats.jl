@@ -24,6 +24,15 @@ export
 
 #-----------------------------------------------------------------------------# types
 # 0 = scalar, 1 = vector, 2 = matrix, -1 = unknown, or Ds.Distribution
+"""
+    OnlineStat{I, O}
+Abstract type which provides input `I` and output `O` dimensions or object.
+- 0 = scalar
+- 1 = vector
+- 2 = matrix
+- -1 = unknown size
+- Distribution
+"""
 abstract type OnlineStat{INDIM, OUTDIM} end
 
 const AA        = AbstractArray

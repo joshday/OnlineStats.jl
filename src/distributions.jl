@@ -40,6 +40,18 @@ end
 
 
 #------------------------------------------------------------------# Categorical
+"""
+    FitCategorical(T)
+Fit a categorical distribution where the inputs are of type `T`.
+# Example
+    using Distributions
+    s = Series(rand(1:10, 1000), FitCategorical(Int))
+    keys(stats(s))      # inputs (categories)
+    probs(value(s))     # probability vector associated with keys
+
+    vals = ["small", "medium", "large"]
+    s = Series(rand(vals, 1000), FitCategorical(String))
+"""
 mutable struct FitCategorical{T<:Any} <: DistributionStat{0}
     d::Dict{T, Int}
     nobs::Int
