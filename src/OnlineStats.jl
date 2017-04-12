@@ -1,8 +1,8 @@
 module OnlineStats
 
 
-import StatsBase: nobs, fit!, skewness, kurtosis, confint
-import LearnBase: value, ObsDim
+import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict
+import LearnBase: value, ObsDim, Loss, Penalty, deriv, prox
 import Distributions
 Ds = Distributions
 
@@ -32,6 +32,7 @@ Abstract type which provides input `I` and output `O` dimensions or object.
 - 2 = matrix
 - -1 = unknown size
 - Distribution
+- (1, 0) = x,y pair where x is a vector, y is a scalar
 """
 abstract type OnlineStat{INDIM, OUTDIM} end
 
@@ -117,6 +118,7 @@ include("distributions.jl")
 include("scalarinput/normalmix.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
+include("xyinput/statlearn.jl")
 
 
 

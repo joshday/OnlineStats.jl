@@ -173,6 +173,24 @@ function fit!(s::Series{1}, y::AMat, γ::AVecF, ::ObsDim.Last)
     s
 end
 
+#-----------------------------------------------------------------------# Series{(1, 0)}
+function fit!(s::Series{(1,0)}, x::AVec, y::Number)
+    γ = weight!(s)
+    map(s -> fit!(s, x, y, γ), s.stats)
+    s
+end
+function fit!(s::Series{(1,0)}, x::AVec, y::Number, γ::Float64)
+    updatecounter!(s)
+    map(s -> fit!(s, x, y, γ), s.stats)
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec)
+    for i in eachindex(y)
+        fit!(s, view(x, i, :), y[i])
+    end
+    s
+end
+
 
 #-------------------------------------------------------------------------# merge
 Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1), s2, method)
