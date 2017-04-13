@@ -57,7 +57,17 @@ Series(y::AA, wt::Weight, s...) = (o = Series(wt, s); fit!(o, y))
 Series(y::AA, wt::Weight, s) = (o = Series(wt, s); fit!(o, y))
 
 
-show_series(io::IO, s::Series) = print_item.(io, name.(s.stats), value.(s.stats))
+Base.start(o::OnlineStat) = false
+Base.next(o::OnlineStat, state) = o, true
+Base.done(o::OnlineStat, state) = state
+
+show_series(io::IO, s::Series{0}) = print_item.(io, name.(s.stats), value.(s.stats))
+function show_series(io::IO, s::Series)
+    for stat in s.stats
+        print_item(io, name(stat), "")
+        print(io, value(stat))
+    end
+end
 
 "Map `value` to the `stats` field of a Series."
 value(s::Series) = map(value, s.stats)
@@ -187,6 +197,18 @@ end
 function fit!(s::Series{(1, 0)}, x::AMat, y::AVec)
     for i in eachindex(y)
         fit!(s, view(x, i, :), y[i])
+    end
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::Float64)
+    for i in eachindex(y)
+        fit!(s, view(x, i, :), y[i], γ)
+    end
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::AVecF)
+    for i in eachindex(y)
+        fit!(s, view(x, i, :), y[i], γ[i])
     end
     s
 end

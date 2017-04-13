@@ -1,7 +1,7 @@
 module OnlineStats
 
 
-import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict
+import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef
 import LearnBase: value, ObsDim, Loss, Penalty, deriv, prox
 import Distributions
 Ds = Distributions
@@ -13,7 +13,7 @@ export
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
-    maprows, nups, stats, replicates, nobs, fit!, value, confint,
+    maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef,
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans,
