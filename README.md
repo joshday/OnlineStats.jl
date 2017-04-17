@@ -13,35 +13,36 @@
 
 # What Can OnlineStats Do?
 
-| Statistic/Model                        | OnlineStat                    |
-|:---------------------------------------|:------------------------------|
-| **Univariate Statistics:**             |                               |
-| mean                                   | [`Mean`](doc/api.md#mean)    |
-| variance                               | `Variance`, `Moments`         |
-| quantiles                              | `QuantileSGD`, `QuantileMM`   |
-| max and min                            | `Extrema`                     |
-| skewness and kurtosis                  | `Moments`                     |
-| sum                                    | `Sum`                         |
-| difference                             | `Diff`                        |
-| **Multivariate Analysis:**             |                               |
-| covariance matrix                      | `CovMatrix`                   |
-| k-means clustering                     | `KMeans`                      |
-| multiple univariate statistics         | `MV{<:OnlineStat}`            |
-| **Density Estimation:**                |                               |
-| gaussian mixture                       | `NormalMix`                   |
-| Beta                                   | `FitBeta`                     |
-| Categorical                            | `FitCategorical`              |
-| Cauchy                                 | `FitCauchy`                   |
-| Gamma                                  | `FitGamma`                    |
-| LogNormal                              | `FitLogNormal`                |
-| Normal                                 | `FitNormal`                   |
-| Multinomial                            | `FitMultinomial`              |
-| MvNormal                               | `FitMvNormal`                 |
-| **Statistical Learning:**              |                               |
-| GLMs with regularization               | `StatLearn`                   |
-| **Other:**                             |                               |
-| Bootstrapping                          | `Bootstrap`                   |
-| approximate count of distinct elements | `HyperLogLog`                 |
+| Statistic/Model                        | OnlineStat                                    |
+|:---------------------------------------|:----------------------------------------------|
+| **Univariate Statistics:**             |                                               |
+| mean                                   | [`Mean`](doc/api.md#mean)                     |
+| variance                               | [`Variance`](doc/api.md#variance)             |
+| quantiles via SGD                      | [`QuantileSGD`](doc/api.md#quantilesgd)       |
+| quantiles via Online MM                | [`QuantileMM`](doc/api.md#quantilemm)         |
+| max and min                            | [`Extrema`](doc/api.md#extrema)               |
+| skewness and kurtosis                  | [`Moments`](doc/api.md#moments)               |
+| sum                                    | [`Sum`](doc/api.md#sum)                       |
+| difference                             | [`Diff`](doc/api.md#diff)                     |
+| **Multivariate Analysis:**             |                                               |
+| covariance matrix                      | [`CovMatrix`](doc/api.md#covmatrix) )         |
+| k-means clustering                     | [`KMeans`](doc/api.md#kmeans)                 |
+| multiple univariate statistics         | [`MV{<:OnlineStat}`](doc/api.md#mv)           |
+| **Density Estimation:**                |                                               |
+| gaussian mixture                       | [`NormalMix`](doc/api.md#normalmix)           |
+| Beta                                   | [`FitBeta`](doc/api.md#fitbeta) )             |
+| Categorical                            | [`FitCategorical`](doc/api.md#fitcategorical) |
+| Cauchy                                 | [`FitCauchy`](doc/api.md#fitcauchy)           |
+| Gamma                                  | [`FitGamma`](doc/api.md#fitgamma)             |
+| LogNormal                              | [`FitLogNormal`](doc/api.md#fitlognormal)     |
+| Normal                                 | [`FitNormal`](doc/api.md#fitnormal)           |
+| Multinomial                            | [`FitMultinomial`](doc/api.md#fitmultinomial) |
+| MvNormal                               | [`FitMvNormal`](doc/api.md#fitmvnormal)       |
+| **Statistical Learning:**              |                                               |
+| GLMs with regularization               | [`StatLearn`](doc/api.md#statlearn)           |
+| **Other:**                             |                                               |
+| Bootstrapping                          | [`Bootstrap`](doc/api.md#bootstrap)           |
+| approximate count of distinct elements | [`HyperLogLog`](doc/api.md$hyperloglog)       |
 
 
 # Contents
