@@ -46,6 +46,8 @@
 
 <br><br><br><br>
 
+---
+
 # Contents
 1. [Basics](#basics)
 1. [Weighting](#weighting)
@@ -53,7 +55,9 @@
 1. [Merging](#merging)
 1. [Callbacks](#callbacks)
 
-## Basics
+---
+
+# Basics
 [go to top](#contents)
 ### Every OnlineStat is a type
 ```julia
@@ -99,6 +103,7 @@ Consider how weights affect the influence the next observation has on an online 
 | `BoundedEqualWeight(λ)` | `γ(t) = max(1 / t, λ)`     |
 | `LearningRate(r, λ)`    | `γ(t) = max(1 / t ^ r, λ)` |
 
+![](https://cloud.githubusercontent.com/assets/8075494/18796073/9c844b30-8195-11e6-89a1-7ad9b4d891f2.png)
 
 # Series
 [go to top](#contents)
@@ -127,6 +132,7 @@ Series(y, ExponentialWeight(.01), Mean(), Variance())
 ### Updating a Series
 There are multiple ways to update the OnlineStats in a Series
 - Single observation
+  - Note: A single observation is a vector for OnlineStats such as `CovMatrix`
 ```julia
 s = Series(Mean())
 fit!(s, randn())
@@ -137,6 +143,7 @@ s = Series(Mean())
 fit!(s, randn(), rand())
 ```
 - Multiple observations
+  - Note: multiple observations are a matrix for OnlineStats such as `CovMatrix`
 ```julia
 s = Series(Mean())
 fit!(s, randn(100))

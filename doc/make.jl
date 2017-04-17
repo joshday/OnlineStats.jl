@@ -6,29 +6,12 @@ rootdir = Pkg.dir("OnlineStats")
 #-------------------------------------------------------------------# Generate api.md
 using APIGenerator
 make_api("OnlineStats", Pkg.dir("OnlineStats", "doc", "api.md"); readme=false)
-# api = rootdir * "/doc/api.md"
-# touch(api)
-# rm(api)
-# touch(api)
-# file = open(api, "r+")
-# write(file, "<!--- Generated at " * string(now()) * ".  Don't edit --->\n")
-# write(file, "# API\n\n")
-# info("The following items are included in the output file:\n")
-# nms = setdiff(names(OnlineStats), [:OnlineStats])  # Vector{Symbol} of names
-# for nm in nms
-#     @eval obj = OnlineStats.$nm
-#     d = Docs.doc(obj)
-#     if d != nothing
-#         println(nm)
-#         write(file, "## " * string(nm) * "\n" * Markdown.plain(d) * "\n")
-#     end
-# end
-# close(file)
+
 
 
 #----------------------------------------------------------------# Figure for Weights
 # info("Figure for Weights")
-# using Plots; pyplot()
+# using Plots; gr()
 # o1 = EqualWeight()
 # o2 = ExponentialWeight(.2)
 # o3 = BoundedEqualWeight(.2)
@@ -45,9 +28,9 @@ make_api("OnlineStats", Pkg.dir("OnlineStats", "doc", "api.md"); readme=false)
 #     end
 #     push!(plt_wt, nobs(o1), map(OnlineStats.weight, ovec))
 # end
-# png(plt_wt, rootdir * "/doc/images/weights.png")
+# png(plt_wt, "/Users/joshday/Desktop/weights.png")
 
 #-------------------------------------------------------------# push site to gh-pages
-cd(rootdir)
-run(`mkdocs gh-deploy --clean`)
+# cd(rootdir)
+# run(`mkdocs gh-deploy --clean`)
 end  # MakeOnlineStatsDocs
