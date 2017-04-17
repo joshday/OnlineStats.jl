@@ -26,9 +26,14 @@ end
 coef(o::StatLearn) = o.β
 predict(o::StatLearn, x::AVec) = dot(x, o.β)
 predict(o::StatLearn, x::AMat) = x * o.β
-
-
-
+classify(o::StatLearn, x) = sign.(predict(o, x))
+loss(o::StatLearn, x, y) = mean(value(o.loss, y, predict(o, x)))
+function objective(o::StatLearn, x, y)
+    mean(value(o.loss, y, predict(o, x))) + value(o.penalty, o.β, o.λfactor)
+end
+function statlearnpath(p::Integer, l::Loss, pen::Penalty, λ::VecF, u::Updater = SPGD())
+    [StatLearn(p, l, pen, λj, u) for λj in λ]
+end
 
 function fit!(o::StatLearn, x::AVec, y::Real, γ::Float64)
     xβ = dot(x, o.β)
@@ -65,15 +70,15 @@ function update!(o::StatLearn{SPGD}, γ)
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γη * o.gx[j], γη * o.λfactor[j])
     end
 end
-#-----------------------------------------------------------------------# MSPGD
+#-----------------------------------------------------------------------# MAXSPGD
 "Max SPGD.  Only Update βⱼ with the largest xⱼ"
-struct MSPGD <: Updater
+struct MAXSPGD <: Updater
     η::Float64
-    MSPGD(η::Float64 = 1.0) = new(η)
+    MAXSPGD(η::Float64 = 1.0) = new(η)
 end
-function update!(o::StatLearn{MSPGD}, γ)
+function update!(o::StatLearn{MAXSPGD}, γ)
     γη = γ * o.updater.η
-    j = indmax(x)
+    j = indmax(abs(gx) for gx in o.gx)
     @inbounds o.β[j] = prox(o.penalty, o.β[j] - γη * o.gx[j], γη * o.λfactor[j])
 end
 
@@ -84,7 +89,7 @@ struct ADAGRAD <: Updater
     H::VecF
     ADAGRAD(η::Float64 = 1.0, p::Integer = 0) = new(η, zeros(p))
 end
-init(u::ADAGRAD, p::Integer) = ADAGRAD(u.η, p)
+init(u::ADAGRAD, p) = ADAGRAD(u.η, p)
 function update!(o::StatLearn{ADAGRAD}, γ)
     U = o.updater
     @inbounds for j in eachindex(o.β)
@@ -93,3 +98,24 @@ function update!(o::StatLearn{ADAGRAD}, γ)
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
 end
+
+# #-----------------------------------------------------------------------# ADAM
+# "ADAM"
+# struct ADAM <: Updater
+#     α1::Float64
+#     α2::Float64
+#     η::Float64
+#     M::VecF
+#     V::VecF
+#     function ADAM(α1::Float64 = 0.1, α2::Float64 = .001, η::Float64 = 1.0, p::Integer = 0)
+#         new(β1, β2, η, zeros(p), zeros(p))
+#     end
+# end
+# function update!(o::StatLearn{ADAM}, γ)
+#     U = o.updater
+#     @inbounds for j in eachindex(o.β)
+#         U.M[j] = smooth(U.M[j], o.gx[j], U.α1)
+#         O.V[j] = smooth(U.V[j], o.gx[j] ^ 2, U.α2)
+#         # ...TODO
+#     end
+# end
