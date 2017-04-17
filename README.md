@@ -16,7 +16,7 @@
 | Statistic/Model                        | OnlineStat                    |
 |:---------------------------------------|:------------------------------|
 | **Univariate Statistics:**             |                               |
-| mean                                   | `Mean`, `Variance`, `Moments` |
+| mean                                   | [`Mean`](docs/api.md#mean)    |
 | variance                               | `Variance`, `Moments`         |
 | quantiles                              | `QuantileSGD`, `QuantileMM`   |
 | max and min                            | `Extrema`                     |
@@ -48,10 +48,11 @@
 - [Basics](#basics)
 - [Weights](#weights)
 - [Series](#series)
+- [Merging](#merging)
 - [Callbacks](#callbacks)
 
 ## Basics
-[go to top](#onlinestats)
+[go to top](#contents)
 ### Every OnlineStat is a type
 ```julia
 m = Mean()
@@ -76,7 +77,7 @@ fit!(s, y)
 ```
 
 # Weighting
-[go to top](#onlinestats)
+[go to top](#contents)
 
 Series are parameterized by a `Weight` type that controls the influence the next observation
 has on the OnlineStats contained in the Series.
@@ -97,7 +98,7 @@ Consider how weights affect the influence the next observation has on an online 
 
 
 # Series
-[go to top](#onlinestats)
+[go to top](#contents)
 
 Series are the workhorse of OnlineStats.  A Series tracks
 1. The Weight
@@ -156,7 +157,7 @@ fit!(s, randn(100), rand(100))
   ```
 
 # Merging
-[go to top](#onlinestats)
+[go to top](#contents)
 
 Two Series can be merged if they track the same OnlineStats and those OnlineStats are
 mergeable.  The syntax for in-place merging is
@@ -192,7 +193,7 @@ merge!(s1, s2, .5)
 ```
 
 # Callbacks
-[go to top](#onlinestats)
+[go to top](#contents)
 
 While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a `maprows` function.
 
