@@ -10,10 +10,12 @@ function Base.:(==){T <: Weight}(w1::T, w2::T)
     return equal
 end
 
-default(::Type{Weight}, o::OnlineStat) = EqualWeight()
-function default(w::Type{Weight}, t::Tuple)
-    weight = default(Weight, t[1])
-    all(isa.(default.(Weight, t), typeof(weight))) ||
+
+default_weight(o::OnlineStat) = EqualWeight()
+default_weight(o::StochasticStat) = LearningRate()
+function default_weight(t::Tuple)
+    weight = default_weight(t[1])
+    all(isa.(default_weight.(t), typeof(weight))) ||
         throw(ArgumentError("Default weights differ.  Weight must be specified"))
     weight
 end

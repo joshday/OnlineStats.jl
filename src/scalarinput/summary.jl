@@ -151,13 +151,12 @@ Approximate quantiles via stochastic gradient descent.
     s = Series(randn(1000), LearningRate(.7), QuantileSGD())
     value(s)
 """
-struct QuantileSGD <: OnlineStat{0, 1}
+struct QuantileSGD <: StochasticStat{0, 1}
     value::VecF
     τ::VecF
     QuantileSGD(τ::VecF = [0.25, 0.5, 0.75]) = new(zeros(τ), τ)
     QuantileSGD(args...) = QuantileSGD(collect(args))
 end
-default(::Type{Weight}, ::QuantileSGD) = LearningRate()
 function fit!(o::QuantileSGD, y::Float64, γ::Float64)
     for i in eachindex(o.τ)
         @inbounds v = Float64(y < o.value[i]) - o.τ[i]
@@ -188,7 +187,7 @@ Approximate quantiles via an online MM algorithm.
     s = Series(randn(1000), LearningRate(.7), QuantileMM())
     value(s)
 """
-mutable struct QuantileMM <: OnlineStat{0, 1}
+mutable struct QuantileMM <: StochasticStat{0, 1}
     value::VecF
     τ::VecF
     # "sufficient statistics"
@@ -199,7 +198,6 @@ mutable struct QuantileMM <: OnlineStat{0, 1}
     QuantileMM(args...) = QuantileMM(collect(args))
 end
 fields_to_show(o::QuantileMM) = [:value, :τ]
-default(::Type{Weight}, ::QuantileMM) = LearningRate()
 function fit!(o::QuantileMM, y::Real, γ::Float64)
     o.o = smooth(o.o, 1.0, γ)
     @inbounds for j in 1:length(o.τ)

@@ -35,6 +35,7 @@ Abstract type which provides input `I` and output `O` dimensions or object.
 - (1, 0) = x,y pair where x is a vector, y is a scalar
 """
 abstract type OnlineStat{INDIM, OUTDIM} end
+abstract type StochasticStat{I, O} <: OnlineStat{I, O} end
 
 const AA        = AbstractArray
 const VecF      = Vector{Float64}

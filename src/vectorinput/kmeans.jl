@@ -13,7 +13,7 @@ mutable struct KMeans <: OnlineStat{1, 2}
     KMeans(p::Integer, k::Integer) = new(randn(p, k), zeros(k))
 end
 fields_to_show(o::KMeans) = [:value]
-default(::Type{Weight}, ::KMeans) = LearningRate()
+default_weight(::KMeans) = LearningRate()
 function fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
     d, k = size(o.value)
     @assert length(x) == d

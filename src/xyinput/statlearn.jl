@@ -1,86 +1,95 @@
-#----------------------------------------------------------------------------# Coefficients
-"""
-    Coefficients(p::Integer, λ::VecF)
-Structure for storing the solution path of a `StatLearn` model.
-"""
-struct Coefficients
-    β::MatF
-    λ::VecF
-    function Coefficients(β::MatF, λ)
-        size(β, 2) == length(λ) || throw(DimensionMismatch())
-        new(β, λ)
-    end
-end
-Coefficients(p::Int, λ::VecF) = Coefficients(randn(p, length(λ)) / 1000, λ)
-function Base.show(io::IO, o::Coefficients)
-    header(io, name(o))
-    println(io)
-    for (i, λ) in enumerate(o.λ)
-        print(io, @sprintf("%4s", "$i:"))
-        print(io, @sprintf("%12s", "β($(round(λ,3))) = "))
-        show(io, o.β[:, i]')
-        println(io)
-    end
-end
-
 #-----------------------------------------------------------------------------# StatLearn
 abstract type Updater end
-struct StatLearn{A <: Updater, L <: Loss, P <: Penalty} <: OnlineStat{(1,0), 1}
-    θ::Coefficients
+Base.show(io::IO, u::Updater) = print(io, name(u))
+init(u::Updater, p) = u
+
+struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0), 1}
+    β::VecF
+    gx::VecF
+    λfactor::VecF
     loss::L
     penalty::P
-    factor::VecF
-    algorithm::A
-    # buffers
-    xβ::VecF
-    g::VecF
+    updater::U
 end
-function StatLearn(p::Integer, l::Loss, pen::Penalty, λ::VecF, f::VecF, a::Type)
-    d = length(λ)
-    StatLearn(Coefficients(p, λ), l, pen, f, a(p, d), zeros(d), zeros(d))
+function StatLearn(p::Integer, l::Loss, pen::Penalty, λ::Float64, u::Updater = SPGD())
+    StatLearn(zeros(p), zeros(p), ones(p) * λ, l, pen, init(u, p))
 end
-nparams(o::StatLearn) = size(o.θ.β, 1)
-coef(o::StatLearn) = o.θ
 function Base.show(io::IO, o::StatLearn)
     header(io, name(o))
     println(io)
-    show(io, o.θ)
+    print_item(io, "β", o.β')
+    print_item(io, "λ factor", o.λfactor')
+    print_item(io, "Loss", o.loss)
+    print_item(io, "Penalty", o.penalty)
+    print_item(io, "Updater", o.updater, false)
 end
-default(::Type{Weight}, ::StatLearn) = LearningRate()
+coef(o::StatLearn) = o.β
+predict(o::StatLearn, x::AVec) = dot(x, o.β)
+predict(o::StatLearn, x::AMat) = x * o.β
 
-function fit!(o::StatLearn, x::AVec, y::Number, γ::Float64)
-    At_mul_B!(o.xβ, o.θ.β, x)       # update xβ
-    for k in eachindex(o.g)         # update derivatives
-        o.g[k] = deriv(o.loss, y, o.xβ[k])
-    end
-    for (k, λ) in enumerate(o.θ.λ)  # update coefficients
-        for j in 1:nparams(o)
-            gx = o.g[k] * x[j]
-            update_βj!(o, j, k, γ, γ, gx, λ * o.factor[j])
+
+
+
+function fit!(o::StatLearn, x::AVec, y::Real, γ::Float64)
+    xβ = dot(x, o.β)
+    g = deriv(o.loss, y, xβ)
+    o.gx .= g .* x
+    update!(o, γ)
+end
+
+function fitbatch!(o::StatLearn, x::AMat, y::AVec, γ::Float64)
+    xβ = x * o.β
+    g = deriv(o.loss, y, xβ)
+    @inbounds for j in eachindex(o.gx)
+        o.gx[j] = 0.0
+        for i in eachindex(y)
+            o.gx[j] += g[i] * x[i, j]
         end
     end
+    scale!(o.gx, 1 / length(y))
+    update!(o, γ)
 end
 
-#----------------------------------------------------------------------------# Updaters
-struct SGD <: Updater end
-SGD(p, d) = SGD()
-function update_βj!(o::StatLearn{SGD}, j, k, γ, ηγ, gx, λj)
-    o.θ.β[j, k] -= ηγ * (gx + λj * deriv(o.penalty, o.θ.β[j, k]))
+
+
+
+#-----------------------------------------------------------------------# SPGD
+"Stochastic Proximal Gradient Descent"
+struct SPGD <: Updater
+    η::Float64
+    SPGD(η::Float64 = 1.0) = new(η)
+end
+function update!(o::StatLearn{SPGD}, γ)
+    γη = γ * o.updater.η
+    for j in eachindex(o.β)
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γη * o.gx[j], γη * o.λfactor[j])
+    end
+end
+#-----------------------------------------------------------------------# MSPGD
+"Max SPGD.  Only Update βⱼ with the largest xⱼ"
+struct MSPGD <: Updater
+    η::Float64
+    MSPGD(η::Float64 = 1.0) = new(η)
+end
+function update!(o::StatLearn{MSPGD}, γ)
+    γη = γ * o.updater.η
+    j = indmax(x)
+    @inbounds o.β[j] = prox(o.penalty, o.β[j] - γη * o.gx[j], γη * o.λfactor[j])
 end
 
-struct SPGD <: Updater end
-SPGD(p, d) = SPGD()
-function update_βj!(o::StatLearn{SPGD}, j, k, γ, ηγ, gx, λj)
-    @inbounds o.θ.β[j, k] = prox(o.penalty, o.θ.β[j,k] - ηγ * gx, ηγ * λj)
-end
-
+#-----------------------------------------------------------------------# ADAGRAD
+"Adaptive Gradient. Elementwise learning rate version of SPGD"
 struct ADAGRAD <: Updater
-    H::MatF
+    η::Float64
+    H::VecF
+    ADAGRAD(η::Float64 = 1.0, p::Integer = 0) = new(η, zeros(p))
 end
-ADAGRAD(p, d) = ADAGRAD(fill(ϵ, p, d))
-function update_βj!(o::StatLearn{ADAGRAD}, j, k, γ, ηγ, gx, λj)
-    U = o.algorithm
-    @inbounds U.H[j, k] = OnlineStats.smooth(U.H[j, k], gx * gx, γ)
-    @inbounds s = ηγ * inv(sqrt(U.H[j, k]) + ϵ)
-    @inbounds o.θ.β[j, k] = prox(o.penalty, o.θ.β[j, k] - s * gx, s * λj)
+init(u::ADAGRAD, p::Integer) = ADAGRAD(u.η, p)
+function update!(o::StatLearn{ADAGRAD}, γ)
+    U = o.updater
+    @inbounds for j in eachindex(o.β)
+        U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, γ)
+        s = U.η * γ * inv(sqrt(U.H[j]) + ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
+    end
 end

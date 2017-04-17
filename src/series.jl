@@ -47,11 +47,11 @@ end
 Series(wt::Weight, s...) = Series(wt, s)
 Series(wt::Weight, s) = Series(wt, s)
 
-Series(s...) = Series(default(Weight, s), s)
-Series(s) = Series(default(Weight, s), s)
+Series(s...) = Series(default_weight(s), s)
+Series(s) = Series(default_weight(s), s)
 
-Series(y::AA, s...) = (o = Series(default(Weight, s), s); fit!(o, y))
-Series(y::AA, s) = (o = Series(default(Weight, s), s); fit!(o, y))
+Series(y::AA, s...) = (o = Series(default_weight(s), s); fit!(o, y))
+Series(y::AA, s) = (o = Series(default_weight(s), s); fit!(o, y))
 
 Series(y::AA, wt::Weight, s...) = (o = Series(wt, s); fit!(o, y))
 Series(y::AA, wt::Weight, s) = (o = Series(wt, s); fit!(o, y))
@@ -209,6 +209,14 @@ end
 function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::AVecF)
     for i in eachindex(y)
         fit!(s, view(x, i, :), y[i], γ[i])
+    end
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
+    maprows(b, x, y) do xi, yi
+        bi = length(yi)
+        γ = weight!(s, bi)
+        map(o -> fitbatch!(o, xi, yi, γ), s.stats)
     end
     s
 end
