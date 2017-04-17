@@ -16,7 +16,7 @@
 | Statistic/Model                        | OnlineStat                    |
 |:---------------------------------------|:------------------------------|
 | **Univariate Statistics:**             |                               |
-| mean                                   | [`Mean`](docs/api.md#mean)    |
+| mean                                   | [`Mean`](doc/api.md#mean)    |
 | variance                               | `Variance`, `Moments`         |
 | quantiles                              | `QuantileSGD`, `QuantileMM`   |
 | max and min                            | `Extrema`                     |
