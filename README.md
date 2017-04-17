@@ -89,6 +89,7 @@ s = Series(EqualWeight(), Mean())
 ```
 
 Consider how weights affect the influence the next observation has on an online mean.  Many OnlineStats have an update which takes this form:
+
 <img width="416" src="https://cloud.githubusercontent.com/assets/8075494/25097527/ec26e70e-2372-11e7-9b3c-6ce3cd40afe4.png">
 
 | Constructor             | Weight at Update `t`       |
