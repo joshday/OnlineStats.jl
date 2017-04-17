@@ -48,7 +48,7 @@
 
 # Contents
 1. [Basics](#basics)
-1. [Weights](#weights)
+1. [Weighting](#weighting)
 1. [Series](#series)
 1. [Merging](#merging)
 1. [Callbacks](#callbacks)
@@ -190,7 +190,7 @@ merge!(s1, s2, :mean)
 # Treat s2 as a single observation.
 merge!(s1, s2, :singleton)
 
-# Provide the ratio of influence o2 should have.
+# Provide the ratio of influence s2 should have.
 merge!(s1, s2, .5)
 ```
 
