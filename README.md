@@ -25,12 +25,12 @@
 | sum                                    | [`Sum`](doc/api.md#sum)                       |
 | difference                             | [`Diff`](doc/api.md#diff)                     |
 | **Multivariate Analysis:**             |                                               |
-| covariance matrix                      | [`CovMatrix`](doc/api.md#covmatrix) )         |
+| covariance matrix                      | [`CovMatrix`](doc/api.md#covmatrix)           |
 | k-means clustering                     | [`KMeans`](doc/api.md#kmeans)                 |
 | multiple univariate statistics         | [`MV{<:OnlineStat}`](doc/api.md#mv)           |
 | **Density Estimation:**                |                                               |
 | gaussian mixture                       | [`NormalMix`](doc/api.md#normalmix)           |
-| Beta                                   | [`FitBeta`](doc/api.md#fitbeta) )             |
+| Beta                                   | [`FitBeta`](doc/api.md#fitbeta)               |
 | Categorical                            | [`FitCategorical`](doc/api.md#fitcategorical) |
 | Cauchy                                 | [`FitCauchy`](doc/api.md#fitcauchy)           |
 | Gamma                                  | [`FitGamma`](doc/api.md#fitgamma)             |
@@ -44,13 +44,14 @@
 | Bootstrapping                          | [`Bootstrap`](doc/api.md#bootstrap)           |
 | approximate count of distinct elements | [`HyperLogLog`](doc/api.md$hyperloglog)       |
 
+<br><br><br><br>
 
 # Contents
-- [Basics](#basics)
-- [Weights](#weights)
-- [Series](#series)
-- [Merging](#merging)
-- [Callbacks](#callbacks)
+1. [Basics](#basics)
+1. [Weights](#weights)
+1. [Series](#series)
+1. [Merging](#merging)
+1. [Callbacks](#callbacks)
 
 ## Basics
 [go to top](#contents)
