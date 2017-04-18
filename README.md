@@ -13,7 +13,7 @@
 
 ---
 
-# Contents
+# Readme Contents
 
 1. [What Can OnlineStats Do?](#what-can-onlinestats-do)
 1. [Basics](#basics)
@@ -84,7 +84,7 @@ end
 # or more simply:
 fit!(s, y)
 ```
-[go to top](#contents)
+[go to top](#readme-contents)
 # Weighting
 
 Series are parameterized by a `Weight` type that controls the influence the next observation
@@ -107,7 +107,7 @@ Consider how weights affect the influence the next observation has on an online 
 
 ![](https://cloud.githubusercontent.com/assets/8075494/18796073/9c844b30-8195-11e6-89a1-7ad9b4d891f2.png)
 
-[go to top](#contents)
+[go to top](#readme-contents)
 # Series
 
 Series are the workhorse of OnlineStats.  A Series tracks
@@ -168,7 +168,7 @@ fit!(s, randn(100), rand(100))
   fit!(s, randn(1000), 7)
   ```
 
-[go to top](#contents)
+[go to top](#readme-contents)
 # Merging
 
 Two Series can be merged if they track the same OnlineStats and those OnlineStats are
@@ -204,7 +204,7 @@ merge!(s1, s2, :singleton)
 merge!(s1, s2, .5)
 ```
 
-[go to top](#contents)
+[go to top](#readme-contents)
 # Callbacks
 
 While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a `maprows` function.
@@ -232,4 +232,4 @@ INFO: value of mean is 0.008857939006120167
 INFO: value of mean is 0.016199508928045905
 ```
 
-[go to top](#contents)
+[go to top](#readme-contents)
