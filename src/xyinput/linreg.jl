@@ -90,3 +90,12 @@ function vcov(o::LinReg)
     -mse(o) * o.S[1:p, 1:p] / nobs(o)
  end
 stderr(o::LinReg) = sqrt.(diag(vcov(o)))
+
+function Base.merge!(o1::LinReg, o2::LinReg, γ::Float64)
+    @assert o1.λ == o2.λ
+    @assert length(o1.β) == length(o2.β)
+    smooth!(o1.A, o2.A, γ)
+    o1.nobs += o2.nobs
+    coef(o1)
+    o1
+end

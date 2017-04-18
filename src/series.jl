@@ -1,15 +1,13 @@
-"""
-AbstractSeries:  Managers for a group or single OnlineStat
-
-Subtypes should:
-- Have fields `weight::Weight`, `nobs::Int`, and `nups::Int`
-"""
 abstract type AbstractSeries end
 #----------------------------------------------------------------# AbstractSeries methods
 # helpers for weight
 nobs(o::AbstractSeries) = nobs(o.weight)
 
-"Return the number of updates"
+"""
+    nups(Series(Mean()))
+Return the number of updates a series has done.  Differs from `nobs` only when batch updates
+have been used.
+"""
 nups(o::AbstractSeries) = nups(o.weight)
 weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, n2)
 weight!(o::AbstractSeries, n2::Int = 1) = weight!(o.weight, n2)
@@ -56,10 +54,6 @@ Series(y::AA, s) = (o = Series(default_weight(s), s); fit!(o, y))
 Series(y::AA, wt::Weight, s...) = (o = Series(wt, s); fit!(o, y))
 Series(y::AA, wt::Weight, s) = (o = Series(wt, s); fit!(o, y))
 
-
-Base.start(o::OnlineStat) = false
-Base.next(o::OnlineStat, state) = o, true
-Base.done(o::OnlineStat, state) = state
 
 show_series(io::IO, s::Series{0}) = print_item.(io, name.(s.stats), value.(s.stats))
 function show_series(io::IO, s::Series)

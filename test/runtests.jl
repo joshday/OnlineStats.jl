@@ -388,6 +388,19 @@ end
     @test nobs(s) == 2n
     @test coef(o) == value(o)
     @test coef(o) ≈ x\y
+
+    # merge
+    n2 = 500
+    x2 = randn(n2, p)
+    y2 = x2 * linspace(-1, 1, p) + randn(n2)
+    o1 = LinReg(p)
+    o2 = LinReg(p)
+    s1 = Series(o1)
+    s2 = Series(o2)
+    fit!(s1, x, y)
+    fit!(s2, x2, y2)
+    merge!(s1, s2)
+    @test coef(o1) ≈ vcat(x, x2) \ vcat(y, y2)
 end
 
 
