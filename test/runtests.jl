@@ -376,6 +376,20 @@ end
         @test predict(o, x) == x * o.β
     end
 end
+@testset "LinReg" begin
+    n, p = 1000, 10
+    x = randn(n, p)
+    y = x * linspace(-1, 1, p) + randn(n)
+
+    o = LinReg(p)
+    s = Series(o)
+    fit!(s, x, y)
+    fit!(s, x, y, 9)
+    @test nobs(s) == 2n
+    @test coef(o) == value(o)
+    @test coef(o) ≈ x\y
+    @test coef(o, .1) == value(o, .1)
+end
 
 
 end

@@ -1,8 +1,10 @@
 module OnlineStats
 
 
-import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef
+import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
+    CoefTable, stderr, vcov
 import LearnBase: value, ObsDim, Loss, Penalty, deriv, prox
+import SweepOperator
 import Distributions
 Ds = Distributions
 
@@ -16,7 +18,7 @@ export
     maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef,
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
-    MV, CovMatrix, KMeans,
+    MV, CovMatrix, KMeans, LinReg,
     # statlearn things
     StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, loss, objective, classify,
     statlearnpath,
@@ -124,6 +126,7 @@ include("scalarinput/normalmix.jl")
 include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
 include("xyinput/statlearn.jl")
+include("xyinput/linreg.jl")
 
 
 

@@ -82,7 +82,6 @@ fit!(s, y)
 ```
 [go to top](#contents)
 # Weighting
-[go to top](#contents)
 
 Series are parameterized by a `Weight` type that controls the influence the next observation
 has on the OnlineStats contained in the Series.
