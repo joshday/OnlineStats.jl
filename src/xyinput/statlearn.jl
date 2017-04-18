@@ -4,6 +4,19 @@ abstract type SGUpdater <: Updater end
 Base.show(io::IO, u::Updater) = print(io, name(u))
 init(u::Updater, p) = u
 
+
+"""
+    StatLearn(p, loss, penalty, λ, updater)
+Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  `loss` can be any Loss from LossFunctions.jl and `penalty` can be any Penalty from PenaltyFunctions.jl
+### Example
+    x = randn(100_000, 10)
+    y = x * linspace(-1, 1, 10) + randn(100_000)
+    o = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())
+    s = Series(o)
+    fit!(s, x, y)
+    coef(o)
+    predict(o, x)
+"""
 struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0), 1}
     β::VecF
     gx::VecF
@@ -123,8 +136,9 @@ function update!(o::StatLearn{ADAM}, γ)
     U.nups += 1
     s = γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
-        U.M[j] = smooth(U.M[j], o.gx[j], U.α1)
-        U.V[j] = smooth(U.V[j], o.gx[j] ^ 2, U.α2)
+        gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
+        U.M[j] = smooth(U.M[j], gx, U.α1)
+        U.V[j] = smooth(U.V[j], gx ^ 2, U.α2)
         o.β[j] -= s * U.M[j] / (sqrt(U.V[j]) + ϵ)
     end
 end
@@ -152,8 +166,9 @@ function update!(o::StatLearn{ADAMAX}, γ)
     U.nups += 1
     s = γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
-        U.M[j] = smooth(U.M[j], o.gx[j], U.α1)
-        U.V[j] = max(β2 * U.V[j], abs(o.gx[j]))
+        gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
+        U.M[j] = smooth(U.M[j], gx, U.α1)
+        U.V[j] = max(β2 * U.V[j], abs(gx))
         o.β[j] -= s * U.M[j] / (U.V[j] + ϵ)
     end
 end

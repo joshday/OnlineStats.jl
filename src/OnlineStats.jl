@@ -19,6 +19,7 @@ export
     MV, CovMatrix, KMeans,
     # statlearn things
     StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, loss, objective, classify,
+    statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal, NormalMix,
