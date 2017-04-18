@@ -364,7 +364,7 @@ end
     x = randn(n, p)
     y = x * linspace(-1, 1, p) + randn(n)
 
-    for alg in [SPGD(), MAXSPGD(), ADAGRAD()]
+    for alg in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
         o = StatLearn(p, L2DistLoss(), L2Penalty(), .1, alg)
         s = Series(o)
         fit!(s, x, y)
