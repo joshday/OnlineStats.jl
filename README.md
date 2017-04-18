@@ -94,12 +94,12 @@ Consider how weights affect the influence the next observation has on an online 
 
 <img width="416" src="https://cloud.githubusercontent.com/assets/8075494/25097527/ec26e70e-2372-11e7-9b3c-6ce3cd40afe4.png">
 
-| Constructor             | Weight at Update `t`       |
-|:------------------------|:---------------------------|
-| `EqualWeight()`         | `γ(t) = 1 / t`             |
-| `ExponentialWeight(λ)`  | `γ(t) = λ`                 |
-| `BoundedEqualWeight(λ)` | `γ(t) = max(1 / t, λ)`     |
-| `LearningRate(r, λ)`    | `γ(t) = max(1 / t ^ r, λ)` |
+| Constructor                                              | Weight at Update `t`       |
+|:---------------------------------------------------------|:---------------------------|
+| [`EqualWeight()`](doc/api.md#equalweight)                | `γ(t) = 1 / t`             |
+| [`ExponentialWeight(λ)`](doc/api.md#exponentialweight)   | `γ(t) = λ`                 |
+| [`BoundedEqualWeight(λ)`](doc/api.md#boundedequalweight) | `γ(t) = max(1 / t, λ)`     |
+| [`LearningRate(r, λ)`](doc/api.md#learningrate)          | `γ(t) = max(1 / t ^ r, λ)` |
 
 ![](https://cloud.githubusercontent.com/assets/8075494/18796073/9c844b30-8195-11e6-89a1-7ad9b4d891f2.png)
 
