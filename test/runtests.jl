@@ -388,7 +388,6 @@ end
     @test nobs(s) == 2n
     @test coef(o) == value(o)
     @test coef(o) ≈ x\y
-    @test coef(o, .1) == value(o, .1)
 end
 
 

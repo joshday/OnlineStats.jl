@@ -15,7 +15,7 @@ export
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
-    maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef,
+    maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef, coeftable,
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans, LinReg,

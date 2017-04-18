@@ -1,6 +1,8 @@
 """
     LinReg(p)
-Create a linear regression object with `p` predictors.
+    LinReg(p, λ)
+Create a linear regression object with `p` predictors and optional ridge (L2-regularization)
+parameter `λ`.
 ### Example
     x = randn(1000, 5)
     y = x * linspace(-1, 1, 5) + randn(1000)
@@ -9,19 +11,20 @@ Create a linear regression object with `p` predictors.
     fit!(s, x, y)
     coef(o)
     predict(o, x)
+    coeftable(o)
 """
 mutable struct LinReg <: OnlineStat{(1,0), 1}
     β::VecF
     A::MatF
     S::MatF
     nobs::Int
-    swept::Bool
-    function LinReg(p::Integer)
+    λ::Float64
+    function LinReg(p::Integer, λ::Float64 = 0.0)
         d = p + 1
-        new(zeros(p), zeros(d, d), zeros(d, d), 0, false)
+        new(zeros(p), zeros(d, d), zeros(d, d), 0, λ)
     end
 end
-fields_to_show(o::LinReg) = [:β]
+fields_to_show(o::LinReg) = [:β, :λ]
 nobs(o::LinReg) = o.nobs
 
 function matviews(o::LinReg)
@@ -35,7 +38,6 @@ function fit!(o::LinReg, x::AVec, y::Real, γ::Float64)
     smooth!(xty, x .* y, γ)
     o.A[end] = smooth(o.A[end], y * y, γ)
     o.nobs += 1
-    o.swept = false
 end
 
 function fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
@@ -47,28 +49,23 @@ function fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
     BLAS.gemv!('T', γ1, x, y, γ2, xty)
     o.A[end] = smooth(o.A[end], mean(abs2, y), γ)
     o.nobs += n2
-    o.swept = false
 end
 
-function value(o::LinReg, λ::Float64 = 0.0)
-    if !o.swept
-        copy!(o.S, o.A)
-        p = length(o.β)
-        if λ != 0
-            for i in 1:p
-                o.S[i, i] += λ
-            end
+function value(o::LinReg)
+    copy!(o.S, o.A)
+    p = length(o.β)
+    if o.λ != 0
+        for i in 1:p
+            o.S[i, i] += o.λ
         end
-        SweepOperator.sweep!(o.S, 1:p)
-        copy!(o.β, o.S[1:p, end])
-        o.swept = true
     end
+    SweepOperator.sweep!(o.S, 1:p)
+    copy!(o.β, o.S[1:p, end])
     o.β
 end
-coef(o::LinReg, λ::Float64 = 0.0) = value(o, λ)
+
+coef(o::LinReg) = value(o)
 predict(o::LinReg, x::AMat) = x * coef(o)
-
-
 mse(o::LinReg) = (coef(o); o.S[end] * nobs(o) / (nobs(o) - length(o.β)))
 function coeftable(o::LinReg)
     β = coef(o)
