@@ -14,12 +14,16 @@ end
 
 #--------------------------------------------------------------# Beta
 """
-    FitBeta()
+```julia
+FitBeta()
+```
 Online parameter estimate of a Beta distribution (Method of Moments)
 ### Example
-    using Distributions, OnlineStats
-    y = rand(Beta(3, 5), 1000)
-    s = Series(y, FitBeta())
+```julia
+using Distributions, OnlineStats
+y = rand(Beta(3, 5), 1000)
+s = Series(y, FitBeta())
+```
 """
 struct FitBeta <: DistributionStat{0}
     var::Variance
@@ -41,16 +45,20 @@ end
 
 #------------------------------------------------------------------# Categorical
 """
-    FitCategorical(T)
+```julia
+FitCategorical(T)
+```
 Fit a categorical distribution where the inputs are of type `T`.
 # Example
-    using Distributions
-    s = Series(rand(1:10, 1000), FitCategorical(Int))
-    keys(stats(s))      # inputs (categories)
-    probs(value(s))     # probability vector associated with keys
+```julia
+using Distributions
+s = Series(rand(1:10, 1000), FitCategorical(Int))
+keys(stats(s))      # inputs (categories)
+probs(value(s))     # probability vector associated with keys
 
-    vals = ["small", "medium", "large"]
-    s = Series(rand(vals, 1000), FitCategorical(String))
+vals = ["small", "medium", "large"]
+s = Series(rand(vals, 1000), FitCategorical(String))
+```
 """
 mutable struct FitCategorical{T<:Any} <: DistributionStat{0}
     d::Dict{T, Int}
@@ -70,12 +78,16 @@ Base.keys(o::FitCategorical) = keys(o.d)
 
 #------------------------------------------------------------------# Cauchy
 """
-    FitCauchy()
+```julia
+FitCauchy()
+```
 Online parameter estimate of a Cauchy distribution
 ### Example
-    using Distributions
-    y = rand(Cauchy(0, 10), 10_000)
-    s = Series(y, FitCauchy())
+```julia
+using Distributions
+y = rand(Cauchy(0, 10), 10_000)
+s = Series(y, FitCauchy())
+```
 """
 mutable struct FitCauchy <: DistributionStat{0}
     q::QuantileMM
@@ -95,12 +107,16 @@ end
 
 #------------------------------------------------------------------------# Gamma
 """
-    FitGamma()
+```julia
+FitGamma()
+```
 Online parameter estimate of a Gamma distribution (Method of Moments)
 ### Example
-    using Distributions
-    y = rand(Gamma(5, 1), 1000)
-    s = Series(y, FitGamma())
+```julia
+using Distributions
+y = rand(Gamma(5, 1), 1000)
+s = Series(y, FitGamma())
+```
 """
 # method of moments. TODO: look at Distributions for MLE
 struct FitGamma <: DistributionStat{0}
@@ -123,12 +139,16 @@ end
 
 #-----------------------------------------------------------------------# LogNormal
 """
-    FitLogNormal()
+```julia
+FitLogNormal()
+```
 Online parameter estimate of a LogNormal distribution (MLE)
 ### Example
-    using Distributions
-    y = rand(LogNormal(3, 4), 1000)
-    s = Series(y, FitLogNormal())
+```julia
+using Distributions
+y = rand(LogNormal(3, 4), 1000)
+s = Series(y, FitLogNormal())
+```
 """
 struct FitLogNormal <: DistributionStat{0}
     var::Variance
@@ -142,12 +162,16 @@ end
 
 #-----------------------------------------------------------------------# Normal
 """
-    FitNormal()
+```julia
+FitNormal()
+```
 Online parameter estimate of a Normal distribution (MLE)
 ### FitNormal()
-    using Distributions
-    y = rand(Normal(-3, 4), 1000)
-    s = Series(y, FitNormal())
+```julia
+using Distributions
+y = rand(Normal(-3, 4), 1000)
+s = Series(y, FitNormal())
+```
 """
 struct FitNormal <: DistributionStat{0}
     var::Variance
@@ -180,12 +204,16 @@ end
 
 #---------------------------------------------------------------------# MvNormal
 """
-    FitMvNormal(d)
+```julia
+FitMvNormal(d)
+```
 Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE)
 ### Example
-    using Distributions
-    y = rand(MvNormal(zeros(3), eye(3)), 1000)
-    s = Series(y', FitMvNormal(3))
+```julia
+using Distributions
+y = rand(MvNormal(zeros(3), eye(3)), 1000)
+s = Series(y', FitMvNormal(3))
+```
 """
 struct FitMvNormal<: DistributionStat{1}
     cov::CovMatrix

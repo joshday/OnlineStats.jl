@@ -6,7 +6,9 @@ init(u::Updater, p) = u
 
 
 """
-    StatLearn(p, loss, penalty, λ, updater)
+```julia
+StatLearn(p, loss, penalty, λ, updater)
+```
 Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Arguments are:
 - `loss`: any Loss from LossFunctions.jl
 - `penalty`: any Penalty from PenaltyFunctions.jl.
@@ -14,13 +16,15 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 - `updater`: `SPGD()`, `ADAGRAD()`, `ADAM()`, or `ADAMAX()`
 
 ### Example
-    x = randn(100_000, 10)
-    y = x * linspace(-1, 1, 10) + randn(100_000)
-    o = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())
-    s = Series(o)
-    fit!(s, x, y)
-    coef(o)
-    predict(o, x)
+```julia
+x = randn(100_000, 10)
+y = x * linspace(-1, 1, 10) + randn(100_000)
+o = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())
+s = Series(o)
+fit!(s, x, y)
+coef(o)
+predict(o, x)
+```
 """
 struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0), 1}
     β::VecF
@@ -52,11 +56,15 @@ function objective(o::StatLearn, x, y)
 end
 
 """
-    statlearnpath(p, loss, pen, λvector, updater)
+```julia
+statlearnpath(p, loss, pen, λvector, updater)
+```
 Create a vector of `StatLearn` objects, each using one of the regularization parameters in `λvector`.
 ### Example
-    s = Series(statlearnpath(5, L1DistLoss(), L1Penalty(), collect(0:.1:1), SPGD())...)
-    fit!(s, randn(10000, 5), randn(10000))
+```julia
+s = Series(statlearnpath(5, L1DistLoss(), L1Penalty(), collect(0:.1:1), SPGD())...)
+fit!(s, randn(10000, 5), randn(10000))
+```
 """
 function statlearnpath(p::Integer, l::Loss, pen::Penalty, λ::VecF, u::Updater = SPGD())
     [StatLearn(p, l, pen, λj, u) for λj in λ]
@@ -86,7 +94,10 @@ end
 
 
 #-----------------------------------------------------------------------# SPGD
-"SPGD: Stochastic Proximal Gradient Descent."
+"""
+    SPGD(η)
+Stochastic Proximal Gradient Descent with step size `η`
+"""
 struct SPGD <: SGUpdater
     η::Float64
     SPGD(η::Float64 = 1.0) = new(η)
@@ -98,7 +109,10 @@ function update!(o::StatLearn{SPGD}, γ)
     end
 end
 #-----------------------------------------------------------------------# MAXSPGD
-"MAXSPGD.  Only Update βⱼ with the largest xⱼ"
+"""
+    MAXSPGD(η)
+SPGD where only the largest gradient element is used to update the parameter.
+"""
 struct MAXSPGD <: SGUpdater
     η::Float64
     MAXSPGD(η::Float64 = 1.0) = new(η)
@@ -110,7 +124,10 @@ function update!(o::StatLearn{MAXSPGD}, γ)
 end
 
 #-----------------------------------------------------------------------# ADAGRAD
-"ADAGRAD: Adaptive Gradient."
+"""
+    ADAGRAD(η)
+Adaptive (element-wise learning rate) SPGD with step size `η`
+"""
 struct ADAGRAD <: SGUpdater
     η::Float64
     H::VecF
@@ -127,7 +144,10 @@ function update!(o::StatLearn{ADAGRAD}, γ)
 end
 
 #-----------------------------------------------------------------------# ADAM
-"ADAM: Adaptive Moment Estimation."
+"""
+    ADAM(α1, α2, η)
+Adaptive Moment Estimation with step size `η` and momentum parameters `α1`, `α2`
+"""
 mutable struct ADAM <: SGUpdater
     α1::Float64
     α2::Float64
@@ -157,7 +177,10 @@ function update!(o::StatLearn{ADAM}, γ)
 end
 
 #-----------------------------------------------------------------------# ADAMAX
-"ADAMAX"
+"""
+    ADAMAX(α1, α2, η)
+ADAMAX with step size `η` and momentum parameters `α1`, `α2`
+"""
 mutable struct ADAMAX <: SGUpdater
     α1::Float64
     α2::Float64

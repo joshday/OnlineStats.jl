@@ -1,19 +1,23 @@
 """
-    LinReg(p)
-    LinReg(p, λ)
+```julia
+LinReg(p)
+LinReg(p, λ)
+```
 Create a linear regression object with `p` predictors and optional ridge (L2-regularization)
 parameter `λ`.
 ### Example
-    x = randn(1000, 5)
-    y = x * linspace(-1, 1, 5) + randn(1000)
-    o = LinReg(5)
-    s = Series(o)
-    fit!(s, x, y)
-    coef(o)
-    predict(o, x)
-    coeftable(o)
-    vcov(o)
-    confint(o)
+```julia
+x = randn(1000, 5)
+y = x * linspace(-1, 1, 5) + randn(1000)
+o = LinReg(5)
+s = Series(o)
+fit!(s, x, y)
+coef(o)
+predict(o, x)
+coeftable(o)
+vcov(o)
+confint(o)
+```
 """
 mutable struct LinReg <: OnlineStat{(1,0), 1}
     β::VecF

@@ -1,16 +1,20 @@
 """
-    Bootstrap(s::Series, nreps, d, fun = value)
+```julia
+Bootstrap(s::Series, nreps, d, f = value)
+```
 
 Online Statistical Bootstrapping.
 
 Create `nreps` replicates of the OnlineStat in Series `s`.  When `fit!` is called,
-each of the replicates will be updated `rand(d)` times.  Standard choices for `d` are `Distributions.Poisson()`, `[0, 2]`, etc.  `value(b)` returns `fun` mapped to the replicates.
+each of the replicates will be updated `rand(d)` times.  Standard choices for `d` are `Distributions.Poisson()`, `[0, 2]`, etc.  `value(b)` returns `f` mapped to the replicates.
 
 ### Example
-    b = Bootstrap(Series(Mean()), 100, [0, 2])
-    fit!(b, randn(1000))
-    value(b)        # `fun` mapped to replicates
-    mean(value(b))  # mean
+```julia
+b = Bootstrap(Series(Mean()), 100, [0, 2])
+fit!(b, randn(1000))
+value(b)        # `f` mapped to replicates
+mean(value(b))  # mean
+```
 """
 mutable struct Bootstrap{I, D, O <: OnlineStat{I}, S <: Series{I, O}, F <: Function}
     series::S
@@ -36,13 +40,17 @@ end
 value(b::Bootstrap) = b.f.(b.replicates)
 
 """
-    replicates(b)
+```julia
+replicates(b)
+```
 Return the vector of replicates from Bootstrap `b`
 """
 replicates(b::Bootstrap) = b.replicates
 
 """
-    confint(b, coverageprob = .95, method = :quantile)
+```julia
+confint(b, coverageprob = .95, method = :quantile)
+```
 Return a confidence interval for a Bootstrap `b` by method
 - `:quantile`: use quantiles of `states = value(b)`
 - `:normal`: quantiles from gaussian approximation

@@ -27,7 +27,9 @@ weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
 
 #--------------------------------------------------------------------# EqualWeight
 """
-    EqualWeight()
+```julia
+EqualWeight()
+```
 
 - Equally weighted observations
 - Singleton weight at observation `t` is `γ = 1 / t`
@@ -41,8 +43,10 @@ weight(w::EqualWeight, n2::Int = 1) = n2 / w.nobs
 
 #--------------------------------------------------------------------# ExponentialWeight
 """
-    ExponentialWeight(λ::Real = 0.1)
-    ExponentialWeight(lookback::Integer)
+```julia
+ExponentialWeight(λ::Real = 0.1)
+ExponentialWeight(lookback::Integer)
+```
 
 - Exponentially weighted observations (constant)
 - Singleton weight at observation `t` is `γ = λ`
@@ -58,8 +62,10 @@ weight(w::ExponentialWeight, n2::Int = 1) = w.λ
 
 #--------------------------------------------------------------------# BoundedEqualWeight
 """
-    BoundedEqualWeight(λ::Real = 0.1)
-    BoundedEqualWeight(lookback::Integer)
+```julia
+BoundedEqualWeight(λ::Real = 0.1)
+BoundedEqualWeight(lookback::Integer)
+```
 
 - Use EqualWeight until threshold `λ` is hit, then hold constant.
 - Singleton weight at observation `t` is `γ = max(1 / t, λ)`
@@ -77,7 +83,9 @@ weight(w::BoundedEqualWeight, n2::Int = 1) = max(n2 / w.nobs, w.λ)
 
 #--------------------------------------------------------------------# LearningRate
 """
-    LearningRate(r = .6, λ = 0.0)
+```julia
+LearningRate(r = .6, λ = 0.0)
+```
 
 - Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
 - Decreases at a "slow" rate until threshold `λ` is reached
@@ -94,7 +102,9 @@ weight(w::LearningRate, n2::Int = 1) = max(w.λ, exp(-w.r * log(w.nups)))
 
 #--------------------------------------------------------------------# LearningRate2
 """
-    LearningRate2(c = .5, λ = 0.0)
+```julia
+LearningRate2(c = .5, λ = 0.0)
+```
 
 - Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
 - Decreases at a "slow" rate until threshold `λ` is reached

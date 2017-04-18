@@ -1,10 +1,14 @@
 #-------------------------------------------------------------------------# CovMatrix
 """
-    CovMatrix(d)
+```julia
+CovMatrix(d)
+```
 Covariance Matrix of `d` variables.
 ### Example
-    y = randn(100, 5)
-    Series(y, CovMatrix(5))
+```julia
+y = randn(100, 5)
+Series(y, CovMatrix(5))
+```
 """
 mutable struct CovMatrix <: OnlineStat{1, 2}
     value::MatF

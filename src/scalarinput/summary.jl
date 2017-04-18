@@ -1,10 +1,14 @@
 #--------------------------------------------------------------------# Mean
 """
-    Mean()
+```julia
+Mean()
+```
 Univariate mean.
 ### Example
-    s = Series(randn(100), Mean())
-    value(s)
+```julia
+s = Series(randn(100), Mean())
+value(s)
+```
 """
 mutable struct Mean <: OnlineStat{0, 0}
     μ::Float64
@@ -17,11 +21,15 @@ Base.mean(o::Mean) = value(o)
 
 #--------------------------------------------------------------------# Variance
 """
-    Variance()
+```julia
+Variance()
+```
 Univariate variance.
 ### Example
-    s = Series(randn(100), Variance())
-    value(s)
+```julia
+s = Series(randn(100), Variance())
+value(s)
+```
 """
 mutable struct Variance <: OnlineStat{0, 0}
     σ2::Float64     # biased variance
@@ -51,11 +59,16 @@ nobs(o::Variance) = o.nobs
 
 #--------------------------------------------------------------------# Extrema
 """
-    Extrema()
+```julia
+Extrema()
+```
+
 Maximum and minimum.
 ### Example
-    s = Series(randn(100), Extrema())
-    value(s)
+```julia
+s = Series(randn(100), Extrema())
+value(s)
+```
 """
 mutable struct Extrema <: OnlineStat{0, 1}
     min::Float64
@@ -77,11 +90,15 @@ Base.extrema(o::Extrema) = value(o)
 
 #--------------------------------------------------------------------# OrderStats
 """
-    OrderStats(b)
+```julia
+OrderStats(b)
+```
 Average order statistics with batches of size `b`.
 ### Example
-    s = Series(randn(1000), OrderStats(10))
-    value(s)
+```julia
+s = Series(randn(1000), OrderStats(10))
+value(s)
+```
 """
 mutable struct OrderStats <: OnlineStat{0, 1}
     value::VecF
@@ -107,11 +124,15 @@ fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
 """
-    Moments()
+```julia
+Moments()
+```
 First four non-central moments.
 ### Example
-    s = Series(randn(1000), Moments(10))
-    value(s)
+```julia
+s = Series(randn(1000), Moments(10))
+value(s)
+```
 """
 mutable struct Moments <: OnlineStat{0, 1}
     m::VecF
@@ -145,11 +166,15 @@ end
 
 #--------------------------------------------------------------------# QuantileSGD
 """
-    QuantileSGD()
+```julia
+QuantileSGD()
+```
 Approximate quantiles via stochastic gradient descent.
 ### Example
-    s = Series(randn(1000), LearningRate(.7), QuantileSGD())
-    value(s)
+```julia
+s = Series(randn(1000), LearningRate(.7), QuantileSGD())
+value(s)
+```
 """
 struct QuantileSGD <: StochasticStat{0, 1}
     value::VecF
@@ -181,11 +206,15 @@ end
 
 #--------------------------------------------------------------------# QuantileMM
 """
-    QuantileMM()
+```julia
+QuantileMM()
+```
 Approximate quantiles via an online MM algorithm.
 ### Example
-    s = Series(randn(1000), LearningRate(.7), QuantileMM())
-    value(s)
+```julia
+s = Series(randn(1000), LearningRate(.7), QuantileMM())
+value(s)
+```
 """
 mutable struct QuantileMM <: StochasticStat{0, 1}
     value::VecF
@@ -226,11 +255,15 @@ end
 
 #--------------------------------------------------------------------# Diff
 """
-    Diff()
+```julia
+Diff()
+```
 Track the difference and the last value.
 ### Example
-    s = Series(randn(1000), Diff())
-    value(s)
+```julia
+s = Series(randn(1000), Diff())
+value(s)
+```
 """
 mutable struct Diff{T <: Real} <: OnlineStat{0, 0}
     diff::T
@@ -253,11 +286,15 @@ end
 
 #--------------------------------------------------------------------# Sum
 """
-    Sum()
+```julia
+Sum()
+```
 Track the overall sum.
 ### Example
-    s = Series(randn(1000), Sum())
-    value(s)
+```julia
+s = Series(randn(1000), Sum())
+value(s)
+```
 """
 mutable struct Sum{T <: Real} <: OnlineStat{0, 0}
     sum::T

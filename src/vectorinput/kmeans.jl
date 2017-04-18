@@ -1,11 +1,15 @@
 """
-    KMeans(p, k)
+```julia
+KMeans(p, k)
+```
 Approximate K-Means clustering of `k` clusters of `p` variables
 ### Example
-    using OnlineStats, Distributions
-    d = MixtureModel([Normal(0), Normal(5)])
-    y = rand(d, 100_000, 1)
-    s = Series(y, LearningRate(.6), KMeans(1, 2))
+```julia
+using OnlineStats, Distributions
+d = MixtureModel([Normal(0), Normal(5)])
+y = rand(d, 100_000, 1)
+s = Series(y, LearningRate(.6), KMeans(1, 2))
+```
 """
 mutable struct KMeans <: OnlineStat{1, 2}
     value::MatF

@@ -4,7 +4,9 @@ abstract type AbstractSeries end
 nobs(o::AbstractSeries) = nobs(o.weight)
 
 """
-    nups(Series(Mean()))
+```julia
+nups(Series(Mean()))
+```
 Return the number of updates a series has done.  Differs from `nobs` only when batch updates
 have been used.
 """
@@ -24,16 +26,20 @@ show_series(io::IO, o::AbstractSeries) = print(io)
 
 #----------------------------------------------------------------# Series
 """
-    Series(onlinestats...)
-    Series(weight, onlinestats...)
-    Series(data, onlinestats...)
-    Series(data, weight, onlinestats...)
+```julia
+Series(onlinestats...)
+Series(weight, onlinestats...)
+Series(data, onlinestats...)
+Series(data, weight, onlinestats...)
+```
 
 Manager for an OnlineStat or tuple of OnlineStats.
-
-    s = Series(Mean())
-    s = Series(ExponentialWeight(), Mean(), Variance())
-    s = Series(randn(100, 3), CovMatrix(3))
+### Examples
+```julia
+s = Series(Mean())
+s = Series(ExponentialWeight(), Mean(), Variance())
+s = Series(randn(100, 3), CovMatrix(3))
+```
 """
 mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
     weight::W
@@ -80,9 +86,23 @@ Base.map(f::Function, o::OnlineStat) = f(o)
 #-----------------------------------------------------------------------# Series{0}
 const Singleton = Union{Real, Symbol, AbstractString}  # for FitCategorical/HyperLogLog
 """
-    fit!(s, y)
-    fit!(s, y, w)
+```julia
+fit!(s, y)
+fit!(s, y, w)
+```
 Update a Series `s` with more data `y` and optional weighting `w`.
+### Examples
+```julia
+y = randn(100)
+w = rand(100)
+
+s = Series(Mean())
+fit!(s, y[1])        # one observation: use Series weight
+fit!(s, y[1], w[1])  # one observation: override weight
+fit!(s, y)           # multiple observations: use Series weight
+fit!(s, y, w[1])     # multiple observations: override each weight with w[1]
+fit!(s, y, w)        # multiple observations: y[i] uses weight w[i]
+```
 """
 function fit!(s::Series{0}, y::Singleton)
     γ = weight!(s)
