@@ -60,7 +60,7 @@
 | approximate count of distinct elements | [`HyperLogLog`](doc/api.md$hyperloglog)       |
 
 
-
+[go to top](#readme-contents)
 # Basics
 ### Every OnlineStat is a type
 ```julia
