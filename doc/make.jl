@@ -1,7 +1,7 @@
 module MakeOnlineStatsDocs
 using OnlineStats
 
-rootdir = Pkg.dir("OnlineStats")
+
 
 #-------------------------------------------------------------------# Generate api.md
 using APIGenerator
@@ -31,6 +31,6 @@ make_api("OnlineStats", Pkg.dir("OnlineStats", "doc", "api.md"); readme=false)
 # png(plt_wt, "/Users/joshday/Desktop/weights.png")
 
 #-------------------------------------------------------------# push site to gh-pages
-# cd(rootdir)
+# cd(Pkg.dir("OnlineStats"))
 # run(`mkdocs gh-deploy --clean`)
 end  # MakeOnlineStatsDocs

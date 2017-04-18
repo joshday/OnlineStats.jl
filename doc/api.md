@@ -1,8 +1,11 @@
-<!--- Generated at 2017-04-12T10:39:07.73.  Don't edit --->
+<!--- Generated at 2017-04-18T16:43:30.75.  Don't edit --->
 
 # OnlineStats API
 
 # Contents
+- [ADAGRAD](#adagrad)
+- [ADAM](#adam)
+- [ADAMAX](#adamax)
 - [Bootstrap](#bootstrap)
 - [BoundedEqualWeight](#boundedequalweight)
 - [CovMatrix](#covmatrix)
@@ -22,6 +25,8 @@
 - [KMeans](#kmeans)
 - [LearningRate](#learningrate)
 - [LearningRate2](#learningrate2)
+- [LinReg](#linreg)
+- [MAXSPGD](#maxspgd)
 - [MV](#mv)
 - [Mean](#mean)
 - [Moments](#moments)
@@ -30,20 +35,41 @@
 - [OrderStats](#orderstats)
 - [QuantileMM](#quantilemm)
 - [QuantileSGD](#quantilesgd)
+- [SPGD](#spgd)
 - [Series](#series)
+- [StatLearn](#statlearn)
 - [Sum](#sum)
 - [Variance](#variance)
 - [Weight](#weight)
+- [classify](#classify)
+- [coef](#coef)
+- [coeftable](#coeftable)
 - [confint](#confint)
 - [fit!](#fit!)
+- [loss](#loss)
 - [maprows](#maprows)
 - [nobs](#nobs)
 - [nups](#nups)
+- [objective](#objective)
+- [predict](#predict)
 - [replicates](#replicates)
+- [statlearnpath](#statlearnpath)
 - [stats](#stats)
 - [value](#value)
 ---
 
+## ADAGRAD
+ADAGRAD: Adaptive Gradient.
+
+[top](#contents)
+## ADAM
+ADAM: Adaptive Moment Estimation.
+
+[top](#contents)
+## ADAMAX
+ADAMAX
+
+[top](#contents)
 ## Bootstrap
 ```
 Bootstrap(s::Series, nreps, d, fun = value)
@@ -321,6 +347,32 @@ LearningRate2(c = .5, λ = 0.0)
   * Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
 
 [top](#contents)
+## LinReg
+```
+LinReg(p)
+LinReg(p, λ)
+```
+
+Create a linear regression object with `p` predictors and optional ridge (L2-regularization) parameter `λ`.
+
+### Example
+
+```
+x = randn(1000, 5)
+y = x * linspace(-1, 1, 5) + randn(1000)
+o = LinReg(5)
+s = Series(o)
+fit!(s, x, y)
+coef(o)
+predict(o, x)
+coeftable(o)
+```
+
+[top](#contents)
+## MAXSPGD
+MAXSPGD.  Only Update βⱼ with the largest xⱼ
+
+[top](#contents)
 ## MV
 ```
 MV(p, o)
@@ -400,6 +452,7 @@ Abstract type which provides input `I` and output `O` dimensions or object.
   * 2 = matrix
   * -1 = unknown size
   * Distribution
+  * (1, 0) = x,y pair where x is a vector, y is a scalar
 
 [top](#contents)
 ## OrderStats
@@ -447,6 +500,10 @@ value(s)
 ```
 
 [top](#contents)
+## SPGD
+SPGD: Stochastic Proximal Gradient Descent.
+
+[top](#contents)
 ## Series
 ```
 Series(onlinestats...)
@@ -461,6 +518,31 @@ Manager for an OnlineStat or tuple of OnlineStats.
 s = Series(Mean())
 s = Series(ExponentialWeight(), Mean(), Variance())
 s = Series(randn(100, 3), CovMatrix(3))
+```
+
+[top](#contents)
+## StatLearn
+```
+StatLearn(p, loss, penalty, λ, updater)
+```
+
+Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Arguments are:
+
+  * `loss`: any Loss from LossFunctions.jl
+  * `penalty`: any Penalty from PenaltyFunctions.jl.
+  * `λ`: a Float64 regularization parameter
+  * `updater`: `SPGD()`, `ADAGRAD()`, `ADAM()`, or `ADAMAX()`
+
+### Example
+
+```
+x = randn(100_000, 10)
+y = x * linspace(-1, 1, 10) + randn(100_000)
+o = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())
+s = Series(o)
+fit!(s, x, y)
+coef(o)
+predict(o, x)
 ```
 
 [top](#contents)
@@ -514,7 +596,470 @@ OnlineStats.LearningRate2
 ```
 
 [top](#contents)
+## classify
+No documentation found.
+
+`OnlineStats.classify` is a `Function`.
+
+```
+# 1 method for generic function "classify":
+classify(o::OnlineStats.StatLearn, x) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:48
+```
+
+[top](#contents)
+## coef
+No documentation found.
+
+`StatsBase.coef` is a `Function`.
+
+```
+# 107 methods for generic function "coef":
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:36
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:46
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:46
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:46
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:45
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:45
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:45
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:45
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:45
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:45
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:47
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:47
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:47
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:47
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:47
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:47
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:49
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:49
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:49
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:49
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:54
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:54
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:54
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:54
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:56
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:68
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:68
+coef(o::OnlineStats.LinReg, λ::Float64) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:70
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:70
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:64
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:66
+coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:67
+coef(obj::GLM.LinPredModel) in GLM at /Users/joshday/.julia/v0.6/GLM/src/linpred.jl:161
+coef(obj::StatsBase.StatisticalModel) in StatsBase at /Users/joshday/.julia/v0.6/StatsBase/src/statmodels.jl:5
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:27
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(x::GLM.LinPred) in GLM at /Users/joshday/.julia/v0.6/GLM/src/linpred.jl:160
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:40
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:45
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:45
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:45
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:45
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:45
+```
+
+[top](#contents)
+## coeftable
+No documentation found.
+
+`StatsBase.coeftable` is a `Function`.
+
+```
+# 28 methods for generic function "coeftable":
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:50
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:52
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:52
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:52
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:54
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:54
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:59
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:59
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:61
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:61
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:61
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:61
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:61
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:62
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:74
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:76
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:70
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:72
+coeftable(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:71
+coeftable(mm::GLM.LinearModel) in GLM at /Users/joshday/.julia/v0.6/GLM/src/lm.jl:151
+coeftable(mm::GLM.AbstractGLM) in GLM at /Users/joshday/.julia/v0.6/GLM/src/glmfit.jl:161
+coeftable(obj::StatsBase.StatisticalModel) in StatsBase at /Users/joshday/.julia/v0.6/StatsBase/src/statmodels.jl:6
+```
+
+[top](#contents)
 ## confint
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
+```
+confint(b, coverageprob = .95, method = :quantile)
+```
+
+Return a confidence interval for a Bootstrap `b` by method
+
+  * `:quantile`: use quantiles of `states = value(b)`
+  * `:normal`: quantiles from gaussian approximation
+
 ```
 confint(b, coverageprob = .95, method = :quantile)
 ```
@@ -794,6 +1339,227 @@ fit!(s, y, w)
 
 Update a Series `s` with more data `y` and optional weighting `w`.
 
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+```
+fit!(s, y)
+fit!(s, y, w)
+```
+
+Update a Series `s` with more data `y` and optional weighting `w`.
+
+[top](#contents)
+## loss
+No documentation found.
+
+`OnlineStats.loss` is a `Function`.
+
+```
+# 1 method for generic function "loss":
+loss(o::OnlineStats.StatLearn, x, y) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:49
+```
+
 [top](#contents)
 ## maprows
 ```
@@ -818,9 +1584,47 @@ nobs(obj::StatisticalModel)
 
 Returns the number of independent observations on which the model was fitted. Be careful when using this information, as the definition of an independent observation may vary depending on the model, on the format used to pass the data, on the sampling plan (if specified), etc.
 
+```
+nobs(obj::LinearModel)
+nobs(obj::GLM)
+```
+
+For linear and generalized linear models, returns the number of rows, or, when prior weights are specified, the sum of weights.
+
 [top](#contents)
 ## nups
 Return the number of updates
+
+[top](#contents)
+## objective
+No documentation found.
+
+`OnlineStats.objective` is a `Function`.
+
+```
+# 1 method for generic function "objective":
+objective(o::OnlineStats.StatLearn, x, y) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:51
+```
+
+[top](#contents)
+## predict
+```
+predict(obj::RegressionModel, [newX])
+```
+
+Form the predicted response of model `obj`. An object with new covariate values `newX` can be supplied, which should have the same type and structure as that used to fit `obj`; e.g. for a GLM it would generally be a `DataFrame` with the same variable names as the original predictors.
+
+```
+predict(mm::LinearModel, newx::AbstractMatrix, interval_type::Symbol, level::Real = 0.95)
+```
+
+Specifying `interval_type` will return a 3-column matrix with the prediction and the lower and upper confidence bounds for a given `level` (0.95 equates alpha = 0.05). Valid values of `interval_type` are `:confint` delimiting the  uncertainty of the predicted relationship, and `:predint` delimiting estimated bounds for new data points.
+
+```
+predict(mm::AbstractGLM, newX::AbstractMatrix; offset::FPVector=Vector{eltype(newX)}(0))
+```
+
+Form the predicted response of model `mm` from covariate values `newX` and, optionally, an offset.
 
 [top](#contents)
 ## replicates
@@ -831,11 +1635,86 @@ replicates(b)
 Return the vector of replicates from Bootstrap `b`
 
 [top](#contents)
+## statlearnpath
+```
+statlearnpath(p, loss, pen, λvector, updater)
+```
+
+Create a vector of `StatLearn` objects, each using one of the regularization parameters in `λvector`.
+
+### Example
+
+```
+s = Series(statlearnpath(5, L1DistLoss(), L1Penalty(), collect(0:.1:1), SPGD())...)
+fit!(s, randn(10000, 5), randn(10000))
+```
+
+[top](#contents)
 ## stats
 Return the `stats` field of a Series.
 
 [top](#contents)
 ## value
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
+Map `value` to the `stats` field of a Series.
+
 Map `value` to the `stats` field of a Series.
 
 Map `value` to the `stats` field of a Series.
