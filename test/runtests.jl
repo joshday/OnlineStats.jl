@@ -362,7 +362,7 @@ end
     using LossFunctions, PenaltyFunctions
     n, p = 1000, 10
     x = randn(n, p)
-    y = x * linspace(-1, 1, p) + randn(n)
+    y = x * linspace(-1, 1, p) + .5 * randn(n)
 
     for alg in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
         o = StatLearn(p, L2DistLoss(), L2Penalty(), .1, alg)

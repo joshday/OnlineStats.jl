@@ -12,6 +12,8 @@ parameter `λ`.
     coef(o)
     predict(o, x)
     coeftable(o)
+    vcov(o)
+    confint(o)
 """
 mutable struct LinReg <: OnlineStat{(1,0), 1}
     β::VecF

@@ -54,6 +54,10 @@ Series(y::AA, s) = (o = Series(default_weight(s), s); fit!(o, y))
 Series(y::AA, wt::Weight, s...) = (o = Series(wt, s); fit!(o, y))
 Series(y::AA, wt::Weight, s) = (o = Series(wt, s); fit!(o, y))
 
+# Need the following so this works:  for stat in s.stats
+Base.start(o::OnlineStat) = false
+Base.next(o::OnlineStat, state) = o, true
+Base.done(o::OnlineStat, state) = state
 
 show_series(io::IO, s::Series{0}) = print_item.(io, name.(s.stats), value.(s.stats))
 function show_series(io::IO, s::Series)
