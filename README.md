@@ -58,7 +58,6 @@
 ---
 
 # Basics
-[go to top](#contents)
 ### Every OnlineStat is a type
 ```julia
 m = Mean()
@@ -81,7 +80,7 @@ end
 # or more simply:
 fit!(s, y)
 ```
-
+[go to top](#contents)
 # Weighting
 [go to top](#contents)
 
@@ -105,8 +104,8 @@ Consider how weights affect the influence the next observation has on an online 
 
 ![](https://cloud.githubusercontent.com/assets/8075494/18796073/9c844b30-8195-11e6-89a1-7ad9b4d891f2.png)
 
-# Series
 [go to top](#contents)
+# Series
 
 Series are the workhorse of OnlineStats.  A Series tracks
 1. The Weight
@@ -166,8 +165,8 @@ fit!(s, randn(100), rand(100))
   fit!(s, randn(1000), 7)
   ```
 
-# Merging
 [go to top](#contents)
+# Merging
 
 Two Series can be merged if they track the same OnlineStats and those OnlineStats are
 mergeable.  The syntax for in-place merging is
@@ -202,8 +201,8 @@ merge!(s1, s2, :singleton)
 merge!(s1, s2, .5)
 ```
 
-# Callbacks
 [go to top](#contents)
+# Callbacks
 
 While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a `maprows` function.
 
@@ -229,3 +228,5 @@ INFO: value of mean is 0.05374292238752276
 INFO: value of mean is 0.008857939006120167
 INFO: value of mean is 0.016199508928045905
 ```
+
+[go to top](#contents)
