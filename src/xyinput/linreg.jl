@@ -1,3 +1,15 @@
+"""
+    LinReg(p)
+Create a linear regression object with `p` predictors.
+### Example
+    x = randn(1000, 5)
+    y = x * linspace(-1, 1, 5) + randn(1000)
+    o = LinReg(5)
+    s = Series(o)
+    fit!(s, x, y)
+    coef(o)
+    predict(o, x)
+"""
 mutable struct LinReg <: OnlineStat{(1,0), 1}
     β::VecF
     A::MatF

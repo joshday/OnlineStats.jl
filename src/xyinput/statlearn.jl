@@ -7,7 +7,12 @@ init(u::Updater, p) = u
 
 """
     StatLearn(p, loss, penalty, λ, updater)
-Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  `loss` can be any Loss from LossFunctions.jl and `penalty` can be any Penalty from PenaltyFunctions.jl
+Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Arguments are:
+- `loss`: any Loss from LossFunctions.jl
+- `penalty`: any Penalty from PenaltyFunctions.jl.
+- `λ`: a Float64 regularization parameter
+- `updater`: `SPGD()`, `ADAGRAD()`, `ADAM()`, or `ADAMAX()`
+
 ### Example
     x = randn(100_000, 10)
     y = x * linspace(-1, 1, 10) + randn(100_000)
@@ -45,6 +50,14 @@ loss(o::StatLearn, x, y) = mean(value(o.loss, y, predict(o, x)))
 function objective(o::StatLearn, x, y)
     mean(value(o.loss, y, predict(o, x))) + value(o.penalty, o.β, o.λfactor)
 end
+
+"""
+    statlearnpath(p, loss, pen, λvector, updater)
+Create a vector of `StatLearn` objects, each using one of the regularization parameters in `λvector`.
+### Example
+    s = Series(statlearnpath(5, L1DistLoss(), L1Penalty(), collect(0:.1:1), SPGD())...)
+    fit!(s, randn(10000, 5), randn(10000))
+"""
 function statlearnpath(p::Integer, l::Loss, pen::Penalty, λ::VecF, u::Updater = SPGD())
     [StatLearn(p, l, pen, λj, u) for λj in λ]
 end
