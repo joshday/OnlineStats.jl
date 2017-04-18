@@ -15,7 +15,7 @@
 
 # Contents
 
-1. [What Can OnlineStats Do?](#what-can-onlinestats-do?)
+1. [What Can OnlineStats Do?](#what-can-onlinestats-do)
 1. [Basics](#basics)
 1. [Weighting](#weighting)
 1. [Series](#series)
