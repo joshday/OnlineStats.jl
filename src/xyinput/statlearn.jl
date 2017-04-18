@@ -17,6 +17,7 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 
 ### Example
 ```julia
+using LossFunctions, PenaltyFunctions
 x = randn(100_000, 10)
 y = x * linspace(-1, 1, 10) + randn(100_000)
 o = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())

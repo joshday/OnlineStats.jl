@@ -21,6 +21,7 @@
 1. [Series](#series)
 1. [Merging](#merging)
 1. [Callbacks](#callbacks)
+1. [Low Level Details](#low-level-details)
 
 ---
 
@@ -54,7 +55,7 @@
 | MvNormal                               | [`FitMvNormal`](doc/api.md#fitmvnormal)       |
 | **Statistical Learning:**              |                                               |
 | GLMs with regularization               | [`StatLearn`](doc/api.md#statlearn)           |
-| Linear regression                      | [`LinReg`](doc/api.md#linreg)                 |
+| Linear (also Ridge) regression         | [`LinReg`](doc/api.md#linreg)                 |
 | **Other:**                             |                                               |
 | Bootstrapping                          | [`Bootstrap`](doc/api.md#bootstrap)           |
 | approximate count of distinct elements | [`HyperLogLog`](doc/api.md$hyperloglog)       |
@@ -110,7 +111,7 @@ Consider how weights affect the influence the next observation has on an online 
 [go to top](#readme-contents)
 # Series
 
-Series are the workhorse of OnlineStats.  A Series tracks
+The `Series` type is the workhorse of OnlineStats.  A Series tracks
 1. The Weight
 2. An OnlineStat or tuple of OnlineStats.
 
@@ -240,5 +241,21 @@ INFO: value of mean is 0.05374292238752276
 INFO: value of mean is 0.008857939006120167
 INFO: value of mean is 0.016199508928045905
 ```
+
+[go to top](#readme-contents)
+
+# Low Level Details
+### `OnlineStat{I, O}`
+- The abstract type `OnlineStat` has two parameters:
+  - `I`: The input dimension.  The size of one observation
+  - `O`: The output dimension/object.  The size/object of `value`
+- A Series can only manage OnlineStats that share the same input type `I`.  This is because when you call a method like `fit!(s, randn(100))`, the Series needs to know whether `randn(100)` should be treated as 100 scalar observations or a single vector observation.
+
+
+### `fit!` and `value`
+- `fit!` updates the "sufficient statistics" of an OnlineStat, but does not necessarily update the parameter of interest.
+- `value` creates the parameter of interest from the "sufficient statistics"
+- This is the convention in order to avoid extra computation costs when the `value` is not needed while updating a chunk of data.
+
 
 [go to top](#readme-contents)
