@@ -11,6 +11,20 @@
 
 **OnlineStats** is a Julia package which provides online algorithms for statistical models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
 
+---
+
+# Contents
+
+1. [What Can OnlineStats Do?](#what-can-onlinestats-do?)
+1. [Basics](#basics)
+1. [Weighting](#weighting)
+1. [Series](#series)
+1. [Merging](#merging)
+1. [Callbacks](#callbacks)
+
+---
+
+
 # What Can OnlineStats Do?
 
 | Statistic/Model                        | OnlineStat                                    |
@@ -40,22 +54,12 @@
 | MvNormal                               | [`FitMvNormal`](doc/api.md#fitmvnormal)       |
 | **Statistical Learning:**              |                                               |
 | GLMs with regularization               | [`StatLearn`](doc/api.md#statlearn)           |
+| Linear regression                      | [`LinReg`](doc/api.md#linreg)                 |
 | **Other:**                             |                                               |
 | Bootstrapping                          | [`Bootstrap`](doc/api.md#bootstrap)           |
 | approximate count of distinct elements | [`HyperLogLog`](doc/api.md$hyperloglog)       |
 
-<br><br><br><br>
 
----
-
-# Contents
-1. [Basics](#basics)
-1. [Weighting](#weighting)
-1. [Series](#series)
-1. [Merging](#merging)
-1. [Callbacks](#callbacks)
-
----
 
 # Basics
 ### Every OnlineStat is a type
