@@ -26,7 +26,9 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal, NormalMix,
     # StreamStats
-    HyperLogLog
+    HyperLogLog,
+    # Other
+    ObsDim
 
 #-----------------------------------------------------------------------------# types
 # 0 = scalar, 1 = vector, 2 = matrix, -1 = unknown, or Ds.Distribution

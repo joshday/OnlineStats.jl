@@ -138,6 +138,10 @@ There are multiple ways to update the OnlineStats in a Series
 ```julia
 s = Series(Mean())
 fit!(s, randn())
+
+s = Series(CovMatrix(4))
+fit!(s, randn(4))
+fit!(s, randn(4))
 ```
 - Single observation, override weight
 ```julia
@@ -145,11 +149,16 @@ s = Series(Mean())
 fit!(s, randn(), rand())
 ```
 - Multiple observations
-  - Note: multiple observations are a matrix for OnlineStats such as `CovMatrix`
+  - Note: multiple observations are a matrix for OnlineStats such as `CovMatrix`.  By default, each *row* is considered an observation.  However, there exists `fit!` methods which use observations in *columns*.
 ```julia
 s = Series(Mean())
 fit!(s, randn(100))
+
+s = Series(CovMatrix(4))
+fit!(s, randn(100, 4))                 # Observations in rows
+fit!(s, randn(4, 100), ObsDim.Last())  # Observations in columns
 ```
+
 - Multiple observations, use the same weight for all
 ```julia
 s = Series(Mean())
