@@ -358,24 +358,49 @@ end
     fit!(s, x, .1, ObsDim.Last())
     fit!(s, x, rand(1000), ObsDim.Last())
 end
-# @testset "StatLearn" begin
-#     using LossFunctions, PenaltyFunctions
-#     n, p = 1000, 10
-#     x = randn(n, p)
-#     y = x * linspace(-1, 1, p) + .5 * randn(n)
-#
-#     for alg in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
-#         o = StatLearn(p, L2DistLoss(), L2Penalty(), fill(.1, p), alg)
-#         s = Series(o)
-#         fit!(s, x, y)
-#         fit!(s, x, y, .1)
-#         fit!(s, x, y, rand(length(y)))
-#         fit!(s, x, y, 10)
-#         @test nobs(s) == 4 * n
-#         @test coef(o) == o.β
-#         @test predict(o, x) == x * o.β
-#     end
-# end
+@testset "StatLearn" begin
+    n, p = 1000, 10
+    x = randn(n, p)
+    y = x * linspace(-1, 1, p) + .5 * randn(n)
+
+    for u in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
+        o = @inferred StatLearn(p, L2DistLoss(), L2Penalty(), fill(.1, p), u)
+        s = @inferred Series(o)
+        fit!(s, x, y)
+        fit!(s, x, y, .1)
+        fit!(s, x, y, rand(length(y)))
+        fit!(s, x, y, 10)
+        @test nobs(s) == 4 * n
+        @test coef(o) == o.β
+        @test predict(o, x) == x * o.β
+
+        @testset "Type stability with arbitrary argument order" begin
+            l, r, v = L2DistLoss(), L2Penalty(), fill(.1, p)
+            @inferred StatLearn(p, l, r, v, u)
+            @inferred StatLearn(p, l, r, u, v)
+            @inferred StatLearn(p, l, v, r, u)
+            @inferred StatLearn(p, l, v, u, r)
+            @inferred StatLearn(p, l, u, v, r)
+            @inferred StatLearn(p, l, u, r, v)
+            @inferred StatLearn(p, l, r, v)
+            @inferred StatLearn(p, l, r, u)
+            @inferred StatLearn(p, l, v, r)
+            @inferred StatLearn(p, l, v, u)
+            @inferred StatLearn(p, l, u, v)
+            @inferred StatLearn(p, l, u, r)
+            @inferred StatLearn(p, l, r)
+            @inferred StatLearn(p, l, r)
+            @inferred StatLearn(p, l, v)
+            @inferred StatLearn(p, l, v)
+            @inferred StatLearn(p, l, u)
+            @inferred StatLearn(p, l, u)
+            @inferred StatLearn(p, l)
+            @inferred StatLearn(p, r)
+            @inferred StatLearn(p, v)
+            @inferred StatLearn(p, u)
+        end
+    end
+end
 @testset "LinReg" begin
     n, p = 1000, 10
     x = randn(n, p)

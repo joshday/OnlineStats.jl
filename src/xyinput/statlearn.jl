@@ -38,7 +38,7 @@ end
 function StatLearn{V,L,P,U}(p::Integer, t::Tuple{V,L,P,U})
     λf, loss, penalty, updater = t
     length(λf) == p || throw(DimensionMismatch("lengths of λfactor and β differ"))
-    StatLearn(zeros(p), zeros(p), t...)
+    StatLearn(zeros(p), zeros(p), λf, loss, penalty, init(updater, p))
 end
 
 d(p::Integer) = (fill(.1, p), L2DistLoss(), L2Penalty(), SPGD())
