@@ -3,11 +3,16 @@ module OnlineStats
 
 import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
     CoefTable, stderr, vcov
-import LearnBase: value, ObsDim, Loss, Penalty, deriv, prox
-import SweepOperator
-import Distributions
+importall LearnBase
+import SweepOperator, LossFunctions, PenaltyFunctions, Distributions
 Ds = Distributions
 
+using LearnBase, LossFunctions, PenaltyFunctions
+
+# Reexports
+for pkg in [:LearnBase, :LossFunctions, :PenaltyFunctions]
+    eval(Expr(:toplevel, Expr(:export, setdiff(names(eval(pkg)), [pkg])...)))
+end
 
 export
     # OnlineStatMeta

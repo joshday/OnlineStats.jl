@@ -35,9 +35,26 @@ struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0)
     penalty::P
     updater::U
 end
-function StatLearn(p::Integer, l::Loss, pen::Penalty, λ::Float64, u::Updater = SPGD())
-    StatLearn(zeros(p), zeros(p), ones(p) * λ, l, pen, init(u, p))
+function StatLearn{V,L,P,U}(p::Integer, t::Tuple{V,L,P,U})
+    λf, loss, penalty, updater = t
+    length(λf) == p || throw(DimensionMismatch("lengths of λfactor and β differ"))
+    StatLearn(zeros(p), zeros(p), t...)
 end
+
+d(p::Integer) = (fill(.1, p), L2DistLoss(), L2Penalty(), SPGD())
+
+a(argu::VecF, t)     = (argu, t[2], t[3], t[4])
+a(argu::Loss, t)     = (t[1], argu, t[3], t[4])
+a(argu::Penalty, t)  = (t[1], t[2], argu, t[4])
+a(argu::Updater, t)  = (t[1], t[2], t[3], argu)
+
+StatLearn(p::Integer)                 = StatLearn(p, d(p))
+StatLearn(p::Integer, a1)             = StatLearn(p, a(a1, d(p)))
+StatLearn(p::Integer, a1, a2)         = StatLearn(p, a(a2, a(a1, d(p))))
+StatLearn(p::Integer, a1, a2, a3)     = StatLearn(p, a(a3, a(a2, a(a1, d(p)))))
+StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p))))))
+
+
 function Base.show(io::IO, o::StatLearn)
     header(io, name(o))
     println(io)

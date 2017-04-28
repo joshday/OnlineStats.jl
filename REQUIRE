@@ -3,3 +3,5 @@ StatsBase
 LearnBase
 Distributions
 SweepOperator
+LossFunctions
+PenaltyFunctions
