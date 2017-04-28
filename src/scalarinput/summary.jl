@@ -184,19 +184,14 @@ struct QuantileSGD <: StochasticStat{0, 1}
 end
 function fit!(o::QuantileSGD, y::Float64, γ::Float64)
     for i in eachindex(o.τ)
-        @inbounds v = Float64(y < o.value[i]) - o.τ[i]
-        @inbounds o.value[i] = subgrad(o.value[i], γ, v)
+        @inbounds o.value[i] -= γ * deriv(QuantileLoss(o.τ[i]), y, o.value[i])
     end
 end
-# TODO: fix (this doesn't quite fit in batches, since o.value gets updated inside the loop)
 function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
-    n2 = length(y)
-    γ = γ / n2
-    for yi in y
-        for i in eachindex(o.τ)
-            @inbounds v = Float64(yi < o.value[i]) - o.τ[i]
-            @inbounds o.value[i] = subgrad(o.value[i], γ, v)
-        end
+    g = zeros(y)
+    for i in eachindex(o.τ)
+        g .= deriv.(QuantileLoss(o.τ[i]), y, o.value[i])
+        @inbounds o.value[i] -= γ * mean(g)
     end
 end
 function Base.merge!(o::QuantileSGD, o2::QuantileSGD, γ::Float64)
