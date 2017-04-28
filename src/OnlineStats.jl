@@ -25,7 +25,7 @@ export
     # OnlineStats
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
-    MV, CovMatrix, KMeans, LinReg,
+    MV, CovMatrix, KMeans, LinReg, StochasticLoss,
     # statlearn things
     StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, loss, objective, classify,
     statlearnpath,

@@ -164,6 +164,27 @@ function Base.merge!(o1::Moments, o2::Moments, γ::Float64)
     o1
 end
 
+#--------------------------------------------------------------------# StochasticLoss
+"""
+```julia
+    s = Series(randn(1000), StochasticLoss(QuantileLoss(.7)))
+```
+Minimize a loss (from LossFunctions.jl) using stochastic gradient descent.
+### Example
+```julia
+o1 = StochasticLoss(QuantileLoss(.7))  # approx. .7 quantile
+o2 = StochasticLoss(L2DistLoss())      # approx. mean
+o3 = StochasticLoss(L1DistLoss())      # approx. median
+s = Series(randn(10_000), o1, o2, o3)
+```
+"""
+mutable struct StochasticLoss{L<:Loss} <: StochasticStat{0, 0}
+    value::Float64
+    loss::L
+end
+StochasticLoss(loss::Loss) = StochasticLoss(0.0, loss)
+fit!(o::StochasticLoss, y::Float64, γ::Float64) = (o.value -= γ * deriv(o.loss, y, o.value))
+
 #--------------------------------------------------------------------# QuantileSGD
 """
 ```julia

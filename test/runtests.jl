@@ -182,6 +182,12 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
             @test all(value(o) .≈ f(y))
         end
     end
+    @testset "StochasticLoss" begin
+        o1 = StochasticLoss(QuantileLoss(.7))  # approx. .7 quantile
+        o2 = StochasticLoss(L2DistLoss())      # approx. mean
+        o3 = StochasticLoss(L1DistLoss())      # approx. median
+        s = Series(randn(1_000), o1, o2, o3)
+    end
     @testset "QuantileMM/QuantileSGD" begin
         o = QuantileMM(.2, .3)
         s = @inferred Series(y1, o, QuantileSGD([.4, .5]))
@@ -364,7 +370,7 @@ end
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
     for u in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
-        o = @inferred StatLearn(p, L2DistLoss(), L2Penalty(), fill(.1, p), u)
+        o = @inferred StatLearn(p, scaled(L2DistLoss(), .5), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
         fit!(s, x, y)
         fit!(s, x, y, .1)
