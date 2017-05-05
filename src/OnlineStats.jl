@@ -67,7 +67,8 @@ input{I, O}(o::OnlineStat{I, O}) = I
 output{I, O}(o::OnlineStat{I, O}) = O
 function input(t::Tuple)
     I = input(t[1])
-    all(x -> input(x) == I, t) || throw(ArgumentError("Input dims must be $I"))
+    all(x -> input(x) == I, t) ||
+        throw(ArgumentError("Input dimensions must match.  Found: $(input.(t))"))
     I
 end
 

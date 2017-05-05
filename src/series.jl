@@ -19,7 +19,7 @@ updatecounter!(o::AbstractSeries, n2::Int = 1) = updatecounter!(o.weight, n2)
 Base.copy(o::AbstractSeries) = deepcopy(o)
 function Base.show(io::IO, o::AbstractSeries)
     header(io, "$(name(o))\n")
-    subheader(io, "weight = $(o.weight)\n")
+    subheader(io, "$(o.weight)\n")
     show_series(io, o)
 end
 show_series(io::IO, o::AbstractSeries) = print(io)
@@ -45,20 +45,22 @@ mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: Abst
     weight::W
     stats::OS
 end
-function Series(wt::Weight, S::Union{Tuple, OnlineStat})
-    Series{input(S), typeof(S), typeof(wt)}(wt, S)
+function Series(wt::Weight, T::Union{Tuple, OnlineStat})
+    Series{input(T), typeof(T), typeof(wt)}(wt, T)
 end
-Series(wt::Weight, s...) = Series(wt, s)
-Series(wt::Weight, s) = Series(wt, s)
 
-Series(s...) = Series(default_weight(s), s)
-Series(s) = Series(default_weight(s), s)
+Series(wt::Weight, o) = Series(wt, o)
+Series(wt::Weight, o...) = Series(wt, o)
 
-Series(y::AA, s...) = (o = Series(default_weight(s), s); fit!(o, y))
-Series(y::AA, s) = (o = Series(default_weight(s), s); fit!(o, y))
+Series(o) = Series(default_weight(o), o)
+Series(o...) = Series(default_weight(o), o)
 
-Series(y::AA, wt::Weight, s...) = (o = Series(wt, s); fit!(o, y))
-Series(y::AA, wt::Weight, s) = (o = Series(wt, s); fit!(o, y))
+Series(y::AA, o) = (s = Series(default_weight(o), o); fit!(s, y))
+Series(y::AA, o...) = (s = Series(default_weight(o), o); fit!(s, y))
+
+Series(y::AA, wt::Weight, o) = (s = Series(wt, o); fit!(s, y))
+Series(y::AA, wt::Weight, o...) = (s = Series(wt, o); fit!(s, y))
+
 
 # Need the following so this works:  for stat in s.stats
 Base.start(o::OnlineStat) = false

@@ -25,7 +25,7 @@ function Base.show(io::IO, o::OnlineStat)
     print(io, name(o))
     show_fields(io, o)
 end
-function show_fields(io::IO, o::OnlineStat)
+function show_fields(io::IO, o)
     nms = fields_to_show(o)
     print(io, "(")
     for nm in nms

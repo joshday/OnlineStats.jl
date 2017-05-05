@@ -1,6 +1,10 @@
 #--------------------------------------------------------------------# Weight
 abstract type Weight end
-Base.show(io::IO, w::Weight) = print(io, name(w) * "(nobs = $(w.nobs)): ")
+fields_to_show(w::Weight) = setdiff(fieldnames(w), [:nups])
+function Base.show(io::IO, w::Weight)
+    print(io, name(w))
+    show_fields(io, w)
+end
 function Base.:(==){T <: Weight}(w1::T, w2::T)
     nms = fieldnames(w1)
     equal = true
