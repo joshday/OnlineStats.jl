@@ -25,7 +25,7 @@ export
     # OnlineStats
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
-    MV, CovMatrix, KMeans, LinReg, StochasticLoss,
+    MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample,
     # statlearn things
     StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, loss, objective, classify,
     statlearnpath,
@@ -132,6 +132,7 @@ end
 include("weight.jl")
 include("series.jl")
 include("scalarinput/summary.jl")
+include("scalarinput/reservoir.jl")
 include("vectorinput/mv.jl")
 include("vectorinput/covmatrix.jl")
 include("vectorinput/kmeans.jl")

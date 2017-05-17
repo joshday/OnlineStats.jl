@@ -433,6 +433,14 @@ end
     merge!(s1, s2)
     @test coef(o1) ≈ vcat(x, x2) \ vcat(y, y2)
 end
+@testset "ReservoirSample" begin
+    o = ReservoirSample(100, Int64)
+    s = Series(o)
+    fit!(s, 1:1000)
+    for j in 1:100
+        @test o.value[j] in 1:1000
+    end
+end
 
 
 end
