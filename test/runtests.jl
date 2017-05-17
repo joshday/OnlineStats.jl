@@ -1,5 +1,6 @@
 module OnlineStatsTest
 using OnlineStats, Base.Test, Distributions, LearnBase
+using LossFunctions, PenaltyFunctions
 
 #-----------------------------------------------------------# coverage for show() methods
 info("Messy output for test coverage")

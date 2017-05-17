@@ -1,3 +1,16 @@
+"""
+```julia
+ReservoirSample(k)
+ReservoirSample(k, Float64)
+```
+Reservoir sample of `k` items.
+### Example
+```julia
+o = ReservoirSample(k, Int)
+s = Series(o)
+fit!(s, 1:10000)
+```
+"""
 mutable struct ReservoirSample{T<:Number} <: OnlineStat{0, 1}
     value::Vector{T}
     nobs::Int

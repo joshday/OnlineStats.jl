@@ -1,4 +1,4 @@
-<!--- Generated at 2017-04-28T15:48:24.543.  Don't edit --->
+<!--- Generated at 2017-05-17T17:35:26.297.  Don't edit --->
 
 # OnlineStats API
 
@@ -36,9 +36,11 @@
 - [OrderStats](#orderstats)
 - [QuantileMM](#quantilemm)
 - [QuantileSGD](#quantilesgd)
+- [ReservoirSample](#reservoirsample)
 - [SPGD](#spgd)
 - [Series](#series)
 - [StatLearn](#statlearn)
+- [StochasticLoss](#stochasticloss)
 - [Sum](#sum)
 - [Variance](#variance)
 - [Weight](#weight)
@@ -534,6 +536,23 @@ value(s)
 ```
 
 [top](#contents)
+## ReservoirSample
+```julia
+ReservoirSample(k)
+ReservoirSample(k, Float64)
+```
+
+Reservoir sample of `k` items.
+
+### Example
+
+```julia
+o = ReservoirSample(k, Int)
+s = Series(o)
+fit!(s, 1:10000)
+```
+
+[top](#contents)
 ## SPGD
 ```
 SPGD(η)
@@ -584,6 +603,23 @@ s = Series(o)
 fit!(s, x, y)
 coef(o)
 predict(o, x)
+```
+
+[top](#contents)
+## StochasticLoss
+```julia
+    s = Series(randn(1000), StochasticLoss(QuantileLoss(.7)))
+```
+
+Minimize a loss (from LossFunctions.jl) using stochastic gradient descent.
+
+### Example
+
+```julia
+o1 = StochasticLoss(QuantileLoss(.7))  # approx. .7 quantile
+o2 = StochasticLoss(L2DistLoss())      # approx. mean
+o3 = StochasticLoss(L1DistLoss())      # approx. median
+s = Series(randn(10_000), o1, o2, o3)
 ```
 
 [top](#contents)
@@ -644,7 +680,7 @@ No documentation found.
 
 ```
 # 1 method for generic function "classify":
-classify(o::OnlineStats.StatLearn, x) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:53
+classify(o::OnlineStats.StatLearn, x) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:70
 ```
 
 [top](#contents)
@@ -657,7 +693,7 @@ No documentation found.
 # 3 methods for generic function "coef":
 coef(o::OnlineStats.LinReg) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/linreg.jl:73
 coef(obj::StatsBase.StatisticalModel) in StatsBase at /Users/joshday/.julia/v0.6/StatsBase/src/statmodels.jl:5
-coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:50
+coef(o::OnlineStats.StatLearn) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:67
 ```
 
 [top](#contents)
@@ -714,7 +750,7 @@ No documentation found.
 
 ```
 # 1 method for generic function "loss":
-loss(o::OnlineStats.StatLearn, x, y) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:54
+loss(o::OnlineStats.StatLearn, x, y) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:71
 ```
 
 [top](#contents)
@@ -759,7 +795,7 @@ No documentation found.
 
 ```
 # 1 method for generic function "objective":
-objective(o::OnlineStats.StatLearn, x, y) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:56
+objective(o::OnlineStats.StatLearn, x, y) in OnlineStats at /Users/joshday/.julia/v0.6/OnlineStats/src/xyinput/statlearn.jl:73
 ```
 
 [top](#contents)

@@ -59,6 +59,7 @@
 | **Other:**                             |                                               |
 | Bootstrapping                          | [`Bootstrap`](doc/api.md#bootstrap)           |
 | approximate count of distinct elements | [`HyperLogLog`](doc/api.md$hyperloglog)       |
+| Reservoir Sampling                     | [`ReservoirSample`](doc/api.md$reservoirsample)|
 
 
 [go to top](#readme-contents)
