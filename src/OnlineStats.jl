@@ -27,7 +27,7 @@ export
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,
     MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample,
     # statlearn things
-    StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, loss, objective, classify,
+    StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, MMXTX, loss, objective, classify,
     statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
