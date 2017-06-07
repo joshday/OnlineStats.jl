@@ -88,14 +88,14 @@ function statlearnpath(p::Integer, l::Loss, pen::Penalty, λ::VecF, u::Updater =
     [StatLearn(p, l, pen, λj, u) for λj in λ]
 end
 
-function fit!(o::StatLearn{<:SGUpdater}, x::AVec, y::Real, γ::Float64)
+
+
+function gradient!(o::StatLearn, x::AVec, y::Real, γ::Float64)
     xβ = dot(x, o.β)
     g = deriv(o.loss, y, xβ)
     o.gx .= g .* x
-    update!(o, γ)
 end
-
-function fitbatch!(o::StatLearn{<:SGUpdater}, x::AMat, y::AVec, γ::Float64)
+function gradient!(o::StatLearn, x::AMat, y::AVec, γ::Float64)
     xβ = x * o.β
     g = deriv(o.loss, y, xβ)
     @inbounds for j in eachindex(o.gx)
@@ -105,6 +105,13 @@ function fitbatch!(o::StatLearn{<:SGUpdater}, x::AMat, y::AVec, γ::Float64)
         end
     end
     scale!(o.gx, 1 / length(y))
+end
+function fit!(o::StatLearn{<:SGUpdater}, x::AVec, y::Real, γ::Float64)
+    gradient!(o, x, y, γ)
+    update!(o, γ)
+end
+function fitbatch!(o::StatLearn{<:SGUpdater}, x::AMat, y::AVec, γ::Float64)
+    gradient!(o, x, y, γ)
     update!(o, γ)
 end
 
@@ -224,5 +231,32 @@ function update!(o::StatLearn{ADAMAX}, γ)
         U.M[j] = smooth(U.M[j], gx, U.α1)
         U.V[j] = max(β2 * U.V[j], abs(gx))
         o.β[j] -= s * U.M[j] / (U.V[j] + ϵ)
+    end
+end
+
+
+#-----------------------------------------------------------------------# MMXTX
+"""
+    MMXTX(c)
+Online MM algorithm via quadratic approximation.  Approximates Lipschitz
+constant with `x'x * c * I`.
+"""
+mutable struct MMXTX <: Updater
+    c::Float64
+    h::Float64
+    b::VecF
+end
+MMXTX(c::Float64 = 1.0) = MMXTX(c, 0.0, zeros(0))
+init(u::MMXTX, p) = MMXTX(u.c, 0.0, zeros(p))
+
+function fit!(o::StatLearn{MMXTX}, x::AVec, y::Real, γ::Float64)
+    U = o.updater
+    xβ = dot(x, o.β)
+    g = deriv(o.loss, y, xβ)
+    o.gx .= g .* x
+    U.h = smooth(U.h, x'x * U.c, γ)
+    for j in eachindex(o.β)
+        U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
+        o.β[j] = U.b[j] / U.h
     end
 end
