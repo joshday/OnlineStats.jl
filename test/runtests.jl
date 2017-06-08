@@ -2,7 +2,7 @@ module OnlineStatsTest
 using OnlineStats, Base.Test, Distributions, LearnBase
 using LossFunctions, PenaltyFunctions
 
-#-----------------------------------------------------------# coverage for show() methods
+#-----------------------------------------------------------# coverage for show()
 info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
@@ -74,15 +74,15 @@ end
     @test_throws ArgumentError Series(Mean(), CovMatrix(3))
     @test_throws ArgumentError Series(Mean(), QuantileMM())
     @testset "Type-stable Constructors" begin
-         @inferred Series(EqualWeight(), Mean(), Variance())
-         @inferred Series(EqualWeight(), Mean())
-         @inferred Series(Mean())
-         @inferred Series(Mean(), Variance())
-         @inferred Series((Mean(), Variance()))
-         @inferred Series(randn(100), Mean(), Variance())
-         @inferred Series(randn(100), Mean())
-         @inferred Series(randn(100), EqualWeight(), Mean(), Variance())
-         @inferred Series(randn(100), EqualWeight(), Mean())
+        @inferred Series(EqualWeight(), Mean(), Variance())
+        @inferred Series(EqualWeight(), Mean())
+        @inferred Series(Mean())
+        @inferred Series(Mean(), Variance())
+        @inferred Series((Mean(), Variance()))
+        @inferred Series(randn(100), Mean(), Variance())
+        @inferred Series(randn(100), Mean())
+        @inferred Series(randn(100), EqualWeight(), Mean(), Variance())
+        @inferred Series(randn(100), EqualWeight(), Mean())
     end
     @testset "fit!" begin
         s = Series(Mean(), Sum())
@@ -370,7 +370,7 @@ end
     x = randn(n, p)
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
-    for u in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
+    for u in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX(), MMXTX()]
         o = @inferred StatLearn(p, scaled(L2DistLoss(), .5), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
         fit!(s, x, y)

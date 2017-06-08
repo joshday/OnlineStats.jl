@@ -251,10 +251,17 @@ init(u::MMXTX, p) = MMXTX(u.c, 0.0, zeros(p))
 
 function fit!(o::StatLearn{MMXTX}, x::AVec, y::Real, γ::Float64)
     U = o.updater
-    xβ = dot(x, o.β)
-    g = deriv(o.loss, y, xβ)
-    o.gx .= g .* x
+    gradient!(o, x, y, γ)
     U.h = smooth(U.h, x'x * U.c, γ)
+    for j in eachindex(o.β)
+        U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
+        o.β[j] = U.b[j] / U.h
+    end
+end
+function fitbatch!(o::StatLearn{MMXTX}, x::AMat, y::AVec, γ::Float64)
+    U = o.updater
+    gradient!(o, x, y, γ)
+    U.h = smooth(U.h, mean(sum(abs2, x, 2)) * U.c, γ)
     for j in eachindex(o.β)
         U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
         o.β[j] = U.b[j] / U.h
