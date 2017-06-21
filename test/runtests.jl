@@ -434,6 +434,12 @@ end
     fit!(s2, x2, y2)
     merge!(s1, s2)
     @test coef(o1) ≈ vcat(x, x2) \ vcat(y, y2)
+
+    o = LinReg(p, .1)
+    s = Series(o)
+    fit!(s, x, y)
+    value(o)
+    @test predict(o, x) == x * o.β
 end
 @testset "ReservoirSample" begin
     o = ReservoirSample(100, Int64)

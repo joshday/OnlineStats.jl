@@ -29,11 +29,11 @@ nups(w::Weight) = w.nups
 updatecounter!(w::Weight, n2::Int = 1) = (w.nobs += n2; w.nups += 1;)
 weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
 
-@recipe function f(w::Weight; nobs=50)
+@recipe function f(wt::Weight; nobs=50)
     xlab --> "Number of Observations"
-    label --> name(w)
+    label --> name(wt)
     w --> 2
-    W = deepcopy(w)
+    W = deepcopy(wt)
     v = zeros(nobs)
     for i in eachindex(v)
         updatecounter!(W)
