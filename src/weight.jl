@@ -31,6 +31,7 @@ weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
 
 @recipe function f(wt::Weight; nobs=50)
     xlab --> "Number of Observations"
+    ylabe --> "Weight Value"
     label --> name(wt)
     w --> 2
     W = deepcopy(wt)
