@@ -7,7 +7,7 @@ importall LearnBase
 import SweepOperator, LossFunctions, PenaltyFunctions, Distributions
 Ds = Distributions
 
-using LearnBase, LossFunctions, PenaltyFunctions
+using LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
 
 # Reexports
 # for pkg in [:LearnBase, :LossFunctions, :PenaltyFunctions]

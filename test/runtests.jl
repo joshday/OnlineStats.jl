@@ -17,6 +17,7 @@ info("Messy output for test coverage")
     println(MV(2, Mean()))
     println(HyperLogLog(5))
     println(KMeans(5,3))
+    println(LinReg(5))
     for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
               LearningRate2()]
         println(w)
