@@ -19,7 +19,7 @@ function Base.show{T}(io::IO, o::MV{T})
     s = name(o, true) * "("
     n = length(o.stats)
     for i in 1:n
-        s *= "$(pretty(value(o.stats[i])))"
+        s *= "$(value(o.stats[i]))"
         if i != n
             s *= ", "
         end

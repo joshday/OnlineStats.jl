@@ -1,3 +1,5 @@
+# Ex:  `name(randn(5))`         prints `Array{Float64, 1}`
+# Ex:  `name(randn(5), false)`  prints `Array`
 function name(o, withparams = true)
     s = replace(string(typeof(o)), "OnlineStats.", "")
     if !withparams
@@ -6,38 +8,39 @@ function name(o, withparams = true)
     s
 end
 
-header(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
+indent(io,::IO, nspaces, s = ">") = print(io, repeat(" ", nspaces) * s)
 
-subheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "  ■ $s")
+# first line of Series or Bootstrap
+header(io::IO, s::AbstractString) = print(io, "▦ $s" )
 
-function print_item(io::IO, name::AbstractString, value, newline=true)
-    print(io, "    ▷" * @sprintf("%22s", name * " : "), value)
+# second line, the weight
+function print_weight(io::IO, W)
+    print(io, "┣━━ ")
+    println(io, W)
+end
+
+function print_item(io::IO, name, value, newline)
+    print(io, "    > " * @sprintf("%-16s", name), " : ", value)
     newline && println(io)
 end
-function print_item(io::IO, o::OnlineStat, newline=true)
-    print_item(io, name(o), pretty(value(o)), newline)
-end
-function print_subitem(io::IO, name::AbstractString, value, newline=true)
-    print(io, "        ∘" * @sprintf("%18s", name * " : "), value)
-    newline && println(io)
-end
+print_item(io::IO, o::OnlineStat, newline) = print_item(io, name(o, false), value(o), newline)
 
 
-fields_to_show(o::OnlineStat) = fieldnames(o)
 
-function Base.show(io::IO, o::OnlineStat)
-    print(io, name(o))
-    show_fields(io, o)
-end
+
+
+
+#----------------------------------------------------------# Default OnlineStat show method
+Base.show(io::IO, o::OnlineStat) = (print(io, name(o)); show_fields(io, o))
+
+
 function show_fields(io::IO, o)
     nms = fields_to_show(o)
     print(io, "(")
     for nm in nms
-        print(io, "$nm = $(pretty(getfield(o, nm)))")
+        print(io, "$nm = $(getfield(o, nm))")
         nm != nms[end] && print(io, ", ")
     end
     print(io, ")")
 end
-
-pretty(arg) = arg
-pretty(arg::AbstractFloat) = @sprintf("%F", arg)
+fields_to_show(o::OnlineStat) = fieldnames(o)

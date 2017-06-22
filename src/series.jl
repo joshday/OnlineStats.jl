@@ -1,31 +1,3 @@
-abstract type AbstractSeries end
-#----------------------------------------------------------------# AbstractSeries methods
-# helpers for weight
-nobs(o::AbstractSeries) = nobs(o.weight)
-
-"""
-```julia
-nups(Series(Mean()))
-```
-Return the number of updates a series has done.  Differs from `nobs` only when batch updates
-have been used.
-"""
-nups(o::AbstractSeries) = nups(o.weight)
-weight(o::AbstractSeries, n2::Int = 1) = weight(o.weight, n2)
-weight!(o::AbstractSeries, n2::Int = 1) = weight!(o.weight, n2)
-updatecounter!(o::AbstractSeries, n2::Int = 1) = updatecounter!(o.weight, n2)
-
-
-Base.copy(o::AbstractSeries) = deepcopy(o)
-function Base.show(io::IO, o::AbstractSeries)
-    header(io, "$(name(o))\n")
-    # subheader(io, "$(o.weight)\n")
-    print_item(io, "Weight", o.weight)
-    show_series(io, o)
-end
-show_series(io::IO, o::AbstractSeries) = print(io)
-
-#----------------------------------------------------------------# Series
 """
 ```julia
 Series(onlinestats...)
@@ -42,7 +14,7 @@ s = Series(ExponentialWeight(), Mean(), Variance())
 s = Series(randn(100, 3), CovMatrix(3))
 ```
 """
-mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
+mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight}
     weight::W
     stats::OS
 end
@@ -62,29 +34,64 @@ Series(y::AA, o...) = (s = Series(default_weight(o), o); fit!(s, y))
 Series(y::AA, wt::Weight, o) = (s = Series(wt, o); fit!(s, y))
 Series(y::AA, wt::Weight, o...) = (s = Series(wt, o); fit!(s, y))
 
-
-# Need the following so this works:  for stat in s.stats
+#--------------------------------------------------------------------------# Series methods
+# Need the following so certain things work for both an OnlineStat and tuple of OnlineStats
 Base.start(o::OnlineStat) = false
 Base.next(o::OnlineStat, state) = o, true
 Base.done(o::OnlineStat, state) = state
-
-show_series(io::IO, s::Series{0}) = print_item.(io, name.(s.stats), value.(s.stats))
-function show_series(io::IO, s::Series)
-    for stat in s.stats
-        print_item(io, stat)
-    end
-end
+Base.map(f::Function, o::OnlineStat) = f(o)
+Base.length(o::OnlineStat) = 1
 
 "Map `value` to the `stats` field of a Series."
 value(s::Series) = map(value, s.stats)
 value(s::Series, i::Integer) = value(s.stats[i])
 
+
 "Return the `stats` field of a Series."
 stats(s::Series) = s.stats
 stats(s::Series, i::Integer) = s.stats[i]
 
+# helpers for weight
+nobs(o::Series) = nobs(o.weight)
+nups(o::Series) = nups(o.weight)
+weight(o::Series, n2::Int = 1) = weight(o.weight, n2)
+weight!(o::Series, n2::Int = 1) = weight!(o.weight, n2)
+updatecounter!(o::Series, n2::Int = 1) = updatecounter!(o.weight, n2)
 
-Base.map(f::Function, o::OnlineStat) = f(o)
+Base.copy(o::Series) = deepcopy(o)
+
+#--------------------------------------------------------------------------# Show
+function Base.show{I, OS<:Tuple, W}(io::IO, s::Series{I, OS, W})
+    header(io, name(s))
+    println(io)
+    print(io, "┣━━ ")
+    println(io, s.weight)
+    println(io, "┗━━ Tracking")
+    names = name.(s.stats)
+    indent = maximum(length.(names))
+    n = length(names)
+    i = 0
+    for o in s.stats
+        i += 1
+        char = ifelse(i == n, "┗━━", "┣━━")
+        print(io, "    $char ")
+        print(io, names[i])
+        print(io, repeat(" ", indent - length(names[i])))
+        print(io, " : $(value(o))")
+        i == n || println(io)
+    end
+end
+function Base.show{I, O <: OnlineStat, W}(io::IO, s::Series{I, O, W})
+    header(io, name(s))
+    println(io)
+    print(io, "┣━━ ")
+    println(io, s.weight)
+    print(io, "┗━━ $(name(s.stats)) : $(value(s.stats))")
+end
+
+
+
+#--------------------------------------------------------------------------# fit!
 #-----------------------------------------------------------------------# Series{0}
 const Singleton = Union{Real, Symbol, AbstractString}  # for FitCategorical/HyperLogLog
 """
@@ -242,7 +249,7 @@ function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
 end
 
 
-#-------------------------------------------------------------------------# merge
+#--------------------------------------------------------------------------# merge!
 Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1), s2, method)
 Base.merge{T <: Series}(s1::T, s2::T, w::Float64) = merge!(copy(s1), s2, w)
 

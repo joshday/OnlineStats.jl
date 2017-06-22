@@ -54,21 +54,11 @@ StatLearn(p::Integer, a1, a2)         = StatLearn(p, a(a2, a(a1, d(p))))
 StatLearn(p::Integer, a1, a2, a3)     = StatLearn(p, a(a3, a(a2, a(a1, d(p)))))
 StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p))))))
 
-
 function Base.show(io::IO, o::StatLearn)
-    header(io, name(o))
-    println(io)
-    print_item(io, "β", o.β')
-    print_item(io, "λ factor", o.λfactor')
-    print_item(io, "Loss", o.loss)
-    print_item(io, "Penalty", o.penalty)
-    print_item(io, "Updater", o.updater, false)
+    println(io, name(o))
+    print_item(io, "Loss", o.loss, false)
 end
-function print_item(io::IO, o::StatLearn)
-    print_item(io, "StatLearn", "$(o.loss), $(o.penalty), $(o.updater)")
-    print_subitem(io, "β", coef(o))
-    print_subitem(io, "λfactor", o.λfactor, false)
-end
+
 coef(o::StatLearn) = o.β
 predict(o::StatLearn, x::AVec) = dot(x, o.β)
 predict(o::StatLearn, x::AMat) = x * o.β

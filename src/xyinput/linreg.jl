@@ -30,6 +30,10 @@ mutable struct LinReg <: OnlineStat{(1,0), 1}
         new(zeros(p), zeros(d, d), zeros(d, d), 0, λ)
     end
 end
+function print_item(io::IO, o::LinReg, last_item)
+    print_item(io, name(o, false), "($(o.λ)) " * string(value(o)), last_item)
+end
+
 fields_to_show(o::LinReg) = [:β, :λ]
 nobs(o::LinReg) = o.nobs
 
