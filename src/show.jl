@@ -43,4 +43,4 @@ function show_fields(io::IO, o)
     end
     print(io, ")")
 end
-fields_to_show(o::OnlineStat) = fieldnames(o)
+fields_to_show(o) = fieldnames(o)
