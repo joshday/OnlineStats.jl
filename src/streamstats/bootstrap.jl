@@ -32,9 +32,9 @@ end
 function Base.show(io::IO, b::Bootstrap)
     header(io, name(b))
     println(io)
-    print_item(io, "n replicates", length(b.replicates), false)
-    print_item(io, "function", b.f, false)
-    print_item(io, "boot method", b.d, false)
+    println(io, "    > n replicates : $(length(b.replicates))")
+    println(io, "    > function     : $(b.f)")
+    println(io, "    > boot method  : $(b.d)")
     show(io, b.series)
 end
 value(b::Bootstrap) = b.f.(b.replicates)

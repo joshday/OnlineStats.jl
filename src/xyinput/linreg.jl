@@ -31,8 +31,6 @@ mutable struct LinReg <: OnlineStat{(1,0), 1}
     end
 end
 Base.show(io::IO, o::LinReg) = print(io, "LinReg: β($(o.λ)) = $(coef(o)')")
-
-fields_to_show(o::LinReg) = [:β, :λ]
 nobs(o::LinReg) = o.nobs
 
 function matviews(o::LinReg)

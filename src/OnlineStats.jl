@@ -21,7 +21,7 @@ export
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
     # functions
     maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef, coeftable,
-    vcov,
+    vcov, mse, stderr,
     # OnlineStats
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, Diff, Sum,

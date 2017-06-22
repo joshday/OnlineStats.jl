@@ -8,8 +8,6 @@ function name(o, withparams = true)
     s
 end
 
-indent(io,::IO, nspaces, s = ">") = print(io, repeat(" ", nspaces) * s)
-
 # first line of Series or Bootstrap
 header(io::IO, s::AbstractString) = print(io, "▦ $s" )
 
@@ -18,14 +16,6 @@ function print_weight(io::IO, W)
     print(io, "┣━━ ")
     println(io, W)
 end
-
-function print_item(io::IO, name, value, newline)
-    print(io, "    > " * @sprintf("%-16s", name), " : ", value)
-    newline && println(io)
-end
-print_item(io::IO, o::OnlineStat, newline) = print_item(io, name(o, false), value(o), newline)
-
-
 
 
 

@@ -6,6 +6,7 @@ using LossFunctions, PenaltyFunctions
 info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
+    println(Series(Mean(), Variance()))
     println(Bootstrap(Series(Mean()), 100, Poisson()))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
@@ -19,6 +20,11 @@ info("Messy output for test coverage")
     println(KMeans(5,3))
     println(LinReg(5))
     println(StatLearn(5))
+    o = Mean()
+    Series(LearningRate(), o)
+    for stat in o
+        println(stat)
+    end
     for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
               LearningRate2()]
         println(w)
@@ -348,6 +354,11 @@ end
     mean(value(b))  # mean
     @test replicates(b) == b.replicates
     confint(b)
+    confint(b, .95, :normal)
+    @test_throws Exception confint(b, .95, :fake_method)
+
+    b = Bootstrap(Series(MV(3, Mean())), 100, Poisson())
+    fit!(b, randn(100, 3))
 end
 @testset "Observations in Columns" begin
     x = randn(5, 1000)
@@ -427,6 +438,7 @@ end
     fit!(s, x, y)
     fit!(s, x, y, 9)
     @test nobs(s) == 2n
+    @test nobs(o) == 2n
     @test coef(o) == value(o)
     @test coef(o) ≈ x\y
 
@@ -443,6 +455,12 @@ end
     merge!(s1, s2)
     @test coef(o1) ≈ vcat(x, x2) \ vcat(y, y2)
 
+    mse(o)
+    coeftable(o)
+    confint(o)
+    vcov(o)
+    stderr(o)
+
     o = LinReg(p, .1)
     s = Series(o)
     fit!(s, x, y)
@@ -456,6 +474,9 @@ end
     for j in 1:100
         @test o.value[j] in 1:1000
     end
+end
+@testset "Misc" begin
+    @test length(Mean()) == 1
 end
 
 
