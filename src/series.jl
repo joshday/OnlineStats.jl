@@ -19,7 +19,8 @@ updatecounter!(o::AbstractSeries, n2::Int = 1) = updatecounter!(o.weight, n2)
 Base.copy(o::AbstractSeries) = deepcopy(o)
 function Base.show(io::IO, o::AbstractSeries)
     header(io, "$(name(o))\n")
-    subheader(io, "$(o.weight)\n")
+    # subheader(io, "$(o.weight)\n")
+    print_item(io, "Weight", o.weight)
     show_series(io, o)
 end
 show_series(io::IO, o::AbstractSeries) = print(io)
@@ -70,8 +71,7 @@ Base.done(o::OnlineStat, state) = state
 show_series(io::IO, s::Series{0}) = print_item.(io, name.(s.stats), value.(s.stats))
 function show_series(io::IO, s::Series)
     for stat in s.stats
-        print_item(io, name(stat), "")
-        print(io, value(stat))
+        print_item(io, stat)
     end
 end
 

@@ -64,28 +64,27 @@ function Base.show(io::IO, o::StatLearn)
     print_item(io, "Penalty", o.penalty)
     print_item(io, "Updater", o.updater, false)
 end
+function print_item(io::IO, o::StatLearn)
+    print_item(io, "StatLearn", "$(o.loss), $(o.penalty), $(o.updater)")
+    print_subitem(io, "β", coef(o))
+    print_subitem(io, "λfactor", o.λfactor, false)
+end
 coef(o::StatLearn) = o.β
 predict(o::StatLearn, x::AVec) = dot(x, o.β)
 predict(o::StatLearn, x::AMat) = x * o.β
 classify(o::StatLearn, x) = sign.(predict(o, x))
-loss(o::StatLearn, x, y) = mean(value(o.loss, y, predict(o, x)))
+loss(o::StatLearn, x, y) = value(o.loss, y, predict(o, x), AvgMode.Mean())
 function objective(o::StatLearn, x, y)
     mean(value(o.loss, y, predict(o, x))) + value(o.penalty, o.β, o.λfactor)
 end
 
-"""
-```julia
-statlearnpath(p, loss, pen, λvector, updater)
-```
-Create a vector of `StatLearn` objects, each using one of the regularization parameters in `λvector`.
-### Example
-```julia
-s = Series(statlearnpath(5, L1DistLoss(), L1Penalty(), collect(0:.1:1), SPGD())...)
-fit!(s, randn(10000, 5), randn(10000))
-```
-"""
-function statlearnpath(p::Integer, l::Loss, pen::Penalty, λ::VecF, u::Updater = SPGD())
-    [StatLearn(p, l, pen, λj, u) for λj in λ]
+
+function statlearnpath(o::StatLearn, αs::AbstractVector{<:Real})
+    path = [copy(o) for i in 1:length(αs)]
+    for i in eachindex(αs)
+        path[i].λfactor .*= αs[i]
+    end
+    path
 end
 
 

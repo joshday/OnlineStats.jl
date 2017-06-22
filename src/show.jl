@@ -11,11 +11,15 @@ header(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "■ $s")
 subheader(io::IO, s::AbstractString) = print_with_color(:light_cyan, io, "  ■ $s")
 
 function print_item(io::IO, name::AbstractString, value, newline=true)
-    print(io, "  >" * @sprintf("%18s", name * " : "), value)
+    print(io, "    ▷" * @sprintf("%22s", name * " : "), value)
     newline && println(io)
 end
 function print_item(io::IO, o::OnlineStat, newline=true)
     print_item(io, name(o), pretty(value(o)), newline)
+end
+function print_subitem(io::IO, name::AbstractString, value, newline=true)
+    print(io, "        ∘" * @sprintf("%18s", name * " : "), value)
+    newline && println(io)
 end
 
 

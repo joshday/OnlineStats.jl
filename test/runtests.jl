@@ -18,6 +18,7 @@ info("Messy output for test coverage")
     println(HyperLogLog(5))
     println(KMeans(5,3))
     println(LinReg(5))
+    println(StatLearn(5))
     for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
               LearningRate2()]
         println(w)
@@ -381,6 +382,12 @@ end
         @test nobs(s) == 4 * n
         @test coef(o) == o.β
         @test predict(o, x) == x * o.β
+        @test predict(o, x[1,:]) == x[1,:]'o.β
+        @test loss(o, x, y) == value(o.loss, y, predict(o, x), AvgMode.Mean())
+
+        o = StatLearn(p, LogitMarginLoss())
+        o.β[:] = ones(p)
+        @test classify(o, x) == sign.(vec(sum(x, 2)))
 
         @testset "Type stability with arbitrary argument order" begin
             l, r, v = L2DistLoss(), L2Penalty(), fill(.1, p)
@@ -406,6 +413,7 @@ end
             @inferred StatLearn(p, r)
             @inferred StatLearn(p, v)
             @inferred StatLearn(p, u)
+            @inferred StatLearn(p)
         end
     end
 end
