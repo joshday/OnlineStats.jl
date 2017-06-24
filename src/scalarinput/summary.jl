@@ -185,6 +185,37 @@ end
 StochasticLoss(loss::Loss) = StochasticLoss(0.0, loss)
 fit!(o::StochasticLoss, y::Float64, γ::Float64) = (o.value -= γ * deriv(o.loss, y, o.value))
 
+#--------------------------------------------------------------------# QuantileISGD
+"""
+```julia
+QuantileISGD()
+```
+Approximate quantiles via implicit stochastic gradient descent.
+### Example
+```julia
+s = Series(randn(1000), LearningRate(.7), QuantileISGD())
+value(s)
+```
+"""
+struct QuantileISGD <: StochasticStat{0, 1}
+    value::VecF
+    τ::VecF
+    x::VecF
+    K::Int
+    QuantileISGD(τ::VecF = [0.25, 0.5, 0.75], K::Int = 10) = new(zeros(τ), τ, zeros(τ), K)
+    QuantileISGD(args...) = QuantileSGD(collect(args))
+end
+function fit!(o::QuantileISGD, y::Float64, γ::Float64)
+    for i in eachindex(o.τ)
+        for k in 1:o.K
+            v = o.value[i] - γ * deriv(QuantileLoss(o.τ[i]), y, o.value[i])
+            o.x[i] = smooth(o.x[i], v, 10 / k)  # TODO: find best constant for c / k
+        end
+        o.value[i] = o.x[i]
+    end
+end
+
+
 #--------------------------------------------------------------------# QuantileSGD
 """
 ```julia
