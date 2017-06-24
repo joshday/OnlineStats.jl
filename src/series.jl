@@ -14,7 +14,7 @@ s = Series(ExponentialWeight(), Mean(), Variance())
 s = Series(randn(100, 3), CovMatrix(3))
 ```
 """
-mutable struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight}
+struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight}
     weight::W
     stats::OS
 end
@@ -275,3 +275,5 @@ function Base.merge!{T <: Series}(s1::T, s2::T, w::Float64)
     merge!.(s1.stats, s2.stats, w)
     s1
 end
+
+fit!{T <: Series}(s1::T, s2::T) = merge!(s1, s2)

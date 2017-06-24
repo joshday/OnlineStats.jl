@@ -72,6 +72,8 @@ function input(t::Tuple)
     I
 end
 
+can_be_exact(o::OnlineStat) = default_weight(o) == EqualWeight()
+
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 Base.copy(o::OnlineStat) = deepcopy(o)
 Base.merge{T <: OnlineStat}(o::T, o2::T, wt::Float64) = merge!(copy(o), o2, wt)
