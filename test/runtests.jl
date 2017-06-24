@@ -197,10 +197,11 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         o3 = StochasticLoss(L1DistLoss())      # approx. median
         s = Series(randn(1_000), o1, o2, o3)
     end
-    @testset "QuantileMM/QuantileSGD" begin
-        o = QuantileMM(.2, .3)
-        s = @inferred Series(y1, o, QuantileSGD([.4, .5]))
+    @testset "QuantileMM/QuantileSGD/QuantileISGD" begin
+        s = @inferred Series(y1,
+            QuantileMM(.2, .3), QuantileSGD([.4, .5]), QuantileISGD([.6, .7]))
         @test typeof(s.weight) == LearningRate
+        s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
         fit!(s, y2, 7)
     end
     @testset "Extra methods" begin
