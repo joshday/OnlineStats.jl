@@ -18,6 +18,11 @@ Series(y::AA, o...) = (s = Series(default_weight(o), o); fit!(s, y))
 Series(y::AA, wt::Weight, o) = (s = Series(wt, o); fit!(s, y))
 Series(y::AA, wt::Weight, o...) = (s = Series(wt, o); fit!(s, y))
 
+function Series(x::AbstractMatrix, y::AbstractVector, o)
+    s = Series(default_weight(o), o)
+    fit!(s, x, y)
+end
+
 #--------------------------------------------------------------------------# Series methods
 # Need the following so certain things work for both an OnlineStat and tuple of OnlineStats
 Base.start(o::OnlineStat) = false

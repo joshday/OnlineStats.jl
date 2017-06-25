@@ -35,6 +35,7 @@ export
 
 #-----------------------------------------------------------------------------# types
 # 0 = scalar, 1 = vector, 2 = matrix, -1 = unknown, or Ds.Distribution
+abstract type StochasticStat{I, O} <: OnlineStat{I, O} end
 
 const AA        = AbstractArray
 const VecF      = Vector{Float64}
