@@ -361,7 +361,7 @@ end
     b = Bootstrap(Series(MV(3, Mean())), 100, Poisson())
     fit!(b, randn(100, 3))
 end
-@testset "Observations in Columns" begin
+@testset "Column obs." begin
     x = randn(5, 1000)
 
     o = CovMatrix(5)
