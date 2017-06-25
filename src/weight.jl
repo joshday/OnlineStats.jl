@@ -1,26 +1,9 @@
 #--------------------------------------------------------------------# Weight
 fields_to_show(w::Weight) = setdiff(fieldnames(w), [:nups])
-function Base.show(io::IO, w::Weight)
-    print(io, name(w))
-    show_fields(io, w)
-end
+Base.show(io::IO, w::Weight) = (print(io, name(w)); show_fields(io, w))
 function Base.:(==){T <: Weight}(w1::T, w2::T)
     nms = fieldnames(w1)
-    equal = true
-    for nm in nms
-        equal = getfield(w1, nm) == getfield(w2, nm)
-    end
-    return equal
-end
-
-
-default_weight(o::OnlineStat) = EqualWeight()
-default_weight(o::StochasticStat) = LearningRate()
-function default_weight(t::Tuple)
-    weight = default_weight(t[1])
-    all(isa.(default_weight.(t), typeof(weight))) ||
-        throw(ArgumentError("Default weights differ.  Weight must be specified"))
-    weight
+    all(getfield.(w1, nms) .== getfield.(w2, nms))
 end
 
 nobs(w::Weight) = w.nobs

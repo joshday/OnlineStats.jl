@@ -1,25 +1,67 @@
+#-----------------------------------------------------------------------# Series
+# NOTE: This lives in OnlineStatsBase now
 # struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
 #     weight::W
 #     stats::OS
 # end
+
+# Treat this as inner constructor
 function Series(wt::Weight, T::Union{Tuple, OnlineStat})
+    I = input(T)
     Series{input(T), typeof(T), typeof(wt)}(wt, T)
 end
 
-Series(wt::Weight, o) = Series(wt, o)
-Series(wt::Weight, o...) = Series(wt, o)
+input{I, O}(o::OnlineStat{I, O}) = I
+output{I, O}(o::OnlineStat{I, O}) = O
+function input(t::Tuple)
+    I = input(t[1])
+    if !all(x -> input(x) == I, t)
+        throw(ArgumentError("Input dimensions must match.  Found: $(input.(t))"))
+    end
+    I
+end
 
-Series(o) = Series(default_weight(o), o)
-Series(o...) = Series(default_weight(o), o)
+default_weight(o::OnlineStat) = EqualWeight()
+default_weight(o::StochasticStat) = LearningRate()
+function default_weight(t::Tuple)
+    w = default_weight(t[1])
+    if !all(map(x -> default_weight(x) == w, t))
+        throw(ArgumentError("Default weights differ.  Weight must be specified"))
+    end
+    w
+end
 
-Series(y::AA, o) = (s = Series(default_weight(o), o); fit!(s, y))
-Series(y::AA, o...) = (s = Series(default_weight(o), o); fit!(s, y))
 
-Series(y::AA, wt::Weight, o) = (s = Series(wt, o); fit!(s, y))
-Series(y::AA, wt::Weight, o...) = (s = Series(wt, o); fit!(s, y))
 
-function Series(x::AbstractMatrix, y::AbstractVector, o)
+# empty
+Series(t::Tuple)         = Series(default_weight(t), t)
+Series(o::OnlineStat)    = Series(default_weight(o), o)
+Series(o::OnlineStat...) = Series(default_weight(o), o)
+Series(wt::Weight, o...) = Series(wt, o)  # leave out type annotation to avoid method confusion
+
+# init with data
+Series(y::AA, o::OnlineStat) = (s = Series(default_weight(o), o); fit!(s, y))
+Series(y::AA, o::OnlineStat...) = (s = Series(default_weight(o), o); fit!(s, y))
+Series(y::AA, wt::Weight, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
+Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
+Series(wt::Weight, y::AA, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
+Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
+
+# Special constructors for (1, 0) input
+function Series(x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)})
     s = Series(default_weight(o), o)
+    fit!(s, x, y)
+end
+function Series(x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)}...)
+    s = Series(default_weight(o), o)
+    fit!(s, x, y)
+end
+function Series(wt::Weight, x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)})
+    s = Series(wt, o)
+    fit!(s, x, y)
+end
+function Series(x::AbstractMatrix, y::AbstractVector, wt::Weight, o::OnlineStat{(1,0)})
+    s = Series(wt, o)
     fit!(s, x, y)
 end
 
