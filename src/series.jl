@@ -1,23 +1,7 @@
-"""
-```julia
-Series(onlinestats...)
-Series(weight, onlinestats...)
-Series(data, onlinestats...)
-Series(data, weight, onlinestats...)
-```
-
-Manager for an OnlineStat or tuple of OnlineStats.
-### Examples
-```julia
-s = Series(Mean())
-s = Series(ExponentialWeight(), Mean(), Variance())
-s = Series(randn(100, 3), CovMatrix(3))
-```
-"""
-struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight}
-    weight::W
-    stats::OS
-end
+# struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
+#     weight::W
+#     stats::OS
+# end
 function Series(wt::Weight, T::Union{Tuple, OnlineStat})
     Series{input(T), typeof(T), typeof(wt)}(wt, T)
 end

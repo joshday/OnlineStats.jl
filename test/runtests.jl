@@ -19,7 +19,7 @@ info("Messy output for test coverage")
     println(HyperLogLog(5))
     println(KMeans(5,3))
     println(LinReg(5))
-    println(StatLearn(5))
+    # println(StatLearn(5))
     o = Mean()
     Series(LearningRate(), o)
     for stat in o

@@ -3,16 +3,12 @@ module OnlineStats
 
 import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
     CoefTable, stderr, vcov
-importall LearnBase
-import SweepOperator, LossFunctions, PenaltyFunctions, Distributions
+importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
+import SweepOperator, Distributions
 Ds = Distributions
 
-using LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
+using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
 
-# Reexports
-# for pkg in [:LearnBase, :LossFunctions, :PenaltyFunctions]
-#     eval(Expr(:toplevel, Expr(:export, setdiff(names(eval(pkg)), [pkg])...)))
-# end
 
 export
     # OnlineStatMeta
@@ -39,18 +35,6 @@ export
 
 #-----------------------------------------------------------------------------# types
 # 0 = scalar, 1 = vector, 2 = matrix, -1 = unknown, or Ds.Distribution
-"""
-    OnlineStat{I, O}
-Abstract type which provides input `I` and output `O` dimensions or object.
-- 0 = scalar
-- 1 = vector
-- 2 = matrix
-- -1 = unknown size
-- Distribution
-- (1, 0) = x,y pair where x is a vector, y is a scalar
-"""
-abstract type OnlineStat{INDIM, OUTDIM} end
-abstract type StochasticStat{I, O} <: OnlineStat{I, O} end
 
 const AA        = AbstractArray
 const VecF      = Vector{Float64}

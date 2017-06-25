@@ -1,5 +1,4 @@
 #--------------------------------------------------------------------# Weight
-abstract type Weight end
 fields_to_show(w::Weight) = setdiff(fieldnames(w), [:nups])
 function Base.show(io::IO, w::Weight)
     print(io, name(w))

@@ -352,3 +352,8 @@ Base.sum(o::Sum) = o.sum
 fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64) = (v = convert(T, x); o.sum += v)
 fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64) =       (v = round(T, x);   o.sum += v)
 fitbatch!(o::Sum, y::AVec, γ::Float64) = fit!(o, sum(y), γ)
+
+#-----------------------------------------------------------------------# Hist
+struct Hist <: OnlineStat{0, 1}
+
+end
