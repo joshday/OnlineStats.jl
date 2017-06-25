@@ -1,16 +1,15 @@
 #-----------------------------------------------------------------------# Series
-# NOTE: This lives in OnlineStatsBase now
 # struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
 #     weight::W
 #     stats::OS
 # end
-
-# Treat this as inner constructor
+# act as inner consturctor
 function Series(wt::Weight, T::Union{Tuple, OnlineStat})
     I = input(T)
     Series{input(T), typeof(T), typeof(wt)}(wt, T)
 end
 
+# check input during "inner constructor"
 input{I, O}(o::OnlineStat{I, O}) = I
 output{I, O}(o::OnlineStat{I, O}) = O
 function input(t::Tuple)
@@ -21,6 +20,7 @@ function input(t::Tuple)
     I
 end
 
+# check default weights match during outer constructors
 default_weight(o::OnlineStat) = EqualWeight()
 default_weight(o::StochasticStat) = LearningRate()
 function default_weight(t::Tuple)
