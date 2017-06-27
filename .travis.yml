@@ -4,9 +4,10 @@ os:
   - osx
 julia:
   - 0.6
-# matrix:
-#   allow_failures:
-#     - julia: nightly
+  - nightly
+matrix:
+  allow_failures:
+    - julia: nightly
 notifications:
   email: true
 script:
