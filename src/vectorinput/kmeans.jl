@@ -20,7 +20,7 @@ fields_to_show(o::KMeans) = [:value]
 default_weight(::KMeans) = LearningRate()
 function fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
     d, k = size(o.value)
-    @assert length(x) == d
+    length(x) == d || throw(DimensionMismatch())
     for j in 1:k
         o.v[j] = sum(abs2, x - view(o.value, :, j))
     end
@@ -32,7 +32,7 @@ end
 
 function fitbatch!{T<:Real}(o::KMeans, x::AMat{T}, γ::Float64)
     d, k = size(o.value)
-    @assert size(x, 2) == d
+    size(x, 2) == d || throw(DimensionMismatch())
     x̄ = vec(mean(x, 1))
     for j in 1:k
         o.v[j] = sum(abs2, x̄ - view(o.value, :, j))

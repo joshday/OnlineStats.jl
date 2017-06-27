@@ -45,8 +45,6 @@ const AMat{T}   = AbstractMatrix{T}
 const AVecF     = AVec{Float64}
 const AMatF     = AMat{Float64}
 
-const VectorObservation = Union{AVec, NTuple}
-
 include("show.jl")
 
 #---------------------------------------------------------------------------# helpers
@@ -64,14 +62,8 @@ function smooth!(m::AbstractArray, v::AbstractArray, γ::Float64)
         @inbounds m[i] = smooth(m[i], v[i], γ)
     end
 end
-function smooth!(m::AbstractVector, v::VectorObservation, γ::Float64)
-    length(m) == length(v) || throw(DimensionMismatch())
-    for i in eachindex(v)
-        @inbounds m[i] = smooth(m[i], v[i], γ)
-    end
-end
-function smooth_syr!(A::AMat, x::VectorObservation, γ::Float64)
-    @assert size(A, 1) == length(x)
+function smooth_syr!(A::AMat, x::AVec, γ::Float64)
+    size(A, 1) == length(x) || throw(DimensionMismatch())
     for j in 1:size(A, 2), i in 1:j
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end

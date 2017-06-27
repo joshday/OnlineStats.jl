@@ -18,7 +18,7 @@ mutable struct CovMatrix <: OnlineStat{1, 2}
     nobs::Int
     CovMatrix(p::Integer) = new(zeros(p, p), zeros(p, p), zeros(p, p), zeros(p), 0)
 end
-function fit!(o::CovMatrix, x::VectorObservation, γ::Float64)
+function fit!(o::CovMatrix, x::AVec, γ::Float64)
     smooth!(o.b, x, γ)
     smooth_syr!(o.A, x, γ)
     o.nobs += 1
