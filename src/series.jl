@@ -80,7 +80,7 @@ value(s::Series, i::Integer) = value(s.stats[i])
 
 "Return the `stats` field of a Series."
 stats(s::Series) = s.stats
-stats(s::Series, i::Integer) = s.stats[i]
+# stats(s::Series, i::Integer) = s.stats[i]
 
 # helpers for weight
 nobs(o::Series) = nobs(o.weight)
@@ -217,6 +217,14 @@ function fit!(s::Series{1}, y::AMat, b::Integer)
         γ = weight!(s, bi)
         map(o -> fitbatch!(o, yi, γ), s.stats)
     end
+    s
+end
+
+
+# tuple version
+function fit!(s::Series{1}, y::NTuple)
+    γ = weight!(s)
+    map(s -> fit!(s, y, γ), s.stats)
     s
 end
 
