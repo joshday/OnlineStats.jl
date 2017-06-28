@@ -122,6 +122,7 @@ end
 
 
 #-----------------------------------------------------------------------# McclainWeight
+# Link with MANY weighting schemes:
 # http://castlelab.princeton.edu/ORF569papers/Powell%20ADP%20Chapter%206.pdf
 """
 ```julia
