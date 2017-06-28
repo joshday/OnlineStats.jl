@@ -56,8 +56,9 @@ info("TESTS BEGIN HERE")
     w3 = @inferred BoundedEqualWeight()
     w4 = @inferred LearningRate()
     w5 = @inferred LearningRate2()
+    w6 = @inferred McclainWeight()
 
-    for w in [w1, w3, w4, w5]
+    for w in [w1, w3, w4, w5, w6]
         @test OnlineStats.weight!(w, 1) == 1
     end
     for i in 1:10
@@ -72,6 +73,9 @@ info("TESTS BEGIN HERE")
 
     @inferred ExponentialWeight(100)
     @inferred BoundedEqualWeight(100)
+    @inferred McclainWeight(.2)
+    @test_throws ArgumentError McclainWeight(-1.)
+    @test_throws ArgumentError McclainWeight(1.1)
 
     @test EqualWeight() == EqualWeight()
     @test LearningRate() == LearningRate()

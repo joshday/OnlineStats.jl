@@ -13,8 +13,9 @@ weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
 
 @recipe function f(wt::Weight; nobs=50)
     xlab --> "Number of Observations"
-    ylabe --> "Weight Value"
+    ylab --> "Weight Value"
     label --> name(wt)
+    ylim --> (0, 1)
     w --> 2
     W = deepcopy(wt)
     v = zeros(nobs)
@@ -69,8 +70,6 @@ BoundedEqualWeight(lookback::Integer)
 
 - Use EqualWeight until threshold `λ` is hit, then hold constant.
 - Singleton weight at observation `t` is `γ = max(1 / t, λ)`
-
-
 """
 mutable struct BoundedEqualWeight <: Weight
     λ::Float64
@@ -119,4 +118,32 @@ mutable struct LearningRate2 <: Weight
 end
 function weight(w::LearningRate2, n2::Int = 1)
     max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
+end
+
+
+#-----------------------------------------------------------------------# McclainWeight
+# http://castlelab.princeton.edu/ORF569papers/Powell%20ADP%20Chapter%206.pdf
+"""
+```julia
+McclainWeight(ᾱ = 0.1)
+```
+
+- "smoothed" version of `BoundedEqualWeight`
+- weights asymptotically approach `ᾱ`
+- Singleton weight at observation `t` is `γ(t-1) / (1 + γ(t-1) - ᾱ)`
+"""
+mutable struct McclainWeight <: Weight
+    ᾱ::Float64
+    last::Float64
+    nobs::Int
+    nups::Int
+    function McclainWeight(ᾱ = .1)
+        0 < ᾱ < 1 || throw(ArgumentError("value must be between 0 and 1"))
+        new(ᾱ, 1.0, 0, 0)
+    end
+end
+fields_to_show(w::McclainWeight) = [:ᾱ, :nobs]
+function weight(w::McclainWeight, n2::Int = 1)
+    w.nups == 1 && return 1.0
+    w.last = w.last / (1 + w.last - w.ᾱ)
 end
