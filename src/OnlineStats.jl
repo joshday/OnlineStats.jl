@@ -15,7 +15,7 @@ export
     Series, Bootstrap,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
-    McclainWeight,
+    McclainWeight, HarmonicWeight,
     # functions
     maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef, coeftable,
     vcov, mse, stderr,

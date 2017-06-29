@@ -57,8 +57,9 @@ info("TESTS BEGIN HERE")
     w4 = @inferred LearningRate()
     w5 = @inferred LearningRate2()
     w6 = @inferred McclainWeight()
+    w7 = @inferred HarmonicWeight(5.)
 
-    for w in [w1, w3, w4, w5, w6]
+    for w in [w1, w3, w4, w5, w6, w7]
         @test OnlineStats.weight!(w, 1) == 1
     end
     for i in 1:10
@@ -67,9 +68,9 @@ info("TESTS BEGIN HERE")
         @test OnlineStats.weight(w3) == 1 / i
         @test OnlineStats.weight(w4) ≈ i ^ -w4.r
         @test OnlineStats.weight(w5) ≈ 1 / (1 + w5.c * (i-1))
-        map(OnlineStats.updatecounter!, [w1, w2, w3, w4, w5])
+        @test OnlineStats.weight(w7) ≈ 5. / (5. + i - 1)
+        map(OnlineStats.updatecounter!, [w1, w2, w3, w4, w5, w7])
     end
-    # @test OnlineStats.weight(w3, 1_000_000, 1, 1_000_000) == w3.λ
 
     @inferred ExponentialWeight(100)
     @inferred BoundedEqualWeight(100)

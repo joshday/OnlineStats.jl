@@ -121,6 +121,28 @@ function weight(w::LearningRate2, n2::Int = 1)
 end
 
 
+#-----------------------------------------------------------------------# HarmonicWeight
+"""
+```julia
+HarmonicWeight(a = 10.0)
+```
+- Decreases at a slow rate
+- Singleton weight at observation `t` is `γ = a / (a + t - 1)`
+"""
+mutable struct HarmonicWeight <: Weight
+    a::Float64
+    nobs::Int
+    nups::Int
+    function HarmonicWeight(a::Float64 = 10.0)
+        a > 0 || throw(ArgumentError("`a` must be greater than 0"))
+        new(a, 0, 0)
+    end
+end
+function weight(w::HarmonicWeight, n2::Int = 1)
+    w.a / (w.a + w.nobs - 1)
+end
+
+
 #-----------------------------------------------------------------------# McclainWeight
 # Link with MANY weighting schemes:
 # http://castlelab.princeton.edu/ORF569papers/Powell%20ADP%20Chapter%206.pdf
