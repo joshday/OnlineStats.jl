@@ -3,6 +3,7 @@ module OnlineStats
 
 import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
     CoefTable, stderr, vcov
+import OnlineStatsBase: show_fields, fields_to_show, weight, weight!, updatecounter!, nups
 importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
 import SweepOperator, Distributions
 Ds = Distributions
@@ -35,9 +36,6 @@ export
     ObsDim
 
 #-----------------------------------------------------------------------------# types
-# 0 = scalar, 1 = vector, 2 = matrix, -1 = unknown, or Ds.Distribution
-abstract type StochasticStat{I, O} <: OnlineStat{I, O} end
-
 const AA        = AbstractArray
 const VecF      = Vector{Float64}
 const MatF      = Matrix{Float64}
@@ -54,7 +52,6 @@ can_be_exact(o::OnlineStat) = default_weight(o) == EqualWeight()
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
 input{I, O}(o::OnlineStat{I, O}) = I
 output{I, O}(o::OnlineStat{I, O}) = O
-Base.merge{T <: OnlineStat}(o::T, o2::T, wt::Float64) = merge!(copy(o), o2, wt)
 unbias(o) = o.nobs / (o.nobs - 1)
 
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)

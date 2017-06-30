@@ -1,16 +1,4 @@
 #--------------------------------------------------------------------# Weight
-fields_to_show(w::Weight) = setdiff(fieldnames(w), [:nups])
-Base.show(io::IO, w::Weight) = (print(io, name(w)); show_fields(io, w))
-function Base.:(==){T <: Weight}(w1::T, w2::T)
-    nms = fieldnames(w1)
-    all(getfield.(w1, nms) .== getfield.(w2, nms))
-end
-
-nobs(w::Weight) = w.nobs
-nups(w::Weight) = w.nups
-updatecounter!(w::Weight, n2::Int = 1) = (w.nobs += n2; w.nups += 1;)
-weight!(w::Weight, n2::Int = 1) = (updatecounter!(w, n2); weight(w, n2))
-
 @recipe function f(wt::Weight; nobs=50)
     xlab --> "Number of Observations"
     ylab --> "Weight Value"

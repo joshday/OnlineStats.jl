@@ -30,7 +30,7 @@ function Bootstrap{I, O <:OnlineStat{I}}(s::Series{I, O}, nreps::Integer, d,
     Bootstrap{I, D, O, S, F}(s, replicates, f, d)
 end
 function Base.show(io::IO, b::Bootstrap)
-    header(io, name(b))
+    OnlineStatsBase.header(io, name(b))
     println(io)
     println(io, "    > n replicates : $(length(b.replicates))")
     println(io, "    > function     : $(b.f)")

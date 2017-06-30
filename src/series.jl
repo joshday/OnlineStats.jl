@@ -76,43 +76,10 @@ value(s::Series, i::Integer) = value(s.stats[i])
 stats(s::Series) = s.stats
 # stats(s::Series, i::Integer) = s.stats[i]
 
-# helpers for weight
-nobs(o::Series) = nobs(o.weight)
-nups(o::Series) = nups(o.weight)
-weight(o::Series, n2::Int = 1) = weight(o.weight, n2)
-weight!(o::Series, n2::Int = 1) = weight!(o.weight, n2)
-updatecounter!(o::Series, n2::Int = 1) = updatecounter!(o.weight, n2)
 
-Base.copy(o::Series) = deepcopy(o)
 
 #--------------------------------------------------------------------------# Show
-function Base.show{I, OS<:Tuple, W}(io::IO, s::Series{I, OS, W})
-    header(io, name(s))
-    println(io)
-    print(io, "┣━━ ")
-    println(io, s.weight)
-    println(io, "┗━━ Tracking")
-    names = name.(s.stats)
-    indent = maximum(length.(names))
-    n = length(names)
-    i = 0
-    for o in s.stats
-        i += 1
-        char = ifelse(i == n, "┗━━", "┣━━")
-        print(io, "    $char ")
-        print(io, names[i])
-        print(io, repeat(" ", indent - length(names[i])))
-        print(io, " : $(value(o))")
-        i == n || println(io)
-    end
-end
-function Base.show{I, O <: OnlineStat, W}(io::IO, s::Series{I, O, W})
-    header(io, name(s))
-    println(io)
-    print(io, "┣━━ ")
-    println(io, s.weight)
-    print(io, "┗━━ $(name(s.stats)) : $(value(s.stats))")
-end
+
 
 
 
@@ -281,32 +248,5 @@ function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
     s
 end
 
-
-#--------------------------------------------------------------------------# merge!
-Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append) = merge!(copy(s1), s2, method)
-Base.merge{T <: Series}(s1::T, s2::T, w::Float64) = merge!(copy(s1), s2, w)
-
-function Base.merge!{T <: Series}(s1::T, s2::T, method::Symbol = :append)
-    n2 = nobs(s2)
-    n2 == 0 && return s1
-    updatecounter!(s1, n2)
-    if method == :append
-        merge!.(s1.stats, s2.stats, weight(s1, n2))
-    elseif method == :mean
-        merge!.(s1.stats, s2.stats, (weight(s1) + weight(s2)))
-    elseif method == :singleton
-        merge!.(s1.stats, s2.stats, weight(s1))
-    else
-        throw(ArgumentError("method must be :append, :mean, or :singleton"))
-    end
-    s1
-end
-function Base.merge!{T <: Series}(s1::T, s2::T, w::Float64)
-    n2 = nobs(s2)
-    n2 == 0 && return s1
-    updatecounter!(s1, n2)
-    merge!.(s1.stats, s2.stats, w)
-    s1
-end
 
 fit!{T <: Series}(s1::T, s2::T) = merge!(s1, s2)
