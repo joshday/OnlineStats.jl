@@ -1,77 +1,9 @@
-struct Series{I, OS <: Union{Tuple, OnlineStat{I}}, W <: Weight} <: AbstractSeries
+struct Series{I, OS <: Union{OnlineStat, Tuple}, W <: Weight} <: AbstractSeries
     weight::W
     stats::OS
 end
 function Series(wt::Weight, T::Union{Tuple, OnlineStat})
     Series{input(T), typeof(T), typeof(wt)}(wt, T)
-end
-function input(t::Tuple)
-    I = input(t[1])
-    if !all(x -> input(x) == I, t)
-        throw(ArgumentError("Input dimensions must match.  Found: $(input.(t))"))
-    end
-    I
-end
-
-function Base.show{I, OS<:Tuple, W}(io::IO, s::Series{I, OS, W})
-    header(io, name(s))
-    println(io)
-    print(io, "┣━━ ")
-    println(io, s.weight)
-    println(io, "┗━━ Tracking")
-    names = name.(s.stats)
-    indent = maximum(length.(names))
-    n = length(names)
-    i = 0
-    for o in s.stats
-        i += 1
-        char = ifelse(i == n, "┗━━", "┣━━")
-        print(io, "    $char ")
-        print(io, names[i])
-        print(io, repeat(" ", indent - length(names[i])))
-        print(io, " : $(value(o))")
-        i == n || println(io)
-    end
-end
-function Base.show{I, O <: OnlineStat, W}(io::IO, s::Series{I, O, W})
-    header(io, name(s))
-    println(io)
-    print(io, "┣━━ ")
-    println(io, s.weight)
-    print(io, "┗━━ $(name(s.stats)) : $(value(s.stats))")
-end
-
-
-function Base.merge{T <: Series}(s1::T, s2::T, method::Symbol = :append)
-    merge!(copy(s1), s2, method)
-end
-
-function Base.merge{T <: Series}(s1::T, s2::T, w::Float64)
-    merge!(copy(s1), s2, w)
-end
-
-function Base.merge!{T <: Series}(s1::T, s2::T, method::Symbol = :append)
-    n2 = nobs(s2)
-    n2 == 0 && return s1
-    updatecounter!(s1, n2)
-    if method == :append
-        merge!.(s1.stats, s2.stats, weight(s1, n2))
-    elseif method == :mean
-        merge!.(s1.stats, s2.stats, (weight(s1) + weight(s2)))
-    elseif method == :singleton
-        merge!.(s1.stats, s2.stats, weight(s1))
-    else
-        throw(ArgumentError("method must be :append, :mean, or :singleton"))
-    end
-    s1
-end
-function Base.merge!{T <: Series}(s1::T, s2::T, w::Float64)
-    n2 = nobs(s2)
-    n2 == 0 && return s1
-    0 <= w <= 1 || throw(ArgumentError("weight must be between 0 and 1"))
-    updatecounter!(s1, n2)
-    merge!.(s1.stats, s2.stats, w)
-    s1
 end
 
 # check default weights match during outer constructors
@@ -122,8 +54,7 @@ end
 #--------------------------------------------------------------------------# Series methods
 "Map `value` to the `stats` field of a Series."
 value(s::Series) = map(value, s.stats)
-value(s::Series, i::Integer) = value(s.stats[i])
-
+value(s::Series, i) = value(s.stats[i])
 
 "Return the `stats` field of a Series."
 stats(s::Series) = s.stats

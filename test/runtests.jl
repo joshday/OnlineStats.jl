@@ -7,7 +7,7 @@ info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
     println(Series(Mean(), Variance()))
-    println(Bootstrap(Series(Mean()), 100, Poisson()))
+    # println(Bootstrap(Series(Mean()), 100, Poisson()))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
     println(Variance())
@@ -353,19 +353,19 @@ end
     s = Series(x, o)
     fit!(s, x, 5)
 end
-@testset "Bootstrap" begin
-    b = Bootstrap(Series(Mean()), 100, [0, 2])
-    fit!(b, randn(1000))
-    value(b)        # `fun` mapped to replicates
-    mean(value(b))  # mean
-    @test replicates(b) == b.replicates
-    confint(b)
-    confint(b, .95, :normal)
-    @test_throws Exception confint(b, .95, :fake_method)
-
-    b = Bootstrap(Series(MV(3, Mean())), 100, Poisson())
-    fit!(b, randn(100, 3))
-end
+# @testset "Bootstrap" begin
+#     b = Bootstrap(Series(Mean()), 100, [0, 2])
+#     fit!(b, randn(1000))
+#     value(b)        # `fun` mapped to replicates
+#     mean(value(b))  # mean
+#     @test replicates(b) == b.replicates
+#     confint(b)
+#     confint(b, .95, :normal)
+#     @test_throws Exception confint(b, .95, :fake_method)
+#
+#     b = Bootstrap(Series(MV(3, Mean())), 100, Poisson())
+#     fit!(b, randn(100, 3))
+# end
 @testset "Column obs." begin
     x = randn(5, 1000)
 

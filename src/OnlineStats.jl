@@ -4,7 +4,7 @@ module OnlineStats
 import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
     CoefTable, stderr, vcov
 import OnlineStatsBase: show_fields, fields_to_show, weight, weight!, updatecounter!, nups,
-    header
+    header, input
 importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
 import SweepOperator, Distributions
 Ds = Distributions
@@ -116,7 +116,7 @@ include("vectorinput/kmeans.jl")
 include("distributions.jl")
 include("scalarinput/normalmix.jl")
 include("streamstats/hyperloglog.jl")
-include("streamstats/bootstrap.jl")
+# include("streamstats/bootstrap.jl")
 include("xyinput/statlearn.jl")
 include("xyinput/linreg.jl")
 
