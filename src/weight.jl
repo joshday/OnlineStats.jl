@@ -1,4 +1,4 @@
-#--------------------------------------------------------------------# EqualWeight
+#-------------------------------------------------------------------------# EqualWeight
 """
 ```julia
 EqualWeight()
@@ -12,8 +12,7 @@ mutable struct EqualWeight <: Weight
     EqualWeight() = new(0, 0)
 end
 weight(w::EqualWeight, n2::Int = 1) = n2 / w.nobs
-
-#--------------------------------------------------------------------# ExponentialWeight
+#-------------------------------------------------------------------------# ExponentialWeight
 """
 ```julia
 ExponentialWeight(λ::Real = 0.1)
@@ -30,8 +29,7 @@ mutable struct ExponentialWeight <: Weight
     ExponentialWeight(lookback::Integer) = new(2 / (lookback + 1), 0, 0)
 end
 weight(w::ExponentialWeight, n2::Int = 1) = w.λ
-
-#--------------------------------------------------------------------# BoundedEqualWeight
+#-------------------------------------------------------------------------# BoundedEqualWeight
 """
 ```julia
 BoundedEqualWeight(λ::Real = 0.1)
@@ -48,8 +46,7 @@ mutable struct BoundedEqualWeight <: Weight
     BoundedEqualWeight(lookback::Integer) = new(2 / (lookback + 1), 0, 0)
 end
 weight(w::BoundedEqualWeight, n2::Int = 1) = max(n2 / w.nobs, w.λ)
-
-#--------------------------------------------------------------------# LearningRate
+#-------------------------------------------------------------------------# LearningRate
 """
 ```julia
 LearningRate(r = .6, λ = 0.0)
@@ -66,8 +63,7 @@ mutable struct LearningRate <: Weight
     LearningRate(r::Real = .6, λ::Real = 0.0) = new(λ, r, 0, 0)
 end
 weight(w::LearningRate, n2::Int = 1) = max(w.λ, exp(-w.r * log(w.nups)))
-
-#--------------------------------------------------------------------# LearningRate2
+#-------------------------------------------------------------------------# LearningRate2
 """
 ```julia
 LearningRate2(c = .5, λ = 0.0)
@@ -86,9 +82,7 @@ end
 function weight(w::LearningRate2, n2::Int = 1)
     max(w.λ, 1.0 / (1.0 + w.c * (w.nups - 1)))
 end
-
-
-#-----------------------------------------------------------------------# HarmonicWeight
+#-------------------------------------------------------------------------# HarmonicWeight
 """
 ```julia
 HarmonicWeight(a = 10.0)
@@ -108,9 +102,7 @@ end
 function weight(w::HarmonicWeight, n2::Int = 1)
     w.a / (w.a + w.nobs - 1)
 end
-
-
-#-----------------------------------------------------------------------# McclainWeight
+#-------------------------------------------------------------------------# McclainWeight
 # Link with many weighting schemes:
 # http://castlelab.princeton.edu/ORF569papers/Powell%20ADP%20Chapter%206.pdf
 """
@@ -136,9 +128,6 @@ function weight(w::McclainWeight, n2::Int = 1)
     w.nups == 1 && return 1.0
     w.last = w.last / (1 + w.last - w.ᾱ)
 end
-
-
-
 #-----------------------------------------------------------------------# Plot recipe
 @recipe function f(wt::Weight; nobs=50)
     xlab --> "Number of Observations"
