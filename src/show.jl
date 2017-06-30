@@ -8,17 +8,9 @@ function name(o, withparams = true)
     s
 end
 
-# first line of Series or Bootstrap
-
 
 # second line, the weight
 function print_weight(io::IO, W)
     print(io, "┣━━ ")
     println(io, W)
 end
-
-
-
-
-#----------------------------------------------------------# Default OnlineStat show method
-Base.show(io::IO, o::OnlineStat) = (print(io, name(o)); show_fields(io, o))
