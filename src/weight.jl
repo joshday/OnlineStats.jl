@@ -1,25 +1,8 @@
-#--------------------------------------------------------------------# Weight
-@recipe function f(wt::Weight; nobs=50)
-    xlab --> "Number of Observations"
-    ylab --> "Weight Value"
-    label --> name(wt)
-    ylim --> (0, 1)
-    w --> 2
-    W = deepcopy(wt)
-    v = zeros(nobs)
-    for i in eachindex(v)
-        updatecounter!(W)
-        v[i] = weight(W)
-    end
-    v
-end
-
 #--------------------------------------------------------------------# EqualWeight
 """
 ```julia
 EqualWeight()
 ```
-
 - Equally weighted observations
 - Singleton weight at observation `t` is `γ = 1 / t`
 """
@@ -36,7 +19,6 @@ weight(w::EqualWeight, n2::Int = 1) = n2 / w.nobs
 ExponentialWeight(λ::Real = 0.1)
 ExponentialWeight(lookback::Integer)
 ```
-
 - Exponentially weighted observations (constant)
 - Singleton weight at observation `t` is `γ = λ`
 """
@@ -55,7 +37,6 @@ weight(w::ExponentialWeight, n2::Int = 1) = w.λ
 BoundedEqualWeight(λ::Real = 0.1)
 BoundedEqualWeight(lookback::Integer)
 ```
-
 - Use EqualWeight until threshold `λ` is hit, then hold constant.
 - Singleton weight at observation `t` is `γ = max(1 / t, λ)`
 """
@@ -73,7 +54,6 @@ weight(w::BoundedEqualWeight, n2::Int = 1) = max(n2 / w.nobs, w.λ)
 ```julia
 LearningRate(r = .6, λ = 0.0)
 ```
-
 - Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
 - Decreases at a "slow" rate until threshold `λ` is reached
 - Singleton weight at observation `t` is `γ = max(1 / t ^ r, λ)`
@@ -92,7 +72,6 @@ weight(w::LearningRate, n2::Int = 1) = max(w.λ, exp(-w.r * log(w.nups)))
 ```julia
 LearningRate2(c = .5, λ = 0.0)
 ```
-
 - Mainly for stochastic approximation types (`QuantileSGD`, `QuantileMM` etc.)
 - Decreases at a "slow" rate until threshold `λ` is reached
 - Singleton weight at observation `t` is `γ = max(inv(1 + c * (t - 1), λ)`
@@ -132,13 +111,12 @@ end
 
 
 #-----------------------------------------------------------------------# McclainWeight
-# Link with MANY weighting schemes:
+# Link with many weighting schemes:
 # http://castlelab.princeton.edu/ORF569papers/Powell%20ADP%20Chapter%206.pdf
 """
 ```julia
 McclainWeight(ᾱ = 0.1)
 ```
-
 - "smoothed" version of `BoundedEqualWeight`
 - weights asymptotically approach `ᾱ`
 - Singleton weight at observation `t` is `γ(t-1) / (1 + γ(t-1) - ᾱ)`
@@ -157,4 +135,22 @@ fields_to_show(w::McclainWeight) = [:ᾱ, :nobs]
 function weight(w::McclainWeight, n2::Int = 1)
     w.nups == 1 && return 1.0
     w.last = w.last / (1 + w.last - w.ᾱ)
+end
+
+
+
+#-----------------------------------------------------------------------# Plot recipe
+@recipe function f(wt::Weight; nobs=50)
+    xlab --> "Number of Observations"
+    ylab --> "Weight Value"
+    label --> name(wt)
+    ylim --> (0, 1)
+    w --> 2
+    W = deepcopy(wt)
+    v = zeros(nobs)
+    for i in eachindex(v)
+        updatecounter!(W)
+        v[i] = weight(W)
+    end
+    v
 end
