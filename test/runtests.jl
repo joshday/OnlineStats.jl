@@ -481,9 +481,6 @@ end
         @test o.value[j] in 1:1000
     end
 end
-@testset "Misc" begin
-    @test length(Mean()) == 1
-end
 
 
 end

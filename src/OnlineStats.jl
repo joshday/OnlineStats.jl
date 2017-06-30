@@ -52,7 +52,8 @@ include("show.jl")
 can_be_exact(o::OnlineStat) = default_weight(o) == EqualWeight()
 
 value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
-Base.copy(o::OnlineStat) = deepcopy(o)
+input{I, O}(o::OnlineStat{I, O}) = I
+output{I, O}(o::OnlineStat{I, O}) = O
 Base.merge{T <: OnlineStat}(o::T, o2::T, wt::Float64) = merge!(copy(o), o2, wt)
 unbias(o) = o.nobs / (o.nobs - 1)
 

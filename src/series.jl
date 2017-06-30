@@ -10,8 +10,6 @@ function Series(wt::Weight, T::Union{Tuple, OnlineStat})
 end
 
 # check input during "inner constructor"
-input{I, O}(o::OnlineStat{I, O}) = I
-output{I, O}(o::OnlineStat{I, O}) = O
 function input(t::Tuple)
     I = input(t[1])
     if !all(x -> input(x) == I, t)
@@ -67,11 +65,7 @@ end
 
 #--------------------------------------------------------------------------# Series methods
 # Need the following so certain things work for both an OnlineStat and tuple of OnlineStats
-Base.start(o::OnlineStat) = false
-Base.next(o::OnlineStat, state) = o, true
-Base.done(o::OnlineStat, state) = state
-Base.map(f::Function, o::OnlineStat) = f(o)
-Base.length(o::OnlineStat) = 1
+# Base.length(o::OnlineStat) = 1
 
 "Map `value` to the `stats` field of a Series."
 value(s::Series) = map(value, s.stats)
