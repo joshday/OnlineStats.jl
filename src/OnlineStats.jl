@@ -13,7 +13,7 @@ using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
 
 
 export
-    # OnlineStatMeta
+    # AbstractSeries
     Series, Bootstrap,
     # Weight
     Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,

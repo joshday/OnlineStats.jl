@@ -17,7 +17,7 @@ function default_weight(t::Tuple)
     w
 end
 
-
+nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 
 # empty
 Series(t::Tuple)         = Series(default_weight(t), t)

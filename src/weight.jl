@@ -1,3 +1,4 @@
+nobs(w::Weight) = OnlineStatsBase.nobs(w)
 #-------------------------------------------------------------------------# EqualWeight
 """
 ```julia
