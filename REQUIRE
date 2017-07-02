@@ -1,5 +1,5 @@
 julia 0.6.0
-OnlineStatsBase
+OnlineStatsBase 0.0.3
 StatsBase
 LearnBase
 Distributions
