@@ -1,3 +1,20 @@
+"""
+    Series(stats...)
+    Series(data, stats...)
+    Series(weight, stats...)
+    Series(weight, data, stats...)
+A Series is a container for a Weight and any number of OnlineStats.  Updating the Series
+with `fit!(s, data)` will update the OnlineStats it holds according to its Weight.
+
+### Examples
+    Series(randn(100), Mean(), Variance())
+    Series(ExponentialWeight(.1), Mean())
+
+    s = Series(Mean())
+    fit!(s, randn(100))
+    s2 = Series(randn(123), Mean())
+    merge(s, s2)
+"""
 struct Series{I, OS <: Union{OnlineStat, Tuple}, W <: Weight} <: AbstractSeries
     weight::W
     stats::OS

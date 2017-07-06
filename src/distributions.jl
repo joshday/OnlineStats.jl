@@ -166,7 +166,7 @@ end
 FitNormal()
 ```
 Online parameter estimate of a Normal distribution (MLE)
-### FitNormal()
+### Example
 ```julia
 using Distributions
 y = rand(Normal(-3, 4), 1000)
@@ -185,6 +185,12 @@ end
 
 #-----------------------------------------------------------------------# Multinomial
 # TODO: Allow each observation to have a different n
+"""
+```julia
+FitMultinomial(p)
+```
+Online parameter estimate of a Multinomial distribution.
+"""
 mutable struct FitMultinomial <: DistributionStat{1}
     mvmean::MV{Mean}
     nobs::Int
