@@ -180,6 +180,12 @@ end
     s2 = Series(y2, Moments())
     s3 = merge(s1, s2)
     @test mean(s3.stats) ≈ mean(vcat(y1, y2))
+
+    y1, y2 = randn(5, 2), randn(10, 2)
+    o1, o2 = MV(2, Mean()), MV(2, Mean())
+    s1, s2 = Series(y1, o1), Series(y2, o2)
+    merge!(s1, s2)
+    @test nobs(s1) == 15
 end
 
 moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
@@ -254,8 +260,8 @@ end
             s = Series(y, wt, o)
             fit!(s, y)
             myfit = @eval fit($d, $y)
-            for i in 1:length(params(o))
-                @test params(o)[i] ≈ params(myfit)[i] atol = tol
+            for i in 1:length(Distributions.params(o))
+                @test Distributions.params(o)[i] ≈ Distributions.params(myfit)[i] atol = tol
             end
         end
         testdist(:Beta)
@@ -284,7 +290,7 @@ end
         y = rand(Multinomial(10, ones(5) / 5), 1000)
         myfit = fit(Multinomial, y)
         o = FitMultinomial(5)
-        @test params(value(o)) == (1, ones(5) / 5)
+        @test Distributions.params(value(o)) == (1, ones(5) / 5)
         s = Series(o)
         fit!(s, y')
         @test probs(o) ≈ probs(myfit)
@@ -294,7 +300,7 @@ end
         myfit = fit(MvNormal, y)
         o = FitMvNormal(3)
         @test length(o) == 3
-        @test params(value(o))[1] == zeros(3)
+        @test Distributions.params(value(o))[1] == zeros(3)
         s = Series(y', o)
         @test mean(o) ≈ mean(myfit)
     end

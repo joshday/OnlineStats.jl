@@ -37,3 +37,5 @@ function fit!(o::MV, y::AVec, γ::Float64)
 end
 
 value(o::MV) = map(value, o.stats)
+
+Base.merge!{T <: MV}(o1::T, o2::T, γ::Float64) = merge!.(o1.stats, o2.stats, γ)
