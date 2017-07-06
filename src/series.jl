@@ -83,12 +83,12 @@ fit!(s, y, w)        # multiple observations: y[i] uses weight w[i]
 """
 function fit!(s::Series{0}, y::Singleton)
     γ = weight!(s)
-    map(s -> fit!(s, y, γ), s.stats)
+    foreach(s -> fit!(s, y, γ), s.stats)
     s
 end
 function fit!(s::Series{0}, y::Singleton, γ::Float64)
     updatecounter!(s)
-    map(s -> fit!(s, y, γ), s.stats)
+    foreach(s -> fit!(s, y, γ), s.stats)
     s
 end
 function fit!(s::Series{0}, y::AVec)
@@ -114,7 +114,7 @@ function fit!(s::Series{0}, y::AVec, b::Integer)
     maprows(b, y) do yi
         bi = length(yi)
         γ = weight!(s, bi)
-        map(o -> fitbatch!(o, yi, γ), s.stats)
+        foreach(o -> fitbatch!(o, yi, γ), s.stats)
     end
     s
 end
@@ -122,12 +122,12 @@ end
 #-----------------------------------------------------------------------# Series{1}
 function fit!(s::Series{1}, y::AVec)
     γ = weight!(s)
-    map(s -> fit!(s, y, γ), s.stats)
+    foreach(s -> fit!(s, y, γ), s.stats)
     s
 end
 function fit!(s::Series{1}, y::AVec, γ::Float64)
     updatecounter!(s)
-    map(s -> fit!(s, y, γ), s.stats)
+    foreach(s -> fit!(s, y, γ), s.stats)
     s
 end
 function fit!(s::Series{1}, y::AMat)
@@ -152,7 +152,7 @@ function fit!(s::Series{1}, y::AMat, b::Integer)
     maprows(b, y) do yi
         bi = size(yi, 1)
         γ = weight!(s, bi)
-        map(o -> fitbatch!(o, yi, γ), s.stats)
+        foreach(o -> fitbatch!(o, yi, γ), s.stats)
     end
     s
 end
@@ -161,7 +161,7 @@ end
 # tuple version
 function fit!(s::Series{1}, y::NTuple)
     γ = weight!(s)
-    map(s -> fit!(s, y, γ), s.stats)
+    foreach(s -> fit!(s, y, γ), s.stats)
     s
 end
 
@@ -189,12 +189,12 @@ end
 #-----------------------------------------------------------------------# Series{(1, 0)}
 function fit!(s::Series{(1,0)}, x::AVec, y::Number)
     γ = weight!(s)
-    map(s -> fit!(s, x, y, γ), s.stats)
+    foreach(s -> fit!(s, x, y, γ), s.stats)
     s
 end
 function fit!(s::Series{(1,0)}, x::AVec, y::Number, γ::Float64)
     updatecounter!(s)
-    map(s -> fit!(s, x, y, γ), s.stats)
+    foreach(s -> fit!(s, x, y, γ), s.stats)
     s
 end
 function fit!(s::Series{(1, 0)}, x::AMat, y::AVec)
@@ -219,7 +219,7 @@ function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
     maprows(b, x, y) do xi, yi
         bi = length(yi)
         γ = weight!(s, bi)
-        map(o -> fitbatch!(o, xi, yi, γ), s.stats)
+        foreach(o -> fitbatch!(o, xi, yi, γ), s.stats)
     end
     s
 end
