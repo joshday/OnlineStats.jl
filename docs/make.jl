@@ -14,5 +14,6 @@ deploydocs(
     repo   = "github.com/joshday/OnlineStats.jl.git",
     target = "build",
     deps   = nothing,
-    make   = nothing
+    make   = nothing,
+    julia  = "0.6"
 )
