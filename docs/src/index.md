@@ -43,12 +43,14 @@ Consider how weights affect the influence the next observation has on an online 
 \theta^{(t)} = (1-\gamma_t)\theta^{(t-1)} + \gamma_t x_t
 ```
 
-| Constructor                     | Weight at Update `t`       |
-|:--------------------------------|:---------------------------|
-| [`EqualWeight()`](@ref)         | `γ(t) = 1 / t`             |
-| [`ExponentialWeight(λ)`](@ref)  | `γ(t) = λ`                 |
-| [`BoundedEqualWeight(λ)`](@ref) | `γ(t) = max(1 / t, λ)`     |
-| [`LearningRate(r, λ)`](@ref)    | `γ(t) = max(1 / t ^ r, λ)` |
+| Constructor                     | Weight at Update `t`               |
+|:-------------------------------:|:----------------------------------:|
+| [`EqualWeight()`](@ref)         | `γ(t) = 1 / t`                     |
+| [`ExponentialWeight(λ)`](@ref)  | `γ(t) = λ`                         |
+| [`BoundedEqualWeight(λ)`](@ref) | `γ(t) = max(1 / t, λ)`             |
+| [`LearningRate(r, λ)`](@ref)    | `γ(t) = max(1 / t ^ r, λ)`         |
+| [`HarmonicWeight(a)`](@ref)     | `γ(t) = a / (a + t - 1)`           |
+| [`McclainWeight(a)`](@ref)      | `γ(t) = γ(t-1) / (1 + γ(t-1) - a)` |
 
 ![](https://user-images.githubusercontent.com/8075494/27964520-908491d4-6306-11e7-9bef-0634359e5aa6.png)
 
