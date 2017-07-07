@@ -50,7 +50,7 @@ Consider how weights affect the influence the next observation has on an online 
 | [`BoundedEqualWeight(λ)`](@ref) | `γ(t) = max(1 / t, λ)`     |
 | [`LearningRate(r, λ)`](@ref)    | `γ(t) = max(1 / t ^ r, λ)` |
 
-![](https://cloud.githubusercontent.com/assets/8075494/18796073/9c844b30-8195-11e6-89a1-7ad9b4d891f2.png)
+![](https://user-images.githubusercontent.com/8075494/27964520-908491d4-6306-11e7-9bef-0634359e5aa6.png)
 
 
 ## Series
