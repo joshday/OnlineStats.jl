@@ -72,7 +72,6 @@ mutable struct FitCauchy <: OnlineStat{0, 1, LearningRate}
     nobs::Int
     FitCauchy() = new(QuantileMM(), 0)
 end
-default_weight(o::FitCauchy) = LearningRate()
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
 function _value(o::FitCauchy)
     if o.nobs > 1

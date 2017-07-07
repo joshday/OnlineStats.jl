@@ -12,7 +12,7 @@ s = Series(y, o)
 struct MV{T} <: OnlineStat{1, -1, nothing}
     stats::Vector{T}
 end
-default_weight(o::MV) = default_weight(o.stats[1])
+weight(o::MV) = weight(o.stats[1])
 
 MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
 

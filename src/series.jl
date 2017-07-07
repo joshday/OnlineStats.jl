@@ -26,14 +26,14 @@ end
 nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 
 # empty
-Series(t::Tuple)         = Series(default_weight(t), t)
-Series(o::OnlineStat)    = Series(default_weight(o), o)
-Series(o::OnlineStat...) = Series(default_weight(o), o)
+Series(t::Tuple)         = Series(weight(t), t)
+Series(o::OnlineStat)    = Series(weight(o), o)
+Series(o::OnlineStat...) = Series(weight(o), o)
 Series(wt::Weight, o...) = Series(wt, o)  # leave out type annotation to avoid method confusion
 
 # init with data
-Series(y::AA, o::OnlineStat) = (s = Series(default_weight(o), o); fit!(s, y))
-Series(y::AA, o::OnlineStat...) = (s = Series(default_weight(o), o); fit!(s, y))
+Series(y::AA, o::OnlineStat) = (s = Series(weight(o), o); fit!(s, y))
+Series(y::AA, o::OnlineStat...) = (s = Series(weight(o), o); fit!(s, y))
 Series(y::AA, wt::Weight, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
 Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
 Series(wt::Weight, y::AA, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
@@ -41,11 +41,11 @@ Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
 
 # Special constructors for (1, 0) input
 function Series(x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)})
-    s = Series(default_weight(o), o)
+    s = Series(weight(o), o)
     fit!(s, x, y)
 end
 function Series(x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)}...)
-    s = Series(default_weight(o), o)
+    s = Series(weight(o), o)
     fit!(s, x, y)
 end
 function Series(wt::Weight, x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)})

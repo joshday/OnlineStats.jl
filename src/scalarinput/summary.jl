@@ -37,7 +37,6 @@ mutable struct Variance <: OnlineStat{0, 0, EqualWeight}
     nobs::Int
     Variance() = new(0.0, 0.0, 0)
 end
-fields_to_show(o::Variance) = [:σ2, :μ]
 function fit!(o::Variance, y::Real, γ::Float64)
     μ = o.μ
     o.nobs += 1
@@ -120,7 +119,6 @@ function fit!(o::OrderStats, y::Real, γ::Float64)
     end
     o
 end
-fields_to_show(o::OrderStats) = [:value]
 
 #--------------------------------------------------------------------# Moments
 """
@@ -146,7 +144,6 @@ function fit!(o::Moments, y::Real, γ::Float64)
     @inbounds o.m[3] = smooth(o.m[3], y * y * y, γ)
     @inbounds o.m[4] = smooth(o.m[4], y * y * y * y, γ)
 end
-fields_to_show(o::Moments) = [:m]
 Base.mean(o::Moments) = o.m[1]
 Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
 Base.std(o::Moments) = sqrt.(var(o))
@@ -273,7 +270,6 @@ mutable struct QuantileMM <: OnlineStat{0, 1, LearningRate}
     QuantileMM(τ::VecF = [.25, .5, .75]) = new(zeros(τ), τ, zeros(τ), zeros(τ), 0.0)
     QuantileMM(args...) = QuantileMM(collect(args))
 end
-fields_to_show(o::QuantileMM) = [:value, :τ]
 function fit!(o::QuantileMM, y::Real, γ::Float64)
     o.o = smooth(o.o, 1.0, γ)
     @inbounds for j in 1:length(o.τ)
