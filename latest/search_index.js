@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Online algorithms for statistics",
     "title": "Weighting",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence the next observation has on the OnlineStats contained in the Series.s = Series(EqualWeight(), Mean())Consider how weights affect the influence the next observation has on an online mean.  Many OnlineStats have an update which takes this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tConstructor Weight at Update t\nEqualWeight() γ(t) = 1 / t\nExponentialWeight(λ) γ(t) = λ\nBoundedEqualWeight(λ) γ(t) = max(1 / t, λ)\nLearningRate(r, λ) γ(t) = max(1 / t ^ r, λ)(Image: )"
+    "text": "Series are parameterized by a Weight type that controls the influence the next observation has on the OnlineStats contained in the Series.s = Series(EqualWeight(), Mean())Consider how weights affect the influence the next observation has on an online mean.  Many OnlineStats have an update which takes this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tConstructor Weight at Update t\nEqualWeight() γ(t) = 1 / t\nExponentialWeight(λ) γ(t) = λ\nBoundedEqualWeight(λ) γ(t) = max(1 / t, λ)\nLearningRate(r, λ) γ(t) = max(1 / t ^ r, λ)\nHarmonicWeight(a) γ(t) = a / (a + t - 1)\nMcclainWeight(a) γ(t) = γ(t-1) / (1 + γ(t-1) - a)(Image: )"
 },
 
 {
