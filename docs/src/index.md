@@ -186,13 +186,13 @@ INFO: value of mean is 0.008857939006120167
 INFO: value of mean is 0.016199508928045905
 ```
 
-[go to top](#readme-contents)
 
 ## Low Level Details
-### `OnlineStat{I, O}`
+### `OnlineStat{I, O, W}`
 - The abstract type `OnlineStat` has two parameters:
   - `I`: The input dimension.  The size of one observation
   - `O`: The output dimension/object.  The size/object of `value`
+  - `W`: The default weight.  OnlineStats that use stochastic approximation default to `LearningRate`.  Otherwise, the default is `EqualWeight`.
 - A Series can only manage OnlineStats that share the same input type `I`.  This is because when you call a method like `fit!(s, randn(100))`, the Series needs to know whether `randn(100)` should be treated as 100 scalar observations or a single vector observation.
 
 
