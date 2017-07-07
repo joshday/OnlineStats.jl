@@ -16,7 +16,7 @@
 # s = Series(rand(d, 100_000), NormalMix(2))
 # ```
 # """
-# mutable struct NormalMix <: DistributionStat{0}
+# mutable struct NormalMix <: OnlineStat{0, -1, LearningRate}
 #     s1::VecF
 #     s2::VecF
 #     s3::VecF

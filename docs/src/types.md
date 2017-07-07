@@ -16,7 +16,6 @@
 | k-means clustering                     | [`KMeans`](@ref)           |
 | multiple univariate statistics         | [`MV{<:OnlineStat}`](@ref) |
 | **Density Estimation:**                |                            |
-| gaussian mixture                       | [`NormalMix`](@ref)        |
 | Beta                                   | [`FitBeta`](@ref)          |
 | Categorical                            | [`FitCategorical`](@ref)   |
 | Cauchy                                 | [`FitCauchy`](@ref)        |

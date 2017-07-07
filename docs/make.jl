@@ -5,8 +5,8 @@ makedocs(
     sitename = "OnlineStats.jl",
     pages = [
         "index.md",
-        "api.md",
-        "types.md"
+        "types.md",
+        "api.md"
     ]
 )
 
