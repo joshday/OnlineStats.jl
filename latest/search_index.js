@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Online algorithms for statistics",
     "title": "Example 1",
     "category": "section",
-    "text": "Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905go to top"
+    "text": "Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905"
 },
 
 {
@@ -113,11 +113,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#OnlineStat{I,-O}-1",
+    "location": "index.html#OnlineStat{I,-O,-W}-1",
     "page": "Online algorithms for statistics",
-    "title": "OnlineStat{I, O}",
+    "title": "OnlineStat{I, O, W}",
     "category": "section",
-    "text": "The abstract type OnlineStat has two parameters:\nI: The input dimension.  The size of one observation\nO: The output dimension/object.  The size/object of value\nA Series can only manage OnlineStats that share the same input type I.  This is because when you call a method like fit!(s, randn(100)), the Series needs to know whether randn(100) should be treated as 100 scalar observations or a single vector observation."
+    "text": "The abstract type OnlineStat has two parameters:\nI: The input dimension.  The size of one observation\nO: The output dimension/object.  The size/object of value\nW: The default weight.  OnlineStats that use stochastic approximation default to LearningRate.  Otherwise, the default is EqualWeight.\nA Series can only manage OnlineStats that share the same input type I.  This is because when you call a method like fit!(s, randn(100)), the Series needs to know whether randn(100) should be treated as 100 scalar observations or a single vector observation."
 },
 
 {
