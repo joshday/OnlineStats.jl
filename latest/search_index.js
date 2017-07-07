@@ -129,7 +129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "types.html#",
+    "location": "pages/types.html#",
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "page",
@@ -137,7 +137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "types.html#What-Can-OnlineStats-Do?-1",
+    "location": "pages/types.html#What-Can-OnlineStats-Do?-1",
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
@@ -145,7 +145,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#",
+    "location": "pages/api.html#",
     "page": "API",
     "title": "API",
     "category": "page",
@@ -153,7 +153,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Bootstrap",
+    "location": "pages/api.html#OnlineStats.Bootstrap",
     "page": "API",
     "title": "OnlineStats.Bootstrap",
     "category": "Type",
@@ -161,7 +161,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Diff",
+    "location": "pages/api.html#OnlineStats.Diff",
     "page": "API",
     "title": "OnlineStats.Diff",
     "category": "Type",
@@ -169,7 +169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitCategorical",
+    "location": "pages/api.html#OnlineStats.FitCategorical",
     "page": "API",
     "title": "OnlineStats.FitCategorical",
     "category": "Type",
@@ -177,7 +177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.MV",
+    "location": "pages/api.html#OnlineStats.MV",
     "page": "API",
     "title": "OnlineStats.MV",
     "category": "Type",
@@ -185,7 +185,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.ReservoirSample",
+    "location": "pages/api.html#OnlineStats.ReservoirSample",
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
     "category": "Type",
@@ -193,7 +193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Series",
+    "location": "pages/api.html#OnlineStats.Series",
     "page": "API",
     "title": "OnlineStats.Series",
     "category": "Type",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.StatLearn",
+    "location": "pages/api.html#OnlineStats.StatLearn",
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.StochasticLoss",
+    "location": "pages/api.html#OnlineStats.StochasticLoss",
     "page": "API",
     "title": "OnlineStats.StochasticLoss",
     "category": "Type",
@@ -217,7 +217,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Sum",
+    "location": "pages/api.html#OnlineStats.Sum",
     "page": "API",
     "title": "OnlineStats.Sum",
     "category": "Type",
@@ -225,7 +225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.ADAGRAD",
+    "location": "pages/api.html#OnlineStats.ADAGRAD",
     "page": "API",
     "title": "OnlineStats.ADAGRAD",
     "category": "Type",
@@ -233,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.ADAM",
+    "location": "pages/api.html#OnlineStats.ADAM",
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
@@ -241,7 +241,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.ADAMAX",
+    "location": "pages/api.html#OnlineStats.ADAMAX",
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
@@ -249,7 +249,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.BoundedEqualWeight",
+    "location": "pages/api.html#OnlineStats.BoundedEqualWeight",
     "page": "API",
     "title": "OnlineStats.BoundedEqualWeight",
     "category": "Type",
@@ -257,7 +257,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.CovMatrix",
+    "location": "pages/api.html#OnlineStats.CovMatrix",
     "page": "API",
     "title": "OnlineStats.CovMatrix",
     "category": "Type",
@@ -265,7 +265,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.EqualWeight",
+    "location": "pages/api.html#OnlineStats.EqualWeight",
     "page": "API",
     "title": "OnlineStats.EqualWeight",
     "category": "Type",
@@ -273,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.ExponentialWeight",
+    "location": "pages/api.html#OnlineStats.ExponentialWeight",
     "page": "API",
     "title": "OnlineStats.ExponentialWeight",
     "category": "Type",
@@ -281,7 +281,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Extrema",
+    "location": "pages/api.html#OnlineStats.Extrema",
     "page": "API",
     "title": "OnlineStats.Extrema",
     "category": "Type",
@@ -289,7 +289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitBeta",
+    "location": "pages/api.html#OnlineStats.FitBeta",
     "page": "API",
     "title": "OnlineStats.FitBeta",
     "category": "Type",
@@ -297,7 +297,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitCauchy",
+    "location": "pages/api.html#OnlineStats.FitCauchy",
     "page": "API",
     "title": "OnlineStats.FitCauchy",
     "category": "Type",
@@ -305,7 +305,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitGamma",
+    "location": "pages/api.html#OnlineStats.FitGamma",
     "page": "API",
     "title": "OnlineStats.FitGamma",
     "category": "Type",
@@ -313,7 +313,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitLogNormal",
+    "location": "pages/api.html#OnlineStats.FitLogNormal",
     "page": "API",
     "title": "OnlineStats.FitLogNormal",
     "category": "Type",
@@ -321,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitMultinomial",
+    "location": "pages/api.html#OnlineStats.FitMultinomial",
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "Type",
@@ -329,7 +329,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitMvNormal",
+    "location": "pages/api.html#OnlineStats.FitMvNormal",
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "Type",
@@ -337,7 +337,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FitNormal",
+    "location": "pages/api.html#OnlineStats.FitNormal",
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "Type",
@@ -345,7 +345,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.HarmonicWeight",
+    "location": "pages/api.html#OnlineStats.HarmonicWeight",
     "page": "API",
     "title": "OnlineStats.HarmonicWeight",
     "category": "Type",
@@ -353,7 +353,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.HyperLogLog",
+    "location": "pages/api.html#OnlineStats.HyperLogLog",
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
     "category": "Type",
@@ -361,7 +361,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.KMeans",
+    "location": "pages/api.html#OnlineStats.KMeans",
     "page": "API",
     "title": "OnlineStats.KMeans",
     "category": "Type",
@@ -369,7 +369,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.LearningRate",
+    "location": "pages/api.html#OnlineStats.LearningRate",
     "page": "API",
     "title": "OnlineStats.LearningRate",
     "category": "Type",
@@ -377,7 +377,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.LearningRate2",
+    "location": "pages/api.html#OnlineStats.LearningRate2",
     "page": "API",
     "title": "OnlineStats.LearningRate2",
     "category": "Type",
@@ -385,7 +385,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.LinReg",
+    "location": "pages/api.html#OnlineStats.LinReg",
     "page": "API",
     "title": "OnlineStats.LinReg",
     "category": "Type",
@@ -393,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.MAXSPGD",
+    "location": "pages/api.html#OnlineStats.MAXSPGD",
     "page": "API",
     "title": "OnlineStats.MAXSPGD",
     "category": "Type",
@@ -401,7 +401,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.MMXTX",
+    "location": "pages/api.html#OnlineStats.MMXTX",
     "page": "API",
     "title": "OnlineStats.MMXTX",
     "category": "Type",
@@ -409,7 +409,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.McclainWeight",
+    "location": "pages/api.html#OnlineStats.McclainWeight",
     "page": "API",
     "title": "OnlineStats.McclainWeight",
     "category": "Type",
@@ -417,7 +417,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Mean",
+    "location": "pages/api.html#OnlineStats.Mean",
     "page": "API",
     "title": "OnlineStats.Mean",
     "category": "Type",
@@ -425,7 +425,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Moments",
+    "location": "pages/api.html#OnlineStats.Moments",
     "page": "API",
     "title": "OnlineStats.Moments",
     "category": "Type",
@@ -433,7 +433,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.OrderStats",
+    "location": "pages/api.html#OnlineStats.OrderStats",
     "page": "API",
     "title": "OnlineStats.OrderStats",
     "category": "Type",
@@ -441,7 +441,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.QuantileISGD",
+    "location": "pages/api.html#OnlineStats.QuantileISGD",
     "page": "API",
     "title": "OnlineStats.QuantileISGD",
     "category": "Type",
@@ -449,7 +449,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.QuantileMM",
+    "location": "pages/api.html#OnlineStats.QuantileMM",
     "page": "API",
     "title": "OnlineStats.QuantileMM",
     "category": "Type",
@@ -457,7 +457,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.QuantileSGD",
+    "location": "pages/api.html#OnlineStats.QuantileSGD",
     "page": "API",
     "title": "OnlineStats.QuantileSGD",
     "category": "Type",
@@ -465,7 +465,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.SPGD",
+    "location": "pages/api.html#OnlineStats.SPGD",
     "page": "API",
     "title": "OnlineStats.SPGD",
     "category": "Type",
@@ -473,7 +473,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Variance",
+    "location": "pages/api.html#OnlineStats.Variance",
     "page": "API",
     "title": "OnlineStats.Variance",
     "category": "Type",
@@ -481,7 +481,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#LearnBase.value-Tuple{OnlineStats.Series}",
+    "location": "pages/api.html#LearnBase.value-Tuple{OnlineStats.Series}",
     "page": "API",
     "title": "LearnBase.value",
     "category": "Method",
@@ -489,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.maprows-Tuple{Function,Integer,Vararg{Any,N} where N}",
+    "location": "pages/api.html#OnlineStats.maprows-Tuple{Function,Integer,Vararg{Any,N} where N}",
     "page": "API",
     "title": "OnlineStats.maprows",
     "category": "Method",
@@ -497,7 +497,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.replicates-Tuple{OnlineStats.Bootstrap}",
+    "location": "pages/api.html#OnlineStats.replicates-Tuple{OnlineStats.Bootstrap}",
     "page": "API",
     "title": "OnlineStats.replicates",
     "category": "Method",
@@ -505,7 +505,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.stats-Tuple{OnlineStats.Series}",
+    "location": "pages/api.html#OnlineStats.stats-Tuple{OnlineStats.Series}",
     "page": "API",
     "title": "OnlineStats.stats",
     "category": "Method",
@@ -513,7 +513,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#StatsBase.confint",
+    "location": "pages/api.html#StatsBase.confint",
     "page": "API",
     "title": "StatsBase.confint",
     "category": "Function",
@@ -521,7 +521,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,OS,W} where W<:OnlineStatsBase.Weight where OS<:Union{OnlineStatsBase.OnlineStat, Tuple},Union{AbstractString, Real, Symbol}}",
+    "location": "pages/api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,OS,W} where W<:OnlineStatsBase.Weight where OS<:Union{OnlineStatsBase.OnlineStat, Tuple},Union{AbstractString, Real, Symbol}}",
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Method",
@@ -529,7 +529,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#API-1",
+    "location": "pages/api.html#API-1",
     "page": "API",
     "title": "API",
     "category": "section",
