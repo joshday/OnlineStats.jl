@@ -7,7 +7,7 @@ info("Messy output for test coverage")
 @testset "show" begin
     println(Series(Mean()))
     println(Series(Mean(), Variance()))
-    # println(Bootstrap(Series(Mean()), 100, Poisson()))
+    println(Bootstrap(Series(Mean()), 100, [0, 2]))
     println(OnlineStats.name(Moments(), false))
     println(Mean())
     println(Variance())
@@ -19,7 +19,7 @@ info("Messy output for test coverage")
     println(HyperLogLog(5))
     println(KMeans(5,3))
     println(LinReg(5))
-    # println(StatLearn(5))
+    println(StatLearn(5))
     o = Mean()
     Series(LearningRate(), o)
     for stat in o
@@ -251,72 +251,49 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
     end
 end
 
-# @testset "Distributions" begin
-#     @testset "Distribution params" begin
-#         function testdist(d::Symbol, wt = EqualWeight(), tol = 1e-4)
-#             y = @eval rand($d(), 10_000)
-#             o = @eval $(Symbol(:Fit, d))()
-#             @test value(o) == @eval($d())
-#             s = Series(y, wt, o)
-#             fit!(s, y)
-#             myfit = @eval fit($d, $y)
-#             for i in 1:length(Distributions.params(o))
-#                 @test Distributions.params(o)[i] ≈ Distributions.params(myfit)[i] atol = tol
-#             end
-#         end
-#         testdist(:Beta)
-#         testdist(:Cauchy, LearningRate(), .1)
-#         testdist(:Gamma, EqualWeight(), .1)
-#         testdist(:LogNormal)
-#         testdist(:Normal)
-#     end
-#     @testset "FitCategorical" begin
-#         y = rand(1:5, 1000)
-#         o = FitCategorical(Int)
-#         s = Series(y, o)
-#         myfit = fit(Categorical, y)
-#         pr = probs(value(o))
-#         for i in eachindex(pr)
-#             @test pr[i] in probs(myfit)
-#         end
-#         for i in 1:5
-#             @test i in keys(o)
-#         end
-#
-#         vals = ["small", "big"]
-#         Series(rand(vals, 100), FitCategorical(String))
-#     end
-#     @testset "FitMultinomial" begin
-#         y = rand(Multinomial(10, ones(5) / 5), 1000)
-#         myfit = fit(Multinomial, y)
-#         o = FitMultinomial(5)
-#         @test Distributions.params(value(o)) == (1, ones(5) / 5)
-#         s = Series(o)
-#         fit!(s, y')
-#         @test probs(o) ≈ probs(myfit)
-#     end
-#     @testset "FitMvNormal" begin
-#         y = rand(MvNormal(zeros(3), eye(3)), 1000)
-#         myfit = fit(MvNormal, y)
-#         o = FitMvNormal(3)
-#         @test length(o) == 3
-#         @test Distributions.params(value(o))[1] == zeros(3)
-#         s = Series(y', o)
-#         @test mean(o) ≈ mean(myfit)
-#     end
-#     @testset "NormalMix" begin
-#         d = MixtureModel([Normal(), Normal(1,2), Normal(2, 3)])
-#         y = rand(d, 1000)
-#         o = NormalMix(3, y)
-#         s = Series(y, o)
-#         fit!(s, y, 10)
-#         components(o)
-#         @test isa(component(o, 1), Normal)
-#         component(o, 2)
-#         component(o, 3)
-#         @test ncomponents(o) == 3
-#     end
-# end
+@testset "Distributions" begin
+    # @testset "Distribution params" begin
+    #     function testdist(d::Symbol, wt = EqualWeight(), tol = 1e-4)
+    #         y = @eval rand($d(), 10_000)
+    #         o = @eval $(Symbol(:Fit, d))()
+    #         @test value(o) == @eval($d())
+    #         s = Series(y, wt, o)
+    #         fit!(s, y)
+    #         myfit = @eval fit($d, $y)
+    #         for i in 1:length(Distributions.params(o))
+    #             @test Distributions.params(o)[i] ≈ value(o) atol = tol
+    #         end
+    #     end
+    #     testdist(:Beta)
+    #     testdist(:Cauchy, LearningRate(), .1)
+    #     testdist(:Gamma, EqualWeight(), .1)
+    #     testdist(:LogNormal)
+    #     testdist(:Normal)
+    # end
+    @testset "sanity check" begin
+        Series(rand(100), FitBeta())
+        Series(randn(100), FitCauchy())
+        Series(rand(100) + 5, FitGamma())
+        Series(rand(100) + 5, FitLogNormal())
+        Series(randn(100), FitNormal())
+    end
+    @testset "FitCategorical" begin
+        y = rand(1:5, 1000)
+        o = FitCategorical(Int)
+        s = Series(y, o)
+        for i in 1:5
+            @test i in keys(o)
+        end
+        vals = ["small", "big"]
+        Series(rand(vals, 100), FitCategorical(String))
+    end
+    @testset "FitMvNormal" begin
+        y = randn(1000, 3)
+        o = FitMvNormal(3)
+        @test length(o) == 3
+        s = Series(y, o)
+    end
+end
 @testset "HyperLogLog" begin
     o = HyperLogLog(10)
     for d in 4:16
