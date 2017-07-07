@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Online algorithms for statistics",
     "title": "Weighting",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence the next observation has on the OnlineStats contained in the Series.s = Series(EqualWeight(), Mean())Consider how weights affect the influence the next observation has on an online mean.  Many OnlineStats have an update which takes this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tConstructor Weight at Update t\nEqualWeight() γ(t) = 1 / t\nExponentialWeight(λ) γ(t) = λ\nBoundedEqualWeight(λ) γ(t) = max(1 / t, λ)\nLearningRate(r, λ) γ(t) = max(1 / t ^ r, λ)\nHarmonicWeight(a) γ(t) = a / (a + t - 1)\nMcclainWeight(a) γ(t) = γ(t-1) / (1 + γ(t-1) - a)(Image: )"
+    "text": "Series are parameterized by a Weight type that controls the influence the next observation has on the OnlineStats contained in the Series.s = Series(EqualWeight(), Mean())Consider how weights affect the influence the next observation has on an online mean.  Many OnlineStats have an update which takes this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tConstructor Weight at Update t\nEqualWeight() γ(t) = 1 / t\nExponentialWeight(λ) γ(t) = λ\nBoundedEqualWeight(λ) γ(t) = max(1 / t, λ)\nLearningRate(r, λ) γ(t) = max(1 / t ^ r, λ)(Image: )"
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Online algorithms for statistics",
     "title": "Example 1",
     "category": "section",
-    "text": "Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905"
+    "text": "Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905go to top"
 },
 
 {
@@ -113,11 +113,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#OnlineStat{I,-O,-W}-1",
+    "location": "index.html#OnlineStat{I,-O}-1",
     "page": "Online algorithms for statistics",
-    "title": "OnlineStat{I, O, W}",
+    "title": "OnlineStat{I, O}",
     "category": "section",
-    "text": "The abstract type OnlineStat has two parameters:\nI: The input dimension.  The size of one observation\nO: The output dimension/object.  The size/object of value\nW: The default weight.  OnlineStats that use stochastic approximation default to LearningRate.  Otherwise, the default is EqualWeight.\nA Series can only manage OnlineStats that share the same input type I.  This is because when you call a method like fit!(s, randn(100)), the Series needs to know whether randn(100) should be treated as 100 scalar observations or a single vector observation."
+    "text": "The abstract type OnlineStat has two parameters:\nI: The input dimension.  The size of one observation\nO: The output dimension/object.  The size/object of value\nA Series can only manage OnlineStats that share the same input type I.  This is because when you call a method like fit!(s, randn(100)), the Series needs to know whether randn(100) should be treated as 100 scalar observations or a single vector observation."
 },
 
 {
