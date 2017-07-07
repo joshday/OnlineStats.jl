@@ -73,23 +73,23 @@ end
 coef(o::LinReg) = value(o)
 predict(o::LinReg, x::AMat) = x * coef(o)
 mse(o::LinReg) = (coef(o); o.S[end] * nobs(o) / (nobs(o) - length(o.β)))
-function coeftable(o::LinReg)
-    β = coef(o)
-    p = length(β)
-    se = stderr(o)
-    ts = β ./ se
-    CoefTable(
-        [β se ts Ds.ccdf(Ds.FDist(1, nobs(o) - p), abs2.(ts))],
-        ["Estimate", "Std.Error", "t value", "Pr(>|t|)"],
-        ["x$i" for i in 1:p],
-        4
-    )
-end
-function confint(o::LinReg, level::Real = 0.95)
-    β = coef(o)
-    mult = stderr(o) * quantile(Ds.TDist(nobs(o) - length(β) - 1), (1 - level) / 2)
-    hcat(β, β) + mult * [1. -1.]
-end
+# function coeftable(o::LinReg)
+#     β = coef(o)
+#     p = length(β)
+#     se = stderr(o)
+#     ts = β ./ se
+#     CoefTable(
+#         [β se ts Ds.ccdf(Ds.FDist(1, nobs(o) - p), abs2.(ts))],
+#         ["Estimate", "Std.Error", "t value", "Pr(>|t|)"],
+#         ["x$i" for i in 1:p],
+#         4
+#     )
+# end
+# function confint(o::LinReg, level::Real = 0.95)
+#     β = coef(o)
+#     mult = stderr(o) * quantile(Ds.TDist(nobs(o) - length(β) - 1), (1 - level) / 2)
+#     hcat(β, β) + mult * [1. -1.]
+# end
 function vcov(o::LinReg)
     coef(o)
     p = length(o.β)

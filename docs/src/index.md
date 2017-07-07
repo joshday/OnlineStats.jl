@@ -161,7 +161,7 @@ merge!(s1, s2, .5)
 
 ## Callbacks
 
-While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a [`maprows`](doc/api.md#maprows) function.
+While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a [`maprows`](@ref) function.
 
 `maprows(f::Function, b::Integer, data...)`
 

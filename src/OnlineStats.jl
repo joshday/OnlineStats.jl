@@ -6,8 +6,7 @@ import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coefta
 import OnlineStatsBase: show_fields, fields_to_show, weight, weight!, updatecounter!, nups,
     header, input
 importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
-import SweepOperator, Distributions
-Ds = Distributions
+import SweepOperator
 
 using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
 

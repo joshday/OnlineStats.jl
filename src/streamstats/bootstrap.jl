@@ -49,11 +49,9 @@ replicates(b::Bootstrap) = b.replicates
 
 """
 ```julia
-confint(b, coverageprob = .95, method = :quantile)
+confint(b, coverageprob = .95)
 ```
-Return a confidence interval for a Bootstrap `b` by method
-- `:quantile`: use quantiles of `states = value(b)`
-- `:normal`: quantiles from gaussian approximation
+Return a confidence interval for a Bootstrap `b`.
 """
 function confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
     states = value(b)
@@ -62,14 +60,7 @@ function confint(b::Bootstrap, coverageprob = 0.95, method = :quantile)
         return (NaN, NaN)
     else
         α = 1 - coverageprob
-        if method == :quantile
-            return (quantile(states, α / 2), quantile(states, 1 - α / 2))
-        elseif method == :normal
-            norm_approx = Ds.Normal(mean(states), std(states))
-            return (quantile(norm_approx, α / 2), quantile(norm_approx, 1 - α / 2))
-        else
-            throw(ArgumentError("$method not recognized.  Use :quantile or :normal"))
-        end
+        return (quantile(states, α / 2), quantile(states, 1 - α / 2))
     end
 end
 

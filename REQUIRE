@@ -2,7 +2,6 @@ julia 0.6.0
 OnlineStatsBase 0.0.3
 StatsBase
 LearnBase
-Distributions
 SweepOperator
 LossFunctions
 PenaltyFunctions
