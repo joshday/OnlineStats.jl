@@ -10,7 +10,7 @@ s = Series(randn(100), Mean())
 value(s)
 ```
 """
-mutable struct Mean <: OnlineStat{0, 0}
+mutable struct Mean <: OnlineStat{0, 0, EqualWeight}
     μ::Float64
     Mean() = new(0.0)
 end
@@ -31,7 +31,7 @@ s = Series(randn(100), Variance())
 value(s)
 ```
 """
-mutable struct Variance <: OnlineStat{0, 0}
+mutable struct Variance <: OnlineStat{0, 0, EqualWeight}
     σ2::Float64     # biased variance
     μ::Float64
     nobs::Int
@@ -51,7 +51,7 @@ function Base.merge!(o::Variance, o2::Variance, γ::Float64)
     o.μ = smooth(o.μ, o2.μ, γ)
     o
 end
-value(o::Variance) = o.σ2 * unbias(o)
+_value(o::Variance) = o.σ2 * unbias(o)
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
@@ -70,7 +70,7 @@ s = Series(randn(100), Extrema())
 value(s)
 ```
 """
-mutable struct Extrema <: OnlineStat{0, 1}
+mutable struct Extrema <: OnlineStat{0, 1, EqualWeight}
     min::Float64
     max::Float64
     Extrema() = new(Inf, -Inf)
@@ -85,7 +85,7 @@ function Base.merge!(o::Extrema, o2::Extrema, γ::Float64)
     o.max = max(o.max, o2.max)
     o
 end
-value(o::Extrema) = (o.min, o.max)
+_value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
 
 #--------------------------------------------------------------------# OrderStats
@@ -100,7 +100,7 @@ s = Series(randn(1000), OrderStats(10))
 value(s)
 ```
 """
-mutable struct OrderStats <: OnlineStat{0, 1}
+mutable struct OrderStats <: OnlineStat{0, 1, EqualWeight}
     value::VecF
     buffer::VecF
     i::Int
@@ -134,7 +134,7 @@ s = Series(randn(1000), Moments(10))
 value(s)
 ```
 """
-mutable struct Moments <: OnlineStat{0, 1}
+mutable struct Moments <: OnlineStat{0, 1, EqualWeight}
     m::VecF
     nobs::Int
     Moments() = new(zeros(4), 0)
@@ -178,7 +178,7 @@ o3 = StochasticLoss(L1DistLoss())      # approx. median
 s = Series(randn(10_000), o1, o2, o3)
 ```
 """
-mutable struct StochasticLoss{L<:Loss} <: StochasticStat{0, 0}
+mutable struct StochasticLoss{L<:Loss} <: OnlineStat{0, 0, LearningRate}
     value::Float64
     loss::L
 end
@@ -197,7 +197,7 @@ s = Series(randn(1000), LearningRate(.7), QuantileISGD())
 value(s)
 ```
 """
-struct QuantileISGD <: StochasticStat{0, 1}
+struct QuantileISGD <: OnlineStat{0, 1, LearningRate}
     value::VecF
     τ::VecF
     x::VecF
@@ -228,7 +228,7 @@ s = Series(randn(1000), LearningRate(.7), QuantileSGD())
 value(s)
 ```
 """
-struct QuantileSGD <: StochasticStat{0, 1}
+struct QuantileSGD <: OnlineStat{0, 1, LearningRate}
     value::VecF
     τ::VecF
     QuantileSGD(τ::VecF = [0.25, 0.5, 0.75]) = new(zeros(τ), τ)
@@ -263,7 +263,7 @@ s = Series(randn(1000), LearningRate(.7), QuantileMM())
 value(s)
 ```
 """
-mutable struct QuantileMM <: StochasticStat{0, 1}
+mutable struct QuantileMM <: OnlineStat{0, 1, LearningRate}
     value::VecF
     τ::VecF
     # "sufficient statistics"
@@ -312,7 +312,7 @@ s = Series(randn(1000), Diff())
 value(s)
 ```
 """
-mutable struct Diff{T <: Real} <: OnlineStat{0, 0}
+mutable struct Diff{T <: Real} <: OnlineStat{0, 0, EqualWeight}
     diff::T
     lastval::T
 end
@@ -343,7 +343,7 @@ s = Series(randn(1000), Sum())
 value(s)
 ```
 """
-mutable struct Sum{T <: Real} <: OnlineStat{0, 0}
+mutable struct Sum{T <: Real} <: OnlineStat{0, 0, EqualWeight}
     sum::T
 end
 Sum() = Sum(0.0)
@@ -353,7 +353,7 @@ fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64) = (v = convert(T, x); o.
 fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64) =       (v = round(T, x);   o.sum += v)
 fitbatch!(o::Sum, y::AVec, γ::Float64) = fit!(o, sum(y), γ)
 
-#-----------------------------------------------------------------------# Hist
-struct Hist <: OnlineStat{0, 1}
-
-end
+# #-----------------------------------------------------------------------# Hist
+# struct Hist <: OnlineStat{0, 1}
+#
+# end

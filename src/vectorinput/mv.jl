@@ -9,9 +9,10 @@ o = MV(5, Mean())
 s = Series(y, o)
 ```
 """
-struct MV{T} <: OnlineStat{1, -1}
+struct MV{T} <: OnlineStat{1, -1, nothing}
     stats::Vector{T}
 end
+default_weight(o::MV) = default_weight(o.stats[1])
 
 MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
 

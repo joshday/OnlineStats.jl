@@ -11,13 +11,12 @@ y = rand(d, 100_000, 1)
 s = Series(y, LearningRate(.6), KMeans(1, 2))
 ```
 """
-mutable struct KMeans <: OnlineStat{1, 2}
+mutable struct KMeans <: OnlineStat{1, 2, LearningRate}
     value::MatF
     v::VecF
     KMeans(p::Integer, k::Integer) = new(randn(p, k), zeros(k))
 end
-fields_to_show(o::KMeans) = [:value]
-default_weight(::KMeans) = LearningRate()
+Base.show(io::IO, o::KMeans) = print(io, "KMeans($(value(o)'))")
 function fit!{T<:Real}(o::KMeans, x::AVec{T}, γ::Float64)
     d, k = size(o.value)
     length(x) == d || throw(DimensionMismatch())

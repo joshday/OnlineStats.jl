@@ -4,7 +4,7 @@ module OnlineStats
 import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
     CoefTable, stderr, vcov
 import OnlineStatsBase: show_fields, fields_to_show, weight, weight!, updatecounter!, nups,
-    header, input
+    header, input, default_weight, _value
 importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
 import SweepOperator
 
@@ -49,7 +49,7 @@ include("show.jl")
 #---------------------------------------------------------------------------# helpers
 can_be_exact(o::OnlineStat) = default_weight(o) == EqualWeight()
 
-value(o::OnlineStat) = getfield(o, fieldnames(o)[1])
+value(o::OnlineStat) = _value(o)
 input{I, O}(o::OnlineStat{I, O}) = I
 output{I, O}(o::OnlineStat{I, O}) = O
 unbias(o) = o.nobs / (o.nobs - 1)

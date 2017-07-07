@@ -23,17 +23,6 @@ function Series(wt::Weight, T::Union{Tuple, OnlineStat})
     Series{input(T), typeof(T), typeof(wt)}(wt, T)
 end
 
-# check default weights match during outer constructors
-default_weight(o::OnlineStat) = EqualWeight()
-default_weight(o::StochasticStat) = LearningRate()
-function default_weight(t::Tuple)
-    w = default_weight(t[1])
-    if !all(map(x -> default_weight(x) == w, t))
-        throw(ArgumentError("Default weights differ.  Weight must be specified"))
-    end
-    w
-end
-
 nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 
 # empty

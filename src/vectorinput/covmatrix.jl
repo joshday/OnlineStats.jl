@@ -10,7 +10,7 @@ y = randn(100, 5)
 Series(y, CovMatrix(5))
 ```
 """
-mutable struct CovMatrix <: OnlineStat{1, 2}
+mutable struct CovMatrix <: OnlineStat{1, 2, EqualWeight}
     value::MatF
     cormat::MatF
     A::MatF  # X'X / n
@@ -30,7 +30,7 @@ function fitbatch!(o::CovMatrix, x::AMat, γ::Float64)
     o.nobs += size(x, 1)
     o
 end
-function value(o::CovMatrix)
+function _value(o::CovMatrix)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
     scale!(o.value, unbias(o))
 end

@@ -11,7 +11,7 @@ s = Series(o)
 fit!(s, 1:10000)
 ```
 """
-mutable struct ReservoirSample{T<:Number} <: OnlineStat{0, 1}
+mutable struct ReservoirSample{T<:Number} <: OnlineStat{0, 1, EqualWeight}
     value::Vector{T}
     nobs::Int
 end

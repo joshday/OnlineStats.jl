@@ -27,7 +27,7 @@ Approximate count of distinct elements.
 s = Series(rand(1:10, 1000), HyperLogLog(12))
 ```
 """
-mutable struct HyperLogLog <: OnlineStat{0, 0}
+mutable struct HyperLogLog <: OnlineStat{0, 0, EqualWeight}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
@@ -58,7 +58,7 @@ function fit!(o::HyperLogLog, v::Any, γ::Float64)
     o
 end
 
-function value(o::HyperLogLog)
+function _value(o::HyperLogLog)
     S = 0.0
     for j in 1:o.m
         S += 1 / (2 ^ o.M[j])

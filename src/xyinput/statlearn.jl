@@ -28,7 +28,7 @@ coef(o)
 predict(o, x)
 ```
 """
-struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0), 1}
+struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: OnlineStat{(1, 0), 1, LearningRate}
     β::VecF
     gx::VecF
     λfactor::VecF
