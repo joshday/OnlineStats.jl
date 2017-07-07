@@ -3,8 +3,7 @@ module OnlineStats
 
 import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
     CoefTable, stderr, vcov
-import OnlineStatsBase: fields_to_show, weight, weight!, updatecounter!, nups,
-    header, input, _value
+import OnlineStatsBase: weight, weight!, updatecounter!, nups, header, input, _value
 importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
 import SweepOperator
 

@@ -2,7 +2,7 @@
 abstract type Updater end
 abstract type SGUpdater <: Updater end
 Base.show(io::IO, u::Updater) = (print(io, name(u)); OnlineStatsBase.show_fields(io, u))
-fields_to_show(u::Updater) = [:η]
+OnlineStatsBase.fields_to_show(u::Updater) = [:η]
 init(u::Updater, p) = u
 
 
