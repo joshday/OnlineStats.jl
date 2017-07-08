@@ -97,6 +97,12 @@ end
         @inferred Series(randn(100), Mean())
         @inferred Series(randn(100), EqualWeight(), Mean(), Variance())
         @inferred Series(randn(100), EqualWeight(), Mean())
+        @inferred Series(EqualWeight(), randn(100), Mean())
+        @inferred Series(EqualWeight(), randn(100), Mean(), Variance())
+        @inferred Series(LearningRate(), randn(100,4), randn(100), StatLearn(4))
+        @inferred Series(LearningRate(), randn(100,4), randn(100), StatLearn(4), LinReg(4))
+        @inferred Series(randn(100,4), randn(100), LearningRate(), StatLearn(4))
+        @inferred Series(randn(100,4), randn(100), LearningRate(), StatLearn(4), LinReg(4))
     end
     @testset "fit!" begin
         s = Series(Mean(), Sum())
@@ -116,6 +122,7 @@ end
         fit!(s, randn(100, 3), rand(100))
         fit!(s, randn(100, 3), 7)
         @test nobs(s) == 400
+        fit!(s, (1.0, 2.0, 3.0))
     end
 end
 @testset "Series{0}" begin

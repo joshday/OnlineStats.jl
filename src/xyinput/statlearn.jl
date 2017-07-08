@@ -103,7 +103,7 @@ function gradient!(o::StatLearn, x::AMat, y::AVec, γ::Float64)
     end
     scale!(o.gx, 1 / length(y))
 end
-function fit!(o::StatLearn{<:SGUpdater}, x::AVec, y::Real, γ::Float64)
+function fit!(o::StatLearn{<:SGUpdater}, x::VectorObservation, y::Real, γ::Float64)
     gradient!(o, x, y, γ)
     update!(o, γ)
 end

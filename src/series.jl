@@ -19,9 +19,9 @@ struct Series{I, OS <: Union{OnlineStat, Tuple}, W <: Weight} <: AbstractSeries
     weight::W
     stats::OS
 end
-function Series(wt::Weight, T::Union{Tuple, OnlineStat})
-    Series{input(T), typeof(T), typeof(wt)}(wt, T)
-end
+# These act as inner constructors
+Series(wt::Weight, t::Tuple)      = Series{input(t), typeof(t), typeof(wt)}(wt, t)
+Series(wt::Weight, o::OnlineStat) = Series{input(o), typeof(o), typeof(wt)}(wt, o)
 
 nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 
@@ -29,7 +29,7 @@ nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 Series(t::Tuple)         = Series(weight(t), t)
 Series(o::OnlineStat)    = Series(weight(o), o)
 Series(o::OnlineStat...) = Series(weight(o), o)
-Series(wt::Weight, o...) = Series(wt, o)  # leave out type annotation to avoid method confusion
+Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, o)
 
 # init with data
 Series(y::AA, o::OnlineStat) = (s = Series(weight(o), o); fit!(s, y))
@@ -40,19 +40,23 @@ Series(wt::Weight, y::AA, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
 Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
 
 # Special constructors for (1, 0) input
+# x, y, o
 function Series(x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)})
     s = Series(weight(o), o)
     fit!(s, x, y)
 end
+# x, y, o...
 function Series(x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)}...)
     s = Series(weight(o), o)
     fit!(s, x, y)
 end
-function Series(wt::Weight, x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)})
+# w, x, y, o
+function Series(wt::Weight, x::AbstractMatrix, y::AbstractVector, o::OnlineStat{(1,0)}...)
     s = Series(wt, o)
     fit!(s, x, y)
 end
-function Series(x::AbstractMatrix, y::AbstractVector, wt::Weight, o::OnlineStat{(1,0)})
+# x, y, w, o
+function Series(x::AbstractMatrix, y::AbstractVector, wt::Weight, o::OnlineStat{(1,0)}...)
     s = Series(wt, o)
     fit!(s, x, y)
 end
@@ -162,7 +166,6 @@ function fit!(s::Series{1}, y::AMat, b::Integer)
     end
     s
 end
-
 
 # tuple version
 function fit!(s::Series{1}, y::NTuple)
