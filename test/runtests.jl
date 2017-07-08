@@ -8,7 +8,6 @@ info("Messy output for test coverage")
     println(Series(Mean()))
     println(Series(Mean(), Variance()))
     println(Bootstrap(Series(Mean()), 100, [0, 2]))
-    println(OnlineStats.name(Moments(), false))
     println(Mean())
     println(Variance())
     println(OrderStats(5))
@@ -26,7 +25,7 @@ info("Messy output for test coverage")
         println(stat)
     end
     for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
-              LearningRate2()]
+              LearningRate2(), McclainWeight(), HarmonicWeight()]
         println(w)
     end
     @testset "maprows" begin
@@ -59,8 +58,10 @@ info("TESTS BEGIN HERE")
     w6 = @inferred McclainWeight()
     w7 = @inferred HarmonicWeight(5.)
 
+
     for w in [w1, w3, w4, w5, w6, w7]
         @test OnlineStats.weight!(w, 1) == 1
+        @test nobs(w) == 1
     end
     for i in 1:10
         @test OnlineStats.weight(w1) == 1 / i

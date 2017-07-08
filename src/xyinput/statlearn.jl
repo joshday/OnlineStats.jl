@@ -1,7 +1,10 @@
 #-----------------------------------------------------------------------------# StatLearn
 abstract type Updater end
 abstract type SGUpdater <: Updater end
-Base.show(io::IO, u::Updater) = (print(io, name(u)); OnlineStatsBase.show_fields(io, u))
+function Base.show(io::IO, u::Updater)
+    print(io, OnlineStatsBase.name(u))
+    OnlineStatsBase.show_fields(io, u)
+end
 OnlineStatsBase.fields_to_show(u::Updater) = [:η]
 init(u::Updater, p) = u
 
@@ -56,7 +59,7 @@ StatLearn(p::Integer, a1, a2, a3)     = StatLearn(p, a(a3, a(a2, a(a1, d(p)))))
 StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p))))))
 
 function Base.show(io::IO, o::StatLearn)
-    println(io, name(o))
+    println(io, OnlineStatsBase.name(o))
     println(io, "    > β       : $(o.β)")
     println(io, "    > λfactor : $(o.λfactor)")
     println(io, "    > Loss    : $(o.loss)")

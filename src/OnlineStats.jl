@@ -43,7 +43,6 @@ const AMat{T}   = AbstractMatrix{T}
 const AVecF     = AVec{Float64}
 const AMatF     = AMat{Float64}
 
-include("show.jl")
 
 #---------------------------------------------------------------------------# helpers
 value(o::OnlineStat) = _value(o)

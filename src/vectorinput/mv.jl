@@ -17,7 +17,7 @@ weight(o::MV) = weight(o.stats[1])
 MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
 
 function Base.show{T}(io::IO, o::MV{T})
-    s = name(o, true) * "("
+    s = OnlineStatsBase.name(o, true) * "("
     n = length(o.stats)
     for i in 1:n
         s *= "$(value(o.stats[i]))"
