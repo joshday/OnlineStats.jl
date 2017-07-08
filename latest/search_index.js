@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "page",
-    "text": ""
+    "text": "<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/27987219-12fe7fc2-63d8-11e7-9869-8cfc5cb6e6c9.gif\">"
 },
 
 {
