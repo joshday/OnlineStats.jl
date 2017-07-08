@@ -2,31 +2,23 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "index.html#",
-    "page": "Online algorithms for statistics",
-    "title": "Online algorithms for statistics",
+    "page": "Basics",
+    "title": "Basics",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "index.html#Online-algorithms-for-statistics-1",
-    "page": "Online algorithms for statistics",
-    "title": "Online algorithms for statistics",
+    "location": "index.html#Basics-1",
+    "page": "Basics",
+    "title": "Basics",
     "category": "section",
     "text": "OnlineStats is a Julia package which provides online algorithms for statistical models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
 },
 
 {
-    "location": "index.html#Basics-1",
-    "page": "Online algorithms for statistics",
-    "title": "Basics",
-    "category": "section",
-    "text": ""
-},
-
-{
     "location": "index.html#Every-OnlineStat-is-a-type-1",
-    "page": "Online algorithms for statistics",
+    "page": "Basics",
     "title": "Every OnlineStat is a type",
     "category": "section",
     "text": "m = Mean()\nv = Variance()"
@@ -34,7 +26,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "index.html#OnlineStats-are-grouped-by-[Series](@ref)-1",
-    "page": "Online algorithms for statistics",
+    "page": "Basics",
     "title": "OnlineStats are grouped by Series",
     "category": "section",
     "text": "s = Series(m, v)"
@@ -42,90 +34,170 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "index.html#Updating-a-Series-updates-the-OnlineStats-1",
-    "page": "Online algorithms for statistics",
+    "page": "Basics",
     "title": "Updating a Series updates the OnlineStats",
     "category": "section",
     "text": "y = randn(100)\n\nfor yi in y\n    fit!(s, yi)\nend\n\n# or more simply:\nfit!(s, y)"
 },
 
 {
-    "location": "index.html#Weighting-1",
-    "page": "Online algorithms for statistics",
-    "title": "Weighting",
+    "location": "index.html#Callbacks-1",
+    "page": "Basics",
+    "title": "Callbacks",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence the next observation has on the OnlineStats contained in the Series.s = Series(EqualWeight(), Mean())Consider how weights affect the influence the next observation has on an online mean.  Many OnlineStats have an update which takes this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tConstructor Weight at Update t\nEqualWeight() γ(t) = 1 / t\nExponentialWeight(λ) γ(t) = λ\nBoundedEqualWeight(λ) γ(t) = max(1 / t, λ)\nLearningRate(r, λ) γ(t) = max(1 / t ^ r, λ)\nHarmonicWeight(a) γ(t) = a / (a + t - 1)\nMcclainWeight(a) γ(t) = γ(t-1) / (1 + γ(t-1) - a)(Image: )"
+    "text": "While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a maprows function.maprows(f::Function, b::Integer, data...)maprows works similar to Base.mapslices, but maps b rows at a time.  It is best used with Julia's do block syntax.Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905"
 },
 
 {
-    "location": "index.html#Series-1",
-    "page": "Online algorithms for statistics",
+    "location": "pages/weights.html#",
+    "page": "Weighting",
+    "title": "Weighting",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "pages/weights.html#Weighting-1",
+    "page": "Weighting",
+    "title": "Weighting",
+    "category": "section",
+    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how the following weighting schemes affect the influence of the next observation on an online mean.  Many OnlineStats have an update of this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_t(Image: )"
+},
+
+{
+    "location": "pages/weights.html#[EqualWeight()](@ref)-1",
+    "page": "Weighting",
+    "title": "EqualWeight()",
+    "category": "section",
+    "text": "Each observation has an equal amount of influence.gamma_t = frac1t"
+},
+
+{
+    "location": "pages/weights.html#[ExponentialWeight(λ)](@ref)-1",
+    "page": "Weighting",
+    "title": "ExponentialWeight(λ)",
+    "category": "section",
+    "text": "Each observation is weighted with a constant, giving newer observations higher influence.gamma_t = lambda"
+},
+
+{
+    "location": "pages/weights.html#[BoundedEqualWeight(λ)](@ref)-1",
+    "page": "Weighting",
+    "title": "BoundedEqualWeight(λ)",
+    "category": "section",
+    "text": "Use EqualWeight until a threshold is hit, then stay constant.gamma_t = textmaxleft(frac1t lambdaright)"
+},
+
+{
+    "location": "pages/weights.html#[LearningRate(r,-λ)](@ref)-1",
+    "page": "Weighting",
+    "title": "LearningRate(r, λ)",
+    "category": "section",
+    "text": "Decrease at a slow rate until a threshold is hit.gamma_t = textmaxleft(frac1t^r lambdaright)"
+},
+
+{
+    "location": "pages/weights.html#[HarmonicWeight(a)](@ref)-1",
+    "page": "Weighting",
+    "title": "HarmonicWeight(a)",
+    "category": "section",
+    "text": "Decrease at a slow rate.gamma_t = fracaa + t - 1"
+},
+
+{
+    "location": "pages/weights.html#[McclainWeight(a)](@ref)-1",
+    "page": "Weighting",
+    "title": "McclainWeight(a)",
+    "category": "section",
+    "text": "Smoothed version of BoundedEqualWeight.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+},
+
+{
+    "location": "pages/series.html#",
+    "page": "Series",
+    "title": "Series",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "pages/series.html#Series-1",
+    "page": "Series",
     "title": "Series",
     "category": "section",
     "text": "The Series type is the workhorse of OnlineStats.  A Series tracksThe Weight\nAn OnlineStat or tuple of OnlineStats."
 },
 
 {
-    "location": "index.html#Creating-a-Series-1",
-    "page": "Online algorithms for statistics",
-    "title": "Creating a Series",
+    "location": "pages/series.html#Creating-1",
+    "page": "Series",
+    "title": "Creating",
     "category": "section",
-    "text": "Series(Mean())\nSeries(Mean(), Variance())\n\nSeries(ExponentialWeight(), Mean())\nSeries(ExponentialWeight(), Mean(), Variance())\n\ny = randn(100)\n\nSeries(y, Mean())\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean())\nSeries(y, ExponentialWeight(.01), Mean(), Variance())"
+    "text": "Start \"empty\"Series(Mean())\nSeries(Mean(), Variance())\n\nSeries(ExponentialWeight(), Mean())\nSeries(ExponentialWeight(), Mean(), Variance())Start with initial datay = randn(100)\n\nSeries(y, Mean())\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean())\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean())\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
 },
 
 {
-    "location": "index.html#Updating-a-Series-1",
-    "page": "Online algorithms for statistics",
-    "title": "Updating a Series",
-    "category": "section",
-    "text": "There are multiple ways to update the OnlineStats in a SeriesSingle observation\nNote: A single observation is a vector for OnlineStats such as CovMatrixs = Series(Mean())\nfit!(s, randn())\n\ns = Series(CovMatrix(4))\nfit!(s, randn(4))\nfit!(s, randn(4))Single observation, override weights = Series(Mean())\nfit!(s, randn(), rand())Multiple observations\nNote: multiple observations are a matrix for OnlineStats such as CovMatrix.  By default, each row is considered an observation.  However, there exists fit! methods which use observations in columns.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))                 # Observations in rows\nfit!(s, randn(4, 100), ObsDim.Last())  # Observations in columnsMultiple observations, use the same weight for alls = Series(Mean())\nfit!(s, randn(100), .01)Multiple observations, provide vector of weightss = Series(Mean())\nfit!(s, randn(100), rand(100))Multiple observations, update in minibatches   OnlineStats which use stochastic approximation (QuantileSGD, QuantileMM, KMeans, etc.) have different behavior if they are updated in minibatches.  \ns = Series(QuantileSGD())\nfit!(s, randn(1000), 7)go to top"
-},
-
-{
-    "location": "index.html#Merging-Series-1",
-    "page": "Online algorithms for statistics",
-    "title": "Merging Series",
-    "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.  The syntax for in-place merging ismerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.using OnlineStats\n\ny1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
-},
-
-{
-    "location": "index.html#Callbacks-1",
-    "page": "Online algorithms for statistics",
-    "title": "Callbacks",
-    "category": "section",
-    "text": "While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a maprows function.maprows(f::Function, b::Integer, data...)maprows works similar to Base.mapslices, but maps b rows at a time.  It is best used with Julia's do block syntax."
-},
-
-{
-    "location": "index.html#Example-1-1",
-    "page": "Online algorithms for statistics",
-    "title": "Example 1",
-    "category": "section",
-    "text": "Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905"
-},
-
-{
-    "location": "index.html#Low-Level-Details-1",
-    "page": "Online algorithms for statistics",
-    "title": "Low Level Details",
+    "location": "pages/series.html#Updating-1",
+    "page": "Series",
+    "title": "Updating",
     "category": "section",
     "text": ""
 },
 
 {
-    "location": "index.html#OnlineStat{I,-O,-W}-1",
-    "page": "Online algorithms for statistics",
-    "title": "OnlineStat{I, O, W}",
+    "location": "pages/series.html#Single-observation-1",
+    "page": "Series",
+    "title": "Single observation",
     "category": "section",
-    "text": "The abstract type OnlineStat has two parameters:\nI: The input dimension.  The size of one observation\nO: The output dimension/object.  The size/object of value\nW: The default weight.  OnlineStats that use stochastic approximation default to LearningRate.  Otherwise, the default is EqualWeight.\nA Series can only manage OnlineStats that share the same input type I.  This is because when you call a method like fit!(s, randn(100)), the Series needs to know whether randn(100) should be treated as 100 scalar observations or a single vector observation."
+    "text": "note: Note\nThe input type of the OnlineStat(s) determines what a single observation is.  For a Mean, a single observation is a Real.  For OnlineStats such as CovMatrix, a single observation is an AbstractVector or NTuple.s = Series(Mean())\nfit!(s, randn())\n\ns = Series(CovMatrix(4))\nfit!(s, randn(4))\nfit!(s, randn(4))"
 },
 
 {
-    "location": "index.html#fit!-and-value-1",
-    "page": "Online algorithms for statistics",
-    "title": "fit! and value",
+    "location": "pages/series.html#Single-observation,-override-weight-1",
+    "page": "Series",
+    "title": "Single observation, override weight",
     "category": "section",
-    "text": "fit! updates the \"sufficient statistics\" of an OnlineStat, but does not necessarily update the parameter of interest.\nvalue creates the parameter of interest from the \"sufficient statistics\"\nThis is the convention in order to avoid extra computation costs when the value is not needed while updating a chunk of data."
+    "text": "s = Series(Mean())\nfit!(s, randn(), .1)"
+},
+
+{
+    "location": "pages/series.html#Multiple-observations-1",
+    "page": "Series",
+    "title": "Multiple observations",
+    "category": "section",
+    "text": "note: Note\nThe input type of the OnlineStat(s) determines what multiple observations are.  For a Mean, this would be a AbstractVector.  For a CovMatrix, this would be an AbstractMatrix.  By default, each row is considered an observation.  You can use column observations with ObsDim.Last() (see below).s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))                 # Obs. in rows\nfit!(s, randn(4, 100), ObsDim.Last())  # Obs. in columns"
+},
+
+{
+    "location": "pages/series.html#Multiple-observations,-use-the-same-weight-for-all-1",
+    "page": "Series",
+    "title": "Multiple observations, use the same weight for all",
+    "category": "section",
+    "text": "s = Series(Mean())\nfit!(s, randn(100), .01)"
+},
+
+{
+    "location": "pages/series.html#Multiple-observations,-provide-vector-of-weights-1",
+    "page": "Series",
+    "title": "Multiple observations, provide vector of weights",
+    "category": "section",
+    "text": "s = Series(Mean())\nfit!(s, randn(100), rand(100))"
+},
+
+{
+    "location": "pages/series.html#Multiple-observations,-update-in-minibatches-1",
+    "page": "Series",
+    "title": "Multiple observations, update in minibatches",
+    "category": "section",
+    "text": "note: Note\nOnlineStats which use stochastic approximation (those which default to use LearningRate) can have different behavior if they are updated in minibatches.  Not all OnlineStats have the ability to be updated in minibatches.s = Series(QuantileSGD())\nfit!(s, randn(1000), 7)"
+},
+
+{
+    "location": "pages/series.html#Merging-1",
+    "page": "Series",
+    "title": "Merging",
+    "category": "section",
+    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.  The syntax for in-place merging ismerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
 },
 
 {
