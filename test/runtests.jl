@@ -123,6 +123,8 @@ end
         fit!(s, randn(100, 3), 7)
         @test nobs(s) == 400
         fit!(s, (1.0, 2.0, 3.0))
+
+        fit!(Series(randn(10), Mean()), Series(randn(11), Mean()))
     end
 end
 @testset "Series{0}" begin
@@ -279,11 +281,11 @@ end
     #     testdist(:Normal)
     # end
     @testset "sanity check" begin
-        Series(rand(100), FitBeta())
-        Series(randn(100), FitCauchy())
-        Series(rand(100) + 5, FitGamma())
-        Series(rand(100) + 5, FitLogNormal())
-        Series(randn(100), FitNormal())
+        value(Series(rand(100), FitBeta()))
+        value(Series(randn(100), FitCauchy()))
+        value(Series(rand(100) + 5, FitGamma()))
+        value(Series(rand(100) + 5, FitLogNormal()))
+        value(Series(randn(100), FitNormal()))
     end
     @testset "FitCategorical" begin
         y = rand(1:5, 1000)
@@ -293,13 +295,15 @@ end
             @test i in keys(o)
         end
         vals = ["small", "big"]
-        Series(rand(vals, 100), FitCategorical(String))
+        s = Series(rand(vals, 100), FitCategorical(String))
+        value(s)
     end
     @testset "FitMvNormal" begin
         y = randn(1000, 3)
         o = FitMvNormal(3)
         @test length(o) == 3
         s = Series(y, o)
+        value(s)
     end
 end
 @testset "HyperLogLog" begin

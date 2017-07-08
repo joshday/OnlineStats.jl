@@ -48,8 +48,6 @@ const VectorObservation = Union{AVec, NTuple}
 
 #---------------------------------------------------------------------------# helpers
 value(o::OnlineStat) = _value(o)
-input{I, O}(o::OnlineStat{I, O}) = I
-output{I, O}(o::OnlineStat{I, O}) = O
 unbias(o) = o.nobs / (o.nobs - 1)
 
 smooth(m::Float64, v::Real, γ::Float64) = m + γ * (v - m)
@@ -65,9 +63,8 @@ function smooth_syr!(A::AMat, x, γ::Float64)
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end
 end
-function smooth_syrk!(A::MatF, x::AMat, γ::Float64)
-    BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
-end
+smooth_syrk!(A::MatF, x::AMat, γ::Float64) = BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
+
 
 const ϵ = 1e-8  # epsilon used in special cases to avoid dividing by 0, etc.
 
