@@ -247,7 +247,7 @@ MMXTX(c::Float64 = 1.0) = MMXTX(c, 0.0, zeros(0))
 init(u::MMXTX, p) = MMXTX(u.c, 0.0, zeros(p))
 Base.show(io::IO, u::MMXTX) = print(io, "MMXTX(c = $(u.c))")
 
-function fit!(o::StatLearn{MMXTX}, x::AVec, y::Real, γ::Float64)
+function fit!(o::StatLearn{MMXTX}, x::VectorObservation, y::Real, γ::Float64)
     U = o.updater
     gradient!(o, x, y, γ)
     U.h = smooth(U.h, x'x * U.c, γ)
@@ -263,5 +263,24 @@ function fitbatch!(o::StatLearn{MMXTX}, x::AMat, y::AVec, γ::Float64)
     for j in eachindex(o.β)
         U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
         o.β[j] = U.b[j] / U.h
+    end
+end
+
+#-----------------------------------------------------------------------# MSPI
+"""
+    MSPI()
+Majorized Stochastic Proximal Iteration.
+Uses quadratic upper bound with `x'x * c * I`.
+"""
+struct MSPI <: Updater
+    c::Float64
+    MSPI(c = 1.0) = new(c)
+end
+Base.show(io::IO, u::MSPI) = print(io, "MSPI(c = $(u.c))")
+function fit!(o::StatLearn{MSPI}, x::VectorObservation, y::Real, γ::Float64)
+    gradient!(o, x, y, γ)
+    xtx = x'x * o.updater.c
+    for j in eachindex(o.β)
+        o.β[j] = inv(1 + γ * xtx) * ((1 + γ * xtx) * o.β[j] - γ * o.gx[j])
     end
 end
