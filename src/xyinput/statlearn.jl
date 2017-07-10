@@ -245,6 +245,7 @@ mutable struct MMXTX <: Updater
 end
 MMXTX(c::Float64 = 1.0) = MMXTX(c, 0.0, zeros(0))
 init(u::MMXTX, p) = MMXTX(u.c, 0.0, zeros(p))
+Base.show(io::IO, u::MMXTX) = print(io, "MMXTX(c = $(u.c))")
 
 function fit!(o::StatLearn{MMXTX}, x::AVec, y::Real, γ::Float64)
     U = o.updater

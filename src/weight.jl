@@ -133,7 +133,7 @@ end
 @recipe function f(wt::Weight; nobs=50)
     xlab --> "Number of Observations"
     ylab --> "Weight Value"
-    label --> name(wt)
+    label --> OnlineStatsBase.name(wt)
     ylim --> (0, 1)
     w --> 2
     W = deepcopy(wt)
