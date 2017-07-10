@@ -481,6 +481,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.MSPI",
+    "page": "API",
+    "title": "OnlineStats.MSPI",
+    "category": "Type",
+    "text": "MSPI()\n\nMajorized Stochastic Proximal Iteration. Uses quadratic upper bound with x'x * c * I.\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.McclainWeight",
     "page": "API",
     "title": "OnlineStats.McclainWeight",
