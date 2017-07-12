@@ -231,7 +231,6 @@ function update!(o::StatLearn{ADAMAX}, γ)
     end
 end
 
-
 #-----------------------------------------------------------------------# MMXTX
 """
     MMXTX(c)
@@ -266,6 +265,7 @@ function fitbatch!(o::StatLearn{MMXTX}, x::AMat, y::AVec, γ::Float64)
     end
 end
 
+
 #-----------------------------------------------------------------------# MSPI
 """
     MSPI()
@@ -279,8 +279,9 @@ end
 Base.show(io::IO, u::MSPI) = print(io, "MSPI(c = $(u.c))")
 function fit!(o::StatLearn{MSPI}, x::VectorObservation, y::Real, γ::Float64)
     gradient!(o, x, y, γ)
+    denom = inv(1 + γ * x'x * o.updater.c)
     xtx = x'x * o.updater.c
     for j in eachindex(o.β)
-        o.β[j] = inv(1 + γ * xtx) * ((1 + γ * xtx) * o.β[j] - γ * o.gx[j])
+        o.β[j] -= γ * denom * o.gx[j]
     end
 end
