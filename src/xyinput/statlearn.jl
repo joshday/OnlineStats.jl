@@ -87,12 +87,12 @@ end
 
 
 
-function gradient!(o::StatLearn, x::AVec, y::Real, γ::Float64)
+function gradient!(o::StatLearn, x::AVec, y::Real)
     xβ = dot(x, o.β)
     g = deriv(o.loss, y, xβ)
     o.gx .= g .* x
 end
-function gradient!(o::StatLearn, x::AMat, y::AVec, γ::Float64)
+function gradient!(o::StatLearn, x::AMat, y::AVec)
     xβ = x * o.β
     g = deriv(o.loss, y, xβ)
     @inbounds for j in eachindex(o.gx)
@@ -104,11 +104,11 @@ function gradient!(o::StatLearn, x::AMat, y::AVec, γ::Float64)
     scale!(o.gx, 1 / length(y))
 end
 function fit!(o::StatLearn{<:SGUpdater}, x::VectorObservation, y::Real, γ::Float64)
-    gradient!(o, x, y, γ)
+    gradient!(o, x, y)
     update!(o, γ)
 end
 function fitbatch!(o::StatLearn{<:SGUpdater}, x::AMat, y::AVec, γ::Float64)
-    gradient!(o, x, y, γ)
+    gradient!(o, x, y)
     update!(o, γ)
 end
 
@@ -248,7 +248,7 @@ Base.show(io::IO, u::MMXTX) = print(io, "MMXTX(c = $(u.c))")
 
 function fit!(o::StatLearn{MMXTX}, x::VectorObservation, y::Real, γ::Float64)
     U = o.updater
-    gradient!(o, x, y, γ)
+    gradient!(o, x, y)
     U.h = smooth(U.h, x'x * U.c, γ)
     for j in eachindex(o.β)
         U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
@@ -257,7 +257,7 @@ function fit!(o::StatLearn{MMXTX}, x::VectorObservation, y::Real, γ::Float64)
 end
 function fitbatch!(o::StatLearn{MMXTX}, x::AMat, y::AVec, γ::Float64)
     U = o.updater
-    gradient!(o, x, y, γ)
+    gradient!(o, x, y)
     U.h = smooth(U.h, mean(sum(abs2, x, 2)) * U.c, γ)
     for j in eachindex(o.β)
         U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
@@ -278,7 +278,7 @@ struct MSPI <: Updater
 end
 Base.show(io::IO, u::MSPI) = print(io, "MSPI(c = $(u.c))")
 function fit!(o::StatLearn{MSPI}, x::VectorObservation, y::Real, γ::Float64)
-    gradient!(o, x, y, γ)
+    gradient!(o, x, y)
     denom = inv(1 + γ * x'x * o.updater.c)
     xtx = x'x * o.updater.c
     for j in eachindex(o.β)
