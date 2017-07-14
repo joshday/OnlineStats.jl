@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
-    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Float64 regularization parameter\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
+    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Vector of element-wise regularization parameters\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
 },
 
 {
