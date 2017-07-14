@@ -473,19 +473,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MMXTX",
+    "location": "pages/api.html#OnlineStats.MSPIC",
     "page": "API",
-    "title": "OnlineStats.MMXTX",
+    "title": "OnlineStats.MSPIC",
     "category": "Type",
-    "text": "MMXTX(c)\n\nOnline MM algorithm via quadratic approximation.  Approximates Lipschitz constant with x'x * c * I.\n\n\n\n"
+    "text": "MSPI-constant\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MSPI",
+    "location": "pages/api.html#OnlineStats.MSPIF",
     "page": "API",
-    "title": "OnlineStats.MSPI",
+    "title": "OnlineStats.MSPIF",
     "category": "Type",
-    "text": "MSPI()\n\nMajorized Stochastic Proximal Iteration. Uses quadratic upper bound with x'x * c * I.\n\n\n\n"
+    "text": "MSPI-full matrix\n\n\n\n"
 },
 
 {
@@ -510,6 +510,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Moments",
     "category": "Type",
     "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.OMMC",
+    "page": "API",
+    "title": "OnlineStats.OMMC",
+    "category": "Type",
+    "text": "OMMC\n\nOMM-constant.\n\nOnline MM algorithm via quadratic approximation using Lipschitz constant.\n\n\n\n"
 },
 
 {
