@@ -477,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.MSPIC",
     "category": "Type",
-    "text": "MSPI-constant\n\n\n\n"
+    "text": "Experimental: MSPI-constant\n\n\n\n"
 },
 
 {
@@ -485,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.MSPIF",
     "category": "Type",
-    "text": "MSPI-full matrix\n\n\n\n"
+    "text": "Experimental: MSPI-full matrix\n\n\n\n"
 },
 
 {
@@ -517,7 +517,15 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.OMMC",
     "category": "Type",
-    "text": "OMMC\n\nOMM-constant.\n\nOnline MM algorithm via quadratic approximation using Lipschitz constant.\n\n\n\n"
+    "text": "Experimental: OMM-constant\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.OMMF",
+    "page": "API",
+    "title": "OnlineStats.OMMF",
+    "category": "Type",
+    "text": "Experimental: OMM-full matrix\n\n\n\n"
 },
 
 {
