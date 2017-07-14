@@ -1,3 +1,12 @@
+const LinearRegression      = LossFunctions.ScaledDistanceLoss{L2DistLoss,0.5}
+const L1Regression          = L1DistLoss
+const LogisticRegression    = LogitMarginLoss
+const PoissonRegression     = PoissonLoss
+const HuberRegression       = HuberLoss
+const SVMLike               = L1HingeLoss
+const QuantileRegression    = QuantileLoss
+const DWDLike               = DWDMarginLoss
+
 #-----------------------------------------------------------------------------# StatLearn
 abstract type Updater end
 abstract type SGUpdater <: Updater end
@@ -122,7 +131,7 @@ Stochastic Proximal Gradient Descent with step size `η`
 """
 struct SPGD <: SGUpdater
     η::Float64
-    SPGD(η::Float64 = 1.0) = new(η)
+    SPGD(η::Real = 1.0) = new(η)
 end
 function update!(o::StatLearn{SPGD}, γ)
     γη = γ * o.updater.η
@@ -231,57 +240,112 @@ function update!(o::StatLearn{ADAMAX}, γ)
     end
 end
 
-#-----------------------------------------------------------------------# MMXTX
+
+
+#-----------------------------------------------------------------------#
+#-----------------------------------------------------------------------#
+#-----------------------------------------------------------------------# Majorization-based
+# Updaters below here are experimental and may change.
+
+const LinearRegression      = LossFunctions.ScaledDistanceLoss{L2DistLoss,0.5}
+const L1Regression          = L1DistLoss
+const LogisticRegression    = LogitMarginLoss
+const PoissonRegression     = PoissonLoss
+const HuberRegression       = HuberLoss
+const SVMLike               = L1HingeLoss
+const QuantileRegression    = QuantileLoss
+const DWDLike               = DWDMarginLoss
+
+# Lipschitz constant
+constH{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
+constH{A}(o::StatLearn{A, L2DistLoss}, x, y)       = 2x'x
+constH{A}(o::StatLearn{A, LinearRegression}, x, y) = x'x
+constH{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = .25 * x'x
+constH{A}(o::StatLearn{A, DWDMarginLoss}, x, y)   = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+
+# Diagonal Matrix for quadratic upper bound
+diagH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
+
+# Full Matrix for quadratic upper bound
+fullH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
+fullH!{A}(o::StatLearn{A, L2DistLoss}, x, y)       = (o.updater.H[:] = 2 * x * x')
+fullH!{A}(o::StatLearn{A, LinearRegression}, x, y) = (o.updater.H[:] = x * x')
+fullH!{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = (o.updater.H[:] = .25 * x * x')
+function fullH!{A}(o::StatLearn{A, DWDMarginLoss}, x, y)
+    o.updater.H[:] = ((L.q + 1) ^ 2 / L.q) * x * x'
+end
+
+#-----------------------------------------------------------------------# OMMC
 """
-    MMXTX(c)
-Online MM algorithm via quadratic approximation.  Approximates Lipschitz
-constant with `x'x * c * I`.
+    OMMC
+
+OMM-constant.
+
+Online MM algorithm via quadratic approximation using Lipschitz constant.
 """
-mutable struct MMXTX <: Updater
-    c::Float64
+mutable struct OMMC <: Updater
     h::Float64
     b::VecF
 end
-MMXTX(c::Float64 = 1.0) = MMXTX(c, 0.0, zeros(0))
-init(u::MMXTX, p) = MMXTX(u.c, 0.0, zeros(p))
-Base.show(io::IO, u::MMXTX) = print(io, "MMXTX(c = $(u.c))")
+OMMC() = OMMC(0.0, zeros(0))
+init(u::OMMC, p) = OMMC(0.0, zeros(p))
+Base.show(io::IO, u::OMMC) = print(io, "OMMC")
 
-function fit!(o::StatLearn{MMXTX}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMMC}, x::VectorObservation, y::Real, γ::Float64)
     U = o.updater
     gradient!(o, x, y)
-    U.h = smooth(U.h, x'x * U.c, γ)
+    ht = constH(o, x, y)
+    U.h = smooth(U.h, ht, γ)
     for j in eachindex(o.β)
-        U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
-        o.β[j] = U.b[j] / U.h
-    end
-end
-function fitbatch!(o::StatLearn{MMXTX}, x::AMat, y::AVec, γ::Float64)
-    U = o.updater
-    gradient!(o, x, y)
-    U.h = smooth(U.h, mean(sum(abs2, x, 2)) * U.c, γ)
-    for j in eachindex(o.β)
-        U.b[j] = smooth(U.b[j], U.h * o.β[j] - o.gx[j], γ)
+        U.b[j] = smooth(U.b[j], ht * o.β[j] - o.gx[j], γ)
         o.β[j] = U.b[j] / U.h
     end
 end
 
 
 #-----------------------------------------------------------------------# MSPI
-"""
-    MSPI()
-Majorized Stochastic Proximal Iteration.
-Uses quadratic upper bound with `x'x * c * I`.
-"""
-struct MSPI <: Updater
-    c::Float64
-    MSPI(c = 1.0) = new(c)
+# """
+#     MSPI()
+# Majorized Stochastic Proximal Iteration.
+# Uses quadratic upper bound with `x'x * c * I`.
+# """
+# struct MSPI <: Updater
+#     c::Float64
+#     MSPI(c = 1.0) = new(c)
+# end
+# Base.show(io::IO, u::MSPI) = print(io, "MSPI(c = $(u.c))")
+# function fit!(o::StatLearn{MSPI}, x::VectorObservation, y::Real, γ::Float64)
+#     gradient!(o, x, y)
+#     denom = inv(1 + γ * x'x * o.updater.c)
+#     for j in eachindex(o.β)
+#         o.β[j] -= γ * denom * o.gx[j]
+#     end
+# end
+
+#-----------------------------------------------------------------------# MSPIC
+"MSPI-constant"
+struct MSPIC <: Updater
+    η::Float64
+    MSPIC(η::Real = 1.) = new(η)
 end
-Base.show(io::IO, u::MSPI) = print(io, "MSPI(c = $(u.c))")
-function fit!(o::StatLearn{MSPI}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{MSPIC}, x::VectorObservation, y::Real, γ::Float64)
     gradient!(o, x, y)
-    denom = inv(1 + γ * x'x * o.updater.c)
-    xtx = x'x * o.updater.c
+    denom = inv(1 + γ * constH(o, x, y))
     for j in eachindex(o.β)
-        o.β[j] -= γ * denom * o.gx[j]
+        @inbounds o.β[j] -= γ * denom * o.gx[j]
     end
+end
+
+#-----------------------------------------------------------------------# MSPIF
+"MSPI-full matrix"
+struct MSPIF <: Updater
+    η::Float64
+    H::Matrix{Float64}
+    MSPIF(η::Real = 1., p = 0) = new(η, zeros(p, p))
+end
+init(u::MSPIF, p) = MSPIF(u.η, p)
+function fit!(o::StatLearn{MSPIF}, x::VectorObservation, y::Real, γ::Float64)
+    gradient!(o, x, y)
+    fullH!(o, x, y)
+    o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
 end

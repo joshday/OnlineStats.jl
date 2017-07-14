@@ -380,7 +380,7 @@ end
     x = randn(n, p)
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
-    for u in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX(), MMXTX()]
+    for u in [SPGD(), MAXSPGD(), ADAGRAD(), ADAM(), ADAMAX()]
         o = @inferred StatLearn(p, scaled(L2DistLoss(), .5), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
         fit!(s, x, y)
