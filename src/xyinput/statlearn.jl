@@ -25,7 +25,7 @@ StatLearn(p, loss, penalty, λ, updater)
 Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Arguments are:
 - `loss`: any Loss from LossFunctions.jl
 - `penalty`: any Penalty from PenaltyFunctions.jl.
-- `λ`: a Float64 regularization parameter
+- `λ`: a Vector of element-wise regularization parameters
 - `updater`: `SPGD()`, `ADAGRAD()`, `ADAM()`, or `ADAMAX()`
 
 ### Example
@@ -33,7 +33,7 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 using LossFunctions, PenaltyFunctions
 x = randn(100_000, 10)
 y = x * linspace(-1, 1, 10) + randn(100_000)
-o = StatLearn(10, L2DistLoss(), L1Penalty(), .1, SPGD())
+o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())
 s = Series(o)
 fit!(s, x, y)
 coef(o)
