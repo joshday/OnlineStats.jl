@@ -276,13 +276,7 @@ function fullH!{A}(o::StatLearn{A, DWDMarginLoss}, x, y)
 end
 
 #-----------------------------------------------------------------------# OMMC
-"""
-    OMMC
-
-OMM-constant.
-
-Online MM algorithm via quadratic approximation using Lipschitz constant.
-"""
+"Experimental: OMM-constant"
 mutable struct OMMC <: Updater
     h::Float64
     b::VecF
@@ -300,6 +294,28 @@ function fit!(o::StatLearn{OMMC}, x::VectorObservation, y::Real, γ::Float64)
         U.b[j] = smooth(U.b[j], ht * o.β[j] - o.gx[j], γ)
         o.β[j] = U.b[j] / U.h
     end
+end
+
+#-----------------------------------------------------------------------# OMMF
+"Experimental: OMM-full matrix"
+mutable struct OMMF <: Updater
+    H::Matrix{Float64}
+    smoothedH::Matrix{Float64}
+    b::VecF
+end
+OMMF() = OMMF(zeros(0, 0), zeros(0, 0), zeros(0))
+init(u::OMMF, p) = OMMF(zeros(p, p), zeros(p, p), zeros(p))
+Base.show(io::IO, u::OMMF) = print(io, "OMMF")
+
+function fit!(o::StatLearn{OMMF}, x::VectorObservation, y::Real, γ::Float64)
+    U = o.updater
+    gradient!(o, x, y)
+    fullH!(o, x, y)
+    smooth!(U.smoothedH, U.H, γ)
+    smooth!(U.b, U.H * o.β - o.gx, γ)
+end
+function value(o::StatLearn{OMMF})
+    o.β[:] = U.smoothedH \ U.b
 end
 
 
@@ -323,7 +339,7 @@ end
 # end
 
 #-----------------------------------------------------------------------# MSPIC
-"MSPI-constant"
+"Experimental: MSPI-constant"
 struct MSPIC <: Updater
     η::Float64
     MSPIC(η::Real = 1.) = new(η)
@@ -337,7 +353,7 @@ function fit!(o::StatLearn{MSPIC}, x::VectorObservation, y::Real, γ::Float64)
 end
 
 #-----------------------------------------------------------------------# MSPIF
-"MSPI-full matrix"
+"Experimental: MSPI-full matrix"
 struct MSPIF <: Updater
     η::Float64
     H::Matrix{Float64}

@@ -1,10 +1,9 @@
 module OnlineStats
 
 
-import StatsBase: nobs, fit!, skewness, kurtosis, confint, predict, coef, coeftable,
-    CoefTable, stderr, vcov
+import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint
 import OnlineStatsBase: weight, weight!, updatecounter!, nups, header, input, _value
-importall OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
+import LearnBase: value, fit!, predict, nobs
 import SweepOperator
 
 using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
@@ -24,7 +23,9 @@ export
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, QuantileISGD,
     Diff, Sum, MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample,
     # statlearn things
-    StatLearn, SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX, OMMC, MSPIC, MSPIF,
+    StatLearn,
+    SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX,
+    OMMC, OMMF, MSPIC, MSPIF,
     loss, objective, classify, statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
