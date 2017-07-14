@@ -261,7 +261,7 @@ constH{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
 constH{A}(o::StatLearn{A, L2DistLoss}, x, y)       = 2x'x
 constH{A}(o::StatLearn{A, LinearRegression}, x, y) = x'x
 constH{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = .25 * x'x
-constH{A}(o::StatLearn{A, DWDMarginLoss}, x, y)   = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+constH{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)   = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
 
 # Diagonal Matrix for quadratic upper bound
 diagH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
@@ -271,8 +271,8 @@ fullH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
 fullH!{A}(o::StatLearn{A, L2DistLoss}, x, y)       = (o.updater.H[:] = 2 * x * x')
 fullH!{A}(o::StatLearn{A, LinearRegression}, x, y) = (o.updater.H[:] = x * x')
 fullH!{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = (o.updater.H[:] = .25 * x * x')
-function fullH!{A}(o::StatLearn{A, DWDMarginLoss}, x, y)
-    o.updater.H[:] = ((L.q + 1) ^ 2 / L.q) * x * x'
+function fullH!{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)
+    o.updater.H[:] = ((o.loss.q + 1) ^ 2 / o.loss.q) * x * x'
 end
 
 #-----------------------------------------------------------------------# OMMC
@@ -313,9 +313,9 @@ function fit!(o::StatLearn{OMMF}, x::VectorObservation, y::Real, γ::Float64)
     fullH!(o, x, y)
     smooth!(U.smoothedH, U.H, γ)
     smooth!(U.b, U.H * o.β - o.gx, γ)
-end
-function value(o::StatLearn{OMMF})
-    o.β[:] = U.smoothedH \ U.b
+    try
+        o.β[:] = U.smoothedH \ U.b
+    end
 end
 
 
