@@ -321,35 +321,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.BoundedEqualWeight",
-    "page": "API",
-    "title": "OnlineStats.BoundedEqualWeight",
-    "category": "Type",
-    "text": "BoundedEqualWeight(λ::Real = 0.1)\nBoundedEqualWeight(lookback::Integer)\n\nUse EqualWeight until threshold λ is hit, then hold constant.\nSingleton weight at observation t is γ = max(1 / t, λ)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.CovMatrix",
     "page": "API",
     "title": "OnlineStats.CovMatrix",
     "category": "Type",
     "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.\n\nExample\n\ny = randn(100, 5)\nSeries(y, CovMatrix(5))\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.EqualWeight",
-    "page": "API",
-    "title": "OnlineStats.EqualWeight",
-    "category": "Type",
-    "text": "EqualWeight()\n\nEqually weighted observations\nSingleton weight at observation t is γ = 1 / t\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.ExponentialWeight",
-    "page": "API",
-    "title": "OnlineStats.ExponentialWeight",
-    "category": "Type",
-    "text": "ExponentialWeight(λ::Real = 0.1)\nExponentialWeight(lookback::Integer)\n\nExponentially weighted observations (constant)\nSingleton weight at observation t is γ = λ\n\n\n\n"
 },
 
 {
@@ -417,14 +393,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.HarmonicWeight",
-    "page": "API",
-    "title": "OnlineStats.HarmonicWeight",
-    "category": "Type",
-    "text": "HarmonicWeight(a = 10.0)\n\nDecreases at a slow rate\nSingleton weight at observation t is γ = a / (a + t - 1)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.HyperLogLog",
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
@@ -438,22 +406,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.KMeans",
     "category": "Type",
     "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters of p variables\n\nExample\n\nusing OnlineStats, Distributions\nd = MixtureModel([Normal(0), Normal(5)])\ny = rand(d, 100_000, 1)\ns = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.LearningRate",
-    "page": "API",
-    "title": "OnlineStats.LearningRate",
-    "category": "Type",
-    "text": "LearningRate(r = .6, λ = 0.0)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate until threshold λ is reached\nSingleton weight at observation t is γ = max(1 / t ^ r, λ)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.LearningRate2",
-    "page": "API",
-    "title": "OnlineStats.LearningRate2",
-    "category": "Type",
-    "text": "LearningRate2(c = .5, λ = 0.0)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate until threshold λ is reached\nSingleton weight at observation t is γ = max(inv(1 + c * (t - 1), λ)\n\n\n\n"
 },
 
 {
@@ -486,14 +438,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.MSPIF",
     "category": "Type",
     "text": "Experimental: MSPI-full matrix\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.McclainWeight",
-    "page": "API",
-    "title": "OnlineStats.McclainWeight",
-    "category": "Type",
-    "text": "McclainWeight(ᾱ = 0.1)\n\n\"smoothed\" version of BoundedEqualWeight\nweights asymptotically approach ᾱ\nSingleton weight at observation t is γ(t-1) / (1 + γ(t-1) - ᾱ)\n\n\n\n"
 },
 
 {
@@ -566,6 +510,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.SPGD",
     "category": "Type",
     "text": "SPGD(η)\n\nStochastic Proximal Gradient Descent with step size η\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.SPI",
+    "page": "API",
+    "title": "OnlineStats.SPI",
+    "category": "Type",
+    "text": "Stochastic Proximal Iteration\n\n\n\n"
 },
 
 {
