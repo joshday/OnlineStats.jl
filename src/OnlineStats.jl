@@ -100,8 +100,24 @@ function maprows(f::Function, b::Integer, data...)
 end
 
 
+#-----------------------------------------------------------------------# Weight
+nobs(w::Weight) = OnlineStatsBase.nobs(w)
+@recipe function f(wt::Weight; nobs=50)
+    xlab --> "Number of Observations"
+    ylab --> "Weight Value"
+    label --> OnlineStatsBase.name(wt)
+    ylim --> (0, 1)
+    w --> 2
+    W = deepcopy(wt)
+    v = zeros(nobs)
+    for i in eachindex(v)
+        updatecounter!(W)
+        v[i] = weight(W)
+    end
+    v
+end
+
 #----------------------------------------------------------------------# source files
-include("weight.jl")
 include("series.jl")
 include("scalarinput/summary.jl")
 include("scalarinput/reservoir.jl")
