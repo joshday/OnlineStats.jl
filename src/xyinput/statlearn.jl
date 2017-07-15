@@ -261,12 +261,13 @@ constH{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
 constH{A}(o::StatLearn{A, L2DistLoss}, x, y)       = 2x'x
 constH{A}(o::StatLearn{A, LinearRegression}, x, y) = x'x
 constH{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = .25 * x'x
-constH{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)   = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+constH{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)  = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
 
 # Diagonal Matrix for quadratic upper bound
 diagH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
 
 # Full Matrix for quadratic upper bound
+# TODO: assume H is symmetric and optimizie
 fullH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
 fullH!{A}(o::StatLearn{A, L2DistLoss}, x, y)       = (o.updater.H[:] = 2 * x * x')
 fullH!{A}(o::StatLearn{A, LinearRegression}, x, y) = (o.updater.H[:] = x * x')
@@ -314,29 +315,34 @@ function fit!(o::StatLearn{OMMF}, x::VectorObservation, y::Real, γ::Float64)
     smooth!(U.smoothedH, U.H, γ)
     smooth!(U.b, U.H * o.β - o.gx, γ)
     try
-        o.β[:] = U.smoothedH \ U.b
+        o.β[:] = (U.smoothedH + ϵ * I) \ U.b
     end
 end
 
-
-#-----------------------------------------------------------------------# MSPI
-# """
-#     MSPI()
-# Majorized Stochastic Proximal Iteration.
-# Uses quadratic upper bound with `x'x * c * I`.
-# """
-# struct MSPI <: Updater
-#     c::Float64
-#     MSPI(c = 1.0) = new(c)
-# end
-# Base.show(io::IO, u::MSPI) = print(io, "MSPI(c = $(u.c))")
-# function fit!(o::StatLearn{MSPI}, x::VectorObservation, y::Real, γ::Float64)
-#     gradient!(o, x, y)
-#     denom = inv(1 + γ * x'x * o.updater.c)
-#     for j in eachindex(o.β)
-#         o.β[j] -= γ * denom * o.gx[j]
-#     end
-# end
+#-----------------------------------------------------------------------# OMM2C
+struct OMM2C <: Updater
+    η::Float64
+    OMM2C(η::Real = 1.0) = new(η)
+end
+function fit!(o::StatLearn{OMM2C}, x::VectorObservation, y::Real, γ::Float64)
+    gradient!(o, x, y)
+    h_inv = inv(constH(o, x, y))
+    for j in eachindex(o.β)
+        o.β[j] -= γ * h_inv * o.gx[j]
+    end
+end
+#-----------------------------------------------------------------------# OMM2F
+struct OMM2F <: Updater
+    η::Float64
+    H::Matrix{Float64}
+    OMM2F(η::Real = 1.0, p = 0) = new(η, zeros(p, p))
+end
+init(o::OMM2F, p) = OMM2F(o.η, p)
+function fit!(o::StatLearn{OMM2F}, x::VectorObservation, y::Real, γ::Float64)
+    gradient!(o, x, y)
+    fullH!(o, x, y)
+    o.β[:] -= γ * ((o.updater.H + ϵ * I) \ o.gx)
+end
 
 #-----------------------------------------------------------------------# MSPIC
 "Experimental: MSPI-constant"
@@ -365,3 +371,20 @@ function fit!(o::StatLearn{MSPIF}, x::VectorObservation, y::Real, γ::Float64)
     fullH!(o, x, y)
     o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
 end
+
+
+
+
+#-----------------------------------------------------------------------# SPI
+"Stochastic Proximal Iteration"
+struct SPI <: Updater
+    η::Float64
+    SPI(η::Real=1.0) = new(η)
+end
+fit!(o::StatLearn{SPI}, x, y, γ) = spi!(o, x, y, γ * o.updater.η)
+
+spi!(o::StatLearn, x, y, γ) = error("$(o.loss) is not defined for SPI")
+function spi!(o::StatLearn{SPI, LinearRegression}, x, y, γ)
+    o.β[:] = (I + γ * x * x') \ (o.β + γ * y * x)
+end
+spi!(o::StatLearn{SPI, L2DistLoss}, x, y, γ) = (o.β[:] = (I + 2γ * x * x') \ (o.β + 2γ * y * x))
