@@ -1,5 +1,6 @@
-module OnlineStats
+__precompile__(true)
 
+module OnlineStats
 
 import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint
 import OnlineStatsBase: weight, weight!, updatecounter!, nups, header, input, _value
