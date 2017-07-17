@@ -2,7 +2,7 @@ __precompile__(true)
 
 module OnlineStats
 
-import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint
+import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram
 import OnlineStatsBase: weight, weight!, updatecounter!, nups, header, input, _value
 import LearnBase: value, fit!, predict, nobs
 import SweepOperator
@@ -22,7 +22,7 @@ export
     # OnlineStats
     OnlineStat,
     Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, QuantileISGD,
-    Diff, Sum, MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample,
+    Diff, Sum, MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample, OHistogram,
     # statlearn things
     StatLearn,
     SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX,

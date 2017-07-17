@@ -225,6 +225,13 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
         fit!(s, y2, 7)
     end
+    @testset "Histogram" begin
+        y = randn(100)
+        h = fit(Histogram, y, weights(ones(100)), -4:.1:4; closed=:left)
+        o = OHistogram(-4:.1:4);
+        s = Series(y, o)
+        @test h == value(o)
+    end
     @testset "Extra methods" begin
         @test mean(Mean()) == 0.0
         @test nobs(Variance()) == 0

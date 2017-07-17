@@ -349,7 +349,29 @@ fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64) = (v = convert(T, x); o.
 fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64) =       (v = round(T, x);   o.sum += v)
 fitbatch!(o::Sum, y::AVec, γ::Float64) = fit!(o, sum(y), γ)
 
-# #-----------------------------------------------------------------------# Hist
-# struct Hist <: OnlineStat{0, 1}
-#
-# end
+#-----------------------------------------------------------------------# Hist
+"""
+    OHistogram(range)
+Make a histogram with bins given by `range`.  Uses left-closed bins.
+### Example
+```julia
+y = randn(100)
+s = Series(y, OHistogram(-4:.1:4))
+value(s)
+```
+"""
+struct OHistogram{H <: Histogram} <: OnlineStat{0, 1, EqualWeight}
+    h::H
+end
+OHistogram(r::Range) = OHistogram(Histogram(r, :left))
+function fit!(o::OHistogram, y::Singleton, γ::Float64)
+    H = o.h
+    x = H.edges[1]
+    a = first(x)
+    δ = step(x)
+    k = floor(Int, (y - a) / δ + 1.0)
+    if 1 <= k <= length(x)
+        @inbounds H.weights[k] += 1
+    end
+end
+_value(o::Histogram) = o.h
