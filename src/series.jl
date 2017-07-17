@@ -32,12 +32,12 @@ Series(o::OnlineStat...) = Series(weight(o), o)
 Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, o)
 
 # init with data
-Series(y::AA, o::OnlineStat) = (s = Series(weight(o), o); fit!(s, y))
-Series(y::AA, o::OnlineStat...) = (s = Series(weight(o), o); fit!(s, y))
-Series(y::AA, wt::Weight, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
-Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
-Series(wt::Weight, y::AA, o::OnlineStat) = (s = Series(wt, o); fit!(s, y))
-Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o); fit!(s, y))
+Series(y::AA, o::OnlineStat)                = (s = Series(weight(o), o); fit!(s, y))
+Series(y::AA, o::OnlineStat...)             = (s = Series(weight(o), o); fit!(s, y))
+Series(y::AA, wt::Weight, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
+Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
+Series(wt::Weight, y::AA, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
+Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
 
 # Special constructors for (1, 0) input
 # x, y, o
