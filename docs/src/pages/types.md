@@ -11,6 +11,7 @@
 | skewness and kurtosis                  | [`Moments`](@ref)          |
 | sum                                    | [`Sum`](@ref)              |
 | difference                             | [`Diff`](@ref)             |
+| histogram                              | [`OHistogram`](@ref)       |
 | **Multivariate Analysis:**             |                            |
 | covariance matrix                      | [`CovMatrix`](@ref)        |
 | k-means clustering                     | [`KMeans`](@ref)           |
