@@ -29,15 +29,15 @@ nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 Series(t::Tuple)         = Series(weight(t), t)
 Series(o::OnlineStat)    = Series(weight(o), o)
 Series(o::OnlineStat...) = Series(weight(o), o)
-Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, o)
+# Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, o, os...)
 
 # init with data
 Series(y::AA, o::OnlineStat)                = (s = Series(weight(o), o); fit!(s, y))
 Series(y::AA, o::OnlineStat...)             = (s = Series(weight(o), o); fit!(s, y))
-Series(y::AA, wt::Weight, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
-Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
-Series(wt::Weight, y::AA, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
-Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
+# Series(y::AA, wt::Weight, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
+# Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
+# Series(wt::Weight, y::AA, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
+# Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
 
 # Special constructors for (1, 0) input
 # x, y, o
@@ -69,8 +69,38 @@ value(s::Series, i) = value(s.stats[i])
 "Return the `stats` field of a Series."
 stats(s::Series) = s.stats
 
-#--------------------------------------------------------------------------# fit!
-#-----------------------------------------------------------------------# Series{0}
+#---------------------------------------------------------------------------# fit helpers
+struct RowsOf{T <: AbstractMatrix}
+    data::T
+end
+Base.start(o::RowsOf) = 1
+Base.next(o::RowsOf, i) = view(o.data, i, :), i + 1
+Base.done(o::RowsOf, i) = i == size(o.data, 1)
+
+struct ColsOf{T <: AbstractMatrix}
+    data::T
+end
+Base.start(o::ColsOf) = 1
+Base.next(o::ColsOf, i) = view(o.data, :, i), i + 1
+Base.done(o::ColsOf, i) = i == size(o.data, 2)
+
+const ScalarOb = Union{Number, AbstractString, Symbol}
+const VectorOb = Union{AbstractVector, NTuple}
+const Rows = ObsDim.First
+const Cols = ObsDim.Last
+
+
+eachob(y, s::Series, dim) = error("$(typeof(s)) can't interpret data of type $(typeof(y))")
+# Single Observation
+eachob(y::ScalarOb, s::Series{0}, dim) = y
+eachob(y::VectorOb, s::Series{1}, dim) = (y,)
+# Multiple Observations
+eachob(y::VectorOb, s::Series{0}, dim) = y
+eachob(y::AbstractMatrix, s::Series{1}, ::ObsDim.First) = RowsOf(y)
+eachob(y::AbstractMatrix, s::Series{1}, ::ObsDim.Last) = ColsOf(y)
+
+
+#--------------------------------------------------------------------------------# fit!
 """
 ```julia
 fit!(s, y)
@@ -90,24 +120,6 @@ fit!(s, y, w[1])     # multiple observations: override each weight with w[1]
 fit!(s, y, w)        # multiple observations: y[i] uses weight w[i]
 ```
 """
-
-const ScalarOb = Union{Number, AbstractString, Symbol}
-const VectorOb = Union{AbstractVector, NTuple}
-
-const Rows = ObsDim.First()
-const Cols = ObsDim.Last()
-
-
-eachob(y, s::Series, dim) = error("$(typeof(s)) can't interpret data of type $(typeof(y))")
-# Single Observation
-eachob(y::ScalarOb, s::Series{0}, dim) = y
-eachob(y::VectorOb, s::Series{1}, dim) = (y,)
-# Multiple Observations
-eachob(y::VectorOb, s::Series{0}, dim) = y
-
-# TODO: slice iterator
-# eachob(y::AbstractMatrix, s::Series{1}, dim) = y
-
 function fit!(s::Series, y, dim::LearnBase.ObsDimension = ObsDim.First())
     for yi in eachob(y, s, dim)
         γ = weight!(s)
@@ -131,169 +143,4 @@ function fit!(s::Series, y, w::VecF, dim::LearnBase.ObsDimension = ObsDim.First(
     end
     s
 end
-
-# function fit!(s::Series{T}, y::T) where T
-#     γ = weight!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{T}, y::T, γ::Float64) where T
-#     updatecounter!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-# for T in [ScalarOb, VectorOb, XYOb]
-#     @eval begin
-#         function fit!(s::Series{T}, y::$(multiple_obs(T))) where T
-#             for yi in y
-#                 fit!(s, yi)
-#             end
-#         end
-#     end
-# end
-
-
-# function fit!(s::Series{0}, y::ScalarOb)
-#     γ = weight!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{0}, y::ScalarOb, γ::Float64)
-#     updatecounter!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{0}, y::AVec)
-#     for yi in y
-#         fit!(s, yi)
-#     end
-#     s
-# end
-# function fit!(s::Series{0}, y::AVec, γ::Float64)
-#     for yi in y
-#         fit!(s, yi, γ)
-#     end
-#     s
-# end
-# function fit!(s::Series{0}, y::AVec, γ::AVecF)
-#     length(y) == length(γ) || throw(DimensionMismatch())
-#     for (yi, γi) in zip(y, γ)
-#         fit!(s, yi, γi)
-#     end
-#     s
-# end
-# function fit!(s::Series{0}, y::AVec, b::Integer)
-#     maprows(b, y) do yi
-#         bi = length(yi)
-#         γ = weight!(s, bi)
-#         foreach(o -> fitbatch!(o, yi, γ), s.stats)
-#     end
-#     s
-# end
-
-#-----------------------------------------------------------------------# Series{1}
-# function fit!(s::Series{1}, y::AVec)
-#     γ = weight!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{1}, y::AVec, γ::Float64)
-#     updatecounter!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{1}, y::AMat)
-#     for i in 1:size(y, 1)
-#         fit!(s, view(y, i, :))
-#     end
-#     s
-# end
-# function fit!(s::Series{1}, y::AMat, γ::Float64)
-#     for i in 1:size(y, 1)
-#         fit!(s, view(y, i, :), γ)
-#     end
-#     s
-# end
-# function fit!(s::Series{1}, y::AMat, γ::AVecF)
-#     for i in 1:size(y, 1)
-#         fit!(s, view(y, i, :), γ[i])
-#     end
-#     s
-# end
-# function fit!(s::Series{1}, y::AMat, b::Integer)
-#     maprows(b, y) do yi
-#         bi = size(yi, 1)
-#         γ = weight!(s, bi)
-#         foreach(o -> fitbatch!(o, yi, γ), s.stats)
-#     end
-#     s
-# end
-
-# tuple version
-# function fit!(s::Series{1}, y::NTuple)
-#     γ = weight!(s)
-#     foreach(s -> fit!(s, y, γ), s.stats)
-#     s
-# end
-
-
-#----------------------------------------------------------------# Series{1}, ObsDim=2
-# function fit!(s::Series{1}, y::AMat, ::ObsDim.Last)
-#     for i in 1:size(y, 2)
-#         fit!(s, view(y, :, i))
-#     end
-#     s
-# end
-# function fit!(s::Series{1}, y::AMat, γ::Float64, ::ObsDim.Last)
-#     for i in 1:size(y, 2)
-#         fit!(s, view(y, :, i), γ)
-#     end
-#     s
-# end
-# function fit!(s::Series{1}, y::AMat, γ::AVecF, ::ObsDim.Last)
-#     for i in 1:size(y, 2)
-#         fit!(s, view(y, :, i), γ[i])
-#     end
-#     s
-# end
-
-#-----------------------------------------------------------------------# Series{(1, 0)}
-# function fit!(s::Series{(1,0)}, x::AVec, y::Number)
-#     γ = weight!(s)
-#     foreach(s -> fit!(s, x, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{(1,0)}, x::AVec, y::Number, γ::Float64)
-#     updatecounter!(s)
-#     foreach(s -> fit!(s, x, y, γ), s.stats)
-#     s
-# end
-# function fit!(s::Series{(1, 0)}, x::AMat, y::AVec)
-#     for i in eachindex(y)
-#         fit!(s, view(x, i, :), y[i])
-#     end
-#     s
-# end
-# function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::Float64)
-#     for i in eachindex(y)
-#         fit!(s, view(x, i, :), y[i], γ)
-#     end
-#     s
-# end
-# function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::AVecF)
-#     for i in eachindex(y)
-#         fit!(s, view(x, i, :), y[i], γ[i])
-#     end
-#     s
-# end
-# function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
-#     maprows(b, x, y) do xi, yi
-#         bi = length(yi)
-#         γ = weight!(s, bi)
-#         foreach(o -> fitbatch!(o, xi, yi, γ), s.stats)
-#     end
-#     s
-# end
-#
-#
-# fit!{T <: Series}(s1::T, s2::T) = merge!(s1, s2)
+fit!(s1::T, s2::T) where {T <: Series} = merge!(s1, s2)
