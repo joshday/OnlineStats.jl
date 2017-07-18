@@ -29,7 +29,7 @@ function Base.show{T}(io::IO, o::MV{T})
     print(io, s)
 end
 
-function fit!(o::MV, y::VectorObservation, γ::Float64)
+function fit!(o::MV, y::VectorOb, γ::Float64)
     stats = o.stats
     for (i, yi) in enumerate(y)
         fit!(stats[i], yi, γ)

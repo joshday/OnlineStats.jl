@@ -364,14 +364,13 @@ struct OHistogram{H <: Histogram} <: OnlineStat{0, 1, EqualWeight}
     h::H
 end
 OHistogram(r::Range) = OHistogram(Histogram(r, :left))
-function fit!(o::OHistogram, y::Singleton, γ::Float64)
+function fit!(o::OHistogram, y::ScalarOb, γ::Float64)
     H = o.h
     x = H.edges[1]
     a = first(x)
     δ = step(x)
-    k = floor(Int, (y - a) / δ + 1.0)
+    k = floor(Int, (y - a) / δ) + 1
     if 1 <= k <= length(x)
         @inbounds H.weights[k] += 1
     end
 end
-_value(o::Histogram) = o.h

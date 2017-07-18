@@ -112,7 +112,7 @@ function gradient!(o::StatLearn, x::AMat, y::AVec)
     end
     scale!(o.gx, 1 / length(y))
 end
-function fit!(o::StatLearn{<:SGUpdater}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{<:SGUpdater}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     update!(o, γ)
 end
@@ -286,7 +286,7 @@ OMMC() = OMMC(0.0, zeros(0))
 init(u::OMMC, p) = OMMC(0.0, zeros(p))
 Base.show(io::IO, u::OMMC) = print(io, "OMMC")
 
-function fit!(o::StatLearn{OMMC}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMMC}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
     gradient!(o, x, y)
     ht = constH(o, x, y)
@@ -308,7 +308,7 @@ OMMF() = OMMF(zeros(0, 0), zeros(0, 0), zeros(0))
 init(u::OMMF, p) = OMMF(zeros(p, p), zeros(p, p), zeros(p))
 Base.show(io::IO, u::OMMF) = print(io, "OMMF")
 
-function fit!(o::StatLearn{OMMF}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMMF}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
     gradient!(o, x, y)
     fullH!(o, x, y)
@@ -324,7 +324,7 @@ struct OMM2C <: Updater
     η::Float64
     OMM2C(η::Real = 1.0) = new(η)
 end
-function fit!(o::StatLearn{OMM2C}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMM2C}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     h_inv = inv(constH(o, x, y))
     for j in eachindex(o.β)
@@ -338,7 +338,7 @@ struct OMM2F <: Updater
     OMM2F(η::Real = 1.0, p = 0) = new(η, zeros(p, p))
 end
 init(o::OMM2F, p) = OMM2F(o.η, p)
-function fit!(o::StatLearn{OMM2F}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMM2F}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     fullH!(o, x, y)
     o.β[:] -= γ * ((o.updater.H + ϵ * I) \ o.gx)
@@ -350,7 +350,7 @@ struct MSPIC <: Updater
     η::Float64
     MSPIC(η::Real = 1.) = new(η)
 end
-function fit!(o::StatLearn{MSPIC}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{MSPIC}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     denom = inv(1 + γ * constH(o, x, y))
     for j in eachindex(o.β)
@@ -366,7 +366,7 @@ struct MSPIF <: Updater
     MSPIF(η::Real = 1., p = 0) = new(η, zeros(p, p))
 end
 init(u::MSPIF, p) = MSPIF(u.η, p)
-function fit!(o::StatLearn{MSPIF}, x::VectorObservation, y::Real, γ::Float64)
+function fit!(o::StatLearn{MSPIF}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     fullH!(o, x, y)
     o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)

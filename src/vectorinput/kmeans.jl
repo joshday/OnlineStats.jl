@@ -17,7 +17,7 @@ mutable struct KMeans <: OnlineStat{1, 2, LearningRate}
     KMeans(p::Integer, k::Integer) = new(randn(p, k), zeros(k))
 end
 Base.show(io::IO, o::KMeans) = print(io, "KMeans($(value(o)'))")
-function fit!(o::KMeans, x::VectorObservation, γ::Float64)
+function fit!(o::KMeans, x::VectorOb, γ::Float64)
     d, k = size(o.value)
     length(x) == d || throw(DimensionMismatch())
     for j in 1:k

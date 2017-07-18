@@ -1,4 +1,4 @@
-using Documenter, OnlineStats
+using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
     format = :html,
@@ -10,7 +10,8 @@ makedocs(
         "pages/weights.md",
         "pages/series.md",
         "pages/types.md",
-        "pages/api.md"
+        "pages/api.md",
+        "pages/newstats.md"
     ]
 )
 

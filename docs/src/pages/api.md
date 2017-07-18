@@ -4,5 +4,5 @@
 ```
 
 ```@autodocs
-Modules = [OnlineStats]
+Modules = [OnlineStats, OnlineStatsBase]
 ```

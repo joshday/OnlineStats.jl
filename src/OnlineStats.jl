@@ -9,7 +9,6 @@ import SweepOperator
 
 using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
 
-
 export
     # AbstractSeries
     Series, Bootstrap,
@@ -44,8 +43,6 @@ const AVec{T}   = AbstractVector{T}
 const AMat{T}   = AbstractMatrix{T}
 const AVecF     = AVec{Float64}
 const AMatF     = AMat{Float64}
-
-const VectorObservation = Union{AVec, NTuple}
 
 
 #---------------------------------------------------------------------------# helpers
