@@ -15,7 +15,6 @@ mutable struct Mean <: OnlineStat{0, 0, EqualWeight}
     Mean() = new(0.0)
 end
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
-fitbatch!(o::Mean, y::AVec, γ::Float64) = (o.μ = smooth(o.μ, mean(y), γ))
 Base.merge!(o::Mean, o2::Mean, γ::Float64) = fit!(o, value(o2), γ)
 Base.mean(o::Mean) = value(o)
 
@@ -236,13 +235,6 @@ function fit!(o::QuantileSGD, y::Float64, γ::Float64)
         @inbounds o.value[i] -= γ * deriv(QuantileLoss(o.τ[i]), y, o.value[i])
     end
 end
-function fitbatch!{T <: Real}(o::QuantileSGD, y::AVec{T}, γ::Float64)
-    g = zeros(y)
-    for i in eachindex(o.τ)
-        g .= deriv.(QuantileLoss(o.τ[i]), y, o.value[i])
-        @inbounds o.value[i] -= γ * mean(g)
-    end
-end
 function Base.merge!(o::QuantileSGD, o2::QuantileSGD, γ::Float64)
     o.τ == o2.τ || throw(ArgumentError("objects track different quantiles"))
     smooth!(o.value, o2.value, γ)
@@ -278,22 +270,6 @@ function fit!(o::QuantileMM, y::Real, γ::Float64)
         o.t[j] = smooth(o.t[j], w, γ)
         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
     end
-end
-function fitbatch!{T <: Real}(o::QuantileMM, y::AVec{T}, γ::Float64)
-    n2 = length(y)
-    γ = γ / n2
-    o.o = smooth(o.o, 1.0, γ)
-    @inbounds for yi in y
-        for j in 1:length(o.τ)
-            w::Float64 = 1.0 / abs(yi - o.value[j])
-            o.s[j] = smooth(o.s[j], w * yi, γ)
-            o.t[j] = smooth(o.t[j], w, γ)
-        end
-    end
-    @inbounds for j in 1:length(o.τ)
-        o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
-    end
-    o
 end
 
 #--------------------------------------------------------------------# Diff
@@ -347,7 +323,6 @@ Sum{T<:Real}(::Type{T}) = Sum(zero(T))
 Base.sum(o::Sum) = o.sum
 fit!{T<:AbstractFloat}(o::Sum{T}, x::Real, γ::Float64) = (v = convert(T, x); o.sum += v)
 fit!{T<:Integer}(o::Sum{T}, x::Real, γ::Float64) =       (v = round(T, x);   o.sum += v)
-fitbatch!(o::Sum, y::AVec, γ::Float64) = fit!(o, sum(y), γ)
 
 #-----------------------------------------------------------------------# Hist
 """

@@ -48,41 +48,6 @@ println()
 println()
 info("TESTS BEGIN HERE")
 #--------------------------------------------------------------------------------# TESTS
-#--------------------------------------------------------------------------------# Weights
-@testset "Weights" begin
-    w1 = @inferred EqualWeight()
-    w2 = @inferred ExponentialWeight()
-    w3 = @inferred BoundedEqualWeight()
-    w4 = @inferred LearningRate()
-    w5 = @inferred LearningRate2()
-    w6 = @inferred McclainWeight()
-    w7 = @inferred HarmonicWeight(5.)
-
-
-    for w in [w1, w3, w4, w5, w6, w7]
-        @test OnlineStats.weight!(w, 1) == 1
-        @test nobs(w) == 1
-    end
-    for i in 1:10
-        @test OnlineStats.weight(w1) == 1 / i
-        @test OnlineStats.weight(w2) == w2.λ
-        @test OnlineStats.weight(w3) == 1 / i
-        @test OnlineStats.weight(w4) ≈ i ^ -w4.r
-        @test OnlineStats.weight(w5) ≈ 1 / (1 + w5.c * (i-1))
-        @test OnlineStats.weight(w7) ≈ 5. / (5. + i - 1)
-        map(OnlineStats.updatecounter!, [w1, w2, w3, w4, w5, w7])
-    end
-
-    @inferred ExponentialWeight(100)
-    @inferred BoundedEqualWeight(100)
-    @inferred McclainWeight(.2)
-    @test_throws ArgumentError McclainWeight(-1.)
-    @test_throws ArgumentError McclainWeight(1.1)
-
-    @test EqualWeight() == EqualWeight()
-    @test LearningRate() == LearningRate()
-    @test nups(EqualWeight()) == 0
-end
 #-----------------------------------------------------------------------------# Series
 @testset "Series" begin
     @test_throws ArgumentError Series(Mean(), CovMatrix(3))
@@ -112,16 +77,12 @@ end
         fit!(s, randn(100), .01)
         fit!(s, randn(100), rand(100))
         @test nobs(s) == 300
-        fit!(s, randn(100), 7)
-        @test nobs(s) == 400
 
         s = Series(CovMatrix(3))
         fit!(s, randn(3))
         fit!(s, randn(99, 3))
         fit!(s, randn(100, 3), .01)
         fit!(s, randn(100, 3), rand(100))
-        fit!(s, randn(100, 3), 7)
-        @test nobs(s) == 400
         fit!(s, (1.0, 2.0, 3.0))
 
         fit!(Series(randn(10), Mean()), Series(randn(11), Mean()))
@@ -223,7 +184,6 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
             QuantileMM(.2, .3), QuantileSGD([.4, .5]), QuantileISGD([.6, .7]))
         @test typeof(s.weight) == LearningRate
         s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
-        fit!(s, y2, 7)
     end
     @testset "Histogram" begin
         y = randn(100)
@@ -329,12 +289,10 @@ end
     o = CovMatrix(5)
     s = Series(x, o)
     @test nobs(s) == 100
-    fit!(s, x, 10)
-    OnlineStats.fitbatch!(o, x, .1)
 
     o = CovMatrix(5)
     s = Series(o)
-    fit!(s, x, 10)
+    fit!(s, x)
     @test mean(o) ≈ vec(mean(x, 1))
     @test var(o) ≈ vec(var(x, 1))
     @test cov(o) ≈ cov(x)
@@ -344,7 +302,7 @@ end
     x2 = randn(101, 5)
     o2 = CovMatrix(5)
     s2 = Series(o2)
-    fit!(s2, x2, 10)
+    fit!(s2, x2)
     merge!(s, s2)
     @test nobs(s) == 201
     @test cov(o) ≈ cov(vcat(x, x2))
@@ -353,7 +311,6 @@ end
     x = randn(100, 3)
     o = KMeans(3, 5)
     s = Series(x, o)
-    fit!(s, x, 5)
 end
 @testset "Bootstrap" begin
     b = Bootstrap(Series(Mean()), 100, [0, 2])
@@ -393,8 +350,7 @@ end
         fit!(s, x, y)
         fit!(s, x, y, .1)
         fit!(s, x, y, rand(length(y)))
-        fit!(s, x, y, 10)
-        @test nobs(s) == 4 * n
+        @test nobs(s) == 3 * n
         @test coef(o) == o.β
         @test predict(o, x) == x * o.β
         @test predict(o, x[1,:]) == x[1,:]'o.β
@@ -440,9 +396,8 @@ end
     o = LinReg(p)
     s = Series(o)
     fit!(s, x, y)
-    fit!(s, x, y, 9)
-    @test nobs(s) == 2n
-    @test nobs(o) == 2n
+    @test nobs(s) == n
+    @test nobs(o) == n
     @test coef(o) == value(o)
     @test coef(o) ≈ x\y
 

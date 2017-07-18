@@ -116,10 +116,6 @@ function fit!(o::StatLearn{<:SGUpdater}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     update!(o, γ)
 end
-function fitbatch!(o::StatLearn{<:SGUpdater}, x::AMat, y::AVec, γ::Float64)
-    gradient!(o, x, y)
-    update!(o, γ)
-end
 
 
 

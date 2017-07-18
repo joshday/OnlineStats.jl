@@ -46,17 +46,6 @@ function fit!(o::LinReg, x::AVec, y::Real, γ::Float64)
     o.nobs += 1
 end
 
-function fitbatch!(o::LinReg, x::AMat, y::AVec, γ::Float64)
-    xtx, xty = matviews(o)
-    n2, p = size(x)
-    γ1 = γ / n2
-    γ2 = 1 - γ
-    BLAS.syrk!('U', 'T', γ1, x, γ2, xtx)
-    BLAS.gemv!('T', γ1, x, y, γ2, xty)
-    o.A[end] = smooth(o.A[end], mean(abs2, y), γ)
-    o.nobs += n2
-end
-
 function _value(o::LinReg)
     copy!(o.S, o.A)
     p = length(o.β)

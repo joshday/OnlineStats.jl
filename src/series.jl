@@ -76,18 +76,20 @@ end
 Base.start(o::RowsOf) = 1
 Base.next(o::RowsOf, i) = view(o.data, i, :), i + 1
 Base.done(o::RowsOf, i) = i > size(o.data, 1)
-
+Base.length(o::RowsOf) = size(o.data, 1)
 struct ColsOf{T <: AbstractMatrix}
     data::T
 end
 Base.start(o::ColsOf) = 1
 Base.next(o::ColsOf, i) = view(o.data, :, i), i + 1
 Base.done(o::ColsOf, i) = i > size(o.data, 2)
+Base.length(o::ColsOf) = size(o.data, 2)
 
 const ScalarOb = Union{Number, AbstractString, Symbol}
 const VectorOb = Union{AbstractVector, NTuple}
 const Rows = ObsDim.First
 const Cols = ObsDim.Last
+const Data = Union{ScalarOb, VectorOb, AbstractMatrix}
 
 
 eachob(y, s::Series, dim) = error("$(typeof(s)) can't interpret data of type $(typeof(y))")
@@ -120,24 +122,27 @@ fit!(s, y, w[1])     # multiple observations: override each weight with w[1]
 fit!(s, y, w)        # multiple observations: y[i] uses weight w[i]
 ```
 """
-function fit!(s::Series, y, dim::LearnBase.ObsDimension = ObsDim.First())
+function fit!(s::Union{Series{0}, Series{1}}, y::Data,
+        dim::LearnBase.ObsDimension = ObsDim.First())
     for yi in eachob(y, s, dim)
         γ = weight!(s)
         foreach(s -> fit!(s, yi, γ), s.stats)
     end
     s
 end
-function fit!(s::Series, y, w::Float64, dim::LearnBase.ObsDimension = ObsDim.First())
+function fit!(s::Union{Series{0}, Series{1}}, y::Data, w::Float64,
+        dim::LearnBase.ObsDimension = ObsDim.First())
     for yi in eachob(y, s, dim)
         updatecounter!(s)
         foreach(s -> fit!(s, yi, w), s.stats)
     end
     s
 end
-function fit!(s::Series, y, w::VecF, dim::LearnBase.ObsDimension = ObsDim.First())
-    data = eachob(y, s, dim)
-    length(w) == length(data) || throw(DimensionMismatch("weights don't match data length"))
-    for (yi, wi) in zip(data, w)
+function fit!(s::Union{Series{0}, Series{1}}, y::Data, w::VecF,
+        dim::LearnBase.ObsDimension = ObsDim.First())
+    data_it = eachob(y, s, dim)
+    length(w) == length(data_it) || throw(DimensionMismatch("weights don't match data length"))
+    for (yi, wi) in zip(data_it, w)
         updatecounter!(s)
         foreach(s -> fit!(s, yi, wi), s.stats)
     end
@@ -173,14 +178,6 @@ end
 function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::AVecF)
     for i in eachindex(y)
         fit!(s, view(x, i, :), y[i], γ[i])
-    end
-    s
-end
-function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
-    maprows(b, x, y) do xi, yi
-        bi = length(yi)
-        γ = weight!(s, bi)
-        foreach(o -> fitbatch!(o, xi, yi, γ), s.stats)
     end
     s
 end

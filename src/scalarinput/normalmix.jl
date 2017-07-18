@@ -73,7 +73,6 @@
 #     scale!(o.w, inv(sum(o.w)))
 # end
 #
-# # Works also for fitbatch! default definition
 # function fit!(o::NormalMix, y, γ::Float64)
 #     get_w!(o, y)
 #     o.nobs += 1
@@ -84,7 +83,6 @@
 #     end
 #     o
 # end
-# fitbatch!(o::NormalMix, y::AVec, γ::Float64) = fit!(o, y, γ)
 #
 #
 # # # Quantiles via Newton's method.  Starting values based on Normal distribution.

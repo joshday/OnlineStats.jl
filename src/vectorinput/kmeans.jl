@@ -28,16 +28,3 @@ function fit!(o::KMeans, x::VectorOb, γ::Float64)
         o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
     end
 end
-
-function fitbatch!{T<:Real}(o::KMeans, x::AMat{T}, γ::Float64)
-    d, k = size(o.value)
-    size(x, 2) == d || throw(DimensionMismatch())
-    x̄ = vec(mean(x, 1))
-    for j in 1:k
-        o.v[j] = sum(abs2, x̄ - view(o.value, :, j))
-    end
-    kstar = indmin(o.v)
-    for i in 1:d
-        o.value[i, kstar] = smooth(o.value[i, kstar], x̄[i], γ)
-    end
-end

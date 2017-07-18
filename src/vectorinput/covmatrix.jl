@@ -24,12 +24,6 @@ function fit!(o::CovMatrix, x::VectorOb, γ::Float64)
     o.nobs += 1
     o
 end
-function fitbatch!(o::CovMatrix, x::AMat, γ::Float64)
-    smooth!(o.b, mean(x, 1), γ)
-    smooth_syrk!(o.A, x, γ)
-    o.nobs += size(x, 1)
-    o
-end
 function _value(o::CovMatrix)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
     scale!(o.value, unbias(o))
