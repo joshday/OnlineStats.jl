@@ -213,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles via SGD QuantileSGD\nquantiles via Online MM QuantileMM\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napproximate count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles via SGD QuantileSGD\nquantiles via Online MM QuantileMM\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napproximate count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
 },
 
 {
@@ -254,6 +254,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.MV",
     "category": "Type",
     "text": "MV(p, o)\n\nTrack p univariate OnlineStats o\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.OHistogram",
+    "page": "API",
+    "title": "OnlineStats.OHistogram",
+    "category": "Type",
+    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.\n\nExample\n\ny = randn(100)\ns = Series(y, OHistogram(-4:.1:4))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -569,11 +577,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,OS,W} where W<:OnlineStatsBase.Weight where OS<:Union{OnlineStatsBase.OnlineStat, Tuple},Union{AbstractString, Real, Symbol}}",
+    "location": "pages/api.html#StatsBase.fit!",
     "page": "API",
     "title": "StatsBase.fit!",
-    "category": "Method",
+    "category": "Function",
     "text": "fit!(s, y)\nfit!(s, y, w)\n\nUpdate a Series s with more data y and optional weighting w.\n\nExamples\n\ny = randn(100)\nw = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])        # one observation: use Series weight\nfit!(s, y[1], w[1])  # one observation: override weight\nfit!(s, y)           # multiple observations: use Series weight\nfit!(s, y, w[1])     # multiple observations: override each weight with w[1]\nfit!(s, y, w)        # multiple observations: y[i] uses weight w[i]\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.AbstractSeries",
+    "page": "API",
+    "title": "OnlineStatsBase.AbstractSeries",
+    "category": "Type",
+    "text": "A container for a Weight and at least one OnlineStat\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.BoundedEqualWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.BoundedEqualWeight",
+    "category": "Type",
+    "text": "BoundedEqualWeight(λ::Real = 0.1)\nBoundedEqualWeight(lookback::Integer)\n\nUse EqualWeight until threshold λ is hit, then hold constant.\nWeight at observation t is γ = max(1 / t, λ)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.EqualWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.EqualWeight",
+    "category": "Type",
+    "text": "EqualWeight()\n\nEqually weighted observations\nWeight at observation t is γ = 1 / t\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.ExponentialWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.ExponentialWeight",
+    "category": "Type",
+    "text": "ExponentialWeight(λ::Real = 0.1)\nExponentialWeight(lookback::Integer)\n\nExponentially weighted observations (constant)\nWeight at observation t is γ = λ\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.HarmonicWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.HarmonicWeight",
+    "category": "Type",
+    "text": "HarmonicWeight(a = 10.0)\n\nDecreases at a slow rate\nWeight at observation t is γ = a / (a + t - 1)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.LearningRate",
+    "page": "API",
+    "title": "OnlineStatsBase.LearningRate",
+    "category": "Type",
+    "text": "LearningRate(r = .6, λ = 0.0)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate until threshold λ is reached\nWeight at observation t is γ = max(1 / t ^ r, λ)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.LearningRate2",
+    "page": "API",
+    "title": "OnlineStatsBase.LearningRate2",
+    "category": "Type",
+    "text": "LearningRate2(c = .5, λ = 0.0)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate until threshold λ is reached\nWeight at observation t is γ = max(inv(1 + c * (t - 1), λ)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.McclainWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.McclainWeight",
+    "category": "Type",
+    "text": "McclainWeight(ᾱ = 0.1)\n\n\"smoothed\" version of BoundedEqualWeight\nweights asymptotically approach ᾱ\nWeight at observation t is γ(t-1) / (1 + γ(t-1) - ᾱ)\n\n\n\n"
 },
 
 {
@@ -581,7 +653,23 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "API",
     "category": "section",
-    "text": "Modules = [OnlineStats]"
+    "text": "Modules = [OnlineStats, OnlineStatsBase]"
+},
+
+{
+    "location": "pages/newstats.html#",
+    "page": "Extending OnlineStats",
+    "title": "Extending OnlineStats",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "pages/newstats.html#Extending-OnlineStats-1",
+    "page": "Extending OnlineStats",
+    "title": "Extending OnlineStats",
+    "category": "section",
+    "text": "Creating new OnlineStat types should be accomplished through OnlineStatsBase.jl, a zero-dependency package which defines the interface an OnlineStat uses."
 },
 
 ]}
