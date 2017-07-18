@@ -29,15 +29,15 @@ nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
 Series(t::Tuple)         = Series(weight(t), t)
 Series(o::OnlineStat)    = Series(weight(o), o)
 Series(o::OnlineStat...) = Series(weight(o), o)
-# Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, o, os...)
+Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, tuple(o, os...))
 
 # init with data
 Series(y::AA, o::OnlineStat)                = (s = Series(weight(o), o); fit!(s, y))
 Series(y::AA, o::OnlineStat...)             = (s = Series(weight(o), o); fit!(s, y))
-# Series(y::AA, wt::Weight, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
-# Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
-# Series(wt::Weight, y::AA, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
-# Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
+Series(y::AA, wt::Weight, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
+Series(y::AA, wt::Weight, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
+Series(wt::Weight, y::AA, o::OnlineStat)    = (s = Series(wt, o);        fit!(s, y))
+Series(wt::Weight, y::AA, o::OnlineStat...) = (s = Series(wt, o);        fit!(s, y))
 
 # Special constructors for (1, 0) input
 # x, y, o
@@ -75,14 +75,14 @@ struct RowsOf{T <: AbstractMatrix}
 end
 Base.start(o::RowsOf) = 1
 Base.next(o::RowsOf, i) = view(o.data, i, :), i + 1
-Base.done(o::RowsOf, i) = i == size(o.data, 1)
+Base.done(o::RowsOf, i) = i > size(o.data, 1)
 
 struct ColsOf{T <: AbstractMatrix}
     data::T
 end
 Base.start(o::ColsOf) = 1
 Base.next(o::ColsOf, i) = view(o.data, :, i), i + 1
-Base.done(o::ColsOf, i) = i == size(o.data, 2)
+Base.done(o::ColsOf, i) = i > size(o.data, 2)
 
 const ScalarOb = Union{Number, AbstractString, Symbol}
 const VectorOb = Union{AbstractVector, NTuple}
@@ -144,3 +144,43 @@ function fit!(s::Series, y, w::VecF, dim::LearnBase.ObsDimension = ObsDim.First(
     s
 end
 fit!(s1::T, s2::T) where {T <: Series} = merge!(s1, s2)
+
+
+# TODO: put (1,0) input into above format
+#-----------------------------------------------------------------------# Series{(1, 0)}
+function fit!(s::Series{(1,0)}, x::AVec, y::Real)
+    γ = weight!(s)
+    foreach(s -> fit!(s, x, y, γ), s.stats)
+    s
+end
+function fit!(s::Series{(1,0)}, x::AVec, y::Number, γ::Float64)
+    updatecounter!(s)
+    foreach(s -> fit!(s, x, y, γ), s.stats)
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec)
+    for i in eachindex(y)
+        fit!(s, view(x, i, :), y[i])
+    end
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::Float64)
+    for i in eachindex(y)
+        fit!(s, view(x, i, :), y[i], γ)
+    end
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, γ::AVecF)
+    for i in eachindex(y)
+        fit!(s, view(x, i, :), y[i], γ[i])
+    end
+    s
+end
+function fit!(s::Series{(1, 0)}, x::AMat, y::AVec, b::Integer)
+    maprows(b, x, y) do xi, yi
+        bi = length(yi)
+        γ = weight!(s, bi)
+        foreach(o -> fitbatch!(o, xi, yi, γ), s.stats)
+    end
+    s
+end
