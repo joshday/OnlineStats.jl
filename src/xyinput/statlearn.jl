@@ -69,8 +69,8 @@ StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p
 
 function Base.show(io::IO, o::StatLearn)
     println(io, OnlineStatsBase.name(o))
-    println(io, "    > β       : $(o.β)")
-    println(io, "    > λfactor : $(o.λfactor)")
+    print(io, "    > β       : "); showcompact(io, o.β);        println(io)
+    print(io, "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
     println(io, "    > Loss    : $(o.loss)")
     println(io, "    > Penalty : $(o.penalty)")
     print(io,   "    > Updater : $(o.updater)")
