@@ -67,14 +67,6 @@ fit!(s, randn(100), .01)
 s = Series(Mean())
 fit!(s, randn(100), rand(100))
 ```
-#### Multiple observations, update in minibatches  
-!!! note
-    OnlineStats which use stochastic approximation (those which default to use `LearningRate`) can have different behavior if they are updated in minibatches.  Not all OnlineStats have the ability to be updated in minibatches.
-
-```julia
-s = Series(QuantileSGD())
-fit!(s, randn(1000), 7)
-```
 
 ## Merging
 
