@@ -70,36 +70,29 @@ value(s::Series, i) = value(s.stats[i])
 stats(s::Series) = s.stats
 
 #---------------------------------------------------------------------------# fit helpers
-struct RowsOf{T <: AbstractMatrix}
-    data::T
-end
-Base.start(o::RowsOf) = 1
-Base.next(o::RowsOf, i) = view(o.data, i, :), i + 1
-Base.done(o::RowsOf, i) = i > size(o.data, 1)
-Base.length(o::RowsOf) = size(o.data, 1)
-struct ColsOf{T <: AbstractMatrix}
-    data::T
-end
-Base.start(o::ColsOf) = 1
-Base.next(o::ColsOf, i) = view(o.data, :, i), i + 1
-Base.done(o::ColsOf, i) = i > size(o.data, 2)
-Base.length(o::ColsOf) = size(o.data, 2)
-
 const ScalarOb = Union{Number, AbstractString, Symbol}
 const VectorOb = Union{AbstractVector, NTuple}
 const Rows = ObsDim.First
 const Cols = ObsDim.Last
 const Data = Union{ScalarOb, VectorOb, AbstractMatrix}
 
+struct ArraySlices{Dim, T <: AbstractMatrix}
+    data::T
+    ArraySlices(data::T, dim) where {T <: AbstractMatrix} = new{dim, typeof(data)}(data)
+end
+Base.start(o::ArraySlices) = 1
+Base.next(o::ArraySlices{Rows()}, i) = view(o.data, i, :), i + 1
+Base.next(o::ArraySlices{Cols()}, i) = view(o.data, :, i), i + 1
+Base.done(o::ArraySlices, i) = i > length(o)
+Base.length(o::ArraySlices{Rows()}) = size(o.data, 1)
+Base.length(o::ArraySlices{Cols()}) = size(o.data, 2)
 
-eachob(y, s::Series, dim) = error("$(typeof(s)) can't interpret data of type $(typeof(y))")
-# Single Observation
+
+eachob(y,           s::Series, dim) = error("$(typeof(s)) can't input type $(typeof(y))")
 eachob(y::ScalarOb, s::Series{0}, dim) = y
 eachob(y::VectorOb, s::Series{1}, dim) = (y,)
-# Multiple Observations
 eachob(y::VectorOb, s::Series{0}, dim) = y
-eachob(y::AbstractMatrix, s::Series{1}, ::ObsDim.First) = RowsOf(y)
-eachob(y::AbstractMatrix, s::Series{1}, ::ObsDim.Last) = ColsOf(y)
+eachob(y::AMat,     s::Series{1}, dim) = ArraySlices(y, dim)
 
 
 #--------------------------------------------------------------------------------# fit!
