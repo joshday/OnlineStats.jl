@@ -185,14 +185,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Multiple-observations,-update-in-minibatches-1",
-    "page": "Series",
-    "title": "Multiple observations, update in minibatches",
-    "category": "section",
-    "text": "note: Note\nOnlineStats which use stochastic approximation (those which default to use LearningRate) can have different behavior if they are updated in minibatches.  Not all OnlineStats have the ability to be updated in minibatches.s = Series(QuantileSGD())\nfit!(s, randn(1000), 7)"
-},
-
-{
     "location": "pages/series.html#Merging-1",
     "page": "Series",
     "title": "Merging",
