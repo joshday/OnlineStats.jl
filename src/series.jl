@@ -75,6 +75,7 @@ const VectorOb = Union{AbstractVector, NTuple}
 const Rows = ObsDim.First
 const Cols = ObsDim.Last
 const Data = Union{ScalarOb, VectorOb, AbstractMatrix}
+const ColsRows = LearnBase.ObsDimension
 
 struct ArraySlices{Dim, T <: AbstractMatrix}
     data::T
@@ -88,7 +89,7 @@ Base.length(o::ArraySlices{Rows()}) = size(o.data, 1)
 Base.length(o::ArraySlices{Cols()}) = size(o.data, 2)
 
 
-eachob(y,           s::Series, dim) = error("$(typeof(s)) can't input type $(typeof(y))")
+eachob(y,           s::Series,    dim) = error("$(typeof(y)) is not an input for $(typeof(s))")
 eachob(y::ScalarOb, s::Series{0}, dim) = y
 eachob(y::VectorOb, s::Series{1}, dim) = (y,)
 eachob(y::VectorOb, s::Series{0}, dim) = y
@@ -115,24 +116,21 @@ fit!(s, y, w[1])     # multiple observations: override each weight with w[1]
 fit!(s, y, w)        # multiple observations: y[i] uses weight w[i]
 ```
 """
-function fit!(s::Union{Series{0}, Series{1}}, y::Data,
-        dim::LearnBase.ObsDimension = ObsDim.First())
+function fit!(s::Union{Series{0}, Series{1}}, y::Data, dim::ColsRows = Rows())
     for yi in eachob(y, s, dim)
         γ = weight!(s)
         foreach(s -> fit!(s, yi, γ), s.stats)
     end
     s
 end
-function fit!(s::Union{Series{0}, Series{1}}, y::Data, w::Float64,
-        dim::LearnBase.ObsDimension = ObsDim.First())
+function fit!(s::Union{Series{0}, Series{1}}, y::Data, w::Float64, dim::ColsRows = Rows())
     for yi in eachob(y, s, dim)
         updatecounter!(s)
         foreach(s -> fit!(s, yi, w), s.stats)
     end
     s
 end
-function fit!(s::Union{Series{0}, Series{1}}, y::Data, w::VecF,
-        dim::LearnBase.ObsDimension = ObsDim.First())
+function fit!(s::Union{Series{0}, Series{1}}, y::Data, w::VecF, dim::ColsRows = Rows())
     data_it = eachob(y, s, dim)
     length(w) == length(data_it) || throw(DimensionMismatch("weights don't match data length"))
     for (yi, wi) in zip(data_it, w)
