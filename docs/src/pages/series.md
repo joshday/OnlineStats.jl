@@ -47,7 +47,7 @@ fit!(s, randn(), .1)
 ```
 #### Multiple observations
 !!! note
-    The input type of the OnlineStat(s) determines what multiple observations are.  For a `Mean`, this would be a `AbstractVector`.  For a `CovMatrix`, this would be an `AbstractMatrix`.  By default, each *row* is considered an observation.  You can use column observations with `ObsDim.Last()` (see below).
+    The input type of the OnlineStat(s) determines what multiple observations are.  For a `Mean`, this would be an `AbstractVector`.  For a `CovMatrix`, this would be an `AbstractMatrix`.  By default, each *row* is considered an observation.  You can use column observations with `ObsDim.Last()` (see below).
 
 ```julia
 s = Series(Mean())

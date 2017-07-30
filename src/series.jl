@@ -142,7 +142,6 @@ end
 fit!(s1::T, s2::T) where {T <: Series} = merge!(s1, s2)
 
 
-# TODO: put (1,0) input into above format
 #-----------------------------------------------------------------------# Series{(1, 0)}
 function fit!(s::Series{(1,0)}, x::AVec, y::Real)
     γ = weight!(s)
