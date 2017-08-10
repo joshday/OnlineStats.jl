@@ -24,10 +24,6 @@ info("Messy output for test coverage")
     for stat in o
         println(stat)
     end
-    for w in [EqualWeight(), ExponentialWeight(), BoundedEqualWeight(), LearningRate(),
-              LearningRate2(), McclainWeight(), HarmonicWeight()]
-        println(w)
-    end
     @testset "maprows" begin
         s = Series(Mean(), Variance())
         y = randn(100)
