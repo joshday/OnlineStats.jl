@@ -13,7 +13,7 @@ export
     # AbstractSeries
     Series, Bootstrap,
     # Weight
-    Weight, EqualWeight, BoundedEqualWeight, ExponentialWeight, LearningRate, LearningRate2,
+    Weight, EqualWeight, Bounded, ExponentialWeight, LearningRate, LearningRate2,
     McclainWeight, HarmonicWeight,
     # functions
     maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef, coeftable,
