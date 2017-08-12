@@ -165,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Multiple observations",
     "category": "section",
-    "text": "note: Note\nThe input type of the OnlineStat(s) determines what multiple observations are.  For a Mean, this would be a AbstractVector.  For a CovMatrix, this would be an AbstractMatrix.  By default, each row is considered an observation.  You can use column observations with ObsDim.Last() (see below).s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))                 # Obs. in rows\nfit!(s, randn(4, 100), ObsDim.Last())  # Obs. in columns"
+    "text": "note: Note\nThe input type of the OnlineStat(s) determines what multiple observations are.  For a Mean, this would be an AbstractVector.  For a CovMatrix, this would be an AbstractMatrix.  By default, each row is considered an observation.  You can use column observations with ObsDim.Last() (see below).s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))                 # Obs. in rows\nfit!(s, randn(4, 100), ObsDim.Last())  # Obs. in columns"
 },
 
 {
@@ -585,14 +585,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.BoundedEqualWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.BoundedEqualWeight",
-    "category": "Type",
-    "text": "BoundedEqualWeight(λ::Real = 0.1)\nBoundedEqualWeight(lookback::Integer)\n\nUse EqualWeight until threshold λ is hit, then hold constant.\nWeight at observation t is γ = max(1 / t, λ)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStatsBase.EqualWeight",
     "page": "API",
     "title": "OnlineStatsBase.EqualWeight",
@@ -621,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.LearningRate",
     "category": "Type",
-    "text": "LearningRate(r = .6, λ = 0.0)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate until threshold λ is reached\nWeight at observation t is γ = max(1 / t ^ r, λ)\n\n\n\n"
+    "text": "LearningRate(r = .6)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate\nWeight at observation t is γ = 1 / t ^ r\n\n\n\n"
 },
 
 {
@@ -629,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.LearningRate2",
     "category": "Type",
-    "text": "LearningRate2(c = .5, λ = 0.0)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate until threshold λ is reached\nWeight at observation t is γ = max(inv(1 + c * (t - 1), λ)\n\n\n\n"
+    "text": "LearningRate2(c = .5)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate\nWeight at observation t is γ = inv(1 + c * (t - 1)\n\n\n\n"
 },
 
 {
