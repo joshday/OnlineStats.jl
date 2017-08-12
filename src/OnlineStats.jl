@@ -33,7 +33,7 @@ export
     # StreamStats
     HyperLogLog,
     # Other
-    ObsDim
+    ObsDim, Cols, Rows
 
 #-----------------------------------------------------------------------------# types
 const AA        = AbstractArray
