@@ -22,16 +22,10 @@ Consider how the following weighting schemes affect the influence of the next ob
 \gamma_t = \lambda
 ```
 
-## [`BoundedEqualWeight(λ)`](@ref)
-- Use `EqualWeight` until a threshold is hit, then stay constant.
-```math
-\gamma_t = \text{max}\left(\frac{1}{t}, \lambda\right)
-```
-
-## [`LearningRate(r, λ)`](@ref)  
+## [`LearningRate(r)`](@ref)  
 - Decrease at a slow rate until a threshold is hit.
 ```math
-\gamma_t = \text{max}\left(\frac{1}{t^r}, \lambda\right)
+\gamma_t = \frac{1}{t^r}
 ```  
 
 ## [`HarmonicWeight(a)`](@ref)  
@@ -44,4 +38,10 @@ Consider how the following weighting schemes affect the influence of the next ob
 - Smoothed version of `BoundedEqualWeight`.
 ```math
 \gamma_t = \frac{\gamma_{t-1}}{1 + \gamma_{t-1} - a}
+```
+
+## [`Bounded(weight, λ)`](@ref)
+- Wrapper for a weight which provides a minimum bound
+```math
+\gamma_t' = \text{max}(\gamma_t, λ)
 ```
