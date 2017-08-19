@@ -7,7 +7,7 @@ Consider how the following weighting schemes affect the influence of the next ob
 ```math
 \theta^{(t)} = (1-\gamma_t)\theta^{(t-1)} + \gamma_t x_t
 ```
-![](https://user-images.githubusercontent.com/8075494/27964520-908491d4-6306-11e7-9bef-0634359e5aa6.png)
+![](https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png)
 
 
 ## [`EqualWeight()`](@ref)  
