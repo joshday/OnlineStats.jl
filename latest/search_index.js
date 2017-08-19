@@ -621,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.LearningRate2",
     "category": "Type",
-    "text": "LearningRate2(c = .5)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate\nWeight at observation t is γ = inv(1 + c * (t - 1)\n\n\n\n"
+    "text": "LearningRate2(c = .5)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate\nWeight at observation t is γ = inv(1 + c * (t - 1))\n\n\n\n"
 },
 
 {
