@@ -81,19 +81,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[BoundedEqualWeight(λ)](@ref)-1",
+    "location": "pages/weights.html#[LearningRate(r)](@ref)-1",
     "page": "Weighting",
-    "title": "BoundedEqualWeight(λ)",
+    "title": "LearningRate(r)",
     "category": "section",
-    "text": "Use EqualWeight until a threshold is hit, then stay constant.gamma_t = textmaxleft(frac1t lambdaright)"
-},
-
-{
-    "location": "pages/weights.html#[LearningRate(r,-λ)](@ref)-1",
-    "page": "Weighting",
-    "title": "LearningRate(r, λ)",
-    "category": "section",
-    "text": "Decrease at a slow rate until a threshold is hit.gamma_t = textmaxleft(frac1t^r lambdaright)"
+    "text": "Decrease at a slow rate until a threshold is hit.gamma_t = frac1t^r"
 },
 
 {
@@ -110,6 +102,14 @@ var documenterSearchIndex = {"docs": [
     "title": "McclainWeight(a)",
     "category": "section",
     "text": "Smoothed version of BoundedEqualWeight.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+},
+
+{
+    "location": "pages/weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "page": "Weighting",
+    "title": "Bounded(weight, λ)",
+    "category": "section",
+    "text": "Wrapper for a weight which provides a minimum boundgamma_t = textmax(gamma_t )"
 },
 
 {
