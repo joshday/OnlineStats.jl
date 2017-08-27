@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
-    "text": "ADAM(α1, α2, η)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
-    "text": "ADAMAX(α1, α2, η)\n\nADAMAX with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAMAX(η, α1, α2)\n\nADAMAX with step size η and momentum parameters α1, α2\n\n\n\n"
 },
 
 {
@@ -457,17 +457,17 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.OMMC",
+    "location": "pages/api.html#OnlineStats.OMASQ",
     "page": "API",
-    "title": "OnlineStats.OMMC",
+    "title": "OnlineStats.OMASQ",
     "category": "Type",
     "text": "Experimental: OMM-constant\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.OMMF",
+    "location": "pages/api.html#OnlineStats.OMASQF",
     "page": "API",
-    "title": "OnlineStats.OMMF",
+    "title": "OnlineStats.OMASQF",
     "category": "Type",
     "text": "Experimental: OMM-full matrix\n\n\n\n"
 },
