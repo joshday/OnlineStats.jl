@@ -172,7 +172,7 @@ end
 
 #-----------------------------------------------------------------------# ADAM
 """
-    ADAM(α1, α2, η)
+    ADAM(η, α1, α2)
 Adaptive Moment Estimation with step size `η` and momentum parameters `α1`, `α2`
 """
 mutable struct ADAM <: SGUpdater
@@ -182,19 +182,19 @@ mutable struct ADAM <: SGUpdater
     M::VecF
     V::VecF
     nups::Int
-    function ADAM(α1::Float64 = 0.1, α2::Float64 = .001, η::Float64 = 1.0, p::Integer = 0)
+    function ADAM(η::Float64 = 1.0, α1::Float64 = 0.1, α2::Float64 = .001, p::Integer = 0)
         @assert 0 < α1 < 1
         @assert 0 < α2 < 1
         new(α1, α2, η, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAM, p) = ADAM(u.α1, u.α2, u.η, p)
+init(u::ADAM, p) = ADAM(u.η, u.α1, u.α2, p)
 function update!(o::StatLearn{ADAM}, γ)
     U = o.updater
     β1 = 1 - U.α1
     β2 = 1 - U.α2
     U.nups += 1
-    s = γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
+    s = γ * U.η * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
         U.M[j] = smooth(U.M[j], gx, U.α1)
@@ -205,7 +205,7 @@ end
 
 #-----------------------------------------------------------------------# ADAMAX
 """
-    ADAMAX(α1, α2, η)
+    ADAMAX(η, α1, α2)
 ADAMAX with step size `η` and momentum parameters `α1`, `α2`
 """
 mutable struct ADAMAX <: SGUpdater
@@ -215,19 +215,19 @@ mutable struct ADAMAX <: SGUpdater
     M::VecF
     V::VecF
     nups::Int
-    function ADAMAX(α1::Float64 = 0.1, α2::Float64 = .001, η::Float64 = 1.0, p::Integer = 0)
+    function ADAMAX(η::Float64 = 1.0, α1::Float64 = 0.1, α2::Float64 = .001, p::Integer = 0)
         @assert 0 < α1 < 1
         @assert 0 < α2 < 1
         new(α1, α2, η, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAMAX, p) = ADAMAX(u.α1, u.α2, u.η, p)
+init(u::ADAMAX, p) = ADAMAX(u.η, u.α1, u.α2, p)
 function update!(o::StatLearn{ADAMAX}, γ)
     U = o.updater
     β1 = 1 - U.α1
     β2 = 1 - U.α2
     U.nups += 1
-    s = γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
+    s = U.η * γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
         U.M[j] = smooth(U.M[j], gx, U.α1)
@@ -272,17 +272,17 @@ function fullH!{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)
     o.updater.H[:] = ((o.loss.q + 1) ^ 2 / o.loss.q) * x * x'
 end
 
-#-----------------------------------------------------------------------# OMMC
+#-----------------------------------------------------------------------# OMASQ
 "Experimental: OMM-constant"
-mutable struct OMMC <: Updater
+mutable struct OMASQ <: Updater
     h::Float64
     b::VecF
 end
-OMMC() = OMMC(0.0, zeros(0))
-init(u::OMMC, p) = OMMC(0.0, zeros(p))
-Base.show(io::IO, u::OMMC) = print(io, "OMMC")
+OMASQ() = OMASQ(0.0, zeros(0))
+init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
+Base.show(io::IO, u::OMASQ) = print(io, "OMASQ")
 
-function fit!(o::StatLearn{OMMC}, x::VectorOb, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
     gradient!(o, x, y)
     ht = constH(o, x, y)
@@ -293,18 +293,18 @@ function fit!(o::StatLearn{OMMC}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 
-#-----------------------------------------------------------------------# OMMF
+#-----------------------------------------------------------------------# OMASQF
 "Experimental: OMM-full matrix"
-mutable struct OMMF <: Updater
+mutable struct OMASQF <: Updater
     H::Matrix{Float64}
     smoothedH::Matrix{Float64}
     b::VecF
 end
-OMMF() = OMMF(zeros(0, 0), zeros(0, 0), zeros(0))
-init(u::OMMF, p) = OMMF(zeros(p, p), zeros(p, p), zeros(p))
-Base.show(io::IO, u::OMMF) = print(io, "OMMF")
+OMASQF() = OMASQF(zeros(0, 0), zeros(0, 0), zeros(0))
+init(u::OMASQF, p) = OMASQF(zeros(p, p), zeros(p, p), zeros(p))
+Base.show(io::IO, u::OMASQF) = print(io, "OMASQF")
 
-function fit!(o::StatLearn{OMMF}, x::VectorOb, y::Real, γ::Float64)
+function fit!(o::StatLearn{OMASQF}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
     gradient!(o, x, y)
     fullH!(o, x, y)
@@ -315,26 +315,24 @@ function fit!(o::StatLearn{OMMF}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 
-#-----------------------------------------------------------------------# OMM2C
-struct OMM2C <: Updater
-    η::Float64
-    OMM2C(η::Real = 1.0) = new(η)
-end
-function fit!(o::StatLearn{OMM2C}, x::VectorOb, y::Real, γ::Float64)
+#-----------------------------------------------------------------------# OMAPQ
+struct OMAPQ <: Updater end
+Base.show(io::IO, u::OMAPQ) = print(io, "OMAPQ")
+function fit!(o::StatLearn{OMAPQ}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     h_inv = inv(constH(o, x, y))
     for j in eachindex(o.β)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
 end
-#-----------------------------------------------------------------------# OMM2F
-struct OMM2F <: Updater
-    η::Float64
+#-----------------------------------------------------------------------# OMAPQF
+struct OMAPQF <: Updater
     H::Matrix{Float64}
-    OMM2F(η::Real = 1.0, p = 0) = new(η, zeros(p, p))
+    OMAPQF(p = 0) = new(η, zeros(p, p))
 end
-init(o::OMM2F, p) = OMM2F(o.η, p)
-function fit!(o::StatLearn{OMM2F}, x::VectorOb, y::Real, γ::Float64)
+Base.show(io::IO, u::OMAPQF) = print(io, "OMAPQF")
+init(o::OMAPQF, p) = OMAPQF(p)
+function fit!(o::StatLearn{OMAPQF}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     fullH!(o, x, y)
     o.β[:] -= γ * ((o.updater.H + ϵ * I) \ o.gx)
@@ -348,9 +346,10 @@ struct MSPIC <: Updater
 end
 function fit!(o::StatLearn{MSPIC}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
-    denom = inv(1 + γ * constH(o, x, y))
+    ηγ = o.updater.η * γ
+    denom = inv(1 + ηγ * constH(o, x, y))
     for j in eachindex(o.β)
-        @inbounds o.β[j] -= γ * denom * o.gx[j]
+        @inbounds o.β[j] -= ηγ * denom * o.gx[j]
     end
 end
 
@@ -364,8 +363,9 @@ end
 init(u::MSPIF, p) = MSPIF(u.η, p)
 function fit!(o::StatLearn{MSPIF}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
+    ηγ = o.updater.η * γ
     fullH!(o, x, y)
-    o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
+    o.β[:] = o.β - ηγ * ((I + ηγ * o.updater.H) \ o.gx)
 end
 
 

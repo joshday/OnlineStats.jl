@@ -25,7 +25,7 @@ export
     # statlearn things
     StatLearn,
     SPGD, MAXSPGD, ADAGRAD, ADAM, ADAMAX,
-    OMMC, OMMF, OMM2C, OMM2F, MSPIC, MSPIF, SPI,
+    OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF, SPI,
     loss, objective, classify, statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
