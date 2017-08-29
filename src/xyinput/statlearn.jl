@@ -130,7 +130,7 @@ struct SGD <: SGUpdater
     v::VecF
     SGD(η::Real = 1.0, α = 0.0, p = 0) = new(η, α, zeros(p))
 end
-Base.show(io::IO, u::SGD) = print(io, "SGD(η = $(u.δ), α = $(u.α))")
+Base.show(io::IO, u::SGD) = print(io, "SGD(η = $(u.η), α = $(u.α))")
 init(u::SGD, p) = SGD(u.η, u.α, p)
 function update!(o::StatLearn{SGD}, γ)
     U = o.updater

@@ -24,7 +24,7 @@ export
     Diff, Sum, MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample, OHistogram,
     # statlearn things
     StatLearn,
-    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA,
+    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
     OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF, SPI,
     loss, objective, classify, statlearnpath,
     # DistributionStats
