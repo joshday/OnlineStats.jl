@@ -130,6 +130,7 @@ struct SGD <: SGUpdater
     v::VecF
     SGD(η::Real = 1.0, α = 0.0, p = 0) = new(η, α, zeros(p))
 end
+Base.show(io::IO, u::SGD) = print(io, "SGD(η = $(u.δ), α = $(u.α))")
 init(u::SGD, p) = SGD(u.η, u.α, p)
 function update!(o::StatLearn{SGD}, γ)
     U = o.updater
@@ -192,21 +193,24 @@ end
     ADADELTA(η = 1.0, ρ = .95)
 ADADELTA ignores weight.
 """
-mutable struct ADADELTA <: OnlineStats.SGUpdater
+mutable struct ADADELTA <: SGUpdater
     η::Float64
     ρ::Float64
     g::Vector{Float64}
     Δβ::Vector{Float64}
     ADADELTA(η = 1.0, ρ = .95, p = 0) = new(η, ρ, zeros(p), zeros(p))
 end
-OnlineStats.init(u::ADADELTA, p) = ADADELTA(u.η, u.ρ, p)
-function OnlineStats.update!(o::StatLearn{ADADELTA}, γ)
+init(u::ADADELTA, p) = ADADELTA(u.η, u.ρ, p)
+function update!(o::StatLearn{ADADELTA}, γ)
     U = o.updater
+    ϵ = .0001
     for j in eachindex(o.β)
-        U.g[j] = smooth(U.g[j], o.gx[j]^2, 1 - U.ρ)  #U.ρ * U.g[j] + (1 - U.ρ) * o.gx[j]^2
+        U.g[j] = smooth(o.gx[j]^2, U.g[j], U.ρ)
+        # U.ρ * U.g[j] + (1 - U.ρ) * o.gx[j]^2
         Δβ = U.η * sqrt(U.Δβ[j] + ϵ) / sqrt(U.g[j] + ϵ) * o.gx[j]
         o.β[j] -= Δβ
-        U.Δβ[j] = smooth(U.Δβ[j], Δβ^2, 1 - U.ρ)  #U.ρ * U.Δβ[j] + (1 - U.ρ) * Δβ^2
+        U.Δβ[j] = smooth(Δβ^2, U.Δβ[j], U.ρ)
+        # U.ρ * U.Δβ[j] + (1 - U.ρ) * Δβ^2
     end
 end
 
@@ -229,70 +233,103 @@ end
 
 #-----------------------------------------------------------------------# ADAM
 """
-    ADAM(η, α1, α2
+    ADAM(η, α1, α2)
 Adaptive Moment Estimation with step size `η` and momentum parameters `α1`, `α2`
 """
 mutable struct ADAM <: SGUpdater
-    α1::Float64
-    α2::Float64
+    β1::Float64
+    β2::Float64
     η::Float64
     M::VecF
     V::VecF
     nups::Int
-    function ADAM(η::Float64 = 1.0, α1::Float64 = 0.1, α2::Float64 = .001, p::Integer = 0)
-        @assert 0 < α1 < 1
-        @assert 0 < α2 < 1
-        new(α1, α2, η, zeros(p), zeros(p), 0)
+    function ADAM(η::Float64 = 1.0, β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
+        @assert 0 < β1 < 1
+        @assert 0 < β2 < 1
+        new(β1, β2, η, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAM, p) = ADAM(u.η, u.α1, u.α2, p)
+init(u::ADAM, p) = ADAM(u.η, u.β1, u.β2, p)
 function update!(o::StatLearn{ADAM}, γ)
     U = o.updater
-    β1 = 1 - U.α1
-    β2 = 1 - U.α2
+    β1 = U.β1
+    β2 = U.β2
     U.nups += 1
     s = γ * U.η * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
-        U.M[j] = smooth(U.M[j], gx, U.α1)
-        U.V[j] = smooth(U.V[j], gx ^ 2, U.α2)
+        U.M[j] = smooth(gx, U.M[j], U.β1)
+        U.V[j] = smooth(gx ^ 2, U.V[j], U.β2)
         o.β[j] -= s * U.M[j] / (sqrt(U.V[j]) + ϵ)
     end
 end
 
 #-----------------------------------------------------------------------# ADAMAX
 """
-    ADAMAX(η, α1, α2)
-ADAMAX with step size `η` and momentum parameters `α1`, `α2`
+    ADAMAX(η, β1, β2)
+ADAMAX with step size `η` and momentum parameters `β1`, `β2`
 """
 mutable struct ADAMAX <: SGUpdater
-    α1::Float64
-    α2::Float64
+    β1::Float64
+    β2::Float64
     η::Float64
     M::VecF
     V::VecF
     nups::Int
-    function ADAMAX(η::Float64 = 1.0, α1::Float64 = 0.1, α2::Float64 = .001, p::Integer = 0)
-        @assert 0 < α1 < 1
-        @assert 0 < α2 < 1
-        new(α1, α2, η, zeros(p), zeros(p), 0)
+    function ADAMAX(η::Float64 = 1.0, β1::Float64 = 0.9, β2::Float64 = .999, p::Integer = 0)
+        @assert 0 < β1 < 1
+        @assert 0 < β2 < 1
+        new(β1, β2, η, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAMAX, p) = ADAMAX(u.η, u.α1, u.α2, p)
+init(u::ADAMAX, p) = ADAMAX(u.η, u.β1, u.β2, p)
 function update!(o::StatLearn{ADAMAX}, γ)
     U = o.updater
-    β1 = 1 - U.α1
-    β2 = 1 - U.α2
     U.nups += 1
-    s = U.η * γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
+    s = U.η * γ * sqrt(1 - U.β2 ^ U.nups) / (1 - U.β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
-        U.M[j] = smooth(U.M[j], gx, U.α1)
-        U.V[j] = max(β2 * U.V[j], abs(gx))
-        o.β[j] -= s * U.M[j] / (U.V[j] + ϵ)
+        U.M[j] = smooth(gx, U.M[j], U.β1)
+        U.V[j] = max(U.β2 * U.V[j], abs(gx))
+        o.β[j] -= s * (U.M[j] / (1 - U.β1 ^ U.nups)) / (U.V[j] + ϵ)
     end
 end
 
+#-----------------------------------------------------------------------# NADAM
+"""
+    NADAM(η, α1, α2)
+Adaptive Moment Estimation with step size `η` and momentum parameters `α1`, `α2`
+"""
+mutable struct NADAM <: SGUpdater
+    β1::Float64
+    β2::Float64
+    η::Float64
+    M::VecF
+    V::VecF
+    nups::Int
+    function NADAM(η::Float64 = 1.0, β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
+        @assert 0 < β1 < 1
+        @assert 0 < β2 < 1
+        new(β1, β2, η, zeros(p), zeros(p), 0)
+    end
+end
+init(u::NADAM, p) = NADAM(u.η, u.β1, u.β2, p)
+function update!(o::StatLearn{NADAM}, γ)
+    U = o.updater
+    β1 = U.β1
+    β2 = U.β2
+    U.nups += 1
+    ηγ = γ * U.η
+    @inbounds for j in eachindex(o.β)
+        gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
+        U.M[j] = smooth(gx, U.M[j], U.β1)
+        U.V[j] = smooth(gx ^ 2, U.V[j], U.β2)
+        mt = U.M[j] / (1 - U.β1 ^ U.nups)
+        vt = U.V[j] / (1 - U.β2 ^ U.nups)
+        Δ = ηγ / (sqrt(vt + ϵ)) * (U.β1 * mt + (1 - U.β1) / (1 - U.β1^U.nups) * gx)
+        o.β[j] -= Δ
+    end
+end
 
 
 #-----------------------------------------------------------------------#
