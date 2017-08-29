@@ -297,6 +297,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.ADADELTA",
+    "page": "API",
+    "title": "OnlineStats.ADADELTA",
+    "category": "Type",
+    "text": "ADADELTA(η = 1.0, ρ = .95)\n\nADADELTA ignores weight.\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.ADAGRAD",
     "page": "API",
     "title": "OnlineStats.ADAGRAD",
@@ -309,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
-    "text": "ADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAM(η, α1, α2\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
 },
 
 {
@@ -417,14 +425,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MAXSPGD",
-    "page": "API",
-    "title": "OnlineStats.MAXSPGD",
-    "category": "Type",
-    "text": "MAXSPGD(η)\n\nSPGD where only the largest gradient element is used to update the parameter.\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.MSPIC",
     "page": "API",
     "title": "OnlineStats.MSPIC",
@@ -454,6 +454,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Moments",
     "category": "Type",
     "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.NSGD",
+    "page": "API",
+    "title": "OnlineStats.NSGD",
+    "category": "Type",
+    "text": "NSGD(η, α)\n\nNesterov accelerated Stochastic Proximal Gradient Descent.\n\n\n\n"
 },
 
 {
@@ -505,11 +513,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.SPGD",
+    "location": "pages/api.html#OnlineStats.SGD",
     "page": "API",
-    "title": "OnlineStats.SPGD",
+    "title": "OnlineStats.SGD",
     "category": "Type",
-    "text": "SPGD(η)\n\nStochastic Proximal Gradient Descent with step size η\n\n\n\n"
+    "text": "SGD(η, α=0.0)\n\nStochastic Proximal Gradient Descent with step size η and momentum term α.\n\n\n\n"
 },
 
 {
