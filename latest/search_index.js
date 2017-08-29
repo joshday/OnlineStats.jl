@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
-    "text": "ADAM(η, α1, α2\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
 },
 
 {
@@ -325,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
-    "text": "ADAMAX(η, α1, α2)\n\nADAMAX with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAMAX(η, β1, β2)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
 },
 
 {
@@ -454,6 +454,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Moments",
     "category": "Type",
     "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.NADAM",
+    "page": "API",
+    "title": "OnlineStats.NADAM",
+    "category": "Type",
+    "text": "NADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
 },
 
 {
