@@ -71,7 +71,7 @@ stats(s::Series) = s.stats
 
 #---------------------------------------------------------------------------# fit helpers
 const ScalarOb = Union{Number, AbstractString, Symbol}
-const VectorOb = Union{AbstractVector, NTuple}
+const VectorOb = Union{AbstractVector, Tuple}
 const Rows = ObsDim.First
 const Cols = ObsDim.Last
 const Data = Union{ScalarOb, VectorOb, AbstractMatrix}

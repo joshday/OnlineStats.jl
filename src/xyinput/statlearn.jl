@@ -161,8 +161,8 @@ function fit!(o::StatLearn{NSGD}, x::AVec, y::Real, γ::Float64)
     end
     ŷ = x'U.θ
     for j in eachindex(o.β)
-        U.v[j] = U.α * U.v[j] + γη * deriv(o.loss, y, ŷ) * x[j]
-        @inbounds o.β[j] = prox(o.penalty, o.β[j] - U.v[j], γη * o.λfactor[j])
+        U.v[j] = U.α * U.v[j] + U.η * deriv(o.loss, y, ŷ) * x[j]
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γη * o.λfactor[j])
     end
 end
 
