@@ -272,6 +272,19 @@ function fit!(o::QuantileMM, y::Real, γ::Float64)
     end
 end
 
+#-----------------------------------------------------------------------# QuantileOMAP
+mutable struct QuantileOMAP <: OnlineStat{0, 0, LearningRate}
+    value::Float64
+    τ::Float64
+    QuantileOMAP(τ::Real = .5) = new(0.0, τ)
+end
+function fit!(o::QuantileOMAP, y::Real, γ::Float64)
+    u = y - o.value
+    l = QuantileLoss(o.τ)
+    c = (value(l, -u) - value(l, u) - 2deriv(l, u) * u) / (2 * u ^ 2)
+    o.value -= γ * deriv(l, u) / c
+end
+
 #--------------------------------------------------------------------# Diff
 """
 ```julia
