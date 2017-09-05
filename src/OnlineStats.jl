@@ -65,7 +65,7 @@ end
 smooth_syrk!(A::MatF, x::AMat, γ::Float64) = BLAS.syrk!('U', 'T', γ / size(x, 1), x, 1.0 - γ, A)
 
 
-const ϵ = 1e-8  # epsilon used in special cases to avoid dividing by 0, etc.
+const ϵ = 1e-6  # epsilon used in special cases to avoid dividing by 0, etc.
 
 #---------------------------------------------------------------------------# maprows
 rows(x::AVec, rng) = view(x, rng)
