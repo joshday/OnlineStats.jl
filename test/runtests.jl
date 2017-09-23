@@ -13,6 +13,7 @@ info("Messy output for test coverage")
     println(OrderStats(5))
     println(Moments())
     println(QuantileMM())
+    println(QuantileMSPI())
     # println(NormalMix(2))
     println(MV(2, Mean()))
     println(HyperLogLog(5))
@@ -86,7 +87,7 @@ info("TESTS BEGIN HERE")
 end
 @testset "Series{0}" begin
     for o in (Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
-              QuantileMM(), Diff(), Sum())
+              QuantileMM(), QuantileMSPI(), Diff(), Sum())
         y = randn(100)
         @testset "typeof(stats) <: OnlineStat" begin
             s = @inferred Series(o)
@@ -175,9 +176,8 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         o3 = StochasticLoss(L1DistLoss())      # approx. median
         s = Series(randn(1_000), o1, o2, o3)
     end
-    @testset "QuantileMM/QuantileSGD/QuantileISGD" begin
-        s = @inferred Series(y1,
-            QuantileMM(.2, .3), QuantileSGD([.4, .5]), QuantileISGD([.6, .7]))
+    @testset "QuantileMM/QuantileSGD" begin
+        s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
         @test typeof(s.weight) == LearningRate
         s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
     end

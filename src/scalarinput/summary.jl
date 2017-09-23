@@ -181,37 +181,6 @@ end
 StochasticLoss(loss::Loss) = StochasticLoss(0.0, loss)
 fit!(o::StochasticLoss, y::Float64, γ::Float64) = (o.value -= γ * deriv(o.loss, y, o.value))
 
-#--------------------------------------------------------------------# QuantileISGD
-"""
-```julia
-QuantileISGD()
-```
-Approximate quantiles via implicit stochastic gradient descent.
-### Example
-```julia
-s = Series(randn(1000), LearningRate(.7), QuantileISGD())
-value(s)
-```
-"""
-struct QuantileISGD <: OnlineStat{0, 1, LearningRate}
-    value::VecF
-    τ::VecF
-    x::VecF
-    K::Int
-    QuantileISGD(τ::VecF = [0.25, 0.5, 0.75], K::Int = 10) = new(zeros(τ), τ, zeros(τ), K)
-    QuantileISGD(args...) = QuantileSGD(collect(args))
-end
-function fit!(o::QuantileISGD, y::Float64, γ::Float64)
-    for i in eachindex(o.τ)
-        for k in 1:o.K
-            v = o.value[i] - γ * deriv(QuantileLoss(o.τ[i]), y, o.value[i])
-            o.x[i] = smooth(o.x[i], v, 10 / k)  # TODO: find best constant for c / k
-        end
-        o.value[i] = o.x[i]
-    end
-end
-
-
 #--------------------------------------------------------------------# QuantileSGD
 """
 ```julia
@@ -270,6 +239,19 @@ function fit!(o::QuantileMM, y::Real, γ::Float64)
         o.t[j] = smooth(o.t[j], w, γ)
         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
     end
+end
+
+#-----------------------------------------------------------------------# QuantileMSPI
+mutable struct QuantileMSPI <: OnlineStat{0, 0, LearningRate}
+    value::Float64
+    τ::Float64
+    QuantileMSPI(τ::Real = .5) = new(0.0, Float64(τ))
+end
+Base.show(io::IO, o::QuantileMSPI) = print("QuantileMSPI($(o.τ), $(o.value))")
+function fit!(o::QuantileMSPI, y::Real, γ::Float64)
+    w = abs(y - o.value)
+    b = o.τ - .5 * (1 - y/w)
+    o.value = (o.value + γ * b) / (1 + γ / 2w)
 end
 
 #-----------------------------------------------------------------------# QuantileOMAP
