@@ -242,6 +242,13 @@ function fit!(o::QuantileMM, y::Real, γ::Float64)
 end
 
 #-----------------------------------------------------------------------# QuantileMSPI
+"""
+    QuantileMSPI(τ = .5)
+Approximate quantiles using majorized stochastic proximal iteration.
+### Example
+    s = Series(randn(1000), LearningRate(.7), QuantileMSPI(.5))
+    value(s)
+"""
 mutable struct QuantileMSPI <: OnlineStat{0, 0, LearningRate}
     value::Float64
     τ::Float64
