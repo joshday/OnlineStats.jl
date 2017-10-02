@@ -19,11 +19,14 @@ MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
 function Base.show{T}(io::IO, o::MV{T})
     s = name(o, true) * "("
     n = length(o.stats)
-    for i in 1:n
+    for i in 1:min(10,n)
         s *= "$(value(o.stats[i]))"
-        if i != n
+        if i != min(10,n)
             s *= ", "
         end
+    end
+    if n>10
+        s *= ", ..."
     end
     s *= ")"
     print(io, s)
