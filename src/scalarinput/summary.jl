@@ -192,12 +192,15 @@ struct Quantiles{T} <: OnlineStat{0, 1, LearningRate}
     value::VecF
     τvec::VecF
 end
-Quantiles(alg::Symbol, τvec::AVecF = [.25, .5, .75]) = Quantiles(τvec, alg)
-function Quantiles(τvec::AVecF = [.25, .5, .75], algorithm::Symbol = :SGD)
-    alglist = [:SGD, :MSPI]
-    algorithm in alglist || throw(ArgumentError("algorithm must be in $alglist"))
-    Quantiles{algorithm}(zeros(τvec), collect(τvec))
-end
+Quantiles{T}(τvec::AVecF = [.25, .5, .75]) where {T} = Quantiles{T}(zeros(τvec), τvec)
+Quantiles(τvec::AVecF = [.25, .5, .75]) = Quantiles{:MSPI}(τvec)
+
+# Quantiles(alg::Symbol, τvec::AVecF = [.25, .5, .75]) = Quantiles(τvec, alg)
+# function Quantiles(τvec::AVecF = [.25, .5, .75], algorithm::Symbol = :SGD)
+#     alglist = [:SGD, :MSPI]
+#     algorithm in alglist || throw(ArgumentError("algorithm must be in $alglist"))
+#     Quantiles{algorithm}(zeros(τvec), collect(τvec))
+# end
 function fit!(o::Quantiles{:SGD}, y::Float64, γ::Float64)
     for i in eachindex(o.τvec)
         @inbounds o.value[i] -= γ * deriv(QuantileLoss(o.τvec[i]), y, o.value[i])

@@ -70,7 +70,7 @@ Cauchy(value(s)...)
 mutable struct FitCauchy <: OnlineStat{0, 1, LearningRate}
     q::Quantiles{:MSPI}
     nobs::Int
-    FitCauchy() = new(Quantiles(:MSPI), 0)
+    FitCauchy() = new(Quantiles(), 0)
 end
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
 function _value(o::FitCauchy)

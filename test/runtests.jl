@@ -12,8 +12,8 @@ info("Messy output for test coverage")
     println(Variance())
     println(OrderStats(5))
     println(Moments())
-    println(Quantiles(:SGD))
-    println(Quantiles(:MSPI))
+    println(Quantiles{:SGD}())
+    println(Quantiles())
     # println(NormalMix(2))
     println(MV(2, Mean()))
     println(HyperLogLog(5))
@@ -48,7 +48,7 @@ info("TESTS BEGIN HERE")
 #-----------------------------------------------------------------------------# Series
 @testset "Series" begin
     @test_throws ArgumentError Series(Mean(), CovMatrix(3))
-    @test_throws ArgumentError Series(Mean(), Quantiles())
+    @test_throws ArgumentError Series(Mean(), Quantiles{:SGD}())
     @testset "Type-stable Constructors" begin
         @inferred Series(EqualWeight(), Mean(), Variance())
         @inferred Series(EqualWeight(), Mean())
@@ -86,7 +86,7 @@ info("TESTS BEGIN HERE")
     end
 end
 @testset "Series{0}" begin
-    for o in (Mean(), Variance(), Extrema(), OrderStats(10), Moments(), Quantiles(:SGD), Quantiles(:MSPI), Diff(), Sum())
+    for o in (Mean(), Variance(), Extrema(), OrderStats(10), Moments(), Quantiles{:SGD}(), Quantiles{:MSPI}(), Quantiles(), Diff(), Sum())
         y = randn(100)
         @testset "typeof(stats) <: OnlineStat" begin
             s = @inferred Series(o)
@@ -176,9 +176,9 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         s = Series(randn(1_000), o1, o2, o3)
     end
     @testset "Quantiles" begin
-        s = @inferred Series(y1, Quantiles(:SGD), Quantiles(:MSPI))
+        s = @inferred Series(y1, Quantiles{:SGD}(), Quantiles())
         @test typeof(s.weight) == LearningRate
-        s = @inferred Series(y1, Quantiles(:SGD), Quantiles(:MSPI))
+        s = @inferred Series(y1, Quantiles{:SGD}(), Quantiles())
     end
     @testset "Histogram" begin
         y = randn(100)
