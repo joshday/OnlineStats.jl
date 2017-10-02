@@ -16,6 +16,10 @@ weight(o::MV) = weight(o.stats[1])
 
 MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
 
+for T in [:Mean, :Variance, :Extrema, :Moments, :OrderStats]
+    @eval MV(p::Integer, o::$T) = MV([$T() for i in 1:p])
+end
+
 function Base.show{T}(io::IO, o::MV{T})
     s = OnlineStatsBase.name(o, true) * "("
     n = length(o.stats)
