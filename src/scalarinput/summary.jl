@@ -181,98 +181,79 @@ end
 StochasticLoss(loss::Loss) = StochasticLoss(0.0, loss)
 fit!(o::StochasticLoss, y::Float64, γ::Float64) = (o.value -= γ * deriv(o.loss, y, o.value))
 
-#--------------------------------------------------------------------# QuantileSGD
+#-----------------------------------------------------------------------# Quantiles
 """
-```julia
-QuantileSGD()
-```
-Approximate quantiles via stochastic gradient descent.
+    Quantiles(qs::Vector{Float64}, algorithm = :SGD)
+Approximate quantiles via the specified `algorithm` (`:SGD` or `:MSPI`).
 ### Example
-```julia
-s = Series(randn(1000), LearningRate(.7), QuantileSGD())
-value(s)
-```
+    s = Series(randn(10_000), Quantiles(.1:.1:.9, :MSPI)
 """
-struct QuantileSGD <: OnlineStat{0, 1, LearningRate}
+struct Quantiles{T} <: OnlineStat{0, 1, LearningRate}
     value::VecF
-    τ::VecF
-    QuantileSGD(τ::VecF = [0.25, 0.5, 0.75]) = new(zeros(τ), τ)
-    QuantileSGD(args...) = QuantileSGD(collect(args))
+    τvec::VecF
 end
-function fit!(o::QuantileSGD, y::Float64, γ::Float64)
-    for i in eachindex(o.τ)
-        @inbounds o.value[i] -= γ * deriv(QuantileLoss(o.τ[i]), y, o.value[i])
+Quantiles(alg::Symbol, τvec::AVecF = [.25, .5, .75]) = Quantiles(τvec, alg)
+function Quantiles(τvec::AVecF = [.25, .5, .75], algorithm::Symbol = :SGD)
+    alglist = [:SGD, :MSPI]
+    algorithm in alglist || throw(ArgumentError("algorithm must be in $alglist"))
+    Quantiles{algorithm}(zeros(τvec), collect(τvec))
+end
+function fit!(o::Quantiles{:SGD}, y::Float64, γ::Float64)
+    for i in eachindex(o.τvec)
+        @inbounds o.value[i] -= γ * deriv(QuantileLoss(o.τvec[i]), y, o.value[i])
     end
 end
-function Base.merge!(o::QuantileSGD, o2::QuantileSGD, γ::Float64)
-    o.τ == o2.τ || throw(ArgumentError("objects track different quantiles"))
+function fit!(o::Quantiles{:MSPI}, y::Real, γ::Float64)
+    for i in eachindex(o.τvec)
+        w = abs(y - o.value[i])
+        b = o.τvec[i] - .5 * (1 - y / w)
+        o.value[i] = (o.value[i] + γ * b) / (1 + γ / 2w)
+    end
+end
+# TODO
+# function fit!(o::Quantiles{:OMAP}, y::Real, γ::Float64)
+#     for i in eachindex(o.τvec)
+#         u = y - o.value[i]
+#         l = QuantileLoss(o.τvec[i])
+#         c = (value(l, -u) - value(l, u) - 2deriv(l, u) * u) / (2 * u ^ 2)
+#         o.value[i] -= γ * deriv(l, u) / c
+#     end
+# end
+
+function Base.merge!(o::Quantiles, o2::Quantiles, γ::Float64)
+    o.value == o2.value || throw(ArgumentError("objects track different quantiles"))
     smooth!(o.value, o2.value, γ)
 end
 
-#--------------------------------------------------------------------# QuantileMM
-"""
-```julia
-QuantileMM()
-```
-Approximate quantiles via an online MM algorithm.
-### Example
-```julia
-s = Series(randn(1000), LearningRate(.7), QuantileMM())
-value(s)
-```
-"""
-mutable struct QuantileMM <: OnlineStat{0, 1, LearningRate}
-    value::VecF
-    τ::VecF
-    # "sufficient statistics"
-    s::VecF
-    t::VecF
-    o::Float64
-    QuantileMM(τ::VecF = [.25, .5, .75]) = new(zeros(τ), τ, zeros(τ), zeros(τ), 0.0)
-    QuantileMM(args...) = QuantileMM(collect(args))
-end
-function fit!(o::QuantileMM, y::Real, γ::Float64)
-    o.o = smooth(o.o, 1.0, γ)
-    @inbounds for j in 1:length(o.τ)
-        w::Float64 = 1.0 / (abs(y - o.value[j]) + ϵ)
-        o.s[j] = smooth(o.s[j], w * y, γ)
-        o.t[j] = smooth(o.t[j], w, γ)
-        o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
-    end
-end
+# #--------------------------------------------------------------------# QuantileMM
+# """
+#     QuantileMM(q = 0.5)
+# Approximate quantiles via an online MM algorithm.
+# ### Example
+# ```julia
+# s = Series(randn(1000), LearningRate(.7), QuantileMM())
+# value(s)
+# ```
+# """
+# mutable struct QuantileMM <: OnlineStat{0, 1, LearningRate}
+#     value::Float64
+#     τ::Float64
+#     s::Float64
+#     t::Float64
+#     QuantileMM(τ::Real = .5) = new(0.0, τ, 0.0, 0.0)
+#     QuantileMM(args...) = QuantileMM(collect(args))
+# end
+# function fit!(o::QuantileMM, y::Real, γ::Float64)
+#     o.o = smooth(o.o, 1.0, γ)
+#     @inbounds for j in 1:length(o.τ)
+#         w::Float64 = 1.0 / (abs(y - o.value[j]) + ϵ)
+#         o.s[j] = smooth(o.s[j], w * y, γ)
+#         o.t[j] = smooth(o.t[j], w, γ)
+#         o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
+#     end
+# end
 
-#-----------------------------------------------------------------------# QuantileMSPI
-"""
-    QuantileMSPI(τ = .5)
-Approximate quantiles using majorized stochastic proximal iteration.
-### Example
-    s = Series(randn(1000), LearningRate(.7), QuantileMSPI(.5))
-    value(s)
-"""
-mutable struct QuantileMSPI <: OnlineStat{0, 0, LearningRate}
-    value::Float64
-    τ::Float64
-    QuantileMSPI(τ::Real = .5) = new(0.0, Float64(τ))
-end
-Base.show(io::IO, o::QuantileMSPI) = print("QuantileMSPI($(o.τ), $(o.value))")
-function fit!(o::QuantileMSPI, y::Real, γ::Float64)
-    w = abs(y - o.value)
-    b = o.τ - .5 * (1 - y/w)
-    o.value = (o.value + γ * b) / (1 + γ / 2w)
-end
 
-#-----------------------------------------------------------------------# QuantileOMAP
-mutable struct QuantileOMAP <: OnlineStat{0, 0, LearningRate}
-    value::Float64
-    τ::Float64
-    QuantileOMAP(τ::Real = .5) = new(0.0, τ)
-end
-function fit!(o::QuantileOMAP, y::Real, γ::Float64)
-    u = y - o.value
-    l = QuantileLoss(o.τ)
-    c = (value(l, -u) - value(l, u) - 2deriv(l, u) * u) / (2 * u ^ 2)
-    o.value -= γ * deriv(l, u) / c
-end
 
 #--------------------------------------------------------------------# Diff
 """

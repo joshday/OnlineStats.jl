@@ -20,7 +20,7 @@ export
     vcov, mse, stderr,
     # OnlineStats
     OnlineStat,
-    Mean, Variance, Extrema, OrderStats, Moments, QuantileSGD, QuantileMM, QuantileMSPI,
+    Mean, Variance, Extrema, OrderStats, Moments, Quantiles,
     Diff, Sum, MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample, OHistogram,
     # statlearn things
     StatLearn,

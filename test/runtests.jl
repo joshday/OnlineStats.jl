@@ -12,8 +12,8 @@ info("Messy output for test coverage")
     println(Variance())
     println(OrderStats(5))
     println(Moments())
-    println(QuantileMM())
-    println(QuantileMSPI())
+    println(Quantiles(:SGD))
+    println(Quantiles(:MSPI))
     # println(NormalMix(2))
     println(MV(2, Mean()))
     println(HyperLogLog(5))
@@ -48,7 +48,7 @@ info("TESTS BEGIN HERE")
 #-----------------------------------------------------------------------------# Series
 @testset "Series" begin
     @test_throws ArgumentError Series(Mean(), CovMatrix(3))
-    @test_throws ArgumentError Series(Mean(), QuantileMM())
+    @test_throws ArgumentError Series(Mean(), Quantiles())
     @testset "Type-stable Constructors" begin
         @inferred Series(EqualWeight(), Mean(), Variance())
         @inferred Series(EqualWeight(), Mean())
@@ -86,8 +86,7 @@ info("TESTS BEGIN HERE")
     end
 end
 @testset "Series{0}" begin
-    for o in (Mean(), Variance(), Extrema(), OrderStats(10), Moments(), QuantileSGD(),
-              QuantileMM(), QuantileMSPI(), Diff(), Sum())
+    for o in (Mean(), Variance(), Extrema(), OrderStats(10), Moments(), Quantiles(:SGD), Quantiles(:MSPI), Diff(), Sum())
         y = randn(100)
         @testset "typeof(stats) <: OnlineStat" begin
             s = @inferred Series(o)
@@ -176,10 +175,10 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         o3 = StochasticLoss(L1DistLoss())      # approx. median
         s = Series(randn(1_000), o1, o2, o3)
     end
-    @testset "QuantileMM/QuantileSGD" begin
-        s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
+    @testset "Quantiles" begin
+        s = @inferred Series(y1, Quantiles(:SGD), Quantiles(:MSPI))
         @test typeof(s.weight) == LearningRate
-        s = @inferred Series(y1, QuantileMM(.2, .3), QuantileSGD([.4, .5]))
+        s = @inferred Series(y1, Quantiles(:SGD), Quantiles(:MSPI))
     end
     @testset "Histogram" begin
         y = randn(100)
@@ -202,8 +201,8 @@ moments(y) = [mean(y), mean(y.^2), mean(y.^3), mean(y.^4)]
         @test kurtosis(o) ≈ kurtosis(y) atol = .1
         @test skewness(o) ≈ skewness(y) atol = .1
 
-        o1 = QuantileSGD(.4, .5)
-        o2 = QuantileSGD(.4, .5)
+        o1 = Quantiles([.4, .5])
+        o2 = Quantiles([.4, .5])
         merge!(o1, o2, .5)
 
         o = Diff(Int64)
