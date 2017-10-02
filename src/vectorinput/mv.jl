@@ -13,8 +13,8 @@ struct MV{T} <: OnlineStat{1, -1, nothing}
     stats::Vector{T}
 end
 weight(o::MV) = weight(o.stats[1])
-
-MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
+MV(args...) = MV(collect(args))
+MV(p::Integer, o::OnlineStat{0}) = MV(copy(o) for i in 1:p)
 
 function Base.show{T}(io::IO, o::MV{T})
     s = OnlineStatsBase.name(o, true) * "("
