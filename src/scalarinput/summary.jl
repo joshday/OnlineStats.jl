@@ -183,10 +183,13 @@ fit!(o::StochasticLoss, y::Float64, γ::Float64) = (o.value -= γ * deriv(o.loss
 
 #-----------------------------------------------------------------------# Quantiles
 """
-    Quantiles(qs::Vector{Float64}, algorithm = :SGD)
+    Quantiles(q = [.25, .5, .75])  # default algorithm is :MSPI
+    Quantiles{:SGD}(q = [.25, .5, .75])
+    Quantiles{:MSPI}(q = [.25, .5, .75])
+
 Approximate quantiles via the specified `algorithm` (`:SGD` or `:MSPI`).
 ### Example
-    s = Series(randn(10_000), Quantiles(.1:.1:.9, :MSPI)
+    s = Series(randn(10_000), Quantiles(.1:.1:.9)
 """
 struct Quantiles{T} <: OnlineStat{0, 1, LearningRate}
     value::VecF
