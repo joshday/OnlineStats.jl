@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantiles",
     "category": "Type",
-    "text": "Quantiles(qs::Vector{Float64}, algorithm = :SGD)\n\nApproximate quantiles via the specified algorithm (:SGD or :MSPI).\n\nExample\n\ns = Series(randn(10_000), Quantiles(.1:.1:.9, :MSPI)\n\n\n\n"
+    "text": "Quantiles(q = [.25, .5, .75])  # default algorithm is :MSPI\nQuantiles{:SGD}(q = [.25, .5, .75])\nQuantiles{:MSPI}(q = [.25, .5, .75])\n\nApproximate quantiles via the specified algorithm (:SGD or :MSPI).\n\nExample\n\ns = Series(randn(10_000), Quantiles(.1:.1:.9)\n\n\n\n"
 },
 
 {
