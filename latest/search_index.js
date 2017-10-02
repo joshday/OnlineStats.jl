@@ -257,6 +257,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.Quantiles",
+    "page": "API",
+    "title": "OnlineStats.Quantiles",
+    "category": "Type",
+    "text": "Quantiles(qs::Vector{Float64}, algorithm = :SGD)\n\nApproximate quantiles via the specified algorithm (:SGD or :MSPI).\n\nExample\n\ns = Series(randn(10_000), Quantiles(.1:.1:.9, :MSPI)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.ReservoirSample",
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
@@ -494,30 +502,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.OrderStats",
     "category": "Type",
     "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileISGD",
-    "page": "API",
-    "title": "OnlineStats.QuantileISGD",
-    "category": "Type",
-    "text": "QuantileISGD()\n\nApproximate quantiles via implicit stochastic gradient descent.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileISGD())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileMM",
-    "page": "API",
-    "title": "OnlineStats.QuantileMM",
-    "category": "Type",
-    "text": "QuantileMM()\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileSGD",
-    "page": "API",
-    "title": "OnlineStats.QuantileSGD",
-    "category": "Type",
-    "text": "QuantileSGD()\n\nApproximate quantiles via stochastic gradient descent.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileSGD())\nvalue(s)\n\n\n\n"
 },
 
 {
