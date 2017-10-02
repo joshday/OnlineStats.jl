@@ -211,7 +211,7 @@ function fit!(o::Quantiles{:SGD}, y::Float64, γ::Float64)
 end
 function fit!(o::Quantiles{:MSPI}, y::Real, γ::Float64)
     for i in eachindex(o.τvec)
-        w = abs(y - o.value[i])
+        w = abs(y - o.value[i]) + ϵ
         b = o.τvec[i] - .5 * (1 - y / w)
         o.value[i] = (o.value[i] + γ * b) / (1 + γ / 2w)
     end
