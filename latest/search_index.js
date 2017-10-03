@@ -273,14 +273,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.Series",
-    "page": "API",
-    "title": "OnlineStats.Series",
-    "category": "Type",
-    "text": "Series(stats...)\nSeries(data, stats...)\nSeries(weight, stats...)\nSeries(weight, data, stats...)\n\nA Series is a container for a Weight and any number of OnlineStats.  Updating the Series with fit!(s, data) will update the OnlineStats it holds according to its Weight.\n\nExamples\n\nSeries(randn(100), Mean(), Variance())\nSeries(ExponentialWeight(.1), Mean())\n\ns = Series(Mean())\nfit!(s, randn(100))\ns2 = Series(randn(123), Mean())\nmerge(s, s2)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.StatLearn",
     "page": "API",
     "title": "OnlineStats.StatLearn",
@@ -529,7 +521,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#LearnBase.value-Tuple{OnlineStats.Series}",
+    "location": "pages/api.html#LearnBase.value-Tuple{OnlineStatsBase.Series}",
     "page": "API",
     "title": "LearnBase.value",
     "category": "Method",
@@ -553,7 +545,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.stats-Tuple{OnlineStats.Series}",
+    "location": "pages/api.html#OnlineStats.stats-Tuple{OnlineStatsBase.Series}",
     "page": "API",
     "title": "OnlineStats.stats",
     "category": "Method",
@@ -585,11 +577,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.AbstractSeries",
+    "location": "pages/api.html#OnlineStatsBase.OnlineStat",
     "page": "API",
-    "title": "OnlineStatsBase.AbstractSeries",
+    "title": "OnlineStatsBase.OnlineStat",
     "category": "Type",
-    "text": "A container for a Weight and at least one OnlineStat\n\n\n\n"
+    "text": "OnlineStat{I, O, W} is an abstract type parameterized by the input and output type/dimension I and O as well as the default weight type W. The supported I and O value are:     0       = Union{Number, Symbol, AbstractString} (ScalarOb)     1       = AbstractVector or Tuple     2       = AbstractMatrix     -1      = unknown     (1, 0)  = (x, y) pair of (vector, scalar)\n\n\n\nA new OnlineStat should define StatsBase.fit!(o::MyStat, y::InputType, w::Float64)whereInputTypedepends onI`\n\n\n\nIf the OnlineStat is mergeable, it should define\n\nmerge!(o1::MyStat, o2::MyStat, w::Float64)\n\nwhere w is the influence (between 0 and 1) o2 should have on o1\n\n\n\nIf the OnlineStat's value is not updated with fit!, it should define _value(o), which calculates the value\n\n\n\n"
 },
 
 {
@@ -638,6 +630,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.McclainWeight",
     "category": "Type",
     "text": "McclainWeight(ᾱ = 0.1)\n\n\"smoothed\" version of BoundedEqualWeight\nweights asymptotically approach ᾱ\nWeight at observation t is γ(t-1) / (1 + γ(t-1) - ᾱ)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Series",
+    "page": "API",
+    "title": "OnlineStatsBase.Series",
+    "category": "Type",
+    "text": "Series(stats...)\nSeries(data, stats...)\nSeries(weight, stats...)\nSeries(weight, data, stats...)\n\nA Series is a container for a Weight and any number of OnlineStats.  Updating the Series with fit!(s, data) will update the OnlineStats it holds according to its Weight.\n\nExamples\n\nSeries(randn(100), Mean(), Variance())\nSeries(ExponentialWeight(.1), Mean())\n\ns = Series(Mean())\nfit!(s, randn(100))\ns2 = Series(randn(123), Mean())\nmerge(s, s2)\n\n\n\n"
 },
 
 {
