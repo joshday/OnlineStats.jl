@@ -128,6 +128,7 @@ include("streamstats/hyperloglog.jl")
 include("streamstats/bootstrap.jl")
 include("xyinput/statlearn.jl")
 include("xyinput/linreg.jl")
+include("deprecated.jl")
 
 
 
