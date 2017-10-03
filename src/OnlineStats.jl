@@ -10,7 +10,6 @@ import SweepOperator
 using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
 
 export
-    # AbstractSeries
     Series, Bootstrap,
     # Weight
     Weight, EqualWeight, Bounded, ExponentialWeight, LearningRate, LearningRate2,
