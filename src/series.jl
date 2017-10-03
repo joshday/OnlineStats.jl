@@ -1,35 +1,4 @@
-"""
-    Series(stats...)
-    Series(data, stats...)
-    Series(weight, stats...)
-    Series(weight, data, stats...)
-A Series is a container for a Weight and any number of OnlineStats.  Updating the Series
-with `fit!(s, data)` will update the OnlineStats it holds according to its Weight.
-
-### Examples
-    Series(randn(100), Mean(), Variance())
-    Series(ExponentialWeight(.1), Mean())
-
-    s = Series(Mean())
-    fit!(s, randn(100))
-    s2 = Series(randn(123), Mean())
-    merge(s, s2)
-"""
-struct Series{I, OS <: Union{OnlineStat, Tuple}, W <: Weight} <: AbstractSeries
-    weight::W
-    stats::OS
-end
-# These act as inner constructors
-Series(wt::Weight, t::Tuple)      = Series{input(t), typeof(t), typeof(wt)}(wt, t)
-Series(wt::Weight, o::OnlineStat) = Series{input(o), typeof(o), typeof(wt)}(wt, o)
-
-nobs(s::AbstractSeries) = OnlineStatsBase.nobs(s)
-
-# empty
-Series(t::Tuple)         = Series(weight(t), t)
-Series(o::OnlineStat)    = Series(weight(o), o)
-Series(o::OnlineStat...) = Series(weight(o), o)
-Series(wt::Weight, o::OnlineStat, os::OnlineStat...) = Series(wt, tuple(o, os...))
+nobs(s::Series) = OnlineStatsBase.nobs(s)
 
 # init with data
 Series(y::AA, o::OnlineStat)                = (s = Series(weight(o), o); fit!(s, y))

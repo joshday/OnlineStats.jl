@@ -3,7 +3,7 @@ __precompile__(true)
 module OnlineStats
 
 import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram
-import OnlineStatsBase: weight, weight!, updatecounter!, nups, header, input, _value
+import OnlineStatsBase: weight, weight!, updatecounter!, nups, header, input, _value, Series
 import LearnBase: value, fit!, predict, nobs
 import SweepOperator
 
