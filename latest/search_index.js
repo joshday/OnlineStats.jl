@@ -577,6 +577,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.QuantileMM",
+    "page": "API",
+    "title": "OnlineStats.QuantileMM",
+    "category": "Type",
+    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.AbstractSeries",
     "page": "API",
     "title": "OnlineStatsBase.AbstractSeries",
