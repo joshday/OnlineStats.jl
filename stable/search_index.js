@@ -81,19 +81,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[BoundedEqualWeight(λ)](@ref)-1",
+    "location": "pages/weights.html#[LearningRate(r)](@ref)-1",
     "page": "Weighting",
-    "title": "BoundedEqualWeight(λ)",
+    "title": "LearningRate(r)",
     "category": "section",
-    "text": "Use EqualWeight until a threshold is hit, then stay constant.gamma_t = textmaxleft(frac1t lambdaright)"
-},
-
-{
-    "location": "pages/weights.html#[LearningRate(r,-λ)](@ref)-1",
-    "page": "Weighting",
-    "title": "LearningRate(r, λ)",
-    "category": "section",
-    "text": "Decrease at a slow rate until a threshold is hit.gamma_t = textmaxleft(frac1t^r lambdaright)"
+    "text": "Decrease at a slow rate until a threshold is hit.gamma_t = frac1t^r"
 },
 
 {
@@ -110,6 +102,14 @@ var documenterSearchIndex = {"docs": [
     "title": "McclainWeight(a)",
     "category": "section",
     "text": "Smoothed version of BoundedEqualWeight.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+},
+
+{
+    "location": "pages/weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "page": "Weighting",
+    "title": "Bounded(weight, λ)",
+    "category": "section",
+    "text": "Wrapper for a weight which provides a minimum boundgamma_t = textmax(gamma_t )"
 },
 
 {
@@ -257,19 +257,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.Quantiles",
+    "page": "API",
+    "title": "OnlineStats.Quantiles",
+    "category": "Type",
+    "text": "Quantiles(q = [.25, .5, .75])  # default algorithm is :MSPI\nQuantiles{:SGD}(q = [.25, .5, .75])\nQuantiles{:MSPI}(q = [.25, .5, .75])\n\nApproximate quantiles via the specified algorithm (:SGD or :MSPI).\n\nExample\n\ns = Series(randn(10_000), Quantiles(.1:.1:.9)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.ReservoirSample",
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
     "category": "Type",
     "text": "ReservoirSample(k)\nReservoirSample(k, Float64)\n\nReservoir sample of k items.\n\nExample\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Series",
-    "page": "API",
-    "title": "OnlineStats.Series",
-    "category": "Type",
-    "text": "Series(stats...)\nSeries(data, stats...)\nSeries(weight, stats...)\nSeries(weight, data, stats...)\n\nA Series is a container for a Weight and any number of OnlineStats.  Updating the Series with fit!(s, data) will update the OnlineStats it holds according to its Weight.\n\nExamples\n\nSeries(randn(100), Mean(), Variance())\nSeries(ExponentialWeight(.1), Mean())\n\ns = Series(Mean())\nfit!(s, randn(100))\ns2 = Series(randn(123), Mean())\nmerge(s, s2)\n\n\n\n"
 },
 
 {
@@ -297,6 +297,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.ADADELTA",
+    "page": "API",
+    "title": "OnlineStats.ADADELTA",
+    "category": "Type",
+    "text": "ADADELTA(η = 1.0, ρ = .95)\n\nADADELTA ignores weight.\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.ADAGRAD",
     "page": "API",
     "title": "OnlineStats.ADAGRAD",
@@ -309,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
-    "text": "ADAM(α1, α2, η)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
 },
 
 {
@@ -317,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
-    "text": "ADAMAX(α1, α2, η)\n\nADAMAX with step size η and momentum parameters α1, α2\n\n\n\n"
+    "text": "ADAMAX(η, β1, β2)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
 },
 
 {
@@ -417,14 +425,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MAXSPGD",
-    "page": "API",
-    "title": "OnlineStats.MAXSPGD",
-    "category": "Type",
-    "text": "MAXSPGD(η)\n\nSPGD where only the largest gradient element is used to update the parameter.\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.MSPIC",
     "page": "API",
     "title": "OnlineStats.MSPIC",
@@ -457,17 +457,33 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.OMMC",
+    "location": "pages/api.html#OnlineStats.NADAM",
     "page": "API",
-    "title": "OnlineStats.OMMC",
+    "title": "OnlineStats.NADAM",
+    "category": "Type",
+    "text": "NADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.NSGD",
+    "page": "API",
+    "title": "OnlineStats.NSGD",
+    "category": "Type",
+    "text": "NSGD(η, α)\n\nNesterov accelerated Stochastic Proximal Gradient Descent.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.OMASQ",
+    "page": "API",
+    "title": "OnlineStats.OMASQ",
     "category": "Type",
     "text": "Experimental: OMM-constant\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.OMMF",
+    "location": "pages/api.html#OnlineStats.OMASQF",
     "page": "API",
-    "title": "OnlineStats.OMMF",
+    "title": "OnlineStats.OMASQF",
     "category": "Type",
     "text": "Experimental: OMM-full matrix\n\n\n\n"
 },
@@ -481,35 +497,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.QuantileISGD",
+    "location": "pages/api.html#OnlineStats.SGD",
     "page": "API",
-    "title": "OnlineStats.QuantileISGD",
+    "title": "OnlineStats.SGD",
     "category": "Type",
-    "text": "QuantileISGD()\n\nApproximate quantiles via implicit stochastic gradient descent.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileISGD())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileMM",
-    "page": "API",
-    "title": "OnlineStats.QuantileMM",
-    "category": "Type",
-    "text": "QuantileMM()\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileSGD",
-    "page": "API",
-    "title": "OnlineStats.QuantileSGD",
-    "category": "Type",
-    "text": "QuantileSGD()\n\nApproximate quantiles via stochastic gradient descent.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileSGD())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.SPGD",
-    "page": "API",
-    "title": "OnlineStats.SPGD",
-    "category": "Type",
-    "text": "SPGD(η)\n\nStochastic Proximal Gradient Descent with step size η\n\n\n\n"
+    "text": "SGD(η, α=0.0)\n\nStochastic Proximal Gradient Descent with step size η and momentum term α.\n\n\n\n"
 },
 
 {
@@ -529,7 +521,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#LearnBase.value-Tuple{OnlineStats.Series}",
+    "location": "pages/api.html#LearnBase.value-Tuple{OnlineStatsBase.Series}",
     "page": "API",
     "title": "LearnBase.value",
     "category": "Method",
@@ -553,7 +545,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.stats-Tuple{OnlineStats.Series}",
+    "location": "pages/api.html#OnlineStats.stats-Tuple{OnlineStatsBase.Series}",
     "page": "API",
     "title": "OnlineStats.stats",
     "category": "Method",
@@ -577,11 +569,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.AbstractSeries",
+    "location": "pages/api.html#OnlineStats.QuantileMM",
     "page": "API",
-    "title": "OnlineStatsBase.AbstractSeries",
+    "title": "OnlineStats.QuantileMM",
     "category": "Type",
-    "text": "A container for a Weight and at least one OnlineStat\n\n\n\n"
+    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.OnlineStat",
+    "page": "API",
+    "title": "OnlineStatsBase.OnlineStat",
+    "category": "Type",
+    "text": "OnlineStat{I, O, W} is an abstract type parameterized by the input and output type/dimension I and O as well as the default weight type W. The supported I and O value are:     0       = Union{Number, Symbol, AbstractString} (ScalarOb)     1       = AbstractVector or Tuple     2       = AbstractMatrix     -1      = unknown     (1, 0)  = (x, y) pair of (vector, scalar)\n\n\n\nA new OnlineStat should define StatsBase.fit!(o::MyStat, y::InputType, w::Float64)whereInputTypedepends onI`\n\n\n\nIf the OnlineStat is mergeable, it should define\n\nmerge!(o1::MyStat, o2::MyStat, w::Float64)\n\nwhere w is the influence (between 0 and 1) o2 should have on o1\n\n\n\nIf the OnlineStat's value is not updated with fit!, it should define _value(o), which calculates the value\n\n\n\n"
 },
 
 {
@@ -630,6 +630,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.McclainWeight",
     "category": "Type",
     "text": "McclainWeight(ᾱ = 0.1)\n\n\"smoothed\" version of BoundedEqualWeight\nweights asymptotically approach ᾱ\nWeight at observation t is γ(t-1) / (1 + γ(t-1) - ᾱ)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Series",
+    "page": "API",
+    "title": "OnlineStatsBase.Series",
+    "category": "Type",
+    "text": "Series(stats...)\nSeries(data, stats...)\nSeries(weight, stats...)\nSeries(weight, data, stats...)\n\nA Series is a container for a Weight and any number of OnlineStats.  Updating the Series with fit!(s, data) will update the OnlineStats it holds according to its Weight.\n\nExamples\n\nSeries(randn(100), Mean(), Variance())\nSeries(ExponentialWeight(.1), Mean())\n\ns = Series(Mean())\nfit!(s, randn(100))\ns2 = Series(randn(123), Mean())\nmerge(s, s2)\n\n\n\n"
 },
 
 {
