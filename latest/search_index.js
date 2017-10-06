@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "LearningRate(r)",
     "category": "section",
-    "text": "Decrease at a slow rate until a threshold is hit.gamma_t = frac1t^r"
+    "text": "Decrease at a slow rate.gamma_t = frac1t^r"
 },
 
 {
@@ -110,6 +110,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Bounded(weight, λ)",
     "category": "section",
     "text": "Wrapper for a weight which provides a minimum boundgamma_t = textmax(gamma_t )"
+},
+
+{
+    "location": "pages/weights.html#[Scaled(weight,-λ)](@ref)-1",
+    "page": "Weighting",
+    "title": "Scaled(weight, λ)",
+    "category": "section",
+    "text": "Wrapper for a weight which scales the weight by a constant.  This is only meant for use with stochastic gradient algorithms.gamma_t =  * gamma_t"
 },
 
 {
@@ -577,11 +585,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.Bounded",
+    "page": "API",
+    "title": "OnlineStatsBase.Bounded",
+    "category": "Type",
+    "text": "Bounded(weight, λ)\n\nGive a Weight a lower bound.\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.OnlineStat",
     "page": "API",
     "title": "OnlineStatsBase.OnlineStat",
     "category": "Type",
     "text": "OnlineStat{I, O, W} is an abstract type parameterized by the input and output type/dimension I and O as well as the default weight type W. The supported I and O value are:     0       = Union{Number, Symbol, AbstractString} (ScalarOb)     1       = AbstractVector or Tuple     2       = AbstractMatrix     -1      = unknown     (1, 0)  = (x, y) pair of (vector, scalar)\n\n\n\nA new OnlineStat should define StatsBase.fit!(o::MyStat, y::InputType, w::Float64)whereInputTypedepends onI`\n\n\n\nIf the OnlineStat is mergeable, it should define\n\nmerge!(o1::MyStat, o2::MyStat, w::Float64)\n\nwhere w is the influence (between 0 and 1) o2 should have on o1\n\n\n\nIf the OnlineStat's value is not updated with fit!, it should define _value(o), which calculates the value\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Scaled",
+    "page": "API",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "Type",
+    "text": "Scaled(weight, λ)\nλ * weight\n\nScale a weight by a constant.\n\n\n\n"
 },
 
 {
@@ -613,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.LearningRate",
     "category": "Type",
-    "text": "LearningRate(r = .6)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate\nWeight at observation t is γ = 1 / t ^ r\n\n\n\n"
+    "text": "LearningRate(r = .6)\n\nMainly for stochastic approximation types\nDecreases at a \"slow\" rate\nWeight at observation t is γ = 1 / t ^ r\n\n\n\n"
 },
 
 {
@@ -621,7 +645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.LearningRate2",
     "category": "Type",
-    "text": "LearningRate2(c = .5)\n\nMainly for stochastic approximation types (QuantileSGD, QuantileMM etc.)\nDecreases at a \"slow\" rate\nWeight at observation t is γ = inv(1 + c * (t - 1))\n\n\n\n"
+    "text": "LearningRate2(c = .5)\n\nMainly for stochastic approximation types\nDecreases at a \"slow\" rate\nWeight at observation t is γ = inv(1 + c * (t - 1))\n\n\n\n"
 },
 
 {
