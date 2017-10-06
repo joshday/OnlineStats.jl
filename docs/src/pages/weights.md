@@ -23,7 +23,7 @@ Consider how the following weighting schemes affect the influence of the next ob
 ```
 
 ## [`LearningRate(r)`](@ref)  
-- Decrease at a slow rate until a threshold is hit.
+- Decrease at a slow rate.
 ```math
 \gamma_t = \frac{1}{t^r}
 ```  
@@ -44,4 +44,10 @@ Consider how the following weighting schemes affect the influence of the next ob
 - Wrapper for a weight which provides a minimum bound
 ```math
 \gamma_t' = \text{max}(\gamma_t, λ)
+```
+
+## [`Scaled(weight, λ)`](@ref)
+- Wrapper for a weight which scales the weight by a constant.  This is only meant for use with stochastic gradient algorithms.
+```math
+\gamma_t' = λ * \gamma_t
 ```
