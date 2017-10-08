@@ -213,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles via SGD QuantileSGD\nquantiles via Online MM QuantileMM\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\napproximate order statistics OrderStatistics\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napproximate count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles Quantiles\nquantiles via Online MM QuantileMM\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\napproximate order statistics OrderStatistics\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napproximate count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
 },
 
 {
@@ -505,6 +505,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.QuantileMM",
+    "page": "API",
+    "title": "OnlineStats.QuantileMM",
+    "category": "Type",
+    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.SGD",
     "page": "API",
     "title": "OnlineStats.SGD",
@@ -574,14 +582,6 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.fit!",
     "category": "Function",
     "text": "fit!(s, y)\nfit!(s, y, w)\n\nUpdate a Series s with more data y and optional weighting w.\n\nExamples\n\ny = randn(100)\nw = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])        # one observation: use Series weight\nfit!(s, y[1], w[1])  # one observation: override weight\nfit!(s, y)           # multiple observations: use Series weight\nfit!(s, y, w[1])     # multiple observations: override each weight with w[1]\nfit!(s, y, w)        # multiple observations: y[i] uses weight w[i]\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileMM",
-    "page": "API",
-    "title": "OnlineStats.QuantileMM",
-    "category": "Type",
-    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
 },
 
 {
