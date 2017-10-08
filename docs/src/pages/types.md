@@ -5,7 +5,7 @@
 | **Univariate Statistics:**             |                            |
 | mean                                   | [`Mean`](@ref)             |
 | variance                               | [`Variance`](@ref)         |
-| quantiles via SGD                      | [`QuantileSGD`](@ref)      |
+| quantiles                              | [`Quantiles`](@ref)        |
 | quantiles via Online MM                | [`QuantileMM`](@ref)       |
 | max and min                            | [`Extrema`](@ref)          |
 | skewness and kurtosis                  | [`Moments`](@ref)          |

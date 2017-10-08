@@ -242,20 +242,18 @@ value(s)
 ```
 """
 mutable struct QuantileMM <: OnlineStat{0, 1, LearningRate}
-    value::Float64
-    τ::Float64
-    s::Float64
-    t::Float64
-    QuantileMM(τ::Real = .5) = new(0.0, τ, 0.0, 0.0)
-    QuantileMM(args...) = QuantileMM(collect(args))
+    value::Vector{Float64}
+    τ::Vector{Float64}
+    s::Vector{Float64}
+    t::Vector{Float64}
+    QuantileMM(τ = [.25, .5, .75]) = new(zeros(τ), τ, zeros(τ), zeros(τ))
 end
 function fit!(o::QuantileMM, y::Real, γ::Float64)
-    o.o = smooth(o.o, 1.0, γ)
     @inbounds for j in 1:length(o.τ)
-        w::Float64 = 1.0 / (abs(y - o.value[j]) + ϵ)
+        w = 1.0 / (abs(y - o.value[j]) + ϵ)
         o.s[j] = smooth(o.s[j], w * y, γ)
         o.t[j] = smooth(o.t[j], w, γ)
-        o.value[j] = (o.s[j] + o.o * (2.0 * o.τ[j] - 1.0)) / o.t[j]
+        o.value[j] = (o.s[j] + (2.0 * o.τ[j] - 1.0)) / o.t[j]
     end
 end
 
