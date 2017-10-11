@@ -18,16 +18,12 @@ function α(m::UInt32)
 end
 
 """
-```julia
-HyperLogLog(b)  # 4 ≤ b ≤ 16
-```
+    HyperLogLog(b)  # 4 ≤ b ≤ 16
 Approximate count of distinct elements.
-### Example
-```julia
-s = Series(rand(1:10, 1000), HyperLogLog(12))
-```
+    s = Series(rand(1:10, 1000), HyperLogLog(12))
+    value(s)
 """
-mutable struct HyperLogLog <: OnlineStat{0, 0, EqualWeight}
+mutable struct HyperLogLog <: OnlineStat{0, EqualWeight}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
@@ -58,7 +54,7 @@ function fit!(o::HyperLogLog, v::Any, γ::Float64)
     o
 end
 
-function _value(o::HyperLogLog)
+function value(o::HyperLogLog)
     S = 0.0
     for j in 1:o.m
         S += 1 / (2 ^ o.M[j])

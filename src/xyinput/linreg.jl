@@ -19,7 +19,7 @@ vcov(o)
 confint(o)
 ```
 """
-mutable struct LinReg <: OnlineStat{(1,0), 1, EqualWeight}
+mutable struct LinReg <: OnlineStat{(1,0), EqualWeight}
     β::VecF
     A::MatF
     S::MatF
@@ -46,7 +46,7 @@ function fit!(o::LinReg, x::VectorOb, y::Real, γ::Float64)
     o.nobs += 1
 end
 
-function _value(o::LinReg)
+function value(o::LinReg)
     copy!(o.S, o.A)
     p = length(o.β)
     if o.λ != 0

@@ -1,18 +1,13 @@
 #---------------------------------------------------------------------------------# Beta
 """
-```julia
-FitBeta()
-```
+    FitBeta()
 Online parameter estimate of a Beta distribution (Method of Moments)
-### Example
-```julia
-using Distributions, OnlineStats
-y = rand(Beta(3, 5), 1000)
-s = Series(y, FitBeta())
-Beta(value(s)...)
-```
+    using Distributions, OnlineStats
+    y = rand(Beta(3, 5), 1000)
+    s = Series(y, FitBeta())
+    Beta(value(s)...)
 """
-struct FitBeta <: OnlineStat{0, 1, EqualWeight}
+struct FitBeta <: OnlineStat{0, EqualWeight}
     var::Variance
     FitBeta() = new(Variance())
 end
@@ -32,7 +27,6 @@ end
 """
     FitCategorical(T)
 Fit a categorical distribution where the inputs are of type `T`.
-# Example
     using Distributions
     s = Series(rand(1:10, 1000), FitCategorical(Int))
     value(s)
@@ -41,7 +35,7 @@ Fit a categorical distribution where the inputs are of type `T`.
     s = Series(rand(vals, 1000), FitCategorical(String))
     value(s)
 """
-mutable struct FitCategorical{T<:Any} <: OnlineStat{0, 1, EqualWeight}
+mutable struct FitCategorical{T<:Any} <: OnlineStat{0, EqualWeight}
     d::Dict{T, Int}
     nobs::Int
     FitCategorical{T}() where T<:Any = new(Dict{T, Int}(), 0)
@@ -55,19 +49,14 @@ _value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, z
 Base.keys(o::FitCategorical) = keys(o.d)
 #---------------------------------------------------------------------------------# Cauchy
 """
-```julia
-FitCauchy()
-```
+    FitCauchy()
 Online parameter estimate of a Cauchy distribution
-### Example
-```julia
-using Distributions
-y = rand(Cauchy(0, 10), 10_000)
-s = Series(y, FitCauchy())
-Cauchy(value(s)...)
-```
+    using Distributions
+    y = rand(Cauchy(0, 10), 10_000)
+    s = Series(y, FitCauchy())
+    Cauchy(value(s)...)
 """
-mutable struct FitCauchy <: OnlineStat{0, 1, LearningRate}
+mutable struct FitCauchy <: OnlineStat{0, LearningRate}
     q::Quantiles{:MSPI}
     nobs::Int
     FitCauchy() = new(Quantiles(), 0)
@@ -82,20 +71,15 @@ function _value(o::FitCauchy)
 end
 #---------------------------------------------------------------------------------# Gamma
 """
-```julia
-FitGamma()
-```
+    FitGamma()
 Online parameter estimate of a Gamma distribution (Method of Moments)
-### Example
-```julia
-using Distributions
-y = rand(Gamma(5, 1), 1000)
-s = Series(y, FitGamma())
-Gamma(value(s)...)
-```
+    using Distributions
+    y = rand(Gamma(5, 1), 1000)
+    s = Series(y, FitGamma())
+    Gamma(value(s)...)
 """
 # method of moments. TODO: look at Distributions for MLE
-struct FitGamma <: OnlineStat{0, 1, EqualWeight}
+struct FitGamma <: OnlineStat{0, EqualWeight}
     var::Variance
 end
 FitGamma() = FitGamma(Variance())
@@ -113,19 +97,14 @@ function _value(o::FitGamma)
 end
 #---------------------------------------------------------------------------------# LogNormal
 """
-```julia
-FitLogNormal()
-```
+    FitLogNormal()
 Online parameter estimate of a LogNormal distribution (MLE)
-### Example
-```julia
-using Distributions
-y = rand(LogNormal(3, 4), 1000)
-s = Series(y, FitLogNormal())
-LogNormal(value(s)...)
-```
+    using Distributions
+    y = rand(LogNormal(3, 4), 1000)
+    s = Series(y, FitLogNormal())
+    LogNormal(value(s)...)
 """
-struct FitLogNormal <: OnlineStat{0, 1, EqualWeight}
+struct FitLogNormal <: OnlineStat{0, EqualWeight}
     var::Variance
     FitLogNormal() = new(Variance())
 end
@@ -139,18 +118,13 @@ function _value(o::FitLogNormal)
 end
 #---------------------------------------------------------------------------------# Normal
 """
-```julia
-FitNormal()
-```
+    FitNormal()
 Online parameter estimate of a Normal distribution (MLE)
-### Example
-```julia
-using Distributions
-y = rand(Normal(-3, 4), 1000)
-s = Series(y, FitNormal())
-```
+    using Distributions
+    y = rand(Normal(-3, 4), 1000)
+    s = Series(y, FitNormal())
 """
-struct FitNormal <: OnlineStat{0, 1, EqualWeight}
+struct FitNormal <: OnlineStat{0, EqualWeight}
     var::Variance
     FitNormal() = new(Variance())
 end
@@ -165,19 +139,14 @@ end
 #---------------------------------------------------------------------------------# Multinomial
 # TODO: Allow each observation to have a different n
 """
-```julia
-FitMultinomial(p)
-```
+    FitMultinomial(p)
 Online parameter estimate of a Multinomial distribution.
-### Example
-```julia
-using Distributions
-y = rand(Multinomial(10, [.2, .2, .6]), 1000)
-s = Series(y', FitMultinomial())
-Multinomial(value(s)...)
-```
+    using Distributions
+    y = rand(Multinomial(10, [.2, .2, .6]), 1000)
+    s = Series(y', FitMultinomial())
+    Multinomial(value(s)...)
 """
-mutable struct FitMultinomial <: OnlineStat{1, 1, EqualWeight}
+mutable struct FitMultinomial <: OnlineStat{1, EqualWeight}
     mvmean::MV{Mean}
     nobs::Int
     FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
@@ -198,18 +167,13 @@ function _value(o::FitMultinomial)
 end
 #---------------------------------------------------------------------------------# MvNormal
 """
-```julia
-FitMvNormal(d)
-```
+    FitMvNormal(d)
 Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE)
-### Example
-```julia
-using Distributions
-y = rand(MvNormal(zeros(3), eye(3)), 1000)
-s = Series(y', FitMvNormal(3))
-```
+    using Distributions
+    y = rand(MvNormal(zeros(3), eye(3)), 1000)
+    s = Series(y', FitMvNormal(3))
 """
-struct FitMvNormal<: OnlineStat{1, (1, 2), EqualWeight}
+struct FitMvNormal<: OnlineStat{1, EqualWeight}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end
