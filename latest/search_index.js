@@ -229,15 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Bootstrap",
     "category": "Type",
-    "text": "Bootstrap(s::Series, nreps, d, f = value)\n\nOnline Statistical Bootstrapping.\n\nCreate nreps replicates of the OnlineStat in Series s.  When fit! is called, each of the replicates will be updated rand(d) times.  Standard choices for d are Distributions.Poisson(), [0, 2], etc.  value(b) returns f mapped to the replicates.\n\nExample\n\nb = Bootstrap(Series(Mean()), 100, [0, 2])\nfit!(b, randn(1000))\nvalue(b)        # `f` mapped to replicates\nmean(value(b))  # mean\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Diff",
-    "page": "API",
-    "title": "OnlineStats.Diff",
-    "category": "Type",
-    "text": "Diff()\n\nTrack the difference and the last value.\n\nExample\n\ns = Series(randn(1000), Diff())\nvalue(s)\n\n\n\n"
+    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2], f = value)\n\nOnline Statistical Bootstrapping.  Create nreps replicates of the OnlineStat o. When fit! is called, each of the replicates will be updated rand(d) times. value(b::Bootstrap) returns f mapped to the replicates.\n\nb = Bootstrap(Mean())\nfit!(b, randn(1000))\nvalue(b)        # `f` mapped to replicates\nmean(value(b))  # mean\n\n\n\n"
 },
 
 {
@@ -245,23 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitCategorical",
     "category": "Type",
-    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.\n\nExample\n\nusing Distributions\ns = Series(rand(1:10, 1000), FitCategorical(Int))\nvalue(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.MV",
-    "page": "API",
-    "title": "OnlineStats.MV",
-    "category": "Type",
-    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.OHistogram",
-    "page": "API",
-    "title": "OnlineStats.OHistogram",
-    "category": "Type",
-    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.\n\nExample\n\ny = randn(100)\ns = Series(y, OHistogram(-4:.1:4))\nvalue(s)\n\n\n\n"
+    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.     using Distributions     s = Series(rand(1:10, 1000), FitCategorical(Int))     value(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -273,35 +249,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.ReservoirSample",
-    "page": "API",
-    "title": "OnlineStats.ReservoirSample",
-    "category": "Type",
-    "text": "ReservoirSample(k)\nReservoirSample(k, Float64)\n\nReservoir sample of k items.\n\nExample\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.StatLearn",
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
-    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Vector of element-wise regularization parameters\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.StochasticLoss",
-    "page": "API",
-    "title": "OnlineStats.StochasticLoss",
-    "category": "Type",
-    "text": "    s = Series(randn(1000), StochasticLoss(QuantileLoss(.7)))\n\nMinimize a loss (from LossFunctions.jl) using stochastic gradient descent.\n\nExample\n\no1 = StochasticLoss(QuantileLoss(.7))  # approx. .7 quantile\no2 = StochasticLoss(L2DistLoss())      # approx. mean\no3 = StochasticLoss(L1DistLoss())      # approx. median\ns = Series(randn(10_000), o1, o2, o3)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Sum",
-    "page": "API",
-    "title": "OnlineStats.Sum",
-    "category": "Type",
-    "text": "Sum()\n\nTrack the overall sum.\n\nExample\n\ns = Series(randn(1000), Sum())\nvalue(s)\n\n\n\n"
+    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Vector of element-wise regularization parameters\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\nusing LossFunctions, PenaltyFunctions   x = randn(100_000, 10)   y = x * linspace(-1, 1, 10) + randn(100_000)   o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())   s = Series(o)   fit!(s, x, y)   coef(o)   predict(o, x)\n\n\n\n"
 },
 
 {
@@ -337,27 +289,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.CovMatrix",
-    "page": "API",
-    "title": "OnlineStats.CovMatrix",
-    "category": "Type",
-    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.\n\nExample\n\ny = randn(100, 5)\nSeries(y, CovMatrix(5))\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Extrema",
-    "page": "API",
-    "title": "OnlineStats.Extrema",
-    "category": "Type",
-    "text": "Extrema()\n\nMaximum and minimum.\n\nExample\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.FitBeta",
     "page": "API",
     "title": "OnlineStats.FitBeta",
     "category": "Type",
-    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments)\n\nExample\n\nusing Distributions, OnlineStats\ny = rand(Beta(3, 5), 1000)\ns = Series(y, FitBeta())\nBeta(value(s)...)\n\n\n\n"
+    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments)     using Distributions, OnlineStats     y = rand(Beta(3, 5), 1000)     s = Series(y, FitBeta())     Beta(value(s)...)\n\n\n\n"
 },
 
 {
@@ -365,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitCauchy",
     "category": "Type",
-    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution\n\nExample\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\ns = Series(y, FitCauchy())\nCauchy(value(s)...)\n\n\n\n"
+    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution     using Distributions     y = rand(Cauchy(0, 10), 10_000)     s = Series(y, FitCauchy())     Cauchy(value(s)...)\n\n\n\n"
 },
 
 {
@@ -373,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitGamma",
     "category": "Type",
-    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments)\n\nExample\n\nusing Distributions\ny = rand(Gamma(5, 1), 1000)\ns = Series(y, FitGamma())\nGamma(value(s)...)\n\n\n\n"
+    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments)     using Distributions     y = rand(Gamma(5, 1), 1000)     s = Series(y, FitGamma())     Gamma(value(s)...)\n\n\n\n"
 },
 
 {
@@ -381,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitLogNormal",
     "category": "Type",
-    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE)\n\nExample\n\nusing Distributions\ny = rand(LogNormal(3, 4), 1000)\ns = Series(y, FitLogNormal())\nLogNormal(value(s)...)\n\n\n\n"
+    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE)     using Distributions     y = rand(LogNormal(3, 4), 1000)     s = Series(y, FitLogNormal())     LogNormal(value(s)...)\n\n\n\n"
 },
 
 {
@@ -389,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "Type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.\n\nExample\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\ns = Series(y', FitMultinomial())\nMultinomial(value(s)...)\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.     using Distributions     y = rand(Multinomial(10, [.2, .2, .6]), 1000)     s = Series(y', FitMultinomial())     Multinomial(value(s)...)\n\n\n\n"
 },
 
 {
@@ -397,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "Type",
-    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE)\n\nExample\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\ns = Series(y', FitMvNormal(3))\n\n\n\n"
+    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE)     using Distributions     y = rand(MvNormal(zeros(3), eye(3)), 1000)     s = Series(y', FitMvNormal(3))\n\n\n\n"
 },
 
 {
@@ -405,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "Type",
-    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE)\n\nExample\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\ns = Series(y, FitNormal())\n\n\n\n"
+    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE)     using Distributions     y = rand(Normal(-3, 4), 1000)     s = Series(y, FitNormal())\n\n\n\n"
 },
 
 {
@@ -413,15 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
     "category": "Type",
-    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\ns = Series(rand(1:10, 1000), HyperLogLog(12))\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.KMeans",
-    "page": "API",
-    "title": "OnlineStats.KMeans",
-    "category": "Type",
-    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters of p variables\n\nExample\n\nusing OnlineStats, Distributions\nd = MixtureModel([Normal(0), Normal(5)])\ny = rand(d, 100_000, 1)\ns = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
+    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.     s = Series(rand(1:10, 1000), HyperLogLog(12))     value(s)\n\n\n\n"
 },
 
 {
@@ -446,22 +374,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.MSPIF",
     "category": "Type",
     "text": "Experimental: MSPI-full matrix\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Mean",
-    "page": "API",
-    "title": "OnlineStats.Mean",
-    "category": "Type",
-    "text": "Mean()\n\nUnivariate mean.\n\nExample\n\ns = Series(randn(100), Mean())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Moments",
-    "page": "API",
-    "title": "OnlineStats.Moments",
-    "category": "Type",
-    "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -497,22 +409,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.OrderStats",
-    "page": "API",
-    "title": "OnlineStats.OrderStats",
-    "category": "Type",
-    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.QuantileMM",
-    "page": "API",
-    "title": "OnlineStats.QuantileMM",
-    "category": "Type",
-    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.\n\nExample\n\ns = Series(randn(1000), LearningRate(.7), QuantileMM())\nvalue(s)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.SGD",
     "page": "API",
     "title": "OnlineStats.SGD",
@@ -529,27 +425,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.Variance",
-    "page": "API",
-    "title": "OnlineStats.Variance",
-    "category": "Type",
-    "text": "Variance()\n\nUnivariate variance.\n\nExample\n\ns = Series(randn(100), Variance())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#LearnBase.value-Tuple{OnlineStatsBase.Series}",
-    "page": "API",
-    "title": "LearnBase.value",
-    "category": "Method",
-    "text": "Map value to the stats field of a Series.\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.maprows-Tuple{Function,Integer,Vararg{Any,N} where N}",
     "page": "API",
     "title": "OnlineStats.maprows",
     "category": "Method",
-    "text": "maprows(f::Function, b::Integer, data...)\n\nMap rows of data in batches of size b.  Most usage is done through do blocks.\n\nExample\n\ns = Series(Mean())\nmaprows(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
+    "text": "maprows(f::Function, b::Integer, data...)\n\nMap rows of data in batches of size b.  Most usage is done through do blocks.     s = Series(Mean())     maprows(10, randn(100)) do yi         fit!(s, yi)         info(\"nobs: nobs(s)\")     end\n\n\n\n"
 },
 
 {
@@ -561,27 +441,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.stats-Tuple{OnlineStatsBase.Series}",
-    "page": "API",
-    "title": "OnlineStats.stats",
-    "category": "Method",
-    "text": "Return the stats field of a Series.\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#StatsBase.confint",
     "page": "API",
     "title": "StatsBase.confint",
     "category": "Function",
     "text": "confint(b, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#StatsBase.fit!",
-    "page": "API",
-    "title": "StatsBase.fit!",
-    "category": "Function",
-    "text": "fit!(s, y)\nfit!(s, y, w)\n\nUpdate a Series s with more data y and optional weighting w.\n\nExamples\n\ny = randn(100)\nw = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])        # one observation: use Series weight\nfit!(s, y[1], w[1])  # one observation: override weight\nfit!(s, y)           # multiple observations: use Series weight\nfit!(s, y, w[1])     # multiple observations: override each weight with w[1]\nfit!(s, y, w)        # multiple observations: y[i] uses weight w[i]\n\n\n\n"
 },
 
 {
@@ -593,11 +457,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.OnlineStat",
+    "location": "pages/api.html#OnlineStatsBase.Diff",
     "page": "API",
-    "title": "OnlineStatsBase.OnlineStat",
+    "title": "OnlineStatsBase.Diff",
     "category": "Type",
-    "text": "OnlineStat{I, O, W} is an abstract type parameterized by the input and output type/dimension I and O as well as the default weight type W. The supported I and O value are:     0       = Union{Number, Symbol, AbstractString} (ScalarOb)     1       = AbstractVector or Tuple     2       = AbstractMatrix     -1      = unknown     (1, 0)  = (x, y) pair of (vector, scalar)\n\n\n\nA new OnlineStat should define StatsBase.fit!(o::MyStat, y::InputType, w::Float64)whereInputTypedepends onI`\n\n\n\nIf the OnlineStat is mergeable, it should define\n\nmerge!(o1::MyStat, o2::MyStat, w::Float64)\n\nwhere w is the influence (between 0 and 1) o2 should have on o1\n\n\n\nIf the OnlineStat's value is not updated with fit!, it should define _value(o), which calculates the value\n\n\n\n"
+    "text": "Diff()\n\nTrack the difference and the last value.     s = Series(randn(1000), Diff())     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.MV",
+    "page": "API",
+    "title": "OnlineStatsBase.MV",
+    "category": "Type",
+    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o     y = randn(1000, 5)     o = MV(5, Mean())     s = Series(y, o)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.OHistogram",
+    "page": "API",
+    "title": "OnlineStatsBase.OHistogram",
+    "category": "Type",
+    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.     y = randn(100)     s = Series(y, OHistogram(-4:.1:4))     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.ReservoirSample",
+    "page": "API",
+    "title": "OnlineStatsBase.ReservoirSample",
+    "category": "Type",
+    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.     o = ReservoirSample(k, Int)     s = Series(o)     fit!(s, 1:10000)\n\n\n\n"
 },
 
 {
@@ -606,6 +494,22 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.Scaled",
     "category": "Type",
     "text": "Scaled(weight, λ)\nλ * weight\n\nScale a weight by a constant.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Sum",
+    "page": "API",
+    "title": "OnlineStatsBase.Sum",
+    "category": "Type",
+    "text": "Sum()\n\nTrack the overall sum.     s = Series(randn(1000), Sum())     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.CovMatrix",
+    "page": "API",
+    "title": "OnlineStatsBase.CovMatrix",
+    "category": "Type",
+    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.     y = randn(100, 5)     Series(y, CovMatrix(5))\n\n\n\n"
 },
 
 {
@@ -625,11 +529,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.Extrema",
+    "page": "API",
+    "title": "OnlineStatsBase.Extrema",
+    "category": "Type",
+    "text": "Extrema()\n\nMaximum and minimum.     s = Series(randn(100), Extrema())     value(s)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.HarmonicWeight",
     "page": "API",
     "title": "OnlineStatsBase.HarmonicWeight",
     "category": "Type",
     "text": "HarmonicWeight(a = 10.0)\n\nDecreases at a slow rate\nWeight at observation t is γ = a / (a + t - 1)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.KMeans",
+    "page": "API",
+    "title": "OnlineStatsBase.KMeans",
+    "category": "Type",
+    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables     using OnlineStats, Distributions     d = MixtureModel([Normal(0), Normal(5)])     y = rand(d, 100_000, 1)     s = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
 },
 
 {
@@ -657,11 +577,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Series",
+    "location": "pages/api.html#OnlineStatsBase.Mean",
     "page": "API",
-    "title": "OnlineStatsBase.Series",
+    "title": "OnlineStatsBase.Mean",
     "category": "Type",
-    "text": "Series(stats...)\nSeries(data, stats...)\nSeries(weight, stats...)\nSeries(weight, data, stats...)\n\nA Series is a container for a Weight and any number of OnlineStats.  Updating the Series with fit!(s, data) will update the OnlineStats it holds according to its Weight.\n\nExamples\n\nSeries(randn(100), Mean(), Variance())\nSeries(ExponentialWeight(.1), Mean())\n\ns = Series(Mean())\nfit!(s, randn(100))\ns2 = Series(randn(123), Mean())\nmerge(s, s2)\n\n\n\n"
+    "text": "Mean()\n\nUnivariate mean.     s = Series(randn(100), Mean())     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Moments",
+    "page": "API",
+    "title": "OnlineStatsBase.Moments",
+    "category": "Type",
+    "text": "Moments()\n\nFirst four non-central moments.     s = Series(randn(1000), Moments(10))     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.OrderStats",
+    "page": "API",
+    "title": "OnlineStatsBase.OrderStats",
+    "category": "Type",
+    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.     s = Series(randn(1000), OrderStats(10))     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.QuantileMM",
+    "page": "API",
+    "title": "OnlineStatsBase.QuantileMM",
+    "category": "Type",
+    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.     s = Series(randn(1000), QuantileMM())     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Variance",
+    "page": "API",
+    "title": "OnlineStatsBase.Variance",
+    "category": "Type",
+    "text": "Variance()\n\nUnivariate variance.     s = Series(randn(100), Variance())     value(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#StatsBase.fit!",
+    "page": "API",
+    "title": "StatsBase.fit!",
+    "category": "Function",
+    "text": "fit!(s, y)\nfit!(s, y, w)\n\nUpdate a Series s with more data y and optional weighting w.     y = randn(100)     w = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])        # one observation: use Series weight\nfit!(s, y[1], w[1])  # one observation: override weight\nfit!(s, y)           # multiple observations: use Series weight\nfit!(s, y, w[1])     # multiple observations: override each weight with w[1]\nfit!(s, y, w)        # multiple observations: y[i] uses weight w[i]\n\n\n\n"
 },
 
 {
