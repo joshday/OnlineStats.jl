@@ -7,21 +7,17 @@ import OnlineStatsBase: VectorOb, smooth, smooth!, smooth_syr!, ϵ, default_weig
 import LearnBase: ObsDimension, value
 import SweepOperator
 
-using Reexport, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
-@reexport using OnlineStatsBase
+using Reexport, RecipesBase
+@reexport using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
 
 export
     # functions
     maprows, confint, coeftable, vcov, mse, stderr,
-    # OnlineStats
-    Quantiles,
-    # Updaters
-    SGD, MSPI, OMAS,
-    # statlearn things
-    # StatLearn,
-    # SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
-    # OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF, SPI,
-    # loss, objective, classify, statlearnpath,
+    # Statlearn and Updaters
+    StatLearn,
+    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
+    OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF,
+    loss, objective, classify, statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal
@@ -77,30 +73,13 @@ end
     v
 end
 
-#-----------------------------------------------------------------------# Updaters
-abstract type Updater end
-abstract type SGUpdater <: Updater end
 
-Base.show(io::IO, u::Updater) = print(io, name(u, false, false))
-Base.:(==)(u1::Updater, u2::Updater) = (typeof(u1) == typeof(u2))
 
-updater_init!(o::OnlineStat) = nothing
-
-struct SGD <: SGUpdater end
-
-struct MSPI <: Updater end
-
-struct OMAP <: Updater end
-
-struct OMAS{T <: Tuple} <: Updater
-    suffvalues::T
-end
-OMAS(args...) = OMAS(args)
 
 #-----------------------------------------------------------------------# source files
 # include("quantile.jl")
 include("distributions.jl")
-# include("xyinput/statlearn.jl")
+include("statlearn.jl")
 # include("xyinput/linreg.jl")
 
 end # module

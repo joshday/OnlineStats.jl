@@ -7,7 +7,10 @@ const SVMLike               = L1HingeLoss
 const QuantileRegression    = QuantileLoss
 const DWDLike               = DWDMarginLoss
 
+
 #-----------------------------------------------------------------------------# StatLearn
+abstract type Updater end
+abstract type SGUpdater <: Updater end
 init(u::Updater, p) = u
 
 
@@ -88,19 +91,25 @@ end
 function gradient!(o::StatLearn, x::AVec, y::Real)
     xβ = dot(x, o.β)
     g = deriv(o.loss, y, xβ)
-    o.gx .= g .* x
-end
-function gradient!(o::StatLearn, x::AMat, y::AVec)
-    xβ = x * o.β
-    g = deriv(o.loss, y, xβ)
-    @inbounds for j in eachindex(o.gx)
-        o.gx[j] = 0.0
-        for i in eachindex(y)
-            o.gx[j] += g[i] * x[i, j]
-        end
+    gx = o.gx
+    for i in eachindex(gx)
+        @inbounds gx[i] = g * x[i]
     end
-    scale!(o.gx, 1 / length(y))
 end
+# Batch version (unused)
+# function gradient!(o::StatLearn, x::AMat, y::AVec)
+#     xβ = x * o.β
+#     g = deriv(o.loss, y, xβ)
+#     @inbounds for j in eachindex(o.gx)
+#         o.gx[j] = 0.0
+#         for i in eachindex(y)
+#             o.gx[j] += g[i] * x[i, j]
+#         end
+#     end
+#     scale!(o.gx, 1 / length(y))
+# end
+
+
 function fit!(o::StatLearn{<:SGUpdater}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     update!(o, γ)
@@ -110,141 +119,123 @@ end
 
 #-----------------------------------------------------------------------# SGD
 """
-    SGD(η, α=0.0)
-Stochastic Proximal Gradient Descent with step size `η` and momentum term `α`.
+    SGD()
+Proximal Stochastic Gradient Descent.
 """
-struct SGD <: SGUpdater
-    η::Float64
-    α::Float64
-    v::VecF
-    SGD(η::Real = 1.0, α = 0.0, p = 0) = new(η, α, zeros(p))
-end
-Base.show(io::IO, u::SGD) = print(io, "SGD(η = $(u.η), α = $(u.α))")
-init(u::SGD, p) = SGD(u.η, u.α, p)
+struct SGD <: SGUpdater end
 function update!(o::StatLearn{SGD}, γ)
-    U = o.updater
-    γη = γ * U.η
     for j in eachindex(o.β)
-        U.v[j] = U.α * U.v[j] + γη * o.gx[j]
-        @inbounds o.β[j] = prox(o.penalty, o.β[j] - U.v[j], γη * o.λfactor[j])
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λfactor[j])
     end
 end
 #-----------------------------------------------------------------------# NSGD
 """
-    NSGD(η, α)
-Nesterov accelerated Stochastic Proximal Gradient Descent.
+    NSGD(α)
+Nesterov accelerated Proximal Stochastic Gradient Descent.
 """
 struct NSGD <: SGUpdater
-    η::Float64
     α::Float64
     v::VecF
     θ::VecF
-    NSGD(η::Real = 1.0, α = 0.0, p = 0) = new(η, α, zeros(p), zeros(p))
+    NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
 end
-init(u::NSGD, p) = NSGD(u.η, u.α, p)
+init(u::NSGD, p) = NSGD(u.α, p)
 function fit!(o::StatLearn{NSGD}, x::AVec, y::Real, γ::Float64)
     U = o.updater
-    γη = γ * U.η
     for j in eachindex(o.β)
         U.θ[j] = o.β[j] - U.α * U.v[j]
     end
     ŷ = x'U.θ
     for j in eachindex(o.β)
-        U.v[j] = U.α * U.v[j] + U.η * deriv(o.loss, y, ŷ) * x[j]
-        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γη * o.λfactor[j])
+        U.v[j] = U.α * U.v[j] + deriv(o.loss, y, ŷ) * x[j]
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
     end
 end
 
 #-----------------------------------------------------------------------# ADAGRAD
 """
-    ADAGRAD(η)
-Adaptive (element-wise learning rate) SPGD with step size `η`
+    ADAGRAD()
+Adaptive (element-wise learning rate) stochastic proximal gradient descent.
 """
 mutable struct ADAGRAD <: SGUpdater
-    η::Float64
     H::VecF
     n::Int
-    ADAGRAD(η::Float64 = 1.0, p::Integer = 0) = new(η, zeros(p), 0)
+    ADAGRAD(p::Integer = 0) = new(zeros(p), 0)
 end
-init(u::ADAGRAD, p) = ADAGRAD(u.η, p)
+init(u::ADAGRAD, p) = ADAGRAD(p)
 function update!(o::StatLearn{ADAGRAD}, γ)
     U = o.updater
     U.n += 1
     @inbounds for j in eachindex(o.β)
         U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, 1 / U.n)
-        s = U.η * γ * inv(sqrt(U.H[j] + ϵ))
+        s = γ * inv(sqrt(U.H[j] + ϵ))
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
 end
 
 #-----------------------------------------------------------------------# ADADELTA
 """
-    ADADELTA(η = 1.0, ρ = .95)
+    ADADELTA(ρ = .95)
 ADADELTA ignores weight.
 """
 mutable struct ADADELTA <: SGUpdater
-    η::Float64
     ρ::Float64
     g::Vector{Float64}
     Δβ::Vector{Float64}
-    ADADELTA(η = 1.0, ρ = .95, p = 0) = new(η, ρ, zeros(p), zeros(p))
+    ADADELTA(ρ = .95, p = 0) = new(ρ, zeros(p), zeros(p))
 end
-init(u::ADADELTA, p) = ADADELTA(u.η, u.ρ, p)
+init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
 function update!(o::StatLearn{ADADELTA}, γ)
     U = o.updater
     ϵ = .0001
     for j in eachindex(o.β)
         U.g[j] = smooth(o.gx[j]^2, U.g[j], U.ρ)
-        # U.ρ * U.g[j] + (1 - U.ρ) * o.gx[j]^2
-        Δβ = U.η * sqrt(U.Δβ[j] + ϵ) / sqrt(U.g[j] + ϵ) * o.gx[j]
+        Δβ = sqrt(U.Δβ[j] + ϵ) / sqrt(U.g[j] + ϵ) * o.gx[j]
         o.β[j] -= Δβ
         U.Δβ[j] = smooth(Δβ^2, U.Δβ[j], U.ρ)
-        # U.ρ * U.Δβ[j] + (1 - U.ρ) * Δβ^2
     end
 end
 
 #-----------------------------------------------------------------------# RMSPROP
 mutable struct RMSPROP <: SGUpdater
-    η::Float64
     α::Float64
     g::Vector{Float64}
-    RMSPROP(η = 1.0, α = .9, p = 0) = new(η, α, zeros(p))
+    RMSPROP(α = .9, p = 0) = new(α, zeros(p))
 end
-init(u::RMSPROP, p) = RMSPROP(u.η, u.α, p)
+init(u::RMSPROP, p) = RMSPROP(u.α, p)
 function update!(o::StatLearn{RMSPROP}, γ)
     U = o.updater
     for j in eachindex(o.β)
         U.g[j] = U.α * U.g[j] + (1 - U.α) * o.gx[j]^2
-        o.β[j] -= γ * U.η * o.gx[j] / sqrt(U.g[j] + ϵ)
+        o.β[j] -= γ * o.gx[j] / sqrt(U.g[j] + ϵ)
     end
 
 end
 
 #-----------------------------------------------------------------------# ADAM
 """
-    ADAM(η, α1, α2)
-Adaptive Moment Estimation with step size `η` and momentum parameters `α1`, `α2`
+    ADAM(α1, α2)
+Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
 """
 mutable struct ADAM <: SGUpdater
     β1::Float64
     β2::Float64
-    η::Float64
     M::VecF
     V::VecF
     nups::Int
-    function ADAM(η::Float64 = 1.0, β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
+    function ADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
         @assert 0 < β1 < 1
         @assert 0 < β2 < 1
-        new(β1, β2, η, zeros(p), zeros(p), 0)
+        new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAM, p) = ADAM(u.η, u.β1, u.β2, p)
+init(u::ADAM, p) = ADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAM}, γ)
     U = o.updater
     β1 = U.β1
     β2 = U.β2
     U.nups += 1
-    s = γ * U.η * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
+    s = γ * sqrt(1 - β2 ^ U.nups) / (1 - β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
         U.M[j] = smooth(gx, U.M[j], U.β1)
@@ -261,21 +252,20 @@ ADAMAX with step size `η` and momentum parameters `β1`, `β2`
 mutable struct ADAMAX <: SGUpdater
     β1::Float64
     β2::Float64
-    η::Float64
     M::VecF
     V::VecF
     nups::Int
-    function ADAMAX(η::Float64 = 1.0, β1::Float64 = 0.9, β2::Float64 = .999, p::Integer = 0)
+    function ADAMAX(β1::Float64 = 0.9, β2::Float64 = .999, p::Integer = 0)
         @assert 0 < β1 < 1
         @assert 0 < β2 < 1
-        new(β1, β2, η, zeros(p), zeros(p), 0)
+        new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAMAX, p) = ADAMAX(u.η, u.β1, u.β2, p)
+init(u::ADAMAX, p) = ADAMAX(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAMAX}, γ)
     U = o.updater
     U.nups += 1
-    s = U.η * γ * sqrt(1 - U.β2 ^ U.nups) / (1 - U.β1 ^ U.nups)
+    s = γ * sqrt(1 - U.β2 ^ U.nups) / (1 - U.β1 ^ U.nups)
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
         U.M[j] = smooth(gx, U.M[j], U.β1)
@@ -286,36 +276,34 @@ end
 
 #-----------------------------------------------------------------------# NADAM
 """
-    NADAM(η, α1, α2)
-Adaptive Moment Estimation with step size `η` and momentum parameters `α1`, `α2`
+    NADAM(α1, α2)
+Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
 """
 mutable struct NADAM <: SGUpdater
     β1::Float64
     β2::Float64
-    η::Float64
     M::VecF
     V::VecF
     nups::Int
-    function NADAM(η::Float64 = 1.0, β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
+    function NADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
         @assert 0 < β1 < 1
         @assert 0 < β2 < 1
-        new(β1, β2, η, zeros(p), zeros(p), 0)
+        new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
-init(u::NADAM, p) = NADAM(u.η, u.β1, u.β2, p)
+init(u::NADAM, p) = NADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{NADAM}, γ)
     U = o.updater
     β1 = U.β1
     β2 = U.β2
     U.nups += 1
-    ηγ = γ * U.η
     @inbounds for j in eachindex(o.β)
         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
         U.M[j] = smooth(gx, U.M[j], U.β1)
         U.V[j] = smooth(gx ^ 2, U.V[j], U.β2)
         mt = U.M[j] / (1 - U.β1 ^ U.nups)
         vt = U.V[j] / (1 - U.β2 ^ U.nups)
-        Δ = ηγ / (sqrt(vt + ϵ)) * (U.β1 * mt + (1 - U.β1) / (1 - U.β1^U.nups) * gx)
+        Δ = γ / (sqrt(vt + ϵ)) * (U.β1 * mt + (1 - U.β1) / (1 - U.β1^U.nups) * gx)
         o.β[j] -= Δ
     end
 end
@@ -422,48 +410,42 @@ function fit!(o::StatLearn{OMAPQF}, x::VectorOb, y::Real, γ::Float64)
 end
 
 #-----------------------------------------------------------------------# MSPIC
-"Experimental: MSPI-constant"
-struct MSPIC <: Updater
-    η::Float64
-    MSPIC(η::Real = 1.) = new(η)
-end
+"""
+    MSPIC()
+MSPI-Q algorithm using a Lipschitz constant to majorize the objective.
+"""
+struct MSPIC <: Updater end
 function fit!(o::StatLearn{MSPIC}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
-    ηγ = o.updater.η * γ
-    denom = inv(1 + ηγ * constH(o, x, y))
+    denom = inv(1 + γ * constH(o, x, y))
     for j in eachindex(o.β)
-        @inbounds o.β[j] -= ηγ * denom * o.gx[j]
+        @inbounds o.β[j] -= γ * denom * o.gx[j]
     end
 end
 
 #-----------------------------------------------------------------------# MSPIF
 "Experimental: MSPI-full matrix"
 struct MSPIF <: Updater
-    η::Float64
     H::Matrix{Float64}
-    MSPIF(η::Real = 1., p = 0) = new(η, zeros(p, p))
+    MSPIF(p = 0) = new(zeros(p, p))
 end
-init(u::MSPIF, p) = MSPIF(u.η, p)
+init(u::MSPIF, p) = MSPIF(p)
 function fit!(o::StatLearn{MSPIF}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
-    ηγ = o.updater.η * γ
     fullH!(o, x, y)
-    o.β[:] = o.β - ηγ * ((I + ηγ * o.updater.H) \ o.gx)
+    o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
 end
 
 
 
 
-#-----------------------------------------------------------------------# SPI
-"Stochastic Proximal Iteration"
-struct SPI <: Updater
-    η::Float64
-    SPI(η::Real=1.0) = new(η)
-end
-fit!(o::StatLearn{SPI}, x, y, γ) = spi!(o, x, y, γ * o.updater.η)
-
-spi!(o::StatLearn, x, y, γ) = error("$(o.loss) is not defined for SPI")
-function spi!(o::StatLearn{SPI, LinearRegression}, x, y, γ)
-    o.β[:] = (I + γ * x * x') \ (o.β + γ * y * x)
-end
-spi!(o::StatLearn{SPI, L2DistLoss}, x, y, γ) = (o.β[:] = (I + 2γ * x * x') \ (o.β + 2γ * y * x))
+# #-----------------------------------------------------------------------# SPI
+# "Stochastic Proximal Iteration"
+# struct SPI <: Updater end
+# fit!(o::StatLearn{SPI}, x, y, γ) = spi!(o, x, y, γ)
+#
+# spi!(o::StatLearn, x, y, γ) = error("$(o.loss) is not defined for SPI")
+# function spi!(o::StatLearn{SPI, LinearRegression}, x, y, γ)
+#     o.β[:] = (I + γ * x * x') \ (o.β + γ * y * x)
+# end
+# spi!(o::StatLearn{SPI, L2DistLoss}, x, y, γ) = (o.β[:] = (I + 2γ * x * x') \ (o.β + 2γ * y * x))
