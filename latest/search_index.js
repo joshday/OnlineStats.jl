@@ -213,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles Quantiles\nquantiles via Online MM QuantileMM\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\napproximate order statistics OrderStatistics\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napproximate count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles QuantileMM, QuantileMSPI, QuantileSGD\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\napproximate order statistics OrderStats\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napprox. count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
 },
 
 {
@@ -225,11 +225,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitCategorical",
+    "location": "pages/api.html#OnlineStats.ADADELTA",
     "page": "API",
-    "title": "OnlineStats.FitCategorical",
+    "title": "OnlineStats.ADADELTA",
     "category": "Type",
-    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.     using Distributions     s = Series(rand(1:10, 1000), FitCategorical(Int))     value(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
+    "text": "ADADELTA(ρ = .95)\n\nADADELTA ignores weight.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.ADAGRAD",
+    "page": "API",
+    "title": "OnlineStats.ADAGRAD",
+    "category": "Type",
+    "text": "ADAGRAD()\n\nAdaptive (element-wise learning rate) stochastic proximal gradient descent.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.ADAM",
+    "page": "API",
+    "title": "OnlineStats.ADAM",
+    "category": "Type",
+    "text": "ADAM(α1, α2)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.ADAMAX",
+    "page": "API",
+    "title": "OnlineStats.ADAMAX",
+    "category": "Type",
+    "text": "ADAMAX(η, β1, β2)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
 },
 
 {
@@ -238,6 +262,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.FitBeta",
     "category": "Type",
     "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments)     using Distributions, OnlineStats     y = rand(Beta(3, 5), 1000)     s = Series(y, FitBeta())     Beta(value(s)...)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.FitCategorical",
+    "page": "API",
+    "title": "OnlineStats.FitCategorical",
+    "category": "Type",
+    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.     using Distributions     s = Series(rand(1:10, 1000), FitCategorical(Int))     value(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -289,6 +321,70 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.MSPIC",
+    "page": "API",
+    "title": "OnlineStats.MSPIC",
+    "category": "Type",
+    "text": "MSPIC()\n\nMSPI-Q algorithm using a Lipschitz constant to majorize the objective.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.MSPIF",
+    "page": "API",
+    "title": "OnlineStats.MSPIF",
+    "category": "Type",
+    "text": "Experimental: MSPI-full matrix\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.NADAM",
+    "page": "API",
+    "title": "OnlineStats.NADAM",
+    "category": "Type",
+    "text": "NADAM(α1, α2)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.NSGD",
+    "page": "API",
+    "title": "OnlineStats.NSGD",
+    "category": "Type",
+    "text": "NSGD(α)\n\nNesterov accelerated Proximal Stochastic Gradient Descent.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.OMASQ",
+    "page": "API",
+    "title": "OnlineStats.OMASQ",
+    "category": "Type",
+    "text": "Experimental: OMM-constant\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.OMASQF",
+    "page": "API",
+    "title": "OnlineStats.OMASQF",
+    "category": "Type",
+    "text": "Experimental: OMM-full matrix\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.SGD",
+    "page": "API",
+    "title": "OnlineStats.SGD",
+    "category": "Type",
+    "text": "SGD()\n\nProximal Stochastic Gradient Descent.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.StatLearn",
+    "page": "API",
+    "title": "OnlineStats.StatLearn",
+    "category": "Type",
+    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Vector of element-wise regularization parameters\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\nusing LossFunctions, PenaltyFunctions   x = randn(100_000, 10)   y = x * linspace(-1, 1, 10) + randn(100_000)   o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())   s = Series(o)   fit!(s, x, y)   coef(o)   predict(o, x)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.maprows-Tuple{Function,Integer,Vararg{Any,N} where N}",
     "page": "API",
     "title": "OnlineStats.maprows",
@@ -313,59 +409,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Diff",
-    "page": "API",
-    "title": "OnlineStatsBase.Diff",
-    "category": "Type",
-    "text": "Diff()\n\nTrack the difference and the last value.     s = Series(randn(1000), Diff())     value(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStatsBase.MV",
-    "page": "API",
-    "title": "OnlineStatsBase.MV",
-    "category": "Type",
-    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o     y = randn(1000, 5)     o = MV(5, Mean())     s = Series(y, o)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStatsBase.OHistogram",
-    "page": "API",
-    "title": "OnlineStatsBase.OHistogram",
-    "category": "Type",
-    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.     y = randn(100)     s = Series(y, OHistogram(-4:.1:4))     value(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStatsBase.ReservoirSample",
-    "page": "API",
-    "title": "OnlineStatsBase.ReservoirSample",
-    "category": "Type",
-    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.     o = ReservoirSample(k, Int)     s = Series(o)     fit!(s, 1:10000)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStatsBase.Scaled",
-    "page": "API",
-    "title": "OnlineStatsBase.Scaled",
-    "category": "Type",
-    "text": "Scaled(weight, λ)\nλ * weight\n\nScale a weight by a constant.\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStatsBase.Sum",
-    "page": "API",
-    "title": "OnlineStatsBase.Sum",
-    "category": "Type",
-    "text": "Sum()\n\nTrack the overall sum.     s = Series(randn(1000), Sum())     value(s)\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStatsBase.CovMatrix",
     "page": "API",
     "title": "OnlineStatsBase.CovMatrix",
     "category": "Type",
     "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.     y = randn(100, 5)     Series(y, CovMatrix(5))\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Diff",
+    "page": "API",
+    "title": "OnlineStatsBase.Diff",
+    "category": "Type",
+    "text": "Diff()\n\nTrack the difference and the last value.     s = Series(randn(1000), Diff())     value(s)\n\n\n\n"
 },
 
 {
@@ -433,6 +489,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.LinReg",
+    "page": "API",
+    "title": "OnlineStatsBase.LinReg",
+    "category": "Type",
+    "text": "LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nLinReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.     x = randn(100, 10)     y = x * linspace(-1, 1, 10) + randn(100)     o = LinReg(10)     Series((x,y), o)     value(o)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.MV",
+    "page": "API",
+    "title": "OnlineStatsBase.MV",
+    "category": "Type",
+    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o     y = randn(1000, 5)     o = MV(5, Mean())     s = Series(y, o)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.McclainWeight",
     "page": "API",
     "title": "OnlineStatsBase.McclainWeight",
@@ -457,6 +529,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.OHistogram",
+    "page": "API",
+    "title": "OnlineStatsBase.OHistogram",
+    "category": "Type",
+    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.     y = randn(100)     s = Series(y, OHistogram(-4:.1:4))     value(s)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.OrderStats",
     "page": "API",
     "title": "OnlineStatsBase.OrderStats",
@@ -473,11 +553,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.RidgeReg",
+    "location": "pages/api.html#OnlineStatsBase.ReservoirSample",
     "page": "API",
-    "title": "OnlineStatsBase.RidgeReg",
+    "title": "OnlineStatsBase.ReservoirSample",
     "category": "Type",
-    "text": "RidgeReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nRidgeReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.     x = randn(100, 10)     y = x * linspace(-1, 1, 10) + randn(100)     o = RidgeReg(10)     Series((x,y), o)     value(o)\n\n\n\n"
+    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.     o = ReservoirSample(k, Int)     s = Series(o)     fit!(s, 1:10000)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Scaled",
+    "page": "API",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "Type",
+    "text": "Scaled(weight, λ)\nλ * weight\n\nScale a weight by a constant.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.Sum",
+    "page": "API",
+    "title": "OnlineStatsBase.Sum",
+    "category": "Type",
+    "text": "Sum()\n\nTrack the overall sum.     s = Series(randn(1000), Sum())     value(s)\n\n\n\n"
 },
 
 {
