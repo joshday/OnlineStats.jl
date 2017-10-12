@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitBeta",
     "category": "Type",
-    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments)     using Distributions, OnlineStats     y = rand(Beta(3, 5), 1000)     s = Series(y, FitBeta())     Beta(value(s)...)\n\n\n\n"
+    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\nusing Distributions, OnlineStats\ny = rand(Beta(3, 5), 1000)\ns = Series(y, FitBeta())\nBeta(value(s)...)\n\n\n\n"
 },
 
 {
@@ -269,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitCategorical",
     "category": "Type",
-    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.     using Distributions     s = Series(rand(1:10, 1000), FitCategorical(Int))     value(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
+    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.\n\nusing Distributions\ns = Series(rand(1:10, 1000), FitCategorical(Int))\nvalue(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitCauchy",
     "category": "Type",
-    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution     using Distributions     y = rand(Cauchy(0, 10), 10_000)     s = Series(y, FitCauchy())     Cauchy(value(s)...)\n\n\n\n"
+    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution.\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\ns = Series(y, FitCauchy())\nCauchy(value(s)...)\n\n\n\n"
 },
 
 {
@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitGamma",
     "category": "Type",
-    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments)     using Distributions     y = rand(Gamma(5, 1), 1000)     s = Series(y, FitGamma())     Gamma(value(s)...)\n\n\n\n"
+    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\nusing Distributions\ny = rand(Gamma(5, 1), 1000)\ns = Series(y, FitGamma())\nGamma(value(s)...)\n\n\n\n"
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitLogNormal",
     "category": "Type",
-    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE)     using Distributions     y = rand(LogNormal(3, 4), 1000)     s = Series(y, FitLogNormal())     LogNormal(value(s)...)\n\n\n\n"
+    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\nusing Distributions\ny = rand(LogNormal(3, 4), 1000)\ns = Series(y, FitLogNormal())\nLogNormal(value(s)...)\n\n\n\n"
 },
 
 {
@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "Type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.     using Distributions     y = rand(Multinomial(10, [.2, .2, .6]), 1000)     s = Series(y', FitMultinomial())     Multinomial(value(s)...)\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\ns = Series(y', FitMultinomial())\nMultinomial(value(s)...)\n\n\n\n"
 },
 
 {
@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "Type",
-    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE)     using Distributions     y = rand(MvNormal(zeros(3), eye(3)), 1000)     s = Series(y', FitMvNormal(3))\n\n\n\n"
+    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\ns = Series(y', FitMvNormal(3))\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "Type",
-    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE)     using Distributions     y = rand(Normal(-3, 4), 1000)     s = Series(y, FitNormal())\n\n\n\n"
+    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE).\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\ns = Series(y, FitNormal())\n\n\n\n"
 },
 
 {
@@ -389,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.maprows",
     "category": "Method",
-    "text": "maprows(f::Function, b::Integer, data...)\n\nMap rows of data in batches of size b.  Most usage is done through do blocks.     s = Series(Mean())     maprows(10, randn(100)) do yi         fit!(s, yi)         info(\"nobs: nobs(s)\")     end\n\n\n\n"
+    "text": "maprows(f::Function, b::Integer, data...)\n\nMap rows of data in batches of size b.  Most usage is done through do blocks.\n\ns = Series(Mean())\nmaprows(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
 },
 
 {
@@ -413,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.CovMatrix",
     "category": "Type",
-    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.     y = randn(100, 5)     Series(y, CovMatrix(5))\n\n\n\n"
+    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.\n\ny = randn(100, 5)\nSeries(y, CovMatrix(5))\n\n\n\n"
 },
 
 {
@@ -421,7 +421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Diff",
     "category": "Type",
-    "text": "Diff()\n\nTrack the difference and the last value.     s = Series(randn(1000), Diff())     value(s)\n\n\n\n"
+    "text": "Diff()\n\nTrack the difference and the last value.\n\ns = Series(randn(1000), Diff())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -445,7 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Extrema",
     "category": "Type",
-    "text": "Extrema()\n\nMaximum and minimum.     s = Series(randn(100), Extrema())     value(s)\n\n\n\n"
+    "text": "Extrema()\n\nMaximum and minimum.\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -461,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.HyperLogLog",
     "category": "Type",
-    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.     s = Series(rand(1:10, 1000), HyperLogLog(12))     value(s)\n\n\n\n"
+    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\ns = Series(rand(1:10, 1000), HyperLogLog(12))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -469,7 +469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.KMeans",
     "category": "Type",
-    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables     using OnlineStats, Distributions     d = MixtureModel([Normal(0), Normal(5)])     y = rand(d, 100_000, 1)     s = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
+    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables.\n\nusing OnlineStats, Distributions\nd = MixtureModel([Normal(0), Normal(5)])\ny = rand(d, 100_000, 1)\ns = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
 },
 
 {
@@ -493,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.LinReg",
     "category": "Type",
-    "text": "LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nLinReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.     x = randn(100, 10)     y = x * linspace(-1, 1, 10) + randn(100)     o = LinReg(10)     Series((x,y), o)     value(o)\n\n\n\n"
+    "text": "LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nLinReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.\n\nx = randn(100, 10)\ny = x * linspace(-1, 1, 10) + randn(100)\no = LinReg(10)\nSeries((x,y), o)\nvalue(o)\n\n\n\n"
 },
 
 {
@@ -517,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Mean",
     "category": "Type",
-    "text": "Mean()\n\nUnivariate mean.     s = Series(randn(100), Mean())     value(s)\n\n\n\n"
+    "text": "Mean()\n\nUnivariate mean.\n\ns = Series(randn(100), Mean())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -525,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Moments",
     "category": "Type",
-    "text": "Moments()\n\nFirst four non-central moments.     s = Series(randn(1000), Moments(10))     value(s)\n\n\n\n"
+    "text": "Moments()\n\nFirst four non-central moments.\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -533,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.OHistogram",
     "category": "Type",
-    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.     y = randn(100)     s = Series(y, OHistogram(-4:.1:4))     value(s)\n\n\n\n"
+    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.\n\ny = randn(100)\ns = Series(y, OHistogram(-4:.1:4))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -541,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.OrderStats",
     "category": "Type",
-    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.     s = Series(randn(1000), OrderStats(10))     value(s)\n\n\n\n"
+    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -549,7 +549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.QuantileMM",
     "category": "Type",
-    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.     s = Series(randn(1000), QuantileMM())     value(s)\n\n\n\n"
+    "text": "QuantileMM(q = 0.5)\n\nApproximate quantiles via an online MM algorithm.\n\ns = Series(randn(1000), QuantileMM())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -557,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.ReservoirSample",
     "category": "Type",
-    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.     o = ReservoirSample(k, Int)     s = Series(o)     fit!(s, 1:10000)\n\n\n\n"
+    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
 },
 
 {
@@ -581,7 +581,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Sum",
     "category": "Type",
-    "text": "Sum()\n\nTrack the overall sum.     s = Series(randn(1000), Sum())     value(s)\n\n\n\n"
+    "text": "Sum()\n\nTrack the overall sum.\n\ns = Series(randn(1000), Sum())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -589,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Variance",
     "category": "Type",
-    "text": "Variance()\n\nUnivariate variance.     s = Series(randn(100), Variance())     value(s)\n\n\n\n"
+    "text": "Variance()\n\nUnivariate variance.\n\ns = Series(randn(100), Variance())\nvalue(s)\n\n\n\n"
 },
 
 {
