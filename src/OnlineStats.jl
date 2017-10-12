@@ -38,7 +38,9 @@ rows(x::AbstractMatrix, rng) = view(x, rng, :)
 
 """
     maprows(f::Function, b::Integer, data...)
+
 Map rows of `data` in batches of size `b`.  Most usage is done through `do` blocks.
+
     s = Series(Mean())
     maprows(10, randn(100)) do yi
         fit!(s, yi)

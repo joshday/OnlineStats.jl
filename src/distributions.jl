@@ -1,7 +1,9 @@
 #---------------------------------------------------------------------------------# Beta
 """
     FitBeta()
-Online parameter estimate of a Beta distribution (Method of Moments)
+
+Online parameter estimate of a Beta distribution (Method of Moments).
+
     using Distributions, OnlineStats
     y = rand(Beta(3, 5), 1000)
     s = Series(y, FitBeta())
@@ -26,7 +28,9 @@ end
 #---------------------------------------------------------------------------------# Categorical
 """
     FitCategorical(T)
+
 Fit a categorical distribution where the inputs are of type `T`.
+
     using Distributions
     s = Series(rand(1:10, 1000), FitCategorical(Int))
     value(s)
@@ -50,7 +54,9 @@ Base.keys(o::FitCategorical) = keys(o.d)
 #---------------------------------------------------------------------------------# Cauchy
 """
     FitCauchy()
-Online parameter estimate of a Cauchy distribution
+
+Online parameter estimate of a Cauchy distribution.
+
     using Distributions
     y = rand(Cauchy(0, 10), 10_000)
     s = Series(y, FitCauchy())
@@ -72,7 +78,9 @@ end
 #---------------------------------------------------------------------------------# Gamma
 """
     FitGamma()
-Online parameter estimate of a Gamma distribution (Method of Moments)
+
+Online parameter estimate of a Gamma distribution (Method of Moments).
+
     using Distributions
     y = rand(Gamma(5, 1), 1000)
     s = Series(y, FitGamma())
@@ -98,7 +106,9 @@ end
 #---------------------------------------------------------------------------------# LogNormal
 """
     FitLogNormal()
-Online parameter estimate of a LogNormal distribution (MLE)
+
+Online parameter estimate of a LogNormal distribution (MLE).
+
     using Distributions
     y = rand(LogNormal(3, 4), 1000)
     s = Series(y, FitLogNormal())
@@ -119,7 +129,9 @@ end
 #---------------------------------------------------------------------------------# Normal
 """
     FitNormal()
-Online parameter estimate of a Normal distribution (MLE)
+
+Online parameter estimate of a Normal distribution (MLE).
+
     using Distributions
     y = rand(Normal(-3, 4), 1000)
     s = Series(y, FitNormal())
@@ -140,7 +152,9 @@ end
 # TODO: Allow each observation to have a different n
 """
     FitMultinomial(p)
+
 Online parameter estimate of a Multinomial distribution.
+
     using Distributions
     y = rand(Multinomial(10, [.2, .2, .6]), 1000)
     s = Series(y', FitMultinomial())
@@ -168,7 +182,9 @@ end
 #---------------------------------------------------------------------------------# MvNormal
 """
     FitMvNormal(d)
-Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE)
+
+Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
+
     using Distributions
     y = rand(MvNormal(zeros(3), eye(3)), 1000)
     s = Series(y', FitMvNormal(3))
