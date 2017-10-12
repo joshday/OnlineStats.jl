@@ -57,9 +57,9 @@ Online parameter estimate of a Cauchy distribution
     Cauchy(value(s)...)
 """
 mutable struct FitCauchy <: OnlineStat{0, LearningRate}
-    q::Quantiles{:MSPI}
+    q::QuantileMM
     nobs::Int
-    FitCauchy() = new(Quantiles(), 0)
+    FitCauchy() = new(QuantileMM(), 0)
 end
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
 function _value(o::FitCauchy)
@@ -151,7 +151,7 @@ mutable struct FitMultinomial <: OnlineStat{1, EqualWeight}
     nobs::Int
     FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
 end
-function fit!{T<:Real}(o::FitMultinomial, y::AVec{T}, γ::Float64)
+function fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64)
     o.nobs += 1
     fit!(o.mvmean, y, γ)
     o
@@ -178,7 +178,7 @@ struct FitMvNormal<: OnlineStat{1, EqualWeight}
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end
 Base.length(o::FitMvNormal) = length(o.cov)
-fit!{T<:Real}(o::FitMvNormal, y::AVec{T}, γ::Float64) = fit!(o.cov, y, γ)
+fit!{T<:Real}(o::FitMvNormal, y::AbstractVector{T}, γ::Float64) = fit!(o.cov, y, γ)
 function _value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)

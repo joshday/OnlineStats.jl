@@ -8,13 +8,6 @@ const QuantileRegression    = QuantileLoss
 const DWDLike               = DWDMarginLoss
 
 #-----------------------------------------------------------------------------# StatLearn
-abstract type Updater end
-abstract type SGUpdater <: Updater end
-function Base.show(io::IO, u::Updater)
-    print(io, OnlineStatsBase.name(u))
-    OnlineStatsBase.show_fields(io, u)
-end
-OnlineStatsBase.fields_to_show(u::Updater) = [:η]
 init(u::Updater, p) = u
 
 

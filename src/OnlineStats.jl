@@ -2,37 +2,29 @@ __precompile__(true)
 
 module OnlineStats
 
-import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram
-import OnlineStatsBase: VectorOb, smooth, smooth!, smooth_syr!, ϵ, default_weight
-import LearnBase: value, fit!, predict, nobs
+import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram, fit!
+import OnlineStatsBase: VectorOb, smooth, smooth!, smooth_syr!, ϵ, default_weight, name
+import LearnBase: ObsDimension, value
 import SweepOperator
 
-using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
+using Reexport, LearnBase, LossFunctions, PenaltyFunctions, RecipesBase
+@reexport using OnlineStatsBase
 
 export
-    Series, Bootstrap,
-    # Weight
-    Weight, EqualWeight, Bounded, ExponentialWeight, LearningRate, LearningRate2,
-    McclainWeight, HarmonicWeight,
     # functions
-    maprows, nups, stats, replicates, nobs, fit!, value, confint, predict, coef, coeftable,
-    vcov, mse, stderr,
+    maprows, confint, coeftable, vcov, mse, stderr,
     # OnlineStats
-    OnlineStat,
-    Mean, Variance, Extrema, OrderStats, Moments, Quantiles, QuantileMM,
-    Diff, Sum, MV, CovMatrix, KMeans, LinReg, StochasticLoss, ReservoirSample, OHistogram,
+    Quantiles,
+    # Updaters
+    SGD, MSPI, OMAS,
     # statlearn things
-    StatLearn,
-    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
-    OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF, SPI,
-    loss, objective, classify, statlearnpath,
+    # StatLearn,
+    # SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
+    # OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF, SPI,
+    # loss, objective, classify, statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
-    FitMvNormal, NormalMix,
-    # StreamStats
-    HyperLogLog,
-    # Other
-    ObsDim, Cols, Rows
+    FitMvNormal
 
 #-----------------------------------------------------------------------------# types
 const AA        = AbstractArray
@@ -45,8 +37,8 @@ const AMatF     = AMat{Float64}
 
 
 #---------------------------------------------------------------------------# maprows
-rows(x::AVec, rng) = view(x, rng)
-rows(x::AMat, rng) = view(x, rng, :)
+rows(x::AbstractVector, rng) = view(x, rng)
+rows(x::AbstractMatrix, rng) = view(x, rng, :)
 
 """
     maprows(f::Function, b::Integer, data...)
@@ -85,13 +77,30 @@ end
     v
 end
 
-#----------------------------------------------------------------------# source files
-include("scalarinput/summary.jl")
+#-----------------------------------------------------------------------# Updaters
+abstract type Updater end
+abstract type SGUpdater <: Updater end
+
+Base.show(io::IO, u::Updater) = print(io, name(u, false, false))
+Base.:(==)(u1::Updater, u2::Updater) = (typeof(u1) == typeof(u2))
+
+updater_init!(o::OnlineStat) = nothing
+
+struct SGD <: SGUpdater end
+
+struct MSPI <: Updater end
+
+struct OMAP <: Updater end
+
+struct OMAS{T <: Tuple} <: Updater
+    suffvalues::T
+end
+OMAS(args...) = OMAS(args)
+
+#-----------------------------------------------------------------------# source files
+# include("quantile.jl")
 include("distributions.jl")
-include("streamstats/hyperloglog.jl")
-include("streamstats/bootstrap.jl")
-include("xyinput/xycommon.jl")
-include("xyinput/statlearn.jl")
-include("xyinput/linreg.jl")
+# include("xyinput/statlearn.jl")
+# include("xyinput/linreg.jl")
 
 end # module

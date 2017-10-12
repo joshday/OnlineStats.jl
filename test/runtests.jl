@@ -2,6 +2,37 @@ module OnlineStatsTest
 using OnlineStats, Base.Test, LearnBase, StatsBase
 using LossFunctions, PenaltyFunctions
 
+
+
+#-----------------------------------------------------------------------# Distributions
+@testset "Distributions" begin
+    @testset "sanity check" begin
+        value(Series(rand(100), FitBeta()))
+        value(Series(randn(100), FitCauchy()))
+        value(Series(rand(100) + 5, FitGamma()))
+        value(Series(rand(100) + 5, FitLogNormal()))
+        value(Series(randn(100), FitNormal()))
+    end
+    @testset "FitCategorical" begin
+        y = rand(1:5, 1000)
+        o = FitCategorical(Int)
+        s = Series(y, o)
+        for i in 1:5
+            @test i in keys(o)
+        end
+        vals = ["small", "big"]
+        s = Series(rand(vals, 100), FitCategorical(String))
+        value(s)
+    end
+    @testset "FitMvNormal" begin
+        y = randn(1000, 3)
+        o = FitMvNormal(3)
+        @test length(o) == 3
+        s = Series(y, o)
+        value(s)
+    end
+end
+
 # #-----------------------------------------------------------# coverage for show()
 # info("Messy output for test coverage")
 # @testset "show" begin

@@ -4,3 +4,4 @@ SweepOperator
 LossFunctions
 PenaltyFunctions
 RecipesBase
+Reexport
