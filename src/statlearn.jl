@@ -69,8 +69,10 @@ function Base.show(io::IO, o::StatLearn)
 end
 
 coef(o::StatLearn) = o.β
-predict(o::StatLearn, x::AVec) = dot(x, o.β)
-predict(o::StatLearn, x::AMat) = x * o.β
+predict(o::StatLearn, x::AbstractVector) = dot(x, o.β)
+predict(o::StatLearn, x::AbstractMatrix) = x * o.β
+predict(o::StatLearn, x::AbstractMatrix, c::Cols) = x'o.β
+
 classify(o::StatLearn, x) = sign.(predict(o, x))
 loss(o::StatLearn, x, y) = value(o.loss, y, predict(o, x), AvgMode.Mean())
 function objective(o::StatLearn, x, y)
@@ -88,7 +90,7 @@ end
 
 
 
-function gradient!(o::StatLearn, x::AVec, y::Real)
+function gradient!(o::StatLearn, x::VectorOb, y::Real)
     xβ = dot(x, o.β)
     g = deriv(o.loss, y, xβ)
     gx = o.gx
@@ -97,7 +99,7 @@ function gradient!(o::StatLearn, x::AVec, y::Real)
     end
 end
 # Batch version (unused)
-# function gradient!(o::StatLearn, x::AMat, y::AVec)
+# function gradient!(o::StatLearn, x::VectorOb, y::AVec)
 #     xβ = x * o.β
 #     g = deriv(o.loss, y, xβ)
 #     @inbounds for j in eachindex(o.gx)
@@ -140,7 +142,7 @@ struct NSGD <: SGUpdater
     NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
 end
 init(u::NSGD, p) = NSGD(u.α, p)
-function fit!(o::StatLearn{NSGD}, x::AVec, y::Real, γ::Float64)
+function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
     for j in eachindex(o.β)
         U.θ[j] = o.β[j] - U.α * U.v[j]

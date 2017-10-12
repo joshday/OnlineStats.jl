@@ -23,13 +23,13 @@ export
     FitMvNormal
 
 #-----------------------------------------------------------------------------# types
-const AA        = AbstractArray
+# const AA        = AbstractArray
 const VecF      = Vector{Float64}
-const MatF      = Matrix{Float64}
-const AVec{T}   = AbstractVector{T}
-const AMat{T}   = AbstractMatrix{T}
-const AVecF     = AVec{Float64}
-const AMatF     = AMat{Float64}
+# const MatF      = Matrix{Float64}
+# const AVec{T}   = AbstractVector{T}
+# const AMat{T}   = AbstractMatrix{T}
+# const AVecF     = AVec{Float64}
+# const AMatF     = AMat{Float64}
 
 
 #---------------------------------------------------------------------------# maprows
