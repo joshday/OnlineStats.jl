@@ -225,67 +225,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.Bootstrap",
-    "page": "API",
-    "title": "OnlineStats.Bootstrap",
-    "category": "Type",
-    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2], f = value)\n\nOnline Statistical Bootstrapping.  Create nreps replicates of the OnlineStat o. When fit! is called, each of the replicates will be updated rand(d) times. value(b::Bootstrap) returns f mapped to the replicates.\n\nb = Bootstrap(Mean())\nfit!(b, randn(1000))\nvalue(b)        # `f` mapped to replicates\nmean(value(b))  # mean\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.FitCategorical",
     "page": "API",
     "title": "OnlineStats.FitCategorical",
     "category": "Type",
     "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.     using Distributions     s = Series(rand(1:10, 1000), FitCategorical(Int))     value(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.Quantiles",
-    "page": "API",
-    "title": "OnlineStats.Quantiles",
-    "category": "Type",
-    "text": "Quantiles(q = [.25, .5, .75])  # default algorithm is :MSPI\nQuantiles{:SGD}(q = [.25, .5, .75])\nQuantiles{:MSPI}(q = [.25, .5, .75])\n\nApproximate quantiles via the specified algorithm (:SGD or :MSPI).\n\nExample\n\ns = Series(randn(10_000), Quantiles(.1:.1:.9)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.StatLearn",
-    "page": "API",
-    "title": "OnlineStats.StatLearn",
-    "category": "Type",
-    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Vector of element-wise regularization parameters\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\nusing LossFunctions, PenaltyFunctions   x = randn(100_000, 10)   y = x * linspace(-1, 1, 10) + randn(100_000)   o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())   s = Series(o)   fit!(s, x, y)   coef(o)   predict(o, x)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.ADADELTA",
-    "page": "API",
-    "title": "OnlineStats.ADADELTA",
-    "category": "Type",
-    "text": "ADADELTA(η = 1.0, ρ = .95)\n\nADADELTA ignores weight.\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.ADAGRAD",
-    "page": "API",
-    "title": "OnlineStats.ADAGRAD",
-    "category": "Type",
-    "text": "ADAGRAD(η)\n\nAdaptive (element-wise learning rate) SPGD with step size η\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.ADAM",
-    "page": "API",
-    "title": "OnlineStats.ADAM",
-    "category": "Type",
-    "text": "ADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.ADAMAX",
-    "page": "API",
-    "title": "OnlineStats.ADAMAX",
-    "category": "Type",
-    "text": "ADAMAX(η, β1, β2)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
 },
 
 {
@@ -345,86 +289,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.HyperLogLog",
-    "page": "API",
-    "title": "OnlineStats.HyperLogLog",
-    "category": "Type",
-    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.     s = Series(rand(1:10, 1000), HyperLogLog(12))     value(s)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.LinReg",
-    "page": "API",
-    "title": "OnlineStats.LinReg",
-    "category": "Type",
-    "text": "LinReg(p)\nLinReg(p, λ)\n\nCreate a linear regression object with p predictors and optional ridge (L2-regularization) parameter λ.\n\nExample\n\nx = randn(1000, 5)\ny = x * linspace(-1, 1, 5) + randn(1000)\no = LinReg(5)\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\ncoeftable(o)\nvcov(o)\nconfint(o)\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.MSPIC",
-    "page": "API",
-    "title": "OnlineStats.MSPIC",
-    "category": "Type",
-    "text": "Experimental: MSPI-constant\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.MSPIF",
-    "page": "API",
-    "title": "OnlineStats.MSPIF",
-    "category": "Type",
-    "text": "Experimental: MSPI-full matrix\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.NADAM",
-    "page": "API",
-    "title": "OnlineStats.NADAM",
-    "category": "Type",
-    "text": "NADAM(η, α1, α2)\n\nAdaptive Moment Estimation with step size η and momentum parameters α1, α2\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.NSGD",
-    "page": "API",
-    "title": "OnlineStats.NSGD",
-    "category": "Type",
-    "text": "NSGD(η, α)\n\nNesterov accelerated Stochastic Proximal Gradient Descent.\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.OMASQ",
-    "page": "API",
-    "title": "OnlineStats.OMASQ",
-    "category": "Type",
-    "text": "Experimental: OMM-constant\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.OMASQF",
-    "page": "API",
-    "title": "OnlineStats.OMASQF",
-    "category": "Type",
-    "text": "Experimental: OMM-full matrix\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.SGD",
-    "page": "API",
-    "title": "OnlineStats.SGD",
-    "category": "Type",
-    "text": "SGD(η, α=0.0)\n\nStochastic Proximal Gradient Descent with step size η and momentum term α.\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.SPI",
-    "page": "API",
-    "title": "OnlineStats.SPI",
-    "category": "Type",
-    "text": "Stochastic Proximal Iteration\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.maprows-Tuple{Function,Integer,Vararg{Any,N} where N}",
     "page": "API",
     "title": "OnlineStats.maprows",
@@ -433,19 +297,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.replicates-Tuple{OnlineStats.Bootstrap}",
+    "location": "pages/api.html#OnlineStatsBase.Bootstrap",
     "page": "API",
-    "title": "OnlineStats.replicates",
-    "category": "Method",
-    "text": "replicates(b)\n\nReturn the vector of replicates from Bootstrap b\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#StatsBase.confint",
-    "page": "API",
-    "title": "StatsBase.confint",
-    "category": "Function",
-    "text": "confint(b, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
+    "title": "OnlineStatsBase.Bootstrap",
+    "category": "Type",
+    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2], f = value)\n\nOnline Statistical Bootstrapping.  Create nreps replicates of the OnlineStat o. When fit! is called, each of the replicates will be updated rand(d) times. value(b::Bootstrap) returns f mapped to the replicates.\n\nb = Bootstrap(Mean())\nfit!(b, randn(1000))\nvalue(b)        # `f` mapped to replicates\nmean(value(b))  # mean\n\n\n\n"
 },
 
 {
@@ -545,6 +401,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.HyperLogLog",
+    "page": "API",
+    "title": "OnlineStatsBase.HyperLogLog",
+    "category": "Type",
+    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.     s = Series(rand(1:10, 1000), HyperLogLog(12))     value(s)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.KMeans",
     "page": "API",
     "title": "OnlineStatsBase.KMeans",
@@ -609,6 +473,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.RidgeReg",
+    "page": "API",
+    "title": "OnlineStatsBase.RidgeReg",
+    "category": "Type",
+    "text": "RidgeReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nRidgeReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.     x = randn(100, 10)     y = x * linspace(-1, 1, 10) + randn(100)     o = RidgeReg(10)     Series((x,y), o)     value(o)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.Variance",
     "page": "API",
     "title": "OnlineStatsBase.Variance",
@@ -617,11 +489,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.replicates-Tuple{OnlineStatsBase.Bootstrap}",
+    "page": "API",
+    "title": "OnlineStatsBase.replicates",
+    "category": "Method",
+    "text": "replicates(b)\n\nReturn the vector of replicates from Bootstrap b\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#StatsBase.fit!",
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Function",
     "text": "fit!(s, y)\nfit!(s, y, w)\n\nUpdate a Series s with more data y and optional weighting w.     y = randn(100)     w = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])        # one observation: use Series weight\nfit!(s, y[1], w[1])  # one observation: override weight\nfit!(s, y)           # multiple observations: use Series weight\nfit!(s, y, w[1])     # multiple observations: override each weight with w[1]\nfit!(s, y, w)        # multiple observations: y[i] uses weight w[i]\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#StatsBase.confint",
+    "page": "API",
+    "title": "StatsBase.confint",
+    "category": "Function",
+    "text": "confint(b, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
 },
 
 {
