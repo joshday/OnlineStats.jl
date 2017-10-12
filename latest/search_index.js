@@ -569,6 +569,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStatsBase.Series",
+    "page": "API",
+    "title": "OnlineStatsBase.Series",
+    "category": "Type",
+    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats using a given weighting mechanism.\n\ns = Series(ExponentialWeight(.1), Mean(), Variance(), Moments())\nfit!(s, randn(1000))\nvalue(s)\n\nx, y = randn(1000, 10), randn(1000)\ns = Series(LinReg(10))\nfit!(s, (x,y))\nvalue(s)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStatsBase.Sum",
     "page": "API",
     "title": "OnlineStatsBase.Sum",
