@@ -365,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.SGD",
     "category": "Type",
-    "text": "SGD()\n\nProximal Stochastic Gradient Descent.\n\nheta^(t) = 	heta^(t-1) - gamma_t  abla ll_t(	heta^(t-1))\n\n\n\n"
+    "text": "SGD()\n\nProximal Stochastic Gradient Descent.\n\ntheta^(t) = theta^(t-1) - gamma_t nabla ell_t(theta^(t-1))\n\n\n\n"
 },
 
 {
