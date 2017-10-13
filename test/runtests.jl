@@ -1,6 +1,7 @@
 module OnlineStatsTest
 
 using OnlineStats, Base.Test
+import StatsBase
 
 
 @testset "maprows" begin
@@ -50,7 +51,7 @@ end
         s = @inferred Series(o)
         fit!(s, (x, y))
         fit!(s, (x, y), .1)
-        fit!(s, (x, y), rand(length(y)))
+        fit!(s, (x, y), StatsBase.Weights(rand(length(y))))
         @test nobs(s) == 3 * n
         @test coef(o) == o.β
         @test predict(o, x) == x * o.β
