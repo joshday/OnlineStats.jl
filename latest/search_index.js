@@ -41,14 +41,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Callbacks-1",
-    "page": "Basics",
-    "title": "Callbacks",
-    "category": "section",
-    "text": "While an OnlineStat is being updated, you may wish to perform an action like print intermediate results to a log file or update a plot.  For this purpose, OnlineStats exports a maprows function.maprows(f::Function, b::Integer, data...)maprows works similar to Base.mapslices, but maps b rows at a time.  It is best used with Julia's do block syntax.Inputy = randn(100)\ns = Series(Mean())\nmaprows(20, y) do yi\n    fit!(s, yi)\n    info(\"value of mean is $(value(s))\")\nendOutputINFO: value of mean is 0.06340121912925167\nINFO: value of mean is -0.06576995293439102\nINFO: value of mean is 0.05374292238752276\nINFO: value of mean is 0.008857939006120167\nINFO: value of mean is 0.016199508928045905"
-},
-
-{
     "location": "pages/weights.html#",
     "page": "Weighting",
     "title": "Weighting",
@@ -637,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Extending OnlineStats",
     "title": "Extending OnlineStats",
     "category": "section",
-    "text": "Creating new OnlineStat types should be accomplished through OnlineStatsBase.jl, a zero-dependency package which defines the interface an OnlineStat uses."
+    "text": "Creating new OnlineStat types should be accomplished through OnlineStatsBase.jl, a light-weight package which defines the OnlineStats interface."
 },
 
 ]}
