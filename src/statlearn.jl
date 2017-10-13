@@ -15,14 +15,16 @@ init(u::Updater, p) = u
 
 
 """
-    StatLearn(p, loss, penalty, λ, updater)
+    StatLearn(p::Int, args...)
 
-Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Arguments are:
-- `loss`: any Loss from LossFunctions.jl
-- `penalty`: any Penalty from PenaltyFunctions.jl.
-- `λ`: a Vector of element-wise regularization parameters
-- `updater`: `SPGD()`, `ADAGRAD()`, `ADAM()`, or `ADAMAX()`
+Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Additional arguments can be given in any order (and is still type stable):
 
+- `loss = .5 * L2DistLoss()`: any Loss from LossFunctions.jl
+- `penalty = L2Penalty()`: any Penalty (which has a `prox` method) from PenaltyFunctions.jl.
+- `λ = fill(.1, p)`: a Vector of element-wise regularization parameters
+- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`]((@ref))
+
+# Example
     using LossFunctions, PenaltyFunctions
     x = randn(100_000, 10)
     y = x * linspace(-1, 1, 10) + randn(100_000)
@@ -61,24 +63,28 @@ StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p
 
 function Base.show(io::IO, o::StatLearn)
     println(io, OnlineStatsBase.name(o))
-    print(io, "    > β       : "); showcompact(io, o.β);        println(io)
-    print(io, "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
+    print(io,   "    > β       : "); showcompact(io, o.β);        println(io)
+    print(io,   "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
     println(io, "    > Loss    : $(o.loss)")
     println(io, "    > Penalty : $(o.penalty)")
     print(io,   "    > Updater : $(o.updater)")
 end
 
 coef(o::StatLearn) = o.β
+
 predict(o::StatLearn, x::AbstractVector) = dot(x, o.β)
-predict(o::StatLearn, x::AbstractMatrix, c::Rows = Rows()) = x * o.β
-predict(o::StatLearn, x::AbstractMatrix, c::Cols) = x'o.β
 
-classify(o::StatLearn, x) = sign.(predict(o, x))
-loss(o::StatLearn, x, y) = value(o.loss, y, predict(o, x), AvgMode.Mean())
-function objective(o::StatLearn, x, y)
-    mean(value(o.loss, y, predict(o, x))) + value(o.penalty, o.β, o.λfactor)
+predict(o::StatLearn, x::AbstractMatrix, ::Rows = Rows()) = x * o.β
+
+predict(o::StatLearn, x::AbstractMatrix, ::Cols) = x'o.β
+
+classify(o::StatLearn, x, dim = Rows()) = sign.(predict(o, x, dim))
+
+loss(o::StatLearn, x, y, dim = Rows()) = value(o.loss, y, predict(o, x, dim), AvgMode.Mean())
+
+function objective(o::StatLearn, x, y, dim = Rows())
+    value(o.loss, y, predict(o, x, dim), AvgMode.Mean()) + value(o.penalty, o.β, o.λfactor)
 end
-
 
 function statlearnpath(o::StatLearn, αs::AbstractVector{<:Real})
     path = [copy(o) for i in 1:length(αs)]
@@ -87,8 +93,6 @@ function statlearnpath(o::StatLearn, αs::AbstractVector{<:Real})
     end
     path
 end
-
-
 
 function gradient!(o::StatLearn, x::VectorOb, y::Real)
     xβ = dot(x, o.β)
@@ -99,7 +103,7 @@ function gradient!(o::StatLearn, x::VectorOb, y::Real)
     end
 end
 # Batch version (unused)
-# function gradient!(o::StatLearn, x::VectorOb, y::AVec)
+# function gradient!(o::StatLearn, x::AbstractMatrix, y::VectorOb)
 #     xβ = x * o.β
 #     g = deriv(o.loss, y, xβ)
 #     @inbounds for j in eachindex(o.gx)
@@ -123,6 +127,10 @@ end
 """
     SGD()
 Proximal Stochastic Gradient Descent.
+
+``
+\theta^{(t)} = \theta^{(t-1)} - \gamma_t \nabla \ell_t(\theta^{(t-1)})
+``
 """
 struct SGD <: SGUpdater end
 function update!(o::StatLearn{SGD}, γ)
