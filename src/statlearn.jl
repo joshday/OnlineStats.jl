@@ -14,7 +14,7 @@ abstract type SGUpdater <: Updater end
 init(u::Updater, p) = u
 
 
-"""
+doc"""
     StatLearn(p::Int, args...)
 
 Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Additional arguments can be given in any order (and is still type stable):
@@ -24,11 +24,19 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 - `λ = fill(.1, p)`: a Vector of element-wise regularization parameters
 - `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref)
 
+# Details
+
+The (offline) objective function which StatLearn approximately minimizes is
+
+``\frac{1}{n}\sum_{i=1}^n f_i(\beta) + \sum_{j=1}^p \lambda_j g(\beta_j),``
+
+where the ``f_i``'s are loss functions evaluated on a single observation, ``g`` is a penalty function, and the ``\lambda_j``s are nonnegative regularization parameters.
+
 # Example
     using LossFunctions, PenaltyFunctions
     x = randn(100_000, 10)
     y = x * linspace(-1, 1, 10) + randn(100_000)
-    o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())
+    o = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())
     s = Series(o)
     fit!(s, x, y)
     coef(o)
@@ -124,12 +132,9 @@ end
 
 
 #-----------------------------------------------------------------------# SGD
-doc"""
+"""
     SGD()
 Proximal Stochastic Gradient Descent.
-
-
-``\theta^{(t)} = \theta^{(t-1)} - \gamma_t \nabla \ell_t(\theta^{(t-1)})``
 """
 struct SGD <: SGUpdater end
 function update!(o::StatLearn{SGD}, γ)
