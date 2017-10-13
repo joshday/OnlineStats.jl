@@ -365,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.SGD",
     "category": "Type",
-    "text": "SGD()\n\nProximal Stochastic Gradient Descent.\n\n\n\n"
+    "text": "SGD()\n\nProximal Stochastic Gradient Descent.\n\nheta^(t) = 	heta^(t-1) - gamma_t  abla ll_t(	heta^(t-1))\n\n\n\n"
 },
 
 {
@@ -373,7 +373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
-    "text": "StatLearn(p, loss, penalty, λ, updater)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Arguments are:\n\nloss: any Loss from LossFunctions.jl\npenalty: any Penalty from PenaltyFunctions.jl.\nλ: a Vector of element-wise regularization parameters\nupdater: SPGD(), ADAGRAD(), ADAM(), or ADAMAX()\nusing LossFunctions, PenaltyFunctions   x = randn(100_000, 10)   y = x * linspace(-1, 1, 10) + randn(100_000)   o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())   s = Series(o)   fit!(s, x, y)   coef(o)   predict(o, x)\n\n\n\n"
+    "text": "StatLearn(p::Int, args...)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Additional arguments can be given in any order (and is still type stable):\n\nloss = .5 * L2DistLoss(): any Loss from LossFunctions.jl\npenalty = L2Penalty(): any Penalty (which has a prox method) from PenaltyFunctions.jl.\nλ = fill(.1, p): a Vector of element-wise regularization parameters\nupdater = SGD(): SGD, ADAGRAD, ADAM, ADAMAX\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
 },
 
 {
@@ -613,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Function",
-    "text": "fit!(s, y)\nfit!(s, y, w)\n\nUpdate a Series s with more data y and optional weighting w.     y = randn(100)     w = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])        # one observation: use Series weight\nfit!(s, y[1], w[1])  # one observation: override weight\nfit!(s, y)           # multiple observations: use Series weight\nfit!(s, y, w[1])     # multiple observations: override each weight with w[1]\nfit!(s, y, w)        # multiple observations: y[i] uses weight w[i]\n\n\n\n"
+    "text": "fit!(s::Series, data)\nfit!(s::Series, data, w::StatsBase.AbstractWeights)\n\nUpdate a Series with more data, optionally overriding the Weight.\n\nExample\n\ny = randn(100)\nw = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])          # one observation: use Series weight\nfit!(s, y[1], w[1])     # one observation: override weight\nfit!(s, y)              # multiple observations: use Series weight\nfit!(s, y, w[1])        # multiple observations: override each weight with w[1]\nfit!(s, y, Weights(w))  # multiple observations: y[i] uses weight w[i]\n\nx, y = randn(100, 5), randn(100)\ns = Series(LinReg(5))\nfit!(s, (x, y))  # or fit!(s, x, y)\n\n\n\n"
 },
 
 {
