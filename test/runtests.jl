@@ -3,8 +3,15 @@ module OnlineStatsTest
 using OnlineStats, Base.Test
 
 
+@testset "maprows" begin
+    x = randn(100, 5)
+    s = Series(CovMatrix(5))
+    maprows(26, x) do xi
+        fit!(s, xi)
+        println("maprows: this should print 4 times")
+    end
+end
 
-#-----------------------------------------------------------------------# Distributions
 @testset "Distributions" begin
     @testset "sanity check" begin
         value(Series(rand(100), FitBeta()))

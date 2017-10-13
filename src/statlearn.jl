@@ -70,7 +70,7 @@ end
 
 coef(o::StatLearn) = o.β
 predict(o::StatLearn, x::AbstractVector) = dot(x, o.β)
-predict(o::StatLearn, x::AbstractMatrix) = x * o.β
+predict(o::StatLearn, x::AbstractMatrix, c::Rows = Rows()) = x * o.β
 predict(o::StatLearn, x::AbstractMatrix, c::Cols) = x'o.β
 
 classify(o::StatLearn, x) = sign.(predict(o, x))

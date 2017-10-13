@@ -59,29 +59,8 @@ function maprows(f::Function, b::Integer, data...)
 end
 
 
-#-----------------------------------------------------------------------# Weight Recipe
-@recipe function f(wt::Weight; nobs=50)
-    xlab --> "Number of Observations"
-    ylab --> "Weight Value"
-    label --> OnlineStatsBase.name(wt)
-    ylim --> (0, 1)
-    w --> 2
-    W = deepcopy(wt)
-    v = zeros(nobs)
-    for i in eachindex(v)
-        updatecounter!(W)
-        v[i] = weight(W)
-    end
-    v
-end
-
-
-
-
 #-----------------------------------------------------------------------# source files
-# include("quantile.jl")
+include("recipes.jl")
 include("distributions.jl")
 include("statlearn.jl")
-# include("xyinput/linreg.jl")
-
 end # module
