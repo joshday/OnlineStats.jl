@@ -22,13 +22,13 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 - `loss = .5 * L2DistLoss()`: any Loss from LossFunctions.jl
 - `penalty = L2Penalty()`: any Penalty (which has a `prox` method) from PenaltyFunctions.jl.
 - `λ = fill(.1, p)`: a Vector of element-wise regularization parameters
-- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`]((@ref))
+- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref)
 
 # Example
     using LossFunctions, PenaltyFunctions
     x = randn(100_000, 10)
     y = x * linspace(-1, 1, 10) + randn(100_000)
-    o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SPGD())
+    o = StatLearn(10, L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())
     s = Series(o)
     fit!(s, x, y)
     coef(o)
