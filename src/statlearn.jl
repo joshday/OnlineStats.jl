@@ -128,9 +128,7 @@ end
     SGD()
 Proximal Stochastic Gradient Descent.
 
-``
-\theta^{(t)} = \theta^{(t-1)} - \gamma_t \nabla \ell_t(\theta^{(t-1)})
-``
+$\theta^{(t)} = \theta^{(t-1)} - \gamma_t \nabla \ell_t(\theta^{(t-1)})$
 """
 struct SGD <: SGUpdater end
 function update!(o::StatLearn{SGD}, γ)
