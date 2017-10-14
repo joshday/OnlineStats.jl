@@ -50,6 +50,12 @@ end
         value(Series(rand(100) + 5, FitLogNormal()))
         value(Series(randn(100), FitNormal()))
     end
+    @testset "FitBeta" begin
+        o = FitBeta()
+        Series(rand(100), o)
+        @test value(o)[1] ≈ 1.0 atol=.4
+        @test value(o)[2] ≈ 1.0 atol=.4
+    end
     @testset "FitCategorical" begin
         y = rand(1:5, 1000)
         o = FitCategorical(Int)
@@ -61,12 +67,38 @@ end
         s = Series(rand(vals, 100), FitCategorical(String))
         value(s)
     end
+    @testset "FitGamma" begin
+        o = FitGamma()
+        Series(rand(100) + 5, o)
+        @test value(o)[1] > 0
+        @test value(o)[2] > 0
+    end
+    @testset "FitLogNormal" begin
+        o = FitLogNormal()
+        Series(exp.(randn(100)), o)
+        @test value(o)[1] != 0
+        @test value(o)[2] > 0
+    end
+    @testset "FitNormal" begin
+        o = FitNormal()
+        y = randn(100)
+        Series(y, o)
+        @test value(o)[1] ≈ mean(y)
+        @test value(o)[2] ≈ std(y)
+    end
+    @testset "FitMultinomial" begin
+        o = FitMultinomial(5)
+        s = Series([1,2,3,4,5], o)
+        fit!(s, [5,4,3,2,1])
+        @test value(o)[2] == ones(5) / 5
+    end
     @testset "FitMvNormal" begin
         y = randn(1000, 3)
         o = FitMvNormal(3)
         @test length(o) == 3
         s = Series(y, o)
-        value(s)
+        @test value(o)[1] ≈ vec(mean(y, 1))
+        @test value(o)[2] ≈ cov(y)
     end
 end
 

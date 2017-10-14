@@ -14,7 +14,7 @@ struct FitBeta <: OnlineStat{0, EqualWeight}
     FitBeta() = new(Variance())
 end
 fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function _value(o::FitBeta)
+function value(o::FitBeta)
     if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
@@ -49,7 +49,7 @@ function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
     o.nobs += 1
     haskey(o.d, y) ? (o.d[y] += 1) : (o.d[y] = 1)
 end
-_value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, zeros(0))
+value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, zeros(0))
 Base.keys(o::FitCategorical) = keys(o.d)
 #---------------------------------------------------------------------------------# Cauchy
 """
@@ -68,7 +68,7 @@ mutable struct FitCauchy <: OnlineStat{0, LearningRate}
     FitCauchy() = new(QuantileMM(), 0)
 end
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
-function _value(o::FitCauchy)
+function value(o::FitCauchy)
     if o.nobs > 1
         return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
     else
@@ -92,7 +92,7 @@ struct FitGamma <: OnlineStat{0, EqualWeight}
 end
 FitGamma() = FitGamma(Variance())
 fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function _value(o::FitGamma)
+function value(o::FitGamma)
     if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
@@ -119,7 +119,7 @@ struct FitLogNormal <: OnlineStat{0, EqualWeight}
     FitLogNormal() = new(Variance())
 end
 fit!(o::FitLogNormal, y::Real, γ::Float64) = fit!(o.var, log(y), γ)
-function _value(o::FitLogNormal)
+function value(o::FitLogNormal)
     if o.var.nobs > 1
         return mean(o.var), std(o.var)
     else
@@ -141,7 +141,7 @@ struct FitNormal <: OnlineStat{0, EqualWeight}
     FitNormal() = new(Variance())
 end
 fit!(o::FitNormal, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function _value(o::FitNormal)
+function value(o::FitNormal)
     if o.var.nobs > 1
         return mean(o.var), std(o.var)
     else
@@ -170,7 +170,7 @@ function fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64)
     fit!(o.mvmean, y, γ)
     o
 end
-function _value(o::FitMultinomial)
+function value(o::FitMultinomial)
     m = value(o.mvmean)
     p = length(o.mvmean.stats)
     if o.nobs > 0
@@ -195,7 +195,7 @@ struct FitMvNormal<: OnlineStat{1, EqualWeight}
 end
 Base.length(o::FitMvNormal) = length(o.cov)
 fit!{T<:Real}(o::FitMvNormal, y::AbstractVector{T}, γ::Float64) = fit!(o.cov, y, γ)
-function _value(o::FitMvNormal)
+function value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)
         return mean(o.cov), c
