@@ -321,14 +321,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MSPIF",
-    "page": "API",
-    "title": "OnlineStats.MSPIF",
-    "category": "Type",
-    "text": "Experimental: MSPI-full matrix\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStats.NADAM",
     "page": "API",
     "title": "OnlineStats.NADAM",
@@ -382,14 +374,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.mapblocks",
     "category": "Function",
     "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax\n\nExample\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.maprows-Tuple",
-    "page": "API",
-    "title": "OnlineStats.maprows",
-    "category": "Method",
-    "text": "Deprecated: See mapblocks.\n\n\n\n"
 },
 
 {
