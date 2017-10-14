@@ -5,14 +5,12 @@ import StatsBase
 
 
 @testset "mapblocks" begin
-    mapblocks(5, randn(6)) do x
-        println("mapblocks 1")
-    end
-    mapblocks(5, randn(6, 2)) do x
-        println("mapblocks  2")
-    end
-    mapblocks(4, (randn(7, 2), randn(7))) do xy
-        println("mapblocks   3")
+    for o = [randn(6), randn(6,2), (randn(7,2), randn(7))]
+        i = 0
+        mapblocks(5, o) do x
+            i += 1
+        end
+        @test i == 2
     end
 
     s = Series(StatLearn(5))
@@ -21,7 +19,15 @@ import StatsBase
         fit!(s, xy)
     end
     s2 = Series((x,y), StatLearn(5))
+    @test nobs(s2) == nobs(s)
     @test s == s2
+
+    s3 = Series(StatLearn(5))
+    mapblocks(11, (x', y), Cols()) do xy
+        fit!(s3, xy, Cols())
+    end
+    @test nobs(s3) == 100
+    @test all(value(s) .≈ value(s3))
 end
 
 @testset "Distributions" begin
