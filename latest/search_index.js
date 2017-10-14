@@ -377,11 +377,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.maprows-Tuple{Function,Integer,Vararg{Any,N} where N}",
+    "location": "pages/api.html#OnlineStats.mapblocks",
+    "page": "API",
+    "title": "OnlineStats.mapblocks",
+    "category": "Function",
+    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax\n\nExample\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStats.maprows-Tuple",
     "page": "API",
     "title": "OnlineStats.maprows",
     "category": "Method",
-    "text": "maprows(f::Function, b::Integer, data...)\n\nMap rows of data in batches of size b.  Most usage is done through do blocks.\n\ns = Series(Mean())\nmaprows(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
+    "text": "Deprecated: See mapblocks.\n\n\n\n"
 },
 
 {
