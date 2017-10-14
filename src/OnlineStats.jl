@@ -12,7 +12,7 @@ using Reexport, RecipesBase
 
 export
     # functions
-    maprows, confint, coeftable, vcov, mse, stderr,
+    mapblocks, maprows, confint, coeftable, vcov, mse, stderr,
     # Statlearn and Updaters
     StatLearn,
     SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
@@ -22,40 +22,58 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal
 
-#-----------------------------------------------------------------------------# types
-# const AA        = AbstractArray
-const VecF      = Vector{Float64}
-# const MatF      = Matrix{Float64}
-# const AVec{T}   = AbstractVector{T}
-# const AMat{T}   = AbstractMatrix{T}
-# const AVecF     = AVec{Float64}
-# const AMatF     = AMat{Float64}
 
+const VecF = Vector{Float64}
 
-#---------------------------------------------------------------------------# maprows
-rows(x::AbstractVector, rng) = view(x, rng)
-rows(x::AbstractMatrix, rng) = view(x, rng, :)
+#-----------------------------------------------------------------------# mapblocks
+"Deprecated: See [`mapblocks`](@ref)."
+function maprows(args...)
+    Base.depwarn("maprows is deprecated.  Use mapblocks instead.  See `?mapblocks`", :maprows)
+    mapblocks(args...)
+end
 
 """
-    maprows(f::Function, b::Integer, data...)
+    mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())
 
-Map rows of `data` in batches of size `b`.  Most usage is done through `do` blocks.
+Map `data` in batches of size `b` to the function `f`.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on `dim`.  Most usage is through Julia's `do` block syntax
+
+# Example
 
     s = Series(Mean())
-    maprows(10, randn(100)) do yi
+    mapblocks(10, randn(100)) do yi
         fit!(s, yi)
         info("nobs: \$(nobs(s))")
     end
 """
-function maprows(f::Function, b::Integer, data...)
-    n = size(data[1], 1)
+function mapblocks(f::Function, b::Integer, y, dim::ObsDimension = Rows())
+    n = _nobs(y, dim)
     i = 1
     while i <= n
         rng = i:min(i + b - 1, n)
-        batch_data = map(x -> rows(x, rng), data)
-        f(batch_data...)
+        yi = getblock(y, rng, dim)
+        f(yi)
         i += b
     end
+end
+
+_nobs(y::VectorOb, ::ObsDimension) = length(y)
+_nobs(y::AbstractMatrix, ::Rows) = size(y, 1)
+_nobs(y::AbstractMatrix, ::Cols) = size(y, 2)
+function _nobs(y::Tuple{AbstractMatrix, VectorOb}, dim::ObsDimension)
+    n = _nobs(first(y), dim)
+    if all(_nobs.(y, dim) .== n)
+        return n
+    else
+        error("Data objects have different nobs")
+    end
+end
+
+
+getblock(y::VectorOb, rng, ::ObsDimension) = @view y[rng]
+getblock(y::AbstractMatrix, rng, ::Rows) = @view y[rng, :]
+getblock(y::AbstractMatrix, rng, ::Cols) = @view y[:, rng]
+function getblock(y::Tuple{AbstractMatrix, VectorOb}, rng, dim::ObsDimension)
+    map(x -> getblock(x, rng, dim), y)
 end
 
 

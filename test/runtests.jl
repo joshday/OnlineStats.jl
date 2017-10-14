@@ -4,13 +4,24 @@ using OnlineStats, Base.Test
 import StatsBase
 
 
-@testset "maprows" begin
-    x = randn(100, 5)
-    s = Series(CovMatrix(5))
-    maprows(26, x) do xi
-        fit!(s, xi)
-        println("maprows: this should print 4 times")
+@testset "mapblocks" begin
+    mapblocks(5, randn(6)) do x
+        println("mapblocks 1")
     end
+    mapblocks(5, randn(6, 2)) do x
+        println("mapblocks  2")
+    end
+    mapblocks(4, (randn(7, 2), randn(7))) do xy
+        println("mapblocks   3")
+    end
+
+    s = Series(StatLearn(5))
+    x, y = randn(100,5), randn(100)
+    mapblocks(10, (x,y)) do xy
+        fit!(s, xy)
+    end
+    s2 = Series((x,y), StatLearn(5))
+    @test s == s2
 end
 
 @testset "Distributions" begin
