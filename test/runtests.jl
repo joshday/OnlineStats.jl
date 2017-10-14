@@ -13,6 +13,7 @@ import StatsBase
         @test i == 2
     end
 
+    # (1, 0) input
     s = Series(StatLearn(5))
     x, y = randn(100,5), randn(100)
     mapblocks(10, (x,y)) do xy
@@ -28,6 +29,17 @@ import StatsBase
     end
     @test nobs(s3) == 100
     @test all(value(s) .≈ value(s3))
+
+    # 1 input
+    s4 = Series(CovMatrix(5))
+    mapblocks(11, x) do xi
+        fit!(s4, xi)
+    end
+    s5 = Series(CovMatrix(5))
+    mapblocks(11, x', Cols()) do xi
+        fit!(s5, xi, Cols())
+    end
+    @test s4 == s5
 end
 
 @testset "Distributions" begin
