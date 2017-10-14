@@ -437,20 +437,18 @@ function fit!(o::StatLearn{MSPIC}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 
-#-----------------------------------------------------------------------# MSPIF
-"Experimental: MSPI-full matrix"
-struct MSPIF <: Updater
-    H::Matrix{Float64}
-    MSPIF(p = 0) = new(zeros(p, p))
-end
-init(u::MSPIF, p) = MSPIF(p)
-function fit!(o::StatLearn{MSPIF}, x::VectorOb, y::Real, γ::Float64)
-    gradient!(o, x, y)
-    fullH!(o, x, y)
-    o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
-end
-
-
+# #-----------------------------------------------------------------------# MSPIF
+# "Experimental: MSPI-full matrix"
+# struct MSPIF <: Updater
+#     H::Matrix{Float64}
+#     MSPIF(p = 0) = new(zeros(p, p))
+# end
+# init(u::MSPIF, p) = MSPIF(p)
+# function fit!(o::StatLearn{MSPIF}, x::VectorOb, y::Real, γ::Float64)
+#     gradient!(o, x, y)
+#     fullH!(o, x, y)
+#     o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
+# end
 
 
 # #-----------------------------------------------------------------------# SPI

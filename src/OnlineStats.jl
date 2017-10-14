@@ -26,11 +26,8 @@ export
 const VecF = Vector{Float64}
 
 #-----------------------------------------------------------------------# mapblocks
-"Deprecated: See [`mapblocks`](@ref)."
-function maprows(args...)
-    Base.depwarn("maprows is deprecated.  Use mapblocks instead.  See `?mapblocks`", :maprows)
-    mapblocks(args...)
-end
+@deprecate maprows(f::Function, b::Int, data) mapblocks(f::Function, b::Int, data, Rows())
+
 
 """
     mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())

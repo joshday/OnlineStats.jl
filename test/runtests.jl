@@ -3,6 +3,8 @@ module OnlineStatsTest
 using OnlineStats, Base.Test
 import StatsBase
 
+@show StatLearn(5)
+
 
 @testset "mapblocks" begin
     for o = [randn(6), randn(6,2), (randn(7,2), randn(7))]
@@ -40,6 +42,8 @@ import StatsBase
         fit!(s5, xi, Cols())
     end
     @test s4 == s5
+
+    @test_throws Exception mapblocks(sum, 10, (x,y), Cols())
 end
 
 @testset "Distributions" begin
@@ -107,7 +111,8 @@ end
     x = randn(n, p)
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
-    for u in [SGD(), NSGD(), ADAGRAD(), ADADELTA(), RMSPROP(), ADAM(), ADAMAX()]
+    for u in [SGD(), NSGD(), ADAGRAD(), ADADELTA(), RMSPROP(), ADAM(), ADAMAX(), NADAM(), OMAPQ(),
+            OMASQ(), MSPIC()]
         o = @inferred StatLearn(p, .5 * L2DistLoss(), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
         fit!(s, (x, y))
@@ -116,12 +121,16 @@ end
         @test nobs(s) == 3 * n
         @test coef(o) == o.β
         @test predict(o, x) == x * o.β
+        @test predict(o, x', Cols()) ≈ x * o.β
         @test predict(o, x[1,:]) == x[1,:]'o.β
         @test loss(o, x, y) == value(o.loss, y, predict(o, x), AvgMode.Mean())
 
         o = StatLearn(p, LogitMarginLoss())
         o.β[:] = ones(p)
         @test classify(o, x) == sign.(vec(sum(x, 2)))
+
+        os = OnlineStats.statlearnpath(o, 0:.01:.1)
+        @test length(os) == length(0:.01:.1)
 
         @testset "Type stability with arbitrary argument order" begin
             l, r, v = L2DistLoss(), L2Penalty(), fill(.1, p)
