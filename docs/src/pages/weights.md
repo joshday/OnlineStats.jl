@@ -1,7 +1,5 @@
 # Weighting
 
-![](https://user-images.githubusercontent.com/8075494/31587278-e4cc3996-b1ac-11e7-93d6-c650c6d2a362.gif)
-
 Series are parameterized by a `Weight` type that controls the influence of the next observation.
 
 Consider how weights affect the influence of the next observation on an online mean ``\theta^{(t)}``, as many OnlineStats use updates of this form.  A larger weight  ``\gamma_t`` puts higher influence on the new observation ``x_t``:
