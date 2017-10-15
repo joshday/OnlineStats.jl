@@ -313,11 +313,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MSPIC",
+    "location": "pages/api.html#OnlineStats.MSPIQ",
     "page": "API",
-    "title": "OnlineStats.MSPIC",
+    "title": "OnlineStats.MSPIQ",
     "category": "Type",
-    "text": "MSPIC()\n\nMSPI-Q algorithm using a Lipschitz constant to majorize the objective.\n\n\n\n"
+    "text": "MSPIQ()\n\nMSPI-Q algorithm using a Lipschitz constant to majorize the objective.\n\n\n\n"
 },
 
 {
@@ -342,14 +342,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.OMASQ",
     "category": "Type",
     "text": "Experimental: OMM-constant\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStats.OMASQF",
-    "page": "API",
-    "title": "OnlineStats.OMASQF",
-    "category": "Type",
-    "text": "Experimental: OMM-full matrix\n\n\n\n"
 },
 
 {
