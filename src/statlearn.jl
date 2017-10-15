@@ -12,6 +12,7 @@ const DWDLike               = DWDMarginLoss
 abstract type Updater end
 abstract type SGUpdater <: Updater end
 init(u::Updater, p) = u
+Base.show(io::IO, u::Updater) = print(io, name(u))
 
 
 doc"""
@@ -365,7 +366,6 @@ mutable struct OMASQ <: Updater
 end
 OMASQ() = OMASQ(0.0, zeros(0))
 init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
-Base.show(io::IO, u::OMASQ) = print(io, "OMASQ")
 
 function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
@@ -378,31 +378,30 @@ function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 
-#-----------------------------------------------------------------------# OMASQF
-"Experimental: OMM-full matrix"
-mutable struct OMASQF <: Updater
-    H::Matrix{Float64}
-    smoothedH::Matrix{Float64}
-    b::VecF
-end
-OMASQF() = OMASQF(zeros(0, 0), zeros(0, 0), zeros(0))
-init(u::OMASQF, p) = OMASQF(zeros(p, p), zeros(p, p), zeros(p))
-Base.show(io::IO, u::OMASQF) = print(io, "OMASQF")
-
-function fit!(o::StatLearn{OMASQF}, x::VectorOb, y::Real, γ::Float64)
-    U = o.updater
-    gradient!(o, x, y)
-    fullH!(o, x, y)
-    smooth!(U.smoothedH, U.H, γ)
-    smooth!(U.b, U.H * o.β - o.gx, γ)
-    try
-        o.β[:] = (U.smoothedH + ϵ * I) \ U.b
-    end
-end
+# #-----------------------------------------------------------------------# OMASQF
+# "Experimental: OMM-full matrix"
+# mutable struct OMASQF <: Updater
+#     H::Matrix{Float64}
+#     smoothedH::Matrix{Float64}
+#     b::VecF
+# end
+# OMASQF() = OMASQF(zeros(0, 0), zeros(0, 0), zeros(0))
+# init(u::OMASQF, p) = OMASQF(zeros(p, p), zeros(p, p), zeros(p))
+# Base.show(io::IO, u::OMASQF) = print(io, "OMASQF")
+#
+# function fit!(o::StatLearn{OMASQF}, x::VectorOb, y::Real, γ::Float64)
+#     U = o.updater
+#     gradient!(o, x, y)
+#     fullH!(o, x, y)
+#     smooth!(U.smoothedH, U.H, γ)
+#     smooth!(U.b, U.H * o.β - o.gx, γ)
+#     try
+#         o.β[:] = (U.smoothedH + ϵ * I) \ U.b
+#     end
+# end
 
 #-----------------------------------------------------------------------# OMAPQ
 struct OMAPQ <: Updater end
-Base.show(io::IO, u::OMAPQ) = print(io, "OMAPQ")
 function fit!(o::StatLearn{OMAPQ}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     h_inv = inv(constH(o, x, y))
@@ -410,54 +409,29 @@ function fit!(o::StatLearn{OMAPQ}, x::VectorOb, y::Real, γ::Float64)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
 end
-#-----------------------------------------------------------------------# OMAPQF
-struct OMAPQF <: Updater
-    H::Matrix{Float64}
-    OMAPQF(p = 0) = new(η, zeros(p, p))
-end
-Base.show(io::IO, u::OMAPQF) = print(io, "OMAPQF")
-init(o::OMAPQF, p) = OMAPQF(p)
-function fit!(o::StatLearn{OMAPQF}, x::VectorOb, y::Real, γ::Float64)
-    gradient!(o, x, y)
-    fullH!(o, x, y)
-    o.β[:] -= γ * ((o.updater.H + ϵ * I) \ o.gx)
-end
+# #-----------------------------------------------------------------------# OMAPQF
+# struct OMAPQF <: Updater
+#     H::Matrix{Float64}
+#     OMAPQF(p = 0) = new(η, zeros(p, p))
+# end
+# Base.show(io::IO, u::OMAPQF) = print(io, "OMAPQF")
+# init(o::OMAPQF, p) = OMAPQF(p)
+# function fit!(o::StatLearn{OMAPQF}, x::VectorOb, y::Real, γ::Float64)
+#     gradient!(o, x, y)
+#     fullH!(o, x, y)
+#     o.β[:] -= γ * ((o.updater.H + ϵ * I) \ o.gx)
+# end
 
-#-----------------------------------------------------------------------# MSPIC
+#-----------------------------------------------------------------------# MSPIQ
 """
-    MSPIC()
+    MSPIQ()
 MSPI-Q algorithm using a Lipschitz constant to majorize the objective.
 """
-struct MSPIC <: Updater end
-function fit!(o::StatLearn{MSPIC}, x::VectorOb, y::Real, γ::Float64)
+struct MSPIQ <: Updater end
+function fit!(o::StatLearn{MSPIQ}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     denom = inv(1 + γ * constH(o, x, y))
     for j in eachindex(o.β)
         @inbounds o.β[j] -= γ * denom * o.gx[j]
     end
 end
-
-# #-----------------------------------------------------------------------# MSPIF
-# "Experimental: MSPI-full matrix"
-# struct MSPIF <: Updater
-#     H::Matrix{Float64}
-#     MSPIF(p = 0) = new(zeros(p, p))
-# end
-# init(u::MSPIF, p) = MSPIF(p)
-# function fit!(o::StatLearn{MSPIF}, x::VectorOb, y::Real, γ::Float64)
-#     gradient!(o, x, y)
-#     fullH!(o, x, y)
-#     o.β[:] = o.β - γ * ((I + γ * o.updater.H) \ o.gx)
-# end
-
-
-# #-----------------------------------------------------------------------# SPI
-# "Stochastic Proximal Iteration"
-# struct SPI <: Updater end
-# fit!(o::StatLearn{SPI}, x, y, γ) = spi!(o, x, y, γ)
-#
-# spi!(o::StatLearn, x, y, γ) = error("$(o.loss) is not defined for SPI")
-# function spi!(o::StatLearn{SPI, LinearRegression}, x, y, γ)
-#     o.β[:] = (I + γ * x * x') \ (o.β + γ * y * x)
-# end
-# spi!(o::StatLearn{SPI, L2DistLoss}, x, y, γ) = (o.β[:] = (I + 2γ * x * x') \ (o.β + 2γ * y * x))

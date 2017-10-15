@@ -15,8 +15,7 @@ export
     mapblocks, maprows, confint, coeftable, vcov, mse, stderr,
     # Statlearn and Updaters
     StatLearn,
-    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM,
-    OMASQ, OMASQF, OMAPQ, OMAPQF, MSPIC, MSPIF,
+    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM, OMASQ, OMAPQ, MSPIQ,
     loss, objective, classify, statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,

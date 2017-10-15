@@ -124,9 +124,10 @@ end
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
     for u in [SGD(), NSGD(), ADAGRAD(), ADADELTA(), RMSPROP(), ADAM(), ADAMAX(), NADAM(), OMAPQ(),
-            OMASQ(), MSPIC()]
+            OMASQ(), MSPIQ()]
         o = @inferred StatLearn(p, .5 * L2DistLoss(), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
+        @test objective(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
         fit!(s, (x, y))
         fit!(s, (x, y), .1)
         fit!(s, (x, y), StatsBase.Weights(rand(length(y))))
@@ -171,5 +172,9 @@ end
             @inferred StatLearn(p)
         end
     end
+    @testset "MM-based" begin
+        x, y = randn(100, 5), randn(100)
+        @test_throws ErrorException Series((x,y), StatLearn(5, PoissonLoss(), OMASQ()))
+    end
 end
-end
+end #module
