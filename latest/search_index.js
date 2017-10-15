@@ -645,7 +645,31 @@ var documenterSearchIndex = {"docs": [
     "page": "Extending OnlineStats",
     "title": "Extending OnlineStats",
     "category": "section",
-    "text": "Creating new OnlineStat types should be accomplished through OnlineStatsBase.jl, a light-weight package which defines the OnlineStats interface."
+    "text": "Creating new OnlineStat types should be accomplished through OnlineStatsBase.jl, a lightweight package which defines the OnlineStats interface."
+},
+
+{
+    "location": "pages/newstats.html#Make-a-subtype-of-OnlineStat-and-give-it-a-fit!-method.-1",
+    "page": "Extending OnlineStats",
+    "title": "Make a subtype of OnlineStat and give it a fit! method.",
+    "category": "section",
+    "text": "using OnlineStatsBase\n\nmutable struct MyMean <: OnlineStat{0, EqualWeight}\n    value::Float64\n    MyMean() = new(0.0)\nend\n\nOnlineStatsBase.fit!(o::MyMean, y::Real, w::Float64) = (o.value += w * (y - o.value))"
+},
+
+{
+    "location": "pages/newstats.html#That's-all-there-is-to-it-1",
+    "page": "Extending OnlineStats",
+    "title": "That's all there is to it",
+    "category": "section",
+    "text": "using OnlineStats\n\ny = randn(1000)\n\ns = Series(MyMean(), Variance())\n\nfor yi in y\n    fit!(s, yi)\nend\n\nvalue(s)\nmean(y), var(y)"
+},
+
+{
+    "location": "pages/newstats.html#Details-1",
+    "page": "Extending OnlineStats",
+    "title": "Details",
+    "category": "section",
+    "text": "An OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has."
 },
 
 ]}
