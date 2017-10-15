@@ -10,8 +10,6 @@ Consider how weights affect the influence of the next observation on an online m
 
 ![](https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png)
 
-![](https://user-images.githubusercontent.com/8075494/31586782-0050e6de-b1a4-11e7-9ada-895c7aeb6a90.gif)
-
 
 ## [`EqualWeight()`](@ref)  
 - Each observation has an equal amount of influence.
