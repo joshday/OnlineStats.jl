@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Weighting",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how the following weighting schemes affect the influence of the next observation on an online mean.  Many OnlineStats have an update of this form:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_t(Image: )"
+    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_t(Image: )(Image: )"
 },
 
 {
@@ -125,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Series",
     "category": "section",
-    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksThe Weight\nAn OnlineStat or tuple of OnlineStats."
+    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksThe Weight\nA tuple of OnlineStats."
 },
 
 {
@@ -133,7 +133,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Creating",
     "category": "section",
-    "text": "Start \"empty\"Series(Mean())\nSeries(Mean(), Variance())\n\nSeries(ExponentialWeight(), Mean())\nSeries(ExponentialWeight(), Mean(), Variance())Start with initial datay = randn(100)\n\nSeries(y, Mean())\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean())\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean())\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
+    "text": ""
+},
+
+{
+    "location": "pages/series.html#Start-\"empty\"-1",
+    "page": "Series",
+    "title": "Start \"empty\"",
+    "category": "section",
+    "text": "Series(Mean(), Variance())\n\nSeries(ExponentialWeight(), Mean(), Variance())"
+},
+
+{
+    "location": "pages/series.html#Start-with-initial-data-1",
+    "page": "Series",
+    "title": "Start with initial data",
+    "category": "section",
+    "text": "y = randn(100)\n\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
 },
 
 {
@@ -141,7 +157,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Updating",
     "category": "section",
-    "text": ""
+    "text": "A Series can be updated with a single observation or a collection of observations.  fit!(series, data)"
 },
 
 {
@@ -149,13 +165,13 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Single observation",
     "category": "section",
-    "text": "note: Note\nThe input type of the OnlineStat(s) determines what a single observation is.  For a Mean, a single observation is a Real.  For OnlineStats such as CovMatrix, a single observation is an AbstractVector or NTuple.s = Series(Mean())\nfit!(s, randn())\n\ns = Series(CovMatrix(4))\nfit!(s, randn(4))\nfit!(s, randn(4))"
+    "text": "note: Note\nA single observation depends on the OnlineStat.  For example, a single observation for a Mean is Real and for a CovMatrix is AbstractVector or Tuple.s = Series(Mean())\nfit!(s, randn())\n\ns = Series(CovMatrix(4))\nfit!(s, randn(4))"
 },
 
 {
-    "location": "pages/series.html#Single-observation,-override-weight-1",
+    "location": "pages/series.html#Single-observation,-override-Weight-1",
     "page": "Series",
-    "title": "Single observation, override weight",
+    "title": "Single observation, override Weight",
     "category": "section",
     "text": "s = Series(Mean())\nfit!(s, randn(), .1)"
 },
@@ -165,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Multiple observations",
     "category": "section",
-    "text": "note: Note\nThe input type of the OnlineStat(s) determines what multiple observations are.  For a Mean, this would be an AbstractVector.  For a CovMatrix, this would be an AbstractMatrix.  By default, each row is considered an observation.  You can use column observations with ObsDim.Last() (see below).s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))                 # Obs. in rows\nfit!(s, randn(4, 100), ObsDim.Last())  # Obs. in columns"
+    "text": "note: Note\nIf a single observation is a Vector, a Matrix is ambiguous in how the observations are stored.  A Rows() (default) or Cols() argument can be added to the fit! call to specify observations are in rows or columns, respectively.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))          # Obs. in rows\nfit!(s, randn(4, 100), Cols())  # Obs. in columns"
 },
 
 {
@@ -181,7 +197,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Multiple observations, provide vector of weights",
     "category": "section",
-    "text": "s = Series(Mean())\nfit!(s, randn(100), rand(100))"
+    "text": "s = Series(Mean())\nw = StatsBase.Weights(rand(100))\nfit!(s, randn(100), w)"
 },
 
 {
@@ -189,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Merging",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.  The syntax for in-place merging ismerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
+    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
 },
 
 {
