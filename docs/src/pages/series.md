@@ -2,35 +2,38 @@
 
 The `Series` type is the workhorse of OnlineStats.  A Series tracks
 1. The `Weight`
-2. An OnlineStat or tuple of OnlineStats.
+2. A tuple of OnlineStats.
 
 ## Creating
-- Start "empty"
+### Start "empty"
 ```julia
-Series(Mean())
 Series(Mean(), Variance())
 
-Series(ExponentialWeight(), Mean())
 Series(ExponentialWeight(), Mean(), Variance())
 ```
-- Start with initial data
+### Start with initial data
 ```julia
 y = randn(100)
 
-Series(y, Mean())
 Series(y, Mean(), Variance())
 
-Series(y, ExponentialWeight(.01), Mean())
 Series(y, ExponentialWeight(.01), Mean(), Variance())
 
-Series(ExponentialWeight(.01), y, Mean())
 Series(ExponentialWeight(.01), y, Mean(), Variance())
 ```
 
 ## Updating
-#### Single observation
+
+A Series can be updated with a single observation or a collection of observations.  
+
+```julia
+fit!(series, data)
+```
+
+
+### Single observation
 !!! note
-    The input type of the OnlineStat(s) determines what a single observation is.  For a `Mean`, a single observation is a `Real`.  For OnlineStats such as `CovMatrix`, a single observation is an `AbstractVector` or `NTuple`.
+    A single observation depends on the OnlineStat.  For example, a single observation for a `Mean` is `Real` and for a `CovMatrix` is `AbstractVector` or `Tuple`.
 
 ```julia
 s = Series(Mean())
@@ -38,42 +41,45 @@ fit!(s, randn())
 
 s = Series(CovMatrix(4))
 fit!(s, randn(4))
-fit!(s, randn(4))
 ```
-#### Single observation, override weight
+#### Single observation, override Weight
 ```julia
 s = Series(Mean())
 fit!(s, randn(), .1)
 ```
-#### Multiple observations
+### Multiple observations
 !!! note
-    The input type of the OnlineStat(s) determines what multiple observations are.  For a `Mean`, this would be an `AbstractVector`.  For a `CovMatrix`, this would be an `AbstractMatrix`.  By default, each *row* is considered an observation.  You can use column observations with `ObsDim.Last()` (see below).
+    If a single observation is a Vector, a Matrix is ambiguous in how the observations are stored.  A `Rows()` (default) or `Cols()` argument can be added to the `fit!` call to specify observations are in rows or columns, respectively.
 
 ```julia
 s = Series(Mean())
 fit!(s, randn(100))
 
 s = Series(CovMatrix(4))
-fit!(s, randn(100, 4))                 # Obs. in rows
-fit!(s, randn(4, 100), ObsDim.Last())  # Obs. in columns
+fit!(s, randn(100, 4))          # Obs. in rows
+fit!(s, randn(4, 100), Cols())  # Obs. in columns
 ```
+
 #### Multiple observations, use the same weight for all
 ```julia
 s = Series(Mean())
 fit!(s, randn(100), .01)
 ```
+
 #### Multiple observations, provide vector of weights
 ```julia
 s = Series(Mean())
-fit!(s, randn(100), rand(100))
+w = StatsBase.Weights(rand(100))
+fit!(s, randn(100), w)
 ```
 
 ## Merging
 
 Two Series can be merged if they track the same OnlineStats and those OnlineStats are
-mergeable.  The syntax for in-place merging is
+mergeable.
 
 ```julia
+merge(series1, series2, arg)
 merge!(series1, series2, arg)
 ```
 

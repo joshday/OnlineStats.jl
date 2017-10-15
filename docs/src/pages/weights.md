@@ -2,12 +2,15 @@
 
 Series are parameterized by a `Weight` type that controls the influence of the next observation.
 
-Consider how the following weighting schemes affect the influence of the next observation on an online mean.  Many OnlineStats have an update of this form:
+Consider how weights affect the influence of the next observation on an online mean ``\theta^{(t)}``, as many OnlineStats use updates of this form.  A larger weight  ``\gamma_t`` puts higher influence on the new observation ``x_t``:
 
 ```math
 \theta^{(t)} = (1-\gamma_t)\theta^{(t-1)} + \gamma_t x_t
 ```
+
 ![](https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png)
+
+![](https://user-images.githubusercontent.com/8075494/31586782-0050e6de-b1a4-11e7-9ada-895c7aeb6a90.gif)
 
 
 ## [`EqualWeight()`](@ref)  
