@@ -381,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.mapblocks",
     "category": "Function",
-    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax\n\nExample\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
+    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
 },
 
 {
@@ -398,6 +398,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.Bounded",
     "category": "Type",
     "text": "Bounded(weight, λ)\n\nGive a Weight a lower bound.\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.CStat",
+    "page": "API",
+    "title": "OnlineStatsBase.CStat",
+    "category": "Type",
+    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
 },
 
 {
