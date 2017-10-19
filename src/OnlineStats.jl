@@ -31,15 +31,22 @@ const VecF = Vector{Float64}
 """
     mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())
 
-Map `data` in batches of size `b` to the function `f`.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on `dim`.  Most usage is through Julia's `do` block syntax
+Map `data` in batches of size `b` to the function `f`.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on `dim`.  Most usage is through Julia's `do` block syntax.
 
-# Example
+# Examples
 
     s = Series(Mean())
     mapblocks(10, randn(100)) do yi
         fit!(s, yi)
         info("nobs: \$(nobs(s))")
     end
+
+    x = [1 2 3 4; 
+         1 2 3 4; 
+         1 2 3 4;
+         1 2 3 4]
+    mapblocks(println, 2, x)
+    mapblocks(println, 2, x, Cols())
 """
 function mapblocks(f::Function, b::Integer, y, dim::ObsDimension = Rows())
     n = _nobs(y, dim)
