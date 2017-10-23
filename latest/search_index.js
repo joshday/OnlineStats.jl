@@ -325,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "Type",
-    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE).\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\no = FitNormal()\ns = Series(y, o)\nNormal(value)\n\n\n\n"
+    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE).\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\no = FitNormal()\ns = Series(y, o)\nNormal(value(o)...)\n\n\n\n"
 },
 
 {
