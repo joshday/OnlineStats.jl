@@ -6,8 +6,9 @@ Online parameter estimate of a Beta distribution (Method of Moments).
 
     using Distributions, OnlineStats
     y = rand(Beta(3, 5), 1000)
-    s = Series(y, FitBeta())
-    Beta(value(s)...)
+    o = FitBeta()
+    s = Series(y, o)
+    Beta(value(o)...)
 """
 struct FitBeta <: OnlineStat{0, EqualWeight}
     var::Variance
@@ -59,8 +60,9 @@ Online parameter estimate of a Cauchy distribution.
 
     using Distributions
     y = rand(Cauchy(0, 10), 10_000)
-    s = Series(y, FitCauchy())
-    Cauchy(value(s)...)
+    o = FitCauchy()
+    s = Series(y, o)
+    Cauchy(value(o)...)
 """
 mutable struct FitCauchy <: OnlineStat{0, LearningRate}
     q::QuantileMM
@@ -83,8 +85,9 @@ Online parameter estimate of a Gamma distribution (Method of Moments).
 
     using Distributions
     y = rand(Gamma(5, 1), 1000)
-    s = Series(y, FitGamma())
-    Gamma(value(s)...)
+    o = FitGamma()
+    s = Series(y, o)
+    Gamma(value(o)...)
 """
 # method of moments. TODO: look at Distributions for MLE
 struct FitGamma <: OnlineStat{0, EqualWeight}
@@ -111,8 +114,9 @@ Online parameter estimate of a LogNormal distribution (MLE).
 
     using Distributions
     y = rand(LogNormal(3, 4), 1000)
-    s = Series(y, FitLogNormal())
-    LogNormal(value(s)...)
+    o = FitLogNormal()
+    s = Series(y, o)
+    LogNormal(value(o)...)
 """
 struct FitLogNormal <: OnlineStat{0, EqualWeight}
     var::Variance
@@ -134,7 +138,9 @@ Online parameter estimate of a Normal distribution (MLE).
 
     using Distributions
     y = rand(Normal(-3, 4), 1000)
-    s = Series(y, FitNormal())
+    o = FitNormal()
+    s = Series(y, o)
+    Normal(value)
 """
 struct FitNormal <: OnlineStat{0, EqualWeight}
     var::Variance
@@ -153,12 +159,15 @@ end
 """
     FitMultinomial(p)
 
-Online parameter estimate of a Multinomial distribution.
+Online parameter estimate of a Multinomial distribution.  The sum of counts does not need
+to be consistent across observations.  Therefore, the `n` parameter of the Multinomial 
+distribution is returned as 1.
 
     using Distributions
     y = rand(Multinomial(10, [.2, .2, .6]), 1000)
-    s = Series(y', FitMultinomial())
-    Multinomial(value(s)...)
+    o = FitMultinomial(3)
+    s = Series(y', o)
+    Multinomial(value(o)...)
 """
 mutable struct FitMultinomial <: OnlineStat{1, EqualWeight}
     mvmean::MV{Mean}
@@ -187,7 +196,9 @@ Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
 
     using Distributions
     y = rand(MvNormal(zeros(3), eye(3)), 1000)
-    s = Series(y', FitMvNormal(3))
+    o = FitMvNormal(3)
+    s = Series(y', o)
+    MvNormal(value(o)...)
 """
 struct FitMvNormal<: OnlineStat{1, EqualWeight}
     cov::CovMatrix
