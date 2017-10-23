@@ -101,7 +101,7 @@ function gradient!(o::StatLearn, x::VectorOb, y::Real)
         @inbounds gx[i] = g * x[i]
     end
 end
-# Batch version (unused)
+# Batch version (unused unless we add minibatch updates)
 # function gradient!(o::StatLearn, x::AbstractMatrix, y::VectorOb)
 #     xβ = x * o.β
 #     g = deriv(o.loss, y, xβ)
