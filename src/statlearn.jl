@@ -1,13 +1,3 @@
-const LinearRegression      = LossFunctions.ScaledDistanceLoss{L2DistLoss,0.5}
-const L1Regression          = L1DistLoss
-const LogisticRegression    = LogitMarginLoss
-const PoissonRegression     = PoissonLoss
-const HuberRegression       = HuberLoss
-const SVMLike               = L1HingeLoss
-const QuantileRegression    = QuantileLoss
-const DWDLike               = DWDMarginLoss
-
-
 #-----------------------------------------------------------------------------# StatLearn
 abstract type Updater end
 abstract type SGUpdater <: Updater end
@@ -329,7 +319,7 @@ end
 #-----------------------------------------------------------------------# Majorization-based
 # Updaters below here are experimental and may change.
 
-const LinearRegression      = LossFunctions.ScaledDistanceLoss{L2DistLoss,0.5}
+# const LinearRegression      = LossFunctions.ScaledDistanceLoss{L2DistLoss,0.5}
 const L1Regression          = L1DistLoss
 const LogisticRegression    = LogitMarginLoss
 const PoissonRegression     = PoissonLoss
@@ -339,21 +329,20 @@ const QuantileRegression    = QuantileLoss
 const DWDLike               = DWDMarginLoss
 
 # Lipschitz constant
-constH{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
-constH{A}(o::StatLearn{A, L2DistLoss}, x, y)       = 2x'x
-constH{A}(o::StatLearn{A, LinearRegression}, x, y) = x'x
-constH{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = .25 * x'x
-constH{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)  = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+constH(o::StatLearn{A, L}, x, y) where {A, L} = error("$A is not defined for $L")
+constH(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
 
-# Diagonal Matrix for quadratic upper bound
-diagH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
+const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
+constH(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = 2 * N * x'x 
+constH(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = .25 * x'x
+constH(o::StatLearn{A, <:DWDMarginLoss}, x, y) where {A} = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+
 
 # Full Matrix for quadratic upper bound
-# TODO: assume H is symmetric and optimizie
-fullH!{A, L}(o::StatLearn{A, L}, x, y) = error("$A is not defined for $L")
-fullH!{A}(o::StatLearn{A, L2DistLoss}, x, y)       = (o.updater.H[:] = 2 * x * x')
-fullH!{A}(o::StatLearn{A, LinearRegression}, x, y) = (o.updater.H[:] = x * x')
-fullH!{A}(o::StatLearn{A, LogitMarginLoss}, x, y)  = (o.updater.H[:] = .25 * x * x')
+# TODO: assume H is symmetric and optimize
+fullH!(o::StatLearn{A, L2DistLoss}, x, y) where {A} = (o.updater.H[:] = 2 * x * x')
+fullH!(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = (o.updater.H[:] = 2 * N * x * x')
+fullH!(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = (o.updater.H[:] = .25 * x * x')
 function fullH!{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)
     o.updater.H[:] = ((o.loss.q + 1) ^ 2 / o.loss.q) * x * x'
 end
