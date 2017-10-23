@@ -71,6 +71,9 @@ end
         vals = ["small", "big"]
         s = Series(rand(vals, 100), FitCategorical(String))
         value(s)
+
+        @test keys(o) == keys(o.d)
+        @test values(o) == values(o.d)
     end
     @testset "FitCauchy" begin
         o = FitCauchy()
