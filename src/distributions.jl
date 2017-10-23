@@ -142,7 +142,7 @@ Online parameter estimate of a Normal distribution (MLE).
     y = rand(Normal(-3, 4), 1000)
     o = FitNormal()
     s = Series(y, o)
-    Normal(value)
+    Normal(value(o)...)
 """
 struct FitNormal <: OnlineStat{0, EqualWeight}
     var::Variance
