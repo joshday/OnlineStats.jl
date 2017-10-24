@@ -3,7 +3,8 @@ __precompile__(true)
 module OnlineStats
 
 import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram, fit!
-import OnlineStatsBase: VectorOb, smooth, smooth!, smooth_syr!, ϵ, default_weight, name
+import OnlineStatsBase: ScalarOb, VectorOb, smooth, smooth!, smooth_syr!, ϵ, 
+    default_weight, name
 import LearnBase: ObsDimension, value
 import SweepOperator
 
