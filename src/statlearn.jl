@@ -120,7 +120,13 @@ function fit!(o::StatLearn{<:SGUpdater}, x::VectorOb, y::Real, γ::Float64)
     update!(o, γ)
 end
 
+function Base.merge!(o::T, o2::T, γ::Float64) where {T <: StatLearn}
+    o.λfactor == o2.λfactor || error("Merge failed. StatLearn objects have different λs.")
+    merge!(o.updater, o2.updater, γ)
+    smooth!(o.β, o2.β, γ)
+end
 
+Base.merge!(o::T, o2::T, γ::Float64) where {T <: Updater} = warn("$T can't be merged.")
 
 #-----------------------------------------------------------------------# SGD
 """
@@ -133,9 +139,11 @@ function update!(o::StatLearn{SGD}, γ)
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λfactor[j])
     end
 end
+Base.merge!(o::SGD, o2::SGD, γ::Float64) = nothing
 #-----------------------------------------------------------------------# NSGD
 """
     NSGD(α)
+
 Nesterov accelerated Proximal Stochastic Gradient Descent.
 """
 struct NSGD <: SGUpdater
@@ -156,6 +164,11 @@ function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
     end
 end
+function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
+    o.α == o2.α || error("Merge Failed.  NSGD objects use different α.")
+    smooth!(o.v, o2.v, γ)
+    smooth!(o.θ, o2.θ, γ)
+end
 
 #-----------------------------------------------------------------------# ADAGRAD
 """
@@ -164,18 +177,22 @@ Adaptive (element-wise learning rate) stochastic proximal gradient descent.
 """
 mutable struct ADAGRAD <: SGUpdater
     H::VecF
-    n::Int
+    nobs::Int
     ADAGRAD(p::Integer = 0) = new(zeros(p), 0)
 end
 init(u::ADAGRAD, p) = ADAGRAD(p)
 function update!(o::StatLearn{ADAGRAD}, γ)
     U = o.updater
-    U.n += 1
+    U.nobs += 1
     @inbounds for j in eachindex(o.β)
-        U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, 1 / U.n)
+        U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, 1 / U.nobs)
         s = γ * inv(sqrt(U.H[j] + ϵ))
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
+end
+function Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ::Float64)
+    o.nobs += o2.nobs
+    smooth!(o.H, o2.H, γ)
 end
 
 #-----------------------------------------------------------------------# ADADELTA
@@ -200,6 +217,11 @@ function update!(o::StatLearn{ADADELTA}, γ)
         U.Δβ[j] = smooth(Δβ^2, U.Δβ[j], U.ρ)
     end
 end
+function Base.merge!(o::ADADELTA, o2::ADADELTA, γ::Float64)
+    o.ρ == o2.ρ || error("Merge failed.  ADADELTA objects use different ρ.")
+    smooth!(o.g, o2.g, γ)
+    smooth!(o.Δβ, o2.Δβ, γ)
+end
 
 #-----------------------------------------------------------------------# RMSPROP
 mutable struct RMSPROP <: SGUpdater
@@ -214,7 +236,10 @@ function update!(o::StatLearn{RMSPROP}, γ)
         U.g[j] = U.α * U.g[j] + (1 - U.α) * o.gx[j]^2
         o.β[j] -= γ * o.gx[j] / sqrt(U.g[j] + ϵ)
     end
-
+end
+function Base.merge!(o::RMSPROP, o2::RMSPROP, γ::Float64)
+    o.α == o2.α || error("RMSPROP objects use different α")
+    smooth!(o.g, o2.g, γ)
 end
 
 #-----------------------------------------------------------------------# ADAM
@@ -248,6 +273,13 @@ function update!(o::StatLearn{ADAM}, γ)
         o.β[j] -= s * U.M[j] / (sqrt(U.V[j]) + ϵ)
     end
 end
+function Base.merge!(o::ADAM, o2::ADAM, γ::Float64)
+    (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
+        error("Merge failed.  ADAM objects use different momentum parameters.")
+    o.nups += o2.nups 
+    smooth!(o.M, o2.M, γ)
+    smooth!(o.V, o2.V, γ)
+end
 
 #-----------------------------------------------------------------------# ADAMAX
 """
@@ -277,6 +309,13 @@ function update!(o::StatLearn{ADAMAX}, γ)
         U.V[j] = max(U.β2 * U.V[j], abs(gx))
         o.β[j] -= s * (U.M[j] / (1 - U.β1 ^ U.nups)) / (U.V[j] + ϵ)
     end
+end
+function Base.merge!(o::ADAMAX, o2::ADAMAX, γ::Float64)
+    (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
+        error("Merge failed.  ADAMAX objects use different momentum parameters.")
+    o.nups += o2.nups 
+    smooth!(o.M, o2.M, γ)
+    smooth!(o.V, o2.V, γ)
 end
 
 #-----------------------------------------------------------------------# NADAM
@@ -311,6 +350,13 @@ function update!(o::StatLearn{NADAM}, γ)
         Δ = γ / (sqrt(vt + ϵ)) * (U.β1 * mt + (1 - U.β1) / (1 - U.β1^U.nups) * gx)
         o.β[j] -= Δ
     end
+end
+function Base.merge!(o::NADAM, o2::NADAM, γ::Float64)
+    (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
+        error("Merge failed.  NADAM objects use different momentum parameters.")
+    o.nups += o2.nups 
+    smooth!(o.M, o2.M, γ)
+    smooth!(o.V, o2.V, γ)
 end
 
 
@@ -355,6 +401,7 @@ mutable struct OMASQ <: Updater
 end
 OMASQ() = OMASQ(0.0, zeros(0))
 init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
+Base.merge!(o::OMASQ, o2::OMASQ, γ::Float64) = smooth!(o.b, o2.b, γ)
 
 function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
@@ -398,6 +445,7 @@ function fit!(o::StatLearn{OMAPQ}, x::VectorOb, y::Real, γ::Float64)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
 end
+Base.merge!(o::OMAPQ, o2::OMAPQ, γ::Float64) = nothing
 # #-----------------------------------------------------------------------# OMAPQF
 # struct OMAPQF <: Updater
 #     H::Matrix{Float64}
@@ -424,3 +472,4 @@ function fit!(o::StatLearn{MSPIQ}, x::VectorOb, y::Real, γ::Float64)
         @inbounds o.β[j] -= γ * denom * o.gx[j]
     end
 end
+Base.merge!(o::MSPIQ, o2::MSPIQ, γ::Float64) = nothing

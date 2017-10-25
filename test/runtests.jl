@@ -135,6 +135,9 @@ end
         @test predict(o, x[1,:]) == x[1,:]'o.β
         @test loss(o, x, y) == value(o.loss, y, predict(o, x), AvgMode.Mean())
 
+        # sanity check for merge!
+        merge!(StatLearn(4, u), StatLearn(4, u), .5)
+
         o = StatLearn(p, LogitMarginLoss())
         o.β[:] = ones(p)
         @test classify(o, x) == sign.(vec(sum(x, 2)))
