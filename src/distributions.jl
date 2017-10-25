@@ -26,6 +26,8 @@ function value(o::FitBeta)
         return 1.0, 1.0
     end
 end
+Base.merge!(o::FitBeta, o2::FitBeta, γ::Float64) = merge!(o.var, o2.var, γ)
+
 #---------------------------------------------------------------------------------# Categorical
 """
     FitCategorical(T)
@@ -162,7 +164,7 @@ end
     FitMultinomial(p)
 
 Online parameter estimate of a Multinomial distribution.  The sum of counts does not need
-to be consistent across observations.  Therefore, the `n` parameter of the Multinomial 
+to be consistent across observations.  Therefore, the `n` parameter of the Multinomial
 distribution is returned as 1.
 
     using Distributions

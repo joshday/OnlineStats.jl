@@ -3,48 +3,33 @@ module OnlineStatsTest
 using OnlineStats, Base.Test
 import StatsBase
 
+#-----------------------------------------------------------------------# helpers
+# test: merge is same as fit!
+function test_merge(o1, o2, y1, y2)
+    s1 = @inferred Series(y1, o1)
+    s2 = Series(y2, o2)
+    merge!(s1, s2)
+    fit!(s2, y1)
+    @test value(o1) == value(o1)
+end
+
+# test: value(o) == f(y)
+function test_exact(o, y, f; kw...)
+    s = @inferred Series(y, o; kw...)
+    @test all(value(o) .≈ f(y))
+end
+
+# test: fo(o) == fy(y)
+function test_function(o, y, fo, fy; atol = 1e-10)
+    @inferred Series(y, o)
+    @test all(isapprox.(fo(o), fy(y), atol = atol))
+end
+
+#-----------------------------------------------------------------------# Show
+
 @show StatLearn(5)
 
-
-@testset "mapblocks" begin
-    for o = [randn(6), randn(6,2), (randn(7,2), randn(7))]
-        i = 0
-        mapblocks(5, o) do x
-            i += 1
-        end
-        @test i == 2
-    end
-
-    # (1, 0) input
-    s = Series(StatLearn(5))
-    x, y = randn(100,5), randn(100)
-    mapblocks(10, (x,y)) do xy
-        fit!(s, xy)
-    end
-    s2 = Series((x,y), StatLearn(5))
-    @test nobs(s2) == nobs(s)
-    @test s == s2
-
-    s3 = Series(StatLearn(5))
-    mapblocks(11, (x', y), Cols()) do xy
-        fit!(s3, xy, Cols())
-    end
-    @test nobs(s3) == 100
-    @test all(value(s) .≈ value(s3))
-
-    # 1 input
-    s4 = Series(CovMatrix(5))
-    mapblocks(11, x) do xi
-        fit!(s4, xi)
-    end
-    s5 = Series(CovMatrix(5))
-    mapblocks(11, x', Cols()) do xi
-        fit!(s5, xi, Cols())
-    end
-    @test s4 == s5
-
-    @test_throws Exception mapblocks(sum, 10, (x,y), Cols())
-end
+#-----------------------------------------------------------------------# Tests
 
 @testset "Distributions" begin
     @testset "sanity check" begin
@@ -60,6 +45,7 @@ end
         Series(rand(100), o)
         @test value(o)[1] ≈ 1.0 atol=.4
         @test value(o)[2] ≈ 1.0 atol=.4
+        test_merge(FitBeta(), FitBeta(), rand(50), rand(50))
     end
     @testset "FitCategorical" begin
         y = rand(1:5, 1000)

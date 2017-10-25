@@ -16,7 +16,7 @@ end
 end
 @benchgroup "Series{(1, 0)}" begin
     @bench "LinReg" Series((x,y), LinReg(10))
-    @bench "StatLearn" Series((x,y), StatLearn(10, SGD()))
+    @bench "StatLearn SGD" Series((x,y), StatLearn(10, SGD()))
 end
 
 end #module
