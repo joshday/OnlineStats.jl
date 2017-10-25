@@ -43,10 +43,10 @@ Fit a categorical distribution where the inputs are of type `T`.
     s = Series(rand(vals, 1000), o)
     value(o)
 """
-mutable struct FitCategorical{T<:Any} <: OnlineStat{0, EqualWeight}
+mutable struct FitCategorical{T} <: OnlineStat{0, EqualWeight}
     d::Dict{T, Int}
     nobs::Int
-    FitCategorical{T}() where T<:Any = new(Dict{T, Int}(), 0)
+    FitCategorical{T}() where {T} = new(Dict{T, Int}(), 0)
 end
 FitCategorical(t::Type) = FitCategorical{t}()
 function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
@@ -56,6 +56,11 @@ end
 value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, zeros(0))
 Base.keys(o::FitCategorical) = keys(o.d)
 Base.values(o::FitCategorical) = values(o.d)
+function Base.merge!(o::T, o2::T, γ::Float64) where {T <: FitCategorical}
+    merge!(o.d, o2.d)
+    o.nobs += o2.nobs
+end
+
 #---------------------------------------------------------------------------------# Cauchy
 """
     FitCauchy()

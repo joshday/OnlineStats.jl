@@ -60,6 +60,7 @@ end
 
         @test keys(o) == keys(o.d)
         @test values(o) == values(o.d)
+        test_merge(FitCategorical(Int), FitCategorical(Int), y, rand(1:2, 10))
     end
     @testset "FitCauchy" begin
         o = FitCauchy()
