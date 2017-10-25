@@ -67,6 +67,8 @@ end
         @test value(o) == (0.0, 1.0)
         Series(randn(100), o)
         @test value(o) != (0.0, 1.0)
+
+        merge!(o, FitCauchy(), .5)
     end
     @testset "FitGamma" begin
         o = FitGamma()
@@ -74,6 +76,7 @@ end
         Series(rand(100) + 5, o)
         @test value(o)[1] > 0
         @test value(o)[2] > 0
+        test_merge(FitGamma(), FitGamma(), rand(100) + 5, rand(100) + 5)
     end
     @testset "FitLogNormal" begin
         o = FitLogNormal()
@@ -81,6 +84,7 @@ end
         Series(exp.(randn(100)), o)
         @test value(o)[1] != 0
         @test value(o)[2] > 0
+        test_merge(FitLogNormal(), FitLogNormal(), exp.(randn(100)), exp.(randn(100)))
     end
     @testset "FitNormal" begin
         o = FitNormal()
@@ -89,6 +93,7 @@ end
         Series(y, o)
         @test value(o)[1] ≈ mean(y)
         @test value(o)[2] ≈ std(y)
+        test_merge(FitNormal(), FitNormal(), randn(100), randn(100))
     end
     @testset "FitMultinomial" begin
         o = FitMultinomial(5)
@@ -96,6 +101,7 @@ end
         s = Series([1,2,3,4,5], o)
         fit!(s, [1, 2, 3, 4, 5])
         @test value(o)[2] == [1, 2, 3, 4, 5] ./ 15
+        test_merge(FitMultinomial(3), FitMultinomial(3), [1,2,3], [2,3,4])
     end
     @testset "FitMvNormal" begin
         y = randn(1000, 3)
@@ -105,6 +111,7 @@ end
         s = Series(y, o)
         @test value(o)[1] ≈ vec(mean(y, 1))
         @test value(o)[2] ≈ cov(y)
+        test_merge(FitMvNormal(3), FitMvNormal(3), randn(10,3), randn(10,3))
     end
 end
 

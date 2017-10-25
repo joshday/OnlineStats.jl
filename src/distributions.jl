@@ -86,6 +86,11 @@ function value(o::FitCauchy)
         return 0.0, 1.0
     end
 end
+function Base.merge!(o::FitCauchy, o2::FitCauchy, γ::Float64) 
+    o.nobs += o2.nobs
+    merge!(o.q, o2.q, γ) 
+end
+
 #---------------------------------------------------------------------------------# Gamma
 """
     FitGamma()
@@ -115,6 +120,8 @@ function value(o::FitGamma)
         return 1.0, 1.0
     end
 end
+Base.merge!(o::FitGamma, o2::FitGamma, γ::Float64) = merge!(o.var, o2.var, γ)
+
 #---------------------------------------------------------------------------------# LogNormal
 """
     FitLogNormal()
@@ -139,6 +146,8 @@ function value(o::FitLogNormal)
         return 0.0, 1.0
     end
 end
+Base.merge!(o::FitLogNormal, o2::FitLogNormal, γ::Float64) = merge!(o.var, o2.var, γ)
+
 #---------------------------------------------------------------------------------# Normal
 """
     FitNormal()
@@ -163,6 +172,8 @@ function value(o::FitNormal)
         return 0.0, 1.0
     end
 end
+Base.merge!(o::FitNormal, o2::FitNormal, γ::Float64) = merge!(o.var, o2.var, γ)
+
 #---------------------------------------------------------------------------------# Multinomial
 # TODO: Allow each observation to have a different n
 """
@@ -197,6 +208,11 @@ function value(o::FitMultinomial)
         return 1, ones(p) / p
     end
 end
+function Base.merge!(o::FitMultinomial, o2::FitMultinomial, γ::Float64)
+    o.nobs += o2.nobs
+    merge!(o.mvmean, o2.mvmean, γ)
+end
+
 #---------------------------------------------------------------------------------# MvNormal
 """
     FitMvNormal(d)
@@ -223,3 +239,4 @@ function value(o::FitMvNormal)
         return zeros(length(o)), eye(length(o))
     end
 end
+Base.merge!(o::FitMvNormal, o2::FitMvNormal, γ::Float64) = merge!(o.cov, o2.cov, γ)
