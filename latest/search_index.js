@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "Type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial  distribution is returned as 1.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\no = FitMultinomial(3)\ns = Series(y', o)\nMultinomial(value(o)...)\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\no = FitMultinomial(3)\ns = Series(y', o)\nMultinomial(value(o)...)\n\n\n\n"
 },
 
 {
@@ -377,14 +377,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.mapblocks",
-    "page": "API",
-    "title": "OnlineStats.mapblocks",
-    "category": "Function",
-    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
-},
-
-{
     "location": "pages/api.html#OnlineStatsBase.Bootstrap",
     "page": "API",
     "title": "OnlineStatsBase.Bootstrap",
@@ -405,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.CStat",
     "category": "Type",
-    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to  separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
+    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
 },
 
 {
@@ -541,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.OrderStats",
     "category": "Type",
-    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
+    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -589,7 +581,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Series",
     "category": "Type",
-    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats using a given weighting mechanism.\n\ns = Series(ExponentialWeight(.1), Mean(), Variance(), Moments())\nfit!(s, randn(1000))\nvalue(s)\n\nx, y = randn(1000, 10), randn(1000)\ns = Series(LinReg(10))\nfit!(s, (x,y))\nvalue(s)\n\n\n\n"
+    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...; dim = Rows())\nSeries(weight, data, stats...; dim = Rows())\n\nTrack any number of OnlineStats using a given weighting mechanism.\n\nExamples\n\ns = Series(ExponentialWeight(.1), Mean(), Variance(), Moments())\nfit!(s, randn(1000))\nvalue(s)\n\no = CovMatrix(5)\ns = Series(randn(5, 1000), o; dim = Cols())\ncor(o)\n\nx, y = randn(1000, 10), randn(1000)\ns = Series(LinReg(10))\nfit!(s, (x, y))  # or fit!(s, x, y)\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -606,6 +598,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.Variance",
     "category": "Type",
     "text": "Variance()\n\nUnivariate variance.\n\nExample\n\ns = Series(randn(100), Variance())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "pages/api.html#OnlineStatsBase.mapblocks",
+    "page": "API",
+    "title": "OnlineStatsBase.mapblocks",
+    "category": "Function",
+    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
 },
 
 {
