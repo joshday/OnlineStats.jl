@@ -36,3 +36,9 @@ end
         [0]
     end
 end
+
+@recipe function f(o::Series{(1,0)}, x::AbstractMatrix, y::AbstractVector)
+    for stat in stats(o)
+        @series begin stat end
+    end
+end

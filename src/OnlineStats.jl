@@ -20,8 +20,9 @@ export
     loss, objective, classify, statlearnpath,
     # DistributionStats
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
-    FitMvNormal
-
+    FitMvNormal,
+    # Other
+    LinearModels
 
 const VecF = Vector{Float64}
 
@@ -30,4 +31,5 @@ const VecF = Vector{Float64}
 include("recipes.jl")
 include("distributions.jl")
 include("statlearn.jl")
+include("linearmodels.jl")
 end # module
