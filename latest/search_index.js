@@ -329,6 +329,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "pages/api.html#OnlineStats.LinearModels",
+    "page": "API",
+    "title": "OnlineStats.LinearModels",
+    "category": "Type",
+    "text": "LinearModels(p)\n\nCreate an object from which any variable can be regressed on any other set of variables.\n\nExample\n\nx = randn(1000, 10)\no = LinearModels(10)\ns = Series(x, o)\n# let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]\ncoef(o, 3)\n\n\n\n"
+},
+
+{
     "location": "pages/api.html#OnlineStats.MSPIQ",
     "page": "API",
     "title": "OnlineStats.MSPIQ",
