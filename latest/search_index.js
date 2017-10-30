@@ -1,7 +1,7 @@
 var documenterSearchIndex = {"docs": [
 
 {
-    "location": "index.html#",
+    "location": "pages/index.html#",
     "page": "Basics",
     "title": "Basics",
     "category": "page",
@@ -9,7 +9,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Basics-1",
+    "location": "pages/index.html#Basics-1",
     "page": "Basics",
     "title": "Basics",
     "category": "section",
@@ -17,7 +17,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Every-OnlineStat-is-a-type-1",
+    "location": "pages/index.html#Every-OnlineStat-is-a-type-1",
     "page": "Basics",
     "title": "Every OnlineStat is a type",
     "category": "section",
@@ -25,7 +25,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#OnlineStats-are-grouped-by-[Series](@ref)-1",
+    "location": "pages/index.html#OnlineStats-are-grouped-by-[Series](@ref)-1",
     "page": "Basics",
     "title": "OnlineStats are grouped by Series",
     "category": "section",
@@ -33,7 +33,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Updating-a-Series-updates-the-OnlineStats-1",
+    "location": "pages/index.html#Updating-a-Series-updates-the-OnlineStats-1",
     "page": "Basics",
     "title": "Updating a Series updates the OnlineStats",
     "category": "section",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/types.html#",
+    "location": "pages/whatcan.html#",
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "page",
@@ -217,11 +217,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/types.html#What-Can-OnlineStats-Do?-1",
+    "location": "pages/whatcan.html#What-Can-OnlineStats-Do?-1",
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles QuantileMM, QuantileMSPI, QuantileSGD\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\napproximate order statistics OrderStats\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napprox. count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nHistogram OHistogram\nAverage order statistics OrderStats\nMultivariate Analysis: \nCovariance matrix CovMatrix\nK-means clustering KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nPenalized Regression LinearModels\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample"
 },
 
 {
