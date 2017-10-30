@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.LinearModels",
     "category": "Type",
-    "text": "LinearModels(p)\n\nCreate an object from which any variable can be regressed on any other set of variables.\n\nExample\n\nx = randn(1000, 10)\no = LinearModels(10)\ns = Series(x, o)\n\ncoef(o, 3) # let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]\ncoef(o, 7) # let response = x[:, 7], predictors = x[:, setdiff(1:10, 7)]\n\n\n\n"
+    "text": "LinearModels(p)\n\nCreate an object from which any variable can be regressed on any other set of variables.\n\nExample\n\nx = randn(1000, 10)\no = LinearModels(10)\ns = Series(x, o)\n\n# let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]\ncoef(o, 3) \n\n# let response = x[:, 7], predictors = x[:, [2, 5, 4]]\ncoef(o, 7, [2, 5, 4])\n\n\n\n"
 },
 
 {
