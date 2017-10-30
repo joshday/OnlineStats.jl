@@ -8,8 +8,9 @@ Create an object from which any variable can be regressed on any other set of va
     x = randn(1000, 10)
     o = LinearModels(10)
     s = Series(x, o)
-    # let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]
-    coef(o, 3)
+    
+    coef(o, 3) # let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]
+    coef(o, 7) # let response = x[:, 7], predictors = x[:, setdiff(1:10, 7)]
 """
 struct LinearModels <: OnlineStat{1, EqualWeight}
     A::Matrix{Float64}
