@@ -28,6 +28,7 @@ end
 #-----------------------------------------------------------------------# Show
 
 @show StatLearn(5)
+@show LinearModels(5)
 
 #-----------------------------------------------------------------------# Tests
 
@@ -175,6 +176,14 @@ end
     @testset "MM-based" begin
         x, y = randn(100, 5), randn(100)
         @test_throws ErrorException Series((x,y), StatLearn(5, PoissonLoss(), OMASQ()))
+    end
+end
+@testset "LinearModels" begin
+    x = randn(100, 5)
+    o = LinearModels(5)
+    Series(x, o)
+    for k in 1:5
+        @test coef(o, k) ≈ x[:, setdiff(1:5, k)] \ x[:, k]
     end
 end
 end #module
