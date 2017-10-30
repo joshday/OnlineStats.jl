@@ -26,12 +26,12 @@ fit!(o::LinearModels, y::VectorOb, γ::Float64) = smooth_syr!(o.A, y, γ)
 value(o::LinearModels) = coef(o)
 
 function coef(o::LinearModels, yind::Integer = size(o.A, 2); verbose::Bool = true)
-    sweep_on = setdiff(1:size(o.A, 1), yind)
-    Ainds = vcat(sweep_on, yind)
+    inds = setdiff(1:size(o.A, 1), yind)
+    Ainds = vcat(inds, yind)
     copy!(o.S, Symmetric(o.A)[Ainds, Ainds])
-    verbose && info("Regress var $yind on ", sweep_on)
-    SweepOperator.sweep!(o.S, 1:length(sweep_on))
-    return o.S[1:length(sweep_on), end]
+    verbose && info("Regress var $yind on ", inds)
+    SweepOperator.sweep!(o.S, 1:length(inds))
+    return o.S[1:length(inds), end]
 end
 
 # TODO: coef methods where x is also specified
