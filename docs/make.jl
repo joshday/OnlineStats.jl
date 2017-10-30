@@ -6,10 +6,10 @@ makedocs(
     authors = "Josh Day",
     clean = true,
     pages = [
-        "index.md",
+        "pages/index.md",
         "pages/weights.md",
         "pages/series.md",
-        "pages/types.md",
+        "pages/whatcan.md",
         "pages/api.md",
         "pages/newstats.md"
     ]
