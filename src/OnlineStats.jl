@@ -22,7 +22,7 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal,
     # Other
-    LinearModels
+    LinRegBuilder
 
 const VecF = Vector{Float64}
 
@@ -31,5 +31,5 @@ const VecF = Vector{Float64}
 include("recipes.jl")
 include("distributions.jl")
 include("statlearn.jl")
-include("linearmodels.jl")
+include("linregbuilder.jl")
 end # module

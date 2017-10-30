@@ -28,7 +28,7 @@ end
 #-----------------------------------------------------------------------# Show
 
 @show StatLearn(5)
-@show LinearModels(5)
+@show LinRegBuilder(5)
 
 #-----------------------------------------------------------------------# Tests
 
@@ -178,12 +178,15 @@ end
         @test_throws ErrorException Series((x,y), StatLearn(5, PoissonLoss(), OMASQ()))
     end
 end
-@testset "LinearModels" begin
-    x = randn(100, 5)
-    o = LinearModels(5)
+@testset "LinRegBuilder" begin
+    n, p = 100, 10
+    x = randn(n, p)
+    o = LinRegBuilder(p)
     Series(x, o)
-    for k in 1:5
-        @test coef(o, k) ≈ x[:, setdiff(1:5, k)] \ x[:, k]
+    for k in 1:p
+        @test coef(o, k; verbose=false) ≈ x[:, setdiff(1:p, k)] \ x[:, k]
     end
+    @test coef(o, 3, [1, 2]; verbose=false) ≈ x[:, [1, 2]] \ x[:, 3]
+    @test coef(o, 3, [2, 1]; verbose=false) ≈ x[:, [2, 1]] \ x[:, 3]
 end
 end #module
