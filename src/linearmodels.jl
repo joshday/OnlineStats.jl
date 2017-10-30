@@ -29,7 +29,7 @@ function coef(o::LinearModels, yind::Integer = size(o.A, 2); verbose::Bool = tru
     sweep_on = setdiff(1:size(o.A, 1), yind)
     Ainds = vcat(sweep_on, yind)
     copy!(o.S, Symmetric(o.A)[Ainds, Ainds])
-    verbose && info("Swept on ", sweep_on)
+    verbose && info("Regress var $yind on ", sweep_on)
     SweepOperator.sweep!(o.S, 1:length(sweep_on))
     return o.S[1:length(sweep_on), end]
 end
