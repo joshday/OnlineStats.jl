@@ -329,6 +329,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.IHistogram",
+    "page": "API",
+    "title": "OnlineStats.IHistogram",
+    "category": "Type",
+    "text": "IHistogram(b::Integer)\n\nIncrementally construct a histogram of b bins.\n\nExample\n\nusing Plots\no = IHistogram(1000)\nSeries(randexp(100_000), o)\nplot(o)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.LinRegBuilder",
     "page": "API",
     "title": "OnlineStats.LinRegBuilder",
