@@ -5,6 +5,7 @@ makedocs(
     sitename = "OnlineStats.jl",
     authors = "Josh Day",
     clean = true,
+    doctest = false,
     pages = [
         "pages/index.md",
         "pages/weights.md",
