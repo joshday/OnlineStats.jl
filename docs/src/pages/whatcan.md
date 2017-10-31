@@ -27,8 +27,7 @@
 | MvNormal                           | [`FitMvNormal`](@ref)      |
 | **Statistical Learning:**          |                            |
 | GLMs with regularization           | [`StatLearn`](@ref)        |
-| Linear (also ridge) regression     | [`LinReg`](@ref)           |
-| Penalized Regression               | [`LinearModels`](@ref)     |
+| Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
 | **Other:**                         |                            |
 | Bootstrapping                      | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
