@@ -189,4 +189,13 @@ end
     @test coef(o, 3, [1, 2]; verbose=false) ≈ x[:, [1, 2]] \ x[:, 3]
     @test coef(o, 3, [2, 1]; verbose=false) ≈ x[:, [2, 1]] \ x[:, 3]
 end
+@testset "IHistogram" begin
+    y = rand(1000)
+    o = IHistogram(100)
+    Series(y, o)
+    for val in first.(value(o))
+        @test 0 < val < 1
+    end
+    @test sum(last.(value(o))) == 1000
+end
 end #module

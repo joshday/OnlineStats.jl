@@ -22,14 +22,15 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal,
     # Other
-    LinRegBuilder
+    LinRegBuilder, IHistogram
 
 const VecF = Vector{Float64}
 
 
 #-----------------------------------------------------------------------# source files
-include("recipes.jl")
 include("distributions.jl")
 include("statlearn.jl")
 include("linregbuilder.jl")
+include("histograms.jl")
+include("recipes.jl")
 end # module

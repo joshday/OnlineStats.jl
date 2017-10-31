@@ -42,3 +42,11 @@ end
         @series begin stat end
     end
 end
+
+#-----------------------------------------------------------------------# IHistogram
+@recipe function plot(o::IHistogram)
+    linetype --> :sticks
+    x = first.(value(o))[1:(end-1)]
+    y = last.(value(o))[1:(end-1)]
+    x, y
+end
