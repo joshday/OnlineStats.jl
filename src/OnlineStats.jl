@@ -32,5 +32,5 @@ include("distributions.jl")
 include("statlearn.jl")
 include("linregbuilder.jl")
 include("histograms.jl")
-include("recipes.jl")
+# include("recipes.jl")
 end # module

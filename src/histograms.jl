@@ -1,84 +1,63 @@
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
-
 """
-    IHistogram(b::Integer)
+    IHistogram(b)
 
-Incrementally construct a histogram of `b` bins.
+Incrementally build a histogram of `b` (not equally spaced) bins.  
 
 # Example
 
-    using Plots
-    o = IHistogram(1000)
-    Series(randexp(100_000), o)
-    plot(o)
+    o = IHistogram(100)
+    Series(randn(100_000), o)
 """
 struct IHistogram <: OnlineStat{0, EqualWeight}
-    value::Vector{Pair{Float64, Int}}
+    value::Vector{Float64}
+    counts::Vector{Int}
     buffer::Vector{Float64}
 end
+IHistogram(b::Integer) = IHistogram(fill(Inf, b), zeros(Int, b), zeros(b))
 
-IHistogram(b::Integer) = IHistogram(fill(Pair(0.0, 0), b + 1), zeros(b))
+function fit!(o::IHistogram, y::Real, γ::Float64)
+    i = searchsortedfirst(o.value, y)
+    insert!(o.value, i, y)
+    insert!(o.counts, i, 1)
+    ind = find_min_diff(o)
+    binmerge!(o, ind)
+end
 
-value(o::IHistogram) = sort!(o.value)[1:(end-1)]
-
-function bin_merge(p1::Pair, p2::Pair)
-    k1 = last(p1)
-    k2 = last(p2)
-    q1 = first(p1)
-    q2 = first(p2)
+function binmerge!(o::IHistogram, i)
+    k1 = o.counts[i]
+    k2 = o.counts[i + 1] 
+    q1 = o.value[i]
+    q2 = o.value[i + 1]
     bottom = k1 + k2
-    if bottom == 0 
-        return Pair(.5 * (q1 + q2), 0)
+    if bottom == 0
+        o.value[i] = .5 * (o.value[i] + o.value[i + 1])
+    elseif k2 == 0
+        top = q1 * k1
+        o.value[i] = top / bottom 
+        o.counts[i] = bottom
     else
         top = (q1 * k1 + q2 * k2)
-        return Pair(top / bottom, bottom)
+        o.value[i] = top / bottom 
+        o.counts[i] = bottom
     end
+    deleteat!(o.value, i + 1)
+    deleteat!(o.counts, i + 1)
 end
 
-fit!(o::IHistogram, y::Real, γ::Float64) = push!(o, Pair(y, 1))
-
-# Idea: make (b + 1) bins and then merge the 2 closest bins
-
-function Base.push!(o::IHistogram, p::Pair)
-    v = o.value
-
-    # replace the last element with p, then sort
-    v[end] = p 
-
-    _sort!(v)
-
+function find_min_diff(o::IHistogram)
     # find the index of the smallest difference v[i+1] - v[i]
-    for i in eachindex(o.buffer)
-        @inbounds o.buffer[i] = first(v[i+1]) - first(v[i])
+    v = o.value
+    @inbounds for i in eachindex(o.buffer)
+        val = v[i + 1] - v[i]
+        if isnan(val) || isinf(val)
+            # If the difference is NaN = Inf - Inf or -Inf = Float64 - Inf
+            # merge them to make way for actual values
+            return i
+        end
+        o.buffer[i] = val
     end
     _, ind = findmin(o.buffer)
-
-    # merge pair (i + 1) into i
-    @inbounds v[ind] = bin_merge(v[ind], v[ind + 1])
-
-    # replace i + 1 with end
-    v[ind + 1] = v[end]
-
-    # replace end
-    # v[end] = Pair(Inf, 0)
+    return ind
 end
 
-_sort!(v) = sort!(v; alg = InsertionSort)
-
-# function _sort!(v)
-#     v_end = v[end]
-#     i = searchsortedfirst(v, v_end)
-
-#     j = length(v)
-#     while j > i
-#         v[j] = v[j-1]
-#         j -= 1
-#     end
-#     v[i] = v_end
-# end
-
-function Base.merge!(o::IHistogram, o2::IHistogram, γ::Float64)
-    for p in value(o2)
-        push!(o, p)
-    end
-end
