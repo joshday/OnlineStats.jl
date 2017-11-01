@@ -6,8 +6,8 @@ Incrementally build a histogram of `b` (not equally spaced) bins.
 
 # Example
 
-    o = IHistogram(100)
-    Series(randn(100_000), o)
+    o = IHistogram(50)
+    Series(randn(1000), o)
 """
 struct IHistogram <: OnlineStat{0, EqualWeight}
     value::Vector{Float64}
