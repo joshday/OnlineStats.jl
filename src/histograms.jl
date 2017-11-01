@@ -16,10 +16,20 @@ struct IHistogram <: OnlineStat{0, EqualWeight}
 end
 IHistogram(b::Integer) = IHistogram(fill(Inf, b), zeros(Int, b), zeros(b))
 
-function fit!(o::IHistogram, y::Real, γ::Float64)
-    i = searchsortedfirst(o.value, y)
-    insert!(o.value, i, y)
-    insert!(o.counts, i, 1)
+# function fit!(o::IHistogram, y::Real, γ::Float64)
+#     i = searchsortedfirst(o.value, y)
+#     insert!(o.value, i, y)
+#     insert!(o.counts, i, 1)
+#     ind = find_min_diff(o)
+#     binmerge!(o, ind)
+# end
+
+fit!(o::IHistogram, y::Real, γ::Float64) = push!(o, Pair(y, 1))
+
+function Base.push!(o::IHistogram, p::Pair)
+    i = searchsortedfirst(o.value, first(p))
+    insert!(o.value, i, first(p))
+    insert!(o.counts, i, last(p))
     ind = find_min_diff(o)
     binmerge!(o, ind)
 end
@@ -61,3 +71,8 @@ function find_min_diff(o::IHistogram)
     return ind
 end
 
+function Base.merge!(o::IHistogram, o2::IHistogram, γ::Float64)
+    for p in Pair.(o2.value, o2.counts)
+        push!(o, p)
+    end
+end

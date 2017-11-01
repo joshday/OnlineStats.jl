@@ -193,15 +193,15 @@ end
     y = rand(1000)
     o = IHistogram(100)
     Series(y, o)
-    for val in first.(value(o))
+    for val in value(o)
         @test 0 < val < 1
     end
-    @test sum(last.(value(o))) == 1000
+    @test sum(o.counts) == 1000
 
     o2 = IHistogram(50)
     Series(rand(1000), o2)
 
     merge!(o, o2, .1)
-    @test sum(last.(value(o))) == 2000
+    @test sum(o.counts) == 2000
 end
 end #module
