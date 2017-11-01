@@ -16,13 +16,6 @@ struct IHistogram <: OnlineStat{0, EqualWeight}
 end
 IHistogram(b::Integer) = IHistogram(fill(Inf, b), zeros(Int, b), zeros(b))
 
-# function fit!(o::IHistogram, y::Real, γ::Float64)
-#     i = searchsortedfirst(o.value, y)
-#     insert!(o.value, i, y)
-#     insert!(o.counts, i, 1)
-#     ind = find_min_diff(o)
-#     binmerge!(o, ind)
-# end
 
 fit!(o::IHistogram, y::Real, γ::Float64) = push!(o, Pair(y, 1))
 

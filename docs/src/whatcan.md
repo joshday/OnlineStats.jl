@@ -10,7 +10,7 @@
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
 | Difference                         | [`Diff`](@ref)             |
-| Histogram                          | [`OHistogram`](@ref)       |
+| Histogram                          | [`OHistogram`](@ref), [`IHistogram'](@ref) |
 | Average order statistics           | [`OrderStats`](@ref)  |
 | **Multivariate Analysis:**         |                            |
 | Covariance matrix                  | [`CovMatrix`](@ref)        |
