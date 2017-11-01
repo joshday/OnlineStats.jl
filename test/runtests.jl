@@ -197,5 +197,11 @@ end
         @test 0 < val < 1
     end
     @test sum(last.(value(o))) == 1000
+
+    o2 = IHistogram(50)
+    Series(rand(1000), o2)
+
+    merge!(o, o2, .1)
+    @test sum(last.(value(o))) == 2000
 end
 end #module
