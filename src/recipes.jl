@@ -8,11 +8,22 @@
     W = deepcopy(wt)
     v = zeros(nobs)
     for i in eachindex(v)
-        updatecounter!(W)
-        v[i] = weight(W)
+        OnlineStatsBase.updatecounter!(W)
+        v[i] = OnlineStatsBase.weight(W)
     end
     v
 end
+
+#-----------------------------------------------------------------------# OnlineStat{0}
+struct EmptyPlot end
+@recipe function f(o::OnlineStat{0})
+    title --> "$(name(o)): $(round.(value(o), 5))"
+    legend --> false
+    axis --> false
+    grid --> false
+    EmptyPlot()
+end
+@recipe f(::EmptyPlot) = zeros(0)
 
 #-----------------------------------------------------------------------# OHistogram
 @recipe function f(o::OHistogram)
@@ -44,9 +55,15 @@ end
 end
 
 #-----------------------------------------------------------------------# IHistogram
-@recipe function plot(o::IHistogram)
-    linetype --> :sticks
-    x = first.(value(o))[1:(end-1)]
-    y = last.(value(o))[1:(end-1)]
-    x, y
+@recipe function f(o::IHistogram)
+    linetype --> :bar
+    o.value, o.counts
+end
+
+#-----------------------------------------------------------------------# Series{0}
+@recipe function f(s::Series)
+    layout --> length(stats(s))
+    for stat in stats(s)
+        @series begin stat end
+    end
 end

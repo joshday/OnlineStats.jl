@@ -69,3 +69,10 @@ function Base.merge!(o::IHistogram, o2::IHistogram, γ::Float64)
         push!(o, p)
     end
 end
+
+#-----------------------------------------------------------------------# summaries
+Base.extrema(o::IHistogram) = (first(o.value), last(o.value))
+Base.mean(o::IHistogram) = mean(o.value, fweights(o.counts))
+Base.var(o::IHistogram) = var(o.value, fweights(o.counts); corrected=true)
+Base.std(o::IHistogram) = sqrt(var(o))
+Base.quantile(o::IHistogram, p = [0, .25, .5, .75, 1]) = quantile(o.value, fweights(o.counts), p)
