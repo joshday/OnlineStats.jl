@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nHistogram OHistogram, `IHistogram'\nAverage order statistics OrderStats\nMultivariate Analysis: \nCovariance matrix CovMatrix\nK-means clustering KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nHistogram OHistogram, IHistogram\nAverage order statistics OrderStats\nMultivariate Analysis: \nCovariance matrix CovMatrix\nK-means clustering KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.IHistogram",
     "category": "Type",
-    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  \n\nExample\n\no = IHistogram(100)\nSeries(randn(100_000), o)\n\n\n\n"
+    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  \n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n\n\n"
 },
 
 {
