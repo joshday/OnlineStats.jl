@@ -14,9 +14,10 @@ Incrementally construct a histogram of `b` bins.
 """
 struct IHistogram <: OnlineStat{0, EqualWeight}
     value::Vector{Pair{Float64, Int}}
+    buffer::Vector{Float64}
 end
 
-IHistogram(b::Integer) = IHistogram(fill(Pair(0.0, 0), b + 1))
+IHistogram(b::Integer) = IHistogram(fill(Pair(0.0, 0), b+1), zeros(b))
 
 value(o::IHistogram) = sort!(o.value)
 
@@ -34,13 +35,18 @@ function bin_merge(p1::Pair, p2::Pair)
     end
 end
 
+fit!(o::IHistogram, y::Real, γ::Float64) = push!(o, Pair(y, 1))
 
-function fit!(o::IHistogram, y::ScalarOb, γ::Float64)
+# Idea: make (b + 1) bins and then merge the 2 closest bins
+function Base.push!(o::IHistogram, p::Pair)
     v = o.value
-    v[end] = Pair(y, 1)
-    sort!(v)
-    ind = findmin(diff(first.(v)))[2]
-    v[ind] = bin_merge(v[ind], v[ind + 1])
-    v[ind + 1] = v[end]
-    v[end] = Pair(first(v[end]), 0)
+    v[end] = p
+    sort!(v; alg = InsertionSort)
+    for i in eachindex(o.buffer)
+        @inbounds o.buffer[i] = first(v[i+1]) - first(v[i])
+    end
+    _, ind = findmin(o.buffer)
+    @inbounds v[ind] = bin_merge(v[ind], v[ind + 1])
+    @inbounds v[ind + 1] = v[end]
+    @inbounds v[end] = Pair(first(v[end]), 0)
 end
