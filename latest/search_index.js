@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nHistogram OHistogram, IHistogram\nAverage order statistics OrderStats\nMultivariate Analysis: \nCovariance matrix CovMatrix\nK-means clustering KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nHistogram OHistogram, IHistogram\nAverage order statistics OrderStats\nMultivariate Analysis: \nCovariance matrix CovMatrix\nK-means clustering KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
 },
 
 {
@@ -262,6 +262,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
     "text": "ADAMAX(η, β1, β2)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.CallFun",
+    "page": "API",
+    "title": "OnlineStats.CallFun",
+    "category": "Type",
+    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
 },
 
 {
