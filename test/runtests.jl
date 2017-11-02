@@ -203,5 +203,6 @@ end
 
     merge!(o, o2, .1)
     @test sum(o.counts) == 2000
+    @test median(o) ≈ median(y) atol=.1
 end
 end #module
