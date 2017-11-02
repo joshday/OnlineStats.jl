@@ -32,3 +32,4 @@
 | Bootstrapping                      | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
+| Callbacks                          | [`CallFun`](@ref), [`mapblocks`](@ref) |

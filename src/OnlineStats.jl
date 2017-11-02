@@ -5,7 +5,7 @@ module OnlineStats
 import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram, fit!,
     fweights
 import OnlineStatsBase: ScalarOb, VectorOb, smooth, smooth!, smooth_syr!, ϵ,
-    default_weight, name, mapblocks
+    default_weight, input_ndims, name, mapblocks
 import LearnBase: ObsDimension, value
 import SweepOperator
 
