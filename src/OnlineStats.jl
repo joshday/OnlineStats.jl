@@ -23,7 +23,7 @@ export
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
     FitMvNormal,
     # Other
-    LinRegBuilder, IHistogram
+    LinRegBuilder, IHistogram, CallFun
 
 const VecF = Vector{Float64}
 
@@ -33,5 +33,6 @@ include("distributions.jl")
 include("statlearn.jl")
 include("linregbuilder.jl")
 include("histograms.jl")
+include("experimental.jl")
 include("recipes.jl")
 end # module
