@@ -67,3 +67,9 @@ end
         @series begin stat end
     end
 end
+
+#-----------------------------------------------------------------------# CovMatrix
+@recipe function f(o::CovMatrix)
+    seriestype --> :heatmap
+    cov(o)
+end
