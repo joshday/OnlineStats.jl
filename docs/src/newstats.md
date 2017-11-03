@@ -45,3 +45,6 @@ mean(y), var(y)
     - Create the value from the "sufficient statistics".  By default, this will return the first field of an OnlineStat
   - `merge!(o1, o2, w::Float64)`
     - merge `o2` into `o1`, where `w` is the amount of influence `o2` has.
+- If you don't know the size of a single observation or the default weight 
+  (`<:OnlineStat{Any,Any}`), define methods `OnlineStatsBase.input_ndims(::MyNewStat)` and 
+  `OnlineStatsBase.default_weight(::MyNewStat)`.

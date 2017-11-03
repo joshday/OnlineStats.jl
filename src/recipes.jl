@@ -62,8 +62,8 @@ end
 
 #-----------------------------------------------------------------------# Series{0}
 @recipe function f(s::Series)
-    layout --> length(stats(s))
-    for stat in stats(s)
+    layout --> length(s.stats)
+    for stat in s.stats
         @series begin stat end
     end
 end
@@ -72,4 +72,16 @@ end
 @recipe function f(o::CovMatrix)
     seriestype --> :heatmap
     cov(o)
+end
+
+#-----------------------------------------------------------------------# MV
+@recipe function f(s::MV)
+    i = 1
+    for stat in s.stats
+        @series begin 
+            title --> "Stat $i"
+            stat 
+        end
+        i += 1
+    end
 end
