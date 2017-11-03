@@ -701,7 +701,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Extending OnlineStats",
     "title": "Details",
     "category": "section",
-    "text": "An OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has."
+    "text": "An OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has.\nIf you don't know the size of a single observation or the default weight  (<:OnlineStat{Any,Any}), define methods OnlineStatsBase.input_ndims(::MyNewStat) and  OnlineStatsBase.default_weight(::MyNewStat)."
 },
 
 ]}
