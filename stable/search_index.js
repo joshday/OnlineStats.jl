@@ -41,7 +41,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#",
+    "location": "weights.html#",
     "page": "Weighting",
     "title": "Weighting",
     "category": "page",
@@ -49,7 +49,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#Weighting-1",
+    "location": "weights.html#Weighting-1",
     "page": "Weighting",
     "title": "Weighting",
     "category": "section",
@@ -57,7 +57,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[EqualWeight()](@ref)-1",
+    "location": "weights.html#[EqualWeight()](@ref)-1",
     "page": "Weighting",
     "title": "EqualWeight()",
     "category": "section",
@@ -65,7 +65,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[ExponentialWeight(λ)](@ref)-1",
+    "location": "weights.html#[ExponentialWeight(λ)](@ref)-1",
     "page": "Weighting",
     "title": "ExponentialWeight(λ)",
     "category": "section",
@@ -73,7 +73,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[LearningRate(r)](@ref)-1",
+    "location": "weights.html#[LearningRate(r)](@ref)-1",
     "page": "Weighting",
     "title": "LearningRate(r)",
     "category": "section",
@@ -81,7 +81,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[HarmonicWeight(a)](@ref)-1",
+    "location": "weights.html#[HarmonicWeight(a)](@ref)-1",
     "page": "Weighting",
     "title": "HarmonicWeight(a)",
     "category": "section",
@@ -89,7 +89,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[McclainWeight(a)](@ref)-1",
+    "location": "weights.html#[McclainWeight(a)](@ref)-1",
     "page": "Weighting",
     "title": "McclainWeight(a)",
     "category": "section",
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
     "page": "Weighting",
     "title": "Bounded(weight, λ)",
     "category": "section",
@@ -105,7 +105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/weights.html#[Scaled(weight,-λ)](@ref)-1",
+    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
     "page": "Weighting",
     "title": "Scaled(weight, λ)",
     "category": "section",
@@ -113,7 +113,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#",
+    "location": "series.html#",
     "page": "Series",
     "title": "Series",
     "category": "page",
@@ -121,7 +121,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Series-1",
+    "location": "series.html#Series-1",
     "page": "Series",
     "title": "Series",
     "category": "section",
@@ -129,7 +129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Creating-1",
+    "location": "series.html#Creating-1",
     "page": "Series",
     "title": "Creating",
     "category": "section",
@@ -137,7 +137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Start-\"empty\"-1",
+    "location": "series.html#Start-\"empty\"-1",
     "page": "Series",
     "title": "Start \"empty\"",
     "category": "section",
@@ -145,7 +145,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Start-with-initial-data-1",
+    "location": "series.html#Start-with-initial-data-1",
     "page": "Series",
     "title": "Start with initial data",
     "category": "section",
@@ -153,7 +153,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Updating-1",
+    "location": "series.html#Updating-1",
     "page": "Series",
     "title": "Updating",
     "category": "section",
@@ -161,7 +161,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Single-observation-1",
+    "location": "series.html#Single-observation-1",
     "page": "Series",
     "title": "Single observation",
     "category": "section",
@@ -169,7 +169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Single-observation,-override-Weight-1",
+    "location": "series.html#Single-observation,-override-Weight-1",
     "page": "Series",
     "title": "Single observation, override Weight",
     "category": "section",
@@ -177,7 +177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Multiple-observations-1",
+    "location": "series.html#Multiple-observations-1",
     "page": "Series",
     "title": "Multiple observations",
     "category": "section",
@@ -185,7 +185,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Multiple-observations,-use-the-same-weight-for-all-1",
+    "location": "series.html#Multiple-observations,-use-the-same-weight-for-all-1",
     "page": "Series",
     "title": "Multiple observations, use the same weight for all",
     "category": "section",
@@ -193,7 +193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Multiple-observations,-provide-vector-of-weights-1",
+    "location": "series.html#Multiple-observations,-provide-vector-of-weights-1",
     "page": "Series",
     "title": "Multiple observations, provide vector of weights",
     "category": "section",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/series.html#Merging-1",
+    "location": "series.html#Merging-1",
     "page": "Series",
     "title": "Merging",
     "category": "section",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/types.html#",
+    "location": "whatcan.html#",
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "page",
@@ -217,15 +217,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/types.html#What-Can-OnlineStats-Do?-1",
+    "location": "whatcan.html#What-Can-OnlineStats-Do?-1",
     "page": "What Can OnlineStats Do?",
     "title": "What Can OnlineStats Do?",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nmean Mean\nvariance Variance\nquantiles QuantileMM, QuantileMSPI, QuantileSGD\nmax and min Extrema\nskewness and kurtosis Moments\nsum Sum\ndifference Diff\nhistogram OHistogram\napproximate order statistics OrderStats\nMultivariate Analysis: \ncovariance matrix CovMatrix\nk-means clustering KMeans\nmultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg\nOther: \nBootstrapping Bootstrap\napprox. count of distinct elements HyperLogLog\nReservoir Sampling ReservoirSample"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nHistogram OHistogram, IHistogram\nAverage order statistics OrderStats\nMultivariate Analysis: \nCovariance matrix CovMatrix\nK-means clustering KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nDensity Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
 },
 
 {
-    "location": "pages/api.html#",
+    "location": "api.html#",
     "page": "API",
     "title": "API",
     "category": "page",
@@ -233,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.ADADELTA",
+    "location": "api.html#OnlineStats.ADADELTA",
     "page": "API",
     "title": "OnlineStats.ADADELTA",
     "category": "Type",
@@ -241,7 +241,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.ADAGRAD",
+    "location": "api.html#OnlineStats.ADAGRAD",
     "page": "API",
     "title": "OnlineStats.ADAGRAD",
     "category": "Type",
@@ -249,7 +249,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.ADAM",
+    "location": "api.html#OnlineStats.ADAM",
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
@@ -257,7 +257,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.ADAMAX",
+    "location": "api.html#OnlineStats.ADAMAX",
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
@@ -265,71 +265,95 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitBeta",
+    "location": "api.html#OnlineStats.CallFun",
+    "page": "API",
+    "title": "OnlineStats.CallFun",
+    "category": "Type",
+    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.FitBeta",
     "page": "API",
     "title": "OnlineStats.FitBeta",
     "category": "Type",
-    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\nusing Distributions, OnlineStats\ny = rand(Beta(3, 5), 1000)\ns = Series(y, FitBeta())\nBeta(value(s)...)\n\n\n\n"
+    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\nusing Distributions, OnlineStats\ny = rand(Beta(3, 5), 1000)\no = FitBeta()\ns = Series(y, o)\nBeta(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitCategorical",
+    "location": "api.html#OnlineStats.FitCategorical",
     "page": "API",
     "title": "OnlineStats.FitCategorical",
     "category": "Type",
-    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.\n\nusing Distributions\ns = Series(rand(1:10, 1000), FitCategorical(Int))\nvalue(s)\n\nvals = [\"small\", \"medium\", \"large\"]\ns = Series(rand(vals, 1000), FitCategorical(String))\nvalue(s)\n\n\n\n"
+    "text": "FitCategorical(T)\n\nFit a categorical distribution where the inputs are of type T.\n\nusing Distributions\ns = Series(rand(1:10, 1000), FitCategorical(Int))\nvalue(s)\n\nvals = [\"small\", \"medium\", \"large\"]\no = FitCategorical(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitCauchy",
+    "location": "api.html#OnlineStats.FitCauchy",
     "page": "API",
     "title": "OnlineStats.FitCauchy",
     "category": "Type",
-    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution.\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\ns = Series(y, FitCauchy())\nCauchy(value(s)...)\n\n\n\n"
+    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution.\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\no = FitCauchy()\ns = Series(y, o)\nCauchy(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitGamma",
+    "location": "api.html#OnlineStats.FitGamma",
     "page": "API",
     "title": "OnlineStats.FitGamma",
     "category": "Type",
-    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\nusing Distributions\ny = rand(Gamma(5, 1), 1000)\ns = Series(y, FitGamma())\nGamma(value(s)...)\n\n\n\n"
+    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\nusing Distributions\ny = rand(Gamma(5, 1), 1000)\no = FitGamma()\ns = Series(y, o)\nGamma(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitLogNormal",
+    "location": "api.html#OnlineStats.FitLogNormal",
     "page": "API",
     "title": "OnlineStats.FitLogNormal",
     "category": "Type",
-    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\nusing Distributions\ny = rand(LogNormal(3, 4), 1000)\ns = Series(y, FitLogNormal())\nLogNormal(value(s)...)\n\n\n\n"
+    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\nusing Distributions\ny = rand(LogNormal(3, 4), 1000)\no = FitLogNormal()\ns = Series(y, o)\nLogNormal(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitMultinomial",
+    "location": "api.html#OnlineStats.FitMultinomial",
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "Type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\ns = Series(y', FitMultinomial())\nMultinomial(value(s)...)\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\no = FitMultinomial(3)\ns = Series(y', o)\nMultinomial(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitMvNormal",
+    "location": "api.html#OnlineStats.FitMvNormal",
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "Type",
-    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\ns = Series(y', FitMvNormal(3))\n\n\n\n"
+    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\no = FitMvNormal(3)\ns = Series(y', o)\nMvNormal(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.FitNormal",
+    "location": "api.html#OnlineStats.FitNormal",
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "Type",
-    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE).\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\ns = Series(y, FitNormal())\n\n\n\n"
+    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE).\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\no = FitNormal()\ns = Series(y, o)\nNormal(value(o)...)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStats.MSPIQ",
+    "location": "api.html#OnlineStats.IHistogram",
+    "page": "API",
+    "title": "OnlineStats.IHistogram",
+    "category": "Type",
+    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  \n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.LinRegBuilder",
+    "page": "API",
+    "title": "OnlineStats.LinRegBuilder",
+    "category": "Type",
+    "text": "LinRegBuilder(p)\n\nCreate an object from which any variable can be regressed on any other set of variables.\n\nExample\n\nx = randn(1000, 10)\no = LinRegBuilder(10)\ns = Series(x, o)\n\n# let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]\ncoef(o, 3) \n\n# let response = x[:, 7], predictors = x[:, [2, 5, 4]]\ncoef(o, 7, [2, 5, 4])\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.MSPIQ",
     "page": "API",
     "title": "OnlineStats.MSPIQ",
     "category": "Type",
@@ -337,7 +361,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.NADAM",
+    "location": "api.html#OnlineStats.NADAM",
     "page": "API",
     "title": "OnlineStats.NADAM",
     "category": "Type",
@@ -345,7 +369,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.NSGD",
+    "location": "api.html#OnlineStats.NSGD",
     "page": "API",
     "title": "OnlineStats.NSGD",
     "category": "Type",
@@ -353,7 +377,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.OMASQ",
+    "location": "api.html#OnlineStats.OMASQ",
     "page": "API",
     "title": "OnlineStats.OMASQ",
     "category": "Type",
@@ -361,7 +385,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.SGD",
+    "location": "api.html#OnlineStats.SGD",
     "page": "API",
     "title": "OnlineStats.SGD",
     "category": "Type",
@@ -369,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.StatLearn",
+    "location": "api.html#OnlineStats.StatLearn",
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
@@ -377,15 +401,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStats.mapblocks",
-    "page": "API",
-    "title": "OnlineStats.mapblocks",
-    "category": "Function",
-    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax\n\nExample\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\n\n\n"
-},
-
-{
-    "location": "pages/api.html#OnlineStatsBase.Bootstrap",
+    "location": "api.html#OnlineStatsBase.Bootstrap",
     "page": "API",
     "title": "OnlineStatsBase.Bootstrap",
     "category": "Type",
@@ -393,7 +409,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Bounded",
+    "location": "api.html#OnlineStatsBase.Bounded",
     "page": "API",
     "title": "OnlineStatsBase.Bounded",
     "category": "Type",
@@ -401,7 +417,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.CovMatrix",
+    "location": "api.html#OnlineStatsBase.CStat",
+    "page": "API",
+    "title": "OnlineStatsBase.CStat",
+    "category": "Type",
+    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.CovMatrix",
     "page": "API",
     "title": "OnlineStatsBase.CovMatrix",
     "category": "Type",
@@ -409,7 +433,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Diff",
+    "location": "api.html#OnlineStatsBase.Diff",
     "page": "API",
     "title": "OnlineStatsBase.Diff",
     "category": "Type",
@@ -417,7 +441,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.EqualWeight",
+    "location": "api.html#OnlineStatsBase.EqualWeight",
     "page": "API",
     "title": "OnlineStatsBase.EqualWeight",
     "category": "Type",
@@ -425,7 +449,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.ExponentialWeight",
+    "location": "api.html#OnlineStatsBase.ExponentialWeight",
     "page": "API",
     "title": "OnlineStatsBase.ExponentialWeight",
     "category": "Type",
@@ -433,7 +457,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Extrema",
+    "location": "api.html#OnlineStatsBase.Extrema",
     "page": "API",
     "title": "OnlineStatsBase.Extrema",
     "category": "Type",
@@ -441,7 +465,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.HarmonicWeight",
+    "location": "api.html#OnlineStatsBase.HarmonicWeight",
     "page": "API",
     "title": "OnlineStatsBase.HarmonicWeight",
     "category": "Type",
@@ -449,7 +473,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.HyperLogLog",
+    "location": "api.html#OnlineStatsBase.HyperLogLog",
     "page": "API",
     "title": "OnlineStatsBase.HyperLogLog",
     "category": "Type",
@@ -457,7 +481,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.KMeans",
+    "location": "api.html#OnlineStatsBase.KMeans",
     "page": "API",
     "title": "OnlineStatsBase.KMeans",
     "category": "Type",
@@ -465,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.LearningRate",
+    "location": "api.html#OnlineStatsBase.LearningRate",
     "page": "API",
     "title": "OnlineStatsBase.LearningRate",
     "category": "Type",
@@ -473,7 +497,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.LearningRate2",
+    "location": "api.html#OnlineStatsBase.LearningRate2",
     "page": "API",
     "title": "OnlineStatsBase.LearningRate2",
     "category": "Type",
@@ -481,7 +505,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.LinReg",
+    "location": "api.html#OnlineStatsBase.LinReg",
     "page": "API",
     "title": "OnlineStatsBase.LinReg",
     "category": "Type",
@@ -489,7 +513,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.MV",
+    "location": "api.html#OnlineStatsBase.MV",
     "page": "API",
     "title": "OnlineStatsBase.MV",
     "category": "Type",
@@ -497,7 +521,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.McclainWeight",
+    "location": "api.html#OnlineStatsBase.McclainWeight",
     "page": "API",
     "title": "OnlineStatsBase.McclainWeight",
     "category": "Type",
@@ -505,7 +529,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Mean",
+    "location": "api.html#OnlineStatsBase.Mean",
     "page": "API",
     "title": "OnlineStatsBase.Mean",
     "category": "Type",
@@ -513,7 +537,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Moments",
+    "location": "api.html#OnlineStatsBase.Moments",
     "page": "API",
     "title": "OnlineStatsBase.Moments",
     "category": "Type",
@@ -521,7 +545,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.OHistogram",
+    "location": "api.html#OnlineStatsBase.OHistogram",
     "page": "API",
     "title": "OnlineStatsBase.OHistogram",
     "category": "Type",
@@ -529,15 +553,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.OrderStats",
+    "location": "api.html#OnlineStatsBase.OrderStats",
     "page": "API",
     "title": "OnlineStatsBase.OrderStats",
     "category": "Type",
-    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
+    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.QuantileMM",
+    "location": "api.html#OnlineStatsBase.QuantileMM",
     "page": "API",
     "title": "OnlineStatsBase.QuantileMM",
     "category": "Type",
@@ -545,7 +569,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.QuantileMSPI",
+    "location": "api.html#OnlineStatsBase.QuantileMSPI",
     "page": "API",
     "title": "OnlineStatsBase.QuantileMSPI",
     "category": "Type",
@@ -553,7 +577,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.QuantileSGD",
+    "location": "api.html#OnlineStatsBase.QuantileSGD",
     "page": "API",
     "title": "OnlineStatsBase.QuantileSGD",
     "category": "Type",
@@ -561,7 +585,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.ReservoirSample",
+    "location": "api.html#OnlineStatsBase.ReservoirSample",
     "page": "API",
     "title": "OnlineStatsBase.ReservoirSample",
     "category": "Type",
@@ -569,7 +593,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Scaled",
+    "location": "api.html#OnlineStatsBase.Scaled",
     "page": "API",
     "title": "OnlineStatsBase.Scaled",
     "category": "Type",
@@ -577,15 +601,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Series",
+    "location": "api.html#OnlineStatsBase.Series",
     "page": "API",
     "title": "OnlineStatsBase.Series",
     "category": "Type",
-    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats using a given weighting mechanism.\n\ns = Series(ExponentialWeight(.1), Mean(), Variance(), Moments())\nfit!(s, randn(1000))\nvalue(s)\n\nx, y = randn(1000, 10), randn(1000)\ns = Series(LinReg(10))\nfit!(s, (x,y))\nvalue(s)\n\n\n\n"
+    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...; dim = Rows())\nSeries(weight, data, stats...; dim = Rows())\n\nTrack any number of OnlineStats using a given weighting mechanism.\n\nExamples\n\ns = Series(ExponentialWeight(.1), Mean(), Variance(), Moments())\nfit!(s, randn(1000))\nvalue(s)\n\no = CovMatrix(5)\ns = Series(randn(5, 1000), o; dim = Cols())\ncor(o)\n\nx, y = randn(1000, 10), randn(1000)\ns = Series(LinReg(10))\nfit!(s, (x, y))  # or fit!(s, x, y)\nvalue(s)\n\n\n\n"
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Sum",
+    "location": "api.html#OnlineStatsBase.Sum",
     "page": "API",
     "title": "OnlineStatsBase.Sum",
     "category": "Type",
@@ -593,7 +617,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.Variance",
+    "location": "api.html#OnlineStatsBase.Variance",
     "page": "API",
     "title": "OnlineStatsBase.Variance",
     "category": "Type",
@@ -601,7 +625,15 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#OnlineStatsBase.replicates-Tuple{OnlineStatsBase.Bootstrap}",
+    "location": "api.html#OnlineStatsBase.mapblocks",
+    "page": "API",
+    "title": "OnlineStatsBase.mapblocks",
+    "category": "Function",
+    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.replicates-Tuple{OnlineStatsBase.Bootstrap}",
     "page": "API",
     "title": "OnlineStatsBase.replicates",
     "category": "Method",
@@ -609,7 +641,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#StatsBase.confint",
+    "location": "api.html#StatsBase.confint",
     "page": "API",
     "title": "StatsBase.confint",
     "category": "Function",
@@ -617,7 +649,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#StatsBase.fit!",
+    "location": "api.html#StatsBase.fit!",
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Function",
@@ -625,7 +657,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/api.html#API-1",
+    "location": "api.html#API-1",
     "page": "API",
     "title": "API",
     "category": "section",
@@ -633,7 +665,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/newstats.html#",
+    "location": "newstats.html#",
     "page": "Extending OnlineStats",
     "title": "Extending OnlineStats",
     "category": "page",
@@ -641,7 +673,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/newstats.html#Extending-OnlineStats-1",
+    "location": "newstats.html#Extending-OnlineStats-1",
     "page": "Extending OnlineStats",
     "title": "Extending OnlineStats",
     "category": "section",
@@ -649,7 +681,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/newstats.html#Make-a-subtype-of-OnlineStat-and-give-it-a-fit!-method.-1",
+    "location": "newstats.html#Make-a-subtype-of-OnlineStat-and-give-it-a-fit!-method.-1",
     "page": "Extending OnlineStats",
     "title": "Make a subtype of OnlineStat and give it a fit! method.",
     "category": "section",
@@ -657,7 +689,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/newstats.html#That's-all-there-is-to-it-1",
+    "location": "newstats.html#That's-all-there-is-to-it-1",
     "page": "Extending OnlineStats",
     "title": "That's all there is to it",
     "category": "section",
@@ -665,11 +697,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "pages/newstats.html#Details-1",
+    "location": "newstats.html#Details-1",
     "page": "Extending OnlineStats",
     "title": "Details",
     "category": "section",
-    "text": "An OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has."
+    "text": "An OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has.\nIf you don't know the size of a single observation or the default weight  (<:OnlineStat{Any,Any}), define methods OnlineStatsBase.input_ndims(::MyNewStat) and  OnlineStatsBase.default_weight(::MyNewStat)."
 },
 
 ]}
