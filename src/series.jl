@@ -171,6 +171,8 @@ function fit!(s::Series{1}, y::AbstractMatrix, γ::Vector{Float64}, ::Cols)
 end
 
 #-----------------------------------------------------------------------# fit! (1, 0)
+fit(o::OnlineStat{(1,0)}, xy::Tuple, args...) = fit!(o, xy[1], xy[2], args...)
+
 function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb})
     γ = weight!(s)
     map(x -> fit!(x, xy[1], xy[2], γ), stats(s))

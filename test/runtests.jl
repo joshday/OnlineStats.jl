@@ -350,6 +350,16 @@ end
     @test coef(o, 3, [1, 2]; verbose=false) ≈ x[:, [1, 2]] \ x[:, 3]
     @test coef(o, 3, [2, 1]; verbose=false) ≈ x[:, [2, 1]] \ x[:, 3]
 end
+@testset "LinReg" begin 
+    o = LinReg(5)
+    x, y = randn(100,5), randn(100)
+    s = Series((x,y), o)
+    @test coef(o) ≈ x\y
+    @test predict(o, x) ≈ x * (x\y)
+    @test predict(o, x', Cols()) ≈ x * (x\y)
+    o2 = LinReg(5)
+    s2 = Series((x,y), o2)
+end
 @testset "IHistogram" begin
     y = rand(1000)
     o = IHistogram(100)
@@ -365,8 +375,22 @@ end
     merge!(o, o2, .1)
     @test sum(o.counts) == 2000
     @test median(o) ≈ median(y) atol=.1
-
-    # summaries
+    @test var(o) ≈ var(y) atol=.1
+    @test std(o) ≈ std(y) atol=.1
     @test mean(o) ≈ mean(y) atol=.1
+    o = IHistogram(25)
+    y = 1:25
+    Series(y, o)
+    @test extrema(o) == extrema(y)
+    @test quantile(o) ≈ quantile(y) atol=.1
+end
+@testset "OHistogram" begin 
+    y = randn(100)
+    o = OHistogram(-5:.01:5)
+    Series(y, o)
+    @test mean(o) ≈ mean(y) atol=.1
+    @test var(o) ≈ var(y) atol=.1
+    @test std(o) ≈ std(y) atol=.1
+    @test quantile(o) ≈ quantile(y) atol=.1
 end
 end #module
