@@ -32,8 +32,7 @@ end
 end
 
 #-----------------------------------------------------------------------# (1, 0) residual plot
-@recipe function f(o::OnlineStat{(1,0)}, x::AbstractMatrix, y::AbstractVector,
-        dim::ObsDimension = Rows())
+@recipe function f(o::OnlineStat{(1,0)}, x::AbstractMatrix, y::AbstractVector, dim::ObLoc = Rows())
     ylab --> "Residual"
     xlab --> "Observation Index"
     legend --> false

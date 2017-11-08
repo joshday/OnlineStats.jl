@@ -4,7 +4,6 @@ abstract type SGUpdater <: Updater end
 init(u::Updater, p) = u
 Base.show(io::IO, u::Updater) = print(io, name(u))
 
-
 doc"""
     StatLearn(p::Int, args...)
 
@@ -33,7 +32,7 @@ where the ``f_i``'s are loss functions evaluated on a single observation, ``g`` 
     coef(o)
     predict(o, x)
 """
-struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: OnlineStat{(1, 0), LearningRate}
+struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0)}
     β::VecF
     gx::VecF
     λfactor::VecF
@@ -61,7 +60,7 @@ StatLearn(p::Integer, a1, a2, a3)     = StatLearn(p, a(a3, a(a2, a(a1, d(p)))))
 StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p))))))
 
 function Base.show(io::IO, o::StatLearn)
-    println(io, OnlineStatsBase.name(o))
+    println(io, name(o))
     print(io,   "    > β       : "); showcompact(io, o.β);        println(io)
     print(io,   "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
     println(io, "    > Loss    : $(o.loss)")
@@ -81,7 +80,7 @@ classify(o::StatLearn, x, dim = Rows()) = sign.(predict(o, x, dim))
 
 loss(o::StatLearn, x, y, dim = Rows()) = value(o.loss, y, predict(o, x, dim), AvgMode.Mean())
 
-function objective(o::StatLearn, x, y, dim = Rows())
+function value(o::StatLearn, x, y, dim = Rows())
     value(o.loss, y, predict(o, x, dim), AvgMode.Mean()) + value(o.penalty, o.β, o.λfactor)
 end
 

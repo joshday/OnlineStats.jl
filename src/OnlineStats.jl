@@ -1,38 +1,73 @@
 __precompile__(true)
-
 module OnlineStats
 
-import StatsBase: coef, stderr, vcov, skewness, kurtosis, confint, Histogram, fit!,
-    fweights
-import OnlineStatsBase: ScalarOb, VectorOb, smooth, smooth!, smooth_syr!, ϵ,
-    default_weight, input_ndims, name, mapblocks
-import LearnBase: ObsDimension, value
 import SweepOperator
+import LearnBase: fit!, value, nobs
+import StatsBase: Histogram, skewness, kurtosis, coef, fweights
+import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, 
+    ScalarOb, VectorOb, XyOb, Data, default_weight,
+    Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
+    HarmonicWeight, McclainWeight, Bounded, Scaled
 
 using Reexport, RecipesBase
-@reexport using OnlineStatsBase, LearnBase, LossFunctions, PenaltyFunctions
+@reexport using LossFunctions, PenaltyFunctions
 
 export
-    # functions
-    mapblocks, maprows, confint, coeftable, vcov, mse, stderr,
-    # Statlearn and Updaters
-    StatLearn,
-    SGD, ADAGRAD, ADAM, ADAMAX, NSGD, RMSPROP, ADADELTA, NADAM, OMASQ, OMAPQ, MSPIQ,
-    loss, objective, classify, statlearnpath,
-    # DistributionStats
-    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial,
-    FitMvNormal,
-    # Other
-    LinRegBuilder, IHistogram, CallFun
+    Series, fit!, value, nobs, classify, loss, predict, coef, Cols, Rows,
+    # Weight
+    Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
+    HarmonicWeight, McclainWeight, Bounded, Scaled,
+    # Distributions
+    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, 
+    FitMultinomial, FitMvNormal,
+    Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
+    OrderStats, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
+    LinReg, LinRegBuilder, IHistogram, OHistogram,
+    # StatLearn
+    StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAPQ,
+    OMASQ, MSPIQ
+
+
+#-----------------------------------------------------------------------# ObLoc
+abstract type ObLoc end 
+struct Rows <: ObLoc end 
+struct Cols <: ObLoc end
+
+#-----------------------------------------------------------------------# helpers
+smooth(x, y, γ) = x + γ * (y - x)
+
+function smooth!(x, y, γ)
+    length(x) == length(y) || 
+        throw(DimensionMismatch("can't smooth arrays of different length"))
+    for i in eachindex(x)
+        @inbounds x[i] = smooth(x[i], y[i], γ)
+    end
+end
+
+function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
+    size(A, 1) == length(x) || throw(DimensionMismatch())
+    for j in 1:size(A, 2), i in 1:j
+        @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
+    end
+end
+
+unbias(o) = o.nobs / (o.nobs - 1)
+
+const ϵ = 1e-6
 
 const VecF = Vector{Float64}
+const AVecF = AbstractVector{Float64}
 
-
-#-----------------------------------------------------------------------# source files
-include("distributions.jl")
-include("statlearn.jl")
-include("linregbuilder.jl")
-include("histograms.jl")
-include("experimental.jl")
+#-----------------------------------------------------------------------# includes
+include("stats/stats.jl")
+include("stats/linregbuilder.jl")
+include("stats/histograms.jl")
+include("stats/mv.jl")
+include("stats/distributions.jl")
+include("stats/statlearn.jl")
+include("stats/experimental.jl")
+include("series.jl")
+include("mapblocks.jl")
 include("recipes.jl")
+
 end # module

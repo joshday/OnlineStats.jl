@@ -125,7 +125,7 @@ end
             OMASQ(), MSPIQ()]
         o = @inferred StatLearn(p, .5 * L2DistLoss(), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
-        @test objective(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
+        @test value(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
         fit!(s, (x, y))
         fit!(s, (x, y), .1)
         fit!(s, (x, y), StatsBase.Weights(rand(length(y))))

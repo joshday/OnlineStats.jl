@@ -10,7 +10,7 @@ Online parameter estimate of a Beta distribution (Method of Moments).
     s = Series(y, o)
     Beta(value(o)...)
 """
-struct FitBeta <: OnlineStat{0, EqualWeight}
+struct FitBeta <: ExactStat{0}
     var::Variance
     FitBeta() = new(Variance())
 end
@@ -43,7 +43,7 @@ Fit a categorical distribution where the inputs are of type `T`.
     s = Series(rand(vals, 1000), o)
     value(o)
 """
-mutable struct FitCategorical{T} <: OnlineStat{0, EqualWeight}
+mutable struct FitCategorical{T} <: ExactStat{0}
     d::Dict{T, Int}
     nobs::Int
     FitCategorical{T}() where {T} = new(Dict{T, Int}(), 0)
@@ -73,7 +73,7 @@ Online parameter estimate of a Cauchy distribution.
     s = Series(y, o)
     Cauchy(value(o)...)
 """
-mutable struct FitCauchy <: OnlineStat{0, LearningRate}
+mutable struct FitCauchy <: StochasticStat{0}
     q::QuantileMM
     nobs::Int
     FitCauchy() = new(QuantileMM(), 0)
@@ -104,7 +104,7 @@ Online parameter estimate of a Gamma distribution (Method of Moments).
     Gamma(value(o)...)
 """
 # method of moments. TODO: look at Distributions for MLE
-struct FitGamma <: OnlineStat{0, EqualWeight}
+struct FitGamma <: ExactStat{0}
     var::Variance
 end
 FitGamma() = FitGamma(Variance())
@@ -134,7 +134,7 @@ Online parameter estimate of a LogNormal distribution (MLE).
     s = Series(y, o)
     LogNormal(value(o)...)
 """
-struct FitLogNormal <: OnlineStat{0, EqualWeight}
+struct FitLogNormal <: ExactStat{0}
     var::Variance
     FitLogNormal() = new(Variance())
 end
@@ -160,7 +160,7 @@ Online parameter estimate of a Normal distribution (MLE).
     s = Series(y, o)
     Normal(value(o)...)
 """
-struct FitNormal <: OnlineStat{0, EqualWeight}
+struct FitNormal <: ExactStat{0}
     var::Variance
     FitNormal() = new(Variance())
 end
@@ -189,7 +189,7 @@ distribution is returned as 1.
     s = Series(y', o)
     Multinomial(value(o)...)
 """
-mutable struct FitMultinomial <: OnlineStat{1, EqualWeight}
+mutable struct FitMultinomial <: ExactStat{1}
     mvmean::MV{Mean}
     nobs::Int
     FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
@@ -225,7 +225,7 @@ Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
     s = Series(y', o)
     MvNormal(value(o)...)
 """
-struct FitMvNormal<: OnlineStat{1, EqualWeight}
+struct FitMvNormal <: ExactStat{1}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end

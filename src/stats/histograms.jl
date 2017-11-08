@@ -9,7 +9,7 @@ Incrementally build a histogram of `b` (not equally spaced) bins.
     o = IHistogram(50)
     Series(randn(1000), o)
 """
-struct IHistogram <: OnlineStat{0, EqualWeight}
+struct IHistogram <: ExactStat{0}
     value::Vector{Float64}
     counts::Vector{Int}
     buffer::Vector{Float64}
@@ -80,3 +80,43 @@ function Base.quantile(o::IHistogram, p = [0, .25, .5, .75, 1])
     quantile(o.value[inds], fweights(o.counts[inds]), p)
 end
 Base.median(o::IHistogram) = quantile(o, .5)
+
+#-----------------------------------------------------------------------# OHistogram
+#-----------------------------------------------------------------------# OHistogram
+"""
+    OHistogram(range)
+
+Make a histogram with bins given by `range`.  Uses left-closed bins.
+
+# Example
+
+    y = randn(100)
+    s = Series(y, OHistogram(-4:.1:4))
+    value(s)
+"""
+struct OHistogram{H <: Histogram} <: ExactStat{0}
+    h::H
+end
+OHistogram(r::Range) = OHistogram(Histogram(r, :left))
+function fit!(o::OHistogram, y::ScalarOb, γ::Float64)
+    H = o.h
+    x = H.edges[1]
+    a = first(x)
+    δ = step(x)
+    k = floor(Int, (y - a) / δ) + 1
+    if 1 <= k <= length(x)
+        @inbounds H.weights[k] += 1
+    end
+end
+Base.merge!(o::T, o2::T, γ::Float64) where {T <: OHistogram} = merge!(o.h, o2.h)
+
+_x(o::OHistogram) = (o.h.edges[1] - .5*step(o.h.edges[1]))[2:end]
+
+Base.mean(o::OHistogram) = mean(_x(o), fweights(o.h.weights))
+Base.var(o::OHistogram) = var(_x(o), fweights(o.h.weights); corrected=true)
+Base.std(o::OHistogram) = sqrt(var(o))
+
+function Base.quantile(o::OHistogram, p = [0, .25, .5, .75, 1]) 
+    inds = find(o.h.weights)  # filter out zero weights
+    quantile(_x(o)[inds], fweights(o.h.weights[inds]), p)
+end
