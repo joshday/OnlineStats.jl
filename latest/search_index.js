@@ -265,11 +265,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.CallFun",
+    "location": "api.html#OnlineStats.CStat",
     "page": "API",
-    "title": "OnlineStats.CallFun",
+    "title": "OnlineStats.CStat",
     "category": "Type",
-    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
+    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.CovMatrix",
+    "page": "API",
+    "title": "OnlineStats.CovMatrix",
+    "category": "Type",
+    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.\n\nExample\n\ny = randn(100, 5)\nSeries(y, CovMatrix(5))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Diff",
+    "page": "API",
+    "title": "OnlineStats.Diff",
+    "category": "Type",
+    "text": "Diff()\n\nTrack the difference and the last value.\n\nExample\n\ns = Series(randn(1000), Diff())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Extrema",
+    "page": "API",
+    "title": "OnlineStats.Extrema",
+    "category": "Type",
+    "text": "Extrema()\n\nMaximum and minimum.\n\nExample\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -337,11 +361,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.HyperLogLog",
+    "page": "API",
+    "title": "OnlineStats.HyperLogLog",
+    "category": "Type",
+    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\ns = Series(rand(1:10, 1000), HyperLogLog(12))\nvalue(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.IHistogram",
     "page": "API",
     "title": "OnlineStats.IHistogram",
     "category": "Type",
     "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  \n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.KMeans",
+    "page": "API",
+    "title": "OnlineStats.KMeans",
+    "category": "Type",
+    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nusing OnlineStats, Distributions\nd = MixtureModel([Normal(0), Normal(5)])\ny = rand(d, 100_000, 1)\ns = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.LinReg",
+    "page": "API",
+    "title": "OnlineStats.LinReg",
+    "category": "Type",
+    "text": "LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nLinReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.\n\nExample\n\nx = randn(100, 10)\ny = x * linspace(-1, 1, 10) + randn(100)\no = LinReg(10)\nSeries((x,y), o)\nvalue(o)\n\n\n\n"
 },
 
 {
@@ -361,6 +409,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Mean",
+    "page": "API",
+    "title": "OnlineStats.Mean",
+    "category": "Type",
+    "text": "Mean()\n\nUnivariate mean.\n\nExample\n\ns = Series(randn(100), Mean())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Moments",
+    "page": "API",
+    "title": "OnlineStats.Moments",
+    "category": "Type",
+    "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.NADAM",
     "page": "API",
     "title": "OnlineStats.NADAM",
@@ -377,11 +441,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.OHistogram",
+    "page": "API",
+    "title": "OnlineStats.OHistogram",
+    "category": "Type",
+    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.\n\nExample\n\ny = randn(100)\ns = Series(y, OHistogram(-4:.1:4))\nvalue(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.OMASQ",
     "page": "API",
     "title": "OnlineStats.OMASQ",
     "category": "Type",
     "text": "Experimental: OMM-constant\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.OrderStats",
+    "page": "API",
+    "title": "OnlineStats.OrderStats",
+    "category": "Type",
+    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.QuantileMM",
+    "page": "API",
+    "title": "OnlineStats.QuantileMM",
+    "category": "Type",
+    "text": "QuantileMM(q = [.25, .5, .75])\n\nApproximate quantiles via an online MM algorithm (OMAS).\n\nExample\n\ns = Series(randn(1000), QuantileMM())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.QuantileMSPI",
+    "page": "API",
+    "title": "OnlineStats.QuantileMSPI",
+    "category": "Type",
+    "text": "QuantileMSPI(q = [.25, .5, .75])\n\nApproximate quantiles via Majorized Stochastic Proximal Iteration (MSPI).\n\nExample\n\ns = Series(randn(1000), QuantileMSPI())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.QuantileSGD",
+    "page": "API",
+    "title": "OnlineStats.QuantileSGD",
+    "category": "Type",
+    "text": "QuantileSGD(q = [.25, .5, .75])\n\nApproximate quantiles via an stochastic subgradient descent.\n\nExample\n\ns = Series(randn(1000), QuantileSGD())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.ReservoirSample",
+    "page": "API",
+    "title": "OnlineStats.ReservoirSample",
+    "category": "Type",
+    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.\n\nExample\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
 },
 
 {
@@ -393,6 +505,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Series",
+    "page": "API",
+    "title": "OnlineStats.Series",
+    "category": "Type",
+    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(data, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats.\n\nExample\n\nSeries(Mean())\nSeries(randn(100), Mean())\nSeries(randn(100), Weight.Exponential(), Mean())\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.StatLearn",
     "page": "API",
     "title": "OnlineStats.StatLearn",
@@ -401,259 +521,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStatsBase.Bootstrap",
+    "location": "api.html#OnlineStats.Sum",
     "page": "API",
-    "title": "OnlineStatsBase.Bootstrap",
-    "category": "Type",
-    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2], f = value)\n\nOnline Statistical Bootstrapping.  Create nreps replicates of the OnlineStat o. When fit! is called, each of the replicates will be updated rand(d) times. value(b::Bootstrap) returns f mapped to the replicates.\n\nExample\n\nb = Bootstrap(Mean())\nfit!(b, randn(1000))\nvalue(b)        # `f` mapped to replicates\nmean(value(b))  # mean\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Bounded",
-    "page": "API",
-    "title": "OnlineStatsBase.Bounded",
-    "category": "Type",
-    "text": "Bounded(weight, λ)\n\nGive a Weight a lower bound.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.CStat",
-    "page": "API",
-    "title": "OnlineStatsBase.CStat",
-    "category": "Type",
-    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.CovMatrix",
-    "page": "API",
-    "title": "OnlineStatsBase.CovMatrix",
-    "category": "Type",
-    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.\n\nExample\n\ny = randn(100, 5)\nSeries(y, CovMatrix(5))\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Diff",
-    "page": "API",
-    "title": "OnlineStatsBase.Diff",
-    "category": "Type",
-    "text": "Diff()\n\nTrack the difference and the last value.\n\nExample\n\ns = Series(randn(1000), Diff())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.EqualWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.EqualWeight",
-    "category": "Type",
-    "text": "EqualWeight()\n\nEqually weighted observations\nWeight at observation t is γ = 1 / t\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.ExponentialWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.ExponentialWeight",
-    "category": "Type",
-    "text": "ExponentialWeight(λ::Real = 0.1)\nExponentialWeight(lookback::Integer)\n\nExponentially weighted observations (constant)\nWeight at observation t is γ = λ\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Extrema",
-    "page": "API",
-    "title": "OnlineStatsBase.Extrema",
-    "category": "Type",
-    "text": "Extrema()\n\nMaximum and minimum.\n\nExample\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.HarmonicWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.HarmonicWeight",
-    "category": "Type",
-    "text": "HarmonicWeight(a = 10.0)\n\nDecreases at a slow rate\nWeight at observation t is γ = a / (a + t - 1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.HyperLogLog",
-    "page": "API",
-    "title": "OnlineStatsBase.HyperLogLog",
-    "category": "Type",
-    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\ns = Series(rand(1:10, 1000), HyperLogLog(12))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.KMeans",
-    "page": "API",
-    "title": "OnlineStatsBase.KMeans",
-    "category": "Type",
-    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nusing OnlineStats, Distributions\nd = MixtureModel([Normal(0), Normal(5)])\ny = rand(d, 100_000, 1)\ns = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LearningRate",
-    "page": "API",
-    "title": "OnlineStatsBase.LearningRate",
-    "category": "Type",
-    "text": "LearningRate(r = .6)\n\nMainly for stochastic approximation types\nDecreases at a \"slow\" rate\nWeight at observation t is γ = 1 / t ^ r\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LearningRate2",
-    "page": "API",
-    "title": "OnlineStatsBase.LearningRate2",
-    "category": "Type",
-    "text": "LearningRate2(c = .5)\n\nMainly for stochastic approximation types\nDecreases at a \"slow\" rate\nWeight at observation t is γ = inv(1 + c * (t - 1))\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LinReg",
-    "page": "API",
-    "title": "OnlineStatsBase.LinReg",
-    "category": "Type",
-    "text": "LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nLinReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.\n\nExample\n\nx = randn(100, 10)\ny = x * linspace(-1, 1, 10) + randn(100)\no = LinReg(10)\nSeries((x,y), o)\nvalue(o)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.MV",
-    "page": "API",
-    "title": "OnlineStatsBase.MV",
-    "category": "Type",
-    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.McclainWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.McclainWeight",
-    "category": "Type",
-    "text": "McclainWeight(ᾱ = 0.1)\n\n\"smoothed\" version of BoundedEqualWeight\nweights asymptotically approach ᾱ\nWeight at observation t is γ(t-1) / (1 + γ(t-1) - ᾱ)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Mean",
-    "page": "API",
-    "title": "OnlineStatsBase.Mean",
-    "category": "Type",
-    "text": "Mean()\n\nUnivariate mean.\n\nExample\n\ns = Series(randn(100), Mean())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Moments",
-    "page": "API",
-    "title": "OnlineStatsBase.Moments",
-    "category": "Type",
-    "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.OHistogram",
-    "page": "API",
-    "title": "OnlineStatsBase.OHistogram",
-    "category": "Type",
-    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.\n\nExample\n\ny = randn(100)\ns = Series(y, OHistogram(-4:.1:4))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.OrderStats",
-    "page": "API",
-    "title": "OnlineStatsBase.OrderStats",
-    "category": "Type",
-    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.QuantileMM",
-    "page": "API",
-    "title": "OnlineStatsBase.QuantileMM",
-    "category": "Type",
-    "text": "QuantileMM(q = [.25, .5, .75])\n\nApproximate quantiles via an online MM algorithm (OMAS).\n\nExample\n\ns = Series(randn(1000), QuantileMM())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.QuantileMSPI",
-    "page": "API",
-    "title": "OnlineStatsBase.QuantileMSPI",
-    "category": "Type",
-    "text": "QuantileMSPI(q = [.25, .5, .75])\n\nApproximate quantiles via Majorized Stochastic Proximal Iteration (MSPI).\n\nExample\n\ns = Series(randn(1000), QuantileMSPI())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.QuantileSGD",
-    "page": "API",
-    "title": "OnlineStatsBase.QuantileSGD",
-    "category": "Type",
-    "text": "QuantileSGD(q = [.25, .5, .75])\n\nApproximate quantiles via an stochastic subgradient descent.\n\nExample\n\ns = Series(randn(1000), QuantileSGD())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.ReservoirSample",
-    "page": "API",
-    "title": "OnlineStatsBase.ReservoirSample",
-    "category": "Type",
-    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.\n\nExample\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Scaled",
-    "page": "API",
-    "title": "OnlineStatsBase.Scaled",
-    "category": "Type",
-    "text": "Scaled(weight, λ)\nλ * weight\n\nScale a weight by a constant.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Series",
-    "page": "API",
-    "title": "OnlineStatsBase.Series",
-    "category": "Type",
-    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...; dim = Rows())\nSeries(weight, data, stats...; dim = Rows())\n\nTrack any number of OnlineStats using a given weighting mechanism.\n\nExamples\n\ns = Series(ExponentialWeight(.1), Mean(), Variance(), Moments())\nfit!(s, randn(1000))\nvalue(s)\n\no = CovMatrix(5)\ns = Series(randn(5, 1000), o; dim = Cols())\ncor(o)\n\nx, y = randn(1000, 10), randn(1000)\ns = Series(LinReg(10))\nfit!(s, (x, y))  # or fit!(s, x, y)\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Sum",
-    "page": "API",
-    "title": "OnlineStatsBase.Sum",
+    "title": "OnlineStats.Sum",
     "category": "Type",
     "text": "Sum()\n\nTrack the overall sum.\n\nExample\n\ns = Series(randn(1000), Sum())\nvalue(s)\n\n\n\n"
 },
 
 {
-    "location": "api.html#OnlineStatsBase.Variance",
+    "location": "api.html#OnlineStats.Variance",
     "page": "API",
-    "title": "OnlineStatsBase.Variance",
+    "title": "OnlineStats.Variance",
     "category": "Type",
     "text": "Variance()\n\nUnivariate variance.\n\nExample\n\ns = Series(randn(100), Variance())\nvalue(s)\n\n\n\n"
 },
 
 {
-    "location": "api.html#OnlineStatsBase.mapblocks",
+    "location": "api.html#OnlineStats.CallFun",
     "page": "API",
-    "title": "OnlineStatsBase.mapblocks",
+    "title": "OnlineStats.CallFun",
+    "category": "Type",
+    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.MV",
+    "page": "API",
+    "title": "OnlineStats.MV",
+    "category": "Type",
+    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.mapblocks",
+    "page": "API",
+    "title": "OnlineStats.mapblocks",
     "category": "Function",
     "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
 },
 
 {
-    "location": "api.html#OnlineStatsBase.replicates-Tuple{OnlineStatsBase.Bootstrap}",
+    "location": "api.html#OnlineStatsBase.ExactStat",
     "page": "API",
-    "title": "OnlineStatsBase.replicates",
-    "category": "Method",
-    "text": "replicates(b)\n\nReturn the vector of replicates from Bootstrap b\n\n\n\n"
+    "title": "OnlineStatsBase.ExactStat",
+    "category": "Type",
+    "text": "An OnlineStat which can be updated exactly.\n\n\n\n"
 },
 
 {
-    "location": "api.html#StatsBase.confint",
+    "location": "api.html#OnlineStatsBase.StochasticStat",
     "page": "API",
-    "title": "StatsBase.confint",
-    "category": "Function",
-    "text": "confint(b, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
-},
-
-{
-    "location": "api.html#StatsBase.fit!",
-    "page": "API",
-    "title": "StatsBase.fit!",
-    "category": "Function",
-    "text": "fit!(s::Series, data)\nfit!(s::Series, data, w::StatsBase.AbstractWeights)\n\nUpdate a Series with more data, optionally overriding the Weight.\n\nExample\n\ny = randn(100)\nw = rand(100)\n\ns = Series(Mean())\nfit!(s, y[1])          # one observation: use Series weight\nfit!(s, y[1], w[1])     # one observation: override weight\nfit!(s, y)              # multiple observations: use Series weight\nfit!(s, y, w[1])        # multiple observations: override each weight with w[1]\nfit!(s, y, Weights(w))  # multiple observations: y[i] uses weight w[i]\n\nx, y = randn(100, 5), randn(100)\ns = Series(LinReg(5))\nfit!(s, (x, y))  # or fit!(s, x, y)\n\n\n\n"
+    "title": "OnlineStatsBase.StochasticStat",
+    "category": "Type",
+    "text": "An OnlineStat which must be updated approximately.\n\n\n\n"
 },
 
 {
