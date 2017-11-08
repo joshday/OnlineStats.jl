@@ -13,7 +13,7 @@ Ridge regression of `p` variables with elementwise regularization.
     Series((x,y), o)
     value(o)
 """
-mutable struct LinReg <: OnlineStat{(1,0)}
+mutable struct LinReg <: ExactStat{(1,0)}
     β::Vector{Float64}
     A::Matrix{Float64}
     λfactor::Vector{Float64}

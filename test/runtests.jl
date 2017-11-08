@@ -36,6 +36,7 @@ for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(),
 end
 println(Series(Mean()))
 println(Series(Mean(), Variance(), Moments()))
+Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
 
 println("\n\n")
 
@@ -135,11 +136,36 @@ end
         @test @allocated(Series(ExponentialWeight(), x, MV(5, Mean()))) < 800
     end
 end
+@testset "fit! (1,0)" begin 
+    # single observation
+    s = Series(LinReg(5))
+    fit!(s, (randn(5), randn()))
+    # single observation, override weight 
+    s = Series(LinReg(5))
+    fit!(s, (randn(5), rand()), .1)
+    # multiple observations
+    s = Series(LinReg(5))
+    fit!(s, (x, y))
+    @test value(s)[1] ≈ x\y
+    # multiple observations, by column
+    s = Series(LinReg(5))
+    fit!(s, (x', y), Cols())
+    @test value(s)[1] ≈ x\y
+    # multiple observations, override weight
+    s = Series(LinReg(5))
+    fit!(s, (x, y), .1)
+    # multiple observaitons, override weights 
+    fit!(s, (x, y), rand(length(y)))
+end
 @testset "merging" begin 
     @test merge(Series(Mean()), Series(Mean())) == Series(Mean())
     s1 = merge(Series(y, Mean()), Series(y2, Mean()))
     s2 = Series(vcat(y,y2), Mean())
     @test value(s1)[1] ≈ value(s2)[1]
+    @test_throws Exception merge(Series(y, Mean()), Series(y, Mean()), 100.0)
+    merge(s1, s2, :mean)
+    merge(s1, s2, :singleton)
+    @test_throws Exception merge(s1, s2, :fakemethod)
 end
 end #Series
 
@@ -152,6 +178,17 @@ end #Series
         fit!(s, xi)
     end
     @test cov(o) ≈ cov(x)
+    i = 0
+    mapblocks(3, rand(5)) do xi
+        i += 1
+    end
+    @test i == 2
+    s = Series(LinReg(5))
+    x, y = randn(100, 5), randn(100)
+    mapblocks(11, (x, y)) do xy
+        fit!(s, xy)
+    end
+    @test value(s)[1] ≈ x\y
 end
 
 #-----------------------------------------------------------------------# Tests
@@ -167,7 +204,7 @@ end
     @testset "FitBeta" begin
         o = FitBeta()
         @test value(o) == (1.0, 1.0)
-        Series(rand(100), o)
+        Series(rand(200), o)
         @test value(o)[1] ≈ 1.0 atol=.4
         @test value(o)[2] ≈ 1.0 atol=.4
         test_merge(FitBeta(), FitBeta(), rand(50), rand(50))
@@ -328,5 +365,8 @@ end
     merge!(o, o2, .1)
     @test sum(o.counts) == 2000
     @test median(o) ≈ median(y) atol=.1
+
+    # summaries
+    @test mean(o) ≈ mean(y) atol=.1
 end
 end #module
