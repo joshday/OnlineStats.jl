@@ -26,9 +26,27 @@ function test_function(o, y, fo, fy; atol = 1e-10)
 end
 
 #-----------------------------------------------------------------------# Show
+info("Show")
+for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(), 
+         HyperLogLog(4), KMeans(4, 2), Moments(), OrderStats(10), QuantileMM(),
+         QuantileMSPI(), QuantileSGD(), ReservoirSample(10), Sum() ,StatLearn(5), 
+         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info)]
+    println(o)
+    typeof(o) <: OnlineStat{0} && println(2o)
+end
 
-@show StatLearn(5)
-@show LinRegBuilder(5)
+println("\n\n")
+
+#-----------------------------------------------------------------------# mapblocks
+@testset "mapblocks" begin 
+    x = randn(10, 5)
+    o = CovMatrix(5)
+    s = Series(o)
+    mapblocks(3, x, Rows()) do xi
+        fit!(s, xi)
+    end
+    @test cov(o) ≈ cov(x)
+end
 
 #-----------------------------------------------------------------------# Tests
 

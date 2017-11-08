@@ -13,16 +13,18 @@ using Reexport, RecipesBase
 @reexport using LossFunctions, PenaltyFunctions
 
 export
-    Series, fit!, value, nobs, classify, loss, predict, coef, Cols, Rows,
+    fit!, value, nobs, classify, loss, predict, coef, mapblocks,
+    Series, OnlineStat, Cols, Rows, mapblocks,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled,
     # Distributions
     FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, 
     FitMultinomial, FitMvNormal,
+    # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
-    LinReg, LinRegBuilder, IHistogram, OHistogram,
+    LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAPQ,
     OMASQ, MSPIQ
