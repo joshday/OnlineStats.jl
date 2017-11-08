@@ -34,6 +34,7 @@ Series(wt::Weight, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 
 #-----------------------------------------------------------------------# methods
 header(io::IO, s::AbstractString) = println(io, "▦ $s" )
+
 function Base.show(io::IO, s::Series)
     header(io, name(s))
     print(io, "┣━━━ "); println(io, "$(s.weight), nobs = $(nobs(s))")
@@ -53,6 +54,13 @@ nobs(s::Series) = s.n
 
 weight(s::Series) = s.weight(s.n)
 weight!(s::Series, n2::Int = 1) = (s.n += n2; weight(s))
+
+function Base.:(==)(o1::Series, o2::Series)
+    typeof(o1) == typeof(o2) || return false
+    nms = fieldnames(o1)
+    all(getfield.(o1, nms) .== getfield.(o2, nms))
+end
+Base.copy(w::Series) = deepcopy(w)
 
 #-----------------------------------------------------------------------# fit! 0
 function fit!(s::Series{0}, y::ScalarOb)

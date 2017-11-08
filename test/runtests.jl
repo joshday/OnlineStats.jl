@@ -34,8 +34,89 @@ for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(),
     println(o)
     typeof(o) <: OnlineStat{0} && println(2o)
 end
+println(Series(Mean()))
+println(Series(Mean(), Variance(), Moments()))
 
 println("\n\n")
+
+#-----------------------------------------------------------------------# Data
+y = randn(100)
+y2 = randn(100)
+x = randn(100, 5)
+x2 = randn(100, 5)
+
+#-----------------------------------------------------------------------# Series
+@testset "Series" begin 
+@testset "Constructors" begin
+    @test Series(EqualWeight(), Mean()) == Series(Mean())
+    @test Series(y, Mean()) == Series(EqualWeight(), y, Mean())
+    @test Series(y, Mean()) == Series(y, EqualWeight(), Mean())
+    s = Series(Mean())
+    fit!(s, y)
+    @test s == Series(y, Mean())
+end
+@testset "fit! 0" begin 
+    s = Series(Mean())
+    # single observation
+    fit!(s, y[1])
+    @test value(s)[1] ≈ y[1]
+    # multiple observations
+    fit!(s, y[2:10])
+    @test value(s)[1] ≈ mean(y[1:10])
+    # single observation, override weight
+    s = Series(Mean())
+    fit!(s, y[1], .1)
+    @test value(s)[1] ≈ .1 * y[1]
+    # multiple observation, override weight 
+    s = Series(Mean())
+    fit!(s, y[1:2], .1)
+    @test value(s)[1] ≈ .1 * .9 * y[1] + .1 * y[2]
+    # multiple observation, override weights 
+    s = Series(Mean())
+    fit!(s, y[1:2], [.1, .2])
+    @test value(s)[1] ≈ .1 * .8 * y[1] + .2 * y[2]
+    @testset "allocations" begin 
+        # run once to compile
+        Series(y, Mean())
+        Series(y, ExponentialWeight(), Mean())
+        Series(ExponentialWeight(), y, Mean())
+
+        @test @allocated(Series(y, Mean())) < 300
+        @test @allocated(Series(y, ExponentialWeight(), Mean())) < 300
+        @test @allocated(Series(ExponentialWeight(), y, Mean())) < 300
+    end
+end
+@testset "fit! 1" begin 
+    # single observation
+    s = Series(MV(5, Mean()))
+    fit!(s, x[1, :])
+    @test value(s)[1] ≈ x[1, :]
+    # multiple observations
+    fit!(s, x[2:10, :])
+    @test value(s)[1] ≈ vec(mean(x[1:10, :], 1))
+    # single observation, override weight
+    s = Series(MV(5, Mean()))
+    fit!(s, x[1, :], .1)
+    @test value(s)[1] ≈ .1 .* x[1, :]
+    # multiple observations, override weight 
+    s = Series(MV(5, Mean()))
+    fit!(s, x[1:2, :], .1)
+    @test value(s)[1] ≈ .1 .* .9 .* x[1,:] + .1 .* x[2,:]
+    # multiple observations, override weights
+    s = Series(MV(5, Mean()))
+    fit!(s, x[1:2, :], [.1, .2])
+    @test value(s)[1] ≈ .1 .* .8 .* x[1,:] + .2 * x[2,:]
+    @testset "allocated" begin 
+        Series(x, MV(5, Mean()))
+        Series(x, ExponentialWeight(), MV(5, Mean()))
+        Series(ExponentialWeight(), x, MV(5, Mean()))
+
+        @test @allocated(Series(x, MV(5, Mean()))) < 800
+        @test @allocated(Series(x, ExponentialWeight(), MV(5, Mean()))) < 800
+        @test @allocated(Series(ExponentialWeight(), x, MV(5, Mean()))) < 800
+    end
+end
+end #Series
 
 #-----------------------------------------------------------------------# mapblocks
 @testset "mapblocks" begin 

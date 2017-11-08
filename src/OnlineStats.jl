@@ -24,7 +24,7 @@ export
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
-    LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun,
+    LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAPQ,
     OMASQ, MSPIQ
