@@ -417,6 +417,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.MV",
+    "page": "API",
+    "title": "OnlineStats.MV",
+    "category": "Type",
+    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Mean",
     "page": "API",
     "title": "OnlineStats.Mean",
@@ -550,14 +558,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.mapblocks",
     "category": "Function",
     "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.MV",
-    "page": "API",
-    "title": "OnlineStats.MV",
-    "category": "Type",
-    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\n\n\n"
 },
 
 {
