@@ -106,6 +106,25 @@ end
     s = Series(MV(5, Mean()))
     fit!(s, x[1:2, :], [.1, .2])
     @test value(s)[1] ≈ .1 .* .8 .* x[1,:] + .2 * x[2,:]
+    @testset "column observations" begin 
+        # normal
+        s = Series(CovMatrix(5))
+        fit!(s, x', Cols())
+        @test s == Series(x, CovMatrix(5))
+        # weight override
+        s = Series(CovMatrix(5))
+        s2 = Series(CovMatrix(5))
+        fit!(s, x, .1)
+        fit!(s2, x', .1, Cols())
+        @test s == s2
+        # weights override
+        w = rand(100)
+        s = Series(CovMatrix(5))
+        s2 = Series(CovMatrix(5))
+        fit!(s, x, w)
+        fit!(s2, x', w, Cols())
+        @test s == s2
+    end
     @testset "allocated" begin 
         Series(x, MV(5, Mean()))
         Series(x, ExponentialWeight(), MV(5, Mean()))
@@ -115,6 +134,12 @@ end
         @test @allocated(Series(x, ExponentialWeight(), MV(5, Mean()))) < 800
         @test @allocated(Series(ExponentialWeight(), x, MV(5, Mean()))) < 800
     end
+end
+@testset "merging" begin 
+    @test merge(Series(Mean()), Series(Mean())) == Series(Mean())
+    s1 = merge(Series(y, Mean()), Series(y2, Mean()))
+    s2 = Series(vcat(y,y2), Mean())
+    @test value(s1)[1] ≈ value(s2)[1]
 end
 end #Series
 

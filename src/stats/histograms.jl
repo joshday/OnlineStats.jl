@@ -81,7 +81,7 @@ function Base.quantile(o::IHistogram, p = [0, .25, .5, .75, 1])
 end
 Base.median(o::IHistogram) = quantile(o, .5)
 
-#-----------------------------------------------------------------------# OHistogram
+
 #-----------------------------------------------------------------------# OHistogram
 """
     OHistogram(range)

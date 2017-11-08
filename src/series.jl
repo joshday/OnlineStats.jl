@@ -52,8 +52,8 @@ stats(s::Series) = s.stats
 value(s::Series) = value.(stats(s))
 nobs(s::Series) = s.n
 
-weight(s::Series) = s.weight(s.n)
-weight!(s::Series, n2::Int = 1) = (s.n += n2; weight(s))
+weight(s::Series, n2::Int = 1) = s.weight(s.n, n2)
+weight!(s::Series, n2::Int = 1) = (s.n += n2; weight(s, n2))
 
 function Base.:(==)(o1::Series, o2::Series)
     typeof(o1) == typeof(o2) || return false
@@ -258,18 +258,18 @@ end
 
 
 #-----------------------------------------------------------------------# merging
-function Base.merge(s1::T, s2::T, w::Float64) where {T <: Series}
-    merge!(copy(s1), s2, w)
-end
+Base.merge(s1::T, s2::T, w::Float64) where {T <: Series} = merge!(copy(s1), s2, w)
+
 function Base.merge(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     merge!(copy(s1), s2, method)
 end
+
 function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     n2 = nobs(s2)
     n2 == 0 && return s1
     s1.n += n2
     if method == :append
-        merge!.(s1.stats, s2.stats, s1.weight(n2))
+        merge!.(s1.stats, s2.stats, weight(s1, n2))
     elseif method == :mean
         γ1 = s1.weight(s1.n)
         γ2 = s2.weight(s2.n)
@@ -281,6 +281,7 @@ function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     end
     s1
 end
+
 function Base.merge!(s1::T, s2::T, w::Float64) where {T <: Series}
     n2 = nobs(s2)
     n2 == 0 && return s1
