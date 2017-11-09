@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "Type",
-    "text": "ADAM(α1, α2)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
+    "text": "ADAM(α1 = .99, α2 = .999)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
 },
 
 {
@@ -269,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
-    "text": "ADAMAX(η, β1, β2)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
+    "text": "ADAMAX(η, β1 = .9, β2 = .999)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CallFun",
     "category": "Type",
-    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
+    "text": "CallFun(o::OnlineStat{0}, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
 },
 
 {
@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.IHistogram",
     "category": "Type",
-    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  \n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n\n\n"
+    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  An IHistogram can be used as a \"surrogate\" for a datset to get approximate summary statistics.\n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n# approximate summary stats\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\nextrema(o)\nmedian(o)\n\n\n\n"
 },
 
 {
@@ -429,7 +429,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.MSPIQ",
     "category": "Type",
-    "text": "MSPIQ()\n\nMSPI-Q algorithm using a Lipschitz constant to majorize the objective.\n\n\n\n"
+    "text": "MSPIQ()\n\nMSPI-Q (Proximal mapping applied to majorization) algorithm using a Lipschitz constant to  majorize the objective.  \n\n\n\n"
 },
 
 {
@@ -437,7 +437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.MV",
     "category": "Type",
-    "text": "MV(p, o)\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\nSeries(y, 5Mean())\n\n\n\n"
+    "text": "MV(p, o)\np * o\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\nSeries(y, 5Mean())\n\n\n\n"
 },
 
 {
@@ -461,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.NADAM",
     "category": "Type",
-    "text": "NADAM(α1, α2)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
+    "text": "NADAM(α1 = .99, α2 = .999)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
 },
 
 {
@@ -477,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.OHistogram",
     "category": "Type",
-    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.\n\nExample\n\ny = randn(100)\ns = Series(y, OHistogram(-4:.1:4))\nvalue(s)\n\n\n\n"
+    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.  OHistogram fits faster than IHistogram, but has the disadvantage of requiring specification of bins before data is observed.\n\nExample\n\ny = randn(100)\no = OHistogram(-5:.01:5)\ns = Series(y, o)\n\nvalue(o)  # return StatsBase.Histogram\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\n\n\n\n"
 },
 
 {
@@ -521,6 +521,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.RMSPROP",
+    "page": "API",
+    "title": "OnlineStats.RMSPROP",
+    "category": "Type",
+    "text": "RMSPROP(α = .9)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.ReservoirSample",
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
@@ -549,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
-    "text": "StatLearn(p::Int, args...)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Additional arguments can be given in any order (and is still type stable):\n\nloss = .5 * L2DistLoss(): any Loss from LossFunctions.jl\npenalty = L2Penalty(): any Penalty (which has a prox method) from PenaltyFunctions.jl.\nλ = fill(.1, p): a Vector of element-wise regularization parameters\nupdater = SGD(): SGD, ADAGRAD, ADAM, ADAMAX\n\nDetails\n\nThe (offline) objective function which StatLearn approximately minimizes is\n\nfrac1nsum_i=1^n f_i(beta) + sum_j=1^p lambda_j g(beta_j)\n\nwhere the f_i's are loss functions evaluated on a single observation, g is a penalty function, and the lambda_js are nonnegative regularization parameters.\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
+    "text": "StatLearn(p::Int, args...)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Additional arguments can be given in any order (and is still type stable):\n\nloss = .5 * L2DistLoss(): any Loss from LossFunctions.jl\npenalty = L2Penalty(): any Penalty (which has a prox method) from PenaltyFunctions.jl.\nλ = fill(.1, p): a Vector of element-wise regularization parameters\nupdater = SGD(): SGD, ADAGRAD, ADAM, ADAMAX, MSPIQ\n\nDetails\n\nThe (offline) objective function which StatLearn approximately minimizes is\n\nfrac1nsum_i=1^n f_i(beta) + sum_j=1^p lambda_j g(beta_j)\n\nwhere the f_i's are loss functions evaluated on a single observation, g is a penalty function, and the lambda_js are nonnegative regularization parameters.\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
 },
 
 {
