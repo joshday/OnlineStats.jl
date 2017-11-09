@@ -10,13 +10,14 @@
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
 | Difference                         | [`Diff`](@ref)             |
-| Histogram                          | [`OHistogram`](@ref), [`IHistogram`](@ref) |
-| Average order statistics           | [`OrderStats`](@ref)  |
 | **Multivariate Analysis:**         |                            |
 | Covariance matrix                  | [`CovMatrix`](@ref)        |
 | K-means clustering                 | [`KMeans`](@ref)           |
 | Multiple univariate statistics     | [`MV{<:OnlineStat}`](@ref) |
-| **Density Estimation:**            |                            |
+| **Nonparametric Density Estimation:**|                          |
+| Histograms                         | [`OHistogram`](@ref), [`IHistogram`](@ref) |
+| Approximate order statistics       | [`OrderStats`](@ref)       |
+| **Parametric Density Estimation:** |                            |
 | Beta                               | [`FitBeta`](@ref)          |
 | Categorical                        | [`FitCategorical`](@ref)   |
 | Cauchy                             | [`FitCauchy`](@ref)        |
