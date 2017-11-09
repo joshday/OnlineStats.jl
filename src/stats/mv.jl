@@ -9,6 +9,8 @@ Track `p` univariate OnlineStats `o`.
     y = randn(1000, 5)
     o = MV(5, Mean())
     s = Series(y, o)
+
+    Series(y, 5Mean())
 """
 struct MV{T} <: OnlineStat{1}
     stats::Vector{T}

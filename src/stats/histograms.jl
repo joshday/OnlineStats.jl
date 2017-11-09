@@ -110,7 +110,7 @@ function fit!(o::OHistogram, y::ScalarOb, γ::Float64)
 end
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: OHistogram} = merge!(o.h, o2.h)
 
-_x(o::OHistogram) = (o.h.edges[1] - .5*step(o.h.edges[1]))[2:end]
+_x(o::OHistogram) = (o.h.edges[1] + .5*step(o.h.edges[1]))[2:end]
 
 Base.mean(o::OHistogram) = mean(_x(o), fweights(o.h.weights))
 Base.var(o::OHistogram) = var(_x(o), fweights(o.h.weights); corrected=true)

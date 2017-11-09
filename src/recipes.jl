@@ -15,15 +15,13 @@
 end
 
 #-----------------------------------------------------------------------# OnlineStat{0}
-struct EmptyPlot end
 @recipe function f(o::OnlineStat{0})
     title --> "$(name(o)): $(round.(value(o), 5))"
     legend --> false
     axis --> false
     grid --> false
-    EmptyPlot()
+    zeros(0)
 end
-@recipe f(::EmptyPlot) = zeros(0)
 
 #-----------------------------------------------------------------------# OHistogram
 @recipe function f(o::OHistogram)

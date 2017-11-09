@@ -37,7 +37,7 @@ header(io::IO, s::AbstractString) = println(io, "▦ $s" )
 
 function Base.show(io::IO, s::Series)
     header(io, name(s))
-    print(io, "┣━━━ "); println(io, "$(s.weight), nobs = $(nobs(s))")
+    print(io, "┣━━━━ "); println(io, "$(s.weight), nobs = $(nobs(s))")
     print(io, "┗━┓")
     n = length(stats(s))
     i = 0

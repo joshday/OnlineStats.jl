@@ -13,7 +13,7 @@ using Reexport, RecipesBase
 @reexport using LossFunctions, PenaltyFunctions
 
 export
-    fit!, value, nobs, classify, loss, predict, coef, mapblocks,
+    fit!, value, nobs, classify, loss, predict, coef, mapblocks, stats,
     Series, OnlineStat, Cols, Rows, mapblocks,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 

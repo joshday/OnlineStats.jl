@@ -10,7 +10,7 @@ function test_merge(o1, o2, y1, y2)
     s2 = Series(y2, o2)
     merge!(s1, s2)
     fit!(s2, y1)
-    @test value(o1) == value(o1)
+    @test all(value(o1) .≈ value(o1))
 end
 
 # test: value(o) == f(y)
@@ -45,6 +45,15 @@ y = randn(100)
 y2 = randn(100)
 x = randn(100, 5)
 x2 = randn(100, 5)
+
+#-----------------------------------------------------------------------# merge stats
+@testset "test_merge 0" begin 
+    for o in [Mean(), Variance(), CStat(Mean()), Extrema(), HyperLogLog(10), Moments(),
+        OrderStats(5), Sum()]
+        test_merge(o, copy(o), y, y2)
+    end
+end
+
 
 #-----------------------------------------------------------------------# Series
 @testset "Series" begin 
