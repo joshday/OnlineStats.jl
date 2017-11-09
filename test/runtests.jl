@@ -490,4 +490,11 @@ end
         @test yi in y 
     end
 end
+@testset "Bootstrap" begin 
+    o = Bootstrap(Mean(), 100, [1])
+    Series(y, o)
+    for ybar in value(o)
+        @test ybar == value(o.o)
+    end
+end
 end #module

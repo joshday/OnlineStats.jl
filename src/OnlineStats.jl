@@ -3,7 +3,7 @@ module OnlineStats
 
 import SweepOperator
 import LearnBase: fit!, value, nobs, predict
-import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis
+import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, confint
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, 
     ScalarOb, VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
@@ -24,7 +24,7 @@ export
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
-    LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV,
+    LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV, Bootstrap,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAPQ,
     OMASQ, MSPIQ
@@ -68,6 +68,7 @@ include("stats/mv.jl")
 include("stats/distributions.jl")
 include("stats/statlearn.jl")
 include("stats/experimental.jl")
+include("stats/bootstrap.jl")
 include("series.jl")
 include("mapblocks.jl")
 include("recipes.jl")
