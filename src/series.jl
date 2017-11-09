@@ -318,6 +318,10 @@ end
 "See [`merge!`](@ref)"
 Base.merge(s1::T, s2::T, w::Float64) where {T <: Series} = merge!(copy(s1), s2, w)
 
+function Base.merge(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
+    merge!(copy(s1), s2, method)
+end
+
 """
     merge!(s1::Series, s2::Series, arg)
 
@@ -332,10 +336,6 @@ Merge `s2` into `s1` in place where `s2`'s influence is determined by `arg`. Opt
     - treat `s2` as a single observation.
 - any `Float64` in [0, 1]
 """
-function Base.merge(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
-    merge!(copy(s1), s2, method)
-end
-
 function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     n2 = nobs(s2)
     n2 == 0 && return s1
