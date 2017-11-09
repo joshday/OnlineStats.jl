@@ -569,6 +569,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#StatsBase.confint",
+    "page": "API",
+    "title": "StatsBase.confint",
+    "category": "Function",
+    "text": "confint(b, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStatsBase.ExactStat",
     "page": "API",
     "title": "OnlineStatsBase.ExactStat",
