@@ -273,6 +273,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Bootstrap",
+    "page": "API",
+    "title": "OnlineStats.Bootstrap",
+    "category": "Type",
+    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nOnline statistical bootstrap.  Create nreps replicates of o.  For each call to fit!, a replicate will be updated rand(d) times.\n\nExample\n\no = Bootstrap(Variance())\nSeries(randn(1000), o)\nconfint(o)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.CStat",
     "page": "API",
     "title": "OnlineStats.CStat",
@@ -533,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Series",
     "category": "Type",
-    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(data, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats.\n\nExample\n\nSeries(Mean())\nSeries(randn(100), Mean())\nSeries(randn(100), Weight.Exponential(), Mean())\n\n\n\n"
+    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(data, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats.\n\nExample\n\nSeries(Mean())\nSeries(randn(100), Mean())\nSeries(randn(100), Weight.Exponential(), Mean())\n\ns = Series(QuantileMM([.25, .5, .75]))\nfit!(s, randn(1000))\n\n\n\n"
 },
 
 {
@@ -561,6 +569,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#LearnBase.value-Tuple{OnlineStats.Series}",
+    "page": "API",
+    "title": "LearnBase.value",
+    "category": "Method",
+    "text": "value(s::Series)\n\nReturn a tuple of value mapped to the OnlineStats contained in the Series.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.mapblocks",
     "page": "API",
     "title": "OnlineStats.mapblocks",
@@ -569,11 +585,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.stats-Tuple{OnlineStats.Series}",
+    "page": "API",
+    "title": "OnlineStats.stats",
+    "category": "Method",
+    "text": "stats(s::Series)\n\nReturn a tuple of the OnlineStats contained in the Series.\n\nExample\n\ns = Series(randn(100), Mean(), Variance())\nm, v = stats(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#StatsBase.confint",
     "page": "API",
     "title": "StatsBase.confint",
     "category": "Function",
-    "text": "confint(b, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
+    "text": "confint(b::Bootstrap, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
+},
+
+{
+    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,T,W} where W where T<:Tuple,Union{AbstractString, Number, Symbol}}",
+    "page": "API",
+    "title": "StatsBase.fit!",
+    "category": "Method",
+    "text": "fit!(s::Series, data, args...)\n\nUpdate a Series with more data.  Additional arguments can be used to \n\noverride the weight\nuse the columns of a matrix as observations (default is rows)\n\nExamples\n\n# Univariate Series \ns = Series(Mean())\nfit!(s, randn(100))\n\n# Multivariate Series\nx = randn(100, 3)\ns = Series(CovMatrix(3))\nfit!(s, x)  # Same as fit!(s, x, Rows())\nfit!(s, x', Cols())\n\n# overriding the weight\nfit!(s, x, .1)  # use .1 for every observation's weight\nw = rand(100)\nfit!(s, x, w)  # use w[i] as the weight for observation x[i, :]\n\n# Model Series\nx, y = randn(100, 10), randn(100)\ns = Series(LinReg(10))\nfit!(s, (x, y))\n\n\n\n"
+},
+
+{
+    "location": "api.html#StatsBase.nobs-Tuple{OnlineStats.Series}",
+    "page": "API",
+    "title": "StatsBase.nobs",
+    "category": "Method",
+    "text": "nobs(s::Series)\n\nReturn the number of observations the Series has fit!-ted.\n\n\n\n"
+},
+
+{
+    "location": "api.html#Base.merge-Union{Tuple{T,T,Float64}, Tuple{T}} where T<:OnlineStats.Series",
+    "page": "API",
+    "title": "Base.merge",
+    "category": "Method",
+    "text": "See merge!\n\n\n\n"
+},
+
+{
+    "location": "api.html#Base.merge-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
+    "page": "API",
+    "title": "Base.merge",
+    "category": "Method",
+    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappend s2 to s1.  Essentially fit!(s1, data_which_s2_saw).\n:mean\nUse the average of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
 },
 
 {
@@ -590,6 +646,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
     "text": "An OnlineStat which must be updated approximately.\n\n\n\n"
+},
+
+{
+    "location": "api.html#LearnBase.value-Tuple{OnlineStatsBase.OnlineStat}",
+    "page": "API",
+    "title": "LearnBase.value",
+    "category": "Method",
+    "text": "value(o::OnlineStat)\n\nReturn the value of the OnlineStat.\n\n\n\n"
 },
 
 {
