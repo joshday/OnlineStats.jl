@@ -227,6 +227,15 @@ end #Series
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
 
+#-----------------------------------------------------------------------# Quantiles
+@testset "Quantiles" begin 
+    y = randn(10_000)
+    for o in [QuantileMM(.1:.1:.9), QuantileMSPI(.1:.1:.9), QuantileSGD(.1:.1:.9)]
+        Series(y, o)
+        @test value(o) ≈ quantile(y, .1:.1:.9) atol=.2
+    end
+end
+
 #-----------------------------------------------------------------------# Tests
 @testset "Distributions" begin
     @testset "sanity check" begin
@@ -463,11 +472,22 @@ end
     Series(y, o)
     @test nobs(o) == length(y)
     @test length(5Mean()) == 5
+    @test sum(Sum()) == 0
 end
 @testset "Diff" begin 
     o = Diff(Int)
     Series([1,2], o)
     @test diff(o) == 1
     @test last(o) == 2
+end
+@testset "ReservoirSample" begin 
+    o = ReservoirSample(100)
+    Series(y, o)
+    @test value(o) == y
+    o = ReservoirSample(10)
+    Series(y, o)
+    for yi in value(o)
+        @test yi in y 
+    end
 end
 end #module
