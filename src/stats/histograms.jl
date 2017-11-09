@@ -1,4 +1,16 @@
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
+#-----------------------------------------------------------------------# IHist 
+"Read: IHistogramNext"
+struct IHist <: ExactStat{0}
+    value::Vector{Float64}
+    counts::Vector{Int}
+    nn::Tuple{Float64, Int}  # difference, index of two closest bins
+end
+IHist(nbins::Integer) = IHist([Pair(Inf, 0) for _ in 1:nbins], (Inf, 0))
+
+fit!(o::IHist, y::Real, γ::Float64) = fit!(o, Pair(Float64(y), 1))
+
+
 """
     IHistogram(b)
 
@@ -18,17 +30,25 @@ used as a "surrogate" for a datset to get approximate summary statistics.
     extrema(o)
     median(o)
 """
-struct IHistogram <: ExactStat{0}
+mutable struct IHistogram <: ExactStat{0}
     value::Vector{Float64}
     counts::Vector{Int}
-    buffer::Vector{Float64}
+    n::Int
 end
-IHistogram(b::Integer) = IHistogram(fill(Inf, b), zeros(Int, b), zeros(b))
+IHistogram(b::Integer) = IHistogram(fill(Inf, b), zeros(Int, b), 0)
 
 
 fit!(o::IHistogram, y::Real, γ::Float64) = push!(o, Pair(y, 1))
 
 function Base.push!(o::IHistogram, p::Pair)
+    o.n += last(p)
+    # y = first(p)
+    # i = 1
+    # for j in eachindex(o.value)
+    #     if y > o.value[j]
+    #         i += 1
+    #     end
+    # end
     i = searchsortedfirst(o.value, first(p))
     insert!(o.value, i, first(p))
     insert!(o.counts, i, last(p))
@@ -37,38 +57,32 @@ function Base.push!(o::IHistogram, p::Pair)
 end
 
 function binmerge!(o::IHistogram, i)
-    k1 = o.counts[i]
-    k2 = o.counts[i + 1] 
-    q1 = o.value[i]
-    q2 = o.value[i + 1]
-    bottom = k1 + k2
-    if k2 == 0
-        top = q1 * k1
-        o.value[i] = top / bottom 
-        o.counts[i] = bottom
-    else
-        top = (q1 * k1 + q2 * k2)
-        o.value[i] = top / bottom 
-        o.counts[i] = bottom
+    # k2 may be zero
+    k2 = o.counts[i+1]
+    if k2 != 0
+        k1 = o.counts[i]
+        q1 = o.value[i]
+        q2 = o.value[i + 1]
+        o.value[i] = smooth(q1, q2, k2 / (k1 + k2))
+        o.counts[i] += k2
     end
     deleteat!(o.value, i + 1)
     deleteat!(o.counts, i + 1)
 end
 
-function find_min_diff(o::IHistogram)
-    # find the index of the smallest difference v[i+1] - v[i]
+function find_min_diff(o)
     v = o.value
-    @inbounds for i in eachindex(o.buffer)
-        val = v[i + 1] - v[i]
-        if !isfinite(val)  #isnan(val) || isinf(val)
-            # If the difference is NaN = Inf - Inf or -Inf = Float64 - Inf
-            # merge them to make way for actual values
-            return i
+    o.n < length(v) && return o.n
+    ind = 0
+    mindiff = Inf
+    for i in 1:(length(v) - 1)
+        @inbounds diff = v[i + 1] - v[i]
+        if diff < mindiff 
+            mindiff = diff 
+            ind = i
         end
-        o.buffer[i] = val
     end
-    _, ind = findmin(o.buffer)
-    return ind
+    ind
 end
 
 function Base.merge!(o::IHistogram, o2::IHistogram, γ::Float64)
