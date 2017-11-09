@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Bounded(weight, λ)",
     "category": "section",
-    "text": "Wrapper for a weight which provides a minimum boundgamma_t = textmax(gamma_t )"
+    "text": "Wrapper for a weight which provides a minimum bound.gamma_t = textmax(gamma_t )"
 },
 
 {
@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Scaled(weight, λ)",
     "category": "section",
-    "text": "Wrapper for a weight which scales the weight by a constant.  This is only meant for use with stochastic gradient algorithms.gamma_t =  * gamma_t"
+    "text": "Wrapper for a weight which scales the weight by a constant.  This is only meant for usewith <:StochasticStat, as it violates an assumption for <:ExactStat that that gamma_1 = 1.gamma_t =  * gamma_t"
 },
 
 {
@@ -165,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Under the hood",
     "category": "section",
-    "text": "Each OnlineStat implements fit!(o::OnlineStat, data, w::Float64).  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.note: Note\nSee Extending OnlineStats"
+    "text": "Each OnlineStat implements fit!(o::OnlineStat, data, w::Float64) where w is a weight in 0 1 which controls the amount of influence data has on o.  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.  See Extending OnlineStats for more details."
 },
 
 {
@@ -613,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Extending OnlineStats",
     "title": "Make a subtype of OnlineStat and give it a fit! method.",
     "category": "section",
-    "text": "using OnlineStatsBase\n\nmutable struct MyMean <: OnlineStat{0, EqualWeight}\n    value::Float64\n    MyMean() = new(0.0)\nend\n\nOnlineStatsBase.fit!(o::MyMean, y::Real, w::Float64) = (o.value += w * (y - o.value))"
+    "text": "import OnlineStatsBase: fit!, ExactStat\n\nmutable struct MyMean <: ExactStat{0}\n    value::Float64\n    MyMean() = new(0.0)\nend\n\nfit!(o::MyMean, y::Real, w::Float64) = (o.value += w * (y - o.value))"
 },
 
 {
@@ -629,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Extending OnlineStats",
     "title": "Details",
     "category": "section",
-    "text": "An OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has.\nIf you don't know the size of a single observation or the default weight  (<:OnlineStat{Any,Any}), define methods OnlineStatsBase.input_ndims(::MyNewStat) and  OnlineStatsBase.default_weight(::MyNewStat)."
+    "text": "An ExactStat is something that can be updated exactly.  A StochasticStat is something that must be approximated (typically through stochastic approximation).\nExactStat will use EqualWeight unless default_weight is overloaded.\nStochasticStat will use LearningRate unless default_weight is overloaded.\nAn OnlineStat is parameterized by the size of a single observation (and default weight).\n0: a Number, Symbol, or String\n1: an AbstractVector or Tuple\n(1, 0): one of each\nOnlineStat Interface\nfit!(o, new_observation, w::Float64)\nUpdate the \"sufficient statistics\", not necessarily the value\nvalue(o)\nCreate the value from the \"sufficient statistics\".  By default, this will return the first field of an OnlineStat\nmerge!(o1, o2, w::Float64)\nmerge o2 into o1, where w is the amount of influence o2 has.\nIf you don't know the size of a single observation or the default weight  (<:OnlineStat{Any,Any}), define methods OnlineStatsBase.input_ndims(::MyNewStat) and  OnlineStatsBase.default_weight(::MyNewStat)."
 },
 
 ]}
