@@ -36,6 +36,7 @@ for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(),
 end
 println(Series(Mean()))
 println(Series(Mean(), Variance(), Moments()))
+println(25Mean())
 Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
 
 println("\n\n")
@@ -222,10 +223,10 @@ end #Series
         fit!(s, xy)
     end
     @test value(s)[1] ≈ x\y
+    @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
 
 #-----------------------------------------------------------------------# Tests
-
 @testset "Distributions" begin
     @testset "sanity check" begin
         value(Series(rand(100), FitBeta()))
@@ -409,8 +410,10 @@ end
 end
 @testset "LinReg" begin 
     o = LinReg(5)
+    @test nobs(o) == 0
     x, y = randn(100,5), randn(100)
     s = Series((x,y), o)
+    @test nobs(o) == 100
     @test coef(o) ≈ x\y
     @test predict(o, x) ≈ x * (x\y)
     @test predict(o, x', Cols()) ≈ x * (x\y)
@@ -457,5 +460,12 @@ end
     @test nobs(o) == 0
     Series(y, o)
     @test nobs(o) == length(y)
+    @test length(5Mean()) == 5
+end
+@testset "Diff" begin 
+    o = Diff(Int)
+    Series([1,2], o)
+    @test diff(o) == 1
+    @test last(o) == 2
 end
 end #module
