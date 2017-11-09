@@ -625,6 +625,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.IHist",
+    "page": "API",
+    "title": "OnlineStats.IHist",
+    "category": "Type",
+    "text": "Read: IHistogramNext\n\n\n\n"
+},
+
+{
     "location": "api.html#Base.merge!-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
     "page": "API",
     "title": "Base.merge!",
