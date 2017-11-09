@@ -157,7 +157,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Updating",
     "category": "section",
-    "text": "A Series can be updated with a single observation or a collection of observations.  fit!(series, data)"
+    "text": "A Series can be updated with a single observation or a collection of observations.  The most common way to update a series is with:fit!(series, data)"
+},
+
+{
+    "location": "series.html#Under-the-hood-1",
+    "page": "Series",
+    "title": "Under the hood",
+    "category": "section",
+    "text": "Each OnlineStat implements fit!(o::OnlineStat, data, w::Float64).  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.note: Note\nSee Extending OnlineStats"
 },
 
 {
