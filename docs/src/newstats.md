@@ -2,20 +2,21 @@
 
 Creating new OnlineStat types should be accomplished through [OnlineStatsBase.jl](https://github.com/joshday/OnlineStatsBase.jl), a lightweight package which defines the OnlineStats interface.
 
-### Make a subtype of OnlineStat and give it a `fit!` method.
+## Make a subtype of OnlineStat and give it a `fit!` method.
 
 ```julia
-using OnlineStatsBase
+import OnlineStatsBase: fit!, ExactStat
 
-mutable struct MyMean <: OnlineStat{0, EqualWeight}
+mutable struct MyMean <: ExactStat{0}
     value::Float64
     MyMean() = new(0.0)
 end
 
-OnlineStatsBase.fit!(o::MyMean, y::Real, w::Float64) = (o.value += w * (y - o.value))
+fit!(o::MyMean, y::Real, w::Float64) = (o.value += w * (y - o.value))
 ```
 
-### That's all there is to it
+## That's all there is to it
+
 ```julia
 using OnlineStats
 
@@ -31,9 +32,12 @@ value(s)
 mean(y), var(y)
 ```
 
+## Details
 
-### Details
-
+- An `ExactStat` is something that can be updated exactly.  A `StochasticStat` is something
+  that must be approximated (typically through stochastic approximation).
+  - `ExactStat` will use `EqualWeight` unless `default_weight` is overloaded.
+  - `StochasticStat` will use `LearningRate` unless `default_weight` is overloaded.
 - An OnlineStat is parameterized by the size of a single observation (and default weight).
   - 0: a `Number`, `Symbol`, or `String`
   - 1: an `AbstractVector` or `Tuple`

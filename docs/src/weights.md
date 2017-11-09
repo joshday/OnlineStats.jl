@@ -10,45 +10,60 @@ Consider how weights affect the influence of the next observation on an online m
 
 ![](https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png)
 
+## [`EqualWeight()`](@ref)
 
-## [`EqualWeight()`](@ref)  
 - Each observation has an equal amount of influence.
+
 ```math
 \gamma_t = \frac{1}{t}
 ```
 
-## [`ExponentialWeight(λ)`](@ref)  
+## [`ExponentialWeight(λ)`](@ref)
+
 - Each observation is weighted with a constant, giving newer observations higher influence.
+
 ```math
 \gamma_t = \lambda
 ```
 
-## [`LearningRate(r)`](@ref)  
+## [`LearningRate(r)`](@ref)
+
 - Decrease at a slow rate.
+
 ```math
 \gamma_t = \frac{1}{t^r}
-```  
+```
 
-## [`HarmonicWeight(a)`](@ref)  
+## [`HarmonicWeight(a)`](@ref)
+
 - Decrease at a slow rate.
+
 ```math
 \gamma_t = \frac{a}{a + t - 1}
-```  
+```
 
-## [`McclainWeight(a)`](@ref)  
+## [`McclainWeight(a)`](@ref)
+
 - Smoothed version of `BoundedEqualWeight`.
+
 ```math
 \gamma_t = \frac{\gamma_{t-1}}{1 + \gamma_{t-1} - a}
 ```
 
 ## [`Bounded(weight, λ)`](@ref)
-- Wrapper for a weight which provides a minimum bound
+
+- Wrapper for a weight which provides a minimum bound.
+
 ```math
 \gamma_t' = \text{max}(\gamma_t, λ)
 ```
 
 ## [`Scaled(weight, λ)`](@ref)
-- Wrapper for a weight which scales the weight by a constant.  This is only meant for use with stochastic gradient algorithms.
+
+- Wrapper for a weight which scales the weight by a constant.  This is only meant for use
+with `<:StochasticStat`, as it violates an assumption for `<:ExactStat` that that
+``\gamma_1 = 1``.
+
 ```math
 \gamma_t' = λ * \gamma_t
 ```

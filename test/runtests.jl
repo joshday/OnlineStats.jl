@@ -13,17 +13,17 @@ function test_merge(o1, o2, y1, y2)
     @test all(value(o1) .≈ value(o1))
 end
 
-# test: value(o) == f(y)
-function test_exact(o, y, f; kw...)
-    s = @inferred Series(y, o; kw...)
-    @test all(value(o) .≈ f(y))
-end
+# # test: value(o) == f(y)
+# function test_exact(o, y, f; kw...)
+#     s = @inferred Series(y, o; kw...)
+#     @test all(value(o) .≈ f(y))
+# end
 
-# test: fo(o) == fy(y)
-function test_function(o, y, fo, fy; atol = 1e-10)
-    @inferred Series(y, o)
-    @test all(isapprox.(fo(o), fy(y), atol = atol))
-end
+# # test: fo(o) == fy(y)
+# function test_function(o, y, fo, fy; atol = 1e-10)
+#     @inferred Series(y, o)
+#     @test all(isapprox.(fo(o), fy(y), atol = atol))
+# end
 
 #-----------------------------------------------------------------------# Show
 info("Show")

@@ -38,12 +38,10 @@ fit!(series, data)
 
 ### Under the hood
 
-Each OnlineStat implements `fit!(o::OnlineStat, data, w::Float64)`.  When `fit!(series, data)`
-is called, `w` is created by the `Weight` and passed to `fit!` for each of the OnlineStats
-in the Series.
-
-!!! note
-    See [Extending OnlineStats](@ref)
+Each OnlineStat implements `fit!(o::OnlineStat, data, w::Float64)` where `w` is a weight
+in ``[0, 1]`` which controls the amount of influence `data` has on `o`.  When
+`fit!(series, data)` is called, `w` is created by the `Weight` and passed to `fit!` for
+each of the OnlineStats in the Series.  See [Extending OnlineStats](@ref) for more details.
 
 
 ### Single observation
