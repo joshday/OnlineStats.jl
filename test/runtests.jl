@@ -53,6 +53,7 @@ x2 = randn(100, 5)
               OrderStats(5), Sum()]
         test_merge(o, copy(o), y, y2)
     end
+    test_merge(OrderStats(5), OrderStats(5), rand(6), rand(6))
 end
 @testset "test_merge 1" begin 
     for o in [5Mean(), 5Variance(), CovMatrix(5), LinRegBuilder(5)]
@@ -407,6 +408,7 @@ end
     @test var(o) ≈ var(y) 
     @test std(o) ≈ std(y)
     @test skewness(o) ≈ skewness(y) atol=.1
+    @test kurtosis(o) ≈ kurtosis(y) atol=.1
 end
 @testset "LinReg" begin 
     o = LinReg(5)

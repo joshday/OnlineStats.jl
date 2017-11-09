@@ -386,10 +386,10 @@ end
 function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
     length(o.value) == length(o2.value) || 
         error("Merge failed.  OrderStats track different batch sizes")
-    smooth!(o.value, o2.value, γ)
-    for j in 1:o2.i
-        fit!(o, o2.buffer[j])
+    for i in 1:o2.i 
+        o2.value[i] = smooth(o2.value[i], o2.buffer[i], 1 / o.nreps)
     end
+    smooth!(o.value, o2.value, γ)
 end
 
 #-----------------------------------------------------------------------# QuantileMM
