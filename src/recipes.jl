@@ -23,12 +23,6 @@ end
     zeros(0)
 end
 
-#-----------------------------------------------------------------------# OHistogram
-@recipe function f(o::OHistogram)
-    linetype --> :bar
-    o.h.edges[1][1:(end-1)], o.h.weights
-end
-
 #-----------------------------------------------------------------------# (1, 0) residual plot
 @recipe function f(o::OnlineStat{(1,0)}, x::AbstractMatrix, y::AbstractVector, dim::ObLoc = Rows())
     ylab --> "Residual"
@@ -49,6 +43,13 @@ end
     for stat in stats(o)
         @series begin stat end
     end
+end
+
+#-----------------------------------------------------------------------# OHistogram
+@recipe function f(o::OHistogram)
+    linetype --> :bar
+    rng = o.h.edges[1]
+    rng[1:(end-1)] .+ .5*step(rng), o.h.weights
 end
 
 #-----------------------------------------------------------------------# IHistogram

@@ -2,8 +2,8 @@ __precompile__(true)
 module OnlineStats
 
 import SweepOperator
-import LearnBase: fit!, value, nobs
-import StatsBase: Histogram, skewness, kurtosis, coef, fweights
+import LearnBase: fit!, value, nobs, predict
+import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, 
     ScalarOb, VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 

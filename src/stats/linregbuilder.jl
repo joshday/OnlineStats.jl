@@ -95,13 +95,17 @@ value(o::LinRegBuilder) = coef(o)
 
 function coef(o::LinRegBuilder, yind::Integer = size(o.A, 2), 
         xinds::AbstractVector{<:Integer} = setdiff(1:size(o.A, 2), yind); 
-        verbose::Bool = true)
+        verbose::Bool = false)
     Ainds = vcat(xinds, yind)
     d = length(Ainds)
     S = Symmetric(o.A)[Ainds, Ainds]
     verbose && info("Regress var $yind on $xinds")
     SweepOperator.sweep!(S, 1:length(xinds))
     return S[1:length(xinds), end]
+end
+
+function Base.merge!(o::LinRegBuilder, o2::LinRegBuilder, γ::Float64)
+    smooth!(o.A, o2.A, γ)
 end
 
 # TODO: incorporation with PenaltyFunctions

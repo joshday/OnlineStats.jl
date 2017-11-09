@@ -1,7 +1,7 @@
 module OnlineStatsTest
 
 using OnlineStats, Base.Test
-import StatsBase
+using StatsBase
 
 #-----------------------------------------------------------------------# helpers
 # test: merge is same as fit!
@@ -49,8 +49,18 @@ x2 = randn(100, 5)
 #-----------------------------------------------------------------------# merge stats
 @testset "test_merge 0" begin 
     for o in [Mean(), Variance(), CStat(Mean()), Extrema(), HyperLogLog(10), Moments(),
-        OrderStats(5), Sum()]
+              OrderStats(5), Sum()]
         test_merge(o, copy(o), y, y2)
+    end
+end
+@testset "test_merge 1" begin 
+    for o in [5Mean(), 5Variance(), CovMatrix(5), LinRegBuilder(5)]
+        test_merge(o, copy(o), x, x2)
+    end
+end
+@testset "test_merge (1,0)" begin 
+    for o in [LinReg(5), StatLearn(5)]
+        test_merge(o, copy(o), (x,y), (x2, y2))
     end
 end
 
@@ -67,6 +77,7 @@ end
 end
 @testset "fit! 0" begin 
     s = Series(Mean())
+    @test value(s)[1] == mean(stats(s)[1])
     # single observation
     fit!(s, y[1])
     @test value(s)[1] ≈ y[1]
@@ -163,8 +174,11 @@ end
     # multiple observations, override weight
     s = Series(LinReg(5))
     fit!(s, (x, y), .1)
+    s = Series(LinReg(5))
+    fit!(s, (x', y), .1, Cols())
     # multiple observaitons, override weights 
     fit!(s, (x, y), rand(length(y)))
+    fit!(s, (x', y), rand(length(y)), Cols())
 end
 @testset "merging" begin 
     @test merge(Series(Mean()), Series(Mean())) == Series(Mean())
@@ -175,6 +189,11 @@ end
     merge(s1, s2, :mean)
     merge(s1, s2, :singleton)
     @test_throws Exception merge(s1, s2, :fakemethod)
+
+    s1 = Series(y, Mean())
+    s2 = Series(y2, Mean())
+    merge!(s1, s2)
+    @test value(stats(s1)[1]) ≈ mean(vcat(y, y2))
 end
 end #Series
 
@@ -186,6 +205,11 @@ end #Series
     mapblocks(3, x, Rows()) do xi
         fit!(s, xi)
     end
+    i = 0
+    mapblocks(2, x, Cols()) do xi 
+        i += 1
+    end
+    @test i == 3
     @test cov(o) ≈ cov(x)
     i = 0
     mapblocks(3, rand(5)) do xi
@@ -358,6 +382,30 @@ end
     end
     @test coef(o, 3, [1, 2]; verbose=false) ≈ x[:, [1, 2]] \ x[:, 3]
     @test coef(o, 3, [2, 1]; verbose=false) ≈ x[:, [2, 1]] \ x[:, 3]
+    @test coef(o) == value(o)
+end
+@testset "CovMatrix" begin 
+    x = randn(100, 5)
+    o = CovMatrix(5)
+    Series(x, o)
+    @test var(o) ≈ vec(var(x, 1))
+    @test std(o) ≈ vec(std(x, 1))
+    @test mean(o) ≈ vec(mean(x, 1))
+    @test cor(o) ≈ cor(x)
+end
+@testset "Extrema" begin 
+    o = Extrema()
+    Series(y, o)
+    @test extrema(o)[1] == extrema(y)[1]
+    @test extrema(o)[2] == extrema(y)[2]
+end
+@testset "Moments" begin 
+    o = Moments()
+    Series(y, o)
+    @test mean(o) ≈ mean(y)
+    @test var(o) ≈ var(y) 
+    @test std(o) ≈ std(y)
+    @test skewness(o) ≈ skewness(y) atol=.1
 end
 @testset "LinReg" begin 
     o = LinReg(5)
@@ -368,6 +416,8 @@ end
     @test predict(o, x', Cols()) ≈ x * (x\y)
     o2 = LinReg(5)
     s2 = Series((x,y), o2)
+    @test LinReg(5, .1) == LinReg(5, fill(.1, 5))
+    @test predict(o2, zeros(5)) == 0.0
 end
 @testset "IHistogram" begin
     y = rand(1000)
@@ -401,5 +451,11 @@ end
     @test var(o) ≈ var(y) atol=.1
     @test std(o) ≈ std(y) atol=.1
     @test quantile(o) ≈ quantile(y) atol=.1
+end
+@testset "Other" begin 
+    o = Variance()
+    @test nobs(o) == 0
+    Series(y, o)
+    @test nobs(o) == length(y)
 end
 end #module
