@@ -42,9 +42,7 @@ function binmerge!(o::IHistogram, i)
     q1 = o.value[i]
     q2 = o.value[i + 1]
     bottom = k1 + k2
-    if bottom == 0
-        o.value[i] = .5 * (o.value[i] + o.value[i + 1])
-    elseif k2 == 0
+    if k2 == 0
         top = q1 * k1
         o.value[i] = top / bottom 
         o.counts[i] = bottom
@@ -62,7 +60,7 @@ function find_min_diff(o::IHistogram)
     v = o.value
     @inbounds for i in eachindex(o.buffer)
         val = v[i + 1] - v[i]
-        if isnan(val) || isinf(val)
+        if !isfinite(val)  #isnan(val) || isinf(val)
             # If the difference is NaN = Inf - Inf or -Inf = Float64 - Inf
             # merge them to make way for actual values
             return i

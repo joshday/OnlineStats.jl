@@ -30,7 +30,7 @@ info("Show")
 for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(), 
          HyperLogLog(4), KMeans(4, 2), Moments(), OrderStats(10), QuantileMM(),
          QuantileMSPI(), QuantileSGD(), ReservoirSample(10), Sum() ,StatLearn(5), 
-         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info)]
+         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean())]
     println(o)
     typeof(o) <: OnlineStat{0} && println(2o)
 end
@@ -54,6 +54,11 @@ x2 = randn(100, 5)
         test_merge(o, copy(o), y, y2)
     end
     test_merge(OrderStats(5), OrderStats(5), rand(6), rand(6))
+
+    # merge! with weight
+    s = Series([1], Mean())
+    merge!(s, Series([2], Mean()))
+    @test value(s)[1] == 1.5
 end
 @testset "test_merge 1" begin 
     for o in [5Mean(), 5Variance(), CovMatrix(5), LinRegBuilder(5)]
@@ -233,6 +238,10 @@ end
     for o in [QuantileMM(.1:.1:.9), QuantileMSPI(.1:.1:.9), QuantileSGD(.1:.1:.9)]
         Series(y, o)
         @test value(o) ≈ quantile(y, .1:.1:.9) atol=.2
+        # merging
+        o2 = copy(o)
+        merge!(o, copy(o), .5)
+        @test o == o2
     end
 end
 
@@ -432,6 +441,10 @@ end
     s2 = Series((x,y), o2)
     @test LinReg(5, .1) == LinReg(5, fill(.1, 5))
     @test predict(o2, zeros(5)) == 0.0
+    # check both fit! methods
+    o = LinReg(5)
+    fit!(o, (randn(5), randn()), .1)
+    fit!(o, randn(5), randn(), .1)
 end
 @testset "IHistogram" begin
     y = rand(1000)
@@ -479,6 +492,10 @@ end
     Series([1,2], o)
     @test diff(o) == 1
     @test last(o) == 2
+    o = Diff(Float64)
+    Series([1,2], o)
+    @test diff(o) == 1
+    @test last(o) == 2
 end
 @testset "ReservoirSample" begin 
     o = ReservoirSample(100)
@@ -496,5 +513,13 @@ end
     for ybar in value(o)
         @test ybar == value(o.o)
     end
+    @test length(confint(o)) == 2
+    o.replicates[1].μ = NaN
+    @test isnan(confint(o)[1])
+    @test isnan(confint(o)[2])
+end
+@testset "KMeans" begin 
+    o = KMeans(5, 4)
+    Series(randn(100, 5), o)
 end
 end #module
