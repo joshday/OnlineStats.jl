@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "page",
-    "text": "<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/27987219-12fe7fc2-63d8-11e7-9869-8cfc5cb6e6c9.gif\">"
+    "text": ""
 },
 
 {
@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Updating a Series updates the OnlineStats",
     "category": "section",
-    "text": "y = randn(100)\n\nfor yi in y\n    fit!(s, yi)\nend\n\n# or more simply:\nfit!(s, y)"
+    "text": "y = randn(100)\n\nfor yi in y\n    fit!(s, yi)\nend\n\n# or more simply:\nfit!(s, y)<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/27987219-12fe7fc2-63d8-11e7-9869-8cfc5cb6e6c9.gif\">"
 },
 
 {
@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Weighting",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_t(Image: )EqualWeight"
+    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_t<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=400>"
 },
 
 {
@@ -625,6 +625,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#Base.merge!-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
+    "page": "API",
+    "title": "Base.merge!",
+    "category": "Method",
+    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappend s2 to s1.  Essentially fit!(s1, data_which_s2_saw).\n:mean\nUse the average of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
+},
+
+{
     "location": "api.html#Base.merge-Union{Tuple{T,T,Float64}, Tuple{T}} where T<:OnlineStats.Series",
     "page": "API",
     "title": "Base.merge",
@@ -633,11 +641,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#Base.merge-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
+    "location": "api.html#OnlineStatsBase.Bounded",
     "page": "API",
-    "title": "Base.merge",
-    "category": "Method",
-    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappend s2 to s1.  Essentially fit!(s1, data_which_s2_saw).\n:mean\nUse the average of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
+    "title": "OnlineStatsBase.Bounded",
+    "category": "Type",
+    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\n_bounded(t) = max((t) )\n\nExample\n\nBounded(EqualWeight(), .1)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.EqualWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.EqualWeight",
+    "category": "Type",
+    "text": "EqualWeight()\n\nEqually weighted observations.  \n\n(t) = 1  t\n\nExample\n\nSeries(randn(100), EqualWeight(), Variance())\n\n\n\n"
 },
 
 {
@@ -649,11 +665,67 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStatsBase.ExponentialWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.ExponentialWeight",
+    "category": "Type",
+    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  \n\n(t) =  = 2  (lookback + 1)\n\nExample\n\nSeries(randn(100), ExponentialWeight(), Variance())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.HarmonicWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.HarmonicWeight",
+    "category": "Type",
+    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\n(t) = a  (a + t - 1)\n\nExample\n\nSeries(randn(1000), HarmonicWeight(), QuantileMSPI())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.LearningRate",
+    "page": "API",
+    "title": "OnlineStatsBase.LearningRate",
+    "category": "Type",
+    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  \n\n(t) = 1  t^r\n\nExample\n\nSeries(randn(1000), LearningRate(.7), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.LearningRate2",
+    "page": "API",
+    "title": "OnlineStatsBase.LearningRate2",
+    "category": "Type",
+    "text": "LearningRate2(c = .5)\n\nSlowly decreasing weight.  \n\n(t) = 1  (1 + c * (t - 1))\n\nExample\n\nSeries(randn(1000), LearningRate2(.3), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.McclainWeight",
+    "page": "API",
+    "title": "OnlineStatsBase.McclainWeight",
+    "category": "Type",
+    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\n(t) = (t-1)  (1 + (t) - )\n\nExample\n\nSeries(randn(100), McclainWeight(), Mean())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.Scaled",
+    "page": "API",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "Type",
+    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\n_scaled(t) =  * (t)\n\nExample\n\nBounded(LearningRate(.5), .1)\n\nSeries(randn(1000), 2.0 * LearningRate(.9), QuantileMM())\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStatsBase.StochasticStat",
     "page": "API",
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
     "text": "An OnlineStat which must be updated approximately.\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase.Weight",
+    "page": "API",
+    "title": "OnlineStatsBase.Weight",
+    "category": "Type",
+    "text": "Weight is an abstract type.  Subtypes must be callable have a method to produce the weight given the current number of observations in an OnlineStat n and the number of  observations included in the update (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
 },
 
 {
