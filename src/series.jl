@@ -12,6 +12,9 @@ Track any number of OnlineStats.
     Series(Mean())
     Series(randn(100), Mean())
     Series(randn(100), Weight.Exponential(), Mean())
+
+    s = Series(QuantileMM([.25, .5, .75]))
+    fit!(s, randn(1000))
 """
 mutable struct Series{N, T <: Tuple, W}
     stats::T
@@ -48,8 +51,30 @@ function Base.show(io::IO, s::Series)
     end
 end
 
+"""
+    stats(s::Series)
+
+Return a tuple of the OnlineStats contained in the Series.
+
+# Example
+
+    s = Series(randn(100), Mean(), Variance())
+    m, v = stats(s)
+"""
 stats(s::Series) = s.stats
+
+"""
+    value(s::Series)
+
+Return a tuple of `value` mapped to the OnlineStats contained in the Series.
+"""
 value(s::Series) = value.(stats(s))
+
+"""
+    nobs(s::Series)
+
+Return the number of observations the Series has `fit!`-ted.
+"""
 nobs(s::Series) = s.n
 
 weight(s::Series, n2::Int = 1) = s.weight(s.n, n2)
@@ -63,6 +88,36 @@ end
 Base.copy(w::Series) = deepcopy(w)
 
 #-----------------------------------------------------------------------# fit! 0
+"""
+    fit!(s::Series, data, args...)
+
+Update a Series with more `data`.  Additional arguments can be used to 
+
+- override the weight
+- use the columns of a matrix as observations (default is rows)
+
+# Examples
+
+    # Univariate Series 
+    s = Series(Mean())
+    fit!(s, randn(100))
+
+    # Multivariate Series
+    x = randn(100, 3)
+    s = Series(CovMatrix(3))
+    fit!(s, x)  # Same as fit!(s, x, Rows())
+    fit!(s, x', Cols())
+
+    # overriding the weight
+    fit!(s, x, .1)  # use .1 for every observation's weight
+    w = rand(100)
+    fit!(s, x, w)  # use w[i] as the weight for observation x[i, :]
+
+    # Model Series
+    x, y = randn(100, 10), randn(100)
+    s = Series(LinReg(10))
+    fit!(s, (x, y))
+"""
 function fit!(s::Series{0}, y::ScalarOb)
     γ = weight!(s)
     map(x -> fit!(x, y, γ), stats(s))
@@ -260,8 +315,23 @@ end
 
 
 #-----------------------------------------------------------------------# merging
+"See [`merge!`](@ref)"
 Base.merge(s1::T, s2::T, w::Float64) where {T <: Series} = merge!(copy(s1), s2, w)
 
+"""
+    merge!(s1::Series, s2::Series, arg)
+
+Merge `s2` into `s1` in place where `s2`'s influence is determined by `arg`. Options for
+`arg`` are:
+
+- `:append` (default)
+    - append `s2` to `s1`.  Essentially `fit!(s1, data_which_s2_saw)`.
+- `:mean`
+    - Use the average of the Series' generated weights.
+- `:singleton`
+    - treat `s2` as a single observation.
+- any `Float64` in [0, 1]
+"""
 function Base.merge(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     merge!(copy(s1), s2, method)
 end

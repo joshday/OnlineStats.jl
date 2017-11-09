@@ -1,3 +1,15 @@
+"""
+    Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
+
+Online statistical bootstrap.  Create `nreps` replicates of `o`.  For each call to `fit!`,
+a replicate will be updated `rand(d)` times.
+
+# Example
+
+    o = Bootstrap(Variance())
+    Series(randn(1000), o)
+    confint(o)
+"""
 struct Bootstrap{O <: OnlineStat, D} <: OnlineStat{0}
     o::O 
     replicates::Vector{O}
@@ -12,7 +24,7 @@ default_weight(b::Bootstrap) = default_weight(b.o)
 
 
 """
-    confint(b, coverageprob = .95)
+    confint(b::Bootstrap, coverageprob = .95)
 
 Return a confidence interval for a Bootstrap `b`.
 """

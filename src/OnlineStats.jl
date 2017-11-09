@@ -14,7 +14,7 @@ using Reexport, RecipesBase
 
 export
     fit!, value, nobs, classify, loss, predict, coef, mapblocks, stats,
-    Series, OnlineStat, Cols, Rows, mapblocks,
+    Series, OnlineStat, Cols, Rows, mapblocks, confint,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled,
