@@ -2,12 +2,21 @@
 """
     IHistogram(b)
 
-Incrementally build a histogram of `b` (not equally spaced) bins.  
+Incrementally build a histogram of `b` (not equally spaced) bins.  An `IHistogram` can be
+used as a "surrogate" for a datset to get approximate summary statistics.
 
 # Example
 
     o = IHistogram(50)
     Series(randn(1000), o)
+
+    # approximate summary stats
+    quantile(o)
+    mean(o)
+    var(o)
+    std(o)
+    extrema(o)
+    median(o)
 """
 struct IHistogram <: ExactStat{0}
     value::Vector{Float64}
@@ -86,13 +95,21 @@ Base.median(o::IHistogram) = quantile(o, .5)
 """
     OHistogram(range)
 
-Make a histogram with bins given by `range`.  Uses left-closed bins.
+Make a histogram with bins given by `range`.  Uses left-closed bins.  `OHistogram` fits
+faster than [`IHistogram`](@ref), but has the disadvantage of requiring specification of
+bins before data is observed.
 
 # Example
 
     y = randn(100)
-    s = Series(y, OHistogram(-4:.1:4))
-    value(s)
+    o = OHistogram(-5:.01:5)
+    s = Series(y, o)
+    
+    value(o)  # return StatsBase.Histogram
+    quantile(o)
+    mean(o)
+    var(o)
+    std(o)
 """
 struct OHistogram{H <: Histogram} <: ExactStat{0}
     h::H

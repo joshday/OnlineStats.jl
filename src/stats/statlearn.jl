@@ -12,7 +12,7 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 - `loss = .5 * L2DistLoss()`: any Loss from LossFunctions.jl
 - `penalty = L2Penalty()`: any Penalty (which has a `prox` method) from PenaltyFunctions.jl.
 - `λ = fill(.1, p)`: a Vector of element-wise regularization parameters
-- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref)
+- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref), [`MSPIQ`](@ref)
 
 # Details
 
@@ -130,6 +130,7 @@ Base.merge!(o::T, o2::T, γ::Float64) where {T <: Updater} = warn("$T can't be m
 #-----------------------------------------------------------------------# SGD
 """
     SGD()
+
 Proximal Stochastic Gradient Descent.
 """
 struct SGD <: SGUpdater end
@@ -172,6 +173,7 @@ end
 #-----------------------------------------------------------------------# ADAGRAD
 """
     ADAGRAD()
+
 Adaptive (element-wise learning rate) stochastic proximal gradient descent.
 """
 mutable struct ADAGRAD <: SGUpdater
@@ -197,6 +199,7 @@ end
 #-----------------------------------------------------------------------# ADADELTA
 """
     ADADELTA(ρ = .95)
+
 ADADELTA ignores weight.
 """
 mutable struct ADADELTA <: SGUpdater
@@ -223,6 +226,9 @@ function Base.merge!(o::ADADELTA, o2::ADADELTA, γ::Float64)
 end
 
 #-----------------------------------------------------------------------# RMSPROP
+"""
+    RMSPROP(α = .9)
+"""
 mutable struct RMSPROP <: SGUpdater
     α::Float64
     g::Vector{Float64}
@@ -243,7 +249,8 @@ end
 
 #-----------------------------------------------------------------------# ADAM
 """
-    ADAM(α1, α2)
+    ADAM(α1 = .99, α2 = .999)
+
 Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
 """
 mutable struct ADAM <: SGUpdater
@@ -282,7 +289,8 @@ end
 
 #-----------------------------------------------------------------------# ADAMAX
 """
-    ADAMAX(η, β1, β2)
+    ADAMAX(η, β1 = .9, β2 = .999)
+
 ADAMAX with step size `η` and momentum parameters `β1`, `β2`
 """
 mutable struct ADAMAX <: SGUpdater
@@ -319,7 +327,8 @@ end
 
 #-----------------------------------------------------------------------# NADAM
 """
-    NADAM(α1, α2)
+    NADAM(α1 = .99, α2 = .999)
+
 Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
 """
 mutable struct NADAM <: SGUpdater
@@ -461,7 +470,9 @@ Base.merge!(o::OMAPQ, o2::OMAPQ, γ::Float64) = nothing
 #-----------------------------------------------------------------------# MSPIQ
 """
     MSPIQ()
-MSPI-Q algorithm using a Lipschitz constant to majorize the objective.
+
+MSPI-Q (Proximal mapping applied to majorization) algorithm using a Lipschitz constant to 
+majorize the objective.  
 """
 struct MSPIQ <: Updater end
 function fit!(o::StatLearn{MSPIQ}, x::VectorOb, y::Real, γ::Float64)

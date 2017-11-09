@@ -1,5 +1,5 @@
 """
-    CallFun(o::OnlineStat, f::Function)
+    CallFun(o::OnlineStat{0}, f::Function)
 
 Call `f(o)` every time the OnlineStat `o` gets updated.
 
