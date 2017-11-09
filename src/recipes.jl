@@ -47,9 +47,7 @@ end
 
 #-----------------------------------------------------------------------# OHistogram
 @recipe function f(o::OHistogram)
-    linetype --> :bar
-    rng = o.h.edges[1]
-    rng[1:(end-1)] .+ .5*step(rng), o.h.weights
+    o.h
 end
 
 #-----------------------------------------------------------------------# IHistogram
