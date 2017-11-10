@@ -4,7 +4,7 @@ module OnlineStats
 import SweepOperator
 import LearnBase: fit!, value, nobs, predict
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, confint
-import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, 
+import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value,
     ScalarOb, VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled
@@ -54,6 +54,8 @@ function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
 end
 
 unbias(o) = o.nobs / (o.nobs - 1)
+
+value(o::OnlineStat) = _value(o)
 
 const ϵ = 1e-6
 
