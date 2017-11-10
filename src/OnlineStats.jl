@@ -4,7 +4,7 @@ module OnlineStats
 import SweepOperator
 import LearnBase: fit!, value, nobs, predict
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, confint
-import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value,
+import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
     ScalarOb, VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled
@@ -56,6 +56,7 @@ end
 unbias(o) = o.nobs / (o.nobs - 1)
 
 value(o::OnlineStat) = _value(o)
+fit!(o::OnlineStat, ob, γ::Float64) = _fit!(o, ob, γ)
 
 const ϵ = 1e-6
 

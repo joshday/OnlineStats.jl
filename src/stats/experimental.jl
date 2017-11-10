@@ -17,7 +17,7 @@ Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.o) |> $(o.f)")
 
 value(o::CallFun) = value(o.o)
 
-function fit!(o::CallFun, args...) 
-    fit!(o.o, args...)
+function fit!(o::CallFun, arg, γ::Float64) 
+    fit!(o.o, arg, γ)
     o.f(o.o)
 end
