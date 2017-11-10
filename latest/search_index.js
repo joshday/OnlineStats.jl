@@ -737,9 +737,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#LearnBase.value-Tuple{OnlineStatsBase.OnlineStat}",
+    "location": "api.html#OnlineStatsBase._value-Tuple{OnlineStatsBase.OnlineStat}",
     "page": "API",
-    "title": "LearnBase.value",
+    "title": "OnlineStatsBase._value",
     "category": "Method",
     "text": "value(o::OnlineStat)\n\nReturn the value of the OnlineStat.\n\n\n\n"
 },
