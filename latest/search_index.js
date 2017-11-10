@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.IHistogram",
     "category": "Type",
-    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  An IHistogram can be used as a \"surrogate\" for a datset to get approximate summary statistics.\n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n# approximate summary stats\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\nextrema(o)\nmedian(o)\n\n\n\n"
+    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  An IHistogram can be used as a \"surrogate\" for a dataset to get approximate summary statistics.\n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n# approximate summary stats\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\nextrema(o)\nmedian(o)\n\n\n\n"
 },
 
 {
@@ -622,14 +622,6 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.nobs",
     "category": "Method",
     "text": "nobs(s::Series)\n\nReturn the number of observations the Series has fit!-ted.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.IHist",
-    "page": "API",
-    "title": "OnlineStats.IHist",
-    "category": "Type",
-    "text": "Read: IHistogramNext\n\n\n\n"
 },
 
 {
