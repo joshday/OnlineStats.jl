@@ -86,12 +86,18 @@ end
 #-----------------------------------------------------------------------# CovMatrix
 """
     CovMatrix(d)
-Covariance Matrix of `d` variables.
+
+Covariance Matrix of `d` variables.  Principal component analysis can be performed using
+eigen decomposition of the covariance or correlation matrix.
 
 # Example
 
     y = randn(100, 5)
-    Series(y, CovMatrix(5))
+    o = CovMatrix(5)
+    Series(y, o)
+
+    # PCA
+    evals, evecs = eig(cor(o))
 """
 mutable struct CovMatrix <: ExactStat{1}
     value::Matrix{Float64}

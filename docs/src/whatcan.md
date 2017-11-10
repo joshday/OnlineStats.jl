@@ -11,8 +11,9 @@
 | Sum                                | [`Sum`](@ref)              |
 | Difference                         | [`Diff`](@ref)             |
 | **Multivariate Analysis:**         |                            |
-| Covariance matrix                  | [`CovMatrix`](@ref)        |
-| K-means clustering                 | [`KMeans`](@ref)           |
+| Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
+| Principal components analysis      | [`CovMatrix`](@ref)        |
+| K-means clustering (SGD)           | [`KMeans`](@ref)           |
 | Multiple univariate statistics     | [`MV{<:OnlineStat}`](@ref) |
 | **Nonparametric Density Estimation:**|                          |
 | Histograms                         | [`OHistogram`](@ref), [`IHistogram`](@ref) |
@@ -28,6 +29,12 @@
 | MvNormal                           | [`FitMvNormal`](@ref)      |
 | **Statistical Learning:**          |                            |
 | GLMs with regularization           | [`StatLearn`](@ref)        |
+| Logistic regression                | [`StatLearn`](@ref)        |
+| Linear SVMs                        | [`StatLearn`](@ref)        |
+| Quantile regression                | [`StatLearn`](@ref)        |
+| Absolute loss regression           | [`StatLearn`](@ref)        |
+| Distance-weighted discrimination   | [`StatLearn`](@ref)        |
+| Huber-loss regression
 | Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
 | **Other:**                         |                            |
 | Bootstrapping                      | [`Bootstrap`](@ref)        |
