@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Weighting",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_t<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=400>"
+    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a weight must follow two rules:gamma_1 = 1\nThis guarantees theta^(1) = x_1\ngamma_t in (0 1) quad forall t  1\nThis guarantees theta^(t) stays inside a convex space<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=300>"
 },
 
 {
@@ -65,35 +65,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "weights.html#[ExponentialWeight(λ)](@ref)-1",
+    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
     "page": "Weighting",
-    "title": "ExponentialWeight(λ)",
+    "title": "ExponentialWeight(λ = 0.1)",
     "category": "section",
     "text": "Each observation is weighted with a constant, giving newer observations higher influence.gamma_t = lambda"
 },
 
 {
-    "location": "weights.html#[LearningRate(r)](@ref)-1",
+    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
     "page": "Weighting",
-    "title": "LearningRate(r)",
+    "title": "LearningRate(r = 0.6)",
     "category": "section",
     "text": "Decrease at a slow rate.gamma_t = frac1t^r"
 },
 
 {
-    "location": "weights.html#[HarmonicWeight(a)](@ref)-1",
+    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
     "page": "Weighting",
-    "title": "HarmonicWeight(a)",
+    "title": "HarmonicWeight(a = 10.0)",
     "category": "section",
     "text": "Decrease at a slow rate.gamma_t = fracaa + t - 1"
 },
 
 {
-    "location": "weights.html#[McclainWeight(a)](@ref)-1",
+    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
     "page": "Weighting",
-    "title": "McclainWeight(a)",
+    "title": "McclainWeight(a = 0.1)",
     "category": "section",
-    "text": "Smoothed version of BoundedEqualWeight.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+    "text": "Smoothed version of Bounded{EqualWeight}.  Weight approaches a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
 },
 
 {
@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Scaled(weight, λ)",
     "category": "section",
-    "text": "Wrapper for a weight which scales the weight by a constant.  This is only meant for use with <:StochasticStat, as it violates the usual assumption gamma_1 = 1.gamma_t =  * gamma_t"
+    "text": "Wrapper for a weight which scales the weight by a constant.  This is only meant for use with subtypes of StochasticStat, as it violates the rule gamma_1 = 1.gamma_t =  * gamma_t"
 },
 
 {
