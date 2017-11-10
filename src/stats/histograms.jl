@@ -42,13 +42,6 @@ fit!(o::IHistogram, y::Real, γ::Float64) = push!(o, Pair(y, 1))
 
 function Base.push!(o::IHistogram, p::Pair)
     o.n += last(p)
-    # y = first(p)
-    # i = 1
-    # for j in eachindex(o.value)
-    #     if y > o.value[j]
-    #         i += 1
-    #     end
-    # end
     i = searchsortedfirst(o.value, first(p))
     insert!(o.value, i, first(p))
     insert!(o.counts, i, last(p))
@@ -57,7 +50,6 @@ function Base.push!(o::IHistogram, p::Pair)
 end
 
 function binmerge!(o::IHistogram, i)
-    # k2 may be zero
     k2 = o.counts[i+1]
     if k2 != 0
         k1 = o.counts[i]
