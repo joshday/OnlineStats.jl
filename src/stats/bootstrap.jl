@@ -19,7 +19,7 @@ function Bootstrap(o::OnlineStat{0}, nreps::Integer = 100, d = [0, 2])
     Bootstrap(o, [copy(o) for i in 1:nreps], d)
 end
 Base.show(io::IO, b::Bootstrap) = print(io, "Bootstrap($(length(b.replicates))): $(b.o)")
-value(b::Bootstrap) = value.(b.replicates)
+_value(b::Bootstrap) = value.(b.replicates)
 default_weight(b::Bootstrap) = default_weight(b.o)
 
 

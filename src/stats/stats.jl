@@ -48,7 +48,7 @@ function Base.merge!(o::Variance, o2::Variance, γ::Float64)
     o.μ = smooth(o.μ, o2.μ, γ)
     o
 end
-value(o::Variance) = o.σ2 * unbias(o)
+_value(o::Variance) = o.σ2 * unbias(o)
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
@@ -73,7 +73,7 @@ end
 default_weight(o::CStat) = default_weight(o.re_stat)
 CStat(o::OnlineStat{0}) = CStat(o, copy(o))
 Base.show(io::IO, o::CStat) = print(io, "CStat: re = $(o.re_stat), im = $(o.im_stat)")
-value(o::CStat) = value(o.re_stat), value(o.im_stat)
+_value(o::CStat) = value(o.re_stat), value(o.im_stat)
 function fit!(o::CStat, y::Real, γ::Float64) 
     fit!(o.re_stat, real(y), γ)
     fit!(o.im_stat, complex(y, γ).im, γ)
@@ -113,7 +113,7 @@ function fit!(o::CovMatrix, x::VectorOb, γ::Float64)
     o.nobs += 1
     o
 end
-function value(o::CovMatrix)
+function _value(o::CovMatrix)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
     scale!(o.value, unbias(o))
 end
@@ -192,7 +192,7 @@ function Base.merge!(o::Extrema, o2::Extrema, γ::Float64)
     o.max = max(o.max, o2.max)
     o
 end
-value(o::Extrema) = (o.min, o.max)
+_value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
 
 #-----------------------------------------------------------------------# HyperLogLog
@@ -255,7 +255,7 @@ function fit!(o::HyperLogLog, v::Any, γ::Float64)
     o
 end
 
-function value(o::HyperLogLog)
+function _value(o::HyperLogLog)
     S = 0.0
     for j in eachindex(o.M)
         S += 1 / (2 ^ o.M[j])

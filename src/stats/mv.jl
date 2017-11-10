@@ -52,6 +52,6 @@ function fit!(o::MV, y::VectorOb, γ::Float64)
     o
 end
 
-value(o::MV) = map(value, o.stats)
+_value(o::MV) = map(value, o.stats)
 
 Base.merge!(o1::T, o2::T, γ::Float64) where {T <: MV} = merge!.(o1.stats, o2.stats, γ)

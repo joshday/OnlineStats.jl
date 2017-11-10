@@ -15,7 +15,7 @@ default_weight(o::CallFun) = default_weight(o.o)
 
 Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.o) |> $(o.f)")
 
-value(o::CallFun) = value(o.o)
+_value(o::CallFun) = value(o.o)
 
 function fit!(o::CallFun, arg, γ::Float64) 
     fit!(o.o, arg, γ)

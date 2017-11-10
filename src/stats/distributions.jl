@@ -15,7 +15,7 @@ struct FitBeta <: ExactStat{0}
     FitBeta() = new(Variance())
 end
 fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function value(o::FitBeta)
+function _value(o::FitBeta)
     if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
@@ -53,7 +53,7 @@ function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
     o.nobs += 1
     haskey(o.d, y) ? (o.d[y] += 1) : (o.d[y] = 1)
 end
-value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, zeros(0))
+_value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, zeros(0))
 Base.keys(o::FitCategorical) = keys(o.d)
 Base.values(o::FitCategorical) = values(o.d)
 function Base.merge!(o::T, o2::T, γ::Float64) where {T <: FitCategorical}
@@ -79,7 +79,7 @@ mutable struct FitCauchy <: StochasticStat{0}
     FitCauchy() = new(QuantileMM(), 0)
 end
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
-function value(o::FitCauchy)
+function _value(o::FitCauchy)
     if o.nobs > 1
         return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
     else
@@ -109,7 +109,7 @@ struct FitGamma <: ExactStat{0}
 end
 FitGamma() = FitGamma(Variance())
 fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function value(o::FitGamma)
+function _value(o::FitGamma)
     if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
@@ -139,7 +139,7 @@ struct FitLogNormal <: ExactStat{0}
     FitLogNormal() = new(Variance())
 end
 fit!(o::FitLogNormal, y::Real, γ::Float64) = fit!(o.var, log(y), γ)
-function value(o::FitLogNormal)
+function _value(o::FitLogNormal)
     if o.var.nobs > 1
         return mean(o.var), std(o.var)
     else
@@ -165,7 +165,7 @@ struct FitNormal <: ExactStat{0}
     FitNormal() = new(Variance())
 end
 fit!(o::FitNormal, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function value(o::FitNormal)
+function _value(o::FitNormal)
     if o.var.nobs > 1
         return mean(o.var), std(o.var)
     else
@@ -199,7 +199,7 @@ function fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64)
     fit!(o.mvmean, y, γ)
     o
 end
-function value(o::FitMultinomial)
+function _value(o::FitMultinomial)
     m = value(o.mvmean)
     p = length(o.mvmean.stats)
     if o.nobs > 0
@@ -231,7 +231,7 @@ struct FitMvNormal <: ExactStat{1}
 end
 Base.length(o::FitMvNormal) = length(o.cov)
 fit!{T<:Real}(o::FitMvNormal, y::AbstractVector{T}, γ::Float64) = fit!(o.cov, y, γ)
-function value(o::FitMvNormal)
+function _value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)
         return mean(o.cov), c

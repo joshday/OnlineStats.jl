@@ -1,3 +1,12 @@
+struct IHist <: ExactStat{0}
+    ex::Extrema
+end
+
+function fit!(o::IHist, y::Real, γ::Float64)
+    fit!(o.ex, y, γ)
+end
+
+
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
 """
     IHistogram(b)
