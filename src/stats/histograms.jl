@@ -1,21 +1,9 @@
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
-#-----------------------------------------------------------------------# IHist 
-"Read: IHistogramNext"
-struct IHist <: ExactStat{0}
-    value::Vector{Float64}
-    counts::Vector{Int}
-    nn::Tuple{Float64, Int}  # difference, index of two closest bins
-end
-IHist(nbins::Integer) = IHist([Pair(Inf, 0) for _ in 1:nbins], (Inf, 0))
-
-fit!(o::IHist, y::Real, γ::Float64) = fit!(o, Pair(Float64(y), 1))
-
-
 """
     IHistogram(b)
 
 Incrementally build a histogram of `b` (not equally spaced) bins.  An `IHistogram` can be
-used as a "surrogate" for a datset to get approximate summary statistics.
+used as a "surrogate" for a dataset to get approximate summary statistics.
 
 # Example
 
