@@ -80,7 +80,7 @@ classify(o::StatLearn, x, dim = Rows()) = sign.(predict(o, x, dim))
 
 loss(o::StatLearn, x, y, dim = Rows()) = value(o.loss, y, predict(o, x, dim), AvgMode.Mean())
 
-function _value(o::StatLearn, x, y, dim = Rows())
+function value(o::StatLearn, x, y, dim = Rows())
     value(o.loss, y, predict(o, x, dim), AvgMode.Mean()) + value(o.penalty, o.β, o.λfactor)
 end
 
