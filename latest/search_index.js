@@ -792,4 +792,36 @@ var documenterSearchIndex = {"docs": [
     "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. A printed warning will occur for these cases.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
 },
 
+{
+    "location": "datasurrogates.html#",
+    "page": "Data Surrogates",
+    "title": "Data Surrogates",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "datasurrogates.html#Data-Surrogates-1",
+    "page": "Data Surrogates",
+    "title": "Data Surrogates",
+    "category": "section",
+    "text": "Some OnlineStats are especially useful for out-of-core computations, as after they have run through the data, they can be used as a surrogate for the entire dataset for calculating approximate summary statistics or exact linear models."
+},
+
+{
+    "location": "datasurrogates.html#IHistogram-1",
+    "page": "Data Surrogates",
+    "title": "IHistogram",
+    "category": "section",
+    "text": "IHistogram incrementally builds a histogram of unequally spaced bins.  It has a  Plots.jl recipe and can be used to get  approximate summary statistics, without the need to run through the data again.o = IHistogram(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nplot(o)(Image: )"
+},
+
+{
+    "location": "datasurrogates.html#LinRegBuilder-1",
+    "page": "Data Surrogates",
+    "title": "LinRegBuilder",
+    "category": "section",
+    "text": "TODO"
+},
+
 ]}
