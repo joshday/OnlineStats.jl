@@ -12,7 +12,8 @@ makedocs(
         "whatcan.md",
         "api.md",
         "newstats.md",
-        "parallel.md"
+        "parallel.md",
+        "datasurrogates.md"
     ]
 )
 
