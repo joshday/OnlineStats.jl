@@ -773,7 +773,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Parallel Computation",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), IHistogram(50))\ns2 = Series(Mean(), Variance(), IHistogram(50))\ns3 = Series(Mean(), Variance(), IHistogram(50))\n\nfit!(s1, y1)\nfit!(s1, y2)\nfit!(s2, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1(Image: )"
+    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  In general, fit! is a cheaper operation than merge! and should be preferred."
+},
+
+{
+    "location": "parallel.html#ExactStat-merges-1",
+    "page": "Parallel Computation",
+    "title": "ExactStat merges",
+    "category": "section",
+    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.# NOTE: This code is not actually running in parallel\ny1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), IHistogram(50))\ns2 = Series(Mean(), Variance(), IHistogram(50))\ns3 = Series(Mean(), Variance(), IHistogram(50))\n\nfit!(s1, y1)\nfit!(s1, y2)\nfit!(s2, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1(Image: )"
+},
+
+{
+    "location": "parallel.html#Other-Merges-1",
+    "page": "Parallel Computation",
+    "title": "Other Merges",
+    "category": "section",
+    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. A printed warning will occur for these cases.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
 },
 
 ]}
