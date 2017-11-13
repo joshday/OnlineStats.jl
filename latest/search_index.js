@@ -217,17 +217,97 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "whatcan.html#",
-    "page": "What Can OnlineStats Do?",
-    "title": "What Can OnlineStats Do?",
+    "location": "newstats.html#",
+    "page": "Extending OnlineStats",
+    "title": "Extending OnlineStats",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "whatcan.html#What-Can-OnlineStats-Do?-1",
-    "page": "What Can OnlineStats Do?",
-    "title": "What Can OnlineStats Do?",
+    "location": "newstats.html#Extending-OnlineStats-1",
+    "page": "Extending OnlineStats",
+    "title": "Extending OnlineStats",
+    "category": "section",
+    "text": "New OnlineStats which work with the Series/Weight interface can be accomplished through the zero-dependency OnlineStatsBase.jl"
+},
+
+{
+    "location": "parallel.html#",
+    "page": "Parallel Computation",
+    "title": "Parallel Computation",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "parallel.html#Parallel-Computation-1",
+    "page": "Parallel Computation",
+    "title": "Parallel Computation",
+    "category": "section",
+    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  In general, fit! is a cheaper operation than merge! and should be preferred."
+},
+
+{
+    "location": "parallel.html#ExactStat-merges-1",
+    "page": "Parallel Computation",
+    "title": "ExactStat merges",
+    "category": "section",
+    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.# NOTE: This code is not actually running in parallel\ny1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), IHistogram(50))\ns2 = Series(Mean(), Variance(), IHistogram(50))\ns3 = Series(Mean(), Variance(), IHistogram(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1(Image: )"
+},
+
+{
+    "location": "parallel.html#Other-Merges-1",
+    "page": "Parallel Computation",
+    "title": "Other Merges",
+    "category": "section",
+    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. A printed warning will occur for these cases.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+},
+
+{
+    "location": "datasurrogates.html#",
+    "page": "Data Surrogates",
+    "title": "Data Surrogates",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "datasurrogates.html#Data-Surrogates-1",
+    "page": "Data Surrogates",
+    "title": "Data Surrogates",
+    "category": "section",
+    "text": "Some OnlineStats are especially useful for out-of-core computations, as after they have run through the data, they can be used as a surrogate for the entire dataset for calculating approximate summary statistics or exact linear models."
+},
+
+{
+    "location": "datasurrogates.html#IHistogram-1",
+    "page": "Data Surrogates",
+    "title": "IHistogram",
+    "category": "section",
+    "text": "IHistogram incrementally builds a histogram of unequally spaced bins.  It has a  Plots.jl recipe and can be used to get  approximate summary statistics, without the need to run through the data again.o = IHistogram(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nplot(o)(Image: )"
+},
+
+{
+    "location": "datasurrogates.html#LinRegBuilder-1",
+    "page": "Data Surrogates",
+    "title": "LinRegBuilder",
+    "category": "section",
+    "text": "TODO"
+},
+
+{
+    "location": "stats_and_models.html#",
+    "page": "Statistics and Models",
+    "title": "Statistics and Models",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "stats_and_models.html#Statistics-and-Models-1",
+    "page": "Statistics and Models",
+    "title": "Statistics and Models",
     "category": "section",
     "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles QuantileMM, QuantileMSPI, QuantileSGD\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms OHistogram, IHistogram\nApproximate order statistics OrderStats\nParametric Density Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
 },
@@ -742,86 +822,6 @@ var documenterSearchIndex = {"docs": [
     "title": "API",
     "category": "section",
     "text": "Modules = [OnlineStats, OnlineStatsBase]"
-},
-
-{
-    "location": "newstats.html#",
-    "page": "Extending OnlineStats",
-    "title": "Extending OnlineStats",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "newstats.html#Extending-OnlineStats-1",
-    "page": "Extending OnlineStats",
-    "title": "Extending OnlineStats",
-    "category": "section",
-    "text": "New OnlineStats which work with the Series/Weight interface can be accomplished through the zero-dependency OnlineStatsBase.jl"
-},
-
-{
-    "location": "parallel.html#",
-    "page": "Parallel Computation",
-    "title": "Parallel Computation",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "parallel.html#Parallel-Computation-1",
-    "page": "Parallel Computation",
-    "title": "Parallel Computation",
-    "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  In general, fit! is a cheaper operation than merge! and should be preferred."
-},
-
-{
-    "location": "parallel.html#ExactStat-merges-1",
-    "page": "Parallel Computation",
-    "title": "ExactStat merges",
-    "category": "section",
-    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.# NOTE: This code is not actually running in parallel\ny1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), IHistogram(50))\ns2 = Series(Mean(), Variance(), IHistogram(50))\ns3 = Series(Mean(), Variance(), IHistogram(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1(Image: )"
-},
-
-{
-    "location": "parallel.html#Other-Merges-1",
-    "page": "Parallel Computation",
-    "title": "Other Merges",
-    "category": "section",
-    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. A printed warning will occur for these cases.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
-},
-
-{
-    "location": "datasurrogates.html#",
-    "page": "Data Surrogates",
-    "title": "Data Surrogates",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "datasurrogates.html#Data-Surrogates-1",
-    "page": "Data Surrogates",
-    "title": "Data Surrogates",
-    "category": "section",
-    "text": "Some OnlineStats are especially useful for out-of-core computations, as after they have run through the data, they can be used as a surrogate for the entire dataset for calculating approximate summary statistics or exact linear models."
-},
-
-{
-    "location": "datasurrogates.html#IHistogram-1",
-    "page": "Data Surrogates",
-    "title": "IHistogram",
-    "category": "section",
-    "text": "IHistogram incrementally builds a histogram of unequally spaced bins.  It has a  Plots.jl recipe and can be used to get  approximate summary statistics, without the need to run through the data again.o = IHistogram(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nplot(o)(Image: )"
-},
-
-{
-    "location": "datasurrogates.html#LinRegBuilder-1",
-    "page": "Data Surrogates",
-    "title": "LinRegBuilder",
-    "category": "section",
-    "text": "TODO"
 },
 
 ]}
