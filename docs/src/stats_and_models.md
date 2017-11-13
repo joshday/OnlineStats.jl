@@ -1,4 +1,4 @@
-# What Can OnlineStats Do?
+# Statistics and Models
 
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|

@@ -9,11 +9,11 @@ makedocs(
         "index.md",
         "weights.md",
         "series.md",
-        "whatcan.md",
-        "api.md",
         "newstats.md",
         "parallel.md",
-        "datasurrogates.md"
+        "datasurrogates.md",
+        "stats_and_models.md",
+        "api.md"
     ]
 )
 
