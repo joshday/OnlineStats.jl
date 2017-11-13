@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Parallel Computation · OnlineStats.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>OnlineStats.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="index.html">Basics</a></li><li><a class="toctext" href="weights.html">Weighting</a></li><li><a class="toctext" href="series.html">Series</a></li><li><a class="toctext" href="whatcan.html">What Can OnlineStats Do?</a></li><li><a class="toctext" href="api.html">API</a></li><li><a class="toctext" href="newstats.html">Extending OnlineStats</a></li><li class="current"><a class="toctext" href="parallel.html">Parallel Computation</a><ul class="internal"></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href="parallel.html">Parallel Computation</a></li></ul><a class="edit-page" href="https://github.com/joshday/OnlineStats.jl/blob/master/docs/src/parallel.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Parallel Computation</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Parallel-Computation-1" href="#Parallel-Computation-1">Parallel Computation</a></h1><p>Two Series can be merged if they track the same OnlineStats.  This facilitates <a href="https://en.wikipedia.org/wiki/Embarrassingly_parallel">embarassingly parallel</a> computations.</p><pre><code class="language-julia">y1 = randn(100)
+y2 = randn(100)
+y3 = randn(100)
+
+s1 = Series(Mean())
+s2 = Series(Mean())
+s3 = Series(Mean())
+
+fit!(s1, y1)
+fit!(s2, y2)
+fit!(s3, y3)
+
+merge!(s1, s2)  # merge information from s2 into s1
+merge!(s1, s2)  # merge information from s3 into s1</code></pre><p><img src="https://user-images.githubusercontent.com/8075494/32733928-978bc52a-c85e-11e7-9505-993804b8f3c4.png" alt/></p><footer><hr/><a class="previous" href="newstats.html"><span class="direction">Previous</span><span class="title">Extending OnlineStats</span></a></footer></article></body></html>
