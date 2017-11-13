@@ -29,5 +29,5 @@ fit!(s, y)
 ```
 
 ```@raw html
-<img width = 200 src = "https://user-images.githubusercontent.com/8075494/27987219-12fe7fc2-63d8-11e7-9869-8cfc5cb6e6c9.gif">
+<img width = 200 src = "https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif">
 ```

@@ -19,5 +19,4 @@ merge!(s1, s2)  # merge information from s2 into s1
 merge!(s1, s2)  # merge information from s3 into s1
 ```
 
-
 ![](https://user-images.githubusercontent.com/8075494/32733928-978bc52a-c85e-11e7-9505-993804b8f3c4.png)
