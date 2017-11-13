@@ -773,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Parallel Computation",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.y1 = randn(100)\ny2 = randn(100)\ny3 = randn(100)\n\ns1 = Series(Mean())\ns2 = Series(Mean())\ns3 = Series(Mean())\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s2)  # merge information from s3 into s1(Image: )"
+    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.y1 = randn(100)\ny2 = randn(100)\ny3 = randn(100)\n\ns1 = Series(Mean())\ns2 = Series(Mean())\ns3 = Series(Mean())\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1(Image: )"
 },
 
 ]}
