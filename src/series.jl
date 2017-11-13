@@ -343,9 +343,7 @@ function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     if method == :append
         merge!.(s1.stats, s2.stats, weight(s1, n2))
     elseif method == :mean
-        γ1 = s1.weight(s1.n)
-        γ2 = s2.weight(s2.n)
-        merge!.(s1.stats, s2.stats, .5 * (γ1 + γ2))
+        merge!.(s1.stats, s2.stats, n2 / s1.n)
     elseif method == :singleton
         merge!.(s1.stats, s2.stats, s1.weight(s1.n))
     else
