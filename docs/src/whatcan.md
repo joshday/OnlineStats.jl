@@ -34,7 +34,7 @@
 | Quantile regression                | [`StatLearn`](@ref)        |
 | Absolute loss regression           | [`StatLearn`](@ref)        |
 | Distance-weighted discrimination   | [`StatLearn`](@ref)        |
-| Huber-loss regression
+| Huber-loss regression              | [`StatLearn`](@ref)        |
 | Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
 | **Other:**                         |                            |
 | Bootstrapping                      | [`Bootstrap`](@ref)        |
