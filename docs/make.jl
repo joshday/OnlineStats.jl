@@ -11,7 +11,8 @@ makedocs(
         "series.md",
         "whatcan.md",
         "api.md",
-        "newstats.md"
+        "newstats.md",
+        "parallel.md"
     ]
 )
 
