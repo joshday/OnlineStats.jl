@@ -21,8 +21,8 @@ s2 = Series(Mean(), Variance(), IHistogram(50))
 s3 = Series(Mean(), Variance(), IHistogram(50))
 
 fit!(s1, y1)
-fit!(s1, y2)
-fit!(s2, y3)
+fit!(s2, y2)
+fit!(s3, y3)
 
 merge!(s1, s2)  # merge information from s2 into s1
 merge!(s1, s3)  # merge information from s3 into s1
