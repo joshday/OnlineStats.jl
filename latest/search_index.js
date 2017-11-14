@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "EqualWeight()",
     "category": "section",
-    "text": "Each observation has an equal amount of influence.gamma_t = frac1t"
+    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "ExponentialWeight(λ = 0.1)",
     "category": "section",
-    "text": "Each observation is weighted with a constant, giving newer observations higher influence.gamma_t = lambda"
+    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
 },
 
 {
@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "LearningRate(r = 0.6)",
     "category": "section",
-    "text": "Decrease at a slow rate.gamma_t = frac1t^r"
+    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "HarmonicWeight(a = 10.0)",
     "category": "section",
-    "text": "Decrease at a slow rate.gamma_t = fracaa + t - 1"
+    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
 },
 
 {
@@ -93,7 +93,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "McclainWeight(a = 0.1)",
     "category": "section",
-    "text": "Smoothed version of Bounded{EqualWeight}.  Weight approaches a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+},
+
+{
+    "location": "weights.html#Weight-Wrappers-1",
+    "page": "Weighting",
+    "title": "Weight Wrappers",
+    "category": "section",
+    "text": "Several types can change the behavior of a Weight."
 },
 
 {
@@ -101,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Bounded(weight, λ)",
     "category": "section",
-    "text": "Wrapper for a weight which provides a minimum bound.gamma_t = textmax(gamma_t )"
+    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
 },
 
 {
@@ -109,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weighting",
     "title": "Scaled(weight, λ)",
     "category": "section",
-    "text": "Wrapper for a weight which scales the weight by a constant.  This is only meant for use with subtypes of StochasticStat, as it violates the rule gamma_1 = 1.gamma_t =  * gamma_t"
+    "text": "Weights are scaled by a constant.  This should only be used with certain subtypes of  StochasticStat (those based on stochastic gradient algorithms), as it may violate the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are QuantileSGD, QuantileMSPI, KMeans, and StatLearn.gamma_t =  * gamma_t"
 },
 
 {
