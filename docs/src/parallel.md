@@ -28,7 +28,9 @@ merge!(s1, s2)  # merge information from s2 into s1
 merge!(s1, s3)  # merge information from s3 into s1
 ```
 
-![](https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png)
+```@raw html
+<img width = 400 src = "https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png">
+```
 
 ## Other Merges
 
