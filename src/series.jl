@@ -121,10 +121,12 @@ Update a Series with more `data`.  Additional arguments can be used to
 function fit!(s::Series{0}, y::ScalarOb)
     γ = weight!(s)
     map(x -> fit!(x, y, γ), stats(s))
+    s
 end
 function fit!(s::Series{0}, y::ScalarOb, γ::Float64)
     s.n += 1
     map(x -> fit!(x, y, γ), stats(s))
+    s
 end
 function fit!(s::Series{0}, y::AbstractArray)
     for yi in y 
