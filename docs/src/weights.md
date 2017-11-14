@@ -18,7 +18,7 @@ Consider how weights affect the influence of the next observation on an online m
 
 ```@raw html
 <br>
-<img src="https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png" height=300>
+<img src="https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png" height=400>
 ```
 
 ## [`EqualWeight()`](@ref)
