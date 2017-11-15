@@ -11,7 +11,7 @@ Track any number of OnlineStats.
 
     Series(Mean())
     Series(randn(100), Mean())
-    Series(randn(100), Weight.Exponential(), Mean())
+    Series(randn(100), ExponentialWeight(), Mean())
 
     s = Series(QuantileMM([.25, .5, .75]))
     fit!(s, randn(1000))
@@ -38,18 +38,26 @@ Series(wt::Weight, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 #-----------------------------------------------------------------------# methods
 header(io::IO, s::AbstractString) = println(io, "▦ $s" )
 
+function header(io::IO, s::Series{N}) where {N} 
+    println(io, "▦ Series{$N} with $(s.weight)")
+    print(io, "  ├── ", "nobs = $(s.n)")
+end
+
 function Base.show(io::IO, s::Series)
-    header(io, name(s))
-    print(io, "┣━━━━ "); println(io, "$(s.weight), nobs = $(nobs(s))")
-    print(io, "┗━┓")
+    header(io, s)
+    # print(io, "├──── "); println(io, "$(s.weight), nobs = $(nobs(s))")
+    # print(io, "└─┐")
     n = length(stats(s))
     i = 0
     for o in stats(s)
         i += 1
-        char = ifelse(i == n, "┗━━", "┣━━")
-        print(io, "\n  $char $(name(o)): $(value(o))")
+        char = ifelse(i == n, "└──", "├──")
+        # char = '>'
+        print(io, "\n  $char $o")
+        # print(io, "\n  $char $(name(o)): $(round.(value(o), 4))")
     end
 end
+Base.showcompact(io::IO, s::Series) = (header(io,s); print(io, s.stats))
 
 """
     stats(s::Series)
