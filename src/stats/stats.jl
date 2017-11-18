@@ -48,7 +48,7 @@ function Base.merge!(o::Variance, o2::Variance, γ::Float64)
     o.μ = smooth(o.μ, o2.μ, γ)
     o
 end
-_value(o::Variance) = o.σ2 * unbias(o)
+_value(o::Variance) = o.nobs < 2 ? 0.0 : o.σ2 * unbias(o)
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
