@@ -11,7 +11,7 @@ struct SGD <: SGUpdater end
 Base.merge!(a::SGD, b::SGD, γ::Float64) = a
 
 #-----------------------------------------------------------------------# MSPI
-struct MSPI{T} <: SGUpdater
+mutable struct MSPI{T} <: SGUpdater
     buffer::T 
 end
 MSPI() = MSPI(nothing)

@@ -410,27 +410,6 @@ function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 
-# #-----------------------------------------------------------------------# OMASQF
-# "Experimental: OMM-full matrix"
-# mutable struct OMASQF <: Updater
-#     H::Matrix{Float64}
-#     smoothedH::Matrix{Float64}
-#     b::VecF
-# end
-# OMASQF() = OMASQF(zeros(0, 0), zeros(0, 0), zeros(0))
-# statlearn_init(u::OMASQF, p) = OMASQF(zeros(p, p), zeros(p, p), zeros(p))
-# Base.show(io::IO, u::OMASQF) = print(io, "OMASQF")
-#
-# function fit!(o::StatLearn{OMASQF}, x::VectorOb, y::Real, γ::Float64)
-#     U = o.updater
-#     gradient!(o, x, y)
-#     fullH!(o, x, y)
-#     smooth!(U.smoothedH, U.H, γ)
-#     smooth!(U.b, U.H * o.β - o.gx, γ)
-#     try
-#         o.β[:] = (U.smoothedH + ϵ * I) \ U.b
-#     end
-# end
 
 #-----------------------------------------------------------------------# OMAPQ
 struct OMAPQ <: Updater end
@@ -473,7 +452,7 @@ end
 Base.merge!(o::MSPIQ, o2::MSPIQ, γ::Float64) = nothing
 
 #-----------------------------------------------------------------------# MSPI
-function fit!(o::StatLearn{MSPI}, x::VectorOb, y::Real, γ::Float64)
+function fit!(o::StatLearn{<:MSPI}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     denom = inv(1 + γ * constH(o, x, y))
     for j in eachindex(o.β)

@@ -336,7 +336,7 @@ end
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
     for u in [SGD(), NSGD(), ADAGRAD(), ADADELTA(), RMSPROP(), ADAM(), ADAMAX(), NADAM(), OMAPQ(),
-            OMASQ(), MSPIQ()]
+            OMASQ(), MSPIQ(), MSPI()]
         o = @inferred StatLearn(p, .5 * L2DistLoss(), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
         @test value(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
