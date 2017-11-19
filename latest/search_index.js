@@ -341,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAGRAD",
     "category": "Type",
-    "text": "ADAGRAD()\n\nAdaptive (element-wise learning rate) stochastic proximal gradient descent.\n\n\n\n"
+    "text": "ADAGRAD()\n\nAdaptive (element-wise learning rate) stochastic gradient descent.\n\n\n\n"
 },
 
 {
@@ -597,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "Type",
-    "text": "Quantile(q = [.25, .5, .75], alg = MSPI())\nQuantile(alg, q = [.25, .5, .75])\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are MSPI, SGD, and OMAS.\n\nExample\n\ny = randn(10_000)\nSeries(y, Quantile(MSPI()), Quantile(SGD()), Quantile(OMAS()))\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75], alg = MSPI())\nQuantile(alg, q = [.25, .5, .75])\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are MSPI, SGD, ADAGRAD, and OMAS.\n\nExample\n\ny = randn(10_000)\nSeries(y, Quantile(MSPI()), Quantile(SGD()), Quantile(OMAS()))\n\n\n\n"
 },
 
 {
@@ -614,6 +614,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.ReservoirSample",
     "category": "Type",
     "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.\n\nExample\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.SGD",
+    "page": "API",
+    "title": "OnlineStats.SGD",
+    "category": "Type",
+    "text": "SGD()\n\nStochastic gradient descent.\n\n\n\n"
 },
 
 {
