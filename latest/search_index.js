@@ -593,27 +593,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.QuantileMM",
+    "location": "api.html#OnlineStats.Quantile",
     "page": "API",
-    "title": "OnlineStats.QuantileMM",
+    "title": "OnlineStats.Quantile",
     "category": "Type",
-    "text": "QuantileMM(q = [.25, .5, .75])\n\nApproximate quantiles via an online MM algorithm (OMAS).\n\nExample\n\ns = Series(randn(1000), QuantileMM())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.QuantileMSPI",
-    "page": "API",
-    "title": "OnlineStats.QuantileMSPI",
-    "category": "Type",
-    "text": "QuantileMSPI(q = [.25, .5, .75])\n\nApproximate quantiles via Majorized Stochastic Proximal Iteration (MSPI).\n\nExample\n\ns = Series(randn(1000), QuantileMSPI())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.QuantileSGD",
-    "page": "API",
-    "title": "OnlineStats.QuantileSGD",
-    "category": "Type",
-    "text": "QuantileSGD(q = [.25, .5, .75])\n\nApproximate quantiles via an stochastic subgradient descent.\n\nExample\n\ns = Series(randn(1000), QuantileSGD())\nvalue(s)\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75], alg = MSPI())\nQuantile(alg, q = [.25, .5, .75])\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are MSPI, SGD, and OMAS.\n\nExample\n\ny = randn(10_000)\nSeries(y, Quantile(MSPI()), Quantile(SGD()), Quantile(OMAS()))\n\n\n\n"
 },
 
 {
@@ -670,6 +654,30 @@ var documenterSearchIndex = {"docs": [
     "title": "LearnBase.value",
     "category": "Method",
     "text": "value(s::Series)\n\nReturn a tuple of value mapped to the OnlineStats contained in the Series.\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.QuantileMM",
+    "page": "API",
+    "title": "OnlineStats.QuantileMM",
+    "category": "Function",
+    "text": "Deprecated.  See Quantile\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.QuantileMSPI",
+    "page": "API",
+    "title": "OnlineStats.QuantileMSPI",
+    "category": "Function",
+    "text": "Deprecated.  See Quantile\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.QuantileSGD",
+    "page": "API",
+    "title": "OnlineStats.QuantileSGD",
+    "category": "Function",
+    "text": "Deprecated.  See Quantile\n\n\n\n"
 },
 
 {
