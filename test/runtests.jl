@@ -335,8 +335,8 @@ end
     x = randn(n, p)
     y = x * linspace(-1, 1, p) + .5 * randn(n)
 
-    for u in [SGD(), NSGD(), ADAGRAD(), ADADELTA(), RMSPROP(), ADAM(), ADAMAX(), NADAM(), OMAPQ(),
-            OMASQ(), MSPIQ(), MSPI()]
+    for u in [SGD(), NSGD(), ADAGRAD(), ADADELTA(), RMSPROP(), ADAM(), ADAMAX(), NADAM(), 
+              MSPI(), OMAP(), OMAS()]
         o = @inferred StatLearn(p, .5 * L2DistLoss(), L2Penalty(), fill(.1, p), u)
         s = @inferred Series(o)
         @test value(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
@@ -389,7 +389,7 @@ end
     end
     @testset "MM-based" begin
         x, y = randn(100, 5), randn(100)
-        @test_throws ErrorException Series((x,y), StatLearn(5, PoissonLoss(), OMASQ()))
+        @test_throws ErrorException Series((x,y), StatLearn(5, PoissonLoss(), OMAS()))
     end
 end
 @testset "LinRegBuilder" begin

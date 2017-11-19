@@ -7,7 +7,7 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 - `loss = .5 * L2DistLoss()`: any Loss from LossFunctions.jl
 - `penalty = L2Penalty()`: any Penalty (which has a `prox` method) from PenaltyFunctions.jl.
 - `λ = fill(.1, p)`: a Vector of element-wise regularization parameters
-- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref), [`MSPIQ`](@ref)
+- `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref), [`MSPI`](@ref)
 
 # Details
 
@@ -359,98 +359,71 @@ end
 #-----------------------------------------------------------------------#
 #-----------------------------------------------------------------------#
 #-----------------------------------------------------------------------# Majorization-based
-# Updaters below here are experimental and may change.
-
-# const LinearRegression      = LossFunctions.ScaledDistanceLoss{L2DistLoss,0.5}
-const L1Regression          = L1DistLoss
-const LogisticRegression    = LogitMarginLoss
-const PoissonRegression     = PoissonLoss
-const HuberRegression       = HuberLoss
-const SVMLike               = L1HingeLoss
-const QuantileRegression    = QuantileLoss
-const DWDLike               = DWDMarginLoss
+# These currently only work for L2DistLoss, LogitMarginLoss, DWDMarginLoss
 
 # Lipschitz constant
 constH(o::StatLearn{A, L}, x, y) where {A, L} = error("$A is not defined for $L")
-constH(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
 
 const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
 constH(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = 2 * N * x'x 
+constH(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
 constH(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = .25 * x'x
 constH(o::StatLearn{A, <:DWDMarginLoss}, x, y) where {A} = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
 
 
-# Full Matrix for quadratic upper bound
-# TODO: assume H is symmetric and optimize
-fullH!(o::StatLearn{A, L2DistLoss}, x, y) where {A} = (o.updater.H[:] = 2 * x * x')
-fullH!(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = (o.updater.H[:] = 2 * N * x * x')
-fullH!(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = (o.updater.H[:] = .25 * x * x')
-function fullH!{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)
-    o.updater.H[:] = ((o.loss.q + 1) ^ 2 / o.loss.q) * x * x'
-end
+# # Full Matrix for quadratic upper bound
+# # TODO: assume H is symmetric and optimize
+# fullH!(o::StatLearn{A, L2DistLoss}, x, y) where {A} = (o.updater.H[:] = 2 * x * x')
+# fullH!(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = (o.updater.H[:] = 2 * N * x * x')
+# fullH!(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = (o.updater.H[:] = .25 * x * x')
+# function fullH!{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)
+#     o.updater.H[:] = ((o.loss.q + 1) ^ 2 / o.loss.q) * x * x'
+# end
 
 #-----------------------------------------------------------------------# OMASQ
-"Experimental: OMM-constant"
-mutable struct OMASQ <: Updater
-    h::Float64
-    b::VecF
-end
-OMASQ() = OMASQ(0.0, zeros(0))
-statlearn_init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
-Base.merge!(o::OMASQ, o2::OMASQ, γ::Float64) = smooth!(o.b, o2.b, γ)
+# "Experimental: OMM-constant"
+# mutable struct OMASQ <: Updater
+#     h::Float64
+#     b::VecF
+# end
+# OMASQ() = OMASQ(0.0, zeros(0))
+# statlearn_init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
+# Base.merge!(o::OMASQ, o2::OMASQ, γ::Float64) = smooth!(o.b, o2.b, γ)
 
-function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
-    U = o.updater
+# function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
+#     U = o.updater
+#     gradient!(o, x, y)
+#     ht = constH(o, x, y)
+#     U.h = smooth(U.h, ht, γ)
+#     for j in eachindex(o.β)
+#         U.b[j] = smooth(U.b[j], ht * o.β[j] - o.gx[j], γ)
+#         o.β[j] = U.b[j] / U.h
+#     end
+# end
+
+# Online MM Stuff using a Lipschitz constant of the gradient
+
+#-----------------------------------------------------------------------# OMAS
+statlearn_init(u::OMAS, p) = OMAS(zeros(p + 1))  # buffer[end] = h
+function fit!(o::StatLearn{<:OMAS}, x::VectorOb, y::Real, γ::Float64)
+    B = o.updater.buffer
     gradient!(o, x, y)
     ht = constH(o, x, y)
-    U.h = smooth(U.h, ht, γ)
+    B[end] = smooth(B[end], ht, γ)
+    h = B[end]
     for j in eachindex(o.β)
-        U.b[j] = smooth(U.b[j], ht * o.β[j] - o.gx[j], γ)
-        o.β[j] = U.b[j] / U.h
+        B[j] = smooth(B[j], ht * o.β[j] - o.gx[j], γ)
+        o.β[j] = B[j] / h
     end
 end
-
-
-#-----------------------------------------------------------------------# OMAPQ
-struct OMAPQ <: Updater end
-function fit!(o::StatLearn{OMAPQ}, x::VectorOb, y::Real, γ::Float64)
+#-----------------------------------------------------------------------# OMAP
+function fit!(o::StatLearn{<:OMAP}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)
     h_inv = inv(constH(o, x, y))
     for j in eachindex(o.β)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
 end
-Base.merge!(o::OMAPQ, o2::OMAPQ, γ::Float64) = nothing
-# #-----------------------------------------------------------------------# OMAPQF
-# struct OMAPQF <: Updater
-#     H::Matrix{Float64}
-#     OMAPQF(p = 0) = new(η, zeros(p, p))
-# end
-# Base.show(io::IO, u::OMAPQF) = print(io, "OMAPQF")
-# statlearn_init(o::OMAPQF, p) = OMAPQF(p)
-# function fit!(o::StatLearn{OMAPQF}, x::VectorOb, y::Real, γ::Float64)
-#     gradient!(o, x, y)
-#     fullH!(o, x, y)
-#     o.β[:] -= γ * ((o.updater.H + ϵ * I) \ o.gx)
-# end
-
-#-----------------------------------------------------------------------# MSPIQ
-"""
-    MSPIQ()
-
-MSPI-Q (Proximal mapping applied to majorization) algorithm using a Lipschitz constant to 
-majorize the objective.  
-"""
-struct MSPIQ <: Updater end
-function fit!(o::StatLearn{MSPIQ}, x::VectorOb, y::Real, γ::Float64)
-    gradient!(o, x, y)
-    denom = inv(1 + γ * constH(o, x, y))
-    for j in eachindex(o.β)
-        @inbounds o.β[j] -= γ * denom * o.gx[j]
-    end
-end
-Base.merge!(o::MSPIQ, o2::MSPIQ, γ::Float64) = nothing
-
 #-----------------------------------------------------------------------# MSPI
 function fit!(o::StatLearn{<:MSPI}, x::VectorOb, y::Real, γ::Float64)
     gradient!(o, x, y)

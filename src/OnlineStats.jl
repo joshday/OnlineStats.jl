@@ -26,8 +26,7 @@ export
     OrderStats, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
     LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV, Bootstrap,
     # StatLearn
-    StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAPQ,
-    OMASQ, MSPIQ, MSPI
+    StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
 
 
 #-----------------------------------------------------------------------# ObLoc
@@ -40,6 +39,7 @@ struct Cols <: ObLoc end
 # (1 - γ) * a + γ * b
 smooth(a::Number, b::Number, γ::Float64) = a + γ * (b - a)
 smooth!(a::Void, b::Void, γ::Float64) = a  # help with merging updaters
+smooth!(a::Number, b::Number, γ::Float64) = smooth(a, b, γ)  # help with merging updaters
 function smooth!(a, b, γ::Float64)
     length(a) == length(b) || 
         throw(DimensionMismatch("can't smooth arrays of different length"))
