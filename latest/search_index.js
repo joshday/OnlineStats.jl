@@ -625,14 +625,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.SGD",
-    "page": "API",
-    "title": "OnlineStats.SGD",
-    "category": "Type",
-    "text": "SGD()\n\nProximal Stochastic Gradient Descent.\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.Series",
     "page": "API",
     "title": "OnlineStats.Series",
