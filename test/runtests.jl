@@ -28,8 +28,8 @@ end
 #-----------------------------------------------------------------------# Show
 info("Show")
 for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(), 
-         HyperLogLog(4), KMeans(4, 2), Moments(), OrderStats(10), QuantileMM(),
-         QuantileMSPI(), QuantileSGD(), ReservoirSample(10), Sum() ,StatLearn(5), 
+         HyperLogLog(4), KMeans(4, 2), Moments(), OrderStats(10), Quantile(), 
+         ReservoirSample(10), Sum(), StatLearn(5), 
          LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean())]
     println(o)
     typeof(o) <: OnlineStat{0} && println(2o)
@@ -235,7 +235,7 @@ end
 #-----------------------------------------------------------------------# Quantiles
 @testset "Quantiles" begin 
     y = randn(10_000)
-    for o in [QuantileMM(.1:.1:.9), QuantileMSPI(.1:.1:.9), QuantileSGD(.1:.1:.9)]
+    for o in [Quantile(.1:.1:.9)]
         Series(y, o)
         @test value(o) ≈ quantile(y, .1:.1:.9) atol=.2
         # merging

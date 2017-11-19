@@ -23,7 +23,7 @@ export
     FitMultinomial, FitMvNormal,
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
-    OrderStats, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
+    OrderStats, Quantile, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
     LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV, Bootstrap,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
@@ -79,5 +79,6 @@ include("stats/bootstrap.jl")
 include("series.jl")
 include("mapblocks.jl")
 include("recipes.jl")
+include("deprecated.jl")
 
 end # module

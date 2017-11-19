@@ -73,11 +73,11 @@ Online parameter estimate of a Cauchy distribution.
     s = Series(y, o)
     Cauchy(value(o)...)
 """
-mutable struct FitCauchy <: StochasticStat{0}
-    q::QuantileMM
+mutable struct FitCauchy{T} <: StochasticStat{0}
+    q::Quantile{T}
     nobs::Int
-    FitCauchy() = new(QuantileMM(), 0)
 end
+FitCauchy(alg = MSPI()) = FitCauchy(Quantile(alg), 0)
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
 function _value(o::FitCauchy)
     if o.nobs > 1

@@ -31,7 +31,7 @@ for T in [:OMAS, :OMAS2, :OMAP, :OMAP2, :MSPI, :MSPI2]
             buffer::T 
         end
         $T() = $T(nothing)
-        function Base.merge!(a::$T{T}, b::$T{T}, γ::Float64) where {T} 
+        function Base.merge!(a::S, b::S, γ::Float64) where {S <: $T} 
             smooth!.(a.buffer, b.buffer, γ)
             a
         end
