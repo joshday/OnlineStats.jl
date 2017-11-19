@@ -159,17 +159,7 @@ function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
 end
 
 #-----------------------------------------------------------------------# ADAGRAD
-"""
-    ADAGRAD()
-
-Adaptive (element-wise learning rate) stochastic proximal gradient descent.
-"""
-mutable struct ADAGRAD <: SGUpdater
-    H::VecF
-    nobs::Int
-    ADAGRAD(p::Integer = 0) = new(zeros(p), 0)
-end
-statlearn_init(u::ADAGRAD, p) = ADAGRAD(p)
+statlearn_init(u::ADAGRAD, p) = init(u, p)
 function update!(o::StatLearn{ADAGRAD}, γ)
     U = o.updater
     U.nobs += 1
@@ -179,10 +169,7 @@ function update!(o::StatLearn{ADAGRAD}, γ)
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
 end
-function Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ::Float64)
-    o.nobs += o2.nobs
-    smooth!(o.H, o2.H, γ)
-end
+
 
 #-----------------------------------------------------------------------# ADADELTA
 """
@@ -369,39 +356,6 @@ constH(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = 2 * N * x'x
 constH(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
 constH(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = .25 * x'x
 constH(o::StatLearn{A, <:DWDMarginLoss}, x, y) where {A} = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
-
-
-# # Full Matrix for quadratic upper bound
-# # TODO: assume H is symmetric and optimize
-# fullH!(o::StatLearn{A, L2DistLoss}, x, y) where {A} = (o.updater.H[:] = 2 * x * x')
-# fullH!(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = (o.updater.H[:] = 2 * N * x * x')
-# fullH!(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = (o.updater.H[:] = .25 * x * x')
-# function fullH!{A}(o::StatLearn{A, <:DWDMarginLoss}, x, y)
-#     o.updater.H[:] = ((o.loss.q + 1) ^ 2 / o.loss.q) * x * x'
-# end
-
-#-----------------------------------------------------------------------# OMASQ
-# "Experimental: OMM-constant"
-# mutable struct OMASQ <: Updater
-#     h::Float64
-#     b::VecF
-# end
-# OMASQ() = OMASQ(0.0, zeros(0))
-# statlearn_init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
-# Base.merge!(o::OMASQ, o2::OMASQ, γ::Float64) = smooth!(o.b, o2.b, γ)
-
-# function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
-#     U = o.updater
-#     gradient!(o, x, y)
-#     ht = constH(o, x, y)
-#     U.h = smooth(U.h, ht, γ)
-#     for j in eachindex(o.β)
-#         U.b[j] = smooth(U.b[j], ht * o.β[j] - o.gx[j], γ)
-#         o.β[j] = U.b[j] / U.h
-#     end
-# end
-
-# Online MM Stuff using a Lipschitz constant of the gradient
 
 #-----------------------------------------------------------------------# OMAS
 statlearn_init(u::OMAS, p) = OMAS(zeros(p + 1))  # buffer[end] = h

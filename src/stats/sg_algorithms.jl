@@ -5,10 +5,34 @@ abstract type SGUpdater <: Updater end
 Base.show(io::IO, u::Updater) = print(io, name(u))
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: Updater} = warn("$T can't be merged.")
 
+init(u::Updater, p) = error("")
+
 
 #-----------------------------------------------------------------------# SGD
+"""
+    SGD()
+
+Stochastic gradient descent.
+"""
 struct SGD <: SGUpdater end
 Base.merge!(a::SGD, b::SGD, γ::Float64) = a
+
+"""
+    ADAGRAD()
+
+Adaptive (element-wise learning rate) stochastic gradient descent.
+"""
+mutable struct ADAGRAD <: SGUpdater
+    H::VecF
+    nobs::Int
+    ADAGRAD(p = 0) = new(zeros(p), 0)
+end
+init(u::ADAGRAD, p) = ADAGRAD(p)
+function Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ::Float64)
+    o.nobs += o2.nobs
+    smooth!(o.H, o2.H, γ)
+    o
+end
 
 #-----------------------------------------------------------------------# MSPI
 for T in [:OMAS, :OMAS2, :OMAP, :OMAP2, :MSPI, :MSPI2]

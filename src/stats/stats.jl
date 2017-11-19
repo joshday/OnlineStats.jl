@@ -404,7 +404,7 @@ end
     Quantile(alg, q = [.25, .5, .75])
 
 Approximate the quantiles `q` via the stochastic approximation algorithm `alg`.  Options
-are `MSPI`, `SGD`, and `OMAS`.
+are `MSPI`, `SGD`, `ADAGRAD`, and `OMAS`.
 
 # Example
 
@@ -446,6 +446,19 @@ q_init(u::SGD, p) = u
 function q_fit!(o::Quantile{SGD}, y, γ)
     for j in eachindex(o.value)
         @inbounds o.value[j] -= γ * ((o.value[j] > y) - o.τ[j])
+    end
+end
+
+# ADAGRAD
+q_init(u::ADAGRAD, p) = init(u, p)
+function q_fit!(o::Quantile{ADAGRAD}, y, γ)
+    U = o.updater
+    U.nobs += 1
+    w = 1 / U.nobs
+    for j in eachindex(o.value)
+        g = ((o.value[j] > y) - o.τ[j])
+        U.H[j] = smooth(U.H[j], g ^ 2, w)
+        @inbounds o.value[j] -= γ * g / U.H[j]
     end
 end
 

@@ -232,16 +232,17 @@ end #Series
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
 
-#-----------------------------------------------------------------------# Quantiles
-@testset "Quantiles" begin 
+#-----------------------------------------------------------------------# Quantile
+@testset "Quantile" begin 
     y = randn(10_000)
-    for o in [Quantile(.1:.1:.9)]
+    for o in [Quantile(.1:.1:.9, SGD()), Quantile(.1:.1:.9, MSPI()), 
+              Quantile(.1:.1:.9, OMAS()), Quantile(.1:.1:.9, ADAGRAD())]
         Series(y, o)
         @test value(o) ≈ quantile(y, .1:.1:.9) atol=.2
         # merging
         o2 = copy(o)
         merge!(o, copy(o), .5)
-        @test o == o2
+        @test value(o) ≈ value(o2)
     end
 end
 
