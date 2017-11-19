@@ -31,21 +31,24 @@ export
 
 
 #-----------------------------------------------------------------------# ObLoc
+# if an OnlineStat{1} is given a matrix, are observations in rows or cols
 abstract type ObLoc end 
 struct Rows <: ObLoc end 
 struct Cols <: ObLoc end
 
 #-----------------------------------------------------------------------# helpers
-smooth(x, y, γ) = x + γ * (y - x)
-
-function smooth!(x, y, γ)
-    length(x) == length(y) || 
+# (1 - γ) * a + γ * b
+smooth(a::Number, b::Number, γ::Float64) = a + γ * (b - a)
+smooth!(a::Number, b::Number, γ::Float64) = smooth(a, b, γ)
+function smooth!(a, b, γ::Float64)
+    length(a) == length(b) || 
         throw(DimensionMismatch("can't smooth arrays of different length"))
-    for i in eachindex(x)
-        @inbounds x[i] = smooth(x[i], y[i], γ)
+    for i in eachindex(a)
+        @inbounds a[i] = smooth(a[i], b[i], γ)
     end
 end
 
+# (1 - γ) * A + γ * x * x'
 function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
     size(A, 1) == length(x) || throw(DimensionMismatch())
     for j in 1:size(A, 2), i in 1:j
@@ -64,6 +67,7 @@ const VecF = Vector{Float64}
 const AVecF = AbstractVector{Float64}
 
 #-----------------------------------------------------------------------# includes
+include("stats/sg_algorithms.jl")
 include("stats/stats.jl")
 include("stats/linregbuilder.jl")
 include("stats/histograms.jl")

@@ -1,9 +1,4 @@
 #-----------------------------------------------------------------------------# StatLearn
-abstract type Updater end
-abstract type SGUpdater <: Updater end
-init(u::Updater, p) = u
-Base.show(io::IO, u::Updater) = print(io, name(u))
-
 doc"""
     StatLearn(p::Int, args...)
 
@@ -43,8 +38,10 @@ end
 function StatLearn{V,L,P,U}(p::Integer, t::Tuple{V,L,P,U})
     λf, loss, penalty, updater = t
     length(λf) == p || throw(DimensionMismatch("lengths of λfactor and β differ"))
-    StatLearn(zeros(p), zeros(p), λf, loss, penalty, init(updater, p))
+    StatLearn(zeros(p), zeros(p), λf, loss, penalty, statlearn_init(updater, p))
 end
+
+statlearn_init(u::Updater, p) = u
 
 d(p::Integer) = (fill(.1, p), L2DistLoss(), L2Penalty(), SGD())
 
@@ -125,21 +122,12 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T <: StatLearn}
     smooth!(o.β, o2.β, γ)
 end
 
-Base.merge!(o::T, o2::T, γ::Float64) where {T <: Updater} = warn("$T can't be merged.")
-
 #-----------------------------------------------------------------------# SGD
-"""
-    SGD()
-
-Proximal Stochastic Gradient Descent.
-"""
-struct SGD <: SGUpdater end
 function update!(o::StatLearn{SGD}, γ)
     for j in eachindex(o.β)
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λfactor[j])
     end
 end
-Base.merge!(o::SGD, o2::SGD, γ::Float64) = nothing
 #-----------------------------------------------------------------------# NSGD
 """
     NSGD(α)
@@ -152,7 +140,7 @@ struct NSGD <: SGUpdater
     θ::VecF
     NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
 end
-init(u::NSGD, p) = NSGD(u.α, p)
+statlearn_init(u::NSGD, p) = NSGD(u.α, p)
 function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
     for j in eachindex(o.β)
@@ -181,7 +169,7 @@ mutable struct ADAGRAD <: SGUpdater
     nobs::Int
     ADAGRAD(p::Integer = 0) = new(zeros(p), 0)
 end
-init(u::ADAGRAD, p) = ADAGRAD(p)
+statlearn_init(u::ADAGRAD, p) = ADAGRAD(p)
 function update!(o::StatLearn{ADAGRAD}, γ)
     U = o.updater
     U.nobs += 1
@@ -208,7 +196,7 @@ mutable struct ADADELTA <: SGUpdater
     Δβ::Vector{Float64}
     ADADELTA(ρ = .95, p = 0) = new(ρ, zeros(p), zeros(p))
 end
-init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
+statlearn_init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
 function update!(o::StatLearn{ADADELTA}, γ)
     U = o.updater
     ϵ = .0001
@@ -234,7 +222,7 @@ mutable struct RMSPROP <: SGUpdater
     g::Vector{Float64}
     RMSPROP(α = .9, p = 0) = new(α, zeros(p))
 end
-init(u::RMSPROP, p) = RMSPROP(u.α, p)
+statlearn_init(u::RMSPROP, p) = RMSPROP(u.α, p)
 function update!(o::StatLearn{RMSPROP}, γ)
     U = o.updater
     for j in eachindex(o.β)
@@ -265,7 +253,7 @@ mutable struct ADAM <: SGUpdater
         new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAM, p) = ADAM(u.β1, u.β2, p)
+statlearn_init(u::ADAM, p) = ADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAM}, γ)
     U = o.updater
     β1 = U.β1
@@ -305,7 +293,7 @@ mutable struct ADAMAX <: SGUpdater
         new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
-init(u::ADAMAX, p) = ADAMAX(u.β1, u.β2, p)
+statlearn_init(u::ADAMAX, p) = ADAMAX(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAMAX}, γ)
     U = o.updater
     U.nups += 1
@@ -343,7 +331,7 @@ mutable struct NADAM <: SGUpdater
         new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
-init(u::NADAM, p) = NADAM(u.β1, u.β2, p)
+statlearn_init(u::NADAM, p) = NADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{NADAM}, γ)
     U = o.updater
     β1 = U.β1
@@ -408,7 +396,7 @@ mutable struct OMASQ <: Updater
     b::VecF
 end
 OMASQ() = OMASQ(0.0, zeros(0))
-init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
+statlearn_init(u::OMASQ, p) = OMASQ(0.0, zeros(p))
 Base.merge!(o::OMASQ, o2::OMASQ, γ::Float64) = smooth!(o.b, o2.b, γ)
 
 function fit!(o::StatLearn{OMASQ}, x::VectorOb, y::Real, γ::Float64)
@@ -430,7 +418,7 @@ end
 #     b::VecF
 # end
 # OMASQF() = OMASQF(zeros(0, 0), zeros(0, 0), zeros(0))
-# init(u::OMASQF, p) = OMASQF(zeros(p, p), zeros(p, p), zeros(p))
+# statlearn_init(u::OMASQF, p) = OMASQF(zeros(p, p), zeros(p, p), zeros(p))
 # Base.show(io::IO, u::OMASQF) = print(io, "OMASQF")
 #
 # function fit!(o::StatLearn{OMASQF}, x::VectorOb, y::Real, γ::Float64)
@@ -460,7 +448,7 @@ Base.merge!(o::OMAPQ, o2::OMAPQ, γ::Float64) = nothing
 #     OMAPQF(p = 0) = new(η, zeros(p, p))
 # end
 # Base.show(io::IO, u::OMAPQF) = print(io, "OMAPQF")
-# init(o::OMAPQF, p) = OMAPQF(p)
+# statlearn_init(o::OMAPQF, p) = OMAPQF(p)
 # function fit!(o::StatLearn{OMAPQF}, x::VectorOb, y::Real, γ::Float64)
 #     gradient!(o, x, y)
 #     fullH!(o, x, y)
@@ -483,3 +471,12 @@ function fit!(o::StatLearn{MSPIQ}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 Base.merge!(o::MSPIQ, o2::MSPIQ, γ::Float64) = nothing
+
+#-----------------------------------------------------------------------# MSPI
+function fit!(o::StatLearn{MSPI}, x::VectorOb, y::Real, γ::Float64)
+    gradient!(o, x, y)
+    denom = inv(1 + γ * constH(o, x, y))
+    for j in eachindex(o.β)
+        @inbounds o.β[j] -= γ * denom * o.gx[j]
+    end
+end
