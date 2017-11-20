@@ -429,7 +429,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitCauchy",
     "category": "Type",
-    "text": "FitCauchy()\n\nOnline parameter estimate of a Cauchy distribution.\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\no = FitCauchy()\ns = Series(y, o)\nCauchy(value(o)...)\n\n\n\n"
+    "text": "FitCauchy(alg = SGD())\n\nApproximate parameter estimation of a Cauchy distribution.  Estimates are based on quantiles, so that alg will be passed to Quantile.\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\no = FitCauchy(SGD())\ns = Series(y, o)\nCauchy(value(o)...)\n\n\n\n"
 },
 
 {
@@ -597,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "Type",
-    "text": "Quantile(q = [.25, .5, .75], alg = MSPI())\nQuantile(alg, q = [.25, .5, .75])\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are MSPI, SGD, ADAGRAD, and OMAS.\n\nExample\n\ny = randn(10_000)\nSeries(y, Quantile(MSPI()), Quantile(SGD()), Quantile(OMAS()))\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75], alg = SGD())\nQuantile(alg, q = [.25, .5, .75])\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are SGD, MSPI, and OMAS.\n\nExample\n\ny = randn(10_000)\nSeries(y, Quantile(SGD()), Quantile(MSPI()), Quantile(OMAS()))\n\n\n\n"
 },
 
 {
@@ -761,7 +761,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#Base.merge-Union{Tuple{T,T,Float64}, Tuple{T}} where T<:OnlineStats.Series",
+    "location": "api.html#Base.merge-Tuple{OnlineStats.Series,OnlineStats.Series,Float64}",
     "page": "API",
     "title": "Base.merge",
     "category": "Method",
