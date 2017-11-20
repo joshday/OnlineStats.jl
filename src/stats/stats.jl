@@ -406,7 +406,6 @@ end
 #-----------------------------------------------------------------------# Quantile
 """
     Quantile(q = [.25, .5, .75], alg = SGD())
-    Quantile(alg, q = [.25, .5, .75])
 
 Approximate the quantiles `q` via the stochastic approximation algorithm `alg`.  Options
 are `SGD`, `MSPI`, and `OMAS`.
@@ -414,7 +413,8 @@ are `SGD`, `MSPI`, and `OMAS`.
 # Example
 
     y = randn(10_000)
-    Series(y, Quantile(SGD()), Quantile(MSPI()), Quantile(OMAS()))
+    τ = collect(.1:.1:.0)
+    Series(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))
 """
 struct Quantile{T <: Updater} <: StochasticStat{0}
     value::Vector{Float64}
@@ -424,7 +424,6 @@ end
 function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) 
     Quantile(zeros(τ), collect(τ), q_init(u, length(τ)))
 end
-Quantile(u::Updater, τ::AbstractVector = [.25, .5, .75]) = Quantile(τ, u)
 
 # function Base.show(io::IO, o::Quantile) 
 #     print(io, "Quantile($(name(o.updater, false, false))) : $(value(o))")

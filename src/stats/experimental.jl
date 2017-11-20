@@ -7,7 +7,7 @@ Call `f(o)` every time the OnlineStat `o` gets updated.
 
     Series(randn(5), CallFun(Mean(), info))
 """
-struct CallFun{O, F} <: OnlineStat{0}
+struct CallFun{O <: OnlineStat, F <: Function} <: OnlineStat{0}
     o::O
     f::F
 end 
