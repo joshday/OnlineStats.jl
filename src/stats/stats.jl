@@ -301,14 +301,14 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
     y = rand(d, 100_000, 1)
     s = Series(y, LearningRate(.6), KMeans(1, 2))
 """
-mutable struct KMeans <: StochasticStat{1}
+mutable struct KMeans{U <: Updater} <: StochasticStat{1}
     value::Matrix{Float64}  # p × k
     v::Vector{Float64}
     n::Int
-    KMeans(p::Integer, k::Integer) = new(zeros(p, k), zeros(k), 0)
+    updater::U
 end
-Base.show(io::IO, o::KMeans) = print(io, "KMeans($(value(o)'))")
-function fit!(o::KMeans, x::VectorOb, γ::Float64)
+KMeans(p::Integer, k::Integer, u::Updater = SGD()) = KMeans(zeros(p, k), zeros(k), 0, u)
+function fit!(o::KMeans{<:SGD}, x::VectorOb, γ::Float64)
     o.n += 1
     p, k = size(o.value)
     if o.n <= k 
