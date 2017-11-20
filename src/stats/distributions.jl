@@ -78,7 +78,7 @@ mutable struct FitCauchy{T} <: StochasticStat{0}
     q::Quantile{T}
     nobs::Int
 end
-FitCauchy(alg = MSPI()) = FitCauchy(Quantile(alg), 0)
+FitCauchy(alg = SGD()) = FitCauchy(Quantile([.25, .5, .75], alg), 0)
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
 function _value(o::FitCauchy)
     if o.nobs > 1
