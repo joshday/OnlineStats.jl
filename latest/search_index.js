@@ -597,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "Type",
-    "text": "Quantile(q = [.25, .5, .75], alg = SGD())\nQuantile(alg, q = [.25, .5, .75])\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are SGD, MSPI, and OMAS.\n\nExample\n\ny = randn(10_000)\nSeries(y, Quantile(SGD()), Quantile(MSPI()), Quantile(OMAS()))\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75], alg = SGD())\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are SGD, MSPI, and OMAS.\n\nExample\n\ny = randn(10_000)\nτ = collect(.1:.1:.0)\nSeries(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))\n\n\n\n"
 },
 
 {
@@ -789,7 +789,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.ExactStat",
     "category": "Type",
-    "text": "An OnlineStat which can be updated exactly.\n\n\n\n"
+    "text": "An OnlineStat which can be updated exactly.  Subtypes of ExactStat use EqualWeight() as the default weight.\n\n\n\n"
 },
 
 {
@@ -845,7 +845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
-    "text": "An OnlineStat which must be updated approximately.\n\n\n\n"
+    "text": "An OnlineStat which must be approximated.  Subtypes of StochasticStat use  LearningRate() as the default weight.  Additionally, subtypes should be parameterized by an algorithm, which is an optional last argument.  For example:\n\nOnlineStats.Quantile([.5, .8])\nOnlineStats.Quantile([.5, .8], OnlineStats.SGD())\n\n\n\n"
 },
 
 {
@@ -853,15 +853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Weight",
     "category": "Type",
-    "text": "Weight is an abstract type.  Subtypes must be callable have a method to produce the weight given the current number of observations in an OnlineStat n and the number of  observations included in the update (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase._value-Tuple{OnlineStatsBase.OnlineStat}",
-    "page": "API",
-    "title": "OnlineStatsBase._value",
-    "category": "Method",
-    "text": "value(o::OnlineStat)\n\nReturn the value of the OnlineStat.\n\n\n\n"
+    "text": "Subtypes of Weight must be callable to produce the weight given the current number of  observations in an OnlineStat n and the number of new observations (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
 },
 
 {
