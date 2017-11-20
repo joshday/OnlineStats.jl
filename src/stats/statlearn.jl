@@ -129,17 +129,6 @@ function update!(o::StatLearn{SGD}, γ)
     end
 end
 #-----------------------------------------------------------------------# NSGD
-"""
-    NSGD(α)
-
-Nesterov accelerated Proximal Stochastic Gradient Descent.
-"""
-struct NSGD <: SGUpdater
-    α::Float64
-    v::VecF
-    θ::VecF
-    NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
-end
 statlearn_init(u::NSGD, p) = NSGD(u.α, p)
 function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
     U = o.updater
@@ -151,11 +140,6 @@ function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
         U.v[j] = U.α * U.v[j] + deriv(o.loss, y, ŷ) * x[j]
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
     end
-end
-function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
-    o.α == o2.α || error("Merge Failed.  NSGD objects use different α.")
-    smooth!(o.v, o2.v, γ)
-    smooth!(o.θ, o2.θ, γ)
 end
 
 #-----------------------------------------------------------------------# ADAGRAD

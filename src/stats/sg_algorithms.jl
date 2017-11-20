@@ -12,11 +12,32 @@ init(u::Updater, p) = error("")
 """
     SGD()
 
+``\\theta^{(t)} = \\theta^{(t-1)} - \\gamma_t \\nabla \\ell_t(\\theta^{(t-1)})``
+
 Stochastic gradient descent.
 """
 struct SGD <: SGUpdater end
 Base.merge!(a::SGD, b::SGD, γ::Float64) = a
 
+#-----------------------------------------------------------------------# NSGD
+"""
+    NSGD(α)
+
+Nesterov accelerated Proximal Stochastic Gradient Descent.
+"""
+struct NSGD <: SGUpdater
+    α::Float64
+    v::VecF
+    θ::VecF
+    NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
+end
+function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
+    o.α == o2.α || error("Merge Failed.  NSGD objects use different α.")
+    smooth!(o.v, o2.v, γ)
+    smooth!(o.θ, o2.θ, γ)
+end
+
+#-----------------------------------------------------------------------# ADAGRAD
 """
     ADAGRAD()
 
@@ -34,7 +55,7 @@ function Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ::Float64)
     o
 end
 
-#-----------------------------------------------------------------------# MSPI
+#-----------------------------------------------------------------------# MSPI, OMAS, OMAP
 for T in [:OMAS, :OMAS2, :OMAP, :OMAP2, :MSPI, :MSPI2]
     @eval begin
         """
