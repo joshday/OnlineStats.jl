@@ -302,20 +302,25 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
     s = Series(y, LearningRate(.6), KMeans(1, 2))
 """
 mutable struct KMeans <: StochasticStat{1}
-    value::Matrix{Float64}
+    value::Matrix{Float64}  # p × k
     v::Vector{Float64}
-    KMeans(p::Integer, k::Integer) = new(randn(p, k), zeros(k))
+    n::Int
+    KMeans(p::Integer, k::Integer) = new(zeros(p, k), zeros(k), 0)
 end
 Base.show(io::IO, o::KMeans) = print(io, "KMeans($(value(o)'))")
 function fit!(o::KMeans, x::VectorOb, γ::Float64)
-    d, k = size(o.value)
-    length(x) == d || throw(DimensionMismatch())
-    for j in 1:k
-        o.v[j] = sum(abs2, x - view(o.value, :, j))
-    end
-    kstar = indmin(o.v)
-    for i in 1:d
-        o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
+    o.n += 1
+    p, k = size(o.value)
+    if o.n <= k 
+        o.value[:, o.n] = x
+    else
+        for j in 1:k
+            o.v[j] = sum(abs2, x - view(o.value, :, j))
+        end
+        kstar = indmin(o.v)
+        for i in eachindex(x)
+            o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
+        end
     end
 end
 

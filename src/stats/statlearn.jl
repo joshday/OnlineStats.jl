@@ -141,7 +141,6 @@ function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
     end
 end
-
 #-----------------------------------------------------------------------# ADAGRAD
 statlearn_init(u::ADAGRAD, p) = init(u, p)
 function update!(o::StatLearn{ADAGRAD}, γ)
@@ -153,20 +152,7 @@ function update!(o::StatLearn{ADAGRAD}, γ)
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
 end
-
-
 #-----------------------------------------------------------------------# ADADELTA
-"""
-    ADADELTA(ρ = .95)
-
-ADADELTA ignores weight.
-"""
-mutable struct ADADELTA <: SGUpdater
-    ρ::Float64
-    g::Vector{Float64}
-    Δβ::Vector{Float64}
-    ADADELTA(ρ = .95, p = 0) = new(ρ, zeros(p), zeros(p))
-end
 statlearn_init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
 function update!(o::StatLearn{ADADELTA}, γ)
     U = o.updater
@@ -178,21 +164,7 @@ function update!(o::StatLearn{ADADELTA}, γ)
         U.Δβ[j] = smooth(Δβ^2, U.Δβ[j], U.ρ)
     end
 end
-function Base.merge!(o::ADADELTA, o2::ADADELTA, γ::Float64)
-    o.ρ == o2.ρ || error("Merge failed.  ADADELTA objects use different ρ.")
-    smooth!(o.g, o2.g, γ)
-    smooth!(o.Δβ, o2.Δβ, γ)
-end
-
 #-----------------------------------------------------------------------# RMSPROP
-"""
-    RMSPROP(α = .9)
-"""
-mutable struct RMSPROP <: SGUpdater
-    α::Float64
-    g::Vector{Float64}
-    RMSPROP(α = .9, p = 0) = new(α, zeros(p))
-end
 statlearn_init(u::RMSPROP, p) = RMSPROP(u.α, p)
 function update!(o::StatLearn{RMSPROP}, γ)
     U = o.updater
@@ -201,29 +173,8 @@ function update!(o::StatLearn{RMSPROP}, γ)
         o.β[j] -= γ * o.gx[j] / sqrt(U.g[j] + ϵ)
     end
 end
-function Base.merge!(o::RMSPROP, o2::RMSPROP, γ::Float64)
-    o.α == o2.α || error("RMSPROP objects use different α")
-    smooth!(o.g, o2.g, γ)
-end
 
 #-----------------------------------------------------------------------# ADAM
-"""
-    ADAM(α1 = .99, α2 = .999)
-
-Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
-"""
-mutable struct ADAM <: SGUpdater
-    β1::Float64
-    β2::Float64
-    M::VecF
-    V::VecF
-    nups::Int
-    function ADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
-        @assert 0 < β1 < 1
-        @assert 0 < β2 < 1
-        new(β1, β2, zeros(p), zeros(p), 0)
-    end
-end
 statlearn_init(u::ADAM, p) = ADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAM}, γ)
     U = o.updater
@@ -238,32 +189,8 @@ function update!(o::StatLearn{ADAM}, γ)
         o.β[j] -= s * U.M[j] / (sqrt(U.V[j]) + ϵ)
     end
 end
-function Base.merge!(o::ADAM, o2::ADAM, γ::Float64)
-    (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
-        error("Merge failed.  ADAM objects use different momentum parameters.")
-    o.nups += o2.nups 
-    smooth!(o.M, o2.M, γ)
-    smooth!(o.V, o2.V, γ)
-end
 
 #-----------------------------------------------------------------------# ADAMAX
-"""
-    ADAMAX(η, β1 = .9, β2 = .999)
-
-ADAMAX with step size `η` and momentum parameters `β1`, `β2`
-"""
-mutable struct ADAMAX <: SGUpdater
-    β1::Float64
-    β2::Float64
-    M::VecF
-    V::VecF
-    nups::Int
-    function ADAMAX(β1::Float64 = 0.9, β2::Float64 = .999, p::Integer = 0)
-        @assert 0 < β1 < 1
-        @assert 0 < β2 < 1
-        new(β1, β2, zeros(p), zeros(p), 0)
-    end
-end
 statlearn_init(u::ADAMAX, p) = ADAMAX(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAMAX}, γ)
     U = o.updater
@@ -276,32 +203,8 @@ function update!(o::StatLearn{ADAMAX}, γ)
         o.β[j] -= s * (U.M[j] / (1 - U.β1 ^ U.nups)) / (U.V[j] + ϵ)
     end
 end
-function Base.merge!(o::ADAMAX, o2::ADAMAX, γ::Float64)
-    (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
-        error("Merge failed.  ADAMAX objects use different momentum parameters.")
-    o.nups += o2.nups 
-    smooth!(o.M, o2.M, γ)
-    smooth!(o.V, o2.V, γ)
-end
 
 #-----------------------------------------------------------------------# NADAM
-"""
-    NADAM(α1 = .99, α2 = .999)
-
-Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
-"""
-mutable struct NADAM <: SGUpdater
-    β1::Float64
-    β2::Float64
-    M::VecF
-    V::VecF
-    nups::Int
-    function NADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
-        @assert 0 < β1 < 1
-        @assert 0 < β2 < 1
-        new(β1, β2, zeros(p), zeros(p), 0)
-    end
-end
 statlearn_init(u::NADAM, p) = NADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{NADAM}, γ)
     U = o.updater
@@ -318,13 +221,7 @@ function update!(o::StatLearn{NADAM}, γ)
         o.β[j] -= Δ
     end
 end
-function Base.merge!(o::NADAM, o2::NADAM, γ::Float64)
-    (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
-        error("Merge failed.  NADAM objects use different momentum parameters.")
-    o.nups += o2.nups 
-    smooth!(o.M, o2.M, γ)
-    smooth!(o.V, o2.V, γ)
-end
+
 
 
 #-----------------------------------------------------------------------#
