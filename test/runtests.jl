@@ -201,6 +201,7 @@ end
     s2 = Series(y2, Mean())
     merge!(s1, s2)
     @test value(stats(s1)[1]) ≈ mean(vcat(y, y2))
+    @test_throws ErrorException merge(Series(Mean()), Series(Variance()))
 end
 end #Series
 
@@ -236,7 +237,7 @@ end
 @testset "Quantile" begin 
     y = randn(10_000)
     for o in [Quantile(.1:.1:.9, SGD()), Quantile(.1:.1:.9, MSPI()), 
-              Quantile(.1:.1:.9, OMAS()), Quantile(.1:.1:.9, ADAGRAD())]
+              Quantile(.1:.1:.9, OMAS())]
         Series(y, o)
         @test value(o) ≈ quantile(y, .1:.1:.9) atol=.2
         # merging

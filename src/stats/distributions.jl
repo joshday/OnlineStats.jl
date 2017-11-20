@@ -63,13 +63,14 @@ end
 
 #---------------------------------------------------------------------------------# Cauchy
 """
-    FitCauchy()
+    FitCauchy(alg = SGD())
 
-Online parameter estimate of a Cauchy distribution.
+Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
+quantiles, so that `alg` will be passed to [`Quantile`](@ref).
 
     using Distributions
     y = rand(Cauchy(0, 10), 10_000)
-    o = FitCauchy()
+    o = FitCauchy(SGD())
     s = Series(y, o)
     Cauchy(value(o)...)
 """

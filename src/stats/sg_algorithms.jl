@@ -2,7 +2,7 @@ abstract type Updater end
 
 abstract type SGUpdater <: Updater end
 
-Base.show(io::IO, u::Updater) = print(io, name(u))
+Base.show(io::IO, u::Updater) = print(io, name(u, false, false))
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: Updater} = warn("$T can't be merged.")
 
 init(u::Updater, p) = error("")

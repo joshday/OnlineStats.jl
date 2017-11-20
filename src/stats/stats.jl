@@ -400,30 +400,30 @@ end
 
 #-----------------------------------------------------------------------# Quantile
 """
-    Quantile(q = [.25, .5, .75], alg = MSPI())
+    Quantile(q = [.25, .5, .75], alg = SGD())
     Quantile(alg, q = [.25, .5, .75])
 
 Approximate the quantiles `q` via the stochastic approximation algorithm `alg`.  Options
-are `MSPI`, `SGD`, `ADAGRAD`, and `OMAS`.
+are `SGD`, `MSPI`, and `OMAS`.
 
 # Example
 
     y = randn(10_000)
-    Series(y, Quantile(MSPI()), Quantile(SGD()), Quantile(OMAS()))
+    Series(y, Quantile(SGD()), Quantile(MSPI()), Quantile(OMAS()))
 """
 struct Quantile{T <: Updater} <: StochasticStat{0}
     value::Vector{Float64}
     τ::Vector{Float64}
     updater::T 
 end
-function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = MSPI()) 
+function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) 
     Quantile(zeros(τ), collect(τ), q_init(u, length(τ)))
 end
 Quantile(u::Updater, τ::AbstractVector = [.25, .5, .75]) = Quantile(τ, u)
 
-function Base.show(io::IO, o::Quantile) 
-    print(io, "Quantile($(name(o.updater, false, false))) : $(value(o))")
-end
+# function Base.show(io::IO, o::Quantile) 
+#     print(io, "Quantile($(name(o.updater, false, false))) : $(value(o))")
+# end
 
 function Base.merge!(o::Quantile, o2::Quantile, γ::Float64)
     o.τ == o2.τ || error("Merge failed. Quantile objects track different quantiles.")

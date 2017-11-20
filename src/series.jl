@@ -326,11 +326,10 @@ end
 
 #-----------------------------------------------------------------------# merging
 "See [`merge!`](@ref)"
-Base.merge(s1::T, s2::T, w::Float64) where {T <: Series} = merge!(copy(s1), s2, w)
+Base.merge(s1::Series, s2::Series, w::Float64) = merge!(copy(s1), s2, w)
+Base.merge(s1::Series, s2::Series, m::Symbol = :append) = merge!(copy(s1), s2, m)
 
-function Base.merge(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
-    merge!(copy(s1), s2, method)
-end
+
 
 """
     merge!(s1::Series, s2::Series, arg)
@@ -370,3 +369,5 @@ function Base.merge!(s1::T, s2::T, w::Float64) where {T <: Series}
     merge!.(s1.stats, s2.stats, w)
     s1
 end
+
+Base.merge!(a::Series, b::Series, arg) = error("Can't merge Series that track different stats")
