@@ -71,6 +71,19 @@ function Base.merge!(o::IHistogram, o2::IHistogram, γ::Float64)
     end
 end
 
+# Algorithm 3: Sum Procedure
+# Estimated number of points in interval [-∞, b]
+function Base.sum(o::IHistogram, b)
+    i = searchsortedfirst(o.value, b)
+    m1 = o.counts[i]
+    m2 = o.counts[i + 1]
+    p1 = o.value[i]
+    p2 = o.value[i + 1]
+    mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
+    s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
+    return s + sum(o.counts[1:(i-1)]) + m1/2
+end
+
 #-----------------------------------------------------------------------# summaries
 Base.extrema(o::IHistogram) = (first(o.value), last(o.value))
 Base.mean(o::IHistogram) = mean(o.value, fweights(o.counts))
