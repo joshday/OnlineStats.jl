@@ -408,7 +408,8 @@ end
     Quantile(q = [.25, .5, .75], alg = OMAS())
 
 Approximate the quantiles `q` via the stochastic approximation algorithm `alg`.  Options
-are `SGD`, `MSPI`, and `OMAS`.
+are `SGD`, `MSPI`, and `OMAS`.  In practice, `SGD` and `MSPI` only work well when the
+variance of the data is small.
 
 # Example
 
