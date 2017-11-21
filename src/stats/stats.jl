@@ -461,8 +461,8 @@ function q_fit!(o::Quantile{ADAGRAD}, y, γ)
     w = 1 / U.nobs
     for j in eachindex(o.value)
         g = ((o.value[j] > y) - o.τ[j])
-        U.H[j] = smooth(U.H[j], g ^ 2, w)
-        @inbounds o.value[j] -= γ * g / U.H[j]
+        U.h[j] = smooth(U.h[j], g ^ 2, w)
+        @inbounds o.value[j] -= γ * g / U.h[j]
     end
 end
 
@@ -471,7 +471,8 @@ q_init(u::MSPI, p) = u
 function q_fit!(o::Quantile{<:MSPI}, y, γ)
     @inbounds for i in eachindex(o.τ)
         w = inv(abs(y - o.value[i]) + ϵ)
-        b = o.τ[i] - .5 * (1 - y * w)
+        halfyw = .5 * y * w
+        b = o.τ[i] - .5 + halfyw
         o.value[i] = (o.value[i] + γ * b) / (1 + .5 * γ * w)
     end
 end

@@ -8,17 +8,6 @@ init(u::Updater, p) = u
 init(typ, u::Updater, p) = init(u, p)
 
 #-----------------------------------------------------------------------# SGUpdater
-"""
-SGUpdater subtypes should implement one of:
-
-    update(θ::Number, ∇::Number, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())
-    update!(θ::Vector, ∇::Vector, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())
-
-And optionally:
-
-    init(u::Updater, p::Integer)
-    init_MyStochasticStat(u::SGUpdater, p)
-"""
 abstract type SGUpdater <: Updater end
 
 function update!(θ::Vector, gx::Vector, γ::Float64, u::SGUpdater)
@@ -36,7 +25,7 @@ Stochastic gradient descent.
 """
 struct SGD <: SGUpdater end
 Base.merge!(a::SGD, b::SGD, γ::Float64) = a
-update(θ::Number, gx::Number, γ::Float64, ::SGD, p::Penalty = NoPenalty()) = θ -= γ * gx
+update(θ::Number, gx::Number, γ::Float64, ::SGD) = θ -= γ * gx
 
 #-----------------------------------------------------------------------# NSGD
 """
@@ -83,18 +72,6 @@ function update!(θ::Vector, g::Vector, γ::Float64, u::ADAGRAD)
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
 end
-
-# function update(θ::Number, g::Number, γ::Float64, u::ADAGRAD)
-#     w = 1 / u.nobs 
-#     @inbounds for i in eachindex
-#     U = o.updater
-#     U.nobs += 1
-#     @inbounds for j in eachindex(o.β)
-#         U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, 1 / U.nobs)
-#         s = γ * inv(sqrt(U.H[j] + ϵ))
-#         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
-#     end
-# end
 
 #-----------------------------------------------------------------------# ADADELTA
 """

@@ -5,12 +5,19 @@ TODO:
     ✓ Algorithm 1: Update  
     ✓ Algorithm 2: Merge  
     ✓ Algorithm 3: Sum 
-    ✓  Algorithm 4: Uniform 
+    ✓ Algorithm 4: Uniform 
     X Algorithm 5: Decision Tree
  
 
 ====================================================================#
 
- struct DTree
+struct Node
+    left
+    right
+    label
+end
 
- end
+
+struct Tree
+    node::Node
+end

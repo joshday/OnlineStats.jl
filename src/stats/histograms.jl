@@ -84,7 +84,7 @@ function Base.sum(o::IHistogram, b::Real)
     return s + sum(o.counts[1:(i-1)]) + m1 / 2
 end
 
-# Algorithm 4: Uniform Procedure
+# Algorithm 4: Uniform Procedure (locations of candidate splits)
 function uniform(o::IHistogram, B::Integer)
     m = sum(o.counts) / B
     cs = cumsum(o.counts)
