@@ -753,6 +753,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.SGUpdater",
+    "page": "API",
+    "title": "OnlineStats.SGUpdater",
+    "category": "Type",
+    "text": "SGUpdater subtypes should implement one of:\n\nupdate(θ::Number, ∇::Number, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())\nupdate!(θ::Vector, ∇::Vector, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())\n\nAnd optionally:\n\ninit(u::Updater, p::Integer)\ninit_MyStochasticStat(u::SGUpdater, p)\n\n\n\n"
+},
+
+{
     "location": "api.html#Base.merge!-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
     "page": "API",
     "title": "Base.merge!",
@@ -845,7 +853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
-    "text": "An OnlineStat which must be approximated.  Subtypes of StochasticStat use  LearningRate() as the default weight.  Additionally, subtypes should be parameterized by an algorithm, which is an optional last argument.  For example:\n\nOnlineStats.Quantile([.5, .8])\nOnlineStats.Quantile([.5, .8], OnlineStats.SGD())\n\n\n\n"
+    "text": "An OnlineStat which must be approximated.  Subtypes of StochasticStat use  LearningRate() as the default weight.  Additionally, subtypes should be parameterized by an algorithm, which is an optional last argument.  For example:\n\nstruct Quantile{T <: Updater} <: StochasticStat{0}\n    value::Vector{Float64}\n    τ::Vector{Float64}\n    updater::T \nend\nQuantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) = ...\n\n\n\n"
 },
 
 {
