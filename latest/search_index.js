@@ -753,14 +753,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.SGUpdater",
-    "page": "API",
-    "title": "OnlineStats.SGUpdater",
-    "category": "Type",
-    "text": "SGUpdater subtypes should implement one of:\n\nupdate(θ::Number, ∇::Number, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())\nupdate!(θ::Vector, ∇::Vector, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())\n\nAnd optionally:\n\ninit(u::Updater, p::Integer)\ninit_MyStochasticStat(u::SGUpdater, p)\n\n\n\n"
-},
-
-{
     "location": "api.html#Base.merge!-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
     "page": "API",
     "title": "Base.merge!",
