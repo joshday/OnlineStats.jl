@@ -405,7 +405,7 @@ end
 
 #-----------------------------------------------------------------------# Quantile
 """
-    Quantile(q = [.25, .5, .75], alg = SGD())
+    Quantile(q = [.25, .5, .75], alg = OMAS())
 
 Approximate the quantiles `q` via the stochastic approximation algorithm `alg`.  Options
 are `SGD`, `MSPI`, and `OMAS`.
@@ -421,7 +421,7 @@ struct Quantile{T <: Updater} <: StochasticStat{0}
     τ::Vector{Float64}
     updater::T 
 end
-function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) 
+function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = OMAS()) 
     Quantile(zeros(τ), collect(τ), q_init(u, length(τ)))
 end
 
@@ -481,11 +481,21 @@ end
 q_init(u::OMAS, p) = OMAS((zeros(p), zeros(p)))
 function q_fit!(o::Quantile{<:OMAS}, y, γ)
     s, t = o.updater.buffer
-    @inbounds for j in 1:length(o.τ)
-        w = 1.0 / (abs(y - o.value[j]) + ϵ)
+    @inbounds for j in eachindex(o.τ)
+        w = inv(abs(y - o.value[j]) + ϵ)
         s[j] = smooth(s[j], w * y, γ)
         t[j] = smooth(t[j], w, γ)
         o.value[j] = (s[j] + (2.0 * o.τ[j] - 1.0)) / t[j]
+    end
+end
+
+# OMAP...why is this so bad?
+q_init(u::OMAP, p) = u
+function q_fit!(o::Quantile{<:OMAP}, y, γ)
+    for j in eachindex(o.τ)
+        w = abs(y - o.value[j]) + ϵ
+        θ = w * (2o.τ[j] - 1) + y
+        o.value[j] = smooth(o.value[j], θ, γ)
     end
 end
 
