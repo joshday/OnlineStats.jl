@@ -597,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "Type",
-    "text": "Quantile(q = [.25, .5, .75], alg = OMAS())\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are SGD, MSPI, and OMAS.\n\nExample\n\ny = randn(10_000)\nτ = collect(.1:.1:.0)\nSeries(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75], alg = OMAS())\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are SGD, MSPI, and OMAS.  In practice, SGD and MSPI only work well when the variance of the data is small.\n\nExample\n\ny = randn(10_000)\nτ = collect(.1:.1:.0)\nSeries(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))\n\n\n\n"
 },
 
 {
