@@ -73,7 +73,7 @@ end
 
 # Algorithm 3: Sum Procedure
 # Estimated number of points in interval [-∞, b]
-function Base.sum(o::IHistogram, b)
+function Base.sum(o::IHistogram, b::Real)
     i = searchsortedfirst(o.value, b)
     m1 = o.counts[i]
     m2 = o.counts[i + 1]
@@ -81,7 +81,29 @@ function Base.sum(o::IHistogram, b)
     p2 = o.value[i + 1]
     mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
     s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
-    return s + sum(o.counts[1:(i-1)]) + m1/2
+    return s + sum(o.counts[1:(i-1)]) + m1 / 2
+end
+
+# Algorithm 4: Uniform Procedure
+function uniform(o::IHistogram, B::Integer)
+    m = sum(o.counts) / B
+    cs = cumsum(o.counts)
+    u = Vector{Float64}(B-1)
+    for j in 1:(B-1)
+        s = j * m
+        i = searchsortedfirst(cs, s)
+        d = s - cs[i]
+        m1 = o.counts[i]
+        m2 = o.counts[i + 1]
+        p1 = o.value[i]
+        p2 = o.value[i + 1]
+        a = m2 - m1
+        b = 2m1
+        c = -2d
+        z = (-b + sqrt(b^2 - 4*a*c)) / (2a)
+        u[j] = p1 + (p2 - p1) * z
+    end
+    u
 end
 
 #-----------------------------------------------------------------------# summaries

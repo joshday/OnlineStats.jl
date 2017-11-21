@@ -5,7 +5,7 @@ TODO:
     ✓ Algorithm 1: Update  
     ✓ Algorithm 2: Merge  
     ✓ Algorithm 3: Sum 
-    X Algorithm 4: Uniform 
+    ✓  Algorithm 4: Uniform 
     X Algorithm 5: Decision Tree
  
 
