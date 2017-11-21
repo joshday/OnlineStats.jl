@@ -67,7 +67,7 @@ const VecF = Vector{Float64}
 const AVecF = AbstractVector{Float64}
 
 #-----------------------------------------------------------------------# includes
-include("stats/sg_algorithms.jl")
+include("stats/updaters.jl")
 include("stats/stats.jl")
 include("stats/linregbuilder.jl")
 include("stats/histograms.jl")

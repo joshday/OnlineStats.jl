@@ -236,16 +236,14 @@ function fit!(s::Series{1}, y::AbstractMatrix, γ::Vector{Float64}, ::Cols)
 end
 
 #-----------------------------------------------------------------------# fit! (1, 0)
-fit!(o::OnlineStat{(1,0)}, xy::Tuple{VectorOb, ScalarOb}, γ::Float64) = fit!(o, xy[1], xy[2], γ)
-
 function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb})
     γ = weight!(s)
-    map(x -> fit!(x, xy[1], xy[2], γ), stats(s))
+    map(o -> fit!(o, xy, γ), stats(s))
     s
 end
 function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb}, γ::Float64)
     s.n += 1
-    map(x -> fit!(x, xy[1], xy[2], γ), stats(s))
+    map(x -> fit!(x, xy, γ), stats(s))
     s
 end
 function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Rows = Rows())

@@ -32,6 +32,7 @@ function matviews(o::LinReg)
     @views o.A[1:p, 1:p], o.A[1:p, end]
 end
 
+fit!(o::LinReg, t::Tuple, γ::Float64) = fit!(o, t..., γ)
 function fit!(o::LinReg, x::VectorOb, y::Real, γ::Float64)
     xtx, xty = matviews(o)
     smooth_syr!(xtx, x, γ)

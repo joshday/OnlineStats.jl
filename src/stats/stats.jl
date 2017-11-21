@@ -425,9 +425,9 @@ function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD())
     Quantile(zeros(τ), collect(τ), q_init(u, length(τ)))
 end
 
-# function Base.show(io::IO, o::Quantile) 
-#     print(io, "Quantile($(name(o.updater, false, false))) : $(value(o))")
-# end
+function Base.show(io::IO, o::Quantile) 
+    print(io, "Quantile\{$(name(o.updater, false, false))\}($(value(o)))")
+end
 
 function Base.merge!(o::Quantile, o2::Quantile, γ::Float64)
     o.τ == o2.τ || error("Merge failed. Quantile objects track different quantiles.")

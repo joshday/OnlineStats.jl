@@ -1,11 +1,31 @@
+#-----------------------------------------------------------------------# Updater
 abstract type Updater end
-
-abstract type SGUpdater <: Updater end
 
 Base.show(io::IO, u::Updater) = print(io, name(u, false, false))
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: Updater} = warn("$T can't be merged.")
 
-init(u::Updater, p) = error("")
+init(u::Updater, p) = u
+init(typ, u::Updater, p) = init(u, p)
+
+#-----------------------------------------------------------------------# SGUpdater
+"""
+SGUpdater subtypes should implement one of:
+
+    update(θ::Number, ∇::Number, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())
+    update!(θ::Vector, ∇::Vector, γ::Float64, u::MySGUpdater, p::Penalty = NoPenalty())
+
+And optionally:
+
+    init(u::Updater, p::Integer)
+    init_MyStochasticStat(u::SGUpdater, p)
+"""
+abstract type SGUpdater <: Updater end
+
+function update!(θ::Vector, gx::Vector, γ::Float64, u::SGUpdater)
+    for i in eachindex(θ)
+        @inbounds θ[i] = update(θ[i], gx[i], γ, u)
+    end
+end
 
 
 #-----------------------------------------------------------------------# SGD
@@ -16,6 +36,7 @@ Stochastic gradient descent.
 """
 struct SGD <: SGUpdater end
 Base.merge!(a::SGD, b::SGD, γ::Float64) = a
+update(θ::Number, gx::Number, γ::Float64, ::SGD, p::Penalty = NoPenalty()) = θ -= γ * gx
 
 #-----------------------------------------------------------------------# NSGD
 """
@@ -29,6 +50,7 @@ struct NSGD <: SGUpdater
     θ::VecF
     NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
 end
+init(u::NSGD, p::Int) = NSGD(u.α, p)
 function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
     o.α == o2.α || error("Merge Failed.  NSGD objects use different α.")
     smooth!(o.v, o2.v, γ)
@@ -42,16 +64,37 @@ end
 Adaptive (element-wise learning rate) stochastic gradient descent.
 """
 mutable struct ADAGRAD <: SGUpdater
-    H::VecF
+    h::VecF
     nobs::Int
     ADAGRAD(p = 0) = new(zeros(p), 0)
 end
 init(u::ADAGRAD, p) = ADAGRAD(p)
 function Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ::Float64)
     o.nobs += o2.nobs
-    smooth!(o.H, o2.H, γ)
+    smooth!(o.h, o2.h, γ)
     o
 end
+function update!(θ::Vector, g::Vector, γ::Float64, u::ADAGRAD)
+    u.nobs += 1
+    w = 1 / u.nobs
+    @inbounds for i in eachindex(θ)
+        u.h[i] = smooth(u.h[i], g[i] ^ 2, w)
+        s = γ * inv(sqrt(u.h[i] + ϵ))
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
+    end
+end
+
+# function update(θ::Number, g::Number, γ::Float64, u::ADAGRAD)
+#     w = 1 / u.nobs 
+#     @inbounds for i in eachindex
+#     U = o.updater
+#     U.nobs += 1
+#     @inbounds for j in eachindex(o.β)
+#         U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, 1 / U.nobs)
+#         s = γ * inv(sqrt(U.H[j] + ϵ))
+#         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
+#     end
+# end
 
 #-----------------------------------------------------------------------# ADADELTA
 """
@@ -65,6 +108,7 @@ mutable struct ADADELTA <: SGUpdater
     Δβ::Vector{Float64}
     ADADELTA(ρ = .95, p = 0) = new(ρ, zeros(p), zeros(p))
 end
+init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
 function Base.merge!(o::ADADELTA, o2::ADADELTA, γ::Float64)
     o.ρ == o2.ρ || error("Merge failed.  ADADELTA objects use different ρ.")
     smooth!(o.g, o2.g, γ)
@@ -80,6 +124,7 @@ mutable struct RMSPROP <: SGUpdater
     g::Vector{Float64}
     RMSPROP(α = .9, p = 0) = new(α, zeros(p))
 end
+init(u::RMSPROP, p) = RMSPROP(u.α, p)
 function Base.merge!(o::RMSPROP, o2::RMSPROP, γ::Float64)
     o.α == o2.α || error("RMSPROP objects use different α")
     smooth!(o.g, o2.g, γ)
@@ -103,6 +148,7 @@ mutable struct ADAM <: SGUpdater
         new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
+init(u::ADAM, p) = ADAM(u.β1, u.β2, p)
 function Base.merge!(o::ADAM, o2::ADAM, γ::Float64)
     (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
         error("Merge failed.  ADAM objects use different momentum parameters.")
@@ -129,6 +175,7 @@ mutable struct ADAMAX <: SGUpdater
         new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
+init(u::ADAMAX, p) = ADAMAX(u.β1, u.β2, p)
 function Base.merge!(o::ADAMAX, o2::ADAMAX, γ::Float64)
     (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
         error("Merge failed.  ADAMAX objects use different momentum parameters.")
@@ -155,6 +202,7 @@ mutable struct NADAM <: SGUpdater
         new(β1, β2, zeros(p), zeros(p), 0)
     end
 end
+init(u::NADAM, p) = NADAM(u.β1, u.β2, p)
 function Base.merge!(o::NADAM, o2::NADAM, γ::Float64)
     (o.β1 == o2.β1) && (o.β2 == o2.β2) ||
         error("Merge failed.  NADAM objects use different momentum parameters.")

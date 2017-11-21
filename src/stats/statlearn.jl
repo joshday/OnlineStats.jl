@@ -29,7 +29,7 @@ where the ``f_i``'s are loss functions evaluated on a single observation, ``g`` 
 """
 struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0)}
     β::VecF
-    gx::VecF
+    gx::VecF        # buffer for gradient
     λfactor::VecF
     loss::L
     penalty::P
@@ -38,10 +38,8 @@ end
 function StatLearn{V,L,P,U}(p::Integer, t::Tuple{V,L,P,U})
     λf, loss, penalty, updater = t
     length(λf) == p || throw(DimensionMismatch("lengths of λfactor and β differ"))
-    StatLearn(zeros(p), zeros(p), λf, loss, penalty, statlearn_init(updater, p))
+    StatLearn(zeros(p), zeros(p), λf, loss, penalty, init(StatLearn, updater, p))
 end
-
-statlearn_init(u::Updater, p) = u
 
 d(p::Integer) = (fill(.1, p), L2DistLoss(), L2Penalty(), SGD())
 
@@ -68,9 +66,7 @@ end
 coef(o::StatLearn) = o.β
 
 predict(o::StatLearn, x::AbstractVector) = dot(x, o.β)
-
 predict(o::StatLearn, x::AbstractMatrix, ::Rows = Rows()) = x * o.β
-
 predict(o::StatLearn, x::AbstractMatrix, ::Cols) = x'o.β
 
 classify(o::StatLearn, x, dim = Rows()) = sign.(predict(o, x, dim))
@@ -89,7 +85,8 @@ function statlearnpath(o::StatLearn, αs::AbstractVector{<:Real})
     path
 end
 
-function gradient!(o::StatLearn, x::VectorOb, y::Real)
+function gradient!(o::StatLearn, t::Tuple{VectorOb, Real})
+    x, y = t
     xβ = dot(x, o.β)
     g = deriv(o.loss, y, xβ)
     gx = o.gx
@@ -97,22 +94,9 @@ function gradient!(o::StatLearn, x::VectorOb, y::Real)
         @inbounds gx[i] = g * x[i]
     end
 end
-# Batch version (unused unless we add minibatch updates)
-# function gradient!(o::StatLearn, x::AbstractMatrix, y::VectorOb)
-#     xβ = x * o.β
-#     g = deriv(o.loss, y, xβ)
-#     @inbounds for j in eachindex(o.gx)
-#         o.gx[j] = 0.0
-#         for i in eachindex(y)
-#             o.gx[j] += g[i] * x[i, j]
-#         end
-#     end
-#     scale!(o.gx, 1 / length(y))
-# end
 
-
-function fit!(o::StatLearn{<:SGUpdater}, x::VectorOb, y::Real, γ::Float64)
-    gradient!(o, x, y)
+function fit!(o::StatLearn{<:SGUpdater}, t::Tuple, γ::Float64)
+    gradient!(o, t)
     update!(o, γ)
 end
 
@@ -129,9 +113,9 @@ function update!(o::StatLearn{SGD}, γ)
     end
 end
 #-----------------------------------------------------------------------# NSGD
-statlearn_init(u::NSGD, p) = NSGD(u.α, p)
-function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
+function fit!(o::StatLearn{NSGD}, t::Tuple{VectorOb, Real}, γ::Float64)
     U = o.updater
+    x, y = t
     for j in eachindex(o.β)
         U.θ[j] = o.β[j] - U.α * U.v[j]
     end
@@ -142,18 +126,16 @@ function fit!(o::StatLearn{NSGD}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 #-----------------------------------------------------------------------# ADAGRAD
-statlearn_init(u::ADAGRAD, p) = init(u, p)
 function update!(o::StatLearn{ADAGRAD}, γ)
     U = o.updater
     U.nobs += 1
     @inbounds for j in eachindex(o.β)
-        U.H[j] = smooth(U.H[j], o.gx[j] ^ 2, 1 / U.nobs)
-        s = γ * inv(sqrt(U.H[j] + ϵ))
+        U.h[j] = smooth(U.h[j], o.gx[j] ^ 2, 1 / U.nobs)
+        s = γ * inv(sqrt(U.h[j] + ϵ))
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
     end
 end
 #-----------------------------------------------------------------------# ADADELTA
-statlearn_init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
 function update!(o::StatLearn{ADADELTA}, γ)
     U = o.updater
     ϵ = .0001
@@ -165,7 +147,6 @@ function update!(o::StatLearn{ADADELTA}, γ)
     end
 end
 #-----------------------------------------------------------------------# RMSPROP
-statlearn_init(u::RMSPROP, p) = RMSPROP(u.α, p)
 function update!(o::StatLearn{RMSPROP}, γ)
     U = o.updater
     for j in eachindex(o.β)
@@ -175,7 +156,6 @@ function update!(o::StatLearn{RMSPROP}, γ)
 end
 
 #-----------------------------------------------------------------------# ADAM
-statlearn_init(u::ADAM, p) = ADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAM}, γ)
     U = o.updater
     β1 = U.β1
@@ -191,7 +171,6 @@ function update!(o::StatLearn{ADAM}, γ)
 end
 
 #-----------------------------------------------------------------------# ADAMAX
-statlearn_init(u::ADAMAX, p) = ADAMAX(u.β1, u.β2, p)
 function update!(o::StatLearn{ADAMAX}, γ)
     U = o.updater
     U.nups += 1
@@ -205,7 +184,6 @@ function update!(o::StatLearn{ADAMAX}, γ)
 end
 
 #-----------------------------------------------------------------------# NADAM
-statlearn_init(u::NADAM, p) = NADAM(u.β1, u.β2, p)
 function update!(o::StatLearn{NADAM}, γ)
     U = o.updater
     β1 = U.β1
@@ -224,26 +202,23 @@ end
 
 
 
-#-----------------------------------------------------------------------#
-#-----------------------------------------------------------------------#
-#-----------------------------------------------------------------------# Majorization-based
-# These currently only work for L2DistLoss, LogitMarginLoss, DWDMarginLoss
-
-# Lipschitz constant
-constH(o::StatLearn{A, L}, x, y) where {A, L} = error("$A is not defined for $L")
-
+#------------------------------------------------------------------# Majorization-based
 const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
-constH(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = 2 * N * x'x 
-constH(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
-constH(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = .25 * x'x
-constH(o::StatLearn{A, <:DWDMarginLoss}, x, y) where {A} = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+
+# f(θ) ≤ f(θₜ) + ∇f(θₜ)'(θ - θₜ) + (L / 2) ||θ - θₜ||^2
+lipschitz_constant(o::StatLearn{A, L}, x, y) where {A, L} = error("$A is not defined for $L")
+lipschitz_constant(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = 2N * x'x 
+lipschitz_constant(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
+lipschitz_constant(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = .25 * x'x
+lipschitz_constant(o::StatLearn{A, <:DWDMarginLoss}, x, y) where {A} = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
 
 #-----------------------------------------------------------------------# OMAS
-statlearn_init(u::OMAS, p) = OMAS(zeros(p + 1))  # buffer[end] = h
-function fit!(o::StatLearn{<:OMAS}, x::VectorOb, y::Real, γ::Float64)
+init(StatLearn, u::OMAS, p::Int) = OMAS(zeros(p + 1))  # buffer[end] = h
+function fit!(o::StatLearn{<:OMAS}, t::Tuple{VectorOb, Real}, γ::Float64)
+    x, y = t
     B = o.updater.buffer
-    gradient!(o, x, y)
-    ht = constH(o, x, y)
+    gradient!(o, t)
+    ht = lipschitz_constant(o, x, y)
     B[end] = smooth(B[end], ht, γ)
     h = B[end]
     for j in eachindex(o.β)
@@ -252,17 +227,19 @@ function fit!(o::StatLearn{<:OMAS}, x::VectorOb, y::Real, γ::Float64)
     end
 end
 #-----------------------------------------------------------------------# OMAP
-function fit!(o::StatLearn{<:OMAP}, x::VectorOb, y::Real, γ::Float64)
-    gradient!(o, x, y)
-    h_inv = inv(constH(o, x, y))
+function fit!(o::StatLearn{<:OMAP}, t::Tuple{VectorOb, Real}, γ::Float64)
+    x, y = t
+    gradient!(o, t)
+    h_inv = inv(lipschitz_constant(o, x, y))
     for j in eachindex(o.β)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
 end
 #-----------------------------------------------------------------------# MSPI
-function fit!(o::StatLearn{<:MSPI}, x::VectorOb, y::Real, γ::Float64)
-    gradient!(o, x, y)
-    denom = inv(1 + γ * constH(o, x, y))
+function fit!(o::StatLearn{<:MSPI}, t::Tuple{VectorOb, Real}, γ::Float64)
+    gradient!(o, t)
+    x, y = t
+    denom = inv(1 + γ * lipschitz_constant(o, x, y))
     for j in eachindex(o.β)
         @inbounds o.β[j] -= γ * denom * o.gx[j]
     end
