@@ -38,23 +38,15 @@ Series(wt::Weight, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 #-----------------------------------------------------------------------# methods
 header(io::IO, s::AbstractString) = println(io, "▦ $s" )
 
-function header(io::IO, s::Series{N}) where {N} 
-    println(io, "▦ Series{$N} with $(s.weight)")
-    print(io, "  ├── ", "nobs = $(s.n)")
-end
-
-function Base.show(io::IO, s::Series)
-    header(io, s)
-    # print(io, "├──── "); println(io, "$(s.weight), nobs = $(nobs(s))")
-    # print(io, "└─┐")
+function Base.show(io::IO, s::Series{N}) where {N}
+    print(io, "▦ Series{$N}  |  $(s.weight)  |  nobs = $(s.n)")
+    # print(io, "├── ", "nobs = $(s.n)")
     n = length(stats(s))
     i = 0
     for o in stats(s)
         i += 1
         char = ifelse(i == n, "└──", "├──")
-        # char = '>'
-        print(io, "\n  $char $o")
-        # print(io, "\n  $char $(name(o)): $(round.(value(o), 4))")
+        print(io, "\n$char $o")
     end
 end
 Base.showcompact(io::IO, s::Series) = (header(io,s); print(io, s.stats))
@@ -264,7 +256,7 @@ function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Cols)
     buffer = Vector{eltype(x)}(p)
     for i in 1:n 
         for j in 1:p 
-            buffer[j] = x[j, i]
+            @inbounds buffer[j] = x[j, i]
         end
         fit!(s, (buffer, y[i]))
     end

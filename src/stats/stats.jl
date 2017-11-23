@@ -417,7 +417,7 @@ variance of the data is small.
     τ = collect(.1:.1:.0)
     Series(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))
 """
-struct Quantile{T <: Updater} <: StochasticStat{0}
+mutable struct Quantile{T <: Updater} <: StochasticStat{0}
     value::Vector{Float64}
     τ::Vector{Float64}
     updater::T 
@@ -495,7 +495,7 @@ q_init(u::OMAP, p) = u
 function q_fit!(o::Quantile{<:OMAP}, y, γ)
     for j in eachindex(o.τ)
         w = abs(y - o.value[j]) + ϵ
-        θ = w * (2o.τ[j] - 1) + y
+        θ = y + w * (2o.τ[j] - 1) 
         o.value[j] = smooth(o.value[j], θ, γ)
     end
 end

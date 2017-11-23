@@ -1,3 +1,17 @@
+# mutable struct NextHist{T <: Range} <: ExactStat{0}
+#     value::VecF
+#     rng::T 
+#     n::Int
+# end
+# NextHist(b::Integer) = NextHist(zeros(b), linspace(0, 0, b), 0)
+# function fit!(o::NextHist, y, γ)
+#     o.n += 1
+#     if o.n < length(o.value)
+#         o.value[o.n] = 
+#     end
+# end
+
+#-----------------------------------------------------------------------# IHistogram
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
 """
     IHistogram(b)
@@ -117,6 +131,13 @@ function Base.quantile(o::IHistogram, p = [0, .25, .5, .75, 1])
 end
 Base.median(o::IHistogram) = quantile(o, .5)
 
+function discretized_pdf(o::IHistogram, y::Real)
+    i = searchsortedfirst(o.value, y)
+    if i > length(o.counts)
+        i -= 1
+    end
+    o.counts[i] / sum(o.counts)
+end
 
 #-----------------------------------------------------------------------# OHistogram
 """

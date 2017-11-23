@@ -51,7 +51,7 @@ end
 FitCategorical(t::Type) = FitCategorical{t}()
 function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
     o.nobs += 1
-    haskey(o.d, y) ? (o.d[y] += 1) : (o.d[y] = 1)
+    haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
 end
 _value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)) ./ o.nobs, zeros(0))
 Base.keys(o::FitCategorical) = keys(o.d)
@@ -60,6 +60,7 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T <: FitCategorical}
     merge!(o.d, o2.d)
     o.nobs += o2.nobs
 end
+Base.haskey(o::FitCategorical, key) = haskey(o.d, key)
 
 #---------------------------------------------------------------------------------# Cauchy
 """
