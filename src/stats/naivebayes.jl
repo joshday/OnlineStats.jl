@@ -1,6 +1,15 @@
-# Structure of information:
-# h[j] is a Dict{T, IHistogram} so that h[j][y] is histogram: P(x_j | y)
-struct NBClassifier{T, D <: Dict} <: ExactStat{(1, 0)}
+"""
+    NBClassifier(p, T, b = 20)
+
+Create a Naive Bayes classifier for `p` predictors for classes of type `T`.  Conditional
+probabilities are estimated using the [`IHistogram`](@ref) type with `b` bins.
+
+# Example
+
+    x, y = randn(100, 5), rand(Bool, 100)
+    Series((x,y), NBClassifier(5, Bool))
+"""
+struct NBClassifier{T, D <: Dict{T, IHistogram}} <: ExactStat{(1, 0)}
     cat::FitCategorical{T}
     h::Vector{D}  # length p Vector of Dict{T, IHistogram}
     b::Int
