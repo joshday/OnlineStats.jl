@@ -553,6 +553,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.NBClassifier",
+    "page": "API",
+    "title": "OnlineStats.NBClassifier",
+    "category": "Type",
+    "text": "NBClassifier(p, T, b = 20)\n\nCreate a Naive Bayes classifier for p predictors for classes of type T.  Conditional probabilities are estimated using the IHistogram type with b bins.\n\nExample\n\nx, y = randn(100, 5), rand(Bool, 100)\nSeries((x,y), NBClassifier(5, Bool))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.NSGD",
     "page": "API",
     "title": "OnlineStats.NSGD",
