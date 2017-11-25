@@ -75,3 +75,9 @@ end
         i += 1
     end
 end
+
+#-----------------------------------------------------------------------# FitCategorical
+@recipe function f(o::FitCategorical)
+    seriestype --> :bar 
+    collect(keys(o)), value(o)
+end
