@@ -49,6 +49,7 @@ function smooth!(a, b, γ::Float64)
 end
 
 # (1 - γ) * A + γ * x * x'
+# TODO: make generated function
 function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
     size(A, 1) == length(x) || throw(DimensionMismatch())
     for j in 1:size(A, 2), i in 1:j

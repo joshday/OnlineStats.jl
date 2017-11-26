@@ -81,3 +81,9 @@ end
     seriestype --> :bar 
     collect(keys(o)), value(o)
 end
+
+#-----------------------------------------------------------------------# LinRegBuilder
+# @recipe function f(o::LinRegBuilder, x::AbstractMatrix, y::AbstractVector, dim = Rows())
+#     ŷ = predict(o, x, dim)
+#     r = y - ŷ
+# end

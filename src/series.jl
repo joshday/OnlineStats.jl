@@ -49,7 +49,7 @@ function Base.show(io::IO, s::Series{N}) where {N}
         print(io, "\n$char $o")
     end
 end
-Base.showcompact(io::IO, s::Series) = (header(io,s); print(io, s.stats))
+# Base.showcompact(io::IO, s::Series) = (header(io, s); print(io, s.stats))
 
 """
     stats(s::Series)
