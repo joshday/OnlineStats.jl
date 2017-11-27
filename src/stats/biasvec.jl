@@ -1,12 +1,13 @@
 struct BiasVec{T, A <: AbstractVector{T}} <: AbstractVector{T}
     x::A
+    bias::T
 end
-BiasVec(x) = BiasVec{eltype(x), typeof(x)}(x)
+BiasVec(x, bias = 1.0) = BiasVec{eltype(x), typeof(x)}(x, bias)
 
 Base.length(v::BiasVec) = length(v.x) + 1
 
 Base.size(v::BiasVec) = (length(v), )
 
-Base.getindex(v::BiasVec, i::Int) = i > length(v.x) ? 1.0 : v.x[i]
+Base.getindex(v::BiasVec, i::Int) = i > length(v.x) ? v.bias : v.x[i]
 
 Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
