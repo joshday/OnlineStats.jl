@@ -400,7 +400,7 @@ end
     o = LinRegBuilder(p)
     Series(x, o)
     for k in 1:p
-        @test coef(o, k; verbose=false) ≈ x[:, setdiff(1:p, k)] \ x[:, k]
+        @test coef(o, k; verbose=false) ≈ [x[:, setdiff(1:p, k)] ones(n)] \ x[:, k]
     end
     @test coef(o, 3, [1, 2]; verbose=false) ≈ x[:, [1, 2]] \ x[:, 3]
     @test coef(o, 3, [2, 1]; verbose=false) ≈ x[:, [2, 1]] \ x[:, 3]

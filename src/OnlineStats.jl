@@ -51,7 +51,8 @@ end
 # (1 - γ) * A + γ * x * x'
 # TODO: make generated function
 function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
-    size(A, 1) == length(x) || throw(DimensionMismatch())
+    size(A, 1) == length(x) || 
+        throw(DimensionMismatch("smooth_syr! matrix/vector mismatch: $(size(A, 1)) and $(length(x))"))
     for j in 1:size(A, 2), i in 1:j
         @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
     end
@@ -70,6 +71,7 @@ const AVecF = AbstractVector{Float64}
 #-----------------------------------------------------------------------# includes
 include("stats/updaters.jl")
 include("stats/stats.jl")
+include("stats/biasvec.jl")
 include("stats/linregbuilder.jl")
 include("stats/histograms.jl")
 include("stats/mv.jl")

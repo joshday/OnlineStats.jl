@@ -82,19 +82,23 @@ Create an object from which any variable can be regressed on any other set of va
     coef(o, 7, [2, 5, 4]) 
 """
 struct LinRegBuilder <: ExactStat{1}
-    A::Matrix{Float64}  #  x'x
-    LinRegBuilder(p::Integer) = new(Matrix{Float64}(p, p))
+    A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
+    function LinRegBuilder(p::Integer) 
+        o = new(Matrix{Float64}(p + 1, p + 1))
+        o.A[end] = 1.0 
+        o
+    end
 end
 
 function Base.show(io::IO, o::LinRegBuilder) 
-    print(io, "LinRegBuilder: β(y=last col) = $(coef(o))")
+    print(io, "LinRegBuilder of $(size(o.A, 1) - 1) variables")
 end
 
-fit!(o::LinRegBuilder, y::VectorOb, γ::Float64) = smooth_syr!(o.A, y, γ)
+fit!(o::LinRegBuilder, y::VectorOb, γ::Float64) = smooth_syr!(o.A, BiasVec(y), γ)
 
 _value(o::LinRegBuilder) = coef(o)
 
-function coef(o::LinRegBuilder, yind::Integer = size(o.A, 2), 
+function coef(o::LinRegBuilder, yind::Integer = 1, 
         xinds::AbstractVector{<:Integer} = setdiff(1:size(o.A, 2), yind); 
         verbose::Bool = false)
     Ainds = vcat(xinds, yind)
