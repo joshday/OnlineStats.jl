@@ -1,3 +1,12 @@
+"""
+    BiasVec(x, bias = 1.0)
+
+LightWeight wrapper of a vector which adds a "bias" term at the end.
+
+# Example
+
+    OnlineStats.BiasVec(rand(5), 10)
+"""
 struct BiasVec{T, A <: AbstractVector{T}} <: AbstractVector{T}
     x::A
     bias::T
