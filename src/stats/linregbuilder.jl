@@ -68,19 +68,27 @@ end
     LinRegBuilder(p)
 
 Create an object from which any variable can be regressed on any other set of variables,
-optionally with ridge (`PenaltyFunctions.L2Penalty`) regularization.
+optionally with ridge (`PenaltyFunctions.L2Penalty`) regularization.  The main function
+to use with `LinRegBuilder` is `coef`:
 
-# Example
+    coef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)
+
+Return the coefficients of a regressing column `y` on columns `x` with ridge (`L2Penalty`) 
+parameter `λ`.  An intercept (`bias`) term is added by default.
+
+# Examples
 
     x = randn(1000, 10)
     o = LinRegBuilder(10)
     s = Series(x, o)
 
-    # let response = x[:, 3], predictors = x[:, setdiff(1:10, 3)]
-    coef(o, 3) 
+    # let response = x[:, 3]
+    coef(o; y=3, verbose=true) 
 
     # let response = x[:, 7], predictors = x[:, [2, 5, 4]]
     coef(o, 7, [2, 5, 4]) 
+
+    # 
 """
 struct LinRegBuilder <: ExactStat{1}
     A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
