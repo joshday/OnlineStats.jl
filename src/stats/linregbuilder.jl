@@ -67,7 +67,8 @@ end
 """
     LinRegBuilder(p)
 
-Create an object from which any variable can be regressed on any other set of variables.
+Create an object from which any variable can be regressed on any other set of variables,
+optionally with ridge (`PenaltyFunctions.L2Penalty`) regularization.
 
 # Example
 
@@ -98,21 +99,29 @@ fit!(o::LinRegBuilder, y::VectorOb, γ::Float64) = smooth_syr!(o.A, BiasVec(y), 
 
 _value(o::LinRegBuilder) = coef(o)
 
-function coef(o::LinRegBuilder, yind::Integer = 1, 
-        xinds::AbstractVector{<:Integer} = setdiff(1:size(o.A, 2), yind); 
-        verbose::Bool = false)
-    Ainds = vcat(xinds, yind)
-    d = length(Ainds)
+function coef(o::LinRegBuilder, λ = 0.0; 
+              y = 1, 
+              x = setdiff(1:size(o.A, 2) - 1, y), 
+              bias::Bool = true,
+              verbose::Bool = false
+              )
+    if verbose 
+        s = "Regress $y on $x"
+        if bias 
+            s *= " with bias"
+        end
+        info(s)
+    end
+    if bias 
+        x = vcat(x, size(o.A, 2))
+    end
+    Ainds = vcat(x, y)
     S = Symmetric(o.A)[Ainds, Ainds]
-    verbose && info("Regress var $yind on $xinds")
-    SweepOperator.sweep!(S, 1:length(xinds))
-    return S[1:length(xinds), end]
+    for i in 1:length(x) - bias    
+        S[i, i] += λ
+    end
+    SweepOperator.sweep!(S, 1:length(x))
+    return S[1:length(x), end]
 end
 
-function Base.merge!(o::LinRegBuilder, o2::LinRegBuilder, γ::Float64)
-    smooth!(o.A, o2.A, γ)
-end
-
-# TODO: incorporation with PenaltyFunctions
-# TODO: be able to generate Convex.jl Problem
-# TODO: be able to geenrate JuMP.jl Model
+Base.merge!(o::LinRegBuilder, o2::LinRegBuilder, γ::Float64) = smooth!(o.A, o2.A, γ)
