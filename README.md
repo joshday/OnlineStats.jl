@@ -24,6 +24,5 @@ for yi in y
     fit!(s2, yi)
 end
 ```
-<center>
-<img src = "https://user-images.githubusercontent.com/8075494/27964296-c249baec-6305-11e7-89d0-9875d3bdab3e.gif">
-</center>
+
+![](https://user-images.githubusercontent.com/8075494/27964296-c249baec-6305-11e7-89d0-9875d3bdab3e.gif)
