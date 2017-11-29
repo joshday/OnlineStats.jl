@@ -42,21 +42,24 @@ Base.keys(o::NBClassifier) = keys(o.cat)
 Base.values(o::NBClassifier) = values(o.cat)
 
 function predict(o::NBClassifier, x::AbstractVector)
-    k = collect(keys(o))
-    v = values(o)
-    probs = collect(v) ./ sum(v)
-    probs = log.(probs)
+    kys = collect(keys(o))
+    vals = values(o)
+    probs = log.(collect(vals) ./ sum(vals))
     for i in eachindex(probs)
         for j in eachindex(x)
-            probs[i] += log(discretized_pdf(o.h[j][k[i]], x[j]))
+            probs[i] += log(discretized_pdf(o.h[j][kys[i]], x[j]))
         end
     end
     probs = exp.(probs)
     probs ./ sum(probs)
 end
 
+predict(o::NBClassifier, x::AbstractMatrix) = mapslices(x -> predict(o, x), x, 2)
+
 function classify(o::NBClassifier, x::AbstractVector)
     probs = predict(o, x)
     p, i = findmax(probs)
     return collect(keys(o))[i]
 end
+
+classify(o::NBClassifier, x::AbstractMatrix) = mapslices(x -> classify(o, x), x, 2)
