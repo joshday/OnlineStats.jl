@@ -1,3 +1,4 @@
+# Try 1
 #===================================================================
 http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
     ✓ Algorithm 1: Update  
@@ -7,18 +8,14 @@ http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
     X Algorithm 5: Decision Tree - master and workers need access to decision tree
 ====================================================================#
 
+# Try 2
 #===================================================================
-https://homes.cs.washington.edu/~pedrod/papers/kdd00.pdf
-
+# https://homes.cs.washington.edu/~pedrod/papers/kdd00.pdf
 ====================================================================#
 
-struct Node
-    left
-    right
-    label
-end
 
+# Possible Plan
+# - Don't worry about decision trees being merge-able
+# - Instead create an ensemble type (weight each classifier by nobs or something)
+#   - This could possible get reused elsewhere
 
-struct Tree
-    node::Node
-end
