@@ -1,13 +1,23 @@
+# TODO: Box 2 in https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf
+
+
+# #-----------------------------------------------------------------------# 
+# # Be as fast as OHistogram, but incrementally build range
 # mutable struct NextHist{T <: Range} <: ExactStat{0}
 #     value::VecF
 #     rng::T 
 #     n::Int
 # end
 # NextHist(b::Integer) = NextHist(zeros(b), linspace(0, 0, b), 0)
-# function fit!(o::NextHist, y, γ)
+
+# function fit!(o::NextHist, y::Real, γ::Float64)
 #     o.n += 1
-#     if o.n < length(o.value)
-#         o.value[o.n] = 
+#     if o.n > length(o.value)
+#     elseif o.n <= length(o.value)
+#         o.value[o.n] = y
+#     elseif o.n == length(o.value)
+#         o.rng = linspace(extrema(o.value)..., length(o.rng))
+#         zeros!(o.value)
 #     end
 # end
 
