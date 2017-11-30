@@ -888,4 +888,28 @@ var documenterSearchIndex = {"docs": [
     "text": "Modules = [OnlineStats, OnlineStatsBase]"
 },
 
+{
+    "location": "catalog.html#",
+    "page": "Algorithm Catalog",
+    "title": "Algorithm Catalog",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "catalog.html#Algorithm-Catalog-1",
+    "page": "Algorithm Catalog",
+    "title": "Algorithm Catalog",
+    "category": "section",
+    "text": "This page is very much a work in progress"
+},
+
+{
+    "location": "catalog.html#[Mean](@ref)-1",
+    "page": "Algorithm Catalog",
+    "title": "Mean",
+    "category": "section",
+    "text": "theta^(t) = (1 - gamma_t) theta^(t-1) + gamma_t y_t"
+},
+
 ]}
