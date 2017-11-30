@@ -813,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.ExactStat",
     "category": "Type",
-    "text": "An OnlineStat which can be updated exactly.  Subtypes of ExactStat use EqualWeight() as the default weight.\n\n\n\n"
+    "text": "An OnlineStat which can be updated exactly.\n\n\n\n"
 },
 
 {
@@ -869,7 +869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
-    "text": "An OnlineStat which must be approximated.  Subtypes of StochasticStat use  LearningRate() as the default weight.  Additionally, subtypes should be parameterized by an algorithm, which is an optional last argument.  For example:\n\nstruct Quantile{T <: Updater} <: StochasticStat{0}\n    value::Vector{Float64}\n    τ::Vector{Float64}\n    updater::T \nend\nQuantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) = ...\n\n\n\n"
+    "text": "An OnlineStat which must be updated approximately.\n\n\n\n"
 },
 
 {
@@ -877,7 +877,15 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.Weight",
     "category": "Type",
-    "text": "Subtypes of Weight must be callable to produce the weight given the current number of  observations in an OnlineStat n and the number of new observations (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
+    "text": "Weight is an abstract type.  Subtypes must be callable have a method to produce the weight given the current number of observations in an OnlineStat n and the number of  observations included in the update (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase._value-Tuple{OnlineStatsBase.OnlineStat}",
+    "page": "API",
+    "title": "OnlineStatsBase._value",
+    "category": "Method",
+    "text": "value(o::OnlineStat)\n\nReturn the value of the OnlineStat.\n\n\n\n"
 },
 
 {
