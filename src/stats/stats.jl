@@ -402,6 +402,67 @@ function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
     end
     smooth!(o.value, o2.value, γ)
 end
+Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
+
+#-----------------------------------------------------------------------# PQuantile 
+mutable struct PQuantile <: StochasticStat{0}
+    q::Vector{Float64}  # marker heights
+    n::Vector{Int}  # marker position
+    τ::Float64
+    nobs::Int
+end
+function PQuantile(τ::Real)
+    @assert 0 < τ < 1
+    PQuantile(zeros(5), collect(1:5), τ, 0)
+end
+value(o::PQuantile) = o.q[3]
+function fit!(o::PQuantile, y::Real, γ::Float64)
+    o.nobs += 1
+    q = o.q
+    n = o.n
+    nprime = o.nprime
+    dnprime = o.dnprime
+    if o.nobs > 5
+        # B1
+        k = searchsortedfirst(q, y) - 1
+        k = max(k, 4)
+        k = min(k, 1)
+        q[1] = min(q[1], y)
+        q[5] = max(q[5], y)
+        # B2
+        for i in (k + 1):5
+            n[i] += 1
+        end
+        for i in 1:5 
+            nprime[i] += dnprime[i]
+        end
+        # B3
+        for i in 2:4 
+            di = nprime[i] - n[i]
+            if  (di ≥ 1 && n[i+1] - n[i] > 1) || (di ≤ -1 && n[i-1] - n[i] < -1)
+                ds = Int(sign(di))
+                qip = q[i] + ds / (n[i+1] - n[i-1]) *
+                    (
+                        (n[i] - n[i-1] + ds) * (q[i+1] - q[i]) / (n[i+1] - n[i]) +
+                        (n[i+1] - n[i] - ds) * (q[i] - q[i-1]) / (n[i] - n[i-1])
+                    ) 
+                if q[i-1] < qip < q[i+1]
+                    q[i] = qip
+                else
+                    q[i] += ds * (q[i + ds] - q[i]) / (n[i + ds] - n[i])
+                end
+            end
+            n[i] += Int(sign(di))
+        end
+    # A
+    elseif o.nobs < 5
+        o.q[o.nobs] = y
+    else 
+        o.q[o.nobs] = y
+        sort!(o.q)
+    end
+end
+
 
 #-----------------------------------------------------------------------# Quantile
 """
@@ -421,9 +482,10 @@ mutable struct Quantile{T <: Updater} <: StochasticStat{0}
     value::Vector{Float64}
     τ::Vector{Float64}
     updater::T 
+    n::Int
 end
 function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = OMAS()) 
-    Quantile(zeros(τ), collect(τ), q_init(u, length(τ)))
+    Quantile(zeros(τ), collect(τ), q_init(u, length(τ)), 0)
 end
 
 function Base.show(io::IO, o::Quantile) 
@@ -439,10 +501,14 @@ end
 q_init(u::Updater, p) = error("$u can't be used with Quantile")
 
 function fit!(o::Quantile, y::Real, γ::Float64)
-    if γ == 1.0
-        fill!(o.value, y)  # initialize values with first observations
-    else
+    o.n += 1
+    if o.n > length(o.value)
         q_fit!(o, y, γ)
+    elseif o.n < length(o.value)
+        o.value[o.n] = y  # initialize values with first observations
+    else
+        o.value[o.n] = y 
+        sort!(o.value)
     end
 end
 
