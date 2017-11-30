@@ -23,8 +23,8 @@ export
     FitMultinomial, FitMvNormal,
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
-    OrderStats, Quantile, QuantileMM, QuantileMSPI, QuantileSGD, ReservoirSample, Sum,
-    LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV, Bootstrap, NBClassifier,
+    OrderStats, Quantile, QuantileMM, QuantileMSPI, QuantileSGD, PQuantile, ReservoirSample, 
+    Sum, LinReg, LinRegBuilder, IHistogram, OHistogram, CallFun, MV, Bootstrap, NBClassifier,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
 

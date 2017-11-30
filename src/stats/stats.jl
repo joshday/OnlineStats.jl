@@ -405,6 +405,21 @@ end
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
 #-----------------------------------------------------------------------# PQuantile 
+"""
+    PQuantile(τ = 0.5)
+
+Calculate the approximate quantile via the P^2 algorithm:
+
+[https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf](https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf)
+
+# Example
+
+    y = randn(10^6)
+    o1, o2, o3 = PQuantile(.25), PQuantile(.5), PQuantile(.75)
+    s = Series(y, o1, o2, o3)
+    value(s)
+    quantile(y, [.25, .5, .75])
+"""
 mutable struct PQuantile <: StochasticStat{0}
     q::Vector{Float64}  # marker heights
     n::Vector{Int}  # marker position
@@ -412,11 +427,12 @@ mutable struct PQuantile <: StochasticStat{0}
     τ::Float64
     nobs::Int
 end
-function PQuantile(τ::Real)
+function PQuantile(τ::Real = 0.5)
     @assert 0 < τ < 1
     nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
     PQuantile(zeros(5), collect(1:5), nprime, τ, 0)
 end
+Base.show(io::IO, o::PQuantile) = print(io, "PQuantile($(value(o)))")
 value(o::PQuantile) = o.q[3]
 function fit!(o::PQuantile, y::Real, γ::Float64)
     o.nobs += 1
