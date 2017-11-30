@@ -439,7 +439,7 @@ function fit!(o::PQuantile, y::Real, γ::Float64)
     q = o.q
     n = o.n
     nprime = o.nprime
-    if o.nobs > 5
+    @inbounds if o.nobs > 5
         # B1
         k = searchsortedfirst(q, y) - 1
         k = min(k, 4)
@@ -455,27 +455,41 @@ function fit!(o::PQuantile, y::Real, γ::Float64)
         nprime[4] += (1 + o.τ) / 2
         nprime[5] += 1
         # B3
-        for i in 2:4 
-            di = nprime[i] - n[i]
-            if  (di ≥ 1 && n[i+1] - n[i] > 1) || (di ≤ -1 && n[i-1] - n[i] < -1)
-                ds = Int(sign(di))
-                q[i] = q[i] + ds / (n[i+1] - n[i-1]) *
-                    ((n[i] - n[i-1] + ds) * (q[i+1] - q[i]) / (n[i+1] - n[i]) +
-                    (n[i+1] - n[i] - ds) * (q[i] - q[i-1]) / (n[i] - n[i-1])) 
-                if !(q[i-1] < q[i] < q[i+1])
-                    q[i] += ds * (q[i + ds] - q[i]) / (n[i + ds] - n[i])
-                end
-                n[i] += Int(sign(di))
-            end
+        for i in 2:4
+            _interpolate!(o.q, o.n, nprime[i] - n[i], i)
         end
     # A
     elseif o.nobs < 5
-        o.q[o.nobs] = y
+        @inbounds o.q[o.nobs] = y
     else 
-        o.q[o.nobs] = y
+        @inbounds o.q[o.nobs] = y
         sort!(o.q)
     end
 end
+
+function _interpolate!(q, n, di, i)
+    @inbounds q1, q2, q3 = q[i-1], q[i], q[i+1]
+    @inbounds n1, n2, n3 = n[i-1], n[i], n[i+1]
+    @inbounds if (di ≥ 1 && n3 - n2 > 1) || (di ≤ -1 && n1 - n2 < -1)
+        d = Int(sign(di))
+        df = sign(di)
+        v1 = (n2 - n1 + d) * (q3 - q2) / (n3 - n2) 
+        v2 = (n3 - n2 - d) * (q2 - q1) / (n2 - n1) 
+        qi = q2 + df / (n3 - n1) * (v1 + v2) 
+        if q1 < qi < q3 
+            q[i] = qi
+        else
+            q[i] += df * (q[i + d] - q2) / (n[i + d] - n2)
+        end
+        n[i] += d
+    end
+end
+
+function parabolic_interpolate(q1, q2, q3, n1, n2, n3, d)
+    qi = q2 + d / (n3 - n1) * 
+        ((n2 - n1 + d) * (q3 - q2) / (n3 - n2) + (n3 - n2 - d) * (q2 - q1) / (n2 - n1))
+end
+
 
 
 #-----------------------------------------------------------------------# Quantile
