@@ -408,12 +408,14 @@ Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 mutable struct PQuantile <: StochasticStat{0}
     q::Vector{Float64}  # marker heights
     n::Vector{Int}  # marker position
+    nprime::Vector{Float64}
     τ::Float64
     nobs::Int
 end
 function PQuantile(τ::Real)
     @assert 0 < τ < 1
-    PQuantile(zeros(5), collect(1:5), τ, 0)
+    nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
+    PQuantile(zeros(5), collect(1:5), nprime, τ, 0)
 end
 value(o::PQuantile) = o.q[3]
 function fit!(o::PQuantile, y::Real, γ::Float64)
@@ -421,38 +423,34 @@ function fit!(o::PQuantile, y::Real, γ::Float64)
     q = o.q
     n = o.n
     nprime = o.nprime
-    dnprime = o.dnprime
     if o.nobs > 5
         # B1
         k = searchsortedfirst(q, y) - 1
-        k = max(k, 4)
-        k = min(k, 1)
+        k = min(k, 4)
+        k = max(k, 1)
         q[1] = min(q[1], y)
         q[5] = max(q[5], y)
         # B2
-        for i in (k + 1):5
+        for i in (k+1):5
             n[i] += 1
         end
-        for i in 1:5 
-            nprime[i] += dnprime[i]
-        end
+        nprime[2] += o.τ / 2
+        nprime[3] += o.τ
+        nprime[4] += (1 + o.τ) / 2
+        nprime[5] += 1
         # B3
         for i in 2:4 
             di = nprime[i] - n[i]
             if  (di ≥ 1 && n[i+1] - n[i] > 1) || (di ≤ -1 && n[i-1] - n[i] < -1)
                 ds = Int(sign(di))
-                qip = q[i] + ds / (n[i+1] - n[i-1]) *
-                    (
-                        (n[i] - n[i-1] + ds) * (q[i+1] - q[i]) / (n[i+1] - n[i]) +
-                        (n[i+1] - n[i] - ds) * (q[i] - q[i-1]) / (n[i] - n[i-1])
-                    ) 
-                if q[i-1] < qip < q[i+1]
-                    q[i] = qip
-                else
+                q[i] = q[i] + ds / (n[i+1] - n[i-1]) *
+                    ((n[i] - n[i-1] + ds) * (q[i+1] - q[i]) / (n[i+1] - n[i]) +
+                    (n[i+1] - n[i] - ds) * (q[i] - q[i-1]) / (n[i] - n[i-1])) 
+                if !(q[i-1] < q[i] < q[i+1])
                     q[i] += ds * (q[i + ds] - q[i]) / (n[i + ds] - n[i])
                 end
+                n[i] += Int(sign(di))
             end
-            n[i] += Int(sign(di))
         end
     # A
     elseif o.nobs < 5
