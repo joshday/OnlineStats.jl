@@ -594,68 +594,6 @@ function q_fit!(o::Quantile{<:OMAP}, y, γ)
     end
 end
 
-# #-----------------------------------------------------------------------# QuantileMM
-# "Deprecated.  See [`Quantile`](@ref)"
-# struct QuantileMM <: StochasticStat{0}
-#     value::Vector{Float64}
-#     τ::Vector{Float64}
-#     s::Vector{Float64}
-#     t::Vector{Float64}
-#     QuantileMM(τ = [.25, .5, .75]) = new(zeros(τ), collect(τ), zeros(τ), zeros(τ))
-# end
-# function fit!(o::QuantileMM, y::Real, γ::Float64)
-#     γ == 1.0 && fill!(o.value, y)  # initialize values with first observation
-#     @inbounds for j in 1:length(o.τ)
-#         w = 1.0 / (abs(y - o.value[j]) + ϵ)
-#         o.s[j] = smooth(o.s[j], w * y, γ)
-#         o.t[j] = smooth(o.t[j], w, γ)
-#         o.value[j] = (o.s[j] + (2.0 * o.τ[j] - 1.0)) / o.t[j]
-#     end
-# end
-# function Base.merge!(o::QuantileMM, o2::QuantileMM, γ::Float64)
-#     o.τ == o2.τ || error("Merge failed. QuantileMM objects track different quantiles.")
-#     smooth!(o.value, o2.value, γ)
-# end
-
-# #-----------------------------------------------------------------------# QuantileMSPI
-# "Deprecated.  See [`Quantile`](@ref)"
-# struct QuantileMSPI <: StochasticStat{0}
-#     value::Vector{Float64}
-#     τ::Vector{Float64}
-#     QuantileMSPI(τ = [.25, .5, .75]) = new(zeros(τ), collect(τ))
-# end
-# function fit!(o::QuantileMSPI, y::Real, γ::Float64)
-#     γ == 1.0 && fill!(o.value, y)  # initialize values with first observation
-#     @inbounds for i in eachindex(o.τ)
-#         w = inv(abs(y - o.value[i]) + ϵ)
-#         b = o.τ[i] - .5 * (1 - y * w)
-#         o.value[i] = (o.value[i] + γ * b) / (1 + .5 * γ * w)
-#     end
-# end
-# function Base.merge!(o::QuantileMSPI, o2::QuantileMSPI, γ::Float64)
-#     o.τ == o2.τ || error("Merge failed. QuantileMSPI objects track different quantiles.")
-#     smooth!(o.value, o2.value, γ)
-# end
-
-# #-----------------------------------------------------------------------# QuantileSGD
-# "Deprecated.  See [`Quantile`](@ref)"
-# struct QuantileSGD <: StochasticStat{0}
-#     value::Vector{Float64}
-#     τ::Vector{Float64}
-#     QuantileSGD(τ = [.25, .5, .75]) = new(zeros(τ), collect(τ))
-# end
-# function fit!(o::QuantileSGD, y::Real, γ::Float64)
-#     γ == 1.0 && fill!(o.value, y)  # initialize values with first observation
-#     for j in eachindex(o.value)
-#         u = o.value[j] - y
-#         o.value[j] -= γ * ((u > 0.0) - o.τ[j])
-#     end
-# end
-# function Base.merge!(o::QuantileSGD, o2::QuantileSGD, γ::Float64)
-#     o.τ == o2.τ || error("Merge failed. QuantileSGD objects track different quantiles.")
-#     smooth!(o.value, o2.value, γ)
-# end
-
 #-----------------------------------------------------------------------# ReservoirSample
 """
     ReservoirSample(k, t = Float64)
