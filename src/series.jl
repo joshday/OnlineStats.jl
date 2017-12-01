@@ -13,7 +13,7 @@ Track any number of OnlineStats.
     Series(randn(100), Mean())
     Series(randn(100), ExponentialWeight(), Mean())
 
-    s = Series(QuantileMM([.25, .5, .75]))
+    s = Series(Quantile([.25, .5, .75]))
     fit!(s, randn(1000))
 """
 mutable struct Series{N, T <: Tuple, W}
