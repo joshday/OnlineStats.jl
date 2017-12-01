@@ -84,7 +84,7 @@ Several types can change the behavior of a Weight.
 Weights are scaled by a constant.  This should only be used with certain subtypes of 
 `StochasticStat` (those based on stochastic gradient algorithms), as it may violate the 
 weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms 
-are `QuantileSGD`, `QuantileMSPI`, `KMeans`, and `StatLearn`.
+are [`Quantile`](@ref), [`KMeans`](@ref), and [`StatLearn`](@ref).
 
 ```math
 \gamma_t' = λ * \gamma_t
