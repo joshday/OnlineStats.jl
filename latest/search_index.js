@@ -681,30 +681,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.QuantileMM",
-    "page": "API",
-    "title": "OnlineStats.QuantileMM",
-    "category": "Function",
-    "text": "Deprecated.  See Quantile\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.QuantileMSPI",
-    "page": "API",
-    "title": "OnlineStats.QuantileMSPI",
-    "category": "Function",
-    "text": "Deprecated.  See Quantile\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.QuantileSGD",
-    "page": "API",
-    "title": "OnlineStats.QuantileSGD",
-    "category": "Function",
-    "text": "Deprecated.  See Quantile\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.mapblocks",
     "page": "API",
     "title": "OnlineStats.mapblocks",
