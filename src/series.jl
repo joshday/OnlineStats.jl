@@ -21,18 +21,19 @@ mutable struct Series{N, T <: Tuple, W}
     weight::W
     n::Int
 end
-function Series(w::Weight, o::OnlineStat{N}...) where {N} 
+const WeightLike = Union{Weight, Function}
+function Series(w::WeightLike, o::OnlineStat{N}...) where {N} 
     Series{N, typeof(o), typeof(w)}(o, w, 0)
 end
 Series(o::OnlineStat{N}...) where {N} = Series(default_weight(o), o...)
 
 # init with data
 Series(y::Data, o::OnlineStat{N}...) where {N} = (s = Series(o...); fit!(s, y))
-function Series(y::Data, wt::Weight, o::OnlineStat{N}...) where {N}
+function Series(y::Data, wt::WeightLike, o::OnlineStat{N}...) where {N}
     s = Series(wt, o...)
     fit!(s, y)
 end
-Series(wt::Weight, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
+Series(wt::WeightLike, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 
 
 #-----------------------------------------------------------------------# methods
