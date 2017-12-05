@@ -86,7 +86,7 @@ parameter `λ`.  An intercept (`bias`) term is added by default.
     coef(o; y=3, verbose=true) 
 
     # let response = x[:, 7], predictors = x[:, [2, 5, 4]]
-    coef(o, 7, [2, 5, 4]) 
+    coef(o; y = 7, x = [2, 5, 4]) 
 
     # 
 """
