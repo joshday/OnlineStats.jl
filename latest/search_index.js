@@ -729,6 +729,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Lag",
+    "page": "API",
+    "title": "OnlineStats.Lag",
+    "category": "Type",
+    "text": "Lag(b, T = Float64)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.MSPI2",
     "page": "API",
     "title": "OnlineStats.MSPI2",
