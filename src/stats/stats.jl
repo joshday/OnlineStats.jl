@@ -324,6 +324,30 @@ function fit!(o::KMeans{<:SGD}, x::VectorOb, γ::Float64)
     end
 end
 
+#-----------------------------------------------------------------------# Lag 
+"""
+    Lag(b, T = Float64)
+
+
+"""
+mutable struct Lag{T} <: ExactStat{0}
+    value::Vector{T}
+    n::Int
+end
+Lag(b::Integer, T::Type = Float64) = Lag(Vector{T}(b), 0)
+function fit!(o::Lag{T}, y::T, γ::Float64) where {T} 
+    o.n += 1
+    b = length(o.value)
+    i = o.n % b 
+    if i == 0
+        o.value[end] = y 
+    else
+        o.value[i] = y
+    end
+end
+value(o::Lag, i::Int = length(o.value)) = o.value[i]
+
+
 #-----------------------------------------------------------------------# Moments
 """
     Moments()

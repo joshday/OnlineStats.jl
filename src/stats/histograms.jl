@@ -1,25 +1,36 @@
 # TODO: Box 2 in https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf
 
 
-# #-----------------------------------------------------------------------# 
-# # Be as fast as OHistogram, but incrementally build range
-# mutable struct NextHist{T <: Range} <: ExactStat{0}
-#     value::VecF
-#     rng::T 
-#     n::Int
-# end
-# NextHist(b::Integer) = NextHist(zeros(b), linspace(0, 0, b), 0)
+#-----------------------------------------------------------------------# 
+mutable struct NextHist{T <: Range} <: ExactStat{0}
+    value::Vector{Int}
+    x::T 
+    n::Int
+end
+NextHist(b::Integer) = NextHist(zeros(Int, b), linspace(0, 0, b), 0)
 
-# function fit!(o::NextHist, y::Real, γ::Float64)
-#     o.n += 1
-#     if o.n > length(o.value)
-#     elseif o.n <= length(o.value)
-#         o.value[o.n] = y
-#     elseif o.n == length(o.value)
-#         o.rng = linspace(extrema(o.value)..., length(o.rng))
-#         zeros!(o.value)
-#     end
-# end
+function fit!(o::NextHist, y::Real, γ::Float64)
+    x = o.x
+    a, b = extrema(x)
+    o.n += 1
+    if o.n == 1
+        o.x = linspace(y, y, length(x))
+    end
+    if y < a 
+        o.x = linspace(y, b, length(x))
+    elseif y > b
+        o.x = linspace(a, y, length(x))
+    end 
+
+    # Do OHistogram fit
+    if o.n > 1
+        δ = step(x)
+        k = floor(Int, (y - a) / δ) + 1
+        if 1 <= k <= length(x)
+            @inbounds o.value[k] += 1
+        end
+    end
+end
 
 #-----------------------------------------------------------------------# IHistogram
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
