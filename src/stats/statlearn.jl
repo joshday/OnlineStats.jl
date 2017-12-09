@@ -11,7 +11,7 @@ Fit a statistical learning model of `p` independent variables for a given `loss`
 
 # Details
 
-The (offline) objective function which StatLearn approximately minimizes is
+The (offline) objective function that StatLearn approximately minimizes is
 
 ``\frac{1}{n}\sum_{i=1}^n f_i(\beta) + \sum_{j=1}^p \lambda_j g(\beta_j),``
 
