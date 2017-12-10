@@ -765,7 +765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Base.merge!",
     "category": "Method",
-    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappend s2 to s1.  Essentially fit!(s1, data_which_s2_saw).\n:mean\nUse the average of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
+    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappend s2 to s1.  Essentially fit!(s1, data_which_s2_saw).\n:mean\nUse the average (weighted by nobs) of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
 },
 
 {
