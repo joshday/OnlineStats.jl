@@ -248,7 +248,7 @@ end
     for τ in .1:.1:.9 
         o = PQuantile(τ)
         Series(y, o)
-        @test quantile(y, τ) ≈ value(o) atol=.01
+        @test quantile(y, τ) ≈ value(o) atol=.02
     end
 end
 

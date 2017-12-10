@@ -49,7 +49,7 @@ function smooth!(a, b, γ::Float64)
 end
 
 # (1 - γ) * A + γ * x * x'
-# TODO: make generated function
+# TODO: make generated function for the sake of NamedTuples
 function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
     size(A, 1) == length(x) || 
         throw(DimensionMismatch("smooth_syr! matrix/vector mismatch: $(size(A, 1)) and $(length(x))"))

@@ -409,7 +409,7 @@ function fit!(o::OrderStats, y::Real, γ::Float64)
     p = length(o.value)
     buffer = o.buffer
     o.i += 1
-    buffer[o.i] = y
+    @inbounds buffer[o.i] = y
     if o.i == p
         sort!(buffer)
         o.nreps += 1
@@ -456,7 +456,7 @@ function PQuantile(τ::Real = 0.5)
     nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
     PQuantile(zeros(5), collect(1:5), nprime, τ, 0)
 end
-Base.show(io::IO, o::PQuantile) = print(io, "PQuantile($(value(o)))")
+Base.show(io::IO, o::PQuantile) = print(io, "PQuantile($(o.τ), $(value(o)))")
 value(o::PQuantile) = o.q[3]
 function fit!(o::PQuantile, y::Real, γ::Float64)
     o.nobs += 1

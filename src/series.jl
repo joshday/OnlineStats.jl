@@ -37,11 +37,8 @@ Series(wt::WeightLike, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o
 
 
 #-----------------------------------------------------------------------# methods
-header(io::IO, s::AbstractString) = println(io, "▦ $s" )
-
 function Base.show(io::IO, s::Series{N}) where {N}
-    print(io, "▦ Series{$N}  |  $(s.weight)  |  nobs = $(s.n)")
-    # print(io, "├── ", "nobs = $(s.n)")
+    print_with_color(:green, io, "▦ Series{$N}  |  $(s.weight)  |  nobs = $(s.n)")
     n = length(stats(s))
     i = 0
     for o in stats(s)
@@ -50,7 +47,6 @@ function Base.show(io::IO, s::Series{N}) where {N}
         print(io, "\n$char $o")
     end
 end
-# Base.showcompact(io::IO, s::Series) = (header(io, s); print(io, s.stats))
 
 """
     stats(s::Series)
@@ -78,8 +74,8 @@ Return the number of observations the Series has `fit!`-ted.
 """
 nobs(s::Series) = s.n
 
-weight(s::Series, n2::Int = 1) = s.weight(s.n, n2)
-weight!(s::Series, n2::Int = 1) = (s.n += n2; weight(s, n2))
+weight(s::Series) = s.weight(s.n)
+weight!(s::Series) = s.weight(s.n += 1)
 
 function Base.:(==)(o1::Series, o2::Series)
     typeof(o1) == typeof(o2) || return false
@@ -331,19 +327,21 @@ Merge `s2` into `s1` in place where `s2`'s influence is determined by `arg`. Opt
 - `:append` (default)
     - append `s2` to `s1`.  Essentially `fit!(s1, data_which_s2_saw)`.
 - `:mean`
-    - Use the average of the Series' generated weights.
+    - Use the average (weighted by nobs) of the Series' generated weights.
 - `:singleton`
     - treat `s2` as a single observation.
 - any `Float64` in [0, 1]
 """
 function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
+    n1 = nobs(s1)
     n2 = nobs(s2)
     n2 == 0 && return s1
     s1.n += n2
     if method == :append
-        merge!.(s1.stats, s2.stats, weight(s1, n2))
+        merge!.(s1.stats, s2.stats, s1.weight(s1.n, n2))
     elseif method == :mean
-        merge!.(s1.stats, s2.stats, n2 / s1.n)
+        w = (n1 * s1.weight(n1) + n2 * s2.weight(n2)) / (n1 + n2)
+        merge!.(s1.stats, s2.stats, w)
     elseif method == :singleton
         merge!.(s1.stats, s2.stats, s1.weight(s1.n))
     else

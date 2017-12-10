@@ -1,5 +1,7 @@
 # TODO: Box 2 in https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf
 
+#-----------------------------------------------------------------------# 
+
 
 #-----------------------------------------------------------------------# 
 mutable struct NextHist{T <: Range} <: ExactStat{0}
@@ -11,25 +13,32 @@ NextHist(b::Integer) = NextHist(zeros(Int, b), linspace(0, 0, b), 0)
 
 function fit!(o::NextHist, y::Real, γ::Float64)
     x = o.x
-    a, b = extrema(x)
     o.n += 1
     if o.n == 1
         o.x = linspace(y, y, length(x))
     end
-    if y < a 
+    a, b = extrema(x)
+    if y < a
         o.x = linspace(y, b, length(x))
+        o.value[1] += 1
     elseif y > b
         o.x = linspace(a, y, length(x))
-    end 
-
-    # Do OHistogram fit
-    if o.n > 1
-        δ = step(x)
-        k = floor(Int, (y - a) / δ) + 1
-        if 1 <= k <= length(x)
-            @inbounds o.value[k] += 1
+        o.value[end] += 1
+    elseif o.n > 1
+        if o.n > 1
+            δ = step(x)
+            k = floor(Int, (y - a) / δ) + 1
+            if 1 <= k <= length(x)
+                @inbounds o.value[k] += 1
+            end
         end
     end
+end
+
+#-----------------------------------------------------------------------# Histogram2 
+struct Histogram2 <: ExactStat{0}
+    value::Vector{Float64}
+    counts::Vector{Int}
 end
 
 #-----------------------------------------------------------------------# IHistogram
