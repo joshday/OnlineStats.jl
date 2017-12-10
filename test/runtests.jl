@@ -528,5 +528,6 @@ end
 @testset "KMeans" begin 
     o = KMeans(5, 4)
     Series(randn(100, 5), o)
+    @test size(value(o)) == (5, 4)
 end
 end #module
