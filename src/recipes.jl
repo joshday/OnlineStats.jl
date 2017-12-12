@@ -46,7 +46,8 @@ end
 
 #-----------------------------------------------------------------------# IHistogram
 @recipe function f(o::IHistogram)
-    linetype --> :bar
+    linetype --> :sticks
+    label --> "Discretization"
     o.value, o.counts
 end
 

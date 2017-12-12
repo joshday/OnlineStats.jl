@@ -9,10 +9,10 @@ Univariate mean.
     s = Series(randn(100), Mean())
     value(s)
 """
-mutable struct Mean <: ExactStat{0}
-    μ::Float64
-    Mean(μ = 0.0) = new(μ)
+mutable struct Mean{T <: Number} <: ExactStat{0}
+    μ::T
 end
+Mean(t::Type{T} = Float64) where {T<:Number} = Mean(T(0))
 fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
 Base.merge!(o::Mean, o2::Mean, γ::Float64) = (fit!(o, value(o2), γ); o)
 Base.mean(o::Mean) = value(o)
