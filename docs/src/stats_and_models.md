@@ -5,7 +5,7 @@
 | **Univariate Statistics:**         |                            |
 | Mean                               | [`Mean`](@ref)             |
 | Variance                           | [`Variance`](@ref)         |
-| Quantiles                          | [`Quantile`](@ref), [`PQuantile`](@ref) |
+| Quantiles                          | [`Quantile`](@ref) and [`PQuantile`](@ref) |
 | Maximum/Minimum                    | [`Extrema`](@ref)          |
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
@@ -16,7 +16,7 @@
 | K-means clustering (SGD)           | [`KMeans`](@ref)           |
 | Multiple univariate statistics     | [`MV{<:OnlineStat}`](@ref) |
 | **Nonparametric Density Estimation:**|                          |
-| Histograms                         | [`OHistogram`](@ref), [`IHistogram`](@ref) |
+| Histograms                         | [`Hist`](@ref)             |
 | Approximate order statistics       | [`OrderStats`](@ref)       |
 | **Parametric Density Estimation:** |                            |
 | Beta                               | [`FitBeta`](@ref)          |

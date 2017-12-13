@@ -5,8 +5,27 @@ abstract type HistAlg end
 
 #-----------------------------------------------------------------------# Hist
 """
-    Hist(range)
-    Hist(nbins)
+    Hist(r::Range)
+    Hist(b::Int)
+
+Calculate a histogram over bin edges fixed as `r` or adaptively find the best `b` bins.  
+The two options use [`KnownBins`](@ref) and [`AdaptiveBins`](@ref), respectively.  
+`KnownBins` is much faster, but requires the range of the data to be known before it is 
+observed.  `Hist` objects can be used to return approximate summary statistics of the data.
+
+# Example 
+
+    o = Hist(-5:.1:5)
+    y = randn(1000)
+    Series(y, o)
+
+    # approximate summary statistics
+    mean(o)
+    var(o)
+    std(o)
+    median(o)
+    extrema(o)
+    quantile(o)
 """
 struct Hist{M <: HistAlg} <: ExactStat{0}
     method::M
@@ -41,6 +60,9 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
 end
 
 #-----------------------------------------------------------------------# KnownBins
+"""
+Calculate a histogram over a fixed range.  
+"""
 struct KnownBins{R <: Range} <: HistAlg 
     edges::R
     counts::Vector{Int}
@@ -76,6 +98,11 @@ end
 
 #-----------------------------------------------------------------------# AdaptiveBins
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
+"""
+Calculate a histogram adaptively.
+
+Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
+"""
 mutable struct AdaptiveBins <: HistAlg 
     values::Vector{Float64}
     counts::Vector{Int}
