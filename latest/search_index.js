@@ -481,14 +481,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.IHistogram",
-    "page": "API",
-    "title": "OnlineStats.IHistogram",
-    "category": "Type",
-    "text": "IHistogram(b)\n\nIncrementally build a histogram of b (not equally spaced) bins.  An IHistogram can be used as a \"surrogate\" for a dataset to get approximate summary statistics.\n\nExample\n\no = IHistogram(50)\nSeries(randn(1000), o)\n\n# approximate summary stats\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\nextrema(o)\nmedian(o)\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.KMeans",
     "page": "API",
     "title": "OnlineStats.KMeans",
@@ -566,14 +558,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.NSGD",
     "category": "Type",
     "text": "NSGD(α)\n\nNesterov accelerated Proximal Stochastic Gradient Descent.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.OHistogram",
-    "page": "API",
-    "title": "OnlineStats.OHistogram",
-    "category": "Type",
-    "text": "OHistogram(range)\n\nMake a histogram with bins given by range.  Uses left-closed bins.  OHistogram fits faster than IHistogram, but has the disadvantage of requiring specification of bins before data is observed.\n\nExample\n\ny = randn(100)\no = OHistogram(-5:.01:5)\ns = Series(y, o)\n\nvalue(o)  # return StatsBase.Histogram\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\n\n\n\n"
 },
 
 {
@@ -729,6 +713,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Hist",
+    "page": "API",
+    "title": "OnlineStats.Hist",
+    "category": "Type",
+    "text": "Hist(range)\nHist(nbins)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Lag",
     "page": "API",
     "title": "OnlineStats.Lag",
@@ -862,6 +854,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStatsBase.Weight",
     "category": "Type",
     "text": "Subtypes of Weight must be callable to produce the weight given the current number of  observations in an OnlineStat n and the number of new observations (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStatsBase._fit!",
+    "page": "API",
+    "title": "OnlineStatsBase._fit!",
+    "category": "Function",
+    "text": "_fit!(o::OnlineStat, observation::TypeOfObservation, γ::Float64)\n\nUpdate an OnlineStat with a single observation by a weight γ.  TypeOfObservation depends on typof(o).\n\n\n\n"
 },
 
 {
