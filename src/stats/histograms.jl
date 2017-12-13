@@ -110,6 +110,7 @@ mutable struct AdaptiveBins <: HistAlg
     AdaptiveBins(b::Int) = new(fill(Inf, b), zeros(Int, b), 0)
 end
 Hist(b::Int) = Hist(AdaptiveBins(b))
+Base.show(io::IO, o::AdaptiveBins) = print(io, "AdaptiveBins($(length(o.values)))")
 value(o::AdaptiveBins) = (o.values, o.counts)
 
 fit!(o::Hist{AdaptiveBins}, y::Real, γ::Float64) = push!(o.method, Pair(y, 1))

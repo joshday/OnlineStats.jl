@@ -54,6 +54,20 @@ end
     cov(o)
 end
 
+#-----------------------------------------------------------------------# Hist 
+@recipe f(o::Hist) = o.method
+
+@recipe f(o::KnownBins) = Histogram(o.edges, o.counts, :left)
+
+@recipe function f(o::AdaptiveBins)
+    # mids(v) = [0.5 * (v[i] + v[i + 1]) for i = 1:length(v) - 1]
+    # val = vcat(o.values[1], mids(o.values), o.values[end])
+    # Histogram(val, o.counts, :left)
+    linewidth --> 2
+    seriestype --> :sticks
+    value(o)
+end
+
 #-----------------------------------------------------------------------# MV
 @recipe function f(s::MV)
     i = 1
