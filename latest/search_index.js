@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile, PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms OHistogram, IHistogram\nApproximate order statistics OrderStats\nParametric Density Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nParametric Density Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
 },
 
 {
@@ -477,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Hist",
     "category": "Type",
-    "text": "Hist(range)\nHist(nbins)\n\n\n\n"
+    "text": "Hist(r::Range)\nHist(b::Int)\n\nCalculate a histogram over bin edges fixed as r or adaptively find the best b bins.   The two options use KnownBins and AdaptiveBins, respectively.   KnownBins is much faster, but requires the range of the data to be known before it is  observed.  Hist objects can be used to return approximate summary statistics of the data.\n\nExample\n\no = Hist(-5:.1:5)\ny = randn(1000)\nSeries(y, o)\n\n# approximate summary statistics\nmean(o)\nvar(o)\nstd(o)\nmedian(o)\nextrema(o)\nquantile(o)\n\n\n\n"
 },
 
 {
@@ -597,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.PQuantile",
     "category": "Type",
-    "text": "PQuantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm:\n\nhttps://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\nExample\n\ny = randn(10^6)\no1, o2, o3 = PQuantile(.25), PQuantile(.5), PQuantile(.75)\ns = Series(y, o1, o2, o3)\nvalue(s)\nquantile(y, [.25, .5, .75])\n\n\n\n"
+    "text": "PQuantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm.  It is more computationally expensive than the algorithms used by Quantile, but also more exact.\n\nRef: https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\nExample\n\ny = randn(10^6)\no1, o2, o3 = PQuantile(.25), PQuantile(.5), PQuantile(.75)\ns = Series(y, o1, o2, o3)\nvalue(s)\nquantile(y, [.25, .5, .75])\n\n\n\n"
 },
 
 {
@@ -713,11 +713,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.AdaptiveBins",
+    "page": "API",
+    "title": "OnlineStats.AdaptiveBins",
+    "category": "Type",
+    "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.BiasVec",
     "page": "API",
     "title": "OnlineStats.BiasVec",
     "category": "Type",
     "text": "BiasVec(x, bias = 1.0)\n\nLightWeight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.KnownBins",
+    "page": "API",
+    "title": "OnlineStats.KnownBins",
+    "category": "Type",
+    "text": "Calculate a histogram over a fixed range.  \n\n\n\n"
 },
 
 {
