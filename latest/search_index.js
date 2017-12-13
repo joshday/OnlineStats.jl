@@ -473,6 +473,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Hist",
+    "page": "API",
+    "title": "OnlineStats.Hist",
+    "category": "Type",
+    "text": "Hist(range)\nHist(nbins)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.HyperLogLog",
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
@@ -710,14 +718,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.BiasVec",
     "category": "Type",
     "text": "BiasVec(x, bias = 1.0)\n\nLightWeight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Hist",
-    "page": "API",
-    "title": "OnlineStats.Hist",
-    "category": "Type",
-    "text": "Hist(range)\nHist(nbins)\n\n\n\n"
 },
 
 {
