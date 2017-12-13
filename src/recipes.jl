@@ -39,17 +39,6 @@ end
     end
 end
 
-#-----------------------------------------------------------------------# OHistogram
-@recipe function f(o::OHistogram)
-    o.h
-end
-
-#-----------------------------------------------------------------------# IHistogram
-@recipe function f(o::IHistogram)
-    linetype --> :sticks
-    label --> "Discretization"
-    o.value, o.counts
-end
 
 #-----------------------------------------------------------------------# Series{0}
 @recipe function f(s::Series)

@@ -453,39 +453,39 @@ end
     fit!(o, (randn(5), randn()), .1)
     fit!(o, randn(5), randn(), .1)
 end
-@testset "IHistogram" begin
-    y = rand(1000)
-    o = IHistogram(100)
-    Series(y, o)
-    for val in value(o)
-        @test 0 < val < 1
-    end
-    @test sum(o.counts) == 1000
+# @testset "IHistogram" begin
+#     y = rand(1000)
+#     o = IHistogram(100)
+#     Series(y, o)
+#     for val in value(o)
+#         @test 0 < val < 1
+#     end
+#     @test sum(o.counts) == 1000
 
-    o2 = IHistogram(50)
-    Series(rand(1000), o2)
+#     o2 = IHistogram(50)
+#     Series(rand(1000), o2)
 
-    merge!(o, o2, .1)
-    @test sum(o.counts) == 2000
-    @test median(o) ≈ median(y) atol=.1
-    @test var(o) ≈ var(y) atol=.1
-    @test std(o) ≈ std(y) atol=.1
-    @test mean(o) ≈ mean(y) atol=.1
-    o = IHistogram(25)
-    y = 1:25
-    Series(y, o)
-    @test extrema(o) == extrema(y)
-    @test quantile(o) ≈ quantile(y) atol=.1
-end
-@testset "OHistogram" begin 
-    y = randn(100)
-    o = OHistogram(-5:.01:5)
-    Series(y, o)
-    @test mean(o) ≈ mean(y) atol=.1
-    @test var(o) ≈ var(y) atol=.1
-    @test std(o) ≈ std(y) atol=.1
-    @test quantile(o) ≈ quantile(y) atol=.1
-end
+#     merge!(o, o2, .1)
+#     @test sum(o.counts) == 2000
+#     @test median(o) ≈ median(y) atol=.1
+#     @test var(o) ≈ var(y) atol=.1
+#     @test std(o) ≈ std(y) atol=.1
+#     @test mean(o) ≈ mean(y) atol=.1
+#     o = IHistogram(25)
+#     y = 1:25
+#     Series(y, o)
+#     @test extrema(o) == extrema(y)
+#     @test quantile(o) ≈ quantile(y) atol=.1
+# end
+# @testset "OHistogram" begin 
+#     y = randn(100)
+#     o = OHistogram(-5:.01:5)
+#     Series(y, o)
+#     @test mean(o) ≈ mean(y) atol=.1
+#     @test var(o) ≈ var(y) atol=.1
+#     @test std(o) ≈ std(y) atol=.1
+#     @test quantile(o) ≈ quantile(y) atol=.1
+# end
 @testset "Other" begin 
     o = Variance()
     @test nobs(o) == 0
