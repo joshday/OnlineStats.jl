@@ -248,7 +248,7 @@ end
     for τ in .1:.1:.9 
         o = PQuantile(τ)
         Series(y, o)
-        @test quantile(y, τ) ≈ value(o) atol=.02
+        @test quantile(y, τ) ≈ value(o) atol=.03
     end
 end
 
@@ -453,39 +453,42 @@ end
     fit!(o, (randn(5), randn()), .1)
     fit!(o, randn(5), randn(), .1)
 end
-# @testset "IHistogram" begin
-#     y = rand(1000)
-#     o = IHistogram(100)
-#     Series(y, o)
-#     for val in value(o)
-#         @test 0 < val < 1
-#     end
-#     @test sum(o.counts) == 1000
+@testset "Hist" begin 
+    y = rand(1000)
 
-#     o2 = IHistogram(50)
-#     Series(rand(1000), o2)
+    # Adaptive Bins
+    o = Hist(100)
+    Series(y, o)
+    for val in value(o)[1]
+        @test 0 < val < 1
+    end
+    @test sum(value(o)[2]) == 1000
 
-#     merge!(o, o2, .1)
-#     @test sum(o.counts) == 2000
-#     @test median(o) ≈ median(y) atol=.1
-#     @test var(o) ≈ var(y) atol=.1
-#     @test std(o) ≈ std(y) atol=.1
-#     @test mean(o) ≈ mean(y) atol=.1
-#     o = IHistogram(25)
-#     y = 1:25
-#     Series(y, o)
-#     @test extrema(o) == extrema(y)
-#     @test quantile(o) ≈ quantile(y) atol=.1
-# end
-# @testset "OHistogram" begin 
-#     y = randn(100)
-#     o = OHistogram(-5:.01:5)
-#     Series(y, o)
-#     @test mean(o) ≈ mean(y) atol=.1
-#     @test var(o) ≈ var(y) atol=.1
-#     @test std(o) ≈ std(y) atol=.1
-#     @test quantile(o) ≈ quantile(y) atol=.1
-# end
+    # Both
+    o2 = Hist(50)
+    o3 = Hist(-5:.01:5)
+    Series(randn(1000), o2, o3)
+    merge!(o, o2, .1)
+
+    @testset "summary stats" begin
+        y = randn(1000)
+        o = Hist(50)
+        o2 = Hist(-5:.01:5)
+        Series(y, o, o2)
+        for o in [o, o2]
+            @test sum(value(o)[2]) == 1000
+            @test median(o) ≈ median(y) atol = .1
+            @test var(o)    ≈ var(y)    atol = .1
+            @test std(o)    ≈ std(y)    atol = .1
+            @test mean(o)   ≈ mean(y)   atol = .1
+        end
+        o = Hist(25)
+        y = 1:25 
+        Series(y, o)
+        @test extrema(o) == extrema(y)
+        @test quantile(o) ≈ quantile(y)
+    end
+end
 @testset "Other" begin 
     o = Variance()
     @test nobs(o) == 0
@@ -505,6 +508,7 @@ end
     @test last(o) == 2
 end
 @testset "ReservoirSample" begin 
+    y = randn(100)
     o = ReservoirSample(100)
     Series(y, o)
     @test value(o) == y

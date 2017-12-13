@@ -15,9 +15,8 @@ function Base.show(io::IO, h::Hist)
     print(io, "Hist: $(h.method)")
 end
 
-# method must implement
+# method must implement value --> Tuple of (edge_midpoints, counts)
 value(o::Hist) = value(o.method)
-_midpoints(o::Hist) = _midpoints(o.method)
 
 function Base.mean(o::Hist) 
     mids, counts = value(o)
@@ -28,6 +27,12 @@ function Base.var(o::Hist)
     var(mids, fweights(counts); corrected=true)
 end
 Base.std(o::Hist) = sqrt(var(o))
+Base.median(o::Hist) = quantile(o, .5)
+function Base.extrema(o::Hist) 
+    mids, counts = value(o)
+    inds = find(counts)  # filter out zero weights 
+    mids[inds[1]], mids[inds[end]]
+end
 
 function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1]) 
     mids, counts = value(o)
@@ -40,17 +45,17 @@ struct KnownBins{R <: Range} <: HistAlg
     edges::R
     counts::Vector{Int}
 end
-KnownBins(r::Range) = KnownBins(r, zeros(Int, length(r)))
+KnownBins(r::Range) = KnownBins(r, zeros(Int, length(r) - 1))
 Base.show(io::IO, o::KnownBins) = print(io, "KnownBins(edges = $(o.edges))")
 Hist(r::Range) = Hist(KnownBins(r))
-value(o::KnownBins) = (o.edges, o.counts)
+value(o::KnownBins) = (_midpoints(o.edges), o.counts)
 
 function fit!(o::Hist{<:KnownBins}, y::Real, γ::Float64)
     x = o.method.edges 
     a = first(x)
     δ = step(x)
     k = floor(Int, (y - a) / δ) + 1
-    if 1 <= k <= length(x)
+    if 1 <= k < length(x)
         @inbounds o.method.counts[k] += 1
     end
 end
@@ -78,6 +83,7 @@ mutable struct AdaptiveBins <: HistAlg
     AdaptiveBins(b::Int) = new(fill(Inf, b), zeros(Int, b), 0)
 end
 Hist(b::Int) = Hist(AdaptiveBins(b))
+value(o::AdaptiveBins) = (o.values, o.counts)
 
 fit!(o::Hist{AdaptiveBins}, y::Real, γ::Float64) = push!(o.method, Pair(y, 1))
 
