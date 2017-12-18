@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nDifference Diff\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nParametric Density Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nParametric Density Estimation: \nBeta FitBeta\nCategorical FitCategorical\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
 },
 
 {
@@ -358,6 +358,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.ADAMAX",
     "category": "Type",
     "text": "ADAMAX(η, β1 = .9, β2 = .999)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.AutoCov",
+    "page": "API",
+    "title": "OnlineStats.AutoCov",
+    "category": "Type",
+    "text": "AutoCov(b, T = Float64)\n\n\n\n"
 },
 
 {
