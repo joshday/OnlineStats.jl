@@ -328,7 +328,7 @@ end
 """
     Lag(b, T = Float64)
 
-Store the last `b` values of a data stream.
+Store the last `b` values for a data stream of type `T`.
 """
 struct Lag{T} <: ExactStat{0}
     value::Vector{T}
@@ -344,6 +344,16 @@ end
 #-----------------------------------------------------------------------# AutoCov 
 """
     AutoCov(b, T = Float64)
+
+Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
+
+# Example 
+
+    y = cumsum(randn(100))
+    o = AutoCov(5)
+    Series(y, o)
+    autocov(o)
+    autocor(o)
 """
 struct AutoCov{T} <: ExactStat{0}
     cross::Vector{Float64}
