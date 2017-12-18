@@ -365,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.AutoCov",
     "category": "Type",
-    "text": "AutoCov(b, T = Float64)\n\n\n\n"
+    "text": "AutoCov(b, T = Float64)\n\nCalculate the auto-covariance/correlation for lags 0 to b for a data stream of type T.\n\nExample\n\ny = cumsum(randn(100))\no = AutoCov(5)\nSeries(y, o)\nautocov(o)\nautocor(o)\n\n\n\n"
 },
 
 {
@@ -509,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Lag",
     "category": "Type",
-    "text": "Lag(b, T = Float64)\n\nStore the last b values of a data stream.\n\n\n\n"
+    "text": "Lag(b, T = Float64)\n\nStore the last b values for a data stream of type T.\n\n\n\n"
 },
 
 {
