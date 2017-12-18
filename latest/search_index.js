@@ -497,6 +497,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Lag",
+    "page": "API",
+    "title": "OnlineStats.Lag",
+    "category": "Type",
+    "text": "Lag(b, T = Float64)\n\nStore the last b values of a data stream.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.LinReg",
     "page": "API",
     "title": "OnlineStats.LinReg",
@@ -734,14 +742,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.KnownBins",
     "category": "Type",
     "text": "Calculate a histogram over a fixed range.  \n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Lag",
-    "page": "API",
-    "title": "OnlineStats.Lag",
-    "category": "Type",
-    "text": "Lag(b, T = Float64)\n\n\n\n"
 },
 
 {
