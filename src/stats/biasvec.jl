@@ -7,7 +7,7 @@ LightWeight wrapper of a vector which adds a "bias" term at the end.
 
     OnlineStats.BiasVec(rand(5), 10)
 """
-struct BiasVec{T, A <: AbstractVector{T}} <: AbstractVector{T}
+struct BiasVec{T, A <: VectorOb} <: AbstractVector{T}
     x::A
     bias::T
 end
