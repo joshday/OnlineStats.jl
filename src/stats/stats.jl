@@ -342,14 +342,53 @@ function fit!(o::Lag{T}, y::T, γ::Float64) where {T}
 end
 
 #-----------------------------------------------------------------------# AutoCov 
+"""
+    AutoCov(b, T = Float64)
+"""
 struct AutoCov{T} <: ExactStat{0}
-    value::CovMatrix
-    lag::Lag{T}
+    cross::Vector{Float64}
+    m1::Vector{Float64}
+    m2::Vector{Float64}
+    lag::Lag{T}         # y_{t-1}, y_{t-2}, ...
+    wlag::Lag{Float64}  # γ_{t-1}, γ_{t-2}, ...
+    v::Variance
 end
-AutoCov(b::Integer, T::Type = Float64) = AutoCov(CovMatrix(b), Lag(b, T))
+function AutoCov(k::Integer, T = Float64)
+    AutoCov(
+        zeros(k + 1), zeros(k + 1), zeros(k + 1),
+        Lag(k + 1, T), Lag(k + 1, Float64), Variance()
+    )
+end
+Base.show(io::IO, o::AutoCov) = println(io, "AutoCov: $(value(o))")
+nobs(o::AutoCov) = nobs(o.v)
+
 function fit!(o::AutoCov, y::Real, γ::Float64)
-    fit!(o.lag, y, γ)
+    fit!(o.v, y, γ)
+    fit!(o.lag, y, 1.0)     # y_t, y_{t-1}, ...
+    fit!(o.wlag, γ, 1.0)    # γ_t, γ_{t-1}, ...
+    # M1 ✓
+    for k in reverse(2:length(o.m2))
+        @inbounds o.m1[k] = o.m1[k - 1]
+    end
+    @inbounds o.m1[1] = smooth(o.m1[1], y, γ)
+    # Cross ✓ and M2 ✓
+    @inbounds for k in 1:length(o.m1)
+        γk = value(o.wlag)[k]
+        o.cross[k] = smooth(o.cross[k], y * value(o.lag)[k], γk)
+        o.m2[k] = smooth(o.m2[k], y, γk)
+    end
 end
+
+function value(o::AutoCov)
+    μ = mean(o.v)
+    n = nobs(o)
+    cr = o.cross
+    m1 = o.m1
+    m2 = o.m2
+    [(n - k + 1) / n * (cr[k] + μ * (μ - m1[k] - m2[k])) for k in 1:length(m1)]
+end
+autocov(o::AutoCov) = value(o)
+autocor(o::AutoCov) = value(o) ./ value(o)[1]
 
 
 #-----------------------------------------------------------------------# Moments

@@ -9,7 +9,10 @@
 | Maximum/Minimum                    | [`Extrema`](@ref)          |
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
+| **Time Series:**                   |                            |
 | Difference                         | [`Diff`](@ref)             |
+| Lag                                | [`Lag`](@ref)              |
+| Autocorrelation/autocovariance     | [`AutoCov`](@ref)          |
 | **Multivariate Analysis:**         |                            |
 | Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
 | Principal components analysis      | [`CovMatrix`](@ref)        |

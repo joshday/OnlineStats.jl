@@ -244,6 +244,13 @@ end
     s = Series(data, o)
     @test reverse(value(o)) == data[96:100]
 end
+@testset "AutoCov" begin 
+    o = AutoCov(10)
+    s = Series(y, o)
+    @test autocov(o) ≈ autocov(y, 0:10)
+    @test autocor(o) ≈ autocor(y, 0:10)
+    @test nobs(o) == length(y)
+end
 
 
 #-----------------------------------------------------------------------# Quantile
