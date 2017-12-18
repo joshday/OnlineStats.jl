@@ -23,7 +23,7 @@ export
     FitMultinomial, FitMvNormal,
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
-    OrderStats, Quantile, PQuantile, ReservoirSample, 
+    OrderStats, Quantile, PQuantile, ReservoirSample, Lag,
     Sum, LinReg, LinRegBuilder, IHistogram, OHistogram, Hist, CallFun, MV, Bootstrap, 
     NBClassifier,
     # StatLearn

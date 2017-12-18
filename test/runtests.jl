@@ -233,6 +233,19 @@ end #Series
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
 
+#-----------------------------------------------------------------------# Lag 
+@testset "Lag" begin 
+    o = Lag(10)
+    s = Series(y, o)
+    @test reverse(value(o)) == y[end-9:end]
+
+    data = rand(Bool, 100)
+    o = Lag(5, Bool)
+    s = Series(data, o)
+    @test reverse(value(o)) == data[96:100]
+end
+
+
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 
     y = randn(10_000)

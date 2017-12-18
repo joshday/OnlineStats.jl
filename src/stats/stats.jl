@@ -328,24 +328,28 @@ end
 """
     Lag(b, T = Float64)
 
-
+Store the last `b` values of a data stream.
 """
-mutable struct Lag{T} <: ExactStat{0}
+struct Lag{T} <: ExactStat{0}
     value::Vector{T}
-    n::Int
 end
-Lag(b::Integer, T::Type = Float64) = Lag(Vector{T}(b), 0)
+Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
 function fit!(o::Lag{T}, y::T, γ::Float64) where {T} 
-    o.n += 1
-    b = length(o.value)
-    i = o.n % b 
-    if i == 0
-        o.value[end] = y 
-    else
-        o.value[i] = y
+    for i in reverse(2:length(o.value))
+        @inbounds o.value[i] = o.value[i - 1]
     end
+    o.value[1] = y
 end
-value(o::Lag, i::Int = length(o.value)) = o.value[i]
+
+#-----------------------------------------------------------------------# AutoCov 
+struct AutoCov{T} <: ExactStat{0}
+    value::CovMatrix
+    lag::Lag{T}
+end
+AutoCov(b::Integer, T::Type = Float64) = AutoCov(CovMatrix(b), Lag(b, T))
+function fit!(o::AutoCov, y::Real, γ::Float64)
+    fit!(o.lag, y, γ)
+end
 
 
 #-----------------------------------------------------------------------# Moments

@@ -11,7 +11,8 @@ struct BiasVec{T, A <: VectorOb} <: AbstractVector{T}
     x::A
     bias::T
 end
-BiasVec(x, bias = 1.0) = BiasVec{eltype(x), typeof(x)}(x, bias)
+# typeof(x[1]) instead of eltype -> allow tuples
+BiasVec(x, bias = 1.0) = BiasVec{typeof(x[1]), typeof(x)}(x, bias)
 
 Base.length(v::BiasVec) = length(v.x) + 1
 
