@@ -93,6 +93,14 @@ function Base.merge!(o::Hist{T}, o2::Hist{T}, γ::Float64) where {T <: KnownBins
         end
     end
 end
+function discretized_pdf(o::Hist{KnownBins}, y::Real)
+    b = o.method
+    i = searchsortedfirst(b.edges, y)
+    if i > length(b.counts)
+        i -= 1
+    end
+    b.counts[i] / sum(b.counts)
+end
 
 
 
@@ -158,6 +166,15 @@ function Base.merge!(o::Hist{AdaptiveBins}, o2::Hist{AdaptiveBins}, γ::Float64)
     end
 end
 
+function discretized_pdf(o::Hist{AdaptiveBins}, y::Real)
+    b = o.method
+    i = searchsortedfirst(b.edges, y)
+    if i > length(b.counts)
+        i -= 1
+    end
+    b.counts[i] / sum(b.counts)
+end
+
 
 # # Algorithm 3: Sum Procedure
 # # Estimated number of points in interval [-∞, b]
@@ -195,13 +212,7 @@ end
 # end
 
 
-# function discretized_pdf(o::IHistogram, y::Real)
-#     i = searchsortedfirst(o.value, y)
-#     if i > length(o.counts)
-#         i -= 1
-#     end
-#     o.counts[i] / sum(o.counts)
-# end
+
 
 
 #-----------------------------------------------------------------------# deprecations
