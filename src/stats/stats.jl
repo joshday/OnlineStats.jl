@@ -83,6 +83,41 @@ function Base.merge!(o1::T, o2::T, γ::Float64) where {T<:CStat}
     merge!(o1.im_stat, o2.im_stat, γ)
 end
 
+#-----------------------------------------------------------------------# CountMap
+"""
+    CountMap(T)
+
+Fit a categorical distribution where the inputs are of type `T`.
+
+    using Distributions
+    s = Series(rand(1:10, 1000), CountMap(Int))
+    value(s)
+
+    vals = ["small", "medium", "large"]
+    o = CountMap(String)
+    s = Series(rand(vals, 1000), o)
+    value(o)
+"""
+mutable struct CountMap{T} <: ExactStat{0}
+    d::Dict{T, Int}
+    nobs::Int
+    CountMap{T}() where {T} = new(Dict{T, Int}(), 0)
+end
+CountMap(t::Type) = CountMap{t}()
+function fit!{T}(o::CountMap{T}, y::T, γ::Float64)
+    o.nobs += 1
+    haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
+end
+_value(o::CountMap) = ifelse(o.nobs > 0, collect(values(o.d)), zeros(0))
+Base.keys(o::CountMap) = keys(o.d)
+Base.values(o::CountMap) = values(o.d)
+function Base.merge!(o::T, o2::T, γ::Float64) where {T <: CountMap}
+    merge!(o.d, o2.d)
+    o.nobs += o2.nobs
+end
+Base.haskey(o::CountMap, key) = haskey(o.d, key)
+
+@deprecate FitCategorical(t::Type) CountMap(t::Type)
 #-----------------------------------------------------------------------# CovMatrix
 """
     CovMatrix(d)

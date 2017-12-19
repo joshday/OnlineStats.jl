@@ -20,7 +20,7 @@ export
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled,
     # Distributions
-    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, 
+    FitBeta, FitCategorical, CountMap, FitCauchy, FitGamma, FitLogNormal, FitNormal, 
     FitMultinomial, FitMvNormal,
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
@@ -82,6 +82,7 @@ include("stats/statlearn.jl")
 include("stats/experimental.jl")
 include("stats/bootstrap.jl")
 include("stats/naivebayes.jl")
+include("stats/decisiontree.jl")
 include("series.jl")
 include("mapblocks.jl")
 include("recipes.jl")

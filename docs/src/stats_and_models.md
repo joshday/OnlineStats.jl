@@ -21,9 +21,9 @@
 | **Nonparametric Density Estimation:**|                          |
 | Histograms                         | [`Hist`](@ref)             |
 | Approximate order statistics       | [`OrderStats`](@ref)       |
+| Count for each unique value        | [`CountMap`](@ref)         |
 | **Parametric Density Estimation:** |                            |
 | Beta                               | [`FitBeta`](@ref)          |
-| Categorical                        | [`FitCategorical`](@ref)   |
 | Cauchy                             | [`FitCauchy`](@ref)        |
 | Gamma                              | [`FitGamma`](@ref)         |
 | LogNormal                          | [`FitLogNormal`](@ref)     |

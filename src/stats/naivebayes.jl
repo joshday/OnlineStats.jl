@@ -10,12 +10,12 @@ probabilities are estimated using the [`IHistogram`](@ref) type with `b` bins.
     Series((x,y), NBClassifier(5, Bool))
 """
 struct NBClassifier{T, D <: Dict{T, IHistogram}} <: ExactStat{(1, 0)}
-    cat::FitCategorical{T}
+    cat::CountMap{T}
     h::Vector{D}  # length p Vector of Dict{T, IHistogram}
     b::Int
 end
 function NBClassifier(p::Integer, T::Type, b::Integer = 20) 
-    cat = FitCategorical(T)
+    cat = CountMap(T)
     h = [Dict{T, IHistogram}() for i in 1:p]
     NBClassifier(cat, h, b)
 end

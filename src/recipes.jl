@@ -80,8 +80,8 @@ end
     end
 end
 
-#-----------------------------------------------------------------------# FitCategorical
-@recipe function f(o::FitCategorical)
+#-----------------------------------------------------------------------# CountMap
+@recipe function f(o::CountMap)
     seriestype --> :bar 
     collect(keys(o)), value(o)
 end

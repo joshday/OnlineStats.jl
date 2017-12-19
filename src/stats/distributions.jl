@@ -28,40 +28,6 @@ function _value(o::FitBeta)
 end
 Base.merge!(o::FitBeta, o2::FitBeta, γ::Float64) = merge!(o.var, o2.var, γ)
 
-#---------------------------------------------------------------------------------# Categorical
-"""
-    FitCategorical(T)
-
-Fit a categorical distribution where the inputs are of type `T`.
-
-    using Distributions
-    s = Series(rand(1:10, 1000), FitCategorical(Int))
-    value(s)
-
-    vals = ["small", "medium", "large"]
-    o = FitCategorical(String)
-    s = Series(rand(vals, 1000), o)
-    value(o)
-"""
-mutable struct FitCategorical{T} <: ExactStat{0}
-    d::Dict{T, Int}
-    nobs::Int
-    FitCategorical{T}() where {T} = new(Dict{T, Int}(), 0)
-end
-FitCategorical(t::Type) = FitCategorical{t}()
-function fit!{T}(o::FitCategorical{T}, y::T, γ::Float64)
-    o.nobs += 1
-    haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
-end
-_value(o::FitCategorical) = ifelse(o.nobs > 0, collect(values(o.d)), zeros(0))
-Base.keys(o::FitCategorical) = keys(o.d)
-Base.values(o::FitCategorical) = values(o.d)
-function Base.merge!(o::T, o2::T, γ::Float64) where {T <: FitCategorical}
-    merge!(o.d, o2.d)
-    o.nobs += o2.nobs
-end
-Base.haskey(o::FitCategorical, key) = haskey(o.d, key)
-
 #---------------------------------------------------------------------------------# Cauchy
 """
     FitCauchy(alg = SGD())

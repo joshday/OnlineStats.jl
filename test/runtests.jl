@@ -39,6 +39,8 @@ println(Series(Mean(), Variance(), Moments()))
 println(25Mean())
 Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
 
+@test_warn "deprecated" FitCategorical(Int)
+
 println("\n\n")
 
 #-----------------------------------------------------------------------# Data
@@ -69,8 +71,7 @@ end
     for o in [LinReg(5), StatLearn(5)]
         test_merge(o, copy(o), (x,y), (x2, y2))
     end
-end
-
+end 
 
 #-----------------------------------------------------------------------# Series
 @testset "Series" begin 
@@ -232,9 +233,26 @@ end #Series
     @test value(s)[1] ≈ x\y
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
+#-----------------------------------------------------------------------# CountMap
+@testset "CountMap" begin
+    y = rand(1:5, 1000)
+    o = CountMap(Int)
+    s = Series(y, o)
+    for i in 1:5
+        @test i in keys(o)
+    end
+    vals = ["small", "big"]
+    s = Series(rand(vals, 100), CountMap(String))
+    value(s)
+
+    @test keys(o) == keys(o.d)
+    @test values(o) == values(o.d)
+    test_merge(CountMap(Int), CountMap(Int), y, rand(1:2, 10))
+end
 
 #-----------------------------------------------------------------------# Lag 
 @testset "Lag" begin 
+    y = randn(100)
     o = Lag(10)
     s = Series(y, o)
     @test reverse(value(o)) == y[end-9:end]
@@ -288,21 +306,6 @@ end
         @test value(o)[1] ≈ 1.0 atol=.4
         @test value(o)[2] ≈ 1.0 atol=.4
         test_merge(FitBeta(), FitBeta(), rand(50), rand(50))
-    end
-    @testset "FitCategorical" begin
-        y = rand(1:5, 1000)
-        o = FitCategorical(Int)
-        s = Series(y, o)
-        for i in 1:5
-            @test i in keys(o)
-        end
-        vals = ["small", "big"]
-        s = Series(rand(vals, 100), FitCategorical(String))
-        value(s)
-
-        @test keys(o) == keys(o.d)
-        @test values(o) == values(o.d)
-        test_merge(FitCategorical(Int), FitCategorical(Int), y, rand(1:2, 10))
     end
     @testset "FitCauchy" begin
         o = FitCauchy()
