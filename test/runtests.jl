@@ -40,6 +40,8 @@ println(25Mean())
 Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
 
 @test_warn "deprecated" FitCategorical(Int)
+@test_warn "deprecated" OHistogram(-5:.1:5)
+@test_warn "deprecated" IHistogram(10)
 
 println("\n\n")
 

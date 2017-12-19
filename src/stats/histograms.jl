@@ -194,16 +194,6 @@ end
 #     u
 # end
 
-# #-----------------------------------------------------------------------# summaries
-# Base.extrema(o::IHistogram) = (first(o.value), last(o.value))
-# Base.mean(o::IHistogram) = mean(o.value, fweights(o.counts))
-# Base.var(o::IHistogram) = var(o.value, fweights(o.counts); corrected=true)
-# Base.std(o::IHistogram) = sqrt(var(o))
-# function Base.quantile(o::IHistogram, p = [0, .25, .5, .75, 1]) 
-#     inds = find(o.counts)  # filter out zero weight bins
-#     quantile(o.value[inds], fweights(o.counts[inds]), p)
-# end
-# Base.median(o::IHistogram) = quantile(o, .5)
 
 # function discretized_pdf(o::IHistogram, y::Real)
 #     i = searchsortedfirst(o.value, y)
@@ -213,88 +203,6 @@ end
 #     o.counts[i] / sum(o.counts)
 # end
 
-# #-----------------------------------------------------------------------# OHistogram
-# """
-#     OHistogram(range)
-
-# Make a histogram with bins given by `range`.  Uses left-closed bins.  `OHistogram` fits
-# faster than [`IHistogram`](@ref), but has the disadvantage of requiring specification of
-# bins before data is observed.
-
-# # Example
-
-#     y = randn(100)
-#     o = OHistogram(-5:.01:5)
-#     s = Series(y, o)
-    
-#     value(o)  # return StatsBase.Histogram
-#     quantile(o)
-#     mean(o)
-#     var(o)
-#     std(o)
-# """
-# struct OHistogram{H <: Histogram} <: ExactStat{0}
-#     h::H
-# end
-# OHistogram(r::Range) = OHistogram(Histogram(r, :left))
-# function fit!(o::OHistogram, y::ScalarOb, γ::Float64)
-#     H = o.h
-#     x = H.edges[1]
-#     a = first(x)
-#     δ = step(x)
-#     k = floor(Int, (y - a) / δ) + 1
-#     if 1 <= k <= length(x)
-#         @inbounds H.weights[k] += 1
-#     end
-# end
-# Base.merge!(o::T, o2::T, γ::Float64) where {T <: OHistogram} = merge!(o.h, o2.h)
-
-# _x(o::OHistogram) = (o.h.edges[1] + .5*step(o.h.edges[1]))[2:end]
-
-# Base.mean(o::OHistogram) = mean(_x(o), fweights(o.h.weights))
-# Base.var(o::OHistogram) = var(_x(o), fweights(o.h.weights); corrected=true)
-# Base.std(o::OHistogram) = sqrt(var(o))
-
-# function Base.quantile(o::OHistogram, p = [0, .25, .5, .75, 1]) 
-#     inds = find(o.h.weights)  # filter out zero weights
-#     quantile(_x(o)[inds], fweights(o.h.weights[inds]), p)
-# end
-
-# #-----------------------------------------------------------------------# 
-# mutable struct NextHist{T <: Range} <: ExactStat{0}
-#     value::Vector{Int}
-#     x::T 
-#     n::Int
-# end
-# NextHist(b::Integer) = NextHist(zeros(Int, b), linspace(0, 0, b), 0)
-
-# function Base.show(io::IO, o::NextHist)
-#     print(io, "NextHist(x = $(o.x))")
-# end
-
-# function fit!(o::NextHist, y::Real, γ::Float64)
-#     x = o.x
-#     o.n += 1
-#     if o.n == 1
-#         o.x = linspace(y, y, length(x))
-#     end
-#     a, b = extrema(x)
-#     if y < a
-#         o.x = linspace(y, b, length(x))
-#         o.value[1] += 1
-#     elseif y > b
-#         o.x = linspace(a, y, length(x))
-#         o.value[end] += 1
-#     elseif o.n > 1
-#         if o.n > 1
-#             δ = step(x)
-#             k = floor(Int, (y - a) / δ) + 1
-#             if 1 <= k <= length(x)
-#                 @inbounds o.value[k] += 1
-#             end
-#         end
-#     end
-# end
 
 #-----------------------------------------------------------------------# deprecations
 @deprecate OHistogram(r::Range) Hist(r::Range)
