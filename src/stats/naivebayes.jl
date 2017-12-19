@@ -2,21 +2,21 @@
     NBClassifier(p, T, b = 20)
 
 Create a Naive Bayes classifier for `p` predictors for classes of type `T`.  Conditional
-probabilities are estimated using the [`IHistogram`](@ref) type with `b` bins.
+probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type with `b` bins.
 
 # Example
 
     x, y = randn(100, 5), rand(Bool, 100)
     Series((x,y), NBClassifier(5, Bool))
 """
-struct NBClassifier{T, D <: Dict{T, IHistogram}} <: ExactStat{(1, 0)}
+struct NBClassifier{T, D <: Dict{T, Hist{AdaptiveBins}}} <: ExactStat{(1, 0)}
     cat::CountMap{T}
-    h::Vector{D}  # length p Vector of Dict{T, IHistogram}
+    h::Vector{D}
     b::Int
 end
 function NBClassifier(p::Integer, T::Type, b::Integer = 20) 
     cat = CountMap(T)
-    h = [Dict{T, IHistogram}() for i in 1:p]
+    h = [Dict{T, Hist{AdaptiveBins}}() for i in 1:p]
     NBClassifier(cat, h, b)
 end
 Base.show(io::IO, o::NBClassifier) = print(io, "NBCLassifier with labels: $(keys(o.cat))")
@@ -29,7 +29,7 @@ function fit!(o::NBClassifier, xy::Tuple{VectorOb, ScalarOb}, γ::Float64)
         end
     else  # we haven't seen y, so make a new key for each Dict in h
         for j in eachindex(x)
-            ih = IHistogram(o.b)
+            ih = Hist(o.b)
             fit!(ih, x[j], γ)
             o.h[j][y] = ih
         end

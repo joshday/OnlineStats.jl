@@ -168,7 +168,7 @@ end
 
 function discretized_pdf(o::Hist{AdaptiveBins}, y::Real)
     b = o.method
-    i = searchsortedfirst(b.edges, y)
+    i = searchsortedfirst(b.values, y)
     if i > length(b.counts)
         i -= 1
     end

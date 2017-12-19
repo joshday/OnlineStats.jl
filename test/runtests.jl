@@ -231,6 +231,7 @@ end #Series
     @test value(s)[1] ≈ x\y
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
+
 #-----------------------------------------------------------------------# CountMap
 @testset "CountMap" begin
     y = rand(1:5, 1000)
@@ -246,6 +247,15 @@ end
     @test keys(o) == keys(o.d)
     @test values(o) == values(o.d)
     test_merge(CountMap(Int), CountMap(Int), y, rand(1:2, 10))
+end
+
+#-----------------------------------------------------------------------# NBClassifier
+@testset "NBClassifier" begin 
+    x = randn(1000, 10)
+    y = x * linspace(-1, 1, 10) .> 0
+    o = NBClassifier(10, Bool)
+    Series((x,y), o)
+    @test !classify(o, 1:10)
 end
 
 #-----------------------------------------------------------------------# Lag 
