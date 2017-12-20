@@ -338,7 +338,7 @@ function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     n2 == 0 && return s1
     s1.n += n2
     if method == :append
-        merge!.(s1.stats, s2.stats, s1.weight(s1.n, n2))
+        merge!.(s1.stats, s2.stats, n2 / s1.n)
     elseif method == :mean
         w = (n1 * s1.weight(n1) + n2 * s2.weight(n2)) / (n1 + n2)
         merge!.(s1.stats, s2.stats, w)
