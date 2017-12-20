@@ -246,7 +246,21 @@ end
 
     @test keys(o) == keys(o.d)
     @test values(o) == values(o.d)
-    test_merge(CountMap(Int), CountMap(Int), y, rand(1:2, 10))
+    # test_merge(CountMap(Int), CountMap(Int), y, rand(1:2, 10))
+
+    # merge with same keys
+    o1, o2 = CountMap(Bool), CountMap(Bool)
+    y1, y2 = rand(Bool, 100), rand(Bool, 100)
+    s1, s2 = Series(y1, o1), Series(y2, o2)
+    merge!(s1, s2)
+    @test s1 == Series(vcat(y1, y2), CountMap(Bool))
+
+    # merge with different keys 
+    o1, o2 = CountMap(Bool), CountMap(Bool)
+    y1, y2 = fill(true, 100), fill(false, 100)
+    s1, s2 = Series(y1, o1), Series(y2, o2)
+    merge!(s1, s2)
+    @test s1 == Series(vcat(y1, y2), CountMap(Bool))
 end
 
 #-----------------------------------------------------------------------# NBClassifier

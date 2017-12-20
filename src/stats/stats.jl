@@ -108,11 +108,18 @@ function fit!{T}(o::CountMap{T}, y::T, γ::Float64)
     o.nobs += 1
     haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
 end
-_value(o::CountMap) = ifelse(o.nobs > 0, collect(values(o.d)), zeros(0))
+# _value(o::CountMap) = ifelse(o.nobs > 0, collect(values(o.d)), zeros(0))
 Base.keys(o::CountMap) = keys(o.d)
 Base.values(o::CountMap) = values(o.d)
 function Base.merge!(o::T, o2::T, γ::Float64) where {T <: CountMap}
-    merge!(o.d, o2.d)
+    okeys = keys(o)
+    for k in keys(o2.d)
+        if k in okeys
+            o.d[k] += o2.d[k]
+        else
+            o.d[k] = o2.d[k]
+        end
+    end
     o.nobs += o2.nobs
 end
 Base.haskey(o::CountMap, key) = haskey(o.d, key)

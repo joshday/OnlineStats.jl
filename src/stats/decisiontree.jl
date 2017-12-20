@@ -1,23 +1,57 @@
-# # https://people.cs.umass.edu/~utgoff/papers/mlj-id5r.pdf
+# Review paper:
+# https://people.cs.umass.edu/~utgoff/papers/mlj-id5r.pdf
 
-# abstract type DecisionTreeAlgorithm end
+abstract type DecisionTreeAlgorithm end
 
-# #-----------------------------------------------------------------------# DecisionTree
-# """
-#     DecisionTree(LabelType, alg = ID4())
+#-----------------------------------------------------------------------# DecisionTree
+mutable struct DecisionTree{T <: DecisionTreeAlgorithm} <: ExactStat{(1, 0)}
+    alg::T
+end
+DecisionTree(args...) = DecisionTree(VFDT(args...))
 
-# Create a decision tree where labels have type `LabelType` via the incremental algorithm 
-# `alg`.
-# """
-# mutable struct DecisionTree{T <: DecisionTreeAlgorithm, S} <: ExactStat{(1, 0)}
-#     alg::T
-#     categories::CountMap{S}
-# end
-# DecisionTree(T, alg = ITI()) = DecisionTree(alg, CountMap(T), Node(T))
+function Base.show(io::IO, o::DecisionTree)
+    print_with_color(:green, io, "DecisionTree: ")
+    print(io, o.alg)
+end
 
-# #-----------------------------------------------------------------------# ITI 
-# struct ITI <: DecisionTreeAlgorithm 
-# end
+
+#-----------------------------------------------------------------------# VFDT 
+# https://homes.cs.washington.edu/~pedrod/papers/kdd00.pdf
+
+# Hoeffding Tree Node
+mutable struct HNode{T}
+    ss::Vector{CountMap{T}}
+    children
+end
+HNode(T) = HNode(CountMap{T}[], nothing)
+
+function Base.show(io::IO, o::HNode)
+    print_with_color(:green, io, name(o))
+    println(io)
+    n_att = length(o.ss)
+    println(io, "  > N Attributes: ", n_att)
+    print(io,   "  > Children:     ", o.children)
+end
+
+struct VFDT{G, T} <: DecisionTreeAlgorithm
+    g::G        # split evaluation function 
+    δ::Float64  # 1 - δ = desired probability of choosing correct attribute to split on
+    tree::HNode{T}
+end
+VFDT(T, δ::Float64 = .01) = VFDT(information_gain, δ, HNode(T))
+
+function Base.show(io::IO, o::VFDT{G, T}) where {G, T}
+    print_with_color(:green, io, "VFDT")
+    println(io)
+    println(io, "  > Label Type    : ", T)
+    println(io, "  > Split Criteria: ", o.g)
+    println(io, "  > δ             : ", o.δ)
+    print(  io, "  > Tree Size     : ", 0)
+end
+
+function information_gain()
+
+end
 
 
 
