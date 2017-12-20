@@ -46,7 +46,7 @@ function Base.show(io::IO, o::VFDT{G, T}) where {G, T}
     println(io, "  > Label Type    : ", T)
     println(io, "  > Split Criteria: ", o.g)
     println(io, "  > δ             : ", o.δ)
-    print(  io, "  > Tree Size     : ", 0)
+    print(  io, "  > Tree Size     : ", "???")
 end
 
 function information_gain()

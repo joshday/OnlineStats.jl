@@ -4,7 +4,7 @@ module OnlineStats
 import SweepOperator
 import LearnBase: fit!, value, nobs, predict
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, 
-    confint, autocor, autocov
+    confint, autocor, autocov, entropy
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
     ScalarOb, VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
@@ -20,11 +20,11 @@ export
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled,
     # Distributions
-    FitBeta, FitCategorical, CountMap, FitCauchy, FitGamma, FitLogNormal, FitNormal, 
+    FitBeta, FitCategorical, FitCauchy, FitGamma, FitLogNormal, FitNormal, 
     FitMultinomial, FitMvNormal,
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
-    OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov,
+    OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, IHistogram, OHistogram, Hist, CallFun, MV, Bootstrap, 
     NBClassifier,
     # StatLearn

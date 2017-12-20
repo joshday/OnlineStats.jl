@@ -9,6 +9,7 @@
 | Maximum/Minimum                    | [`Extrema`](@ref)          |
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
+| Count                              | [`Count`](@ref)            |
 | **Time Series:**                   |                            |
 | Difference                         | [`Diff`](@ref)             |
 | Lag                                | [`Lag`](@ref)              |

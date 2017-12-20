@@ -83,6 +83,20 @@ function Base.merge!(o1::T, o2::T, γ::Float64) where {T<:CStat}
     merge!(o1.im_stat, o2.im_stat, γ)
 end
 
+#-----------------------------------------------------------------------# Count 
+"""
+    Count()
+
+The number of things observed.
+"""
+mutable struct Count <: ExactStat{0}
+    n::Int
+    Count() = new(0)
+end
+fit!(o::Count, y::Real, γ::Float64) = (o.n += 1)
+Base.merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n)
+
+
 #-----------------------------------------------------------------------# CountMap
 """
     CountMap(T)
@@ -123,6 +137,7 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T <: CountMap}
     o.nobs += o2.nobs
 end
 Base.haskey(o::CountMap, key) = haskey(o.d, key)
+entropy(o::CountMap) = entropy(collect(values(o)) ./ sum(values(o)))
 
 @deprecate FitCategorical(t::Type) CountMap(t::Type)
 #-----------------------------------------------------------------------# CovMatrix
