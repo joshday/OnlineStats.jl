@@ -4,9 +4,18 @@
 abstract type DecisionTreeAlgorithm end
 
 mutable struct Node{T, F <: Function}
-    pmk::CountMap{T}
+    counts::CountMap{T}
     impurity::F
 end
+function Node(T::Type, impurity = p -> entropy(p, 2)) 
+    Node(CountMap(T), impurity)
+end
+function Base.show(io::IO, o::Node)
+    print_with_color(:green, io, "Node\n")
+    println(io, "  > impurity: ", o.impurity)
+    print(  io, "  > counts:   ", o.counts)
+end
+
 probs(o::Node) = collect(values(o)) ./ sum(values(o))
 
 

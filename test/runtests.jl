@@ -272,6 +272,7 @@ end
     merge!(s1, s2)
     @test s1 == Series(vcat(y1, y2), CountMap(Bool))
     @test value(o1) == countmap(vcat(y1, y2))
+    @test nobs(o1) == 200
 end
 
 #-----------------------------------------------------------------------# NBClassifier

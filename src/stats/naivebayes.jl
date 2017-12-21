@@ -6,8 +6,12 @@ probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type 
 
 # Example
 
-    x, y = randn(100, 5), rand(Bool, 100)
-    Series((x,y), NBClassifier(5, Bool))
+    x = randn(100, 5)
+    y = rand(Bool, 100)
+    o = NBClassifier(5, Bool)
+    Series((x,y), o)
+    predict(o, x)
+    classify(o,x)
 """
 struct NBClassifier{T, D <: Dict{T, Hist{AdaptiveBins}}} <: ExactStat{(1, 0)}
     cat::CountMap{T}

@@ -120,6 +120,7 @@ end
 CountMap(T::Type) = CountMap(Dict{T, Int}())
 fit!{T}(o::CountMap{T}, y::T, γ::Float64) = haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
 Base.merge!(o::CountMap, o2::CountMap, γ::Float64) = merge!(+, o.d, o2.d)
+nobs(o::CountMap) = sum(values(o))
 
 Base.keys(o::CountMap) = keys(o.d)
 Base.values(o::CountMap) = values(o.d)
