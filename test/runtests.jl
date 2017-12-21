@@ -281,7 +281,7 @@ end
     y = x * linspace(-1, 1, 10) .> 0
     o = NBClassifier(10, Bool)
     Series((x,y), o)
-    @test !classify(o, 1:10)
+    @test classify(o, vcat(zeros(5), ones(5)))
 end
 
 #-----------------------------------------------------------------------# Lag 

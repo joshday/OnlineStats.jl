@@ -13,9 +13,9 @@ probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type 
     predict(o, x)
     classify(o,x)
 """
-struct NBClassifier{T, D <: Dict{T, Hist{AdaptiveBins}}} <: ExactStat{(1, 0)}
+struct NBClassifier{T} <: ExactStat{(1, 0)}
     cat::CountMap{T}
-    h::Vector{D}
+    h::Vector{Dict{T, Hist{AdaptiveBins}}}
     b::Int
 end
 function NBClassifier(p::Integer, T::Type, b::Integer = 20) 
@@ -27,16 +27,13 @@ Base.show(io::IO, o::NBClassifier) = print(io, "NBCLassifier with labels: $(keys
 
 function fit!(o::NBClassifier, xy::Tuple{VectorOb, ScalarOb}, γ::Float64)
     x, y = xy
-    if haskey(o, y)  # We've seen y before, so just push to existing histograms
+    if !haskey(o, y)
         for j in eachindex(x)
-            fit!(o.h[j][y], x[j], γ)
+            o.h[j][y] = Hist(o.b)
         end
-    else  # we haven't seen y, so make a new key for each Dict in h
-        for j in eachindex(x)
-            ih = Hist(o.b)
-            fit!(ih, x[j], γ)
-            o.h[j][y] = ih
-        end
+    end
+    for j in eachindex(x)
+        fit!(o.h[j][y], x[j], γ)
     end
     fit!(o.cat, y, γ)
 end
