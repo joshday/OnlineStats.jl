@@ -405,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "Type",
-    "text": "CountMap(T)\n\nFit a categorical distribution where the inputs are of type T.\n\nusing Distributions\ns = Series(rand(1:10, 1000), CountMap(Int))\nvalue(s)\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\n\n\n\n"
+    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Ignores weight  and is equivalent to StatsBase.countmap.\n\nExample\n\ns = Series(rand(1:10, 1000), CountMap(Int))\nvalue(s)[1]\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\n\n\n\n"
 },
 
 {
