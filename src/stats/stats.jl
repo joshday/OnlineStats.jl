@@ -101,11 +101,13 @@ Base.merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n)
 """
     CountMap(T)
 
-Fit a categorical distribution where the inputs are of type `T`.
+Maintain a dictionary mapping unique values to its number of occurrences.  Ignores weight 
+and is equivalent to `StatsBase.countmap`.
 
-    using Distributions
+# Example 
+
     s = Series(rand(1:10, 1000), CountMap(Int))
-    value(s)
+    value(s)[1]
 
     vals = ["small", "medium", "large"]
     o = CountMap(String)

@@ -3,6 +3,14 @@
 
 abstract type DecisionTreeAlgorithm end
 
+mutable struct Node{T, F <: Function}
+    pmk::CountMap{T}
+    impurity::F
+end
+probs(o::Node) = collect(values(o)) ./ sum(values(o))
+
+
+
 #-----------------------------------------------------------------------# DecisionTree
 mutable struct DecisionTree{T <: DecisionTreeAlgorithm} <: ExactStat{(1, 0)}
     alg::T
@@ -13,6 +21,8 @@ function Base.show(io::IO, o::DecisionTree)
     print_with_color(:green, io, "DecisionTree: ")
     print(io, o.alg)
 end
+
+fit!(o::DecisionTree, xy::Tuple{VectorOb, ScalarOb}, γ::Float64) = fit!(o.alg, xy, γ)
 
 
 #-----------------------------------------------------------------------# VFDT 
@@ -49,9 +59,19 @@ function Base.show(io::IO, o::VFDT{G, T}) where {G, T}
     print(  io, "  > Tree Size     : ", "???")
 end
 
-function information_gain()
+# attribute selection measures (TODO)
+function information_gain end
+function gini_index end
+
+# helpers 
+hoeffding_bound(R, δ, n) = sqrt(R ^ 2 * -log(δ) / 2n)
+
+# assume x is a Tuple
+function fit!(o::VFDT, xy::Tuple{VectorOb, ScalarOb}, γ::Float64)
 
 end
+
+
 
 
 
