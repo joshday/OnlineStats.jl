@@ -112,34 +112,19 @@ Fit a categorical distribution where the inputs are of type `T`.
     s = Series(rand(vals, 1000), o)
     value(o)
 """
-mutable struct CountMap{T} <: ExactStat{0}
+struct CountMap{T} <: ExactStat{0}
     d::Dict{T, Int}
-    nobs::Int
-    CountMap{T}() where {T} = new(Dict{T, Int}(), 0)
 end
-CountMap(t::Type) = CountMap{t}()
-function fit!{T}(o::CountMap{T}, y::T, γ::Float64)
-    o.nobs += 1
-    haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
-end
-# _value(o::CountMap) = ifelse(o.nobs > 0, collect(values(o.d)), zeros(0))
+CountMap(T::Type) = CountMap(Dict{T, Int}())
+fit!{T}(o::CountMap{T}, y::T, γ::Float64) = haskey(o, y) ? (o.d[y] += 1) : (o.d[y] = 1)
+Base.merge!(o::CountMap, o2::CountMap, γ::Float64) = merge!(+, o.d, o2.d)
+
 Base.keys(o::CountMap) = keys(o.d)
 Base.values(o::CountMap) = values(o.d)
-function Base.merge!(o::T, o2::T, γ::Float64) where {T <: CountMap}
-    okeys = keys(o)
-    for k in keys(o2.d)
-        if k in okeys
-            o.d[k] += o2.d[k]
-        else
-            o.d[k] = o2.d[k]
-        end
-    end
-    o.nobs += o2.nobs
-end
 Base.haskey(o::CountMap, key) = haskey(o.d, key)
-entropy(o::CountMap) = entropy(collect(values(o)) ./ sum(values(o)))
 
 @deprecate FitCategorical(t::Type) CountMap(t::Type)
+
 #-----------------------------------------------------------------------# CovMatrix
 """
     CovMatrix(d)
