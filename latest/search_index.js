@@ -625,6 +625,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Partition",
+    "page": "API",
+    "title": "OnlineStats.Partition",
+    "category": "Type",
+    "text": "Partition(o::OnlineStat, b = 100)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Quantile",
     "page": "API",
     "title": "OnlineStats.Quantile",
@@ -790,14 +798,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Part",
     "category": "Type",
     "text": "# create first part\nPart(o::OnlineStat, start::Int, n::Int)\n\n# create next part\nPart(p::Part, y::ScalarOb)  # create\n\nSummary for a section of data.  stat is the OnlineStat evaluated on n observations  beginning with start.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Partition",
-    "page": "API",
-    "title": "OnlineStats.Partition",
-    "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 100)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
 },
 
 {
