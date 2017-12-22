@@ -14,7 +14,8 @@ function Base.show(io::IO, o::Summary{O}) where {O}
 end
 
 
-
+# TODO: use OrderedDict?
+# TODO: bug in Hist?
 function fit!(o::Summary, y::ScalarOb, γ::Float64)
     o.n += 1
     newobj = copy(o.summarizer)
@@ -22,7 +23,7 @@ function fit!(o::Summary, y::ScalarOb, γ::Float64)
     o.summaries[o.n] = newobj
     if o.n % 2o.partition == 0
         kys = sort(collect(keys(o.summaries)))
-        for k in 2:2:length(kys)
+        for k in 2:2:o.partition
             summary = pop!(o.summaries, kys[k])
             merge!(o.summaries[kys[k-1]], summary, 1.0)
         end
