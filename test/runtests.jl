@@ -30,7 +30,8 @@ info("Show")
 for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(), 
          HyperLogLog(4), Moments(), OrderStats(10), Quantile(), PQuantile(),
          ReservoirSample(10), Sum(), StatLearn(5), Hist(5), Hist(1:5),
-         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean())]
+         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean()),
+         Partition(Mean(), 5)]
     println(o)
     typeof(o) <: OnlineStat{0} && println(2o)
 end
@@ -230,6 +231,16 @@ end #Series
     end
     @test value(s)[1] ≈ x\y
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
+end
+
+#-----------------------------------------------------------------------# Partition
+@testset "Partition" begin 
+    o = Partition(Variance(), 5)
+    s = Series(o)
+    for i in 1:20
+        fit!(s, rand())
+        @test length(o.parts) <= 10
+    end
 end
 
 #-----------------------------------------------------------------------# Count 

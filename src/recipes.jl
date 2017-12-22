@@ -86,6 +86,43 @@ end
     collect(keys(o)), value(o)
 end
 
+#-----------------------------------------------------------------------# Partition 
+@recipe function f(o::Partition{<:ExactStat{0}})
+    xlab --> "Nobs"
+    title --> name(o.summarizer)
+    x = map(x -> x.start, o.parts)
+    y = value.(o.parts)
+    x, y
+end
+
+@recipe function f(o::Partition{Variance})
+    xlab --> "Nobs"
+    title --> "Partition of Size $(length(o.parts))"
+    μ = map(x -> mean(x.stat), o.parts)
+    σ = map(x -> std(x.stat), o.parts)
+    x = map(x -> x.start, o.parts)
+    @series begin
+        label --> "Mean"
+        x, μ
+    end
+    @series begin 
+        label --> "Parts"
+        seriestype --> :vline 
+        alpha --> .2
+        map(x -> x.start, o.parts)
+    end
+    @series begin
+        fillto --> μ .- 1.96 .* σ
+        alpha --> .3
+        grid --> false
+        linewidth --> 0
+        label --> "95% CI"
+        x, μ .+ 1.96 .* σ
+    end
+end
+
+
+
 #-----------------------------------------------------------------------# LinRegBuilder
 # @recipe function f(o::LinRegBuilder, x::AbstractMatrix, y::AbstractVector, dim = Rows())
 #     ŷ = predict(o, x, dim)
