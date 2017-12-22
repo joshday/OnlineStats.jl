@@ -325,7 +325,8 @@ Merge `s2` into `s1` in place where `s2`'s influence is determined by `arg`. Opt
 `arg`` are:
 
 - `:append` (default)
-    - append `s2` to `s1`.  Essentially `fit!(s1, data_which_s2_saw)`.
+    - `append `s2` to `s1` with influence determined by number of observations.  For 
+    `EqualWeight`, this is equivalent to `fit!(s1, data2)` where `s2 = Series(data2, o...)`.
 - `:mean`
     - Use the average (weighted by nobs) of the Series' generated weights.
 - `:singleton`
