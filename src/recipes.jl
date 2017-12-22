@@ -121,6 +121,22 @@ end
     end
 end
 
+# @recipe function f(o::Partition{CountMap{T}}) where {T}
+#     seriestype --> :bar
+#     bar_position --> :stacked
+#     # get all levels
+#     levels = T[]
+#     for part in o.parts 
+#         for key in keys(part.stat)
+#             key in levels || push!(levels, key)
+#         end
+#     end
+#     # get probs 
+    
+
+#     levels, rand(length(levels), 3)
+# end
+
 
 
 #-----------------------------------------------------------------------# LinRegBuilder
