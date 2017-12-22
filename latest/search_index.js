@@ -785,11 +785,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Part",
+    "page": "API",
+    "title": "OnlineStats.Part",
+    "category": "Type",
+    "text": "# create first part\nPart(o::OnlineStat, start::Int, n::Int)\n\n# create next part\nPart(p::Part, y::ScalarOb)  # create\n\nSummary for a section of data.  stat is the OnlineStat evaluated on n observations  beginning with start.\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Partition",
+    "page": "API",
+    "title": "OnlineStats.Partition",
+    "category": "Type",
+    "text": "Partition(o::OnlineStat, b = 100)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
+},
+
+{
     "location": "api.html#Base.merge!-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
     "page": "API",
     "title": "Base.merge!",
     "category": "Method",
-    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappend s2 to s1.  Essentially fit!(s1, data_which_s2_saw).\n:mean\nUse the average (weighted by nobs) of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
+    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappends2tos1` with influence determined by number of observations.  For \nEqualWeight, this is equivalent to fit!(s1, data2) where s2 = Series(data2, o...).\n:mean\nUse the average (weighted by nobs) of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
 },
 
 {
