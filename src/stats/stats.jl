@@ -125,6 +125,7 @@ nobs(o::CountMap) = sum(values(o))
 Base.keys(o::CountMap) = keys(o.d)
 Base.values(o::CountMap) = values(o.d)
 Base.haskey(o::CountMap, key) = haskey(o.d, key)
+Base.getindex(o::CountMap, key) = getindex(o.d, key)
 
 @deprecate FitCategorical(t::Type) CountMap(t::Type)
 

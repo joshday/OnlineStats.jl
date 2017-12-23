@@ -121,21 +121,37 @@ end
     end
 end
 
-# @recipe function f(o::Partition{CountMap{T}}) where {T}
-#     seriestype --> :bar
-#     bar_position --> :stacked
-#     # get all levels
-#     levels = T[]
-#     for part in o.parts 
-#         for key in keys(part.stat)
-#             key in levels || push!(levels, key)
-#         end
-#     end
-#     # get probs 
-    
+@recipe function f(o::Partition{CountMap{T}}) where {T}
+    seriestype --> :bar
+    # get all levels
+    levels = T[]
+    for part in o.parts 
+        for key in keys(part.stat)
+            key in levels || push!(levels, key)
+        end
+    end
+    sort!(levels)
 
-#     levels, rand(length(levels), 3)
-# end
+    x = map(x -> x.start, o.parts)
+    # get probs 
+    probs = zeros(length(x), length(levels))
+    for i in 1:length(o.parts)
+        stat = o.parts[i].stat 
+        n = nobs(stat)
+        for j in 1:length(levels)
+            if haskey(stat, levels[j]) 
+                probs[i, j] = stat[levels[j]] / n
+            end
+        end 
+        probs[i, 1] = 1.0
+        for j in 2:length(levels)
+            probs[i, j] = probs[i, j-1] - probs[i, j]
+        end
+    end
+    label --> levels
+    xlab --> "Nobs"
+    x, probs
+end
 
 
 
