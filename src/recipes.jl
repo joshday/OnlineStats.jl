@@ -87,76 +87,25 @@ end
 end
 
 #-----------------------------------------------------------------------# Partition 
-@recipe function f(o::Partition{<:ExactStat{0}})
-    xlab --> "Nobs"
-    title --> name(o.summarizer)
-    x = map(x -> x.start, o.parts)
-    y = value.(o.parts)
-    x, y
+struct PartLines
+    o::Partition 
+end 
+@recipe function f(o::PartLines)
+    color --> :black 
+    alpha --> .1 
+    seriestype --> :vline
+    label --> "Parts"
+    grid --> false
+    x = [p.start for p in o.o.parts]
 end
+getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
-@recipe function f(o::Partition{Variance})
-    xlab --> "Nobs"
-    title --> "Partition of Size $(length(o.parts))"
-    μ = map(x -> mean(x.stat), o.parts)
-    σ = map(x -> std(x.stat), o.parts)
-    x = map(x -> x.start, o.parts)
-    @series begin
-        label --> "Mean"
-        x, μ
-    end
+@recipe function f(o::Partition, f = value) 
     @series begin 
-        label --> "Parts"
-        seriestype --> :vline 
-        alpha --> .2
-        map(x -> x.start, o.parts)
+        label --> string(f) * " of " * name(o.parts[1].stat)
+        getx(o), to_plot_shape(map(x -> f(x.stat), o.parts))
     end
-    @series begin
-        fillto --> μ .- 1.96 .* σ
-        alpha --> .3
-        grid --> false
-        linewidth --> 0
-        label --> "95% CI"
-        x, μ .+ 1.96 .* σ
-    end
+    @series PartLines(o) 
 end
-
-@recipe function f(o::Partition{CountMap{T}}) where {T}
-    seriestype --> :bar
-    # get all levels
-    levels = T[]
-    for part in o.parts 
-        for key in keys(part.stat)
-            key in levels || push!(levels, key)
-        end
-    end
-    sort!(levels)
-
-    x = map(x -> x.start, o.parts)
-    # get probs 
-    probs = zeros(length(x), length(levels))
-    for i in 1:length(o.parts)
-        stat = o.parts[i].stat 
-        n = nobs(stat)
-        for j in 1:length(levels)
-            if haskey(stat, levels[j]) 
-                probs[i, j] = stat[levels[j]] / n
-            end
-        end 
-        probs[i, 1] = 1.0
-        for j in 2:length(levels)
-            probs[i, j] = probs[i, j-1] - probs[i, j]
-        end
-    end
-    label --> levels
-    xlab --> "Nobs"
-    x, probs
-end
-
-
-
-#-----------------------------------------------------------------------# LinRegBuilder
-# @recipe function f(o::LinRegBuilder, x::AbstractMatrix, y::AbstractVector, dim = Rows())
-#     ŷ = predict(o, x, dim)
-#     r = y - ŷ
-# end
+to_plot_shape(v::Vector) = v 
+to_plot_shape(v::Vector{<:Vector}) = [v[i][j] for i in 1:length(v), j in 1:length(v[1])]
