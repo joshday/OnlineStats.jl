@@ -100,8 +100,9 @@ end
 end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
-@recipe function f(o::Partition, f = value) 
+@recipe function f(o::Partition, f = value)
     @series begin 
+        title --> "Partition of $(length(o.parts)) Parts"
         label --> string(f) * " of " * name(o.parts[1].stat)
         getx(o), to_plot_shape(map(x -> f(x.stat), o.parts))
     end
@@ -109,3 +110,22 @@ getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 end
 to_plot_shape(v::Vector) = v 
 to_plot_shape(v::Vector{<:Vector}) = [v[i][j] for i in 1:length(v), j in 1:length(v[1])]
+
+@recipe function f(o::Partition{CountMap{T}}) where {T}
+    lvls = T[]
+    for p in o.parts
+        for k in keys(p.stat)
+            k ∉ lvls && push!(lvls, k)
+        end
+    end
+    sort!(lvls)
+    @series begin 
+        title --> "Partition of $(length(o.parts)) Parts"
+        label --> reshape(lvls, (1, length(lvls)))
+        xlab --> "Nobs"
+        seriestype --> :bar
+        bar_width --> nobs.(o.parts)
+        getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, lvls))), o.parts))
+    end
+end
+

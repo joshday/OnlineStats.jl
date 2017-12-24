@@ -127,6 +127,19 @@ Base.values(o::CountMap) = values(o.d)
 Base.haskey(o::CountMap, key) = haskey(o.d, key)
 Base.getindex(o::CountMap, key) = getindex(o.d, key)
 
+function probs(o::CountMap, levels = keys(o))
+    out = Float64[]
+    n = nobs(o)
+    for key in levels
+        if haskey(o, key)
+            push!(out, o[key] / n)
+        else
+            push!(out, 0.0)
+        end
+    end
+    out
+end
+
 @deprecate FitCategorical(t::Type) CountMap(t::Type)
 
 #-----------------------------------------------------------------------# CovMatrix
