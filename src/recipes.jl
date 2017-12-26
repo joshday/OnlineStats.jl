@@ -129,3 +129,31 @@ to_plot_shape(v::Vector{<:Vector}) = [v[i][j] for i in 1:length(v), j in 1:lengt
     end
 end
 
+@recipe function f(o::Partition{Variance}; confint = true)
+    μ = map(x -> mean(x.stat), o.parts)
+    σ = map(x -> std(x.stat), o.parts)
+    n = nobs.(o.parts)
+
+    @series begin 
+        title --> "Partition of $(length(o.parts)) Parts"
+        xlab --> "Nobs"
+        label --> "Mean"
+        σn = σ ./ sqrt.(n)
+        if confint
+            ribbon --> (σn, σn)
+            fillalpha --> .1
+            label --> "Mean (95% CI)"
+        else
+            label --> "Mean"
+        end
+        getx(o), μ
+    end
+        # @series begin 
+        #     label --> "95% CI for Mean"
+        #     fillto --> μ .- σ ./ sqrt.(n)
+        #     alpha = .2
+        #     getx(o), μ .+ σ ./ sqrt.(n)
+        # end
+    @series PartLines(o)
+end
+
