@@ -73,10 +73,11 @@ end
 default_weight(o::CStat) = default_weight(o.re_stat)
 CStat(o::OnlineStat{0}) = CStat(o, copy(o))
 Base.show(io::IO, o::CStat) = print(io, "CStat: re = $(o.re_stat), im = $(o.im_stat)")
-_value(o::CStat) = value(o.re_stat), value(o.im_stat)
-function fit!(o::CStat, y::Real, γ::Float64) 
-    fit!(o.re_stat, real(y), γ)
-    fit!(o.im_stat, complex(y, γ).im, γ)
+value(o::CStat) = value(o.re_stat), value(o.im_stat)
+fit!(o::CStat, y::Real, γ::Float64) = fit!(o.re_stat, real(y), γ)
+function fit!(o::CStat, y::Complex, γ::Float64) 
+    fit!(o.re_stat, y, γ)
+    fit!(o.im_stat, y, γ)
 end
 function Base.merge!(o1::T, o2::T, γ::Float64) where {T<:CStat}
     merge!(o1.re_stat, o2.re_stat, γ)
@@ -534,7 +535,7 @@ function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
     length(o.value) == length(o2.value) || 
         error("Merge failed.  OrderStats track different batch sizes")
     for i in 1:o2.i 
-        o2.value[i] = smooth(o2.value[i], o2.buffer[i], 1 / o.nreps)
+        o2.value[i] = smooth(o2.value[i], o2.buffer[i], 1 / o2.nreps)
     end
     smooth!(o.value, o2.value, γ)
 end

@@ -58,17 +58,34 @@ mutable struct Partition{T} <: ExactStat{0}
     n::Int  # total nobs
     summarizer::T  # empty stat to make copies of
 end
-function Partition(o::T, b::Int = 100) where {T <: OnlineStat{0}} 
+function Partition(o::T, b::Int = 50) where {T <: OnlineStat{0}} 
     Partition([Part(o, 0, 1)], 2b, 1, 0, o)
 end
+
+nobs(o::Partition) = o.n
+value(o::Partition) = value.(o.parts)
 
 function Base.show(io::IO, o::Partition)
     print(io, "Partition of $(o.b): $(name(o.parts[1]))")
 end
 
-function Base.merge!(o::Partition, o2::Partition, γ::Float64)
-    # TODO
-    error("this is kinda hard...but possible")
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Partition}
+    l = o2.l
+    # squash o2 to have the same size partitions as o
+    while l < o.l
+        squash!(o2.parts)
+        l *= 2
+    end
+    # shift starting obs in o2 to be after o
+    map(x -> (x.start += o.n), o2.parts)
+    # update o
+    o.n += o2.n 
+    parts = o.parts
+    append!(parts, o2.parts)
+    while length(parts) >= o.b 
+        squash!(parts)
+        o.l *= 2
+    end
 end
 
 
@@ -78,17 +95,17 @@ function fit!(o::Partition, y::ScalarOb, γ::Float64)
     if o.n == 1 
         parts[1] = Part(parts[1], o.summarizer, y)
     elseif length(parts) < o.b 
-        if nobs(parts[end]) < o.l 
-            fit!(parts[end], y)
+        if nobs(last(parts)) < o.l 
+            fit!(last(parts), y)
         else
-            push!(parts, Part(parts[end], o.summarizer, y))
+            push!(parts, Part(last(parts), o.summarizer, y))
         end
     elseif length(parts) == o.b 
-        if nobs(parts[end]) < o.l 
-            fit!(parts[end], y)
+        if nobs(last(parts)) < o.l 
+            fit!(last(parts), y)
         else
             squash!(parts)
-            push!(parts, Part(parts[end], o.summarizer, y))
+            push!(parts, Part(last(parts), o.summarizer, y))
             o.l *= 2
         end
     else
