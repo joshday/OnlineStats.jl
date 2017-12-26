@@ -311,6 +311,8 @@ function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, γ::AVe
 end
 
 
+(s::Series)(args...) = fit!(s, args...)
+
 #-----------------------------------------------------------------------# merging
 "See [`merge!`](@ref)"
 Base.merge(s1::Series, s2::Series, w::Float64) = merge!(copy(s1), s2, w)
