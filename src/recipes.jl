@@ -137,7 +137,6 @@ end
     @series begin 
         title --> "Partition of $(length(o.parts)) Parts"
         xlab --> "Nobs"
-        label --> "Mean"
         σn = σ ./ sqrt.(n)
         if confint
             ribbon --> (σn, σn)

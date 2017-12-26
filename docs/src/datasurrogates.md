@@ -4,14 +4,14 @@ Some OnlineStats are especially useful for out-of-core computations, as after th
 through the data, they can be used as a surrogate for the entire dataset for calculating
 approximate summary statistics or exact linear models.
 
-## IHistogram
+## Histograms
 
-IHistogram incrementally builds a histogram of unequally spaced bins.  It has a 
-[Plots.jl](https://github.com/JuliaPlots/Plots.jl) recipe and can be used to get 
-approximate summary statistics, without the need to run through the data again.
+The [`Hist`](@ref) type for online histograms has a 
+[Plots.jl](https://github.com/JuliaPlots/Plots.jl) recipe and can also be used to calculate 
+approximate summary statistics, without the need to revisit the actual data.
 
 ```julia
-o = IHistogram(100)
+o = Hist(100)
 s = Series(o)
 
 fit!(s, randexp(100_000))
@@ -27,6 +27,18 @@ plot(o)
 
 ![](https://user-images.githubusercontent.com/8075494/32749535-aae54900-c88d-11e7-8998-7fa6881635d5.png)
 
-## LinRegBuilder
+## Visualizations
 
-TODO
+The [`Partition`](@ref) type uses an OnlineStat to calculate a summary for each part of a 
+partitioned dataset.  Plotting a `Partition` provides a way to visualize arbitrarily large
+datasets and check for nonstationarity.
+
+```julia
+using OnlineStats, Plots
+gr()
+
+s = Series(rand(1:4, 10^5), Partition(CountMap(Int)))
+plot(s)
+```
+
+![](https://user-images.githubusercontent.com/8075494/34360656-cd7accbe-ea30-11e7-8b47-6a9dfbf16dbd.png)

@@ -45,3 +45,4 @@
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
 | Callbacks                          | [`CallFun`](@ref), [`mapblocks`](@ref) |
+| Summary of partition               | [`Partition`](@ref)        |
