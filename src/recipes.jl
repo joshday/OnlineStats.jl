@@ -148,12 +148,6 @@ end
         end
         getx(o), μ
     end
-        # @series begin 
-        #     label --> "95% CI for Mean"
-        #     fillto --> μ .- σ ./ sqrt.(n)
-        #     alpha = .2
-        #     getx(o), μ .+ σ ./ sqrt.(n)
-        # end
     @series PartLines(o)
 end
 
