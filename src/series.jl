@@ -312,6 +312,7 @@ end
 
 
 (s::Series)(args...) = fit!(s, args...)
+(::Series)(s::Series, args...) = s(args...)
 
 #-----------------------------------------------------------------------# merging
 "See [`merge!`](@ref)"
