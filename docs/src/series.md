@@ -1,6 +1,6 @@
 # Series
 
-The `Series` type is the workhorse of OnlineStats.  A `Series` tracks
+The `Series` type is the workhorse of **OnlineStats**.  A `Series` tracks
 
 1. A tuple of `OnlineStat`s.
 1. A [Weight](@ref).
@@ -13,10 +13,10 @@ to be fitted and/or a `Weight`.
 ### Start "empty"
 
 ```julia
-# use default weight: EqualWeight()
+# use default: EqualWeight()
 Series(Mean(), Variance())
 
-# specify weight
+# use exponential weight
 Series(ExponentialWeight(), Mean(), Variance())
 ```
 
@@ -41,17 +41,7 @@ a single observation or a collection of observations via the `fit!` function:
 fit!(series, data)
 ```
 
-### Under the hood
-
-Each `OnlineStat` implements a `fit!` method that updates the `OnlineStat` in place.
-
-```
-fit!(o::OnlineStat, data::TypeOfSingleObservation, w::Float64)
-``` 
-
-where `w` is a weight in ``[0, 1]`` which controls the amount of influence `data` has on `o`.  When
-`fit!(series, data)` is called, `w` is created by the `Weight` and passed to `fit!` for
-each of the OnlineStats in the Series.  See [Extending OnlineStats](@ref) for more details.
+See [Extending OnlineStats](@ref) for a look under the hood.
 
 
 ### Single observation
@@ -76,7 +66,7 @@ fit!(s, randn(), .1)
 
 ### Multiple observations
 !!! note
-    If a single observation is a Vector, a Matrix is ambiguous in how the observations are stored.  A `Rows()` (default) or `Cols()` argument can be added to the `fit!` call to specify observations are in rows or columns, respectively.
+    If a single observation is a Vector, a Matrix represents multiple observations, but this is ambiguous in how the observations are stored.  A `Rows()` (default) or `Cols()` argument can be added to the `fit!` call to specify observations are in rows or columns, respectively.
 
 ```julia
 s = Series(Mean())
@@ -121,7 +111,7 @@ y2 = randn(100)
 s1 = Series(y1, Mean(), Variance())
 s2 = Series(y2, Mean(), Variance())
 
-# Treat s2 as a new batch of data.  Essentially:
+# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:
 # s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)
 merge!(s1, s2, :append)
 

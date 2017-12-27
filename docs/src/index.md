@@ -1,6 +1,6 @@
 # Basics
 
-**OnlineStats** is a Julia package which provides *online parallelizable algorithms* for statistics and models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
+**OnlineStats** is a Julia package which provides *online parallelizable algorithms* for statistics.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
 
 ## Installation
 
@@ -43,9 +43,6 @@ value(m) ≈ mean(y)
 value(v) ≈ var(y)  
 ```
 
-```@raw html
-<img width = 200 src = "https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif">
-```
 
 ### `Series` and `OnlineStat`s can be merged
 
@@ -64,4 +61,8 @@ value(v) ≈ var(vcat(y, y2))
 
 ## Much more than means and variances
 
-OnlineStats can do a lot.  See [Statistics and Models](@ref).
+**OnlineStats can do a lot**.  See [Statistics and Models](@ref).
+
+```@raw html
+<img width = 200 src = "https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif">
+```
