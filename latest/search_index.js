@@ -25,11 +25,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Usage-1",
+    "location": "index.html#Summary-of-Usage-1",
     "page": "Basics",
-    "title": "Usage",
+    "title": "Summary of Usage",
     "category": "section",
-    "text": "using OnlineStats\n\n#### Every statistic/model a type (<: OnlineStat)\nm = Mean()\nv = Variance()\n\n#### OnlineStats are grouped by Series\ns = Series(m, v)\n\n#### Updating a series updates the OnlineStats in place\ny = randn(100)\n\n# for yi in y\n#     fit!(s, yi)\n# end\nfit!(s, y)\n\n#### OnlineStats have a `value`\nvalue(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  <img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
+    "text": ""
+},
+
+{
+    "location": "index.html#Every-statistic/model-is-a-type-(:-OnlineStat)-1",
+    "page": "Basics",
+    "title": "Every statistic/model is a type (<: OnlineStat)",
+    "category": "section",
+    "text": "using OnlineStats \n\nm = Mean()\nv = Variance()"
+},
+
+{
+    "location": "index.html#OnlineStats-are-grouped-by-Series-1",
+    "page": "Basics",
+    "title": "OnlineStats are grouped by Series",
+    "category": "section",
+    "text": "s = Series(m, v)"
+},
+
+{
+    "location": "index.html#Updating-a-Series-updates-the-contained-OnlineStats-1",
+    "page": "Basics",
+    "title": "Updating a Series updates the contained OnlineStats",
+    "category": "section",
+    "text": "y = randn(1000)\n\n# for yi in y\n#     fit!(s, yi)\n# end\nfit!(s, y)"
+},
+
+{
+    "location": "index.html#OnlineStats-have-a-value-1",
+    "page": "Basics",
+    "title": "OnlineStats have a value",
+    "category": "section",
+    "text": "value(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  <img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
+},
+
+{
+    "location": "index.html#Series-and-OnlineStats-can-be-merged-1",
+    "page": "Basics",
+    "title": "Series and OnlineStats can be merged",
+    "category": "section",
+    "text": "See Parallel Computation.y2 = randn(123)\n\ns2 = Series(y2, Mean(), Variance())\n\nmerge!(s, s2)\n\nvalue(m) ≈ mean(vcat(y, y2))    \nvalue(v) ≈ var(vcat(y, y2))  "
 },
 
 {
@@ -53,15 +93,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Series",
     "category": "section",
-    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksA tuple of OnlineStats.\nA Weight"
+    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksA tuple of OnlineStats.\nA Weight."
 },
 
 {
-    "location": "series.html#Creating-1",
+    "location": "series.html#Creating-a-Series-1",
     "page": "Series",
-    "title": "Creating",
+    "title": "Creating a Series",
     "category": "section",
-    "text": ""
+    "text": "The Series constructor accepts any number of OnlineStats, optionally preceded by data  to be fitted and/or a Weight."
 },
 
 {
@@ -69,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start \"empty\"",
     "category": "section",
-    "text": "Series(Mean(), Variance())\n\nSeries(ExponentialWeight(), Mean(), Variance())"
+    "text": "# use default weight: EqualWeight()\nSeries(Mean(), Variance())\n\n# specify weight\nSeries(ExponentialWeight(), Mean(), Variance())"
 },
 
 {
@@ -85,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Updating",
     "category": "section",
-    "text": "A Series can be updated with a single observation or a collection of observations.  The most common way to update a series is with:fit!(series, data)"
+    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)"
 },
 
 {
@@ -93,7 +133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Under the hood",
     "category": "section",
-    "text": "Each OnlineStat implements fit!(o::OnlineStat, data, w::Float64) where w is a weight in 0 1 which controls the amount of influence data has on o.  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.  See Extending OnlineStats for more details."
+    "text": "Each OnlineStat implements a fit! method that updates the OnlineStat in place.fit!(o::OnlineStat, data::TypeOfSingleObservation, w::Float64)where w is a weight in 0 1 which controls the amount of influence data has on o.  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.  See Extending OnlineStats for more details."
 },
 
 {
