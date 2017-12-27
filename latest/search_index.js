@@ -317,7 +317,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Surrogates",
     "category": "section",
-    "text": "Some OnlineStats are especially useful for out-of-core computations, as after they have run through the data, they can be used as a surrogate for the entire dataset for calculating approximate summary statistics or exact linear models."
+    "text": "Some OnlineStats are especially useful for out-of-core computations.  After they've been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again."
+},
+
+{
+    "location": "datasurrogates.html#Data-Summary-1",
+    "page": "Data Surrogates",
+    "title": "Data Summary",
+    "category": "section",
+    "text": "See Partition"
+},
+
+{
+    "location": "datasurrogates.html#Linear-Regressions-1",
+    "page": "Data Surrogates",
+    "title": "Linear Regressions",
+    "category": "section",
+    "text": "See LinRegBuilder"
 },
 
 {
