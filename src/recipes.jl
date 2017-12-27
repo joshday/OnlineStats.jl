@@ -123,6 +123,7 @@ to_plot_shape(v::Vector{<:Vector}) = [v[i][j] for i in 1:length(v), j in 1:lengt
         title --> "Partition of $(length(o.parts)) Parts"
         label --> reshape(lvls, (1, length(lvls)))
         xlab --> "Nobs"
+        linewidth --> 0
         seriestype --> :bar
         bar_width --> nobs.(o.parts)
         getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, lvls))), o.parts))
