@@ -41,7 +41,7 @@
 | Huber-loss regression              | [`StatLearn`](@ref)        |
 | Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
 | **Other:**                         |                            |
-| Bootstrapping                      | [`Bootstrap`](@ref)        |
+| Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
 | Callbacks                          | [`CallFun`](@ref), [`mapblocks`](@ref) |

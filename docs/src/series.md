@@ -2,8 +2,8 @@
 
 The `Series` type is the workhorse of OnlineStats.  A Series tracks
 
-1. The `Weight`
 1. A tuple of OnlineStats.
+1. A [Weight](@ref)
 
 ## Creating
 

@@ -7,8 +7,8 @@ makedocs(
     clean = true,
     pages = [
         "index.md",
-        "weights.md",
         "series.md",
+        "weights.md",
         "newstats.md",
         "parallel.md",
         "datasurrogates.md",

@@ -1,4 +1,4 @@
-# Weighting
+# Weight
 
 Series are parameterized by a `Weight` type that controls the influence of the next observation.
 
