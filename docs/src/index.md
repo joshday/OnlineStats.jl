@@ -10,7 +10,7 @@ Pkg.add("OnlineStats")
 
 ## Summary of Usage
 
-### Every statistic/model is a type (<: OnlineStat)
+### Every statistic/model is a type (`<: OnlineStat`)
 
 ```julia
 using OnlineStats 

@@ -57,7 +57,7 @@ s = Series(CovMatrix(4))
 fit!(s, randn(4))
 ```
 
-#### Single observation, override Weight
+#### Single observation, override `Weight`
 
 ```julia
 s = Series(Mean())
@@ -66,7 +66,7 @@ fit!(s, randn(), .1)
 
 ### Multiple observations
 !!! note
-    If a single observation is a Vector, a Matrix represents multiple observations, but this is ambiguous in how the observations are stored.  A `Rows()` (default) or `Cols()` argument can be added to the `fit!` call to specify observations are in rows or columns, respectively.
+    If a single observation is a `Vector`, a `Matrix` represents multiple observations, but this is ambiguous in how the observations are stored.  A `Rows()` (default) or `Cols()` argument can be added to the `fit!` call to specify observations are in rows or columns, respectively.
 
 ```julia
 s = Series(Mean())
@@ -94,15 +94,14 @@ fit!(s, randn(100), w)
 
 ## Merging
 
-Two Series can be merged if they track the same OnlineStats and those OnlineStats are
-mergeable.
+Two `Series` can be merged if they track the same `OnlineStat`s.
 
 ```julia
 merge(series1, series2, arg)
 merge!(series1, series2, arg)
 ```
 
-Where `series1`/`series2` are Series that contain the same OnlineStats and `arg` is used to determine how `series2` should be merged into `series1`.
+Where `series1`/`series2` are `Series` that contain the same `OnlineStat`s and `arg` is used to determine how `series2` should be merged into `series1`.
 
 ```julia
 y1 = randn(100)

@@ -1,7 +1,7 @@
 # Parallel Computation
 
-Two Series can be merged if they track the same OnlineStats.  This facilitates [embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  In general, `fit!`
-is a cheaper operation than `merge!` and should be preferred.
+Two Series can be merged if they track the same OnlineStats.  This facilitates [embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  However, `fit!`
+is in general a cheaper operation than `merge!` and should be preferred.
 
 ## ExactStat merges
 
