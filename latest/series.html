@@ -13,8 +13,8 @@ Series(ExponentialWeight(.01), y, Mean(), Variance())</code></pre><h2><a class="
 fit!(s, randn())
 
 s = Series(CovMatrix(4))
-fit!(s, randn(4))</code></pre><h4><a class="nav-anchor" id="Single-observation,-override-Weight-1" href="#Single-observation,-override-Weight-1">Single observation, override Weight</a></h4><pre><code class="language-julia">s = Series(Mean())
-fit!(s, randn(), .1)</code></pre><h3><a class="nav-anchor" id="Multiple-observations-1" href="#Multiple-observations-1">Multiple observations</a></h3><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>If a single observation is a Vector, a Matrix represents multiple observations, but this is ambiguous in how the observations are stored.  A <code>Rows()</code> (default) or <code>Cols()</code> argument can be added to the <code>fit!</code> call to specify observations are in rows or columns, respectively.</p></div></div><pre><code class="language-julia">s = Series(Mean())
+fit!(s, randn(4))</code></pre><h4><a class="nav-anchor" id="Single-observation,-override-Weight-1" href="#Single-observation,-override-Weight-1">Single observation, override <code>Weight</code></a></h4><pre><code class="language-julia">s = Series(Mean())
+fit!(s, randn(), .1)</code></pre><h3><a class="nav-anchor" id="Multiple-observations-1" href="#Multiple-observations-1">Multiple observations</a></h3><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>If a single observation is a <code>Vector</code>, a <code>Matrix</code> represents multiple observations, but this is ambiguous in how the observations are stored.  A <code>Rows()</code> (default) or <code>Cols()</code> argument can be added to the <code>fit!</code> call to specify observations are in rows or columns, respectively.</p></div></div><pre><code class="language-julia">s = Series(Mean())
 fit!(s, randn(100))
 
 s = Series(CovMatrix(4))
@@ -22,8 +22,8 @@ fit!(s, randn(100, 4))          # Obs. in rows
 fit!(s, randn(4, 100), Cols())  # Obs. in columns</code></pre><h4><a class="nav-anchor" id="Multiple-observations,-use-the-same-weight-for-all-1" href="#Multiple-observations,-use-the-same-weight-for-all-1">Multiple observations, use the same weight for all</a></h4><pre><code class="language-julia">s = Series(Mean())
 fit!(s, randn(100), .01)</code></pre><h4><a class="nav-anchor" id="Multiple-observations,-provide-vector-of-weights-1" href="#Multiple-observations,-provide-vector-of-weights-1">Multiple observations, provide vector of weights</a></h4><pre><code class="language-julia">s = Series(Mean())
 w = StatsBase.Weights(rand(100))
-fit!(s, randn(100), w)</code></pre><h2><a class="nav-anchor" id="Merging-1" href="#Merging-1">Merging</a></h2><p>Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.</p><pre><code class="language-julia">merge(series1, series2, arg)
-merge!(series1, series2, arg)</code></pre><p>Where <code>series1</code>/<code>series2</code> are Series that contain the same OnlineStats and <code>arg</code> is used to determine how <code>series2</code> should be merged into <code>series1</code>.</p><pre><code class="language-julia">y1 = randn(100)
+fit!(s, randn(100), w)</code></pre><h2><a class="nav-anchor" id="Merging-1" href="#Merging-1">Merging</a></h2><p>Two <code>Series</code> can be merged if they track the same <code>OnlineStat</code>s.</p><pre><code class="language-julia">merge(series1, series2, arg)
+merge!(series1, series2, arg)</code></pre><p>Where <code>series1</code>/<code>series2</code> are <code>Series</code> that contain the same <code>OnlineStat</code>s and <code>arg</code> is used to determine how <code>series2</code> should be merged into <code>series1</code>.</p><pre><code class="language-julia">y1 = randn(100)
 y2 = randn(100)
 
 s1 = Series(y1, Mean(), Variance())

@@ -173,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Merging",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
+    "text": "Two Series can be merged if they track the same OnlineStats.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
 },
 
 {
@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Parallel Computation",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  In general, fit! is a cheaper operation than merge! and should be preferred."
+    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  However, fit! is in general a cheaper operation than merge! and should be preferred."
 },
 
 {
