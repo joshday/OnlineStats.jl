@@ -88,6 +88,17 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Partition}
     end
 end
 
+function Base.merge(o::Partition)
+    n = first(o.parts).n
+    stat = first(o.parts).stat
+    for i in 2:length(o.parts)
+        n2 = o.parts[i].n 
+        n += n2 
+        merge!(stat, o.parts[i].stat, n2 / n)
+    end
+    stat
+end
+
 
 function fit!(o::Partition, y::ScalarOb, γ::Float64)
     o.n += 1
