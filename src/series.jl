@@ -310,9 +310,10 @@ function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, γ::AVe
     s
 end
 
-
+# undocumented, sometimes useful helpers for JuliaDB, testing, etc.
 (s::Series)(args...) = fit!(s, args...)
 (::Series)(s::Series, args...) = s(args...)
+fit!(o::OnlineStat, y) = Series(y, o)
 
 #-----------------------------------------------------------------------# merging
 "See [`merge!`](@ref)"
