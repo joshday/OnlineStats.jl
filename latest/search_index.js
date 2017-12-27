@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "section",
-    "text": "OnlineStats is a Julia package which provides online parallelizable algorithms for statistics and models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
+    "text": "OnlineStats is a Julia package which provides online parallelizable algorithms for statistics.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
 },
 
 {
@@ -61,7 +61,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "OnlineStats have a value",
     "category": "section",
-    "text": "value(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  <img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
+    "text": "value(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  "
 },
 
 {
@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Much more than means and variances",
     "category": "section",
-    "text": "OnlineStats can do a lot.  See Statistics and Models."
+    "text": "OnlineStats can do a lot.  See Statistics and Models.<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
 },
 
 {
@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start \"empty\"",
     "category": "section",
-    "text": "# use default weight: EqualWeight()\nSeries(Mean(), Variance())\n\n# specify weight\nSeries(ExponentialWeight(), Mean(), Variance())"
+    "text": "# use default: EqualWeight()\nSeries(Mean(), Variance())\n\n# use exponential weight\nSeries(ExponentialWeight(), Mean(), Variance())"
 },
 
 {
@@ -125,15 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Updating",
     "category": "section",
-    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)"
-},
-
-{
-    "location": "series.html#Under-the-hood-1",
-    "page": "Series",
-    "title": "Under the hood",
-    "category": "section",
-    "text": "Each OnlineStat implements a fit! method that updates the OnlineStat in place.fit!(o::OnlineStat, data::TypeOfSingleObservation, w::Float64)where w is a weight in 0 1 which controls the amount of influence data has on o.  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.  See Extending OnlineStats for more details."
+    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)See Extending OnlineStats for a look under the hood."
 },
 
 {
@@ -157,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Multiple observations",
     "category": "section",
-    "text": "note: Note\nIf a single observation is a Vector, a Matrix is ambiguous in how the observations are stored.  A Rows() (default) or Cols() argument can be added to the fit! call to specify observations are in rows or columns, respectively.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))          # Obs. in rows\nfit!(s, randn(4, 100), Cols())  # Obs. in columns"
+    "text": "note: Note\nIf a single observation is a Vector, a Matrix represents multiple observations, but this is ambiguous in how the observations are stored.  A Rows() (default) or Cols() argument can be added to the fit! call to specify observations are in rows or columns, respectively.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))          # Obs. in rows\nfit!(s, randn(4, 100), Cols())  # Obs. in columns"
 },
 
 {
@@ -181,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Merging",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
+    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
 },
 
 {
