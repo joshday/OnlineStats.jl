@@ -87,3 +87,21 @@ function Base.merge(o::Partition)
     end
     stat
 end
+
+# merge!
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Partition}
+    # adjust o2's start values
+    n = nobs(o)
+    o2 = copy(o2)
+    map(p -> p.start += n, o2.parts)
+    # make sure o2's parts have same nobs
+    while nobs(o.parts[1]) > nobs(o2.parts[1])
+        squash!(o2.parts)
+    end
+    # then merge 
+    append!(o.parts, o2.parts)
+    while length(o.parts) > o.b 
+        squash!(o.parts)
+    end
+    o
+end

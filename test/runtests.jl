@@ -254,9 +254,11 @@ end
     o1, o2 = Partition(Mean()), Partition(Mean())
     y1, y2 = randn(100), randn(100)
     s1, s2 = Series(y1, o1), Series(y2, o2)
-    # merge!(s1, s2)
-    # @test length(o1.parts) <= o1.b
-    # @test value(merge(o1)) ≈ mean(vcat(y1, y2))
+    merge!(s1, s2)
+    @test length(o1.parts) <= o1.b
+    @test value(merge(o1)) ≈ mean(vcat(y1, y2))
+    @test nobs(o2) == 100 
+    @test nobs(o1) == 200
 end
 
 #-----------------------------------------------------------------------# Count 
