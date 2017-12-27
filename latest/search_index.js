@@ -293,15 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Histograms",
     "category": "section",
-    "text": "The Hist type for online histograms has a  Plots.jl recipe and can also be used to calculate  approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nplot(o)(Image: )"
-},
-
-{
-    "location": "datasurrogates.html#Visualizations-1",
-    "page": "Data Surrogates",
-    "title": "Visualizations",
-    "category": "section",
-    "text": "The Partition type uses an OnlineStat to calculate a summary for each part of a  partitioned dataset.  Plotting a Partition provides a way to visualize arbitrarily large datasets and check for nonstationarity.using OnlineStats, Plots\ngr()\n\ns = Series(rand(1:4, 10^5), Partition(CountMap(Int)))\nplot(s)(Image: )"
+    "text": "The Hist type for online histograms has a  Plots.jl recipe and can also be used to calculate  approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(o)(Image: )"
 },
 
 {
@@ -629,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 100)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
+    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
 },
 
 {
@@ -797,7 +789,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Part",
     "category": "Type",
-    "text": "# create first part\nPart(o::OnlineStat, start::Int, n::Int)\n\n# create next part\nPart(p::Part, y::ScalarOb)  # create\n\nSummary for a section of data.  stat is the OnlineStat evaluated on n observations  beginning with start.\n\n\n\n"
+    "text": "Part(o::OnlineStat, start::Int)\n\nSummary for a section of data.  o is an unfitted OnlineStat to be fitted on observations  beginning with observation start.\n\n\n\n"
 },
 
 {
