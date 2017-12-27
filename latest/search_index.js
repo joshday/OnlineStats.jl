@@ -125,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Updating",
     "category": "section",
-    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)See Extending OnlineStats for a look under the hood."
+    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)See OnlineStatsBase.jl for a look under  the hood of the update machinery."
 },
 
 {
@@ -257,19 +257,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "newstats.html#",
-    "page": "Extending OnlineStats",
-    "title": "Extending OnlineStats",
+    "location": "stats_and_models.html#",
+    "page": "Statistics and Models",
+    "title": "Statistics and Models",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "newstats.html#Extending-OnlineStats-1",
-    "page": "Extending OnlineStats",
-    "title": "Extending OnlineStats",
+    "location": "stats_and_models.html#Statistics-and-Models-1",
+    "page": "Statistics and Models",
+    "title": "Statistics and Models",
     "category": "section",
-    "text": "New OnlineStats which work with the Series/Weight interface can be accomplished through the zero-dependency OnlineStatsBase.jl"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition"
 },
 
 {
@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Parallel Computation",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  However, fit! is in general a cheaper operation than merge! and should be preferred."
+    "text": "Two Series can be merged if they track the same OnlineStats.  Merging facilitates embarassingly parallel computations.  OnlineStats  integrates with JuliaDB to run analytics on large persistent datasets.note: Note\nIn general, fit! is a cheaper operation than merge!."
 },
 
 {
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "ExactStat merges",
     "category": "section",
-    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.# NOTE: This code is not actually running in parallel\ny1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), IHistogram(50))\ns2 = Series(Mean(), Variance(), IHistogram(50))\ns3 = Series(Mean(), Variance(), IHistogram(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 400 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
+    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), Hist(50))\ns2 = Series(Mean(), Variance(), Hist(50))\ns3 = Series(Mean(), Variance(), Hist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
 },
 
 {
@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Other Merges",
     "category": "section",
-    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. A printed warning will occur for these cases.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
 },
 
 {
@@ -326,22 +326,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Histograms",
     "category": "section",
     "text": "The Hist type for online histograms has a  Plots.jl recipe and can also be used to calculate  approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(o)(Image: )"
-},
-
-{
-    "location": "stats_and_models.html#",
-    "page": "Statistics and Models",
-    "title": "Statistics and Models",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "stats_and_models.html#Statistics-and-Models-1",
-    "page": "Statistics and Models",
-    "title": "Statistics and Models",
-    "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition"
 },
 
 {
@@ -942,30 +926,6 @@ var documenterSearchIndex = {"docs": [
     "title": "API",
     "category": "section",
     "text": "Modules = [OnlineStats, OnlineStatsBase]"
-},
-
-{
-    "location": "catalog.html#",
-    "page": "Algorithm Catalog",
-    "title": "Algorithm Catalog",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "catalog.html#Algorithm-Catalog-1",
-    "page": "Algorithm Catalog",
-    "title": "Algorithm Catalog",
-    "category": "section",
-    "text": "This page is very much a work in progress"
-},
-
-{
-    "location": "catalog.html#[Mean](@ref)-1",
-    "page": "Algorithm Catalog",
-    "title": "Mean",
-    "category": "section",
-    "text": "theta^(t) = (1 - gamma_t) theta^(t-1) + gamma_t y_t"
 },
 
 ]}
