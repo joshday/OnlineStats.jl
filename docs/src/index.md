@@ -8,33 +8,58 @@
 Pkg.add("OnlineStats")
 ```
 
-## Usage
+## Summary of Usage
 
-```
-using OnlineStats
+### Every statistic/model is a type (<: OnlineStat)
 
-#### Every statistic/model a type (<: OnlineStat)
+```julia
+using OnlineStats 
+
 m = Mean()
 v = Variance()
+```
 
-#### OnlineStats are grouped by Series
+### `OnlineStat`s are grouped by `Series`
+
+```julia
 s = Series(m, v)
+```
 
-#### Updating a series updates the OnlineStats in place
-y = randn(100)
+### Updating a `Series` updates the contained `OnlineStat`s
+
+```julia
+y = randn(1000)
 
 # for yi in y
 #     fit!(s, yi)
 # end
 fit!(s, y)
+```
 
-#### OnlineStats have a `value`
+### `OnlineStat`s have a `value`
+
+```
 value(m) ≈ mean(y)    
 value(v) ≈ var(y)  
 ```
 
 ```@raw html
 <img width = 200 src = "https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif">
+```
+
+### `Series` and `OnlineStat`s can be merged
+
+See [Parallel Computation](@ref).
+
+```
+y2 = randn(123)
+
+s2 = Series(y2, Mean(), Variance())
+
+merge!(s, s2)
+
+value(m) ≈ mean(vcat(y, y2))    
+value(v) ≈ var(vcat(y, y2))  
 ```
 
 ## Much more than means and variances

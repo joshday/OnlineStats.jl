@@ -1,17 +1,22 @@
 # Series
 
-The `Series` type is the workhorse of OnlineStats.  A Series tracks
+The `Series` type is the workhorse of OnlineStats.  A `Series` tracks
 
-1. A tuple of OnlineStats.
-1. A [Weight](@ref)
+1. A tuple of `OnlineStat`s.
+1. A [Weight](@ref).
 
-## Creating
+## Creating a Series 
+
+The `Series` constructor accepts any number of `OnlineStat`s, optionally preceded by data 
+to be fitted and/or a `Weight`.
 
 ### Start "empty"
 
 ```julia
+# use default weight: EqualWeight()
 Series(Mean(), Variance())
 
+# specify weight
 Series(ExponentialWeight(), Mean(), Variance())
 ```
 
@@ -29,8 +34,8 @@ Series(ExponentialWeight(.01), y, Mean(), Variance())
 
 ## Updating
 
-A Series can be updated with a single observation or a collection of observations.  The
-most common way to update a series is with:
+Updating a `Series` updates the `OnlineStat`s it contains.  A `Series` can be updated with
+a single observation or a collection of observations via the `fit!` function:
 
 ```julia
 fit!(series, data)
@@ -38,8 +43,13 @@ fit!(series, data)
 
 ### Under the hood
 
-Each OnlineStat implements `fit!(o::OnlineStat, data, w::Float64)` where `w` is a weight
-in ``[0, 1]`` which controls the amount of influence `data` has on `o`.  When
+Each `OnlineStat` implements a `fit!` method that updates the `OnlineStat` in place.
+
+```
+fit!(o::OnlineStat, data::TypeOfSingleObservation, w::Float64)
+``` 
+
+where `w` is a weight in ``[0, 1]`` which controls the amount of influence `data` has on `o`.  When
 `fit!(series, data)` is called, `w` is created by the `Weight` and passed to `fit!` for
 each of the OnlineStats in the Series.  See [Extending OnlineStats](@ref) for more details.
 
