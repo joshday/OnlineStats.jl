@@ -39,7 +39,7 @@ end
 
 #-----------------------------------------------------------------------# Partition
 """
-    Partition(o::OnlineStat, b = 100)
+    Partition(o::OnlineStat, b = 50)
 
 Split a data stream between `b` and `2 * b` parts, using `o` to summarize each part.
 """
