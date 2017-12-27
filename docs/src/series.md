@@ -41,7 +41,8 @@ a single observation or a collection of observations via the `fit!` function:
 fit!(series, data)
 ```
 
-See [Extending OnlineStats](@ref) for a look under the hood.
+See [OnlineStatsBase.jl](https://github.com/joshday/OnlineStatsBase.jl) for a look under 
+the hood of the update machinery.
 
 
 ### Single observation
