@@ -13,111 +13,31 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "section",
-    "text": "OnlineStats is a Julia package which provides online algorithms for statistical models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
+    "text": "OnlineStats is a Julia package which provides online parallelizable algorithms for statistics and models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
 },
 
 {
-    "location": "index.html#Every-OnlineStat-is-a-type-1",
+    "location": "index.html#Installation-1",
     "page": "Basics",
-    "title": "Every OnlineStat is a type",
+    "title": "Installation",
     "category": "section",
-    "text": "m = Mean()\nv = Variance()"
+    "text": "Pkg.add(\"OnlineStats\")"
 },
 
 {
-    "location": "index.html#OnlineStats-are-grouped-by-[Series](@ref)-1",
+    "location": "index.html#Usage-1",
     "page": "Basics",
-    "title": "OnlineStats are grouped by Series",
+    "title": "Usage",
     "category": "section",
-    "text": "s = Series(m, v)"
+    "text": "using OnlineStats\n\n#### Every statistic/model a type (<: OnlineStat)\nm = Mean()\nv = Variance()\n\n#### OnlineStats are grouped by Series\ns = Series(m, v)\n\n#### Updating a series updates the OnlineStats in place\ny = randn(100)\n\n# for yi in y\n#     fit!(s, yi)\n# end\nfit!(s, y)\n\n#### OnlineStats have a `value`\nvalue(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  <img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
 },
 
 {
-    "location": "index.html#Updating-a-Series-updates-the-OnlineStats-1",
+    "location": "index.html#Much-more-than-means-and-variances-1",
     "page": "Basics",
-    "title": "Updating a Series updates the OnlineStats",
+    "title": "Much more than means and variances",
     "category": "section",
-    "text": "y = randn(100)\n\nfor yi in y\n    fit!(s, yi)\nend\n\n# or more simply:\nfit!(s, y)<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
-},
-
-{
-    "location": "weights.html#",
-    "page": "Weighting",
-    "title": "Weighting",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "weights.html#Weighting-1",
-    "page": "Weighting",
-    "title": "Weighting",
-    "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a weight must follow two rules:gamma_1 = 1\nThis guarantees theta^(1) = x_1\ngamma_t in (0 1) quad forall t  1\nThis guarantees theta^(t) stays inside a convex space<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=400>"
-},
-
-{
-    "location": "weights.html#[EqualWeight()](@ref)-1",
-    "page": "Weighting",
-    "title": "EqualWeight()",
-    "category": "section",
-    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
-},
-
-{
-    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
-    "page": "Weighting",
-    "title": "ExponentialWeight(λ = 0.1)",
-    "category": "section",
-    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
-},
-
-{
-    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
-    "page": "Weighting",
-    "title": "LearningRate(r = 0.6)",
-    "category": "section",
-    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
-},
-
-{
-    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
-    "page": "Weighting",
-    "title": "HarmonicWeight(a = 10.0)",
-    "category": "section",
-    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
-},
-
-{
-    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
-    "page": "Weighting",
-    "title": "McclainWeight(a = 0.1)",
-    "category": "section",
-    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
-},
-
-{
-    "location": "weights.html#Weight-Wrappers-1",
-    "page": "Weighting",
-    "title": "Weight Wrappers",
-    "category": "section",
-    "text": "Several types can change the behavior of a Weight."
-},
-
-{
-    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
-    "page": "Weighting",
-    "title": "Bounded(weight, λ)",
-    "category": "section",
-    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
-},
-
-{
-    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
-    "page": "Weighting",
-    "title": "Scaled(weight, λ)",
-    "category": "section",
-    "text": "Weights are scaled by a constant.  This should only be used with certain subtypes of  StochasticStat (those based on stochastic gradient algorithms), as it may violate the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+    "text": "OnlineStats can do a lot.  See Statistics and Models."
 },
 
 {
@@ -133,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Series",
     "category": "section",
-    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksThe Weight\nA tuple of OnlineStats."
+    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksA tuple of OnlineStats.\nA Weight"
 },
 
 {
@@ -225,6 +145,86 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "weights.html#",
+    "page": "Weight",
+    "title": "Weight",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "weights.html#Weight-1",
+    "page": "Weight",
+    "title": "Weight",
+    "category": "section",
+    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a weight must follow two rules:gamma_1 = 1\nThis guarantees theta^(1) = x_1\ngamma_t in (0 1) quad forall t  1\nThis guarantees theta^(t) stays inside a convex space<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=400>"
+},
+
+{
+    "location": "weights.html#[EqualWeight()](@ref)-1",
+    "page": "Weight",
+    "title": "EqualWeight()",
+    "category": "section",
+    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
+},
+
+{
+    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
+    "page": "Weight",
+    "title": "ExponentialWeight(λ = 0.1)",
+    "category": "section",
+    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
+},
+
+{
+    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
+    "page": "Weight",
+    "title": "LearningRate(r = 0.6)",
+    "category": "section",
+    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
+},
+
+{
+    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
+    "page": "Weight",
+    "title": "HarmonicWeight(a = 10.0)",
+    "category": "section",
+    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
+},
+
+{
+    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
+    "page": "Weight",
+    "title": "McclainWeight(a = 0.1)",
+    "category": "section",
+    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+},
+
+{
+    "location": "weights.html#Weight-Wrappers-1",
+    "page": "Weight",
+    "title": "Weight Wrappers",
+    "category": "section",
+    "text": "Several types can change the behavior of a Weight."
+},
+
+{
+    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "page": "Weight",
+    "title": "Bounded(weight, λ)",
+    "category": "section",
+    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
+},
+
+{
+    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
+    "page": "Weight",
+    "title": "Scaled(weight, λ)",
+    "category": "section",
+    "text": "Weights are scaled by a constant.  This should only be used with certain subtypes of  StochasticStat (those based on stochastic gradient algorithms), as it may violate the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+},
+
+{
     "location": "newstats.html#",
     "page": "Extending OnlineStats",
     "title": "Extending OnlineStats",
@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition"
 },
 
 {
