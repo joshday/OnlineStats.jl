@@ -236,16 +236,28 @@ end #Series
 end
 
 #-----------------------------------------------------------------------# Partition
-# @testset "Partition" begin 
-#     o = Partition(Variance(), 5)
-#     s = Series(o)
-#     for i in 1:20
-#         fit!(s, rand())
-#         @test length(o.parts) <= 10
-#     end
-#     # merge
-#     test_merge(Partition(Mean()), Partition(Mean()), randn(1000), randn(1000))
-# end
+@testset "Partition" begin 
+    o = Partition(Variance(), 5)
+    s = Series(o)
+    for i in 1:20
+        fit!(s, rand())
+        @test length(o.parts) <= 10
+    end
+    
+    # merge 
+    o = Partition(Mean())
+    y = randn(100)
+    Series(y, o)
+    @test value(merge(o)) ≈ mean(y)
+
+    # merge! 
+    o1, o2 = Partition(Mean()), Partition(Mean())
+    y1, y2 = randn(100), randn(100)
+    s1, s2 = Series(y1, o1), Series(y2, o2)
+    # merge!(s1, s2)
+    # @test length(o1.parts) <= o1.b
+    # @test value(merge(o1)) ≈ mean(vcat(y1, y2))
+end
 
 #-----------------------------------------------------------------------# Count 
 @testset "Count" begin 
