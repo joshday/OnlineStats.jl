@@ -653,7 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\n\n\n"
+    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\n\n\n\n"
 },
 
 {
