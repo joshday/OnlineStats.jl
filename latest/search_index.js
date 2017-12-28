@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start \"empty\"",
     "category": "section",
-    "text": "# use default: EqualWeight()\nSeries(Mean(), Variance())\n\n# use exponential weight\nSeries(ExponentialWeight(), Mean(), Variance())"
+    "text": "using OnlineStats# use default: EqualWeight()\nSeries(Mean(), Variance())\n\n# use exponential weight\nSeries(ExponentialWeight(), Mean(), Variance())"
 },
 
 {
@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start with initial data",
     "category": "section",
-    "text": "y = randn(100)\n\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
+    "text": "y = randn(100);\n\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
 },
 
 {
@@ -189,7 +189,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Weight",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a weight must follow two rules:gamma_1 = 1\nThis guarantees theta^(1) = x_1\ngamma_t in (0 1) quad forall t  1\nThis guarantees theta^(t) stays inside a convex space<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=400>"
+    "text": "Series is parameterized by a Weight type that controls the influence new observations.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a weight must follow two rules:gamma_1 = 1This guarantees theta^(1) = x_1gamma_t in (0 1) quad forall t  1This guarantees theta^(t) stays inside a convex space<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=450>"
 },
 
 {
@@ -254,6 +254,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Scaled(weight, λ)",
     "category": "section",
     "text": "Weights are scaled by a constant.  This should only be used with certain subtypes of  StochasticStat (those based on stochastic gradient algorithms), as it may violate the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+},
+
+{
+    "location": "weights.html#Custom-Weighting-1",
+    "page": "Weight",
+    "title": "Custom Weighting",
+    "category": "section",
+    "text": "You can implement your own Weight type via OnlineStatsBase.jl or pass in a function to a Series in place of a weight.y = randn(100);\n\no = Mean()\nSeries(y, n -> 1/n, o)\n\nvalue(o) ≈ mean(y)"
 },
 
 {
