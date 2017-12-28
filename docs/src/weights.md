@@ -1,9 +1,9 @@
 # Weight
 
-Series are parameterized by a `Weight` type that controls the influence of the next observation.
+`Series` is parameterized by a `Weight` type that controls the influence new observations.
 
 
-Consider how weights affect the influence of the next observation on an online mean ``\theta^{(t)}``, as many OnlineStats use updates of this form.  A larger weight  ``\gamma_t`` puts higher influence on the new observation ``x_t``:
+Consider how weights affect the influence of the next observation on an online mean ``\theta^{(t)}``, as many `OnlineStat`s use updates of this form.  A larger weight  ``\gamma_t`` puts higher influence on the new observation ``x_t``:
 
 ```math
 \theta^{(t)} = (1-\gamma_t)\theta^{(t-1)} + \gamma_t x_t
@@ -11,14 +11,14 @@ Consider how weights affect the influence of the next observation on an online m
 
 !!! note 
     The values produced by a weight must follow two rules:
-    - ``\gamma_1 = 1``
+    1. ``\gamma_1 = 1``
       - This guarantees ``\theta^{(1)} = x_1``
-    - ``\gamma_t \in (0, 1), \quad \forall t > 1``
+    1. ``\gamma_t \in (0, 1), \quad \forall t > 1``
       - This guarantees ``\theta^{(t)}`` stays inside a convex space
 
 ```@raw html
 <br>
-<img src="https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png" height=400>
+<img src="https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png" height=450>
 ```
 
 ## [`EqualWeight()`](@ref)
@@ -67,9 +67,9 @@ a positive constant `a` in the limit.
 \gamma_t = \frac{\gamma_{t-1}}{1 + \gamma_{t-1} - a}
 ```
 
-## Weight Wrappers
+## `Weight` Wrappers
 
-Several types can change the behavior of a Weight.
+Several types can change the behavior of a `Weight`.
 
 ### [`Bounded(weight, λ)`](@ref)
 
@@ -88,4 +88,18 @@ are [`Quantile`](@ref), [`KMeans`](@ref), and [`StatLearn`](@ref).
 
 ```math
 \gamma_t' = λ * \gamma_t
+```
+
+
+## Custom Weighting
+
+You can implement your own `Weight` type via [OnlineStatsBase.jl](https://github.com/joshday/OnlineStatsBase.jl) or pass in a function to a `Series` in place of a weight.
+
+```@repl using
+y = randn(100);
+
+o = Mean()
+Series(y, n -> 1/n, o)
+
+value(o) ≈ mean(y)
 ```
