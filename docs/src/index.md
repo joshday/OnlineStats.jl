@@ -44,7 +44,7 @@ value(v) ≈ var(y)
 ```
 
 
-### `Series` and `OnlineStat`s can be merged
+### Merging a `Series` merges the contained `OnlineStat`s
 
 See [Parallel Computation](@ref).
 

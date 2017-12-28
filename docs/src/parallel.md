@@ -1,8 +1,6 @@
 # Parallel Computation
 
-Two `Series` can be merged if they track the same `OnlineStat`s.  Merging facilitates [embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  **OnlineStats** 
-integrates with [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics
-on large persistent datasets.
+Two `Series` can be merged if they track the same `OnlineStat`s, which facilitates [embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  Merging in **OnlineStats** is used by [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics in parallel on large persistent datasets.
 
 !!! note
     In general, `fit!` is a cheaper operation than `merge!`.
@@ -37,6 +35,6 @@ merge!(s1, s3)  # merge information from s3 into s1
 
 ## Other Merges
 
-For OnlineStats which rely on approximations, merging isn't always a well-defined operation.
+For `OnlineStat`s that rely on approximations, merging isn't always a well-defined operation.
 In these cases, a warning will print that merging did not occur.  Please open an [issue](https://github.com/joshday/OnlineStats.jl/issues) to discuss merging an
 `OnlineStat` if merging fails but you believe it should be merge-able.

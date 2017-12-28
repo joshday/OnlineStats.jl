@@ -41,7 +41,15 @@ end
 """
     Partition(o::OnlineStat, b = 50)
 
-Split a data stream between `b` and `2 * b` parts, using `o` to summarize each part.
+Split a data stream between `b` and `2b` parts, using `o` to summarize each part.
+
+# Example
+
+    y = randn(1000)
+    o = Partition(Mean())
+    Series(y, o)
+    m = merge(o)  # merge partitions into a single `Mean`
+    value(m) ≈ mean(y)
 """
 struct Partition{T} <: ExactStat{0}
     parts::Vector{Part{T}}
