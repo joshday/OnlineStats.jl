@@ -12,23 +12,17 @@ to be fitted and/or a `Weight`.
 
 ### Start "empty"
 
-```@setup using
-using OnlineStats
+
 ```
+Series(Mean(), Variance()) # use default: EqualWeight()
 
-```@repl using
-using OnlineStats # hide
-# use default: EqualWeight()
-Series(Mean(), Variance())
-
-# use exponential weight
-Series(ExponentialWeight(), Mean(), Variance())
+Series(ExponentialWeight(), Mean(), Variance())# use exponential weight
 ```
 
 ### Start with initial data
 
-```@repl using
-y = randn(100);
+```
+y = randn(100)
 
 Series(y, Mean(), Variance())
 

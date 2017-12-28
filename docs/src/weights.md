@@ -95,7 +95,9 @@ are [`Quantile`](@ref), [`KMeans`](@ref), and [`StatLearn`](@ref).
 
 You can implement your own `Weight` type via [OnlineStatsBase.jl](https://github.com/joshday/OnlineStatsBase.jl) or pass in a function to a `Series` in place of a weight.
 
-```@repl using
+```@repl 
+using OnlineStats # hide
+
 y = randn(100);
 
 o = Mean()
