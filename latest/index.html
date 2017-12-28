@@ -8,7 +8,7 @@ v = Variance()</code></pre><h3><a class="nav-anchor" id="OnlineStats-are-grouped
 #     fit!(s, yi)
 # end
 fit!(s, y)</code></pre><h3><a class="nav-anchor" id="OnlineStats-have-a-value-1" href="#OnlineStats-have-a-value-1"><code>OnlineStat</code>s have a <code>value</code></a></h3><pre><code class="language-none">value(m) ≈ mean(y)    
-value(v) ≈ var(y)  </code></pre><h3><a class="nav-anchor" id="Series-and-OnlineStats-can-be-merged-1" href="#Series-and-OnlineStats-can-be-merged-1"><code>Series</code> and <code>OnlineStat</code>s can be merged</a></h3><p>See <a href="parallel.html#Parallel-Computation-1">Parallel Computation</a>.</p><pre><code class="language-none">y2 = randn(123)
+value(v) ≈ var(y)  </code></pre><h3><a class="nav-anchor" id="Merging-a-Series-merges-the-contained-OnlineStats-1" href="#Merging-a-Series-merges-the-contained-OnlineStats-1">Merging a <code>Series</code> merges the contained <code>OnlineStat</code>s</a></h3><p>See <a href="parallel.html#Parallel-Computation-1">Parallel Computation</a>.</p><pre><code class="language-none">y2 = randn(123)
 
 s2 = Series(y2, Mean(), Variance())
 

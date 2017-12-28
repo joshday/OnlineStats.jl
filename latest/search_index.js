@@ -65,9 +65,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Series-and-OnlineStats-can-be-merged-1",
+    "location": "index.html#Merging-a-Series-merges-the-contained-OnlineStats-1",
     "page": "Basics",
-    "title": "Series and OnlineStats can be merged",
+    "title": "Merging a Series merges the contained OnlineStats",
     "category": "section",
     "text": "See Parallel Computation.y2 = randn(123)\n\ns2 = Series(y2, Mean(), Variance())\n\nmerge!(s, s2)\n\nvalue(m) ≈ mean(vcat(y, y2))    \nvalue(v) ≈ var(vcat(y, y2))  "
 },
@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Parallel Computation",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  Merging facilitates embarassingly parallel computations.  OnlineStats  integrates with JuliaDB to run analytics on large persistent datasets.note: Note\nIn general, fit! is a cheaper operation than merge!."
+    "text": "Two Series can be merged if they track the same OnlineStats, which facilitates embarassingly parallel computations.  Merging in OnlineStats is used by JuliaDB to run analytics in parallel on large persistent datasets.note: Note\nIn general, fit! is a cheaper operation than merge!."
 },
 
 {
@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Other Merges",
     "category": "section",
-    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+    "text": "For OnlineStats that rely on approximations, merging isn't always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
 },
 
 {
@@ -653,7 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
+    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\n\n\n"
 },
 
 {
