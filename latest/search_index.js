@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start \"empty\"",
     "category": "section",
-    "text": "using OnlineStats# use default: EqualWeight()\nSeries(Mean(), Variance())\n\n# use exponential weight\nSeries(ExponentialWeight(), Mean(), Variance())"
+    "text": "using OnlineStatsusing OnlineStats # hide\n# use default: EqualWeight()\nSeries(Mean(), Variance())\n\n# use exponential weight\nSeries(ExponentialWeight(), Mean(), Variance())"
 },
 
 {
