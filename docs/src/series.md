@@ -17,6 +17,7 @@ using OnlineStats
 ```
 
 ```@repl using
+using OnlineStats # hide
 # use default: EqualWeight()
 Series(Mean(), Variance())
 
