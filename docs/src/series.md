@@ -12,7 +12,7 @@ to be fitted and/or a `Weight`.
 
 ### Start "empty"
 
-```julia
+```@repl
 # use default: EqualWeight()
 Series(Mean(), Variance())
 
@@ -22,7 +22,7 @@ Series(ExponentialWeight(), Mean(), Variance())
 
 ### Start with initial data
 
-```julia
+```@repl
 y = randn(100)
 
 Series(y, Mean(), Variance())
