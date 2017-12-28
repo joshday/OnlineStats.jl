@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start \"empty\"",
     "category": "section",
-    "text": "using OnlineStatsusing OnlineStats # hide\n# use default: EqualWeight()\nSeries(Mean(), Variance())\n\n# use exponential weight\nSeries(ExponentialWeight(), Mean(), Variance())"
+    "text": "Series(Mean(), Variance()) # use default: EqualWeight()\n\nSeries(ExponentialWeight(), Mean(), Variance())# use exponential weight"
 },
 
 {
@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Start with initial data",
     "category": "section",
-    "text": "y = randn(100);\n\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
+    "text": "y = randn(100)\n\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
 },
 
 {
@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Custom Weighting",
     "category": "section",
-    "text": "You can implement your own Weight type via OnlineStatsBase.jl or pass in a function to a Series in place of a weight.y = randn(100);\n\no = Mean()\nSeries(y, n -> 1/n, o)\n\nvalue(o) ≈ mean(y)"
+    "text": "You can implement your own Weight type via OnlineStatsBase.jl or pass in a function to a Series in place of a weight.using OnlineStats # hide\n\ny = randn(100);\n\no = Mean()\nSeries(y, n -> 1/n, o)\n\nvalue(o) ≈ mean(y)"
 },
 
 {
