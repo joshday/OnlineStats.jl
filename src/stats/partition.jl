@@ -50,6 +50,9 @@ Split a data stream between `b` and `2b` parts, using `o` to summarize each part
     Series(y, o)
     m = merge(o)  # merge partitions into a single `Mean`
     value(m) ≈ mean(y)
+
+    using Plots
+    plot(o)
 """
 struct Partition{T} <: ExactStat{0}
     parts::Vector{Part{T}}
