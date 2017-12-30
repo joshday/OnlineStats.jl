@@ -127,7 +127,7 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:len
         linewidth --> 0
         seriestype --> :bar
         bar_width --> nobs.(o.parts)
-        getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, lvls))), o.parts))
+        getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
     end
 end
 
