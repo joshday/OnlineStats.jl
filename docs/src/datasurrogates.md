@@ -6,6 +6,22 @@ Some `OnlineStat`s are especially useful for out-of-core computations.  After th
 
 See [`Partition`](@ref)
 
+```@eval
+using OnlineStats, Plots
+
+y = rand(["a", "b", "c", "d"], 10^6)
+
+o = Partition(CountMap(String))
+
+s = Series(y, o)
+
+plot(s)
+
+savefig("partition.png")  # hide
+nothing
+```
+![](partition.png)
+
 ## Linear Regressions
 
 See [`LinRegBuilder`](@ref)
