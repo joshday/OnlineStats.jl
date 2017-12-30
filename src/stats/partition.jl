@@ -49,7 +49,8 @@ and checking for nonstationarity.
 
     plot(o::Partition, f::Function = value)
 
-The fallback recipe plots `value(stat)` for every `stat` in the partition.
+The fallback recipe plots `f(stat)` for every `stat` in the partition.  Special plot recipes
+exist for [`CountMap`](@ref) (stacked bar) and [`Variance`](ref) (mean ± 95% CI).
 
 # Example
 

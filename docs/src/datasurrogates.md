@@ -43,7 +43,7 @@ o2 = Partition(Extrema())
 
 s = Series(y, o, o2)
 
-plot(s)
+plot(plot(o), plot(o2))
 savefig("partition2.png"); nothing # hide
 ```
 
@@ -51,17 +51,32 @@ savefig("partition2.png"); nothing # hide
 
 ## Linear Regressions
 
-See [`LinRegBuilder`](@ref)
+The [`LinRegBuilder`](@ref) type allows you to fit any linear regression model where `y`
+can be any variable and the `x`'s can be any subset of variables.
+
+```@example setup
+# make some data
+x = randn(10^6, 10)
+y = x * linspace(-1, 1, 10) + randn(10^6)
+
+o = LinRegBuilder(11)
+
+s = Series([x y], o)
+
+# adds intercept term by default as last coefficient
+coef(o; y = 11, verbose = true)
+```
 
 ## Histograms
 
-The [`Hist`](@ref) type for online histograms has a 
-[Plots.jl](https://github.com/JuliaPlots/Plots.jl) recipe and can also be used to calculate 
-approximate summary statistics, without the need to revisit the actual data.
+The [`Hist`](@ref) type for online histograms uses a different algorithm based on whether
+the argument to the constructor is the number of bins or the bin edges.  `Hist` can be used 
+to calculate approximate summary statistics, without the need to revisit the actual data.
 
 ```@example setup
 o = Hist(100)
-s = Series(o)
+o2 = Hist(-5:.1:5)
+s = Series(o, o2)
 
 fit!(s, randexp(100_000))
 
@@ -72,7 +87,7 @@ var(o)
 std(o)
 
 using Plots
-plot(o)
+plot(s)
 savefig("hist.png"); nothing # hide
 ```
 
