@@ -1,4 +1,4 @@
-```@setup setup
+```@setup abc
 Pkg.add("Plots")
 Pkg.add("GR")
 using OnlineStats

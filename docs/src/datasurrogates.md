@@ -6,7 +6,7 @@ Some `OnlineStat`s are especially useful for out-of-core computations.  After th
 
 See [`Partition`](@ref)
 
-```@example setup
+```@example abc
 using OnlineStats, Plots
 
 y = rand(["a", "b", "c", "d"], 10^6)
@@ -31,7 +31,7 @@ The [`Hist`](@ref) type for online histograms has a
 [Plots.jl](https://github.com/JuliaPlots/Plots.jl) recipe and can also be used to calculate 
 approximate summary statistics, without the need to revisit the actual data.
 
-```@example setup
+```@example abc
 o = Hist(100)
 s = Series(o)
 
