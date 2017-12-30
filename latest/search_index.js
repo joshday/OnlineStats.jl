@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "page",
-    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nusing OnlineStats\nusing Plots\ngr()"
+    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Summary",
     "category": "section",
-    "text": "See Partitionusing OnlineStats, Plots\n\ny = rand([\"a\", \"b\", \"c\", \"d\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\n\nsavefig(\"partition.png\")  # hide\nnothing(Image: )"
+    "text": "See Partitionusing OnlineStats, Plots\n\ny = rand([\"a\", \"b\", \"c\", \"d\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Histograms",
     "category": "section",
-    "text": "The Hist type for online histograms has a  Plots.jl recipe and can also be used to calculate  approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(o)(Image: )"
+    "text": "The Hist type for online histograms has a  Plots.jl recipe and can also be used to calculate  approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(o)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
 },
 
 {
