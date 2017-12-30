@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "page",
-    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
+    "text": ""
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Surrogates",
     "category": "page",
-    "text": ""
+    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
 },
 
 {
