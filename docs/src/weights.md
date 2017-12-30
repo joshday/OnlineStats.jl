@@ -10,11 +10,9 @@ Consider how weights affect the influence of the next observation on an online m
 ```
 
 !!! note 
-    The values produced by a weight must follow two rules:
-    1. ``\gamma_1 = 1``
-      - This guarantees ``\theta^{(1)} = x_1``
-    1. ``\gamma_t \in (0, 1), \quad \forall t > 1``
-      - This guarantees ``\theta^{(t)}`` stays inside a convex space
+    The values produced by a `Weight` must follow two rules:
+    1. ``\gamma_1 = 1`` (guarantees ``\theta^{(1)} = x_1``)
+    1. ``\gamma_t \in (0, 1), \quad \forall t > 1`` (guarantees ``\theta^{(t)}`` stays inside a convex space)
 
 ```@raw html
 <br>
@@ -81,8 +79,8 @@ Several types can change the behavior of a `Weight`.
 
 ### [`Scaled(weight, λ)`](@ref)
 
-Weights are scaled by a constant.  This should only be used with certain subtypes of 
-`StochasticStat` (those based on stochastic gradient algorithms), as it may violate the 
+Weights are scaled by a constant.  This should only be used with the `StochasticStat`s 
+based on stochastic gradient algorithms, as it violates the 
 weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms 
 are [`Quantile`](@ref), [`KMeans`](@ref), and [`StatLearn`](@ref).
 

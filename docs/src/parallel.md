@@ -1,6 +1,6 @@
 # Parallel Computation
 
-Two `Series` can be merged if they track the same `OnlineStat`s, which facilitates [embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  Merging in **OnlineStats** is used by [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics in parallel on large persistent datasets.
+Two `Series` can be merged if they track the same `OnlineStat`s, which facilitates [embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  Merging in **OnlineStats** is used by [**JuliaDB**](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics in parallel on large persistent datasets.
 
 !!! note
     In general, `fit!` is a cheaper operation than `merge!`.

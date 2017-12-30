@@ -8,15 +8,15 @@ The `Series` type is the workhorse of **OnlineStats**.  A `Series` tracks
 ## Creating a Series 
 
 The `Series` constructor accepts any number of `OnlineStat`s, optionally preceded by data 
-to be fitted and/or a `Weight`.
+to be fitted and/or a `Weight`.  When a `Weight` isn't specified, `Series` will use the
+default weight associated with the `OnlineStat`s.
 
 ### Start "empty"
 
-
 ```
-Series(Mean(), Variance()) # use default: EqualWeight()
+Series(Mean(), Variance())
 
-Series(ExponentialWeight(), Mean(), Variance())# use exponential weight
+Series(ExponentialWeight(), Mean(), Variance())
 ```
 
 ### Start with initial data
@@ -47,7 +47,7 @@ the hood of the update machinery.
 ### Single observation
 
 !!! note
-    A single observation depends on the OnlineStat.  For example, a single observation for a `Mean` is `Real` and for a `CovMatrix` is `AbstractVector` or `Tuple`.
+    A single observation depends on the `OnlineStat`.  For example, a single observation for a `Mean` is `Real` and for a `CovMatrix` is `AbstractVector` or `Tuple`.
 
 ```julia
 s = Series(Mean())
