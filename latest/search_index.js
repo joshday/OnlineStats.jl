@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Summarize Partitioned Data",
     "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(s)\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -341,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Linear Regressions",
     "category": "section",
-    "text": "See LinRegBuilder"
+    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x's can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * linspace(-1, 1, 10) + randn(10^6)\n\no = LinRegBuilder(11)\n\ns = Series([x y], o)\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
 },
 
 {
@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Histograms",
     "category": "section",
-    "text": "The Hist type for online histograms has a  Plots.jl recipe and can also be used to calculate  approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(o)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
+    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\no2 = Hist(-5:.1:5)\ns = Series(o, o2)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -661,7 +661,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.  This  is useful for visualizing large datasets where it is not feasible to plot every observation  and checking for nonstationarity.\n\nPlotting\n\nplot(o::Partition, f::Function = value)\n\nThe fallback recipe plots value(stat) for every stat in the partition.\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\nplot!(o, x -> value(x) + 1)\n\n\n\n"
+    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.  This  is useful for visualizing large datasets where it is not feasible to plot every observation  and checking for nonstationarity.\n\nPlotting\n\nplot(o::Partition, f::Function = value)\n\nThe fallback recipe plots f(stat) for every stat in the partition.  Special plot recipes exist for CountMap (stacked bar) and Variance (mean ± 95% CI).\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\nplot!(o, x -> value(x) + 1)\n\n\n\n"
 },
 
 {
