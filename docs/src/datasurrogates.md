@@ -27,7 +27,7 @@ o = Partition(CountMap(String))
 
 s = Series(y, o)
 
-plot(s)
+plot(o)
 savefig("partition.png"); nothing # hide
 ```
 
