@@ -329,11 +329,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "datasurrogates.html#Data-Summary-1",
+    "location": "datasurrogates.html#Summarize-Partitioned-Data-1",
     "page": "Data Surrogates",
-    "title": "Data Summary",
+    "title": "Summarize Partitioned Data",
     "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"b\", \"c\", \"d\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(s)\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -661,7 +661,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\n\n\n\n"
+    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.  This  is useful for visualizing large datasets where it is not feasible to plot every observation  and checking for nonstationarity.\n\nPlotting\n\nplot(o::Partition, f::Function = value)\n\nThe fallback recipe plots value(stat) for every stat in the partition.\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\nplot!(o, x -> value(x) + 1)\n\n\n\n"
 },
 
 {
