@@ -1,8 +1,9 @@
-```@setup abc
+```@setup setup
 Pkg.add("Plots")
 Pkg.add("GR")
 using OnlineStats
 using Plots
+srand(123)
 gr()
 ```
 

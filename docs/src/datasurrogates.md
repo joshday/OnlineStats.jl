@@ -6,7 +6,7 @@ Some `OnlineStat`s are especially useful for out-of-core computations.  After th
 
 See [`Partition`](@ref)
 
-```@eval bac
+```@example setup
 using OnlineStats, Plots
 
 y = rand(["a", "b", "c", "d"], 10^6)
@@ -16,10 +16,9 @@ o = Partition(CountMap(String))
 s = Series(y, o)
 
 plot(s)
-
-savefig("partition.png")  # hide
-nothing
+savefig("partition.png"); nothing # hide
 ```
+
 ![](partition.png)
 
 ## Linear Regressions
@@ -32,7 +31,7 @@ The [`Hist`](@ref) type for online histograms has a
 [Plots.jl](https://github.com/JuliaPlots/Plots.jl) recipe and can also be used to calculate 
 approximate summary statistics, without the need to revisit the actual data.
 
-```julia
+```@example setup
 o = Hist(100)
 s = Series(o)
 
@@ -46,7 +45,8 @@ std(o)
 
 using Plots
 plot(o)
+savefig("hist.png"); nothing # hide
 ```
 
-![](https://user-images.githubusercontent.com/8075494/34454746-912a298a-ed37-11e7-8fdd-e2a3fb9048ae.png)
+![](hist.png)
 
