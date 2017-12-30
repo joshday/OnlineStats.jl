@@ -7,7 +7,7 @@ o = Partition(CountMap(String))
 
 s = Series(y, o)
 
-plot(s)</code></pre></div><p><img src="partition.png" alt/></p><div><pre><code class="language-julia">using OnlineStats, Plots
+plot(o)</code></pre></div><p><img src="partition.png" alt/></p><div><pre><code class="language-julia">using OnlineStats, Plots
 
 y = cumsum(randn(10^6))
 
