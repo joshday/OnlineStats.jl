@@ -1,6 +1,7 @@
 ```@setup setup
 Pkg.add("Plots")
 Pkg.add("GR")
+ENV["GKSwstype"] = "100"
 using OnlineStats
 using Plots
 srand(123)
@@ -13,7 +14,9 @@ Some `OnlineStat`s are especially useful for out-of-core computations.  After th
 
 ## Data Summary
 
-See [`Partition`](@ref)
+The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`. 
+`Partition` has a fallback plot recipe that works for most `OnlineStat`s and specific plot
+recipes for [`Variance`](@ref) (summarizes with mean and 95% CI) and [`CountMap`](@ref) (see below).
 
 ```@example setup
 using OnlineStats, Plots
@@ -29,6 +32,21 @@ savefig("partition.png"); nothing # hide
 ```
 
 ![](partition.png)
+
+```@example setup
+using OnlineStats, Plots
+
+y = cumsum(randn(10^6))
+
+o = Partition(Mean())
+
+s = Series(y, o)
+
+plot(s)
+savefig("partition2.png"); nothing # hide
+```
+
+![](partition2.png)
 
 ## Linear Regressions
 
