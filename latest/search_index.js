@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Summarize Partitioned Data",
     "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o; linewidth = 0)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Histograms",
     "category": "section",
-    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(100)\no2 = Hist(-5:.1:5)\ns = Series(o, o2)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
+    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(100)       # adaptively find 100 bins\no2 = Hist(-5:.1:5)  # specify the bin edges\ns = Series(o, o2)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s; linewidth = 0)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
 },
 
 {
