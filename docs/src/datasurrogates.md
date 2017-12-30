@@ -27,7 +27,7 @@ o = Partition(CountMap(String))
 
 s = Series(y, o)
 
-plot(o; linewidth = 0)
+plot(o)
 savefig("partition.png"); nothing # hide
 ```
 
@@ -74,8 +74,8 @@ the argument to the constructor is the number of bins or the bin edges.  `Hist` 
 to calculate approximate summary statistics, without the need to revisit the actual data.
 
 ```@example setup
-o = Hist(100)       # adaptively find 100 bins
-o2 = Hist(-5:.1:5)  # specify the bin edges
+o = Hist(20)        # adaptively find bins
+o2 = Hist(-5:.5:5)  # specify the bin edges
 s = Series(o, o2)
 
 fit!(s, randexp(100_000))
@@ -87,7 +87,7 @@ var(o)
 std(o)
 
 using Plots
-plot(s; linewidth = 0)
+plot(s)
 savefig("hist.png"); nothing # hide
 ```
 
