@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Surrogates",
     "category": "page",
-    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
+    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Summary",
     "category": "section",
-    "text": "See Partitionusing OnlineStats, Plots\n\ny = rand([\"a\", \"b\", \"c\", \"d\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"b\", \"c\", \"d\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
 },
 
 {
