@@ -346,7 +346,7 @@ end
     for o in [Quantile(.1:.1:.9, SGD()), Quantile(.1:.1:.9, MSPI()), 
               Quantile(.1:.1:.9, OMAS())]
         Series(y, o)
-        @test value(o) ≈ quantile(y, .1:.1:.9) atol=.2
+        @test value(o) ≈ quantile(y, .1:.1:.9) atol=.25
         # merging
         o2 = copy(o)
         merge!(o, copy(o), .5)
