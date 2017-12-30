@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "page",
-    "text": "using OnlineStats\nusing Plots\ngr()"
+    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR)\nusing OnlineStats\nusing Plots\ngr()"
 },
 
 {
