@@ -6,7 +6,7 @@ Some `OnlineStat`s are especially useful for out-of-core computations.  After th
 
 See [`Partition`](@ref)
 
-```@eval
+```@eval bac
 using OnlineStats, Plots
 
 y = rand(["a", "b", "c", "d"], 10^6)
@@ -48,5 +48,5 @@ using Plots
 plot(o)
 ```
 
-![](https://user-images.githubusercontent.com/8075494/32749535-aae54900-c88d-11e7-8998-7fa6881635d5.png)
+![](https://user-images.githubusercontent.com/8075494/34454746-912a298a-ed37-11e7-8fdd-e2a3fb9048ae.png)
 

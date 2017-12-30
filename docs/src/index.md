@@ -1,3 +1,9 @@
+```@setup abc
+using OnlineStats
+using Plots
+gr()
+```
+
 # Basics
 
 **OnlineStats** is a Julia package which provides *online parallelizable algorithms* for statistics.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.

@@ -1,7 +1,7 @@
 """
     BiasVec(x, bias = 1.0)
 
-LightWeight wrapper of a vector which adds a "bias" term at the end.
+Lightweight wrapper of a vector which adds a "bias" term at the end.
 
 # Example
 
@@ -12,7 +12,10 @@ struct BiasVec{T, A <: VectorOb} <: AbstractVector{T}
     bias::T
 end
 # typeof(x[1]) instead of eltype -> allow tuples
-BiasVec(x, bias = 1.0) = BiasVec{typeof(x[1]), typeof(x)}(x, bias)
+function BiasVec(x, bias = 1.0) 
+    T = typeof(x[1])
+    BiasVec(x, T(bias))
+end
 
 Base.length(v::BiasVec) = length(v.x) + 1
 
