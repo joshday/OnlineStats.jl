@@ -1,4 +1,6 @@
 ```@setup abc
+Pkg.add("Plots")
+Pkg.add("GR)
 using OnlineStats
 using Plots
 gr()
