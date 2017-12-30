@@ -41,7 +41,15 @@ end
 """
     Partition(o::OnlineStat, b = 50)
 
-Split a data stream between `b` and `2b` parts, using `o` to summarize each part.
+Split a data stream between `b` and `2b` parts, using `o` to summarize each part.  This 
+is useful for visualizing large datasets where it is not feasible to plot every observation 
+and checking for nonstationarity.
+
+# Plotting 
+
+    plot(o::Partition, f::Function = value)
+
+The fallback recipe plots `value(stat)` for every `stat` in the partition.
 
 # Example
 
@@ -53,6 +61,7 @@ Split a data stream between `b` and `2b` parts, using `o` to summarize each part
 
     using Plots
     plot(o)
+    plot!(o, x -> value(x) + 1)
 """
 struct Partition{T} <: ExactStat{0}
     parts::Vector{Part{T}}

@@ -95,21 +95,22 @@ end
     alpha --> .1 
     seriestype --> :vline
     label --> "Parts"
+    xlab --> "Nobs"
+    title --> "Partition of $(length(o.o.parts)) Parts"
     grid --> false
-    x = [p.start for p in o.o.parts]
+    [p.start for p in o.o.parts]
 end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
-@recipe function f(o::Partition, f = value)
+@recipe function f(o::Partition, f::Function = value, withparts::Bool = true)
     @series begin 
-        title --> "Partition of $(length(o.parts)) Parts"
         label --> string(f) * " of " * name(o.parts[1].stat)
         getx(o), to_plot_shape(map(x -> f(x.stat), o.parts))
     end
-    @series PartLines(o) 
+    withparts && @series PartLines(o) 
 end
 to_plot_shape(v::Vector) = v 
-to_plot_shape(v::Vector{<:Vector}) = [v[i][j] for i in 1:length(v), j in 1:length(v[1])]
+to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:length(v[1])]
 
 @recipe function f(o::Partition{CountMap{T}}) where {T}
     lvls = T[]
@@ -137,7 +138,6 @@ end
 
     @series begin 
         title --> "Partition of $(length(o.parts)) Parts"
-        xlab --> "Nobs"
         σn = σ ./ sqrt.(n)
         if confint
             ribbon --> (σn, σn)

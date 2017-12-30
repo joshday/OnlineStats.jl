@@ -12,7 +12,7 @@ gr()
 
 Some `OnlineStat`s are especially useful for out-of-core computations.  After they've been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again.
 
-## Data Summary
+## Summarize Partitioned Data
 
 The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`. 
 `Partition` has a fallback plot recipe that works for most `OnlineStat`s and specific plot
@@ -21,7 +21,7 @@ recipes for [`Variance`](@ref) (summarizes with mean and 95% CI) and [`CountMap`
 ```@example setup
 using OnlineStats, Plots
 
-y = rand(["a", "b", "c", "d"], 10^6)
+y = rand(["a", "a", "b", "c"], 10^6)
 
 o = Partition(CountMap(String))
 
@@ -39,8 +39,9 @@ using OnlineStats, Plots
 y = cumsum(randn(10^6))
 
 o = Partition(Mean())
+o2 = Partition(Extrema())
 
-s = Series(y, o)
+s = Series(y, o, o2)
 
 plot(s)
 savefig("partition2.png"); nothing # hide
