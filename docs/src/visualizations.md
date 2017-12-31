@@ -1,3 +1,13 @@
+```@setup setup
+Pkg.add("GR")
+Pkg.add("Plots")
+ENV["GKSwstype"] = "100"
+using OnlineStats
+using Plots
+srand(123)
+gr()
+```
+
 # Visualizations
 
 ## Plotting a Series plots the contained OnlineStats

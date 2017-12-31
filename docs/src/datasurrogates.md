@@ -1,6 +1,6 @@
 ```@setup setup
-Pkg.add("Plots")
 Pkg.add("GR")
+Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
 using OnlineStats
 using Plots
