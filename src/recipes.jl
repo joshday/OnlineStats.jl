@@ -40,7 +40,7 @@ end
 end
 
 
-#-----------------------------------------------------------------------# Series{0}
+#-----------------------------------------------------------------------# Series
 @recipe function f(s::Series)
     layout --> length(s.stats)
     for stat in s.stats
@@ -86,7 +86,7 @@ end
     collect(keys(o)), value(o)
 end
 
-#-----------------------------------------------------------------------# Partition 
+#-----------------------------------------------------------------------# PartLines 
 struct PartLines
     o::Partition 
 end 
@@ -98,21 +98,23 @@ end
     xlab --> "Nobs"
     title --> "Partition of $(length(o.o.parts)) Parts"
     grid --> false
-    xlim --> (0, o.o.parts[end].start + o.o.parts[end].n)
+    # xlim --> (0, o.o.parts[end].start + o.o.parts[end].n)
     [p.start for p in o.o.parts]
 end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
-@recipe function f(o::Partition, f::Function = value, withparts::Bool = true)
+#-----------------------------------------------------------------------# Partition
+@recipe function f(o::Partition, f::Function = value)
     @series begin 
         label --> string(f) * " of " * name(o.parts[1].stat)
         getx(o), to_plot_shape(map(x -> f(x.stat), o.parts))
     end
-    withparts && @series PartLines(o) 
+    @series PartLines(o) 
 end
 to_plot_shape(v::Vector) = v 
 to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:length(v[1])]
 
+#-----------------------------------------------------------------------# Partition{<:CountMap}
 @recipe function f(o::Partition{CountMap{T}}) where {T}
     lvls = T[]
     for p in o.parts
@@ -132,13 +134,13 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:len
     end
 end
 
+#-----------------------------------------------------------------------# Partition{Variance}
 @recipe function f(o::Partition{Variance}; confint = true)
     μ = map(x -> mean(x.stat), o.parts)
     σ = map(x -> std(x.stat), o.parts)
     n = nobs.(o.parts)
 
     @series begin 
-        title --> "Partition of $(length(o.parts)) Parts"
         σn = σ ./ sqrt.(n)
         if confint
             ribbon --> (σn, σn)
@@ -152,3 +154,21 @@ end
     @series PartLines(o)
 end
 
+#-----------------------------------------------------------------------# Partition{Extrema}
+@recipe function f(o::Partition{Extrema})
+    @series begin
+        label --> "Extrema"
+        lo = map(x -> value(x)[1], o.parts)
+        hi = map(x -> value(x)[2], o.parts)
+        fillto --> lo
+        linewidth --> 0
+        fillalpha --> .4
+        getx(o), hi
+    end 
+    @series PartLines(o)
+end
+
+#-----------------------------------------------------------------------# Partition{<:Hist}
+@recipe function f(o::Partition{<:Hist})
+
+end

@@ -12,6 +12,7 @@ makedocs(
         "stats_and_models.md",
         "parallel.md",
         "datasurrogates.md",
+        "visualizations.md",
         "api.md"
     ]
 )
