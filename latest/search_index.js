@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Surrogates",
     "category": "page",
-    "text": "Pkg.add(\"Plots\")\nPkg.add(\"GR\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
+    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
 },
 
 {
@@ -357,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Visualizations",
     "category": "page",
-    "text": ""
+    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
 },
 
 {
