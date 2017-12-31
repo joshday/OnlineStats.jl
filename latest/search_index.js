@@ -353,6 +353,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "visualizations.html#",
+    "page": "Visualizations",
+    "title": "Visualizations",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "visualizations.html#Visualizations-1",
+    "page": "Visualizations",
+    "title": "Visualizations",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "visualizations.html#Plotting-a-Series-plots-the-contained-OnlineStats-1",
+    "page": "Visualizations",
+    "title": "Plotting a Series plots the contained OnlineStats",
+    "category": "section",
+    "text": "    s = Series(randn(10^6), Hist(25), Hist(-5:.1:5))\n    plot(s)\n    savefig(\"plot_series.png\"); nothing # hide(Image: )note: Note\nDue to the lightweight nature of RecipesBase, there is occasionally a mix-up of a data series appearing in the wrong subplot.  A workaround is to plot each OnlineStat separately, e.g. plot(plot(o1), plot(o2)) or plot(plot.(stats(my_series))...)."
+},
+
+{
     "location": "api.html#",
     "page": "API",
     "title": "API",
