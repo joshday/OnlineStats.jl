@@ -7,7 +7,7 @@ o = Partition(CountMap(String))
 
 s = Series(y, o)
 
-plot(o; linewidth = 0)</code></pre></div><p><img src="partition.png" alt/></p><div><pre><code class="language-julia">using OnlineStats, Plots
+plot(o)</code></pre></div><p><img src="partition.png" alt/></p><div><pre><code class="language-julia">using OnlineStats, Plots
 
 y = cumsum(randn(10^6))
 
@@ -37,8 +37,8 @@ coef(o; y = 11, verbose = true)</code></pre><pre><code class="language-none">INF
   0.556342
   0.776971
   0.99998
-  0.00125246</code></pre></div><h2><a class="nav-anchor" id="Histograms-1" href="#Histograms-1">Histograms</a></h2><p>The <a href="api.html#OnlineStats.Hist"><code>Hist</code></a> type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  <code>Hist</code> can be used  to calculate approximate summary statistics, without the need to revisit the actual data.</p><div><pre><code class="language-julia">o = Hist(100)       # adaptively find 100 bins
-o2 = Hist(-5:.1:5)  # specify the bin edges
+  0.00125246</code></pre></div><h2><a class="nav-anchor" id="Histograms-1" href="#Histograms-1">Histograms</a></h2><p>The <a href="api.html#OnlineStats.Hist"><code>Hist</code></a> type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  <code>Hist</code> can be used  to calculate approximate summary statistics, without the need to revisit the actual data.</p><div><pre><code class="language-julia">o = Hist(20)        # adaptively find bins
+o2 = Hist(-5:.5:5)  # specify the bin edges
 s = Series(o, o2)
 
 fit!(s, randexp(100_000))
@@ -50,4 +50,4 @@ var(o)
 std(o)
 
 using Plots
-plot(s; linewidth = 0)</code></pre></div><p><img src="hist.png" alt/></p><footer><hr/><a class="previous" href="parallel.html"><span class="direction">Previous</span><span class="title">Parallel Computation</span></a><a class="next" href="api.html"><span class="direction">Next</span><span class="title">API</span></a></footer></article></body></html>
+plot(s)</code></pre></div><p><img src="hist.png" alt/></p><footer><hr/><a class="previous" href="parallel.html"><span class="direction">Previous</span><span class="title">Parallel Computation</span></a><a class="next" href="api.html"><span class="direction">Next</span><span class="title">API</span></a></footer></article></body></html>
