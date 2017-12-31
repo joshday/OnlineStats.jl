@@ -36,6 +36,7 @@ end
 
 # method must implement value --> Tuple of (edge_midpoints, counts)
 value(o::Hist) = value(o.method)
+nobs(o::Hist) = nobs(o.method)
 
 function Base.mean(o::Hist) 
     mids, counts = value(o)
@@ -71,6 +72,7 @@ KnownBins(r::Range) = KnownBins(r, zeros(Int, length(r) - 1))
 Base.show(io::IO, o::KnownBins) = print(io, "KnownBins(edges = $(o.edges))")
 Hist(r::Range) = Hist(KnownBins(r))
 value(o::KnownBins) = (_midpoints(o.edges), o.counts)
+nobs(o::KnownBins) = sum(o.counts)
 
 function fit!(o::Hist{<:KnownBins}, y::Real, γ::Float64)
     x = o.method.edges 
@@ -102,8 +104,6 @@ function discretized_pdf(o::Hist{KnownBins}, y::Real)
     b.counts[i] / sum(b.counts)
 end
 
-
-
 #-----------------------------------------------------------------------# AdaptiveBins
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
 """
@@ -124,12 +124,14 @@ value(o::AdaptiveBins) = (o.values, o.counts)
 fit!(o::Hist{AdaptiveBins}, y::Real, γ::Float64) = push!(o.method, Pair(y, 1))
 
 function Base.push!(o::AdaptiveBins, p::Pair)
-    o.n += 1
-    i = searchsortedfirst(o.values, first(p))
-    insert!(o.values, i, first(p))
-    insert!(o.counts, i, last(p))
-    ind = find_min_diff(o)
-    binmerge!(o, ind)
+    if last(p) > 0
+        o.n += 1
+        i = searchsortedfirst(o.values, first(p))
+        insert!(o.values, i, first(p))
+        insert!(o.counts, i, last(p))
+        ind = find_min_diff(o)
+        binmerge!(o, ind)
+    end
 end
 
 function binmerge!(o::AdaptiveBins, i)

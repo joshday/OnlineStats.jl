@@ -98,6 +98,7 @@ end
     xlab --> "Nobs"
     title --> "Partition of $(length(o.o.parts)) Parts"
     grid --> false
+    xlim --> (0, o.o.parts[end].start + o.o.parts[end].n)
     [p.start for p in o.o.parts]
 end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
