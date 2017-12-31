@@ -10,10 +10,12 @@ end
 
 #-----------------------------------------------------------------------# OnlineStat{0}
 @recipe function f(o::OnlineStat{0})
-    title --> "$(name(o)): $(round.(value(o), 5))"
     legend --> false
     axis --> false
-    grid --> false
+    # grid --> false
+    ylim --> (0, 1)
+    xlim --> (0, 1)
+    annotations --> [(.5, .75, name(o)), (.5, .25, string(value(o)))] #), .1, .2, string(value(o))]
     zeros(0)
 end
 
@@ -69,9 +71,10 @@ end
 end
 
 #-----------------------------------------------------------------------# MV
-@recipe function f(s::MV)
+@recipe function f(o::MV)
     i = 1
-    for stat in s.stats
+    layout --> length(o.stats)
+    for stat in o.stats
         @series begin 
             title --> "Stat $i"
             stat 
