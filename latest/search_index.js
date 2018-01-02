@@ -329,14 +329,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "datasurrogates.html#Summarize-Partitioned-Data-1",
-    "page": "Data Surrogates",
-    "title": "Summarize Partitioned Data",
-    "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition has a fallback plot recipe that works for most OnlineStats and specific plot recipes for Variance (summarizes with mean and 95% CI) and CountMap (see below).using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
-},
-
-{
     "location": "datasurrogates.html#Linear-Regressions-1",
     "page": "Data Surrogates",
     "title": "Linear Regressions",
@@ -373,7 +365,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plotting a Series plots the contained OnlineStats",
     "category": "section",
-    "text": "    s = Series(randn(10^6), Hist(25), Hist(-5:.1:5))\n    plot(s)\n    savefig(\"plot_series.png\"); nothing # hide(Image: )note: Note\nDue to the lightweight nature of RecipesBase, there is occasionally a mix-up of a data series appearing in the wrong subplot.  A workaround is to plot each OnlineStat separately, e.g. plot(plot(o1), plot(o2)) or plot(plot.(stats(my_series))...)."
+    "text": "    s = Series(randn(10^6), Hist(25), Hist(-5:5))\n    plot(s)\n    savefig(\"plot_series.png\"); nothing # hide(Image: )note: Note\nDue to the lightweight nature of RecipesBase, there is occasionally a mix-up of a data series appearing in the wrong subplot.  A workaround is to plot each OnlineStat separately, e.g. plot(plot(o1), plot(o2)) or plot(plot.(stats(my_series))...)."
+},
+
+{
+    "location": "visualizations.html#Partitions-1",
+    "page": "Visualizations",
+    "title": "Partitions",
+    "category": "section",
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition is therefore extremely useful in visualizing huge data, as summaries are plotted rather than every single observation.using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
 },
 
 {
