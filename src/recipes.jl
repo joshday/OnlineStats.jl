@@ -191,6 +191,7 @@ getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
             @series begin
                 w --> 2
                 label --> [labelbase * " $i" for i in 1:length(y[1])]
+                x, to_plot_shape(y)
             end
         end
     end

@@ -517,6 +517,8 @@ end
     Series(y, o)
     @test extrema(o)[1] == extrema(y)[1]
     @test extrema(o)[2] == extrema(y)[2]
+    @test minimum(o) == minimum(y)
+    @test maximum(o) == maximum(y)
 end
 @testset "Moments" begin 
     o = Moments()

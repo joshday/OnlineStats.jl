@@ -27,8 +27,26 @@ gr()
 ## Partitions
 
 The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`. 
-`Partition` is therefore extremely useful in visualizing huge data, as summaries are plotted
-rather than every single observation.
+`Partition` is therefore extremely useful in visualizing huge datasets, as summaries are plotted
+rather than every single observation.  
+
+### Partition Plotting options
+
+```@example setup
+o = Partition(Mean())
+s = Series(randn(10^6), o)
+plot(
+    plot(o),                    
+    plot(o; connect = true),    # connect lines for readability
+    plot(o; parts = false),     # don't plot vertical separators
+    plot(o, x -> mean(x) + 100) # plot a custom function (default is `value`),
+    legend = false)
+savefig("part1.png"); nothing # hide
+```
+
+![](part1.png)
+
+### Examples
 
 ```@example setup
 using OnlineStats, Plots
@@ -46,8 +64,6 @@ savefig("partition.png"); nothing # hide
 ![](partition.png)
 
 ```@example setup
-using OnlineStats, Plots
-
 y = cumsum(randn(10^6))
 
 o = Partition(Mean())
@@ -62,16 +78,25 @@ savefig("partition2.png"); nothing # hide
 ![](partition2.png)
 
 ```@example setup
-using OnlineStats, Plots
-
 y = cumsum(randn(10^6))
 
 o = Partition(Hist(50))
 
 s = Series(y, o)
 
-plot(s)
+plot(s; legend=false, alpha=.8)
 savefig("partition3.png"); nothing # hide
 ```
 
 ![](partition3.png)
+
+```@example setup
+
+o = Partition(Variance())
+
+s = Series(randn(10^6), o)
+
+plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])
+savefig("partition4.png"); nothing # hide
+```
+![](partition4.png)
