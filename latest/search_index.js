@@ -381,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partition Plotting options",
     "category": "section",
-    "text": "o = Partition(Mean())\ns = Series(randn(10^6), o)\nplot(\n    plot(o),                    \n    plot(o; connect = true),    # connect lines for readability\n    plot(o; parts = false),     # don't plot vertical separators\n    plot(o, x -> mean(x) + 100) # plot a custom function (default is `value`),\n    legend = false)\nsavefig(\"part1.png\"); nothing # hide(Image: )"
+    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(\n    plot(o),                    \n    plot(o; connect = true),     # connect lines for readability\n    plot(o; parts = false),      # don't plot vertical separators\n    plot(o, x -> mean(x) + 100); # plot a custom function (default is `value`)\n    legend = false)\n\nsavefig(\"part1.png\"); nothing # hide(Image: )"
 },
 
 {
