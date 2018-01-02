@@ -381,7 +381,31 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partition Plotting options",
     "category": "section",
-    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )plot(o; connect = true)      # connect lines for readability\nsavefig(\"part2.png\"); nothing # hide  (Image: )plot(o; parts = false)       # don't plot vertical separators\nsavefig(\"part3.png\"); nothing # hide  (Image: )plot(o, x -> mean(x) + 100)  # plot a custom function (default is `value`)\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
+    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Connect-lines-for-readability-1",
+    "page": "Visualizations",
+    "title": "Connect lines for readability",
+    "category": "section",
+    "text": "plot(o; connect = true)\n\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Turn-off-the-vertical-separators-1",
+    "page": "Visualizations",
+    "title": "Turn off the vertical separators",
+    "category": "section",
+    "text": "plot(o; parts = false)\n\nsavefig(\"part3.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1",
+    "page": "Visualizations",
+    "title": "Plot a custom function of the OnlineStats (default is value)",
+    "category": "section",
+    "text": "plot(o, x -> mean(x) + 100)\n\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
 },
 
 {
