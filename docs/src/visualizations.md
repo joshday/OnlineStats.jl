@@ -34,13 +34,16 @@ rather than every single observation.
 
 ```@example setup
 o = Partition(Mean())
+
 s = Series(randn(10^6), o)
+
 plot(
     plot(o),                    
     plot(o; connect = true),    # connect lines for readability
     plot(o; parts = false),     # don't plot vertical separators
     plot(o, x -> mean(x) + 100) # plot a custom function (default is `value`),
     legend = false)
+
 savefig("part1.png"); nothing # hide
 ```
 
