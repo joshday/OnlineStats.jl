@@ -373,7 +373,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partitions",
     "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition is therefore extremely useful in visualizing huge data, as summaries are plotted rather than every single observation.using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )using OnlineStats, Plots\n\ny = cumsum(randn(10^6))\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
+},
+
+{
+    "location": "visualizations.html#Partition-Plotting-options-1",
+    "page": "Visualizations",
+    "title": "Partition Plotting options",
+    "category": "section",
+    "text": "o = Partition(Mean())\ns = Series(randn(10^6), o)\nplot(\n    plot(o),                    \n    plot(o; connect = true),    # connect lines for readability\n    plot(o; parts = false),     # don't plot vertical separators\n    plot(o, x -> mean(x) + 100) # plot a custom function (default is `value`),\n    legend = false)\nsavefig(\"part1.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Examples-1",
+    "page": "Visualizations",
+    "title": "Examples",
+    "category": "section",
+    "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )y = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )y = cumsum(randn(10^6))\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )\no = Partition(Variance())\n\ns = Series(randn(10^6), o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
 },
 
 {
