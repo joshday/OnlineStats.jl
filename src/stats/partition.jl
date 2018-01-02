@@ -30,8 +30,14 @@ stat(o::Part) = o.stat
 value(o::Part) = value(o.stat)
 
 function squash!(v::Vector{<:Part})
-    length(v) % 2 == 0 || error("Squashing an odd number of Parts is not defined.")
-    for i in length(v):-2:2
+    lastind = 0
+    if length(v) % 2 == 0 
+        lastind = length(v)
+    else
+        warn("Squashing an odd number of Parts.")
+        lastind = length(v) - 1
+    end
+    for i in lastind:-2:2
         merge!(v[i-1], v[i])
         deleteat!(v, i)
     end
