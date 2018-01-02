@@ -381,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partition Plotting options",
     "category": "section",
-    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )"
+    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \nsavefig(\"part1.png\"); nothing # hide  (Image: )"
 },
 
 {
@@ -389,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Connect lines for readability",
     "category": "section",
-    "text": "plot(o; connect = true)\n\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
+    "text": "plot(o; connect = true)\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
 },
 
 {
@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Turn off the vertical separators",
     "category": "section",
-    "text": "plot(o; parts = false)\n\nsavefig(\"part3.png\"); nothing # hide  (Image: )"
+    "text": "plot(o; parts = false)\nsavefig(\"part3.png\"); nothing # hide  (Image: )"
 },
 
 {
@@ -405,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plot a custom function of the OnlineStats (default is value)",
     "category": "section",
-    "text": "plot(o, x -> mean(x) + 100)\n\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
+    "text": "plot(o, x -> mean(x) + 100)\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
 },
 
 {
