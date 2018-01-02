@@ -6,10 +6,11 @@ s = Series(randn(10^6), o)
 
 plot(
     plot(o),
-    plot(o; connect = true),     # connect lines for readability
-    plot(o; parts = false),      # don&#39;t plot vertical separators
-    plot(o, x -&gt; mean(x) + 100); # plot a custom function (default is `value`)
-    legend = false)</code></pre></div><p><img src="part1.png" alt/></p><h3><a class="nav-anchor" id="Examples-1" href="#Examples-1">Examples</a></h3><div><pre><code class="language-julia">using OnlineStats, Plots
+    plot(o; connect = true),    # connect lines for readability
+    plot(o; parts = false),     # don&#39;t plot vertical separators
+    plot(o, x -&gt; mean(x) + 100) # plot a custom function (default is `value`),
+    legend = false)</code></pre><pre><code class="language-none">▦ Series{0}  |  EqualWeight  |  nobs = 1000000
+└── Partition{Mean}</code></pre></div><p><img src="part1.png" alt/></p><h3><a class="nav-anchor" id="Examples-1" href="#Examples-1">Examples</a></h3><div><pre><code class="language-julia">using OnlineStats, Plots
 
 y = rand([&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 10^6)
 
