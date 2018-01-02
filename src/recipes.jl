@@ -89,6 +89,35 @@ end
     collect(keys(o)), value(o)
 end
 
+# #-----------------------------------------------------------------------# Partition 
+# @recipe function f(o::Partition, f::Function = value) 
+#     legend --> false
+#     color --> :black
+#     xlab --> "Nobs"
+#     title --> "Partition of $(length(o.parts)) Parts: $(name(o.parts[1].stat))"
+#     for part in o.parts
+#         @series begin part, f end
+#     end
+#     # reshape(o.parts, (1, length(o.parts)))
+# end
+
+# @recipe function f(o::Part, f::Function = value)
+#     v = f(o.stat)
+#     x = [o.start, o.start + o.n]
+#     if v isa ScalarOb 
+#         @series begin 
+#             x, [v, v]
+#         end
+#     elseif v isa VectorOb 
+#         v2 = reshape(v, (1, length(v)))
+#         @series begin 
+#             x, repmat(v2, 2, 1)
+#         end
+#     else
+#         error("3D Partition plots not supported yet")
+#     end
+# end
+
 #-----------------------------------------------------------------------# PartLines 
 struct PartLines
     o::Partition 
@@ -101,24 +130,79 @@ end
     xlab --> "Nobs"
     title --> "Partition of $(length(o.o.parts)) Parts"
     grid --> false
+    linewidth --> .5
     # xlim --> (0, o.o.parts[end].start + o.o.parts[end].n)
     [p.start for p in o.o.parts]
 end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
 #-----------------------------------------------------------------------# Partition
-@recipe function f(o::Partition, f::Function = value)
-    @series begin 
-        label --> string(f) * " of " * name(o.parts[1].stat)
-        getx(o), to_plot_shape(map(x -> f(x.stat), o.parts))
+# Fallback partition plot
+# works for values of ScalarOb or VectorOb
+@recipe function f(o::Partition{T}, f::Function = value; parts=true, connect=false) where {T}
+    xlim --> (0, o.parts[end].start + o.parts[end].n)
+
+    statname = name(o.parts[1].stat, false, false)
+    labelbase = f == value ? 
+        "Value of $statname" :
+        "Custom Function of $statname"
+
+    # get values
+    y = repeat(map(x -> f(x.stat), o.parts), inner = 3)
+    x = vcat(map(x -> [x.start, x.start + x.n, NaN], o.parts)...)
+    if connect  # replace NaNs with values
+        for i in 3:3:length(x) 
+            x[i] = x[i - 1]  
+        end
     end
-    @series PartLines(o) 
+
+    firstvalue = y[1]
+
+    if firstvalue isa ScalarOb 
+        @series begin
+            label --> labelbase 
+            w --> 2 
+            x, y
+        end
+    elseif firstvalue isa Tuple{VectorOb, VectorOb}
+        # for Hist
+        # assume firstvalue[1] is values, firstvalue[2] is "weights"
+        @series begin
+            y2 = to_plot_shape([yi[1] for yi in y])
+            y3 = to_plot_shape([yi[2] for yi in y])
+            line_z --> y3 
+            legend --> false
+            w --> 2
+            x, y2
+        end
+    elseif firstvalue isa VectorOb 
+        p = length(firstvalue)
+        # if each value is two numbers, assume they're the same series (e.g. Extrema)
+        if p == 2
+            @series begin 
+                y = to_plot_shape(y)
+                fillto --> y[:, 2]
+                fillalpha --> .4 
+                label --> labelbase 
+                w --> 0 
+                x, y[:, 1]
+            end 
+        else
+            @series begin
+                w --> 2
+                label --> [labelbase * " $i" for i in 1:length(y[1])]
+            end
+        end
+    end
+    parts && @series PartLines(o) 
 end
+
 to_plot_shape(v::Vector) = v 
 to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:length(v[1])]
 
 #-----------------------------------------------------------------------# Partition{<:CountMap}
 @recipe function f(o::Partition{CountMap{T}}) where {T}
+    xlim --> (0, o.parts[end].start + o.parts[end].n)
     lvls = T[]
     for p in o.parts
         for k in keys(p.stat)
@@ -138,40 +222,21 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:len
 end
 
 #-----------------------------------------------------------------------# Partition{Variance}
-@recipe function f(o::Partition{Variance}; confint = true)
-    μ = map(x -> mean(x.stat), o.parts)
-    σ = map(x -> std(x.stat), o.parts)
-    n = nobs.(o.parts)
+# @recipe function f(o::Partition{Variance}; confint = true)
+#     μ = map(x -> mean(x.stat), o.parts)
+#     σ = map(x -> std(x.stat), o.parts)
+#     n = nobs.(o.parts)
 
-    @series begin 
-        σn = σ ./ sqrt.(n)
-        if confint
-            ribbon --> (σn, σn)
-            fillalpha --> .1
-            label --> "Mean (95% CI)"
-        else
-            label --> "Mean"
-        end
-        getx(o), μ
-    end
-    @series PartLines(o)
-end
-
-#-----------------------------------------------------------------------# Partition{Extrema}
-@recipe function f(o::Partition{Extrema})
-    @series begin
-        label --> "Extrema"
-        lo = map(x -> value(x)[1], o.parts)
-        hi = map(x -> value(x)[2], o.parts)
-        fillto --> lo
-        linewidth --> 0
-        fillalpha --> .4
-        getx(o), hi
-    end 
-    @series PartLines(o)
-end
-
-#-----------------------------------------------------------------------# Partition{<:Hist}
-@recipe function f(o::Partition{<:Hist})
-
-end
+#     @series begin 
+#         σn = σ ./ sqrt.(n)
+#         if confint
+#             ribbon --> (σn, σn)
+#             fillalpha --> .1
+#             label --> "Mean (95% CI)"
+#         else
+#             label --> "Mean"
+#         end
+#         getx(o), μ
+#     end
+#     @series PartLines(o)
+# end

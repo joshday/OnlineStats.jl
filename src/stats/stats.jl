@@ -254,6 +254,8 @@ function Base.merge!(o::Extrema, o2::Extrema, γ::Float64)
 end
 _value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
+Base.maximum(o::Extrema) = o.max 
+Base.minimum(o::Extrema) = o.min
 
 #-----------------------------------------------------------------------# HyperLogLog
 # Mostly copy/pasted from StreamStats.jl
