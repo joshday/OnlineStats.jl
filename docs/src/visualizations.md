@@ -41,24 +41,37 @@ plot(o)
 
 savefig("part1.png"); nothing # hide  
 ```
+
 ![](part1.png)
 
+#### Connect lines for readability
+
 ```@example setup
-plot(o; connect = true)      # connect lines for readability
+plot(o; connect = true)
+
 savefig("part2.png"); nothing # hide  
 ```
+
 ![](part2.png)
 
-```@example setup
-plot(o; parts = false)       # don't plot vertical separators
-savefig("part3.png"); nothing # hide  
-```
-![](part3.png)
+#### Turn off the vertical separators
 
 ```@example setup
-plot(o, x -> mean(x) + 100)  # plot a custom function (default is `value`)
+plot(o; parts = false)
+
+savefig("part3.png"); nothing # hide  
+```
+
+![](part3.png)
+
+#### Plot a custom function of the `OnlineStat`s (default is `value`)
+
+```@example setup
+plot(o, x -> mean(x) + 100)
+
 savefig("part4.png"); nothing # hide  
 ```
+
 ![](part4.png)
 
 ### Examples
