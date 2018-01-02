@@ -37,9 +37,9 @@ o = Partition(Mean())
 
 s = Series(randn(10^6), o)
 
-plot(o),                    
-plot(o; connect = true),     # connect lines for readability
-plot(o; parts = false),      # don't plot vertical separators
+plot(o)                    
+plot(o; connect = true)      # connect lines for readability
+plot(o; parts = false)       # don't plot vertical separators
 plot(o, x -> mean(x) + 100)  # plot a custom function (default is `value`)
 
 plot(plot(o), plot(o;connect=true, plot(o;parts=false)), plot(o, x->mean(x) + 100))  # hide
