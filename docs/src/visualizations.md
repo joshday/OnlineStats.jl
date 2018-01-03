@@ -4,7 +4,7 @@ Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
 using OnlineStats
 using Plots
-srand(123)
+srand(1234)
 gr()
 ```
 
@@ -34,9 +34,7 @@ rather than every single observation.
 
 ```@example setup
 o = Partition(Mean())
-
 s = Series(randn(10^6), o)
-
 plot(o)  
 savefig("part1.png"); nothing # hide  
 ```
@@ -46,7 +44,8 @@ savefig("part1.png"); nothing # hide
 #### Connect lines for readability
 
 ```@example setup
-plot(o; connect = true)
+s = Series(randn(10^6), Partition(Mean()))
+plot(s; connect = true)
 savefig("part2.png"); nothing # hide  
 ```
 
