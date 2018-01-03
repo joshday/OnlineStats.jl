@@ -137,8 +137,6 @@ end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
 #-----------------------------------------------------------------------# Partition
-# Fallback partition plot
-# works for values of ScalarOb or VectorOb
 @recipe function f(o::Partition{T}, f::Function = value; parts=true, connect=false) where {T}
     xlim --> (0, o.parts[end].start + o.parts[end].n)
 
@@ -155,6 +153,8 @@ getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
             x[i] = x[i - 1]  
         end
     end
+    @show x
+    @show to_plot_shape(y)
 
     firstvalue = y[1]
 
