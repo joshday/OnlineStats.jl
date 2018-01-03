@@ -34,8 +34,11 @@ rather than every single observation.
 
 ```@example setup
 o = Partition(Mean())
+
 s = Series(randn(10^6), o)
+
 plot(o)  
+
 savefig("part1.png"); nothing # hide  
 ```
 
@@ -44,8 +47,8 @@ savefig("part1.png"); nothing # hide
 #### Connect lines for readability
 
 ```@example setup
-s = Series(randn(10^6), Partition(Mean()))
-plot(s; connect = true)
+plot(o; connect = true)
+
 savefig("part2.png"); nothing # hide  
 ```
 
@@ -55,6 +58,7 @@ savefig("part2.png"); nothing # hide
 
 ```@example setup
 plot(o; parts = false)
+
 savefig("part3.png"); nothing # hide  
 ```
 
@@ -64,6 +68,7 @@ savefig("part3.png"); nothing # hide
 
 ```@example setup
 plot(o, x -> mean(x) + 100)
+
 savefig("part4.png"); nothing # hide  
 ```
 
