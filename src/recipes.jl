@@ -153,8 +153,6 @@ getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
             x[i] = x[i - 1]  
         end
     end
-    @show x
-    @show to_plot_shape(y)
 
     firstvalue = y[1]
 
