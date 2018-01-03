@@ -461,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Demos",
     "title": "Demos",
     "category": "section",
-    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync this repo to JuliaBox:Sign into https://next.juliabox.com\nClick Git in the toolbar\nAdd the git clone url https://github.com/joshday/OnlineStatsDemos.git"
+    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync the notebooks to JuliaBox:Sign into https://next.juliabox.com\nClick Git in the toolbar\nAdd the git clone url https://github.com/joshday/OnlineStatsDemos.git"
 },
 
 {
