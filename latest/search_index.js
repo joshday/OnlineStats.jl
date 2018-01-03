@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Visualizations",
     "category": "page",
-    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
+    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(1234)\ngr()"
 },
 
 {
@@ -381,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partition Plotting options",
     "category": "section",
-    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \nsavefig(\"part1.png\"); nothing # hide  (Image: )"
+    "text": "o = Partition(Mean())\ns = Series(randn(10^6), o)\nplot(o)  \nsavefig(\"part1.png\"); nothing # hide  (Image: )"
 },
 
 {
@@ -389,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Connect lines for readability",
     "category": "section",
-    "text": "plot(o; connect = true)\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
+    "text": "s = Series(randn(10^6), Partition(Mean()))\nplot(s; connect = true)\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
 },
 
 {
