@@ -419,7 +419,7 @@ var documenterSearchIndex = {"docs": [
 {
     "location": "visualizations.html#Special-Plot-Recipe-for-CountMap-1",
     "page": "Visualizations",
-    "title": "Special Plot Recipe for `CountMap",
+    "title": "Special Plot Recipe for CountMap",
     "category": "section",
     "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )"
 },
@@ -437,7 +437,31 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Special Plot Recipe for Hist",
     "category": "section",
-    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )\no = Partition(Variance())\n\ny = randn(10^6) + linspace(0, 1, 10^6)\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Plot-a-custom-function-(mean-std)-1",
+    "page": "Visualizations",
+    "title": "Plot a custom function (mean ± std)",
+    "category": "section",
+    "text": "\no = Partition(Variance())\n\ny = randn(10^6) + linspace(0, 1, 10^6)\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "demos.html#",
+    "page": "Demos",
+    "title": "Demos",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "demos.html#Demos-1",
+    "page": "Demos",
+    "title": "Demos",
+    "category": "section",
+    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync this repo to JuliaBox:Sign into https://next.juliabox.com\nClick Git in the toolbar\nAdd the git clone url https://github.com/joshday/OnlineStatsDemos.git"
 },
 
 {
