@@ -76,12 +76,14 @@ savefig("part4.png"); nothing # hide
 
 ### Examples
 
+#### Special Plot Recipe for `CountMap
+
 ```@example setup
 using OnlineStats, Plots
 
 y = rand(["a", "a", "b", "c"], 10^6)
 
-o = Partition(CountMap(String))
+o = Partition(CountMap(String), 75)
 
 s = Series(y, o)
 
@@ -90,6 +92,8 @@ savefig("partition.png"); nothing # hide
 ```
 
 ![](partition.png)
+
+#### If Output is two numbers, it's filled in (`Extrema`)
 
 ```@example setup
 y = cumsum(randn(10^6))
@@ -105,8 +109,11 @@ savefig("partition2.png"); nothing # hide
 
 ![](partition2.png)
 
+
+#### Special Plot Recipe for `Hist`
+
 ```@example setup
-y = cumsum(randn(10^6))
+y = cumsum(randn(10^6)) + 100randn(10^6)
 
 o = Partition(Hist(50))
 
@@ -122,7 +129,9 @@ savefig("partition3.png"); nothing # hide
 
 o = Partition(Variance())
 
-s = Series(randn(10^6), o)
+y = randn(10^6) + linspace(0, 1, 10^6)
+
+s = Series(y, o)
 
 plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])
 savefig("partition4.png"); nothing # hide
