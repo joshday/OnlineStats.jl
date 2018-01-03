@@ -125,6 +125,8 @@ savefig("partition3.png"); nothing # hide
 
 ![](partition3.png)
 
+#### Plot a custom function (mean ± std)
+
 ```@example setup
 
 o = Partition(Variance())
