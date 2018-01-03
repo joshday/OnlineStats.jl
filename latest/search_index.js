@@ -413,7 +413,31 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Examples",
     "category": "section",
-    "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String))\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )y = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )y = cumsum(randn(10^6))\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )\no = Partition(Variance())\n\ns = Series(randn(10^6), o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
+    "text": ""
+},
+
+{
+    "location": "visualizations.html#Special-Plot-Recipe-for-CountMap-1",
+    "page": "Visualizations",
+    "title": "Special Plot Recipe for `CountMap",
+    "category": "section",
+    "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#If-Output-is-two-numbers,-it's-filled-in-(Extrema)-1",
+    "page": "Visualizations",
+    "title": "If Output is two numbers, it's filled in (Extrema)",
+    "category": "section",
+    "text": "y = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Special-Plot-Recipe-for-Hist-1",
+    "page": "Visualizations",
+    "title": "Special Plot Recipe for Hist",
+    "category": "section",
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )\no = Partition(Variance())\n\ny = randn(10^6) + linspace(0, 1, 10^6)\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
 },
 
 {

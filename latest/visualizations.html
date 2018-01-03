@@ -12,22 +12,22 @@ savefig(&quot;part2.png&quot;); nothing # hide</code></pre></div><p><img src="pa
 
 savefig(&quot;part3.png&quot;); nothing # hide</code></pre></div><p><img src="part3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><div><pre><code class="language-julia">plot(o, x -&gt; mean(x) + 100)
 
-savefig(&quot;part4.png&quot;); nothing # hide</code></pre></div><p><img src="part4.png" alt/></p><h3><a class="nav-anchor" id="Examples-1" href="#Examples-1">Examples</a></h3><div><pre><code class="language-julia">using OnlineStats, Plots
+savefig(&quot;part4.png&quot;); nothing # hide</code></pre></div><p><img src="part4.png" alt/></p><h3><a class="nav-anchor" id="Examples-1" href="#Examples-1">Examples</a></h3><h4><a class="nav-anchor" id="Special-Plot-Recipe-for-CountMap-1" href="#Special-Plot-Recipe-for-CountMap-1">Special Plot Recipe for `CountMap</a></h4><div><pre><code class="language-julia">using OnlineStats, Plots
 
 y = rand([&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 10^6)
 
-o = Partition(CountMap(String))
+o = Partition(CountMap(String), 75)
 
 s = Series(y, o)
 
-plot(o)</code></pre></div><p><img src="partition.png" alt/></p><div><pre><code class="language-julia">y = cumsum(randn(10^6))
+plot(o)</code></pre></div><p><img src="partition.png" alt/></p><h4><a class="nav-anchor" id="If-Output-is-two-numbers,-it&#39;s-filled-in-(Extrema)-1" href="#If-Output-is-two-numbers,-it&#39;s-filled-in-(Extrema)-1">If Output is two numbers, it&#39;s filled in (<code>Extrema</code>)</a></h4><div><pre><code class="language-julia">y = cumsum(randn(10^6))
 
 o = Partition(Mean())
 o2 = Partition(Extrema())
 
 s = Series(y, o, o2)
 
-plot(plot(o), plot(o2))</code></pre></div><p><img src="partition2.png" alt/></p><div><pre><code class="language-julia">y = cumsum(randn(10^6))
+plot(plot(o), plot(o2))</code></pre></div><p><img src="partition2.png" alt/></p><h4><a class="nav-anchor" id="Special-Plot-Recipe-for-Hist-1" href="#Special-Plot-Recipe-for-Hist-1">Special Plot Recipe for <code>Hist</code></a></h4><div><pre><code class="language-julia">y = cumsum(randn(10^6)) + 100randn(10^6)
 
 o = Partition(Hist(50))
 
@@ -35,6 +35,8 @@ s = Series(y, o)
 
 plot(s; legend=false, alpha=.8)</code></pre></div><p><img src="partition3.png" alt/></p><div><pre><code class="language-julia">o = Partition(Variance())
 
-s = Series(randn(10^6), o)
+y = randn(10^6) + linspace(0, 1, 10^6)
+
+s = Series(y, o)
 
 plot(o, x -&gt; [mean(x) - std(x), mean(x), mean(x) + std(x)])</code></pre></div><p><img src="partition4.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="api.html"><span class="direction">Next</span><span class="title">API</span></a></footer></article></body></html>
