@@ -30,13 +30,7 @@ stat(o::Part) = o.stat
 value(o::Part) = value(o.stat)
 
 function squash!(v::Vector{<:Part})
-    lastind = 0
-    if length(v) % 2 == 0 
-        lastind = length(v)
-    else
-        warn("Squashing an odd number of Parts.")
-        lastind = length(v) - 1
-    end
+    lastind = length(v) % 2 == 0 ? length(v) : length(v) - 1
     for i in lastind:-2:2
         merge!(v[i-1], v[i])
         deleteat!(v, i)
@@ -127,7 +121,7 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Partition}
     end
     # then merge 
     append!(o.parts, o2.parts)
-    while length(o.parts) > o.b 
+    while length(o.parts) ≥ o.b 
         squash!(o.parts)
     end
     o

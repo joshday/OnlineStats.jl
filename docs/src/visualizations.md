@@ -76,7 +76,7 @@ savefig("part4.png"); nothing # hide
 
 ### Examples
 
-#### Special Plot Recipe for `CountMap
+#### Special Plot Recipe for `CountMap`
 
 ```@example setup
 using OnlineStats, Plots
