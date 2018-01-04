@@ -83,6 +83,15 @@ end
     end
 end
 
+#-----------------------------------------------------------------------# Group 
+@recipe function f(o::Group)
+    for stat in o.stats 
+        @series begin 
+            stat
+        end
+    end
+end
+
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap)
     seriestype --> :bar 
