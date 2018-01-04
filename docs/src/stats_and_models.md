@@ -18,7 +18,7 @@
 | Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
 | Principal components analysis      | [`CovMatrix`](@ref)        |
 | K-means clustering (SGD)           | [`KMeans`](@ref)           |
-| Multiple univariate statistics     | [`MV{<:OnlineStat}`](@ref) |
+| Multiple univariate statistics     | [`MV`](@ref) and [`Group`](@ref) |
 | **Nonparametric Density Estimation:**|                          |
 | Histograms                         | [`Hist`](@ref)             |
 | Approximate order statistics       | [`OrderStats`](@ref)       |

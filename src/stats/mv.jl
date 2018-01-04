@@ -58,6 +58,22 @@ Base.merge!(o1::T, o2::T, γ::Float64) where {T <: MV} = merge!.(o1.stats, o2.st
 
 
 #-----------------------------------------------------------------------# Group
+"""
+    Group(stats...)
+
+Create an `ExactStat{1}` from several `OnlineStat{0}`s.  For a new observation `y`, `y[i]`
+is sent to `stats[i]`.  This is designed for working with data of different variable types.
+
+# Example 
+
+    y = [randn(100) rand(["a", "b"], 100)]
+
+    o = Group(Mean(), CountMap(String))
+
+    Series(y, o)
+    
+    value(o)
+"""
 struct Group{T} <: ExactStat{1}
     stats::T
 end
