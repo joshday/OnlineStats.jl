@@ -13,9 +13,9 @@ gr()
 ## Plotting a Series plots the contained OnlineStats
 
 ```@example setup
-    s = Series(randn(10^6), Hist(25), Hist(-5:5))
-    plot(s)
-    savefig("plot_series.png"); nothing # hide
+s = Series(randn(10^6), Hist(25), Hist(-5:5))
+plot(s)
+savefig("plot_series.png"); nothing # hide
 ```
 
 ![](plot_series.png)
