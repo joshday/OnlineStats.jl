@@ -33,7 +33,7 @@ o = Partition(Hist(50))
 
 s = Series(y, o)
 
-plot(s; legend=false, alpha=.8)</code></pre></div><p><img src="partition3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-(mean-std)-1" href="#Plot-a-custom-function-(mean-std)-1">Plot a custom function (mean ± std)</a></h4><div><pre><code class="language-julia">o = Partition(Variance())
+plot(s; legend=false, colorbar=true)</code></pre></div><p><img src="partition3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-(mean-std)-1" href="#Plot-a-custom-function-(mean-std)-1">Plot a custom function (mean ± std)</a></h4><div><pre><code class="language-julia">o = Partition(Variance())
 
 y = randn(10^6) + linspace(0, 1, 10^6)
 

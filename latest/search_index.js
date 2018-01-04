@@ -437,7 +437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Special Plot Recipe for Hist",
     "category": "section",
-    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, colorbar=true)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
 },
 
 {
