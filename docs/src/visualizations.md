@@ -119,7 +119,7 @@ o = Partition(Hist(50))
 
 s = Series(y, o)
 
-plot(s; legend=false, alpha=.8)
+plot(s; legend=false, colorbar=true)
 savefig("partition3.png"); nothing # hide
 ```
 

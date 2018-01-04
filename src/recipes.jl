@@ -179,6 +179,7 @@ getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
             y3 = to_plot_shape([yi[2] for yi in y])
             line_z --> y3 
             legend --> false
+            colorbar --> true
             w --> 2
             x, y2
         end
