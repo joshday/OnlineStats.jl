@@ -31,7 +31,7 @@ for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(),
          HyperLogLog(4), Moments(), OrderStats(10), Quantile(), PQuantile(),
          ReservoirSample(10), Sum(), StatLearn(5), Hist(5), Hist(1:5),
          LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean()),
-         Partition(Mean(), 5)]
+         [Mean() Variance()], Partition(Mean(), 5)]
     println(o)
     typeof(o) <: OnlineStat{0} && println(2o)
 end
@@ -235,6 +235,15 @@ end #Series
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
 end
 
+#-----------------------------------------------------------------------# Group 
+@testset "Group" begin 
+    g = [Mean() Variance()]
+    data = randn(100, 2)
+    Series(data, g)
+    @test mean(g.stats[1]) ≈ mean(data[:, 1])
+    @test var(g.stats[2]) ≈ var(data[:, 2])
+end
+
 #-----------------------------------------------------------------------# Partition
 @testset "Partition" begin 
     o = Partition(Variance(), 5)
@@ -314,7 +323,7 @@ end
 @testset "NBClassifier" begin 
     x = randn(1000, 10)
     y = x * linspace(-1, 1, 10) .> 0
-    o = NBClassifier(10, Bool)
+    o = NBClassifier(10, Bool, 100)
     Series((x,y), o)
     @test classify(o, vcat(zeros(5), ones(5)))
 end

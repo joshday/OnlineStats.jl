@@ -55,3 +55,18 @@ end
 _value(o::MV) = map(value, o.stats)
 
 Base.merge!(o1::T, o2::T, γ::Float64) where {T <: MV} = merge!.(o1.stats, o2.stats, γ)
+
+
+#-----------------------------------------------------------------------# Group
+struct Group{T} <: ExactStat{1}
+    stats::T
+end
+Group(o::OnlineStat{0}...) = Group(o)
+value(o::Group) = value.(o.stats)
+Base.show(io::IO, o::Group) = print(io, "Group : $(name.(o.stats, false, false))")
+function fit!(o::Group, y::VectorOb, γ::Float64)
+    for (oi, yi) in zip(o.stats, y)
+        fit!(oi, yi, γ)
+    end
+end
+Base.hcat(o::OnlineStat{0}...) = Group(o)
