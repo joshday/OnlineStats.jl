@@ -13,19 +13,35 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Basics",
     "category": "section",
-    "text": "OnlineStats is a Julia package which provides online algorithms for statistical models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
+    "text": "OnlineStats is a Julia package which provides online parallelizable algorithms for statistics.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
 },
 
 {
-    "location": "index.html#Every-OnlineStat-is-a-type-1",
+    "location": "index.html#Installation-1",
     "page": "Basics",
-    "title": "Every OnlineStat is a type",
+    "title": "Installation",
     "category": "section",
-    "text": "m = Mean()\nv = Variance()"
+    "text": "Pkg.add(\"OnlineStats\")"
 },
 
 {
-    "location": "index.html#OnlineStats-are-grouped-by-[Series](@ref)-1",
+    "location": "index.html#Summary-of-Usage-1",
+    "page": "Basics",
+    "title": "Summary of Usage",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "index.html#Every-statistic/model-is-a-type-(:-OnlineStat)-1",
+    "page": "Basics",
+    "title": "Every statistic/model is a type (<: OnlineStat)",
+    "category": "section",
+    "text": "using OnlineStats \n\nm = Mean()\nv = Variance()"
+},
+
+{
+    "location": "index.html#OnlineStats-are-grouped-by-Series-1",
     "page": "Basics",
     "title": "OnlineStats are grouped by Series",
     "category": "section",
@@ -33,91 +49,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Updating-a-Series-updates-the-OnlineStats-1",
+    "location": "index.html#Updating-a-Series-updates-the-contained-OnlineStats-1",
     "page": "Basics",
-    "title": "Updating a Series updates the OnlineStats",
+    "title": "Updating a Series updates the contained OnlineStats",
     "category": "section",
-    "text": "y = randn(100)\n\nfor yi in y\n    fit!(s, yi)\nend\n\n# or more simply:\nfit!(s, y)<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
+    "text": "y = randn(1000)\n\n# for yi in y\n#     fit!(s, yi)\n# end\nfit!(s, y)"
 },
 
 {
-    "location": "weights.html#",
-    "page": "Weighting",
-    "title": "Weighting",
-    "category": "page",
-    "text": ""
+    "location": "index.html#OnlineStats-have-a-value-1",
+    "page": "Basics",
+    "title": "OnlineStats have a value",
+    "category": "section",
+    "text": "value(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  "
 },
 
 {
-    "location": "weights.html#Weighting-1",
-    "page": "Weighting",
-    "title": "Weighting",
+    "location": "index.html#Merging-a-Series-merges-the-contained-OnlineStats-1",
+    "page": "Basics",
+    "title": "Merging a Series merges the contained OnlineStats",
     "category": "section",
-    "text": "Series are parameterized by a Weight type that controls the influence of the next observation.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a weight must follow two rules:gamma_1 = 1\nThis guarantees theta^(1) = x_1\ngamma_t in (0 1) quad forall t  1\nThis guarantees theta^(t) stays inside a convex space<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=400>"
+    "text": "See Parallel Computation.y2 = randn(123)\n\ns2 = Series(y2, Mean(), Variance())\n\nmerge!(s, s2)\n\nvalue(m) ≈ mean(vcat(y, y2))    \nvalue(v) ≈ var(vcat(y, y2))  "
 },
 
 {
-    "location": "weights.html#[EqualWeight()](@ref)-1",
-    "page": "Weighting",
-    "title": "EqualWeight()",
+    "location": "index.html#Much-more-than-means-and-variances-1",
+    "page": "Basics",
+    "title": "Much more than means and variances",
     "category": "section",
-    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
-},
-
-{
-    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
-    "page": "Weighting",
-    "title": "ExponentialWeight(λ = 0.1)",
-    "category": "section",
-    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
-},
-
-{
-    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
-    "page": "Weighting",
-    "title": "LearningRate(r = 0.6)",
-    "category": "section",
-    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
-},
-
-{
-    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
-    "page": "Weighting",
-    "title": "HarmonicWeight(a = 10.0)",
-    "category": "section",
-    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
-},
-
-{
-    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
-    "page": "Weighting",
-    "title": "McclainWeight(a = 0.1)",
-    "category": "section",
-    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
-},
-
-{
-    "location": "weights.html#Weight-Wrappers-1",
-    "page": "Weighting",
-    "title": "Weight Wrappers",
-    "category": "section",
-    "text": "Several types can change the behavior of a Weight."
-},
-
-{
-    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
-    "page": "Weighting",
-    "title": "Bounded(weight, λ)",
-    "category": "section",
-    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
-},
-
-{
-    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
-    "page": "Weighting",
-    "title": "Scaled(weight, λ)",
-    "category": "section",
-    "text": "Weights are scaled by a constant.  This should only be used with certain subtypes of  StochasticStat (those based on stochastic gradient algorithms), as it may violate the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+    "text": "OnlineStats can do a lot.  See Statistics and Models.<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
 },
 
 {
@@ -133,15 +93,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Series",
     "category": "section",
-    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksThe Weight\nA tuple of OnlineStats."
+    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksA tuple of OnlineStats.\nA Weight."
 },
 
 {
-    "location": "series.html#Creating-1",
+    "location": "series.html#Creating-a-Series-1",
     "page": "Series",
-    "title": "Creating",
+    "title": "Creating a Series",
     "category": "section",
-    "text": ""
+    "text": "The Series constructor accepts any number of OnlineStats, optionally preceded by data  to be fitted and/or a Weight.  When a Weight isn't specified, Series will use the default weight associated with the OnlineStats."
 },
 
 {
@@ -165,15 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Updating",
     "category": "section",
-    "text": "A Series can be updated with a single observation or a collection of observations.  The most common way to update a series is with:fit!(series, data)"
-},
-
-{
-    "location": "series.html#Under-the-hood-1",
-    "page": "Series",
-    "title": "Under the hood",
-    "category": "section",
-    "text": "Each OnlineStat implements fit!(o::OnlineStat, data, w::Float64) where w is a weight in 0 1 which controls the amount of influence data has on o.  When fit!(series, data) is called, w is created by the Weight and passed to fit! for each of the OnlineStats in the Series.  See Extending OnlineStats for more details."
+    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)See OnlineStatsBase.jl for a look under  the hood of the update machinery."
 },
 
 {
@@ -197,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Multiple observations",
     "category": "section",
-    "text": "note: Note\nIf a single observation is a Vector, a Matrix is ambiguous in how the observations are stored.  A Rows() (default) or Cols() argument can be added to the fit! call to specify observations are in rows or columns, respectively.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))          # Obs. in rows\nfit!(s, randn(4, 100), Cols())  # Obs. in columns"
+    "text": "note: Note\nIf a single observation is a Vector, a Matrix represents multiple observations, but this is ambiguous in how the observations are stored.  A Rows() (default) or Cols() argument can be added to the fit! call to specify observations are in rows or columns, respectively.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))          # Obs. in rows\nfit!(s, randn(4, 100), Cols())  # Obs. in columns"
 },
 
 {
@@ -221,87 +173,95 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Merging",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats and those OnlineStats are mergeable.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
+    "text": "Two Series can be merged if they track the same OnlineStats.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
 },
 
 {
-    "location": "newstats.html#",
-    "page": "Extending OnlineStats",
-    "title": "Extending OnlineStats",
+    "location": "weights.html#",
+    "page": "Weight",
+    "title": "Weight",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "newstats.html#Extending-OnlineStats-1",
-    "page": "Extending OnlineStats",
-    "title": "Extending OnlineStats",
+    "location": "weights.html#Weight-1",
+    "page": "Weight",
+    "title": "Weight",
     "category": "section",
-    "text": "New OnlineStats which work with the Series/Weight interface can be accomplished through the zero-dependency OnlineStatsBase.jl"
+    "text": "Series is parameterized by a Weight type that controls the influence new observations.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a Weight must follow two rules:gamma_1 = 1 (guarantees theta^(1) = x_1)\ngamma_t in (0 1) quad forall t  1 (guarantees theta^(t) stays inside a convex space)<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=450>"
 },
 
 {
-    "location": "parallel.html#",
-    "page": "Parallel Computation",
-    "title": "Parallel Computation",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "parallel.html#Parallel-Computation-1",
-    "page": "Parallel Computation",
-    "title": "Parallel Computation",
+    "location": "weights.html#[EqualWeight()](@ref)-1",
+    "page": "Weight",
+    "title": "EqualWeight()",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.  This facilitates embarassingly parallel computations.  In general, fit! is a cheaper operation than merge! and should be preferred."
+    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
 },
 
 {
-    "location": "parallel.html#ExactStat-merges-1",
-    "page": "Parallel Computation",
-    "title": "ExactStat merges",
+    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
+    "page": "Weight",
+    "title": "ExponentialWeight(λ = 0.1)",
     "category": "section",
-    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.# NOTE: This code is not actually running in parallel\ny1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), IHistogram(50))\ns2 = Series(Mean(), Variance(), IHistogram(50))\ns3 = Series(Mean(), Variance(), IHistogram(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 400 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
+    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
 },
 
 {
-    "location": "parallel.html#Other-Merges-1",
-    "page": "Parallel Computation",
-    "title": "Other Merges",
+    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
+    "page": "Weight",
+    "title": "LearningRate(r = 0.6)",
     "category": "section",
-    "text": "For OnlineStats which rely on approximations, merging isn't always a well-defined operation. A printed warning will occur for these cases.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
 },
 
 {
-    "location": "datasurrogates.html#",
-    "page": "Data Surrogates",
-    "title": "Data Surrogates",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "datasurrogates.html#Data-Surrogates-1",
-    "page": "Data Surrogates",
-    "title": "Data Surrogates",
+    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
+    "page": "Weight",
+    "title": "HarmonicWeight(a = 10.0)",
     "category": "section",
-    "text": "Some OnlineStats are especially useful for out-of-core computations, as after they have run through the data, they can be used as a surrogate for the entire dataset for calculating approximate summary statistics or exact linear models."
+    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
 },
 
 {
-    "location": "datasurrogates.html#IHistogram-1",
-    "page": "Data Surrogates",
-    "title": "IHistogram",
+    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
+    "page": "Weight",
+    "title": "McclainWeight(a = 0.1)",
     "category": "section",
-    "text": "IHistogram incrementally builds a histogram of unequally spaced bins.  It has a  Plots.jl recipe and can be used to get  approximate summary statistics, without the need to run through the data again.o = IHistogram(100)\ns = Series(o)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nplot(o)(Image: )"
+    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
 },
 
 {
-    "location": "datasurrogates.html#LinRegBuilder-1",
-    "page": "Data Surrogates",
-    "title": "LinRegBuilder",
+    "location": "weights.html#Weight-Wrappers-1",
+    "page": "Weight",
+    "title": "Weight Wrappers",
     "category": "section",
-    "text": "TODO"
+    "text": "Several types can change the behavior of a Weight."
+},
+
+{
+    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "page": "Weight",
+    "title": "Bounded(weight, λ)",
+    "category": "section",
+    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
+},
+
+{
+    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
+    "page": "Weight",
+    "title": "Scaled(weight, λ)",
+    "category": "section",
+    "text": "Weights are scaled by a constant.  This should only be used with the StochasticStats  based on stochastic gradient algorithms, as it violates the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+},
+
+{
+    "location": "weights.html#Custom-Weighting-1",
+    "page": "Weight",
+    "title": "Custom Weighting",
+    "category": "section",
+    "text": "You can implement your own Weight type via OnlineStatsBase.jl or pass in a function to a Series in place of a weight.using OnlineStats # hide\n\ny = randn(100);\n\no = Mean()\nSeries(y, n -> 1/n, o)\n\nvalue(o) ≈ mean(y)"
 },
 
 {
@@ -317,7 +277,191 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV{<:OnlineStat}\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nBootstrapping Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV and Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition"
+},
+
+{
+    "location": "parallel.html#",
+    "page": "Parallel Computation",
+    "title": "Parallel Computation",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "parallel.html#Parallel-Computation-1",
+    "page": "Parallel Computation",
+    "title": "Parallel Computation",
+    "category": "section",
+    "text": "Two Series can be merged if they track the same OnlineStats, which facilitates embarassingly parallel computations.  Merging in OnlineStats is used by JuliaDB to run analytics in parallel on large persistent datasets.note: Note\nIn general, fit! is a cheaper operation than merge!."
+},
+
+{
+    "location": "parallel.html#ExactStat-merges-1",
+    "page": "Parallel Computation",
+    "title": "ExactStat merges",
+    "category": "section",
+    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), Hist(50))\ns2 = Series(Mean(), Variance(), Hist(50))\ns3 = Series(Mean(), Variance(), Hist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
+},
+
+{
+    "location": "parallel.html#Other-Merges-1",
+    "page": "Parallel Computation",
+    "title": "Other Merges",
+    "category": "section",
+    "text": "For OnlineStats that rely on approximations, merging isn't always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+},
+
+{
+    "location": "datasurrogates.html#",
+    "page": "Data Surrogates",
+    "title": "Data Surrogates",
+    "category": "page",
+    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(123)\ngr()"
+},
+
+{
+    "location": "datasurrogates.html#Data-Surrogates-1",
+    "page": "Data Surrogates",
+    "title": "Data Surrogates",
+    "category": "section",
+    "text": "Some OnlineStats are especially useful for out-of-core computations.  After they've been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again."
+},
+
+{
+    "location": "datasurrogates.html#Linear-Regressions-1",
+    "page": "Data Surrogates",
+    "title": "Linear Regressions",
+    "category": "section",
+    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x's can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * linspace(-1, 1, 10) + randn(10^6)\n\no = LinRegBuilder(11)\n\ns = Series([x y], o)\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
+},
+
+{
+    "location": "datasurrogates.html#Histograms-1",
+    "page": "Data Surrogates",
+    "title": "Histograms",
+    "category": "section",
+    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(20)        # adaptively find bins\no2 = Hist(-5:.5:5)  # specify the bin edges\ns = Series(o, o2)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#",
+    "page": "Visualizations",
+    "title": "Visualizations",
+    "category": "page",
+    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(1234)\ngr()"
+},
+
+{
+    "location": "visualizations.html#Visualizations-1",
+    "page": "Visualizations",
+    "title": "Visualizations",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "visualizations.html#Plotting-a-Series-plots-the-contained-OnlineStats-1",
+    "page": "Visualizations",
+    "title": "Plotting a Series plots the contained OnlineStats",
+    "category": "section",
+    "text": "s = Series(randn(10^6), Hist(25), Hist(-5:5))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )note: Note\nDue to the lightweight nature of RecipesBase, there is occasionally a mix-up of a data series appearing in the wrong subplot.  A workaround is to plot each OnlineStat separately, e.g. plot(plot(o1), plot(o2)) or plot(plot.(stats(my_series))...)."
+},
+
+{
+    "location": "visualizations.html#Partitions-1",
+    "page": "Visualizations",
+    "title": "Partitions",
+    "category": "section",
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
+},
+
+{
+    "location": "visualizations.html#Partition-Plotting-options-1",
+    "page": "Visualizations",
+    "title": "Partition Plotting options",
+    "category": "section",
+    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Connect-lines-for-readability-1",
+    "page": "Visualizations",
+    "title": "Connect lines for readability",
+    "category": "section",
+    "text": "plot(o; connect = true)\n\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Turn-off-the-vertical-separators-1",
+    "page": "Visualizations",
+    "title": "Turn off the vertical separators",
+    "category": "section",
+    "text": "plot(o; parts = false)\n\nsavefig(\"part3.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1",
+    "page": "Visualizations",
+    "title": "Plot a custom function of the OnlineStats (default is value)",
+    "category": "section",
+    "text": "plot(o, x -> mean(x) + 100)\n\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
+},
+
+{
+    "location": "visualizations.html#Examples-1",
+    "page": "Visualizations",
+    "title": "Examples",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "visualizations.html#Special-Plot-Recipe-for-CountMap-1",
+    "page": "Visualizations",
+    "title": "Special Plot Recipe for CountMap",
+    "category": "section",
+    "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#If-Output-is-two-numbers,-it's-filled-in-(Extrema)-1",
+    "page": "Visualizations",
+    "title": "If Output is two numbers, it's filled in (Extrema)",
+    "category": "section",
+    "text": "y = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Special-Plot-Recipe-for-Hist-1",
+    "page": "Visualizations",
+    "title": "Special Plot Recipe for Hist",
+    "category": "section",
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, alpha=.8)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Plot-a-custom-function-(mean-std)-1",
+    "page": "Visualizations",
+    "title": "Plot a custom function (mean ± std)",
+    "category": "section",
+    "text": "\no = Partition(Variance())\n\ny = randn(10^6) + linspace(0, 1, 10^6)\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "demos.html#",
+    "page": "Demos",
+    "title": "Demos",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "demos.html#Demos-1",
+    "page": "Demos",
+    "title": "Demos",
+    "category": "section",
+    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync the notebooks to JuliaBox:Sign into https://next.juliabox.com\nClick Git in the toolbar\nAdd the git clone url https://github.com/joshday/OnlineStatsDemos.git"
 },
 
 {
@@ -489,6 +633,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Group",
+    "page": "API",
+    "title": "OnlineStats.Group",
+    "category": "Type",
+    "text": "Group(stats...)\n\nCreate an ExactStat{1} from several OnlineStat{0}s.  For a new observation y, y[i] is sent to stats[i].  This is designed for working with data of different variable types.\n\nExample\n\ny = [randn(100) rand([\"a\", \"b\"], 100)]\n\no = Group(Mean(), CountMap(String))\n\nSeries(y, o)\n\nvalue(o)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Hist",
     "page": "API",
     "title": "OnlineStats.Hist",
@@ -629,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "Type",
-    "text": "Partition(o::OnlineStat, b = 100)\n\nSplit a data stream between b and 2 * b parts, using o to summarize each part.\n\n\n\n"
+    "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.  This  is useful for visualizing large datasets where it is not feasible to plot every observation  and checking for nonstationarity.\n\nPlotting\n\nplot(o::Partition, f::Function = value)\n\nThe fallback recipe plots f(stat) for every stat in the partition.  Special plot recipes exist for CountMap (stacked bar) and Variance (mean ± 95% CI).\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\nplot!(o, x -> value(x) + 1)\n\n\n\n"
 },
 
 {
@@ -757,7 +909,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.BiasVec",
     "category": "Type",
-    "text": "BiasVec(x, bias = 1.0)\n\nLightWeight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
+    "text": "BiasVec(x, bias = 1.0)\n\nLightweight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
 },
 
 {
@@ -797,7 +949,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Part",
     "category": "Type",
-    "text": "# create first part\nPart(o::OnlineStat, start::Int, n::Int)\n\n# create next part\nPart(p::Part, y::ScalarOb)  # create\n\nSummary for a section of data.  stat is the OnlineStat evaluated on n observations  beginning with start.\n\n\n\n"
+    "text": "Part(o::OnlineStat, start::Int)\n\nSummary for a section of data.  o is an unfitted OnlineStat to be fitted on observations  beginning with observation start.\n\n\n\n"
 },
 
 {
@@ -918,30 +1070,6 @@ var documenterSearchIndex = {"docs": [
     "title": "API",
     "category": "section",
     "text": "Modules = [OnlineStats, OnlineStatsBase]"
-},
-
-{
-    "location": "catalog.html#",
-    "page": "Algorithm Catalog",
-    "title": "Algorithm Catalog",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "catalog.html#Algorithm-Catalog-1",
-    "page": "Algorithm Catalog",
-    "title": "Algorithm Catalog",
-    "category": "section",
-    "text": "This page is very much a work in progress"
-},
-
-{
-    "location": "catalog.html#[Mean](@ref)-1",
-    "page": "Algorithm Catalog",
-    "title": "Mean",
-    "category": "section",
-    "text": "theta^(t) = (1 - gamma_t) theta^(t-1) + gamma_t y_t"
 },
 
 ]}
