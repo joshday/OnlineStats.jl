@@ -85,4 +85,10 @@ function fit!(o::Group, y::VectorOb, γ::Float64)
         fit!(oi, yi, γ)
     end
 end
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Group}
+    for (a, b) in zip(o.stats, o2.stats)
+        merge!(a, b, γ)
+    end
+end
 Base.hcat(o::OnlineStat{0}...) = Group(o)
+

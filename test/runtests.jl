@@ -242,6 +242,16 @@ end
     Series(data, g)
     @test mean(g.stats[1]) ≈ mean(data[:, 1])
     @test var(g.stats[2]) ≈ var(data[:, 2])
+    
+    # merge 
+    x = [randn(100) rand(1:5, 100)]
+    x2 = [randn(100) rand(1:5, 100)]
+    s1 = Series(x, [Mean() CountMap(Float64)])
+    s2 = Series(x2, [Mean() CountMap(Float64)])
+    merge!(s1, s2)
+    fit!(s2, x)
+    @test value(s1)[1][1] ≈ value(s2)[1][1]   # Mean
+    @test value(s1)[1][2] == value(s2)[1][2]  # CountMap
 end
 
 #-----------------------------------------------------------------------# Partition
@@ -321,11 +331,12 @@ end
 
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
-    x = randn(1000, 10)
-    y = x * linspace(-1, 1, 10) .> 0
-    o = NBClassifier(10, Bool, 100)
+    n, p = 1000, 5
+    x = randn(n, p)
+    y = x * linspace(-1, 1, p) .> 0
+    o = NBClassifier(p, Bool, 100)
     Series((x,y), o)
-    @test classify(o, vcat(zeros(5), ones(5)))
+    @test classify(o, [0,0,0,0,1])
 end
 
 #-----------------------------------------------------------------------# Lag 
