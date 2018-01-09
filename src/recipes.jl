@@ -44,9 +44,18 @@ end
 
 #-----------------------------------------------------------------------# Series
 @recipe function f(s::Series)
-    layout --> length(s.stats)
-    for stat in s.stats
-        @series begin stat end
+    if :layout in keys(plotattributes)
+        for stat in s.stats
+            @series begin stat end
+        end 
+    else  # hack to ensure series aren't sent to wrong subplots
+        layout --> length(s.stats)
+        for i in eachindex(s.stats)
+            @series begin 
+                subplot --> i 
+                s.stats[i]
+            end
+        end
     end
 end
 
@@ -95,37 +104,8 @@ end
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap)
     seriestype --> :bar 
-    collect(keys(o)), value(o)
+    collect(keys(o)), collect(values(o))
 end
-
-# #-----------------------------------------------------------------------# Partition 
-# @recipe function f(o::Partition, f::Function = value) 
-#     legend --> false
-#     color --> :black
-#     xlab --> "Nobs"
-#     title --> "Partition of $(length(o.parts)) Parts: $(name(o.parts[1].stat))"
-#     for part in o.parts
-#         @series begin part, f end
-#     end
-#     # reshape(o.parts, (1, length(o.parts)))
-# end
-
-# @recipe function f(o::Part, f::Function = value)
-#     v = f(o.stat)
-#     x = [o.start, o.start + o.n]
-#     if v isa ScalarOb 
-#         @series begin 
-#             x, [v, v]
-#         end
-#     elseif v isa VectorOb 
-#         v2 = reshape(v, (1, length(v)))
-#         @series begin 
-#             x, repmat(v2, 2, 1)
-#         end
-#     else
-#         error("3D Partition plots not supported yet")
-#     end
-# end
 
 #-----------------------------------------------------------------------# PartLines 
 struct PartLines
@@ -135,9 +115,8 @@ end
     color --> :black 
     alpha --> .1 
     seriestype --> :vline
-    label --> "Parts"
+    label --> "Parts ($(length(o.o.parts)))"
     xlab --> "Nobs"
-    title --> "Partition of $(length(o.o.parts)) Parts"
     grid --> false
     linewidth --> .5
     # xlim --> (0, o.o.parts[end].start + o.o.parts[end].n)
@@ -146,16 +125,14 @@ end
 getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
 
 #-----------------------------------------------------------------------# Partition
-@recipe function f(o::Partition{T}, f::Function = value; parts=true, connect=false) where {T}
+@recipe function f(o::Partition{T}; mapfun = value, connect=false) where {T}
     xlim --> (0, o.parts[end].start + o.parts[end].n)
 
     statname = name(o.parts[1].stat, false, false)
-    labelbase = f == value ? 
-        "Value of $statname" :
-        "Custom Function of $statname"
+    labelbase = "$(name(mapfun)[2:end])($statname) in $(length(o.parts)) Parts"
 
     # get values
-    y = repeat(map(x -> f(x.stat), o.parts), inner = 3)
+    y = repeat(map(x -> mapfun(x.stat), o.parts), inner = 3)
     x = vcat(map(x -> [x.start, x.start + x.n, NaN], o.parts)...)
     if connect  # replace NaNs with values
         for i in 3:3:length(x) 
@@ -203,7 +180,7 @@ getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
             end
         end
     end
-    parts && @series PartLines(o) 
+    # parts && @series PartLines(o) 
 end
 
 to_plot_shape(v::Vector) = v 
@@ -227,5 +204,48 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in 1:length(v), j in 1:len
         seriestype --> :bar
         bar_width --> nobs.(o.parts)
         getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+    end
+end
+
+
+#-----------------------------------------------------------------------# PartitionX 
+@recipe function f(o::PartitionX{T, O}; mapfun = value) where {T, O}
+    sort!(o.parts)
+    # get values
+    y = repeat(map(x -> mapfun(x.stat), o.parts), inner = 3)
+    x = vcat(map(x -> [x.first, x.last, NaN], o.parts)...)
+
+    firstvalue = y[1]
+    if firstvalue isa ScalarOb
+        @series begin
+            x, to_plot_shape(y)
+        end 
+    elseif firstvalue isa Tuple{VectorOb, VectorOb}
+        # for Hist
+        # assume firstvalue[1] is values, firstvalue[2] is "weights"
+        @series begin
+            y2 = to_plot_shape([yi[1] for yi in y])
+            y3 = to_plot_shape([yi[2] for yi in y])
+            
+            # ugly hacks: TODO: fix in AdaptiveBins
+            y2[.!isfinite.(y2)] = NaN
+            y3[.!isfinite.(y3)] = NaN
+
+            line_z --> y3 
+            marker_z --> y3
+            legend --> false
+            colorbar --> true
+            color --> :blues
+            x, y2
+        end
+    elseif firstvalue isa VectorOb 
+        y2 = to_plot_shape(y)
+        if length(firstvalue) == 2
+            @series begin 
+                fillto --> y2[:, 2]
+                fillalpha --> .6
+                x, y2[:, 1]
+            end
+        end
     end
 end
