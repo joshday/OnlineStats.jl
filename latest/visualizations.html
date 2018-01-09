@@ -8,11 +8,11 @@ plot(o)
 
 savefig(&quot;part1.png&quot;); nothing # hide</code></pre></div><p><img src="part1.png" alt/></p><h4><a class="nav-anchor" id="Connect-lines-for-readability-1" href="#Connect-lines-for-readability-1">Connect lines for readability</a></h4><div><pre><code class="language-julia">plot(o; connect = true)
 
-savefig(&quot;part2.png&quot;); nothing # hide</code></pre></div><p><img src="part2.png" alt/></p><h4><a class="nav-anchor" id="Turn-off-the-vertical-separators-1" href="#Turn-off-the-vertical-separators-1">Turn off the vertical separators</a></h4><div><pre><code class="language-julia">plot(o; parts = false)
+savefig(&quot;part2.png&quot;); nothing # hide</code></pre></div><p><img src="part2.png" alt/></p><h4><a class="nav-anchor" id="Turn-off-the-vertical-separators-1" href="#Turn-off-the-vertical-separators-1">Turn off the vertical separators</a></h4><pre><code class="language-">plot(o; parts = false)
 
-savefig(&quot;part3.png&quot;); nothing # hide</code></pre></div><p><img src="part3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><div><pre><code class="language-julia">plot(o, x -&gt; mean(x) + 100)
+savefig(&quot;part3.png&quot;); nothing # hide  </code></pre><p><img src="part3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><pre><code class="language-">plot(o, x -&gt; mean(x) + 100)
 
-savefig(&quot;part4.png&quot;); nothing # hide</code></pre></div><p><img src="part4.png" alt/></p><h3><a class="nav-anchor" id="Examples-1" href="#Examples-1">Examples</a></h3><h4><a class="nav-anchor" id="Special-Plot-Recipe-for-CountMap-1" href="#Special-Plot-Recipe-for-CountMap-1">Special Plot Recipe for <code>CountMap</code></a></h4><div><pre><code class="language-julia">using OnlineStats, Plots
+savefig(&quot;part4.png&quot;); nothing # hide  </code></pre><p><img src="part4.png" alt/></p><h3><a class="nav-anchor" id="Examples-1" href="#Examples-1">Examples</a></h3><h4><a class="nav-anchor" id="Special-Plot-Recipe-for-CountMap-1" href="#Special-Plot-Recipe-for-CountMap-1">Special Plot Recipe for <code>CountMap</code></a></h4><div><pre><code class="language-julia">using OnlineStats, Plots
 
 y = rand([&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 10^6)
 
@@ -33,10 +33,12 @@ o = Partition(Hist(50))
 
 s = Series(y, o)
 
-plot(s; legend=false, colorbar=true)</code></pre></div><p><img src="partition3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-(mean-std)-1" href="#Plot-a-custom-function-(mean-std)-1">Plot a custom function (mean ± std)</a></h4><div><pre><code class="language-julia">o = Partition(Variance())
+plot(s; legend=false, colorbar=true)</code></pre></div><p><img src="partition3.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-(mean-std)-1" href="#Plot-a-custom-function-(mean-std)-1">Plot a custom function (mean ± std)</a></h4><pre><code class="language-">
+o = Partition(Variance())
 
 y = randn(10^6) + linspace(0, 1, 10^6)
 
 s = Series(y, o)
 
-plot(o, x -&gt; [mean(x) - std(x), mean(x), mean(x) + std(x)])</code></pre></div><p><img src="partition4.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
+plot(o, x -&gt; [mean(x) - std(x), mean(x), mean(x) + std(x)])
+savefig(&quot;partition4.png&quot;); nothing # hide</code></pre><p><img src="partition4.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>

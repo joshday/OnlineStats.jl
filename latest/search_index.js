@@ -785,6 +785,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.PartitionX",
+    "page": "API",
+    "title": "OnlineStats.PartitionX",
+    "category": "Type",
+    "text": "PartitionX(T, o::OnlineStat{0}, b::Int = 100)\n\nPartition a data stream between b and 2b parts.  The input must have length 2 and is  assumed to be an (x, y) pair.  The \n\nExample\n\nx = rand(Bool, 100)\ny = x .+ randn(100)\n\no = PartitionX(Bool, Mean())\ns = Series(Any[x y], o)\no.parts \nvalue(o)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Quantile",
     "page": "API",
     "title": "OnlineStats.Quantile",
