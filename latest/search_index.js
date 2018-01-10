@@ -665,6 +665,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.IndexedPartition",
+    "page": "API",
+    "title": "OnlineStats.IndexedPartition",
+    "category": "Type",
+    "text": "IndexedPartition(T, o::OnlineStat{0}, b::Int = 100)\n\nPartition a data stream between b and 2b parts.  The input must have length 2 and is  assumed to be an (x, y) pair.  The \n\nExample\n\nx = rand(Bool, 100)\ny = x .+ randn(100)\n\no = IndexedPartition(Bool, Mean())\ns = Series(Any[x y], o)\no.parts \nvalue(o)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.KMeans",
     "page": "API",
     "title": "OnlineStats.KMeans",
@@ -790,14 +798,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Partition",
     "category": "Type",
     "text": "Partition(o::OnlineStat, b = 50)\n\nSplit a data stream between b and 2b parts, using o to summarize each part.  This  is useful for visualizing large datasets where it is not feasible to plot every observation  and checking for nonstationarity.\n\nPlotting\n\nplot(o::Partition, f::Function = value)\n\nThe fallback recipe plots f(stat) for every stat in the partition.  Special plot recipes exist for CountMap (stacked bar) and Variance (mean ± 95% CI).\n\nExample\n\ny = randn(1000)\no = Partition(Mean())\nSeries(y, o)\nm = merge(o)  # merge partitions into a single `Mean`\nvalue(m) ≈ mean(y)\n\nusing Plots\nplot(o)\nplot!(o, x -> value(x) + 1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.PartitionX",
-    "page": "API",
-    "title": "OnlineStats.PartitionX",
-    "category": "Type",
-    "text": "PartitionX(T, o::OnlineStat{0}, b::Int = 100)\n\nPartition a data stream between b and 2b parts.  The input must have length 2 and is  assumed to be an (x, y) pair.  The \n\nExample\n\nx = rand(Bool, 100)\ny = x .+ randn(100)\n\no = PartitionX(Bool, Mean())\ns = Series(Any[x y], o)\no.parts \nvalue(o)\n\n\n\n"
 },
 
 {
