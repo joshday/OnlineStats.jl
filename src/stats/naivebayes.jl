@@ -15,12 +15,12 @@ probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type 
 """
 struct NBClassifier{T} <: ExactStat{(1, 0)}
     cat::CountMap{T}
-    h::Vector{Dict{T, Hist{AdaptiveBins}}}
+    h::Vector{Dict{T, Hist{AdaptiveBins{Float64}}}}
     b::Int
 end
 function NBClassifier(p::Integer, T::Type, b::Integer = 20) 
     cat = CountMap(T)
-    h = [Dict{T, Hist{AdaptiveBins}}() for i in 1:p]
+    h = [Dict{T, Hist{AdaptiveBins{Float64}}}() for i in 1:p]
     NBClassifier(cat, h, b)
 end
 Base.show(io::IO, o::NBClassifier) = print(io, "NBCLassifier with labels: $(keys(o.cat))")

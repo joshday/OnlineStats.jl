@@ -111,70 +111,57 @@ Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-mutable struct AdaptiveBins <: HistAlg 
-    values::Vector{Float64}
-    counts::Vector{Int}
-    n::Int
-    AdaptiveBins(b::Int) = new(fill(Inf, b), zeros(Int, b), 0)
+struct AdaptiveBins{T <: Number} <: HistAlg 
+    value::Vector{Pair{T, Int}}
+    b::Int
 end
-Hist(b::Int) = Hist(AdaptiveBins(b))
-Base.show(io::IO, o::AdaptiveBins) = print(io, "AdaptiveBins($(length(o.values)))")
-value(o::AdaptiveBins) = (o.values, o.counts)
+AdaptiveBins(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
+Hist(b::Int) = Hist(AdaptiveBins(Float64, b))
+Base.show(io::IO, o::AdaptiveBins) = print(io, "AdaptiveBins($(o.b))")
 
-fit!(o::Hist{AdaptiveBins}, y::Real, γ::Float64) = push!(o.method, Pair(y, 1))
+value(o::AdaptiveBins) = (first.(o.value), last.(o.value))
 
-function Base.push!(o::AdaptiveBins, p::Pair)
-    if last(p) > 0
-        o.n += 1
-        i = searchsortedfirst(o.values, first(p))
-        insert!(o.values, i, first(p))
-        insert!(o.counts, i, last(p))
-        ind = find_min_diff(o)
-        binmerge!(o, ind)
-    end
-end
+nobs(o::AdaptiveBins) = sum(last.(o.value))
 
-function binmerge!(o::AdaptiveBins, i)
-    k2 = o.counts[i+1]
-    if k2 != 0
-        k1 = o.counts[i]
-        q1 = o.values[i]
-        q2 = o.values[i + 1]
-        o.values[i] = smooth(q1, q2, k2 / (k1 + k2))
-        o.counts[i] += k2
-    end
-    deleteat!(o.values, i + 1)
-    deleteat!(o.counts, i + 1)
-end
+fit!(o::Hist{<:AdaptiveBins}, y::ScalarOb, γ::Float64) = fit!(o.method, Pair(y, 1))
 
-function find_min_diff(o)
-    v = o.values
-    o.n < length(v) && return o.n
-    ind = 0
-    mindiff = Inf
-    for i in 1:(length(v) - 1)
-        @inbounds diff = v[i + 1] - v[i]
-        if diff < mindiff 
-            mindiff = diff 
-            ind = i
+function fit!(o::AdaptiveBins{T}, y::Pair{T, Int}) where {T}
+    v = o.value
+    i = searchsortedfirst(v, y)
+    insert!(v, i, y)
+    if length(v) > o.b 
+        # find minimum difference
+        i = 0 
+        mindiff = Inf 
+        for k in 1:(length(v) - 1)
+            @inbounds diff = first(v[k + 1]) - first(v[k])
+            if diff < mindiff 
+                mindiff = diff 
+                i = k 
+            end
         end
+        # merge bins i, i+1
+        q2, k2 = v[i + 1]
+        if k2 > 0
+            q1, k1 = v[i]
+            k3 = k1 + k2
+            v[i] = Pair(smooth(q1, q2, k2 / k3), k3)
+        end
+        deleteat!(o.value, i + 1)
     end
-    ind
 end
 
-function Base.merge!(o::Hist{AdaptiveBins}, o2::Hist{AdaptiveBins}, γ::Float64)
-    for p in Pair.(o2.method.values, o2.method.counts)
-        push!(o.method, p)
-    end
+function Base.merge!(o::Hist{T}, o2::Hist{T}, γ::Float64) where {T <: AdaptiveBins}
+    fit!.(o.method, o2.method.value)
 end
 
-function discretized_pdf(o::Hist{AdaptiveBins}, y::Real)
+function discretized_pdf(o::Hist{<:AdaptiveBins}, y::ScalarOb)
     b = o.method
-    i = searchsortedfirst(b.values, y)
-    if i > length(b.counts)
+    i = searchsortedfirst(b.value, Pair(y, 0))
+    if i > length(b.value)
         i -= 1
     end
-    b.counts[i] / sum(b.counts)
+    last(b.value[i]) / nobs(b)
 end
 
 

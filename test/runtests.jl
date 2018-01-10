@@ -336,6 +336,7 @@ end
     y = x * linspace(-1, 1, p) .> 0
     o = NBClassifier(p, Bool, 100)
     Series((x,y), o)
+    # @show predict(o, [0,0,0,0,1])
     @test classify(o, [0,0,0,0,1])
 end
 
@@ -598,7 +599,7 @@ end
             @test std(o)    ≈ std(y)    atol = .1
             @test mean(o)   ≈ mean(y)   atol = .1
         end
-        o = Hist(25)
+        o = Hist(AdaptiveBins(Int, 25))
         y = 1:25 
         Series(y, o)
         @test extrema(o) == extrema(y)
