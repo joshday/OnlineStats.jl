@@ -62,7 +62,7 @@ end
 
 unbias(o) = o.nobs / (o.nobs - 1)
 
-value(o::OnlineStat) = _value(o)
+value(o::OnlineStat, args...; kw...) = _value(o, args...; kw...)
 fit!(o::OnlineStat, ob, γ::Float64) = _fit!(o, ob, γ)
 
 const ϵ = 1e-6
