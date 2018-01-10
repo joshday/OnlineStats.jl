@@ -1,3 +1,98 @@
+abstract type AbstractPartition{N} <: OnlineStat{N} end
+default_weight(::AbstractPartition) = EqualWeight()
+
+#-----------------------------------------------------------------------# IndexedPart
+mutable struct IndexedPart{T, O}
+    stat::O
+    first::T 
+    last::T
+    n::Int
+end
+function IndexedPart(o::OnlineStat, x, y) 
+    o2 = copy(o)
+    fit!(o2, y, 1.0)
+    IndexedPart(o2, x, x, 1)
+end
+function Base.show(io::IO, o::IndexedPart)
+    print(io, name(o) * " (nobs = $(o.n)) : $(o.first) to $(o.last)")
+end
+function Base.merge!(o::T, o2::T) where {T <: IndexedPart}
+    o.n += o2.n
+    merge!(o.stat, o2.stat, o2.n / o.n)
+    o.last = o2.last
+end
+value(o::IndexedPart) = value(o.stat)
+Base.first(o::IndexedPart) = o.first 
+Base.last(o::IndexedPart) = o.last
+
+function fit!(o::IndexedPart{T}, x::T, y) where {T}
+    o.n += 1
+    fit!(o.stat, y, 1 / o.n)
+end
+Base.in(x, o::IndexedPart) = (x >= o.first && x <= o.last)
+Base.isless(o::IndexedPart, o2::IndexedPart) = o.last < o2.first
+nobs(o::IndexedPart) = o.n
+
+function squash!(v::Vector{<:IndexedPart})
+    sort!(v)
+
+    diffs = [v[i].last - v[i - 1].first for i in 2:length(v)]
+
+    for k in 1:floor(Int, length(v) / 2)
+        _, i = findmin(diffs)
+        merge!(v[i], v[i+1])
+        deleteat!(v, i + 1)
+        deleteat!(diffs, i)
+    end
+end
+
+#-----------------------------------------------------------------------# IndexedPartition
+"""
+    IndexedPartition(T, o::OnlineStat{0}, b::Int = 100)
+
+Partition a data stream between `b` and `2b` parts.  The input must have length 2 and is 
+assumed to be an (x, y) pair.  The 
+
+# Example
+
+    x = rand(Bool, 100)
+    y = x .+ randn(100)
+
+    o = IndexedPartition(Bool, Mean())
+    s = Series(Any[x y], o)
+    o.parts 
+    value(o)
+"""
+struct IndexedPartition{T, O} <: AbstractPartition{1}
+    parts::Vector{IndexedPart{T, O}}
+    b::Int
+    empty_stat::O
+end
+function IndexedPartition(T::Type, o::OnlineStat{0}, b::Int = 100)
+    v = IndexedPart{T, typeof(o)}[]
+    IndexedPartition(v, 2b, copy(o))
+end
+function Base.show(io::IO, o::IndexedPartition)
+    print(io, name(o) * " ($(length(o.parts)) parts)")
+end
+
+function fit!(o::IndexedPartition, xy::VectorOb, ::Float64)
+    length(xy) == 2 || error("length of input should be 2 (x and y)")
+    addpart = true
+    x = first(xy)
+    parts = o.parts
+    for p in parts 
+        if x in p 
+            fit!(p, xy...)
+            addpart = false
+        end
+    end
+    addpart && push!(parts, IndexedPart(o.empty_stat, xy...))
+    length(parts) ≥ o.b && squash!(parts)
+end
+
+value(o::IndexedPartition) = value.(sort!(o.parts))
+
 #-----------------------------------------------------------------------# Part 
 """
     Part(o::OnlineStat, start::Int)
@@ -64,9 +159,9 @@ exist for [`CountMap`](@ref) (stacked bar) and [`Variance`](ref) (mean ± 95% CI
     plot(o)
     plot!(o, x -> value(x) + 1)
 """
-struct Partition{T} <: ExactStat{0}
+struct Partition{T} <: AbstractPartition{0}
     parts::Vector{Part{T}}
-    b::Int  # between b and 2b Parts
+    b::Int
     empty_stat::T
 end
 function Partition(o::T, b::Int = 100) where {T <: OnlineStat{0}}
@@ -126,98 +221,3 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Partition}
     end
     o
 end
-
-
-#-----------------------------------------------------------------------#
-#-----------------------------------------------------------------------#
-
-
-#-----------------------------------------------------------------------# XPart
-mutable struct XPart{T, O}
-    stat::O
-    first::T 
-    last::T
-    n::Int
-end
-function XPart(o::OnlineStat, x, y) 
-    o2 = copy(o)
-    fit!(o2, y, 1.0)
-    XPart(o2, x, x, 1)
-end
-function Base.show(io::IO, o::XPart)
-    print(io, name(o) * " (nobs = $(o.n)) : $(o.first) to $(o.last)")
-end
-function Base.merge!(o::T, o2::T) where {T <: XPart}
-    o.n += o2.n
-    merge!(o.stat, o2.stat, o2.n / o.n)
-    o.last = o2.last
-end
-value(o::XPart) = value(o.stat)
-
-function fit!(o::XPart{T}, x::T, y) where {T}
-    o.n += 1
-    fit!(o.stat, y, 1 / o.n)
-end
-Base.in(x, o::XPart) = (x >= o.first && x <= o.last)
-Base.isless(o::XPart, o2::XPart) = o.last < o2.first
-nobs(o::XPart) = o.n
-
-function squash!(v::Vector{<:XPart})
-    sort!(v)
-
-    diffs = [v[i].last - v[i - 1].first for i in 2:length(v)]
-
-    for k in 1:floor(Int, length(v) / 2)
-        _, i = findmin(diffs)
-        merge!(v[i], v[i+1])
-        deleteat!(v, i + 1)
-        deleteat!(diffs, i)
-    end
-end
-
-#-----------------------------------------------------------------------# PartitionX
-"""
-    PartitionX(T, o::OnlineStat{0}, b::Int = 100)
-
-Partition a data stream between `b` and `2b` parts.  The input must have length 2 and is 
-assumed to be an (x, y) pair.  The 
-
-# Example
-
-    x = rand(Bool, 100)
-    y = x .+ randn(100)
-
-    o = PartitionX(Bool, Mean())
-    s = Series(Any[x y], o)
-    o.parts 
-    value(o)
-"""
-struct PartitionX{T, O} <: ExactStat{1}
-    parts::Vector{XPart{T, O}}
-    b::Int
-    empty_stat::O
-end
-function PartitionX(T::Type, o::OnlineStat{0}, b::Int = 100)
-    v = XPart{T, typeof(o)}[]
-    PartitionX(v, 2b, copy(o))
-end
-function Base.show(io::IO, o::PartitionX)
-    print(io, name(o) * " ($(length(o.parts)) parts)")
-end
-
-function fit!(o::PartitionX, xy::VectorOb, ::Float64)
-    length(xy) == 2 || error("length of input should be 2 (x and y)")
-    addpart = true
-    x = first(xy)
-    parts = o.parts
-    for p in parts 
-        if x in p 
-            fit!(p, xy...)
-            addpart = false
-        end
-    end
-    addpart && push!(parts, XPart(o.empty_stat, xy...))
-    length(parts) ≥ o.b && squash!(parts)
-end
-
-value(o::PartitionX) = value.(sort!(o.parts))
