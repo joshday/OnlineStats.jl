@@ -505,6 +505,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.AdaptiveBins",
+    "page": "API",
+    "title": "OnlineStats.AdaptiveBins",
+    "category": "Type",
+    "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.AutoCov",
     "page": "API",
     "title": "OnlineStats.AutoCov",
@@ -902,14 +910,6 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.nobs",
     "category": "Method",
     "text": "nobs(s::Series)\n\nReturn the number of observations the Series has fit!-ted.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.AdaptiveBins",
-    "page": "API",
-    "title": "OnlineStats.AdaptiveBins",
-    "category": "Type",
-    "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n"
 },
 
 {
