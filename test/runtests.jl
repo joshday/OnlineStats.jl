@@ -531,6 +531,8 @@ end
     @test std(o) ≈ vec(std(x, 1))
     @test mean(o) ≈ vec(mean(x, 1))
     @test cor(o) ≈ cor(x)
+    @test cov(o) ≈ cov(x)
+    @test cov(o; corrected=false) ≈ cov(x, 1, false)
 end
 @testset "Extrema" begin 
     o = Extrema()

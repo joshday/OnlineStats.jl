@@ -173,17 +173,18 @@ function fit!(o::CovMatrix, x::VectorOb, γ::Float64)
     o.nobs += 1
     o
 end
-function _value(o::CovMatrix)
+function _value(o::CovMatrix; corrected::Bool = true)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
-    scale!(o.value, unbias(o))
+    corrected && scale!(o.value, unbias(o))
+    o.value
 end
 Base.length(o::CovMatrix) = length(o.b)
 Base.mean(o::CovMatrix) = o.b
-Base.cov(o::CovMatrix) = value(o)
-Base.var(o::CovMatrix) = diag(value(o))
-Base.std(o::CovMatrix) = sqrt.(var(o))
-function Base.cor(o::CovMatrix)
-    copy!(o.cormat, value(o))
+Base.cov(o::CovMatrix; kw...) = value(o; kw...)
+Base.var(o::CovMatrix; kw...) = diag(value(o; kw...))
+Base.std(o::CovMatrix; kw...) = sqrt.(var(o; kw...))
+function Base.cor(o::CovMatrix; kw...)
+    copy!(o.cormat, value(o; kw...))
     v = 1.0 ./ sqrt.(diag(o.cormat))
     scale!(o.cormat, v)
     scale!(v, o.cormat)
