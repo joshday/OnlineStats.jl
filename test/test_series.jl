@@ -79,7 +79,6 @@ end
     s2 = Series(y2, Mean())
     merge!(s1, s2)
     @test value(stats(s1)[1]) ≈ mean(vcat(y, y2))
-    @test_throws ErrorException merge(Series(Mean()), Series(Variance()))
 end
 end #Series
 
