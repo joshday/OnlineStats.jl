@@ -125,7 +125,7 @@ function fit!(s::AugmentedSeries{1}, y::VectorOb)
     s
 end
 function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
-    s.filter(xy) && fit!(s.series. s.transform(xy))
+    s.filter(xy) && fit!(s.series, s.transform(xy))
     s
 end
 

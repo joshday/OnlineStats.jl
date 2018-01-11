@@ -25,28 +25,15 @@ end
 #     @test all(isapprox.(fo(o), fy(y), atol = atol))
 # end
 
-#-----------------------------------------------------------------------# Show
-info("Show")
-for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(), 
-         HyperLogLog(4), Moments(), OrderStats(10), Quantile(), PQuantile(),
-         ReservoirSample(10), Sum(), StatLearn(5), Hist(5), Hist(1:5),
-         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean()),
-         [Mean() Variance()], Partition(Mean(), 5)]
-    println(o)
-    typeof(o) <: OnlineStat{0} && println(2o)
-end
-println(Series(Mean()))
-println(Series(Mean(), Variance(), Moments()))
-println(25Mean())
-Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
-
-println("\n\n")
-
 #-----------------------------------------------------------------------# Data
 y = randn(100)
 y2 = randn(100)
 x = randn(100, 5)
 x2 = randn(100, 5)
+
+#-----------------------------------------------------------------------# test files
+include("test_show.jl")
+include("test_series.jl")
 
 #-----------------------------------------------------------------------# merge stats
 @testset "test_merge 0" begin 
@@ -74,99 +61,7 @@ end
     end
 end 
 
-#-----------------------------------------------------------------------# Series
-@testset "Series" begin 
-@testset "Constructors" begin
-    @test Series(EqualWeight(), Mean()) == Series(Mean())
-    @test Series(y, Mean()) == Series(EqualWeight(), y, Mean())
-    @test Series(y, Mean()) == Series(y, EqualWeight(), Mean())
-    s = Series(Mean())
-    fit!(s, y)
-    @test s == Series(y, Mean())
-end
-@testset "fit! 0" begin 
-    s = Series(Mean())
-    @test value(s)[1] == mean(stats(s)[1])
-    # single observation
-    fit!(s, y[1])
-    @test value(s)[1] ≈ y[1]
-    # multiple observations
-    fit!(s, y[2:10])
-    @test value(s)[1] ≈ mean(y[1:10])
-    @testset "allocations" begin 
-        # run once to compile
-        Series(y, Mean())
-        Series(y, ExponentialWeight(), Mean())
-        Series(ExponentialWeight(), y, Mean())
 
-        @test @allocated(Series(y, Mean())) < 300
-        @test @allocated(Series(y, ExponentialWeight(), Mean())) < 300
-        @test @allocated(Series(ExponentialWeight(), y, Mean())) < 300
-    end
-end
-@testset "fit! 1" begin 
-    # single observation
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1, :])
-    @test value(s)[1] ≈ x[1, :]
-    # multiple observations
-    fit!(s, x[2:10, :])
-    @test value(s)[1] ≈ vec(mean(x[1:10, :], 1))
-
-    @testset "column observations" begin 
-        s = Series(CovMatrix(5))
-        fit!(s, x', Cols())
-        @test s == Series(x, CovMatrix(5))
-    end
-    @testset "allocated" begin 
-        Series(x, MV(5, Mean()))
-        Series(x, ExponentialWeight(), MV(5, Mean()))
-        Series(ExponentialWeight(), x, MV(5, Mean()))
-
-        @test @allocated(Series(x, MV(5, Mean()))) < 800
-        @test @allocated(Series(x, ExponentialWeight(), MV(5, Mean()))) < 800
-        @test @allocated(Series(ExponentialWeight(), x, MV(5, Mean()))) < 800
-    end
-end
-@testset "fit! (1,0)" begin 
-    # single observation
-    s = Series(LinReg(5))
-    fit!(s, (randn(5), randn()))
-    # multiple observations
-    s = Series(LinReg(5))
-    fit!(s, (x, y))
-    @test value(s)[1] ≈ x\y
-    # multiple observations, by column
-    s = Series(LinReg(5))
-    fit!(s, (x', y), Cols())
-    @test value(s)[1] ≈ x\y
-end
-@testset "merging" begin 
-    @test merge(Series(Mean()), Series(Mean())) == Series(Mean())
-    s1 = merge(Series(y, Mean()), Series(y2, Mean()))
-    s2 = Series(vcat(y,y2), Mean())
-    @test value(s1)[1] ≈ value(s2)[1]
-    @test_throws Exception merge(Series(y, Mean()), Series(y, Mean()), 100.0)
-    merge(s1, s2, :mean)
-    merge(s1, s2, :singleton)
-    @test_throws Exception merge(s1, s2, :fakemethod)
-
-    s1 = Series(y, Mean())
-    s2 = Series(y2, Mean())
-    merge!(s1, s2)
-    @test value(stats(s1)[1]) ≈ mean(vcat(y, y2))
-    @test_throws ErrorException merge(Series(Mean()), Series(Variance()))
-end
-end #Series
-
-#-----------------------------------------------------------------------# AugmentedSeries
-@testset "AugmentedSeries" begin 
-    s = series(Mean(), Variance(); transform = abs)
-    y = randn(100)
-    fit!(s, y)
-    @test value(s)[1] ≈ mean(abs.(y))
-    @test value(s)[2] ≈ var(abs.(y))
-end
 
 #-----------------------------------------------------------------------# mapblocks
 @testset "mapblocks" begin 
