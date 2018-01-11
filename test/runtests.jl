@@ -25,28 +25,15 @@ end
 #     @test all(isapprox.(fo(o), fy(y), atol = atol))
 # end
 
-#-----------------------------------------------------------------------# Show
-info("Show")
-for o = [Mean(), Variance(), CStat(Mean()), CovMatrix(5), Diff(), Extrema(), 
-         HyperLogLog(4), Moments(), OrderStats(10), Quantile(), PQuantile(),
-         ReservoirSample(10), Sum(), StatLearn(5), Hist(5), Hist(1:5),
-         LinRegBuilder(5), LinReg(5), CallFun(Mean(), info), Bootstrap(Mean()),
-         [Mean() Variance()], Partition(Mean(), 5)]
-    println(o)
-    typeof(o) <: OnlineStat{0} && println(2o)
-end
-println(Series(Mean()))
-println(Series(Mean(), Variance(), Moments()))
-println(25Mean())
-Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
-
-println("\n\n")
-
 #-----------------------------------------------------------------------# Data
 y = randn(100)
 y2 = randn(100)
 x = randn(100, 5)
 x2 = randn(100, 5)
+
+#-----------------------------------------------------------------------# test files
+include("test_show.jl")
+include("test_series.jl")
 
 #-----------------------------------------------------------------------# merge stats
 @testset "test_merge 0" begin 
@@ -74,138 +61,7 @@ end
     end
 end 
 
-#-----------------------------------------------------------------------# Series
-@testset "Series" begin 
-@testset "Constructors" begin
-    @test Series(EqualWeight(), Mean()) == Series(Mean())
-    @test Series(y, Mean()) == Series(EqualWeight(), y, Mean())
-    @test Series(y, Mean()) == Series(y, EqualWeight(), Mean())
-    s = Series(Mean())
-    fit!(s, y)
-    @test s == Series(y, Mean())
-end
-@testset "fit! 0" begin 
-    s = Series(Mean())
-    @test value(s)[1] == mean(stats(s)[1])
-    # single observation
-    fit!(s, y[1])
-    @test value(s)[1] ≈ y[1]
-    # multiple observations
-    fit!(s, y[2:10])
-    @test value(s)[1] ≈ mean(y[1:10])
-    # single observation, override weight
-    s = Series(Mean())
-    fit!(s, y[1], .1)
-    @test value(s)[1] ≈ .1 * y[1]
-    # multiple observation, override weight 
-    s = Series(Mean())
-    fit!(s, y[1:2], .1)
-    @test value(s)[1] ≈ .1 * .9 * y[1] + .1 * y[2]
-    # multiple observation, override weights 
-    s = Series(Mean())
-    fit!(s, y[1:2], [.1, .2])
-    @test value(s)[1] ≈ .1 * .8 * y[1] + .2 * y[2]
-    @testset "allocations" begin 
-        # run once to compile
-        Series(y, Mean())
-        Series(y, ExponentialWeight(), Mean())
-        Series(ExponentialWeight(), y, Mean())
 
-        @test @allocated(Series(y, Mean())) < 300
-        @test @allocated(Series(y, ExponentialWeight(), Mean())) < 300
-        @test @allocated(Series(ExponentialWeight(), y, Mean())) < 300
-    end
-end
-@testset "fit! 1" begin 
-    # single observation
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1, :])
-    @test value(s)[1] ≈ x[1, :]
-    # multiple observations
-    fit!(s, x[2:10, :])
-    @test value(s)[1] ≈ vec(mean(x[1:10, :], 1))
-    # single observation, override weight
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1, :], .1)
-    @test value(s)[1] ≈ .1 .* x[1, :]
-    # multiple observations, override weight 
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1:2, :], .1)
-    @test value(s)[1] ≈ .1 .* .9 .* x[1,:] + .1 .* x[2,:]
-    # multiple observations, override weights
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1:2, :], [.1, .2])
-    @test value(s)[1] ≈ .1 .* .8 .* x[1,:] + .2 * x[2,:]
-    @testset "column observations" begin 
-        # normal
-        s = Series(CovMatrix(5))
-        fit!(s, x', Cols())
-        @test s == Series(x, CovMatrix(5))
-        # weight override
-        s = Series(CovMatrix(5))
-        s2 = Series(CovMatrix(5))
-        fit!(s, x, .1)
-        fit!(s2, x', .1, Cols())
-        @test s == s2
-        # weights override
-        w = rand(100)
-        s = Series(CovMatrix(5))
-        s2 = Series(CovMatrix(5))
-        fit!(s, x, w)
-        fit!(s2, x', w, Cols())
-        @test s == s2
-    end
-    @testset "allocated" begin 
-        Series(x, MV(5, Mean()))
-        Series(x, ExponentialWeight(), MV(5, Mean()))
-        Series(ExponentialWeight(), x, MV(5, Mean()))
-
-        @test @allocated(Series(x, MV(5, Mean()))) < 800
-        @test @allocated(Series(x, ExponentialWeight(), MV(5, Mean()))) < 800
-        @test @allocated(Series(ExponentialWeight(), x, MV(5, Mean()))) < 800
-    end
-end
-@testset "fit! (1,0)" begin 
-    # single observation
-    s = Series(LinReg(5))
-    fit!(s, (randn(5), randn()))
-    # single observation, override weight 
-    s = Series(LinReg(5))
-    fit!(s, (randn(5), rand()), .1)
-    # multiple observations
-    s = Series(LinReg(5))
-    fit!(s, (x, y))
-    @test value(s)[1] ≈ x\y
-    # multiple observations, by column
-    s = Series(LinReg(5))
-    fit!(s, (x', y), Cols())
-    @test value(s)[1] ≈ x\y
-    # multiple observations, override weight
-    s = Series(LinReg(5))
-    fit!(s, (x, y), .1)
-    s = Series(LinReg(5))
-    fit!(s, (x', y), .1, Cols())
-    # multiple observaitons, override weights 
-    fit!(s, (x, y), rand(length(y)))
-    fit!(s, (x', y), rand(length(y)), Cols())
-end
-@testset "merging" begin 
-    @test merge(Series(Mean()), Series(Mean())) == Series(Mean())
-    s1 = merge(Series(y, Mean()), Series(y2, Mean()))
-    s2 = Series(vcat(y,y2), Mean())
-    @test value(s1)[1] ≈ value(s2)[1]
-    @test_throws Exception merge(Series(y, Mean()), Series(y, Mean()), 100.0)
-    merge(s1, s2, :mean)
-    merge(s1, s2, :singleton)
-    @test_throws Exception merge(s1, s2, :fakemethod)
-
-    s1 = Series(y, Mean())
-    s2 = Series(y2, Mean())
-    merge!(s1, s2)
-    @test value(stats(s1)[1]) ≈ mean(vcat(y, y2))
-    @test_throws ErrorException merge(Series(Mean()), Series(Variance()))
-end
-end #Series
 
 #-----------------------------------------------------------------------# mapblocks
 @testset "mapblocks" begin 
@@ -331,7 +187,7 @@ end
 
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
-    n, p = 1000, 5
+    n, p = 10000, 5
     x = randn(n, p)
     y = x * linspace(-1, 1, p) .> 0
     o = NBClassifier(p, Bool, 100)
@@ -461,9 +317,7 @@ end
         s = @inferred Series(o)
         @test value(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
         fit!(s, (x, y))
-        fit!(s, (x, y), .1)
-        fit!(s, (x, y), StatsBase.Weights(rand(length(y))))
-        @test nobs(s) == 3 * n
+        @test nobs(s) == n
         @test coef(o) == o.β
         @test predict(o, x) == x * o.β
         @test predict(o, x', Cols()) ≈ x * o.β
