@@ -100,6 +100,12 @@ end
 
 
 #-----------------------------------------------------------------------# AugmentedSeries 
+"""
+    AugmentedSeries(s::Series; filter = x->true, transform = identity)
+
+Wrapper around a `Series` so that for new `data`, fitting occurs on `transform(data)`, but 
+only if `filter(data) == true`.
+"""
 struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{N}
     series::S
     filter::F1 
