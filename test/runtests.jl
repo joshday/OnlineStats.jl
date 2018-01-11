@@ -187,7 +187,7 @@ end
 
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
-    n, p = 1000, 5
+    n, p = 10000, 5
     x = randn(n, p)
     y = x * linspace(-1, 1, p) .> 0
     o = NBClassifier(p, Bool, 100)
