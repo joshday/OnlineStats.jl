@@ -93,18 +93,6 @@ end
     # multiple observations
     fit!(s, y[2:10])
     @test value(s)[1] ≈ mean(y[1:10])
-    # single observation, override weight
-    s = Series(Mean())
-    fit!(s, y[1], .1)
-    @test value(s)[1] ≈ .1 * y[1]
-    # multiple observation, override weight 
-    s = Series(Mean())
-    fit!(s, y[1:2], .1)
-    @test value(s)[1] ≈ .1 * .9 * y[1] + .1 * y[2]
-    # multiple observation, override weights 
-    s = Series(Mean())
-    fit!(s, y[1:2], [.1, .2])
-    @test value(s)[1] ≈ .1 * .8 * y[1] + .2 * y[2]
     @testset "allocations" begin 
         # run once to compile
         Series(y, Mean())
@@ -124,36 +112,11 @@ end
     # multiple observations
     fit!(s, x[2:10, :])
     @test value(s)[1] ≈ vec(mean(x[1:10, :], 1))
-    # single observation, override weight
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1, :], .1)
-    @test value(s)[1] ≈ .1 .* x[1, :]
-    # multiple observations, override weight 
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1:2, :], .1)
-    @test value(s)[1] ≈ .1 .* .9 .* x[1,:] + .1 .* x[2,:]
-    # multiple observations, override weights
-    s = Series(MV(5, Mean()))
-    fit!(s, x[1:2, :], [.1, .2])
-    @test value(s)[1] ≈ .1 .* .8 .* x[1,:] + .2 * x[2,:]
+
     @testset "column observations" begin 
-        # normal
         s = Series(CovMatrix(5))
         fit!(s, x', Cols())
         @test s == Series(x, CovMatrix(5))
-        # weight override
-        s = Series(CovMatrix(5))
-        s2 = Series(CovMatrix(5))
-        fit!(s, x, .1)
-        fit!(s2, x', .1, Cols())
-        @test s == s2
-        # weights override
-        w = rand(100)
-        s = Series(CovMatrix(5))
-        s2 = Series(CovMatrix(5))
-        fit!(s, x, w)
-        fit!(s2, x', w, Cols())
-        @test s == s2
     end
     @testset "allocated" begin 
         Series(x, MV(5, Mean()))
@@ -169,9 +132,6 @@ end
     # single observation
     s = Series(LinReg(5))
     fit!(s, (randn(5), randn()))
-    # single observation, override weight 
-    s = Series(LinReg(5))
-    fit!(s, (randn(5), rand()), .1)
     # multiple observations
     s = Series(LinReg(5))
     fit!(s, (x, y))
@@ -180,14 +140,6 @@ end
     s = Series(LinReg(5))
     fit!(s, (x', y), Cols())
     @test value(s)[1] ≈ x\y
-    # multiple observations, override weight
-    s = Series(LinReg(5))
-    fit!(s, (x, y), .1)
-    s = Series(LinReg(5))
-    fit!(s, (x', y), .1, Cols())
-    # multiple observaitons, override weights 
-    fit!(s, (x, y), rand(length(y)))
-    fit!(s, (x', y), rand(length(y)), Cols())
 end
 @testset "merging" begin 
     @test merge(Series(Mean()), Series(Mean())) == Series(Mean())
@@ -206,6 +158,15 @@ end
     @test_throws ErrorException merge(Series(Mean()), Series(Variance()))
 end
 end #Series
+
+#-----------------------------------------------------------------------# AugmentedSeries
+@testset "AugmentedSeries" begin 
+    s = series(Mean(), Variance(); transform = abs)
+    y = randn(100)
+    fit!(s, y)
+    @test value(s)[1] ≈ mean(abs.(y))
+    @test value(s)[2] ≈ var(abs.(y))
+end
 
 #-----------------------------------------------------------------------# mapblocks
 @testset "mapblocks" begin 
@@ -461,9 +422,7 @@ end
         s = @inferred Series(o)
         @test value(o, x, y) == value(.5 * L2DistLoss(), y, zeros(y), AvgMode.Mean())
         fit!(s, (x, y))
-        fit!(s, (x, y), .1)
-        fit!(s, (x, y), StatsBase.Weights(rand(length(y))))
-        @test nobs(s) == 3 * n
+        @test nobs(s) == n
         @test coef(o) == o.β
         @test predict(o, x) == x * o.β
         @test predict(o, x', Cols()) ≈ x * o.β

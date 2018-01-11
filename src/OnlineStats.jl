@@ -14,8 +14,11 @@ using Reexport, RecipesBase
 @reexport using LossFunctions, PenaltyFunctions
 
 export
-    fit!, value, nobs, classify, loss, predict, coef, mapblocks, stats,
-    Series, OnlineStat, Cols, Rows, mapblocks, confint, autocov, autocor,
+    # functions
+    fit!, value, nobs, classify, loss, predict, coef, mapblocks, stats, series, mapblocks,
+    confint, autocov, autocor,
+    # Series and related types
+    Series, AugmentedSeries, OnlineStat, Cols, Rows,
     # Weight
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled,
@@ -26,7 +29,7 @@ export
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
-    NBClassifier, Partition, Group, IndexedPartition,
+    NBClassifier, Partition, Group, IndexedPartition, FilteredStat,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
 
@@ -79,7 +82,7 @@ include("stats/histograms.jl")
 include("stats/mv.jl")
 include("stats/distributions.jl")
 include("stats/statlearn.jl")
-include("stats/experimental.jl")
+include("stats/wrappers.jl")
 include("stats/bootstrap.jl")
 include("stats/naivebayes.jl")
 include("stats/decisiontree.jl")

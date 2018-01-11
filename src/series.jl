@@ -1,3 +1,45 @@
+#-----------------------------------------------------------------------# AbstractSeries
+# Required methods: stats(s), nobs(s), getweight(s)
+abstract type AbstractSeries{N} end
+
+stats(s::AbstractSeries) = s.stats
+nobs(s::AbstractSeries) = s.n
+value(s::AbstractSeries) = value.(stats(s))
+
+getweight(s::AbstractSeries) = s.weight
+weight(s::AbstractSeries) = s.weight(s.n)
+weight!(s::AbstractSeries) = s.weight(s.n += 1)
+
+function Base.:(==)(o1::AbstractSeries, o2::AbstractSeries)
+    nms = fieldnames(o1)
+    all(getfield.(o1, nms) .== getfield.(o2, nms))
+end
+Base.copy(s::AbstractSeries) = deepcopy(s)
+
+# Optional second line of show method
+describe(s::AbstractSeries) = ""
+
+function Base.show(io::IO, s::AbstractSeries{N}) where {N}
+    header = "▦ $(name(s,false,false)){$N}  |  $(getweight(s))  |  nobs = $(nobs(s))"
+    print_with_color(:green, io, header)
+    desc = describe(s)
+    desc != "" && print_with_color(:green, io, "\n▦ ", describe(s))
+    n = length(stats(s))
+    i = 0
+    for o in stats(s)
+        i += 1
+        char = (i == n) ? "└──" : "├──"
+        print(io, "\n$char $o")
+    end
+end
+
+function series(args...; kw...)
+    s = Series(args...)
+    length(kw) == 0 ? s : AugmentedSeries(s; kw...)
+end
+
+
+#-----------------------------------------------------------------------# Series
 """
     Series(stats...)
     Series(weight, stats...)
@@ -16,7 +58,7 @@ Track any number of OnlineStats.
     s = Series(Quantile([.25, .5, .75]))
     fit!(s, randn(1000))
 """
-mutable struct Series{N, T <: Tuple, W}
+mutable struct Series{N, T <: Tuple, W} <: AbstractSeries{N}
     stats::T
     weight::W
     n::Int
@@ -35,54 +77,57 @@ function Series(y::Data, wt::WeightLike, o::OnlineStat{N}...) where {N}
 end
 Series(wt::WeightLike, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 
-
-#-----------------------------------------------------------------------# methods
-function Base.show(io::IO, s::Series{N}) where {N}
-    print_with_color(:green, io, "▦ Series{$N}  |  $(s.weight)  |  nobs = $(s.n)")
-    n = length(stats(s))
-    i = 0
-    for o in stats(s)
-        i += 1
-        char = ifelse(i == n, "└──", "├──")
-        print(io, "\n$char $o")
-    end
+function fit!(s::Series{0}, y::ScalarOb)
+    γ = weight!(s)
+    map(x -> fit!(x, y, γ), stats(s))
+    s
+end
+function fit!(s::Series{1}, y::VectorOb)
+    s.n += 1
+    γ = s.weight(s.n)
+    map(x -> fit!(x, y, γ), stats(s))
+    s
+end
+function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb})
+    γ = weight!(s)
+    map(o -> fit!(o, xy, γ), stats(s))
+    s
 end
 
-"""
-    stats(s::Series)
 
-Return a tuple of the OnlineStats contained in the Series.
-
-# Example
-
-    s = Series(randn(100), Mean(), Variance())
-    m, v = stats(s)
-"""
-stats(s::Series) = s.stats
-
-"""
-    value(s::Series)
-
-Return a tuple of `value` mapped to the OnlineStats contained in the Series.
-"""
-value(s::Series) = value.(stats(s))
-
-"""
-    nobs(s::Series)
-
-Return the number of observations the Series has `fit!`-ted.
-"""
-nobs(s::Series) = s.n
-
-weight(s::Series) = s.weight(s.n)
-weight!(s::Series) = s.weight(s.n += 1)
-
-function Base.:(==)(o1::Series, o2::Series)
-    typeof(o1) == typeof(o2) || return false
-    nms = fieldnames(o1)
-    all(getfield.(o1, nms) .== getfield.(o2, nms))
+#-----------------------------------------------------------------------# AugmentedSeries 
+struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{N}
+    series::S
+    filter::F1 
+    transform::F2 
+    callback::F3
 end
-Base.copy(w::Series) = deepcopy(w)
+function AugmentedSeries(s::Series{N}; filter=always, transform=identity, callback=identity) where {N}
+    S, A, B, C = typeof(s), typeof(filter), typeof(transform), typeof(callback)
+    AugmentedSeries{N, S, A, B, C}(s, filter, transform, callback)
+end
+
+describe(s::AugmentedSeries) = "filter = $(s.filter)  |  transform = $(s.transform)"
+
+"always returns true"
+always(args...) = true
+
+for f in [:nobs, :value, :stats, :weight, :weight!, :getweight]
+    @eval $f(o::AugmentedSeries) = $f(o.series)
+end
+
+function fit!(s::AugmentedSeries{0}, y::ScalarOb) 
+    s.filter(y) && fit!(s.series, s.transform(y))
+    s 
+end
+function fit!(s::AugmentedSeries{1}, y::VectorOb) 
+    s.filter(y) && fit!(s.series, s.transform(y))
+    s
+end
+function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
+    s.filter(xy) && fit!(s.series. s.transform(xy))
+    s
+end
 
 #-----------------------------------------------------------------------# fit! 0
 """
@@ -105,57 +150,20 @@ Update a Series with more `data`.  Additional arguments can be used to
     fit!(s, x)  # Same as fit!(s, x, Rows())
     fit!(s, x', Cols())
 
-    # overriding the weight
-    fit!(s, x, .1)  # use .1 for every observation's weight
-    w = rand(100)
-    fit!(s, x, w)  # use w[i] as the weight for observation x[i, :]
 
     # Model Series
     x, y = randn(100, 10), randn(100)
     s = Series(LinReg(10))
     fit!(s, (x, y))
 """
-function fit!(s::Series{0}, y::ScalarOb)
-    γ = weight!(s)
-    map(x -> fit!(x, y, γ), stats(s))
-    s
-end
-function fit!(s::Series{0}, y::ScalarOb, γ::Float64)
-    s.n += 1
-    map(x -> fit!(x, y, γ), stats(s))
-    s
-end
-function fit!(s::Series{0}, y::AbstractArray)
+function fit!(s::AbstractSeries{0}, y::AbstractArray)
     for yi in y 
         fit!(s, yi)
     end
     s
 end
-function fit!(s::Series{0}, y::AbstractArray, γ::Float64)
-    for yi in y 
-        fit!(s, yi, γ)
-    end
-    s
-end
-function fit!(s::Series{0}, y::AbstractArray, γ::Vector{Float64})
-    for (yi, γi) in zip(y, γ) 
-        fit!(s, yi, γi)
-    end
-    s
-end
-#-----------------------------------------------------------------------# fit! 1 
-function fit!(s::Series{1}, y::VectorOb)
-    s.n += 1
-    γ = s.weight(s.n)
-    map(x -> fit!(x, y, γ), stats(s))
-    s
-end
-function fit!(s::Series{1}, y::VectorOb, γ::Float64)
-    s.n += 1
-    map(x -> fit!(x, y, γ), stats(s))
-    s
-end
-function fit!(s::Series{1}, y::AbstractMatrix, ::Rows = Rows())
+
+function fit!(s::AbstractSeries{1}, y::AbstractMatrix, ::Rows = Rows())
     n, p = size(y)
     buffer = Vector{eltype(y)}(p)
     for i in 1:n
@@ -166,30 +174,7 @@ function fit!(s::Series{1}, y::AbstractMatrix, ::Rows = Rows())
     end
     s
 end
-function fit!(s::Series{1}, y::AbstractMatrix, γ::Float64, ::Rows = Rows())
-    n, p = size(y)
-    buffer = Vector{eltype(y)}(p)
-    for i in 1:n
-        for j in 1:p
-            @inbounds buffer[j] = y[i, j]
-        end
-        fit!(s, buffer, γ)
-    end
-    s
-end
-function fit!(s::Series{1}, y::AbstractMatrix, γ::Vector{Float64}, ::Rows = Rows())
-    n, p = size(y)
-    n == length(γ) || error("Weight vector has length $(length(γ)) instead of $n")
-    buffer = Vector{eltype(y)}(p)
-    for i in 1:n
-        for j in 1:p
-            @inbounds buffer[j] = y[i, j]
-        end
-        @inbounds fit!(s, buffer, γ[i])
-    end
-    s
-end
-function fit!(s::Series{1}, y::AbstractMatrix, ::Cols)
+function fit!(s::AbstractSeries{1}, y::AbstractMatrix, ::Cols)
     p, n = size(y)
     buffer = Vector{eltype(y)}(p)
     for i in 1:n
@@ -197,45 +182,11 @@ function fit!(s::Series{1}, y::AbstractMatrix, ::Cols)
             @inbounds buffer[j] = y[j, i]
         end
         fit!(s, buffer)
-    end
-    s
-end
-function fit!(s::Series{1}, y::AbstractMatrix, γ::Float64, ::Cols)
-    p, n = size(y)
-    buffer = Vector{eltype(y)}(p)
-    for i in 1:n
-        for j in 1:p
-            @inbounds buffer[j] = y[j, i]
-        end
-        fit!(s, buffer, γ)
-    end
-    s
-end
-function fit!(s::Series{1}, y::AbstractMatrix, γ::Vector{Float64}, ::Cols)
-    p, n = size(y)
-    n == length(γ) || error("Weight vector has length $(length(γ)) instead of $n")
-    buffer = Vector{eltype(y)}(p)
-    for i in 1:n
-        for j in 1:p
-            @inbounds buffer[j] = y[j, i]
-        end
-        @inbounds fit!(s, buffer, γ[i])
     end
     s
 end
 
-#-----------------------------------------------------------------------# fit! (1, 0)
-function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb})
-    γ = weight!(s)
-    map(o -> fit!(o, xy, γ), stats(s))
-    s
-end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb}, γ::Float64)
-    s.n += 1
-    map(x -> fit!(x, xy, γ), stats(s))
-    s
-end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Rows = Rows())
+function fit!(s::AbstractSeries{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Rows = Rows())
     x, y = xy
     n, p = size(x)
     buffer = Vector{eltype(x)}(p)
@@ -247,7 +198,7 @@ function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Rows 
     end
     s
 end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Cols)
+function fit!(s::AbstractSeries{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Cols)
     x, y = xy
     p, n = size(x)
     buffer = Vector{eltype(x)}(p)
@@ -256,56 +207,6 @@ function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, ::Cols)
             @inbounds buffer[j] = x[j, i]
         end
         fit!(s, (buffer, y[i]))
-    end
-    s
-end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, γ::Float64, ::Rows = Rows())
-    x, y = xy
-    n, p = size(x)
-    buffer = Vector{eltype(x)}(p)
-    for i in 1:n 
-        for j in 1:p 
-            buffer[j] = x[i, j]
-        end
-        fit!(s, (buffer, y[i]), γ)
-    end
-    s
-end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, γ::Float64, ::Cols)
-    x, y = xy
-    p, n = size(x)
-    buffer = Vector{eltype(x)}(p)
-    for i in 1:n 
-        for j in 1:p 
-            buffer[j] = x[j, i]
-        end
-        fit!(s, (buffer, y[i]), γ)
-    end
-    s
-end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, γ::AVecF, ::Rows = Rows())
-    x, y = xy
-    length(y) == length(γ) || error("Weight vector is incorrect length.")
-    n, p = size(x)
-    buffer = Vector{eltype(x)}(p)
-    for i in 1:n 
-        for j in 1:p 
-            buffer[j] = x[i, j]
-        end
-        fit!(s, (buffer, y[i]), γ[i])
-    end
-    s
-end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb}, γ::AVecF, ::Cols)
-    x, y = xy
-    length(y) == length(γ) || error("Weight vector is incorrect length.")
-    p, n = size(x)
-    buffer = Vector{eltype(x)}(p)
-    for i in 1:n 
-        for j in 1:p 
-            buffer[j] = x[j, i]
-        end
-        fit!(s, (buffer, y[i]), γ[i])
     end
     s
 end
