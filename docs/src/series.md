@@ -57,13 +57,6 @@ s = Series(CovMatrix(4))
 fit!(s, randn(4))
 ```
 
-#### Single observation, override `Weight`
-
-```julia
-s = Series(Mean())
-fit!(s, randn(), .1)
-```
-
 ### Multiple observations
 !!! note
     If a single observation is a `Vector`, a `Matrix` represents multiple observations, but this is ambiguous in how the observations are stored.  A `Rows()` (default) or `Cols()` argument can be added to the `fit!` call to specify observations are in rows or columns, respectively.
@@ -75,21 +68,6 @@ fit!(s, randn(100))
 s = Series(CovMatrix(4))
 fit!(s, randn(100, 4))          # Obs. in rows
 fit!(s, randn(4, 100), Cols())  # Obs. in columns
-```
-
-#### Multiple observations, use the same weight for all
-
-```julia
-s = Series(Mean())
-fit!(s, randn(100), .01)
-```
-
-#### Multiple observations, provide vector of weights
-
-```julia
-s = Series(Mean())
-w = StatsBase.Weights(rand(100))
-fit!(s, randn(100), w)
 ```
 
 ## Merging
@@ -123,3 +101,17 @@ merge!(s1, s2, :singleton)
 # Provide the ratio of influence s2 should have.
 merge!(s1, s2, .5)
 ```
+
+
+## `AugmentedSeries`
+
+[`AugmentedSeries`](@ref) adds methods for filtering and applying functions to a data stream.
+The simplest way to constract an `AugmentedSeries` is through the `series` function:
+
+```
+s = series(Mean(), filter = !isnan, transform = abs)
+
+fit!(s, [-1, NaN, -3])
+```
+
+For a new data point `y`, the value `transform(y)` will be fitted, but only if `filter(y) == true` .
