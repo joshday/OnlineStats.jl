@@ -137,14 +137,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "series.html#Single-observation,-override-Weight-1",
-    "page": "Series",
-    "title": "Single observation, override Weight",
-    "category": "section",
-    "text": "s = Series(Mean())\nfit!(s, randn(), .1)"
-},
-
-{
     "location": "series.html#Multiple-observations-1",
     "page": "Series",
     "title": "Multiple observations",
@@ -153,27 +145,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "series.html#Multiple-observations,-use-the-same-weight-for-all-1",
-    "page": "Series",
-    "title": "Multiple observations, use the same weight for all",
-    "category": "section",
-    "text": "s = Series(Mean())\nfit!(s, randn(100), .01)"
-},
-
-{
-    "location": "series.html#Multiple-observations,-provide-vector-of-weights-1",
-    "page": "Series",
-    "title": "Multiple observations, provide vector of weights",
-    "category": "section",
-    "text": "s = Series(Mean())\nw = StatsBase.Weights(rand(100))\nfit!(s, randn(100), w)"
-},
-
-{
     "location": "series.html#Merging-1",
     "page": "Series",
     "title": "Merging",
     "category": "section",
     "text": "Two Series can be merged if they track the same OnlineStats.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
+},
+
+{
+    "location": "series.html#AugmentedSeries-1",
+    "page": "Series",
+    "title": "AugmentedSeries",
+    "category": "section",
+    "text": "AugmentedSeries adds methods for filtering and applying functions to a data stream. The simplest way to constract an AugmentedSeries is through the series function:s = series(Mean(), filter = !isnan, transform = abs)\n\nfit!(s, [-1, NaN, -3])For a new data point y, the value transform(y) will be fitted, but only if filter(y) == true ."
 },
 
 {
@@ -277,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV and Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV and Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition, IndexedPartition"
 },
 
 {
@@ -513,6 +497,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.AugmentedSeries",
+    "page": "API",
+    "title": "OnlineStats.AugmentedSeries",
+    "category": "Type",
+    "text": "AugmentedSeries(s::Series; filter = x->true, transform = identity)\n\nWrapper around a Series so that for new data, fitting occurs on transform(data), but  only if filter(data) == true.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.AutoCov",
     "page": "API",
     "title": "OnlineStats.AutoCov",
@@ -541,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CallFun",
     "category": "Type",
-    "text": "CallFun(o::OnlineStat{0}, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
+    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
 },
 
 {
@@ -865,27 +857,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#LearnBase.value-Tuple{OnlineStats.Series}",
-    "page": "API",
-    "title": "LearnBase.value",
-    "category": "Method",
-    "text": "value(s::Series)\n\nReturn a tuple of value mapped to the OnlineStats contained in the Series.\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.mapblocks",
     "page": "API",
     "title": "OnlineStats.mapblocks",
     "category": "Function",
     "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.stats-Tuple{OnlineStats.Series}",
-    "page": "API",
-    "title": "OnlineStats.stats",
-    "category": "Method",
-    "text": "stats(s::Series)\n\nReturn a tuple of the OnlineStats contained in the Series.\n\nExample\n\ns = Series(randn(100), Mean(), Variance())\nm, v = stats(s)\n\n\n\n"
 },
 
 {
@@ -897,19 +873,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,T,W} where W where T<:Tuple,Union{AbstractString, Number, Symbol}}",
+    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.AbstractSeries{0},AbstractArray}",
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Method",
-    "text": "fit!(s::Series, data, args...)\n\nUpdate a Series with more data.  Additional arguments can be used to \n\noverride the weight\nuse the columns of a matrix as observations (default is rows)\n\nExamples\n\n# Univariate Series \ns = Series(Mean())\nfit!(s, randn(100))\n\n# Multivariate Series\nx = randn(100, 3)\ns = Series(CovMatrix(3))\nfit!(s, x)  # Same as fit!(s, x, Rows())\nfit!(s, x', Cols())\n\n# overriding the weight\nfit!(s, x, .1)  # use .1 for every observation's weight\nw = rand(100)\nfit!(s, x, w)  # use w[i] as the weight for observation x[i, :]\n\n# Model Series\nx, y = randn(100, 10), randn(100)\ns = Series(LinReg(10))\nfit!(s, (x, y))\n\n\n\n"
-},
-
-{
-    "location": "api.html#StatsBase.nobs-Tuple{OnlineStats.Series}",
-    "page": "API",
-    "title": "StatsBase.nobs",
-    "category": "Method",
-    "text": "nobs(s::Series)\n\nReturn the number of observations the Series has fit!-ted.\n\n\n\n"
+    "text": "fit!(s::Series, data)\n\nUpdate a Series with more data. \n\nExamples\n\n# Univariate Series \ns = Series(Mean())\nfit!(s, randn(100))\n\n# Multivariate Series\nx = randn(100, 3)\ns = Series(CovMatrix(3))\nfit!(s, x)  # Same as fit!(s, x, Rows())\nfit!(s, x', Cols())\n\n# Model Series\nx, y = randn(100, 10), randn(100)\ns = Series(LinReg(10))\nfit!(s, (x, y))\n\n\n\n"
 },
 
 {
@@ -969,11 +937,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#Base.merge-Tuple{OnlineStats.Series,OnlineStats.Series,Float64}",
+    "location": "api.html#Base.merge-Union{Tuple{T,T,Float64}, Tuple{T}} where T<:OnlineStats.AbstractSeries",
     "page": "API",
     "title": "Base.merge",
     "category": "Method",
     "text": "See merge!\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.always-Tuple",
+    "page": "API",
+    "title": "OnlineStats.always",
+    "category": "Method",
+    "text": "always returns true\n\n\n\n"
 },
 
 {
