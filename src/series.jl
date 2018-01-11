@@ -14,6 +14,10 @@ function Base.:(==)(o1::AbstractSeries, o2::AbstractSeries)
     nms = fieldnames(o1)
     all(getfield.(o1, nms) .== getfield.(o2, nms))
 end
+function Base.:(≈)(o1::AbstractSeries, o2::AbstractSeries)
+    nms = fieldnames(o1)
+    all(getfield.(o1, nms) .≈ getfield.(o2, nms))
+end
 Base.copy(s::AbstractSeries) = deepcopy(s)
 
 # Optional second line of show method
@@ -131,12 +135,9 @@ end
 
 #-----------------------------------------------------------------------# fit! 0
 """
-    fit!(s::Series, data, args...)
+    fit!(s::Series, data)
 
-Update a Series with more `data`.  Additional arguments can be used to 
-
-- override the weight
-- use the columns of a matrix as observations (default is rows)
+Update a Series with more `data`. 
 
 # Examples
 
@@ -149,7 +150,6 @@ Update a Series with more `data`.  Additional arguments can be used to
     s = Series(CovMatrix(3))
     fit!(s, x)  # Same as fit!(s, x, Rows())
     fit!(s, x', Cols())
-
 
     # Model Series
     x, y = randn(100, 10), randn(100)
@@ -218,8 +218,8 @@ fit!(o::OnlineStat, y) = Series(y, o)
 
 #-----------------------------------------------------------------------# merging
 "See [`merge!`](@ref)"
-Base.merge(s1::Series, s2::Series, w::Float64) = merge!(copy(s1), s2, w)
-Base.merge(s1::Series, s2::Series, m::Symbol = :append) = merge!(copy(s1), s2, m)
+Base.merge(s1::T, s2::T, w::Float64) where {T<:AbstractSeries} = merge!(copy(s1), s2, w)
+Base.merge(s1::T, s2::T, m::Symbol = :append) where {T <: AbstractSeries} = merge!(copy(s1), s2, m)
 
 
 
@@ -255,7 +255,6 @@ function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     end
     s1
 end
-
 function Base.merge!(s1::T, s2::T, w::Float64) where {T <: Series}
     n2 = nobs(s2)
     n2 == 0 && return s1
@@ -265,4 +264,29 @@ function Base.merge!(s1::T, s2::T, w::Float64) where {T <: Series}
     s1
 end
 
-Base.merge!(a::Series, b::Series, arg) = error("Can't merge Series that track different stats")
+# merge AugmentedSeries
+function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: AugmentedSeries}
+    n1 = nobs(s1)
+    n2 = nobs(s2)
+    n2 == 0 && return s1
+    s1.series.n += n2
+    if method == :append
+        merge!.(s1.series.stats, s2.series.stats, n2 / s1.series.n)
+    elseif method == :mean
+        w = (n1 * s1.series.weight(n1) + n2 * s2.weight(n2)) / (n1 + n2)
+        merge!.(s1.series.stats, s2.series.stats, w)
+    elseif method == :singleton
+        merge!.(s1.series.stats, s2.series.stats, s1.series.weight(s1.series.n))
+    else
+        throw(ArgumentError("method must be :append, :mean, or :singleton"))
+    end
+    s1
+end
+function Base.merge!(s1::T, s2::T, w::Float64) where {T <: AugmentedSeries}
+    n2 = nobs(s2)
+    n2 == 0 && return s1
+    0 <= w <= 1 || throw(ArgumentError("weight must be between 0 and 1"))
+    s1.series.n += n2
+    merge!.(s1.series.stats, s2.series.stats, w)
+    s1
+end

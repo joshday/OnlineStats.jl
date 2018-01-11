@@ -108,4 +108,16 @@ end #Series
         fit!(s, data)
         @test coef(stats(s)[1]) ≈ data[1] \ abs.(data[2])
     end
+    @testset "merging" begin 
+        s1 = series(Mean(); transform = abs)
+        s2 = series(Mean(); transform = abs)
+        data1 = randn(100)
+        data2 = randn(100)
+        fit!(s1, data1)
+        fit!(s2, data2)
+
+        merge!(s1, s2)
+        fit!(s2, data1)
+        @test value(s1)[1] ≈ value(s2)[1]
+    end
 end
