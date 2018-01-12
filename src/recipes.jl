@@ -110,11 +110,9 @@ end
 
 #-----------------------------------------------------------------------# Partition 
 @recipe function f(o::Partition, mapfun = value)
-    ymap = mapfun.(o.parts)
+    ymap = map(x -> mapfun(x.stat), o.parts)
     x = map(x -> x.start + x.n/2, o.parts)
     xlab --> "Nobs"
-
-    # xlim --> (o.parts[1].start, o.parts[end].start + o.parts[end].n)
 
     if first(ymap) isa ScalarOb
             label --> name(o.parts[1].stat, false, false)
@@ -165,24 +163,3 @@ end
 
 to_plot_shape(v::Vector) = v 
 to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]
-
-# #-----------------------------------------------------------------------# Partition{<:CountMap}
-# @recipe function f(o::Partition{CountMap{T}}) where {T}
-#     xlim --> (0, o.parts[end].start + o.parts[end].n)
-#     lvls = T[]
-#     for p in o.parts
-#         for k in keys(p.stat)
-#             k ∉ lvls && push!(lvls, k)
-#         end
-#     end
-#     sort!(lvls)
-#     @series begin 
-#         title --> "Partition of $(length(o.parts)) Parts"
-#         label --> reshape(lvls, (1, length(lvls)))
-#         xlab --> "Nobs"
-#         linewidth --> 0
-#         seriestype --> :bar
-#         bar_width --> nobs.(o.parts)
-#         getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
-#     end
-# end
