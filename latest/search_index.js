@@ -349,7 +349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plotting a Series plots the contained OnlineStats",
     "category": "section",
-    "text": "s = Series(randn(10^6), Hist(25), Hist(-5:5))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )note: Note\nDue to the lightweight nature of RecipesBase, there is occasionally a mix-up of a data series appearing in the wrong subplot.  A workaround is to plot each OnlineStat separately, e.g. plot(plot(o1), plot(o2)) or plot(plot.(stats(my_series))...)."
+    "text": "s = Series(randn(10^6), Hist(25), Hist(-5:5))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -365,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partition Plotting options",
     "category": "section",
-    "text": "o = Partition(Mean())\n\ns = Series(randn(10^6), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )"
+    "text": "o = Partition(Mean())\n\ns = Series(cumsum(randn(10^6)), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )"
 },
 
 {
@@ -373,7 +373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plot a custom function of the OnlineStats (default is value)",
     "category": "section",
-    "text": "plot(o, x -> mean(x) + 100)\n\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
+    "text": "plot(o, x -> [mean(x), mean(x) + 100])\n\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
 },
 
 {
