@@ -37,9 +37,14 @@ function Base.show(io::IO, s::AbstractSeries{N}) where {N}
     end
 end
 
-function series(args...; kw...)
+function series(args::Union{OnlineStat, Weight}...; kw...)
     s = Series(args...)
     length(kw) == 0 ? s : AugmentedSeries(s; kw...)
+end
+function series(y::Data, args::Union{OnlineStat, Weight}...; kw...)
+    s = series(args...; kw...)
+    fit!(s, y)
+    s
 end
 
 

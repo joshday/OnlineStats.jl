@@ -117,9 +117,9 @@ function Base.merge!(o::Part, o2::Part)
     o.n += o2.n
     merge!(o.stat, o2.stat, o2.n / o.n)
 end
-# Base.isless(o::Part, o2::Part) = isless(o.n, o2.n)
+Base.isless(o::Part, o2::Part) = isless(o.n, o2.n)
 
-fit!(o::Part, y::ScalarOb) = (o.n += 1; fit!(o.stat, y, 1 / o.n))
+fit!(o::Part, y) = (o.n += 1; fit!(o.stat, y, 1 / o.n))
 nobs(o::Part) = o.n
 stat(o::Part) = o.stat
 value(o::Part) = value(o.stat)
@@ -132,53 +132,36 @@ function squash!(v::Vector{<:Part})
     end
 end
 
-#-----------------------------------------------------------------------# Partition
-"""
-    Partition(o::OnlineStat, b = 50)
-
-Split a data stream between `b` and `2b` parts, using `o` to summarize each part.  This 
-is useful for visualizing large datasets where it is not feasible to plot every observation 
-and checking for nonstationarity.
-
-# Plotting 
-
-    plot(o::Partition, f::Function = value)
-
-The fallback recipe plots `f(stat)` for every `stat` in the partition.  Special plot recipes
-exist for [`CountMap`](@ref) (stacked bar) and [`Variance`](ref) (mean ± 95% CI).
-
-# Example
-
-    y = randn(1000)
-    o = Partition(Mean())
-    Series(y, o)
-    m = merge(o)  # merge partitions into a single `Mean`
-    value(m) ≈ mean(y)
-
-    using Plots
-    plot(o)
-    plot!(o, x -> value(x) + 1)
-"""
-struct Partition{T} <: AbstractPartition{0}
-    parts::Vector{Part{T}}
-    b::Int
-    empty_stat::T
+function squash_smallest!(v::Vector{<:Part})
+    _, i = findmin(nobs(part) for part in v)
+    n_left = (i == 1) ? typemax(Int) : nobs(v[i - 1])
+    n_right = (i == length(v)) ? typemax(Int) : nobs(v[i + 1])
+    ind = (n_left < n_right) ? i - 1 : i + 1
+    merge!(v[i], v[ind])
+    deleteat!(v, ind)
 end
-function Partition(o::T, b::Int = 100) where {T <: OnlineStat{0}}
-    Partition(Part{T}[], 2b, copy(o))
+
+#-----------------------------------------------------------------------# Partition
+struct Partition{N, O} <: AbstractPartition{N}
+    parts::Vector{Part{O}}
+    b::Int
+    empty_stat::O
+end
+function Partition(o::O, b::Int = 100) where {N, O <: OnlineStat{N}}
+    Partition{N, O}(Part{O}[], 2b, copy(o))
 end
 Base.show(io::IO, o::Partition) = print(io, name(o))
 
 nobs(o::Partition) = length(o.parts) == 0 ? 0 : sum(nobs(part) for part in o.parts)
 
 # fit!
-function pushpart!(o::Partition, y::ScalarOb) 
+function pushpart!(o::Partition, y) 
     p = Part(copy(o.empty_stat), nobs(o) + 1)
     fit!(p, y)
     push!(o.parts, p)
 end
 
-function fit!(o::Partition, y::ScalarOb, γ::Float64)
+function fit!(o::Partition, y, γ::Float64)
     parts = o.parts 
     if length(parts) < 2
         pushpart!(o, y)
@@ -210,14 +193,10 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Partition}
     n = nobs(o)
     o2 = copy(o2)
     map(p -> p.start += n, o2.parts)
-    # make sure o2's parts have same nobs
-    while nobs(o.parts[1]) > nobs(o2.parts[1])
-        squash!(o2.parts)
-    end
-    # then merge 
+    # then merge and squash
     append!(o.parts, o2.parts)
     while length(o.parts) ≥ o.b 
-        squash!(o.parts)
+        squash_smallest!(o.parts)
     end
     o
 end

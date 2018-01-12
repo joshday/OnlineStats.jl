@@ -108,130 +108,81 @@ end
 end
 
 
+#-----------------------------------------------------------------------# Partition 
+@recipe function f(o::Partition, mapfun = value)
+    ymap = mapfun.(o.parts)
+    x = map(x -> x.start + x.n/2, o.parts)
+    xlab --> "Nobs"
 
-# #-----------------------------------------------------------------------# PartLines 
-# struct PartLines
-#     o::Partition 
-# end 
-# @recipe function f(o::PartLines)
-#     color --> :black 
-#     alpha --> .1 
-#     seriestype --> :vline
-#     label --> "Parts ($(length(o.o.parts)))"
-#     xlab --> "Nobs"
-#     grid --> false
-#     linewidth --> .5
-#     # xlim --> (0, o.o.parts[end].start + o.o.parts[end].n)
-#     [p.start for p in o.o.parts]
-# end
-# getx(o::Partition) = [p.start + p.n / 2 for p in o.parts]
+    # xlim --> (o.parts[1].start, o.parts[end].start + o.parts[end].n)
 
-#-----------------------------------------------------------------------# Partition
-getxlim(o::Partition) = (0, o.parts[end].start + o.parts[end].n)
-getxlim(o::IndexedPartition) = (o.parts[1].first, o.parts[end].last)
-
-getx(o::Partition) = vcat(map(x -> [x.start, x.start + x.n, x.start + x.n], o.parts)...)
-getx(o::IndexedPartition) = vcat(map(x -> [x.first, x.last, x.last], o.parts)...)
-
-function gety(o::Partition, mapfun) 
-    repeat(map(x -> mapfun(x.stat), o.parts), inner = 3)
-end
-function gety(o::IndexedPartition, mapfun) 
-    map(x -> mapfun(x.stat), o.parts)
-end
-
-@recipe function f(o::AbstractPartition, mapfun = value; connect=false) 
-    value(o)  # make sure IndexedPartition is sorted
-    xlim --> getxlim(o)
-
-    statname = name(o.parts[1].stat, false, false)
-    labelbase = "$statname ($(length(o.parts)) Parts)"
-
-    # get values
-    ymap = gety(o, mapfun)
-    x = getx(o)
-    
-    if first(ymap) isa ScalarOb 
-        @series begin
-            label --> labelbase 
-            w --> 2 
-            @show x
-                if connect 
-                for i in 3:3:length(x)
-                    ymap[i] = ymap[i - 1]
-                end 
-            end
+    if first(ymap) isa ScalarOb
+            label --> name(o.parts[1].stat, false, false)
+            nvec = nobs.(o.parts)
+            marker_z --> nvec
             x, ymap
+    elseif first(ymap) isa Tuple{VectorOb, VectorOb}
+        realx, y, z = Float64[], Float64[], Float64[]
+        for i in eachindex(ymap)
+            values, counts = ymap[i]
+            for j in eachindex(values)
+                push!(realx, x[i])
+                push!(y, values[j])
+                push!(z, counts[j])
+            end
         end
-    elseif first(ymap) isa Tuple{VectorOb, VectorOb}  # Histogram (values, counts)
-        @series begin
-            values = to_plot_shape(first.(ymap))
-            counts = to_plot_shape(last.(ymap))
-            line_z --> counts 
-            legend --> false
-            colorbar --> true
-            linewidth --> 2
-            # color = :blues
-            x, values
-        end
+        label --> name(o.parts[1].stat, false, false)
+        seriestype --> :scatter 
+        marker_z --> z
+        markerstrokewidth --> 0
+        realx, y
     elseif first(ymap) isa VectorOb 
-        p = length(first(ymap))
-        if p == 2
-            @series begin 
-                y = to_plot_shape(ymap)
-                fillto --> y[:, 2]
-                fillalpha --> .4 
-                label --> labelbase 
-                w --> 0 
-                x, y[:, 1]
-            end 
-        else
-            @series begin
-                w --> 2
-                label --> [labelbase * " $i" for i in 1:p]
-                x, to_plot_shape(ymap)
+        y = to_plot_shape(ymap)
+        label --> name(o.parts[1].stat, false, false)
+        if length(first(ymap)) == 2
+            fillto --> y[:, 2]
+            fillalpha --> .6
+            linewidth --> 0
+            x, y[:, 1]
+        else 
+            x, y
+        end
+    elseif first(ymap) isa Dict 
+        lvls = []
+        for p in o.parts
+            for k in keys(p.stat)
+                k ∉ lvls && push!(lvls, k)
             end
         end
-    end
-end
-
-# get plottable shape from value.(::Partition)
-to_plot_shape(v::Vector) = v 
-
-function to_plot_shape(v::Vector{<:VectorOb}) 
-    lvec = length.(v)
-    if all(lvec == length(v[1]))
-        return [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
-    else
-        n, p = length(v), maximum(lvec)
-        out = fill(NaN, n, p)
-        for i in 1:n 
-            vi = v[i]
-            for j in eachindex(vi)
-                out[i, j] = vi[j]
-            end
-        end
-        return out
-    end
-end
-
-#-----------------------------------------------------------------------# Partition{<:CountMap}
-@recipe function f(o::Partition{CountMap{T}}) where {T}
-    xlim --> (0, o.parts[end].start + o.parts[end].n)
-    lvls = T[]
-    for p in o.parts
-        for k in keys(p.stat)
-            k ∉ lvls && push!(lvls, k)
-        end
-    end
-    sort!(lvls)
-    @series begin 
-        title --> "Partition of $(length(o.parts)) Parts"
+        sort!(lvls)
         label --> reshape(lvls, (1, length(lvls)))
-        xlab --> "Nobs"
         linewidth --> 0
         seriestype --> :bar
         bar_width --> nobs.(o.parts)
-        getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+        x, to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
     end
 end
+
+to_plot_shape(v::Vector) = v 
+to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]
+
+# #-----------------------------------------------------------------------# Partition{<:CountMap}
+# @recipe function f(o::Partition{CountMap{T}}) where {T}
+#     xlim --> (0, o.parts[end].start + o.parts[end].n)
+#     lvls = T[]
+#     for p in o.parts
+#         for k in keys(p.stat)
+#             k ∉ lvls && push!(lvls, k)
+#         end
+#     end
+#     sort!(lvls)
+#     @series begin 
+#         title --> "Partition of $(length(o.parts)) Parts"
+#         label --> reshape(lvls, (1, length(lvls)))
+#         xlab --> "Nobs"
+#         linewidth --> 0
+#         seriestype --> :bar
+#         bar_width --> nobs.(o.parts)
+#         getx(o), to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+#     end
+# end
