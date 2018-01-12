@@ -56,12 +56,13 @@ savefig("partition_mean_ex.png"); nothing # hide
 
 #### Plot a custom function of the `OnlineStat`s (default is `value`)
 
+Plot of mean +/- standard deviation:
+
 ```@example setup
 o = Partition(Variance())
 
 s = Series(y, o)
 
-# μ ± σ
 plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])
 
 savefig("partition_ci.png"); nothing # hide  
