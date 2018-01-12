@@ -357,15 +357,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partitions",
     "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat.  Partition is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  (Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  (Image: )"
 },
 
 {
-    "location": "visualizations.html#Partition-Plotting-options-1",
+    "location": "visualizations.html#Continuous-Data-1",
     "page": "Visualizations",
-    "title": "Partition Plotting options",
+    "title": "Continuous Data",
     "category": "section",
-    "text": "o = Partition(Mean())\n\ns = Series(cumsum(randn(10^6)), o)\n\nplot(o)  \n\nsavefig(\"part1.png\"); nothing # hide  (Image: )"
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s)\nsavefig(\"partition_hist.png\"); nothing # hide(Image: )o = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(s, layout=1)\nsavefig(\"partition_mean_ex.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -373,47 +373,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plot a custom function of the OnlineStats (default is value)",
     "category": "section",
-    "text": "plot(o, x -> [mean(x), mean(x) + 100])\n\nsavefig(\"part4.png\"); nothing # hide  (Image: )"
+    "text": "o = Variance()\n\ns = Series(y, o)\n\n# μ ± σ\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\n\nsavefig(\"partition_ci.png\"); nothing # hide  (Image: )"
 },
 
 {
-    "location": "visualizations.html#Examples-1",
+    "location": "visualizations.html#Categorical-Data-1",
     "page": "Visualizations",
-    "title": "Examples",
+    "title": "Categorical Data",
     "category": "section",
-    "text": ""
-},
-
-{
-    "location": "visualizations.html#Special-Plot-Recipe-for-CountMap-1",
-    "page": "Visualizations",
-    "title": "Special Plot Recipe for CountMap",
-    "category": "section",
-    "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition.png\"); nothing # hide(Image: )"
-},
-
-{
-    "location": "visualizations.html#If-Output-is-two-numbers,-it's-filled-in-(Extrema)-1",
-    "page": "Visualizations",
-    "title": "If Output is two numbers, it's filled in (Extrema)",
-    "category": "section",
-    "text": "y = cumsum(randn(10^6))\n\no = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(plot(o), plot(o2))\nsavefig(\"partition2.png\"); nothing # hide(Image: )"
-},
-
-{
-    "location": "visualizations.html#Special-Plot-Recipe-for-Hist-1",
-    "page": "Visualizations",
-    "title": "Special Plot Recipe for Hist",
-    "category": "section",
-    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s; legend=false, colorbar=true)\nsavefig(\"partition3.png\"); nothing # hide(Image: )"
-},
-
-{
-    "location": "visualizations.html#Plot-a-custom-function-(mean-std)-1",
-    "page": "Visualizations",
-    "title": "Plot a custom function (mean ± std)",
-    "category": "section",
-    "text": "\no = Partition(Variance())\n\ny = randn(10^6) + linspace(0, 1, 10^6)\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\nsavefig(\"partition4.png\"); nothing # hide(Image: )"
+    "text": "using OnlineStats, Plots\n\ny = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o)\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
 },
 
 {
