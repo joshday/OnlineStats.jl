@@ -11,14 +11,14 @@ o2 = Partition(Extrema())
 
 s = Series(y, o, o2)
 
-plot(s, layout=1)</code></pre></div><p><img src="partition_mean_ex.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><pre><code class="language-">o = Variance()
+plot(s, layout=1)</code></pre></div><p><img src="partition_mean_ex.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><div><pre><code class="language-julia">o = Partition(Variance())
 
 s = Series(y, o)
 
 # μ ± σ
 plot(o, x -&gt; [mean(x) - std(x), mean(x), mean(x) + std(x)])
 
-savefig(&quot;partition_ci.png&quot;); nothing # hide  </code></pre><p><img src="partition_ci.png" alt/></p><h4><a class="nav-anchor" id="Categorical-Data-1" href="#Categorical-Data-1">Categorical Data</a></h4><div><pre><code class="language-julia">using OnlineStats, Plots
+savefig(&quot;partition_ci.png&quot;); nothing # hide</code></pre></div><p><img src="partition_ci.png" alt/></p><h4><a class="nav-anchor" id="Categorical-Data-1" href="#Categorical-Data-1">Categorical Data</a></h4><div><pre><code class="language-julia">using OnlineStats, Plots
 
 y = rand([&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 10^6)
 
