@@ -357,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Partitions",
     "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  (Image: )"
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
 },
 
 {
