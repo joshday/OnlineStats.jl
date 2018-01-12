@@ -27,8 +27,6 @@ The [`Partition`](@ref) type summarizes sections of a data stream using any `Onl
 and is therefore extremely useful in visualizing huge datasets, as summaries are plotted
 rather than every single observation.  
 
-![](https://user-images.githubusercontent.com/8075494/34622053-9a69f9b2-f219-11e7-8ed7-f203a47f64f1.gif)
-
 #### Continuous Data
 
 ```@example setup
