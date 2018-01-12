@@ -122,7 +122,7 @@ end
     else
         xlab = "Category"
     end
-    xlab --> xlab
+    xlabel --> xlab
 
     if first(ymap) isa ScalarOb
             label --> name(o.parts[1].stat, false, false)
