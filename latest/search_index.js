@@ -369,22 +369,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "visualizations.html#Connect-lines-for-readability-1",
-    "page": "Visualizations",
-    "title": "Connect lines for readability",
-    "category": "section",
-    "text": "plot(o; connect = true)\n\nsavefig(\"part2.png\"); nothing # hide  (Image: )"
-},
-
-{
-    "location": "visualizations.html#Turn-off-the-vertical-separators-1",
-    "page": "Visualizations",
-    "title": "Turn off the vertical separators",
-    "category": "section",
-    "text": "plot(o; parts = false)\n\nsavefig(\"part3.png\"); nothing # hide  (Image: )"
-},
-
-{
     "location": "visualizations.html#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1",
     "page": "Visualizations",
     "title": "Plot a custom function of the OnlineStats (default is value)",
