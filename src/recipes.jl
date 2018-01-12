@@ -109,17 +109,26 @@ end
 
 
 #-----------------------------------------------------------------------# Partition 
-@recipe function f(o::Partition, mapfun = value)
+@recipe function f(o::AbstractPartition, mapfun = value)
+    value(o)  # Needed to sort IndexedPartition
     ymap = map(x -> mapfun(x.stat), o.parts)
-    x = map(x -> x.start + x.n/2, o.parts)
+    x = midpoints(o)
     nvec = nobs.(o.parts)
-    xlab --> "Nobs"
+    xlab = ""
+    if first(x) isa Number 
+        xlab = "Nobs" 
+    elseif first(x) isa Dates.TimeType
+        xlab = name(first(x), false, false)
+    else
+        xlab = "Category"
+    end
+    xlab --> xlab
 
     if first(ymap) isa ScalarOb
             label --> name(o.parts[1].stat, false, false)
             x, ymap
     elseif first(ymap) isa Tuple{VectorOb, VectorOb}
-        realx, y, z = Float64[], Float64[], Float64[]
+        realx, y, z = [], Float64[], Float64[]
         for i in eachindex(ymap)
             values, counts = ymap[i]
             for j in eachindex(values)
@@ -153,10 +162,12 @@ end
         end
         sort!(lvls)
         label --> reshape(lvls, (1, length(lvls)))
+        ylim --> (0, 1)
         linewidth --> 0
         seriestype --> :bar
-        bar_width --> nobs.(o.parts)
-        x, to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+        # bar_width --> nobs.(o.parts)
+        y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+        x, y
     end
 end
 
@@ -165,6 +176,25 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:le
 
 
 #-----------------------------------------------------------------------# IndexedPartition
-@recipe function f(o::IndexedPartition, mapfun = value)
+# @recipe function f(o::IndexedPartition, mapfun = value)
+#     ymap = map(x -> mapfun(x.stat), o.parts)
+#     x = midpoints(o)
+#     nvec = nobs.(o.parts)
+#     xlab --> "Nobs"
+#     x
+# end
 
+midpoints(o::Partition) = map(x -> x.start + x.n/2, o.parts)
+midpoints(o::IndexedPartition{<:Number}) = map(x -> (x.first + x.last) / 2, o.parts)
+function midpoints(o::IndexedPartition{<:Dates.TimeType}) 
+    map(o.parts) do x 
+        if x.first == x.last 
+            return x.first
+        else
+            (x.first:x.last)[floor(Int, end/2)]
+        end
+    end 
 end
+
+const StringLike = Union{Char, AbstractString, Symbol}
+midpoints(o::IndexedPartition{<:StringLike}) = map(x -> string(x.first), o.parts)

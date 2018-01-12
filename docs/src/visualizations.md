@@ -74,8 +74,6 @@ savefig("partition_ci.png"); nothing # hide
 #### Categorical Data
 
 ```@example setup
-using OnlineStats, Plots
-
 y = rand(["a", "a", "b", "c"], 10^6)
 
 o = Partition(CountMap(String), 75)
@@ -86,3 +84,54 @@ plot(o)
 savefig("partition_countmap.png"); nothing # hide
 ```
 ![](partition_countmap.png)
+
+
+## Indexed Partitions
+
+The `Partition` type can only track the number of observations in the x-axis.  If you wish
+to plot one variable against another, you can use an `IndexedPartition`.  
+
+```@example setup
+x = rand(Date(2000):Date(2020), 10^5)
+y = Dates.year.(x) + randn(10^5)
+
+s = Series([x y], IndexedPartition(Date, Hist(20)))
+
+plot(s)
+savefig("indexpart1.png"); nothing # hide
+```
+![](indexpart1.png)
+
+
+```@example setup
+x = randn(10^5)
+y = x + randn(10^5)
+
+s = Series([x y], IndexedPartition(Float64, Hist(20)))
+
+plot(s, xlab = "X")
+savefig("indexpart2.png"); nothing # hide
+```
+![](indexpart2.png)
+
+```@example setup
+x = rand('a':'z', 10^5)
+y = Float64.(x) + randn(10^5)
+
+s = Series([x y], IndexedPartition(Char, Extrema()))
+
+plot(s)
+savefig("indexpart3.png"); nothing # hide
+```
+![](indexpart3.png)
+
+```@example setup
+x = rand(1:5, 10^5)
+y = rand(1:5, 10^5)
+
+s = Series([x y], IndexedPartition(Int, CountMap(Int)))
+
+plot(s, xlab = "X")
+savefig("indexpart4.png"); nothing # hide
+```
+![](indexpart4.png)

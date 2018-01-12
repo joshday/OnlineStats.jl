@@ -26,6 +26,7 @@ Base.first(o::IndexedPart) = o.first
 Base.last(o::IndexedPart) = o.last
 
 function fit!(o::IndexedPart{T}, x::T, y) where {T}
+    x in o || error("$x isn't between $(o.first) and $(o.last)")
     o.n += 1
     fit!(o.stat, y, 1 / o.n)
 end
@@ -35,9 +36,7 @@ nobs(o::IndexedPart) = o.n
 
 function squash!(v::Vector{<:IndexedPart})
     sort!(v)
-
     diffs = [v[i].last - v[i - 1].first for i in 2:length(v)]
-
     for k in 1:floor(Int, length(v) / 2)
         _, i = findmin(diffs)
         merge!(v[i], v[i+1])
@@ -83,7 +82,7 @@ function fit!(o::IndexedPartition, xy::VectorOb, ::Float64)
     parts = o.parts
     for p in parts 
         if x in p 
-            fit!(p, xy...)
+            fit!(p, x, last(xy))
             addpart = false
         end
     end
