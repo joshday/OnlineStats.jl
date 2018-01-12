@@ -112,12 +112,11 @@ end
 @recipe function f(o::Partition, mapfun = value)
     ymap = map(x -> mapfun(x.stat), o.parts)
     x = map(x -> x.start + x.n/2, o.parts)
+    nvec = nobs.(o.parts)
     xlab --> "Nobs"
 
     if first(ymap) isa ScalarOb
             label --> name(o.parts[1].stat, false, false)
-            nvec = nobs.(o.parts)
-            marker_z --> nvec
             x, ymap
     elseif first(ymap) isa Tuple{VectorOb, VectorOb}
         realx, y, z = Float64[], Float64[], Float64[]
@@ -163,3 +162,9 @@ end
 
 to_plot_shape(v::Vector) = v 
 to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]
+
+
+#-----------------------------------------------------------------------# IndexedPartition
+@recipe function f(o::IndexedPartition, mapfun = value)
+
+end
