@@ -21,9 +21,6 @@ savefig("plot_series.png"); nothing # hide
 ![](plot_series.png)
 
 
-!!! note
-    Due to the lightweight nature of [RecipesBase](https://github.com/JuliaPlots/RecipesBase.jl), there is occasionally a mix-up of a data series appearing in the wrong subplot.  A workaround is to plot each `OnlineStat` separately, e.g. `plot(plot(o1), plot(o2))` or `plot(plot.(stats(my_series))...)`.
-
 ## Partitions
 
 The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`. 
@@ -37,7 +34,7 @@ rather than every single observation.
 ```@example setup
 o = Partition(Mean())
 
-s = Series(randn(10^6), o)
+s = Series(cumsum(randn(10^6)), o)
 
 plot(o)  
 
@@ -49,7 +46,7 @@ savefig("part1.png"); nothing # hide
 #### Plot a custom function of the `OnlineStat`s (default is `value`)
 
 ```@example setup
-plot(o, x -> mean(x) + 100)
+plot(o, x -> [mean(x), mean(x) + 100])
 
 savefig("part4.png"); nothing # hide  
 ```
