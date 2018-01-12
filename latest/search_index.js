@@ -373,7 +373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plot a custom function of the OnlineStats (default is value)",
     "category": "section",
-    "text": "o = Partition(Variance())\n\ns = Series(y, o)\n\n# μ ± σ\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\n\nsavefig(\"partition_ci.png\"); nothing # hide  (Image: )"
+    "text": "Plot of mean +/- standard deviation:o = Partition(Variance())\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])\n\nsavefig(\"partition_ci.png\"); nothing # hide  (Image: )"
 },
 
 {
