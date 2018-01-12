@@ -21,13 +21,14 @@ end
 Base.copy(s::AbstractSeries) = deepcopy(s)
 
 # Optional second line of show method
-describe(s::AbstractSeries) = ""
+details(io::IO, s::AbstractSeries) = nothing
 
 function Base.show(io::IO, s::AbstractSeries{N}) where {N}
-    header = "▦ $(name(s,false,false)){$N}  |  $(getweight(s))  |  nobs = $(nobs(s))"
+    header = "▦ $(name(s,false,false)){$N}"
     print_with_color(:green, io, header)
-    desc = describe(s)
-    desc != "" && print_with_color(:green, io, "\n▦ ", describe(s))
+    print(io, "\n│")
+    print_with_color(:green, io, " $(getweight(s)) | nobs=$(nobs(s))")
+    details(io, s)
     n = length(stats(s))
     i = 0
     for o in stats(s)
@@ -111,36 +112,40 @@ end
 Wrapper around a `Series` so that for new `data`, fitting occurs on `transform(data)`, but 
 only if `filter(data) == true`.
 """
-struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{N}
+mutable struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{N}
     series::S
     filter::F1 
     transform::F2 
     callback::F3
+    nfiltered::Int
 end
 function AugmentedSeries(s::Series{N}; filter=always, transform=identity, callback=identity) where {N}
     S, A, B, C = typeof(s), typeof(filter), typeof(transform), typeof(callback)
-    AugmentedSeries{N, S, A, B, C}(s, filter, transform, callback)
+    AugmentedSeries{N, S, A, B, C}(s, filter, transform, callback, 0)
 end
-
-describe(s::AugmentedSeries) = "filter = $(s.filter)  |  transform = $(s.transform)"
 
 "always returns true"
 always(args...) = true
+
+function details(io::IO, s::AugmentedSeries)
+    s.filter == always || print_with_color(:green, io, " │ filter=$(s.filter) ($(s.nfiltered))")
+    s.transform == identity || print_with_color(:green, io, " │ transform=$(s.transform)")
+end
 
 for f in [:nobs, :value, :stats, :weight, :weight!, :getweight]
     @eval $f(o::AugmentedSeries) = $f(o.series)
 end
 
 function fit!(s::AugmentedSeries{0}, y::ScalarOb) 
-    s.filter(y) && fit!(s.series, s.transform(y))
+    s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nfiltered += 1)
     s 
 end
 function fit!(s::AugmentedSeries{1}, y::VectorOb) 
-    s.filter(y) && fit!(s.series, s.transform(y))
+    s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nfiltered += 1)
     s
 end
 function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
-    s.filter(xy) && fit!(s.series, s.transform(xy))
+    s.filter(xy) ? fit!(s.series, s.transform(xy)) : (s.nfiltered += 1)
     s
 end
 
