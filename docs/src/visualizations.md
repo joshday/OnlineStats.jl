@@ -59,7 +59,7 @@ savefig("partition_mean_ex.png"); nothing # hide
 #### Plot a custom function of the `OnlineStat`s (default is `value`)
 
 ```@example setup
-o = Variance()
+o = Partition(Variance())
 
 s = Series(y, o)
 
