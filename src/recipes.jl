@@ -165,7 +165,9 @@ end
         ylim --> (0, 1)
         linewidth --> 0
         seriestype --> :bar
-        # bar_width --> nobs.(o.parts)
+        if o isa Partition
+            bar_width --> nobs.(o.parts)
+        end
         y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
         x, y
     end
