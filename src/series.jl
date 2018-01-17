@@ -172,7 +172,7 @@ Update a Series with more `data`.
     s = Series(LinReg(10))
     fit!(s, (x, y))
 """
-function fit!(s::AbstractSeries{0}, y::AbstractArray)
+function fit!(s::AbstractSeries{0}, y::VectorOb)
     for yi in y 
         fit!(s, yi)
     end
