@@ -1,8 +1,6 @@
 abstract type AbstractPartition{N} <: OnlineStat{N} end
 default_weight(::AbstractPartition) = EqualWeight()
 
-const Mosaic(T1, T2) = IndexedPart(T1, CountMap(t2))
-
 #-----------------------------------------------------------------------# IndexedPart
 mutable struct IndexedPart{T, O}
     stat::O

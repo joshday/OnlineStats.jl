@@ -159,6 +159,9 @@ end
         if o isa Partition
             bar_width --> nobs.(o.parts)
         end
+        if typeof(o.parts[1].stat) <: Mosaic
+            info("hi")
+        end
         y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
         x, y
     end

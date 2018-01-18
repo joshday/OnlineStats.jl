@@ -107,7 +107,7 @@ y = x + randn(10^5)
 
 s = Series([x y], IndexedPartition(Float64, Hist(20)))
 
-plot(s, xlab = "X")
+plot(s, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
 ```
 ![](indexpart2.png)
