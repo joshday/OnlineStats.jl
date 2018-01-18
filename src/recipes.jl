@@ -114,15 +114,6 @@ end
     ymap = map(x -> mapfun(x.stat), o.parts)
     x = midpoints(o)
     nvec = nobs.(o.parts)
-    xlab = ""
-    if first(x) isa Number 
-        xlab = "Nobs" 
-    elseif first(x) isa Dates.TimeType
-        xlab = name(first(x), false, false)
-    else
-        xlab = "Category"
-    end
-    xlabel --> xlab
 
     if first(ymap) isa ScalarOb
             label --> name(o.parts[1].stat, false, false)

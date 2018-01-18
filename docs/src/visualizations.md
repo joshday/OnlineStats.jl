@@ -36,7 +36,7 @@ o = Partition(Hist(50))
 
 s = Series(y, o)
 
-plot(s)
+plot(s, xlab = "Nobs")
 savefig("partition_hist.png"); nothing # hide
 ```
 ![](partition_hist.png)
@@ -48,7 +48,7 @@ o2 = Partition(Extrema())
 
 s = Series(y, o, o2)
 
-plot(s, layout=1)
+plot(s, layout = 1, xlab = "Nobs")
 savefig("partition_mean_ex.png"); nothing # hide
 ```
 ![](partition_mean_ex.png)
@@ -63,8 +63,7 @@ o = Partition(Variance())
 
 s = Series(y, o)
 
-plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)])
-
+plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = "Nobs")
 savefig("partition_ci.png"); nothing # hide  
 ```
 ![](partition_ci.png)
@@ -79,7 +78,7 @@ o = Partition(CountMap(String), 75)
 
 s = Series(y, o)
 
-plot(o)
+plot(o, xlab = "Nobs")
 savefig("partition_countmap.png"); nothing # hide
 ```
 ![](partition_countmap.png)
@@ -96,7 +95,7 @@ y = Dates.year.(x) + randn(10^5)
 
 s = Series([x y], IndexedPartition(Date, Hist(20)))
 
-plot(s)
+plot(s, xlab = "Date")
 savefig("indexpart1.png"); nothing # hide
 ```
 ![](indexpart1.png)
@@ -119,7 +118,7 @@ y = Float64.(x) + randn(10^5)
 
 s = Series([x y], IndexedPartition(Char, Extrema()))
 
-plot(s)
+plot(s, xlab = "Category")
 savefig("indexpart3.png"); nothing # hide
 ```
 ![](indexpart3.png)
@@ -130,7 +129,7 @@ y = rand(1:5, 10^5)
 
 s = Series([x y], IndexedPartition(Int, CountMap(Int)))
 
-plot(s, xlab = "X")
+plot(s, bar_width = 1, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide
 ```
 ![](indexpart4.png)
