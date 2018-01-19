@@ -737,6 +737,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Partition",
+    "page": "API",
+    "title": "OnlineStats.Partition",
+    "category": "Type",
+    "text": "Partition(o::OnlineStat, b::Int)\n\nIncrementally partition a data stream where between b and 2b sections are summarized  by o. \n\nExample\n\nusing Plots\ns = Series(cumsum(randn(10^6)), Partition(Mean()))\nplot(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Quantile",
     "page": "API",
     "title": "OnlineStats.Quantile",
