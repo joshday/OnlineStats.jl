@@ -32,6 +32,8 @@ for o = [
     println(o)
 end
 
-Series(randn(2), CallFun(Mean(), x -> println("this should print twice")))
+o = CallFun(Mean(), x -> println("this should print twice"))
+Series(ones(2), o)
+@test value(o) == 1.0
 
 println("\n\n")

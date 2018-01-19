@@ -34,6 +34,7 @@ x2 = randn(100, 5)
 #-----------------------------------------------------------------------# test files
 include("test_show.jl")
 include("test_series.jl")
+include("test_stats.jl")
 
 #-----------------------------------------------------------------------# merge stats
 @testset "test_merge 0" begin 
@@ -89,6 +90,7 @@ end
     end
     @test value(s)[1] ≈ x\y
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
+    @test_throws Exception OnlineStats._nobs((randn(100,5), randn(3)), Cols())
 end
 
 #-----------------------------------------------------------------------# Group 
@@ -140,16 +142,6 @@ end
     s1, s2 = Series(y1, o1), Series(y2, o2)
     merge!(s1, s2)
     @test value(merge(o1)) ≈ mean(vcat(y1, y2))
-end
-
-#-----------------------------------------------------------------------# Count 
-@testset "Count" begin 
-    for n in rand(10:50, 20)
-        o = Count()
-        s = Series(rand(n), o)
-        @test value(o) == nobs(s)
-    end
-    test_merge(Count(), Count(), rand(100), rand(100))
 end
 
 #-----------------------------------------------------------------------# CountMap
