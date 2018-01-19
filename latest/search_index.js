@@ -617,14 +617,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.IndexedPartition",
-    "page": "API",
-    "title": "OnlineStats.IndexedPartition",
-    "category": "Type",
-    "text": "IndexedPartition(T, o::OnlineStat{0}, b::Int = 100)\n\nPartition a data stream between b and 2b parts.  The input must have length 2 and is  assumed to be an (x, y) pair.  The \n\nExample\n\nx = rand(Bool, 100)\ny = x .+ randn(100)\n\no = IndexedPartition(Bool, Mean())\ns = Series(Any[x y], o)\no.parts \nvalue(o)\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.KMeans",
     "page": "API",
     "title": "OnlineStats.KMeans",
@@ -870,14 +862,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.OMAS2",
     "category": "Type",
     "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Part",
-    "page": "API",
-    "title": "OnlineStats.Part",
-    "category": "Type",
-    "text": "Part(o::OnlineStat, start::Int)\n\nSummary for a section of data.  o is an unfitted OnlineStat to be fitted on observations  beginning with observation start.\n\n\n\n"
 },
 
 {
