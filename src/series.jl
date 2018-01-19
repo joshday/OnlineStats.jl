@@ -7,16 +7,11 @@ nobs(s::AbstractSeries) = s.n
 value(s::AbstractSeries) = value.(stats(s))
 
 getweight(s::AbstractSeries) = s.weight
-weight(s::AbstractSeries) = s.weight(s.n)
 weight!(s::AbstractSeries) = s.weight(s.n += 1)
 
 function Base.:(==)(o1::AbstractSeries, o2::AbstractSeries)
     nms = fieldnames(o1)
     all(getfield.(o1, nms) .== getfield.(o2, nms))
-end
-function Base.:(≈)(o1::AbstractSeries, o2::AbstractSeries)
-    nms = fieldnames(o1)
-    all(getfield.(o1, nms) .≈ getfield.(o2, nms))
 end
 Base.copy(s::AbstractSeries) = deepcopy(s)
 

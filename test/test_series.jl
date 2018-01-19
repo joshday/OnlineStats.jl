@@ -84,6 +84,8 @@ end #Series
 
 #-----------------------------------------------------------------------# AugmentedSeries
 @testset "AugmentedSeries" begin 
+    data = randn(100)
+    @test value(series(data, Mean(), transform=abs))[1] ≈ mean(abs, data)
     @testset "Sanity Check" begin
         # N = 0
         s = series(Mean(), Variance(); transform = abs)

@@ -26,7 +26,8 @@ for o = [
         2Mean(),
         25Mean(),
         Series(Mean()),
-        Series(Mean(), Variance())
+        Series(Mean(), Variance()),
+        series(Mean(), transform = abs)
     ]
     println(o)
 end
