@@ -1,3 +1,65 @@
+#-----------------------------------------------------------------------# Description
+# x1 => IndexedPartition(LabelType, SummaryType1)
+# x2 => IndxedPartition(LabelType, SummaryType2)
+# ...
+
+struct Node{C, T} <: ExactStat{(1, 0)}
+    summary::T
+    left::C
+    right::C
+end
+function Node(T::Type, summaries::OnlineStat{0}...; left=nothing, right=nothing)
+    Node(IndexedPartition.(T, summaries), left, right)
+end
+function Base.show(io::IO, o::Node{C, T}) where {C, T}
+    print(io, name(o, false, false), "($(index_type(o.summary[1])) label, ", length(o.summary), " summaries)")
+end
+function fit!(o::Node, xy::XyOb, γ::Float64)
+    x, label = xy
+    for i in eachindex(o.summary)
+        fit!(o.summary[i], (label, x[i]), γ)
+    end
+end
+
+
+struct BTree{T}
+    dict
+    left::T
+    right::T
+end
+function fit!(o::BTree, x, y)
+    if haskey(o.dict, y)
+        o.dict[y]
+    end
+end
+
+find_node(o::BTree{Void}) = o 
+function find_node(o::BTree, x::VectorOb)
+    goleft ? find_node(o.left, x) : find_node(o.right, x)
+end
+
+
+
+
+mutable struct VFDT{T} <: ExactStat{(1, 0)}
+    stat_schema::T
+    root::BTree
+end
+function VFDT(stat_schema)
+    VFDT(stat_schema, BTree(Dict(), nothing, nothing))
+end
+Base.show(io::IO, o::VFDT) = print(io, "VFDT: $(name.(o.stat_schema, false, false))")
+function fit!(o::VFDT, xy::XyOb, γ::Float64)
+    x, y = xy
+    node = find_node(o.root, x)
+end
+
+
+
+
+
+
+#-----------------------------------------------------------------------# OLD
 # Review paper:
 # https://people.cs.umass.edu/~utgoff/papers/mlj-id5r.pdf
 
