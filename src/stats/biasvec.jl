@@ -13,7 +13,7 @@ struct BiasVec{T, A <: VectorOb} <: AbstractVector{T}
 end
 # typeof(x[1]) instead of eltype -> allow tuples
 function BiasVec(x, bias = 1.0) 
-    T = typeof(x[1])
+    T = typeof(first(x))
     BiasVec(x, T(bias))
 end
 
