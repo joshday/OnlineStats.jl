@@ -79,6 +79,20 @@ end
     s2 = Series(y2, Mean())
     merge!(s1, s2)
     @test value(stats(s1)[1]) ≈ mean(vcat(y, y2))
+
+    s1 = Series([1], Mean())
+    s2 = Series([2], Mean())
+    merge!(s1, s2, .9)
+    @test value(s1)[1] ≈ .1*1 + .9*2
+end
+@testset "Non-standard things" begin 
+    s = Series(Mean())
+    s([1,2,3])
+    @test value(s)[1] ≈ 2
+
+    o = Mean()
+    fit!(o, y)
+    @test value(o) ≈ mean(y)
 end
 end #Series
 
