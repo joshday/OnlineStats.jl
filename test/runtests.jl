@@ -22,7 +22,7 @@ end
 # test: fo(o) == fy(y)
 function test_exact(o, y, fo, fy, compare = ≈)
     s = Series(y, o)
-    all(compare.(fo(o), fy(y)))
+    @test all(compare.(fo(o), fy(y)))
 end
 
 
@@ -38,6 +38,13 @@ include("test_series.jl")
 include("test_stats.jl")
 
 #-----------------------------------------------------------------------# other
+@testset "BiasVec" begin 
+    v = rand(5)
+    b = OnlineStats.BiasVec(v, 1.0)
+    @test length(b) == 6 
+    @test b == vcat(v, 1.0)
+    @test size(b) == (6,)
+end
 
 # #-----------------------------------------------------------------------# mapblocks
 # @testset "mapblocks" begin 
@@ -69,13 +76,7 @@ include("test_stats.jl")
 # end
 
 # #-----------------------------------------------------------------------# BiasVec
-# @testset "BiasVec" begin 
-#     v = rand(5)
-#     b = OnlineStats.BiasVec(v, 1.0)
-#     @test length(b) == 6 
-#     @test b == vcat(v, 1.0)
-#     @test size(b) == (6,)
-# end
+
 
 # #-----------------------------------------------------------------------# Group 
 # @testset "Group" begin 
@@ -259,17 +260,7 @@ include("test_stats.jl")
 #         @test yi in y 
 #     end
 # end
-# @testset "Bootstrap" begin 
-#     o = Bootstrap(Mean(), 100, [1])
-#     Series(y, o)
-#     for ybar in value(o)
-#         @test ybar == value(o.o)
-#     end
-#     @test length(confint(o)) == 2
-#     o.replicates[1].μ = NaN
-#     @test isnan(confint(o)[1])
-#     @test isnan(confint(o)[2])
-# end
+
 # @testset "KMeans" begin 
 #     o = KMeans(5, 4)
 #     Series(randn(100, 5), o)

@@ -7,6 +7,15 @@ info("Testing Stats:")
     test_exact(AutoCov(10), y, autocor, x -> autocor(x, 0:10))
     test_exact(AutoCov(10), y, nobs, length)
 end
+#-----------------------------------------------------------------------# Bootstrap 
+@testset "Bootstrap" begin 
+    o = Bootstrap(Mean(), 100, [1])
+    Series(y, o)
+    for ybar in value(o)
+        @test ybar == value(o.o)
+    end
+    @test length(confint(o)) == 2
+end
 #-----------------------------------------------------------------------# Count 
 @testset "Count" begin 
     test_exact(Count(), randn(100), value, length)
@@ -22,9 +31,9 @@ end
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin 
-    test_exact(CovMatrix(5), x, var, x -> var(x, 1))
-    test_exact(CovMatrix(5), x, std, x -> std(x, 1))
-    test_exact(CovMatrix(5), x, mean, x -> mean(x, 1))
+    test_exact(CovMatrix(5), x, var, x -> vec(var(x, 1)))
+    test_exact(CovMatrix(5), x, std, x -> vec(std(x, 1)))
+    test_exact(CovMatrix(5), x, mean, x -> vec(mean(x, 1)))
     test_exact(CovMatrix(5), x, cor, cor)
     test_exact(CovMatrix(5), x, cov, cov)
     test_exact(CovMatrix(5), x, o->cov(o;corrected=false), x->cov(x,1,false))
@@ -105,6 +114,35 @@ end
         test_merge(FitMvNormal(3), randn(10,3), randn(10,3))
     end
 end
+#-----------------------------------------------------------------------# Group 
+@testset "Group" begin 
+    o = [Mean() Mean() Mean() Variance() Variance()]
+    test_exact(o, x, value, x -> vcat(mean(x,1)[1:3], var(x,1)[4:5]))
+    test_merge([Mean() Variance() Sum() Moments() Mean()], x, x2)
+end
+#-----------------------------------------------------------------------# Hist 
+@testset "Hist" begin
+    test_exact(Hist(-5:5), y, o -> value(o)[2], y -> fit(Histogram, y, -5:5, closed=:left).weights)
+    test_exact(Hist(-5:.1:5), y, extrema, extrema, (a,b)->≈(a,b;atol=.2))
+    test_exact(Hist(-5:.1:5), y, mean, mean, (a,b)->≈(a,b;atol=.2))
+    test_exact(Hist(-5:.1:5), y, var, var, (a,b)->≈(a,b;atol=.2))
+    test_merge(Hist(-5:.1:5), y, y2)
+
+    test_exact(Hist(100), y, mean, mean)
+    test_exact(Hist(100), y, var, var)
+    test_exact(Hist(100), y, extrema, extrema, ==)
+    test_merge(Hist(200), y, y2)
+end
+#-----------------------------------------------------------------------# LinReg 
+@testset "LinReg" begin 
+    test_exact(LinReg(5), (x,y), coef, xy -> xy[1]\xy[2])
+    test_merge(LinReg(5), (x,y), (x2,y2))
+end
+#-----------------------------------------------------------------------# LinRegBuilder 
+@testset "LinRegBuilder" begin 
+    test_exact(LinRegBuilder(6), [x y], o -> coef(o;bias=false,y=6), f -> x\y)
+    test_merge(LinRegBuilder(5), x, x2)
+end
 #-----------------------------------------------------------------------# Mean 
 @testset "Mean" begin 
     test_exact(Mean(), y, mean, mean)
@@ -122,9 +160,11 @@ end
 end
 #-----------------------------------------------------------------------# MV 
 @testset "MV" begin 
-    test_exact(5Mean(), x, value, x->mean(x,1))
+    o = MV(5, Mean())
+    @test length(o) == 5
+    test_exact(5Mean(), x, value, x->vec(mean(x,1)))
     test_merge(5Mean(), x, x2)
-    test_exact(5Variance(), x, value, x->var(x,1))
+    test_exact(5Variance(), x, value, x->vec(var(x,1)))
     test_merge(5Variance(), x, x2)
 end
 #-----------------------------------------------------------------------# Quantile
