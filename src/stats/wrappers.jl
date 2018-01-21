@@ -36,7 +36,7 @@ a replicate will be updated `rand(d)` times.
     Series(randn(1000), o)
     confint(o)
 """
-struct Bootstrap{O <: OnlineStat, D} <: Wrapped{0}
+struct Bootstrap{O <: OnlineStat, D} <: WrappedStat{0}
     stat::O 
     replicates::Vector{O}
     rand_object::D
@@ -51,7 +51,7 @@ Base.show(io::IO, b::Bootstrap) = print(io, "Bootstrap($(length(b.replicates))):
 Return a confidence interval for a Bootstrap `b`.
 """
 function confint(b::Bootstrap, coverageprob = 0.95)
-    states = value(b)
+    states = value.(b.replicates)
     α = 1 - coverageprob
     return (quantile(states, α / 2), quantile(states, 1 - α / 2))
 end

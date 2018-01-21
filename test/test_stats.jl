@@ -11,9 +11,7 @@ end
 @testset "Bootstrap" begin 
     o = Bootstrap(Mean(), 100, [1])
     Series(y, o)
-    for ybar in value(o)
-        @test ybar == value(o.o)
-    end
+    @test all(value.(o.replicates) .== value(o))
     @test length(confint(o)) == 2
 end
 #-----------------------------------------------------------------------# Count 
@@ -38,6 +36,10 @@ end
     test_exact(CovMatrix(5), x, cov, cov)
     test_exact(CovMatrix(5), x, o->cov(o;corrected=false), x->cov(x,1,false))
     test_merge(CovMatrix(5), x, x2)
+end
+#-----------------------------------------------------------------------# CStat 
+@testset "CStat" begin 
+    test_merge(CStat(Mean()), y, y2)
 end
 #-----------------------------------------------------------------------# Extrema
 @testset "Extrema" begin 
@@ -132,6 +134,7 @@ end
     test_exact(Hist(100), y, var, var)
     test_exact(Hist(100), y, extrema, extrema, ==)
     test_merge(Hist(200), y, y2)
+    test_merge(Hist(1), y, y2)
 end
 #-----------------------------------------------------------------------# LinReg 
 @testset "LinReg" begin 
