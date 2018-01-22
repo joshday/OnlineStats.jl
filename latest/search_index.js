@@ -825,7 +825,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.AbstractSeries{0},Union{AbstractArray{T,1} where T, NamedTuples.NamedTuple, Tuple}}",
+    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,T,W} where W where T<:Tuple,Union{AbstractArray{T,1} where T, NamedTuples.NamedTuple, Tuple}}",
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Method",
