@@ -84,7 +84,7 @@ function fit!(o::Hist{<:KnownBins}, y::Real, γ::Float64)
     end
 end
 _midpoints(r) = r[1:length(r) - 1] + 0.5 * step(r)
-function Base.merge!(o::Hist{T}, o2::Hist{T}, γ::Float64) where {T <: KnownBins}
+function Base.merge!(o::Hist{<:KnownBins}, o2::Hist{<:KnownBins}, γ::Float64)
     if o.method.edges == o2.method.edges 
         o.method.counts .+= o2.method.counts
     else

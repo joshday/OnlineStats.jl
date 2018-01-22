@@ -148,7 +148,7 @@ end
     test_exact(Hist(-5:.1:5), y, var, var, (a,b)->≈(a,b;atol=.2))
     test_merge(Hist(-5:.1:5), y, y2)
     # merge with different edges
-    o, o2 = Hist(-6:.1:6), Hist(-6:.01:6)
+    o, o2 = Hist(-6:6), Hist(-6:.1:6)
     Series(y, o, o2)
     c = copy(value(o)[2])
     merge!(o, o2, .5)
@@ -221,6 +221,16 @@ end
     test_merge(5Mean(), x, x2)
     test_exact(5Variance(), x, value, x->vec(var(x,1)))
     test_merge(5Variance(), x, x2)
+end
+#-----------------------------------------------------------------------# NBClassifier
+@testset "NBClassifier" begin 
+    n, p = 10000, 5
+    X = randn(n, p)
+    Y = X * linspace(-1, 1, p) .> 0
+    o = NBClassifier(p, Bool, 100)
+    Series((X, Y), o)
+    @test predict(o, [0,0,0,0,1])[2] > .5
+    @test classify(o, [0,0,0,0,1])
 end
 #-----------------------------------------------------------------------# OrderStats 
 @testset "OrderStats" begin 
