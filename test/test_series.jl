@@ -1,3 +1,6 @@
+println()
+println()
+info("Testing Series")
 #-----------------------------------------------------------------------# Series
 @testset "Series" begin 
 @testset "Constructors" begin
@@ -71,7 +74,6 @@ end
     s2 = Series(vcat(y,y2), Mean())
     @test value(s1)[1] ≈ value(s2)[1]
     @test_throws Exception merge(Series(y, Mean()), Series(y, Mean()), 100.0)
-    merge(s1, s2, :mean)
     merge(s1, s2, :singleton)
     @test_throws Exception merge(s1, s2, :fakemethod)
 
@@ -84,10 +86,16 @@ end
     s2 = Series([2], Mean())
     merge!(s1, s2, .9)
     @test value(s1)[1] ≈ .1*1 + .9*2
+
+    s1 = Series(y, Mean())
+    s2 = Series(y2, Mean())
+    merge!(s1, s2, :singleton)
+    @test value(s1)[1] ≈ mean(vcat(y, mean(y2)))
 end
 @testset "Non-standard things" begin 
     s = Series(Mean())
     s([1,2,3])
+    s(s, [1,2,3])
     @test value(s)[1] ≈ 2
 
     o = Mean()
@@ -124,15 +132,22 @@ end #Series
         @test coef(stats(s)[1]) ≈ data[1] \ abs.(data[2])
     end
     @testset "merging" begin 
-        s1 = series(Mean(); transform = abs)
-        s2 = series(Mean(); transform = abs)
-        data1 = randn(100)
-        data2 = randn(100)
-        fit!(s1, data1)
-        fit!(s2, data2)
+        # test 1
+        o, o2 = merge_vs_fit(Mean(), y, y2, transform = abs)
+        @test value(o) ≈ mean(abs, vcat(y, y2))
+        @test value(o2) ≈ mean(abs, vcat(y, y2))
 
-        merge!(s1, s2)
-        fit!(s2, data1)
+        # test 2
+        s1, s2 = series(y, Mean(); transform = abs), series(y2, Mean(); transform = abs)
+        merge!(s1, s2, .5)
+        fit!(s2, y)
         @test value(s1)[1] ≈ value(s2)[1]
+        @test_throws Exception merge!(s1, s2, :fake_method)
+
+        # test 3
+        s1, s2 = series(y, Mean(); transform = abs), series(y2, Mean(); transform = abs)
+        merge!(s1, s2, :singleton)
+        @test value(s1)[1] ≈ mean(abs, vcat(y, mean(abs, y2)))
+
     end
 end

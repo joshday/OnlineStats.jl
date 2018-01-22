@@ -256,13 +256,10 @@ function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Series}
     s1.n += n2
     if method == :append
         merge!.(s1.stats, s2.stats, n2 / s1.n)
-    elseif method == :mean
-        w = (n1 * s1.weight(n1) + n2 * s2.weight(n2)) / (n1 + n2)
-        merge!.(s1.stats, s2.stats, w)
     elseif method == :singleton
-        merge!.(s1.stats, s2.stats, s1.weight(s1.n))
+        merge!.(s1.stats, s2.stats, s1.weight(n1 + 1))
     else
-        throw(ArgumentError("method must be :append, :mean, or :singleton"))
+        throw(ArgumentError("method must be :append or :singleton"))
     end
     s1
 end
@@ -283,13 +280,10 @@ function Base.merge!(s1::T, s2::T, method::Symbol = :append) where {T <: Augment
     s1.series.n += n2
     if method == :append
         merge!.(s1.series.stats, s2.series.stats, n2 / s1.series.n)
-    elseif method == :mean
-        w = (n1 * s1.series.weight(n1) + n2 * s2.weight(n2)) / (n1 + n2)
-        merge!.(s1.series.stats, s2.series.stats, w)
     elseif method == :singleton
-        merge!.(s1.series.stats, s2.series.stats, s1.series.weight(s1.series.n))
+        merge!.(s1.series.stats, s2.series.stats, s1.series.weight(n1 + 1))
     else
-        throw(ArgumentError("method must be :append, :mean, or :singleton"))
+        throw(ArgumentError("method must be :append or :singleton"))
     end
     s1
 end

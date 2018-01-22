@@ -1,16 +1,17 @@
 module OnlineStatsTest
 
 using OnlineStats, Base.Test
+import OnlineStatsBase
 using StatsBase
 
 #-----------------------------------------------------------------------# helpers
-function merge_vs_fit(o, y1, y2)
-    s1 = Series(y1, o)
-    s2 = Series(y2, copy(o))
+function merge_vs_fit(o, y1, y2; kw...)
+    s1 = series(y1, o; kw...)
+    s2 = series(y2, copy(o); kw...)
     merge!(s1, s2)
     fit!(s2, y1)
     @test nobs(s1) == nobs(s2)
-    s1.stats[1], s2.stats[1]
+    first(stats(s1)), first(stats(s2))
 end
 
 # test: merge is same as fit!
@@ -37,6 +38,19 @@ include("test_show.jl")
 include("test_series.jl")
 include("test_stats.jl")
 
+println()
+println()
+info("Testing Everything else")
+#-----------------------------------------------------------------------# OnlineStatsBase 
+mutable struct Counter <: OnlineStatsBase.ExactStat{0}
+    value::Int
+    Counter() = new(0)
+end
+OnlineStatsBase._fit!(o::Counter, y::Real, w::Float64) = (o.value += 1)
+@testset "OnlineStatsBase" begin 
+    test_exact(Counter(), y, value, length)
+end
+
 #-----------------------------------------------------------------------# other
 @testset "BiasVec" begin 
     v = rand(5)
@@ -46,34 +60,33 @@ include("test_stats.jl")
     @test size(b) == (6,)
 end
 
-# #-----------------------------------------------------------------------# mapblocks
-# @testset "mapblocks" begin 
-#     x = randn(10, 5)
-#     o = CovMatrix(5)
-#     s = Series(o)
-#     mapblocks(3, x, Rows()) do xi
-#         fit!(s, xi)
-#     end
-#     i = 0
-#     mapblocks(2, x, Cols()) do xi 
-#         i += 1
-#     end
-#     @test i == 3
-#     @test cov(o) ≈ cov(x)
-#     i = 0
-#     mapblocks(3, rand(5)) do xi
-#         i += 1
-#     end
-#     @test i == 2
-#     s = Series(LinReg(5))
-#     x, y = randn(100, 5), randn(100)
-#     mapblocks(11, (x, y)) do xy
-#         fit!(s, xy)
-#     end
-#     @test value(s)[1] ≈ x\y
-#     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
-#     @test_throws Exception OnlineStats._nobs((randn(100,5), randn(3)), Cols())
-# end
+#-----------------------------------------------------------------------# mapblocks
+@testset "mapblocks" begin 
+    x = randn(10, 5)
+    o = CovMatrix(5)
+    s = Series(o)
+    mapblocks(3, x, Rows()) do xi
+        fit!(s, xi)
+    end
+    i = 0
+    mapblocks(2, x, Cols()) do xi 
+        i += 1
+    end
+    @test i == 3
+    @test cov(o) ≈ cov(x)
+    i = 0
+    mapblocks(3, rand(5)) do xi
+        i += 1
+    end
+    @test i == 2
+    s = Series(LinReg(5))
+    mapblocks(11, (x, y)) do xy
+        fit!(s, xy)
+    end
+    @test value(s)[1] ≈ x\y
+    @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
+    @test_throws Exception OnlineStats._nobs((randn(100,5), randn(3)), Cols())
+end
 
 # #-----------------------------------------------------------------------# BiasVec
 
