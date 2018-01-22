@@ -82,7 +82,7 @@ function Series(y::Data, wt::WeightLike, o::OnlineStat{N}...) where {N}
 end
 Series(wt::WeightLike, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 
-function fit!(s::Series{0}, y::ScalarOb)
+function fit!(s::Series{0}, y)
     γ = weight!(s)
     map(x -> fit!(x, y, γ), stats(s))
     s
@@ -93,7 +93,7 @@ function fit!(s::Series{1}, y::VectorOb)
     map(x -> fit!(x, y, γ), stats(s))
     s
 end
-function fit!(s::Series{(1,0)}, xy::Tuple{<:VectorOb, <:ScalarOb})
+function fit!(s::Series{(1,0)}, xy::Tuple{VectorOb, Any})
     γ = weight!(s)
     map(o -> fit!(o, xy, γ), stats(s))
     s
@@ -131,7 +131,7 @@ for f in [:nobs, :value, :stats, :weight, :weight!, :getweight]
     @eval $f(o::AugmentedSeries) = $f(o.series)
 end
 
-function fit!(s::AugmentedSeries{0}, y::ScalarOb) 
+function fit!(s::AugmentedSeries{0}, y) 
     s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nfiltered += 1)
     s 
 end

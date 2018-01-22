@@ -6,7 +6,7 @@ import LearnBase: fit!, value, nobs, predict
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, 
     confint, autocor, autocov, entropy, probs
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
-    ScalarOb, VectorOb, XyOb, Data, default_weight,
+    VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled
 

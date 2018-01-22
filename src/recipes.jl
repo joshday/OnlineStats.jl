@@ -114,11 +114,8 @@ end
     ymap = map(x -> mapfun(x.stat), o.parts)
     x = midpoints(o)
     nvec = nobs.(o.parts)
-
-    if first(ymap) isa ScalarOb
-            label --> name(o.parts[1].stat, false, false)
-            x, ymap
-    elseif first(ymap) isa Tuple{VectorOb, VectorOb}
+      
+    if first(ymap) isa Tuple{VectorOb, VectorOb}
         realx, y, z = [], Float64[], Float64[]
         for i in eachindex(ymap)
             values, counts = ymap[i]
@@ -164,6 +161,9 @@ end
         end
         y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
         x, y
+    else
+        label --> name(o.parts[1].stat, false, false)
+        x, ymap
     end
 end
 

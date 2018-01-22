@@ -753,7 +753,7 @@ function ReservoirSample(k::Integer, ::Type{T} = Float64) where {T<:Number}
     ReservoirSample(zeros(T, k), 0)
 end
 
-function fit!(o::ReservoirSample, y::ScalarOb, γ::Float64)
+function fit!(o::ReservoirSample, y, γ::Float64)
     o.nobs += 1
     if o.nobs <= length(o.value)
         o.value[o.nobs] = y

@@ -123,7 +123,7 @@ value(o::AdaptiveBins) = (first.(o.value), last.(o.value))
 
 nobs(o::AdaptiveBins) = sum(last.(o.value))
 
-fit!(o::Hist{<:AdaptiveBins}, y::ScalarOb, γ::Float64) = fit!(o.method, Pair(y, 1))
+fit!(o::Hist{<:AdaptiveBins}, y::Number, γ::Float64) = fit!(o.method, Pair(y, 1))
 
 function fit!(o::AdaptiveBins{T}, y::Pair{T, Int}) where {T}
     v = o.value
@@ -155,7 +155,7 @@ function Base.merge!(o::Hist{T}, o2::Hist{T}, γ::Float64) where {T <: AdaptiveB
     fit!.(o.method, o2.method.value)
 end
 
-function discretized_pdf(o::Hist{<:AdaptiveBins}, y::ScalarOb)
+function discretized_pdf(o::Hist{<:AdaptiveBins}, y::Number)
     b = o.method
     i = searchsortedfirst(b.value, Pair(y, 0))
     if i > length(b.value)

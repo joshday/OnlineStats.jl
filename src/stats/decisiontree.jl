@@ -93,7 +93,7 @@ end
 #     print(io, o.alg)
 # end
 
-# fit!(o::DecisionTree, xy::Tuple{VectorOb, ScalarOb}, γ::Float64) = fit!(o.alg, xy, γ)
+# fit!(o::DecisionTree, xy::Tuple{VectorOb, Any}, γ::Float64) = fit!(o.alg, xy, γ)
 
 
 # #-----------------------------------------------------------------------# VFDT 
@@ -138,6 +138,6 @@ end
 # hoeffding_bound(R, δ, n) = sqrt(R ^ 2 * -log(δ) / 2n)
 
 # # assume x is a Tuple
-# function fit!(o::VFDT, xy::Tuple{VectorOb, ScalarOb}, γ::Float64)
+# function fit!(o::VFDT, xy::Tuple{VectorOb, Any}, γ::Float64)
 
 # end

@@ -25,7 +25,7 @@ function NBClassifier(p::Integer, T::Type, b::Integer = 20)
 end
 Base.show(io::IO, o::NBClassifier) = print(io, "NBCLassifier with labels: $(keys(o.cat))")
 
-function fit!(o::NBClassifier, xy::Tuple{VectorOb, ScalarOb}, γ::Float64)
+function fit!(o::NBClassifier, xy::Tuple{VectorOb, Any}, γ::Float64)
     x, y = xy
     if !haskey(o, y)
         for j in eachindex(x)

@@ -62,7 +62,7 @@ function fit_replicates!(b::Bootstrap, yi, γ)
         end
     end
 end
-function fit!(b::Bootstrap, y::ScalarOb, γ::Float64)
+function fit!(b::Bootstrap, y, γ::Float64)
     fit!(b.stat, y, γ)
     fit_replicates!(b, y, γ)
     b
