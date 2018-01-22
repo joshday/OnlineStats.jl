@@ -191,6 +191,7 @@ end
     # merge 2
     o, o2 = IndexedPartition(Float64, Mean()), IndexedPartition(Float64, Mean())
     s, s2 = Series([y y2], o), Series([y y2], o2)
+    merge!(s, s2)
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin 
@@ -314,7 +315,7 @@ end
         test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
     end
     for τi in τ
-        test_exact(PQuantile(τi), data, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.2))
+        test_exact(PQuantile(τi), data, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.3))
     end
     @test_throws Exception Quantile(τ, ADAM())
 end
