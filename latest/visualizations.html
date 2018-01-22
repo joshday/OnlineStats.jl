@@ -25,25 +25,22 @@ o = Partition(CountMap(String), 75)
 s = Series(y, o)
 
 plot(o, xlab = &quot;Nobs&quot;)
-savefig(&quot;partition_countmap.png&quot;); nothing # hide</code></pre><p><img src="partition_countmap.png" alt/></p><h2><a class="nav-anchor" id="Indexed-Partitions-1" href="#Indexed-Partitions-1">Indexed Partitions</a></h2><p>The <code>Partition</code> type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an <code>IndexedPartition</code>.  </p><pre><code class="language-">x = rand(Date(2000):Date(2020), 10^5)
+savefig(&quot;partition_countmap.png&quot;); nothing # hide</code></pre><p><img src="partition_countmap.png" alt/></p><h2><a class="nav-anchor" id="Indexed-Partitions-1" href="#Indexed-Partitions-1">Indexed Partitions</a></h2><p>The <code>Partition</code> type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an <code>IndexedPartition</code>.  </p><div><pre><code class="language-julia">x = rand(Date(2000):Date(2020), 10^5)
 y = Dates.year.(x) + randn(10^5)
 
 s = Series([x y], IndexedPartition(Date, Hist(20)))
 
-plot(s, xlab = &quot;Date&quot;)
-savefig(&quot;indexpart1.png&quot;); nothing # hide</code></pre><p><img src="indexpart1.png" alt/></p><pre><code class="language-">x = randn(10^5)
+plot(s, xlab = &quot;Date&quot;)</code></pre></div><p><img src="indexpart1.png" alt/></p><div><pre><code class="language-julia">x = randn(10^5)
 y = x + randn(10^5)
 
 s = Series([x y], IndexedPartition(Float64, Hist(20)))
 
-plot(s, ylab = &quot;Y&quot;, xlab = &quot;X&quot;)
-savefig(&quot;indexpart2.png&quot;); nothing # hide</code></pre><p><img src="indexpart2.png" alt/></p><pre><code class="language-">x = rand(&#39;a&#39;:&#39;z&#39;, 10^5)
+plot(s, ylab = &quot;Y&quot;, xlab = &quot;X&quot;)</code></pre></div><p><img src="indexpart2.png" alt/></p><div><pre><code class="language-julia">x = rand(&#39;a&#39;:&#39;z&#39;, 10^5)
 y = Float64.(x) + randn(10^5)
 
 s = Series([x y], IndexedPartition(Char, Extrema()))
 
-plot(s, xlab = &quot;Category&quot;)
-savefig(&quot;indexpart3.png&quot;); nothing # hide</code></pre><p><img src="indexpart3.png" alt/></p><pre><code class="language-">x = rand(1:5, 10^5)
+plot(s, xlab = &quot;Category&quot;)</code></pre></div><p><img src="indexpart3.png" alt/></p><pre><code class="language-">x = rand(1:5, 10^5)
 y = rand(1:5, 10^5)
 
 s = Series([x y], IndexedPartition(Int, CountMap(Int)))
