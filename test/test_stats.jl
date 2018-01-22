@@ -251,7 +251,7 @@ end
         test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
     end
     for τi in τ
-        test_exact(PQuantile(τi), y, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.2))
+        test_exact(PQuantile(τi), y, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.3))
     end
     @test_throws Exception Quantile(τ, ADAM())
 end
