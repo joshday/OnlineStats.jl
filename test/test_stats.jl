@@ -26,6 +26,9 @@ end
     test_merge(CountMap(Bool), rand(Bool, 100), rand(Bool, 100), ==)
     test_merge(CountMap(Bool), trues(100), falses(100), ==)
     test_merge(CountMap(Int), rand(1:4, 100), rand(5:123, 50), ==)
+    s = Series([1,2,3,4], CountMap(Int))
+    @test all([1,2,3,4] .∈ keys(s.stats[1]))
+    @test probs(s.stats[1]) == fill(.25, 4)
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin 
@@ -39,7 +42,15 @@ end
 end
 #-----------------------------------------------------------------------# CStat 
 @testset "CStat" begin 
+    data = y + y2 * im 
+    data2 = y2 + y * im
+    test_exact(CStat(Mean()), data, o->value(o)[1], x -> mean(y))
     test_merge(CStat(Mean()), y, y2)
+    test_merge(CStat(Mean()), data, data2)
+end
+#-----------------------------------------------------------------------# Diff 
+@testset "Diff" begin 
+    test_exact(Diff(), y, value, y -> y[end] - y[end-1])
 end
 #-----------------------------------------------------------------------# Extrema
 @testset "Extrema" begin 
@@ -136,6 +147,11 @@ end
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
 end
+#-----------------------------------------------------------------------# HyperLogLog 
+@testset "HyperLogLog" begin 
+    test_exact(HyperLogLog(12), y, value, y->length(unique(y)), (a,b) -> ≈(a,b;atol=2))
+    test_merge(HyperLogLog(4), y, y2)
+end
 #-----------------------------------------------------------------------# LinReg 
 @testset "LinReg" begin 
     test_exact(LinReg(5), (x,y), coef, xy -> xy[1]\xy[2])
@@ -170,6 +186,11 @@ end
     test_exact(5Variance(), x, value, x->vec(var(x,1)))
     test_merge(5Variance(), x, x2)
 end
+#-----------------------------------------------------------------------# OrderStats 
+@testset "OrderStats" begin 
+    test_exact(OrderStats(100), y, value, sort)
+    test_merge(OrderStats(10), y, y2, (a,b) -> ≈(a,b;atol=.1))  # Why does this need atol?
+end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 
     data = randn(10_000)
@@ -180,7 +201,6 @@ end
         test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
     end
 end
-
 #-----------------------------------------------------------------------# StatLearn
 @testset "StatLearn" begin
     n, p = 1000, 10

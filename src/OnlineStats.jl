@@ -4,7 +4,7 @@ module OnlineStats
 import SweepOperator
 import LearnBase: fit!, value, nobs, predict
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, 
-    confint, autocor, autocov, entropy
+    confint, autocor, autocov, entropy, probs
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
     ScalarOb, VectorOb, XyOb, Data, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
@@ -16,7 +16,7 @@ using Reexport, RecipesBase
 export
     # functions
     fit!, value, nobs, classify, loss, predict, coef, mapblocks, stats, series, mapblocks,
-    confint, autocov, autocor,
+    confint, autocov, autocor, probs,
     # Series and related types
     Series, AugmentedSeries, OnlineStat, Cols, Rows,
     # Weight

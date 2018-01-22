@@ -76,8 +76,8 @@ Base.show(io::IO, o::CStat) = print(io, "CStat: re = $(o.re_stat), im = $(o.im_s
 value(o::CStat) = value(o.re_stat), value(o.im_stat)
 fit!(o::CStat, y::Real, γ::Float64) = fit!(o.re_stat, real(y), γ)
 function fit!(o::CStat, y::Complex, γ::Float64) 
-    fit!(o.re_stat, y, γ)
-    fit!(o.im_stat, y, γ)
+    fit!(o.re_stat, y.re, γ)
+    fit!(o.im_stat, y.im, γ)
 end
 function Base.merge!(o1::T, o2::T, γ::Float64) where {T<:CStat}
     merge!(o1.re_stat, o2.re_stat, γ)
@@ -140,8 +140,6 @@ function probs(o::CountMap, levels = keys(o))
     end
     out
 end
-
-@deprecate FitCategorical(t::Type) CountMap(t::Type)
 
 #-----------------------------------------------------------------------# CovMatrix
 """
