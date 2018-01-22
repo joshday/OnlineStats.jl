@@ -504,7 +504,7 @@ end
 
 #-----------------------------------------------------------------------# OrderStats
 """
-    OrderStats(b)
+    OrderStats(b::Int, T::Type = Float64)
 
 Average order statistics with batches of size `b`.  Ignores weight.
 
@@ -512,13 +512,13 @@ Average order statistics with batches of size `b`.  Ignores weight.
     s = Series(randn(1000), OrderStats(10))
     value(s)
 """
-mutable struct OrderStats <: ExactStat{0}
-    value::Vector{Float64}
-    buffer::Vector{Float64}
+mutable struct OrderStats{T} <: ExactStat{0}
+    value::Vector{T}
+    buffer::Vector{T}
     i::Int
-    nreps::Int
-    OrderStats(p::Integer) = new(zeros(p), zeros(p), 0, 0)
+    nreps::Int 
 end
+OrderStats(p::Integer, T::Type = Float64) = OrderStats(zeros(T, p), zeros(T, p), 0, 0)
 function fit!(o::OrderStats, y::Real, γ::Float64)
     p = length(o.value)
     buffer = o.buffer

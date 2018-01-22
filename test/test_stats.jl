@@ -270,6 +270,7 @@ end
     test_exact(OrderStats(100), y, value, sort)
     test_exact(OrderStats(100), y, quantile, quantile)
     test_merge(OrderStats(10), y, y2, (a,b) -> ≈(a,b;atol=.1))  # Why does this need atol?
+    test_exact(OrderStats(100, Int), rand(1:10, 100), value, sort)
 end
 #-----------------------------------------------------------------------# Partition 
 @testset "Partition" begin 

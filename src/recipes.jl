@@ -162,7 +162,10 @@ end
 end
 
 midpoint(p::Part{<:Number}) = smooth(first(p), last(p), .5)
-midpoint(p::Part{<:Dates.TimeType}) = (v = first(p):last(p); v[floor(Int, length(v)/2)])
+function midpoint(p::Part{<:Dates.TimeType}) 
+    v = first(p):last(p)
+    length(v) == 1 ? first(v) : v[floor(Int, length(v)/2)]
+end
 function midpoint(p::Part{T}) where {T<:Union{Char, AbstractString, Symbol}}
     string(first(p))
 end
