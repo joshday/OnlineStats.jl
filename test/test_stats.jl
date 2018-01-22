@@ -166,7 +166,7 @@ end
     test_exact(Hist(100), y, extrema, extrema, ==)
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
-    s = Series(y, Hist(20))
+    s = Series(y, Hist(5))
     @test OnlineStats.discretized_pdf(stats(s)[1], 0.0) > .2
     @test OnlineStats.discretized_pdf(o, -10) == 0
     @test OnlineStats.discretized_pdf(o, 10) == 0
@@ -183,6 +183,14 @@ end
     @test value(o) == []
     fit!(o, (1, 1.0))
     @test value(o) == [1.0]
+    # merge 
+    o, o2 = IndexedPartition(Float64, Mean()), IndexedPartition(Float64, Mean())
+    s, s2 = Series([y y2], o), Series([y y2], o2)
+    merge!(s, s2)
+    @test value(merge(o)) ≈ value(merge(o2))
+    # merge 2
+    o, o2 = IndexedPartition(Float64, Mean()), IndexedPartition(Float64, Mean())
+    s, s2 = Series([y y2], o), Series([y y2], o2)
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin 
@@ -239,6 +247,7 @@ end
     test_merge(5Mean(), x, x2)
     test_exact(5Variance(), x, value, x->vec(var(x,1)))
     test_merge(5Variance(), x, x2)
+    @test 4Mean() == 4Mean()
 end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
@@ -249,7 +258,11 @@ end
     Series((X, Y), o)
     @test predict(o, [0,0,0,0,1])[2] > .5
     @test classify(o, [0,0,0,0,1])
-    @test all(classify(o, [zeros(5) zeros(5) zeros(5) rand(5) 1 .+ rand(5)]))
+    X2 = [zeros(5) zeros(5) zeros(5) rand(5) 1 .+ rand(5)]
+    @test all(predict(o, X2)[:, end] .> .5)
+    @test all(classify(o, X2))
+    @test all(predict(o, X2', Cols())[end, :] .> .5)
+    @test all(classify(o, X2', Cols()))
 end
 #-----------------------------------------------------------------------# OrderStats 
 @testset "OrderStats" begin 

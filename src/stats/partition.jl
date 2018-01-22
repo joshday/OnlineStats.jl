@@ -171,3 +171,9 @@ function Base.merge(o::IndexedPartition)
     end
     stat
 end
+
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:IndexedPartition}
+    append!(o.parts, o2.parts)
+    squash_nearest!(o.parts, o.b)
+    o
+end

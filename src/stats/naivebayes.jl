@@ -55,7 +55,8 @@ function predict(o::NBClassifier, x::AbstractVector)
     probs ./ sum(probs)
 end
 
-predict(o::NBClassifier, x::AbstractMatrix) = mapslices(x -> predict(o, x), x, 2)
+predict(o::NBClassifier, x::AbstractMatrix, ::Rows = Rows()) = mapslices(x -> predict(o, x), x, 2)
+predict(o::NBClassifier, x::AbstractMatrix, ::Cols) = mapslices(x -> predict(o, x), x, 1)
 
 function classify(o::NBClassifier, x::AbstractVector)
     probs = predict(o, x)
@@ -63,4 +64,5 @@ function classify(o::NBClassifier, x::AbstractVector)
     return collect(keys(o))[i]
 end
 
-classify(o::NBClassifier, x::AbstractMatrix) = mapslices(x -> classify(o, x), x, 2)
+classify(o::NBClassifier, x::AbstractMatrix, ::Rows = Rows()) = mapslices(x -> classify(o, x), x, 2)
+classify(o::NBClassifier, x::AbstractMatrix, ::Cols) = mapslices(x -> classify(o, x), x, 1)
