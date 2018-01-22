@@ -167,7 +167,14 @@ Update a Series with more `data`.
     s = Series(LinReg(10))
     fit!(s, (x, y))
 """
-function fit!(s::AbstractSeries{0}, y::VectorOb)
+# Separate because fit!(s::AbstractSeries{0}, y::VectorOb) is ambiguous
+function fit!(s::Series{0}, y::VectorOb)
+    for yi in y 
+        fit!(s, yi)
+    end
+    s
+end
+function fit!(s::AugmentedSeries{0}, y::VectorOb)
     for yi in y 
         fit!(s, yi)
     end
