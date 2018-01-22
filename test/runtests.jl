@@ -59,6 +59,7 @@ end
     @test b == vcat(v, 1.0)
     @test size(b) == (6,)
     @test all(OnlineStats.BiasVec(v, 1.0) .== OnlineStats.BiasVec(v, 1))
+    @test all(OnlineStats.BiasVec(v, 1.0) .== OnlineStats.BiasVec(v))
 end
 
 #-----------------------------------------------------------------------# mapblocks
@@ -141,19 +142,6 @@ end
 #     s1, s2 = Series(y1, o1), Series(y2, o2)
 #     merge!(s1, s2)
 #     @test value(merge(o1)) ≈ mean(vcat(y1, y2))
-# end
-
-
-
-# #-----------------------------------------------------------------------# NBClassifier
-# @testset "NBClassifier" begin 
-#     n, p = 10000, 5
-#     x = randn(n, p)
-#     y = x * linspace(-1, 1, p) .> 0
-#     o = NBClassifier(p, Bool, 100)
-#     Series((x,y), o)
-#     # @show predict(o, [0,0,0,0,1])
-#     @test classify(o, [0,0,0,0,1])
 # end
 
 # #-----------------------------------------------------------------------# Lag 

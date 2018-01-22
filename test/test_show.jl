@@ -24,6 +24,7 @@ for o = [
         Bootstrap(Mean()),
         [Mean() Variance()], 
         Partition(Mean(), 5),
+        NBClassifier(5, Int),
         2Mean(),
         25Mean(),
         Series(Mean()),
@@ -32,7 +33,7 @@ for o = [
     ]
     println(o)
 end
-
+coef(LinRegBuilder(5), verbose=true)
 o = CallFun(Mean(), x -> println("this should print twice"))
 Series(ones(2), o)
 @test value(o) == 1.0

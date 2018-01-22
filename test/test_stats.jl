@@ -153,7 +153,9 @@ end
     c = copy(value(o)[2])
     merge!(o, o2, .5)
     @test all(value(o)[2] .== 2c)
-    @test OnlineStats.discretized_pdf(o, 0.0) > .2
+    @test OnlineStats.discretized_pdf(o, 0.0) > .1
+    @test OnlineStats.discretized_pdf(o, -10) == 0
+    @test OnlineStats.discretized_pdf(o, 10) == 0
     #### AdaptiveBins
     test_exact(Hist(100), y, mean, mean)
     test_exact(Hist(100), y, nobs, length)
@@ -166,6 +168,8 @@ end
     test_merge(Hist(1), y, y2)
     s = Series(y, Hist(20))
     @test OnlineStats.discretized_pdf(stats(s)[1], 0.0) > .2
+    @test OnlineStats.discretized_pdf(o, -10) == 0
+    @test OnlineStats.discretized_pdf(o, 10) == 0
 end
 #-----------------------------------------------------------------------# HyperLogLog 
 @testset "HyperLogLog" begin 
@@ -191,7 +195,17 @@ end
 #-----------------------------------------------------------------------# LinReg 
 @testset "LinReg" begin 
     test_exact(LinReg(5), (x,y), coef, xy -> xy[1]\xy[2])
+    test_exact(LinReg(5), (x,y), nobs, xy -> length(xy[2]))
+    βridge = inv(x'x/100 + .1I) * x'y/100
+    test_exact(LinReg(5, .1), (x,y), coef, x -> βridge)
     test_merge(LinReg(5), (x,y), (x2,y2))
+    test_merge(LinReg(5, .1), (x,y), (x2,y2))
+    # predict
+    o = LinReg(5)
+    Series((x,y), o)
+    @test predict(o, x, Rows()) == x * o.β
+    @test predict(o, x', Cols()) ≈ x * o.β
+    @test predict(o, x[1,:]) == x[1,:]' * o.β
 end
 #-----------------------------------------------------------------------# LinRegBuilder 
 @testset "LinRegBuilder" begin 
@@ -231,6 +245,7 @@ end
     Series((X, Y), o)
     @test predict(o, [0,0,0,0,1])[2] > .5
     @test classify(o, [0,0,0,0,1])
+    @test all(classify(o, [zeros(5) zeros(5) zeros(5) rand(5) 1 .+ rand(5)]))
 end
 #-----------------------------------------------------------------------# OrderStats 
 @testset "OrderStats" begin 
@@ -271,7 +286,7 @@ end
         test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
     end
     for τi in τ
-        test_exact(PQuantile(τi), y, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.3))
+        test_exact(PQuantile(τi), data, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.1))
     end
     @test_throws Exception Quantile(τ, ADAM())
 end
@@ -339,6 +354,7 @@ end
             @inferred StatLearn(p, u)
             @inferred StatLearn(p)
         end
+        fit!(o, (randn(p), randn()))
     end
     @testset "MM-based" begin
         X, Y = randn(100, 5), randn(100)
