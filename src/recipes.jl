@@ -12,10 +12,10 @@ end
 @recipe function f(o::OnlineStat{0})
     legend --> false
     axis --> false
-    # grid --> false
+    grid --> false
     ylim --> (0, 1)
     xlim --> (0, 1)
-    annotations --> [(.5, .75, name(o)), (.5, .25, string(value(o)))] #), .1, .2, string(value(o))]
+    annotations --> [(.5, .75, name(o) * ":"), (.5, .4, string(value(o)))] #), .1, .2, string(value(o))]
     zeros(0)
 end
 
@@ -107,15 +107,14 @@ end
     collect(keys(o)), collect(values(o))
 end
 
-
-#-----------------------------------------------------------------------# Partition 
-@recipe function f(o::AbstractPartition, mapfun = value)
-    value(o)  # Needed to sort IndexedPartition
-    ymap = map(x -> mapfun(x.stat), o.parts)
-    x = midpoints(o)
-    nvec = nobs.(o.parts)
-      
-    if first(ymap) isa Tuple{VectorOb, VectorOb}
+#-----------------------------------------------------------------------# Vector{<:Part}
+@recipe function f(parts::Vector{<:Part}, mapfun = value)
+    statname = name(parts[1].stat, false, false)
+    nvec = nobs.(parts)
+    ymap = map(x -> mapfun(x.stat), parts)
+    x = midpoint.(parts)
+    
+    if first(ymap) isa Tuple{VectorOb, VectorOb} #################### Hist
         realx, y, z = [], Float64[], Float64[]
         for i in eachindex(ymap)
             values, counts = ymap[i]
@@ -125,25 +124,14 @@ end
                 push!(z, counts[j])
             end
         end
-        label --> name(o.parts[1].stat, false, false)
+        label --> statname
         seriestype --> :scatter 
         marker_z --> z
         markerstrokewidth --> 0
         realx, y
-    elseif first(ymap) isa VectorOb 
-        y = to_plot_shape(ymap)
-        label --> name(o.parts[1].stat, false, false)
-        if length(first(ymap)) == 2
-            fillto --> y[:, 2]
-            fillalpha --> .6
-            linewidth --> 0
-            x, y[:, 1]
-        else 
-            x, y
-        end
-    elseif first(ymap) isa Dict 
+    elseif first(ymap) isa Dict ##################################### CountMap
         lvls = []
-        for p in o.parts
+        for p in parts
             for k in keys(p.stat)
                 k ∉ lvls && push!(lvls, k)
             end
@@ -153,44 +141,129 @@ end
         ylim --> (0, 1)
         linewidth --> 0
         seriestype --> :bar
-        if o isa Partition
-            bar_width --> nobs.(o.parts)
-        end
-        if typeof(o.parts[1].stat) <: Mosaic
-            info("hi")
-        end
-        y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+        # bar_width --> bar_widths
+        y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), parts))
         x, y
-    else
-        label --> name(o.parts[1].stat, false, false)
+    elseif first(ymap) isa VectorOb ################################# Vector value
+        label --> statname 
+        y = to_plot_shape(ymap)
+        if size(y, 2) == 2
+            fillto --> y[:, 2]
+            fillalpha --> .6
+            linewidth --> 0
+            x, y[:, 1]
+        else
+            x, y
+        end
+    else ############################################################ Scalar value
+        label --> statname
         x, ymap
     end
 end
 
-to_plot_shape(v::Vector) = v 
+midpoint(p::Part{<:Number}) = smooth(first(p), last(p), .5)
+midpoint(p::Part{<:Dates.TimeType}) = (v = first(p):last(p); v[floor(Int, length(v)/2)])
+function midpoint(p::Part{T}) where {T<:Union{Char, AbstractString, Symbol}}
+    string(first(p))
+end
+
 to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]
 
+@recipe function f(o::AbstractPartition, mapfun = value)
+    o.parts, mapfun
+end
 
-#-----------------------------------------------------------------------# IndexedPartition
-# @recipe function f(o::IndexedPartition, mapfun = value)
+
+
+
+
+
+
+
+
+# #-----------------------------------------------------------------------# Partition 
+# @recipe function f(o::AbstractPartition, mapfun = value)
+#     value(o)  # Needed to sort IndexedPartition
 #     ymap = map(x -> mapfun(x.stat), o.parts)
 #     x = midpoints(o)
 #     nvec = nobs.(o.parts)
-#     xlab --> "Nobs"
-#     x
+      
+#     if first(ymap) isa Tuple{VectorOb, VectorOb}
+#         realx, y, z = [], Float64[], Float64[]
+#         for i in eachindex(ymap)
+#             values, counts = ymap[i]
+#             for j in eachindex(values)
+#                 push!(realx, x[i])
+#                 push!(y, values[j])
+#                 push!(z, counts[j])
+#             end
+#         end
+#         label --> name(o.parts[1].stat, false, false)
+#         seriestype --> :scatter 
+#         marker_z --> z
+#         markerstrokewidth --> 0
+#         realx, y
+#     elseif first(ymap) isa VectorOb 
+#         y = to_plot_shape(ymap)
+#         label --> name(o.parts[1].stat, false, false)
+#         if length(first(ymap)) == 2
+#             fillto --> y[:, 2]
+#             fillalpha --> .6
+#             linewidth --> 0
+#             x, y[:, 1]
+#         else 
+#             x, y
+#         end
+#     elseif first(ymap) isa Dict 
+#         lvls = []
+#         for p in o.parts
+#             for k in keys(p.stat)
+#                 k ∉ lvls && push!(lvls, k)
+#             end
+#         end
+#         sort!(lvls)
+#         label --> reshape(lvls, (1, length(lvls)))
+#         ylim --> (0, 1)
+#         linewidth --> 0
+#         seriestype --> :bar
+#         if o isa Partition
+#             bar_width --> nobs.(o.parts)
+#         end
+#         if typeof(o.parts[1].stat) <: Mosaic
+#             info("hi")
+#         end
+#         y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), o.parts))
+#         x, y
+#     else
+#         label --> name(o.parts[1].stat, false, false)
+#         x, ymap
+#     end
 # end
 
-midpoints(o::Partition) = map(x -> x.start + x.n/2, o.parts)
-midpoints(o::IndexedPartition{<:Number}) = map(x -> (x.first + x.last) / 2, o.parts)
-function midpoints(o::IndexedPartition{<:Dates.TimeType}) 
-    map(o.parts) do x 
-        if x.first == x.last 
-            return x.first
-        else
-            (x.first:x.last)[floor(Int, end/2)]
-        end
-    end 
-end
+# to_plot_shape(v::Vector) = v 
+# to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]
 
-const StringLike = Union{Char, AbstractString, Symbol}
-midpoints(o::IndexedPartition{<:StringLike}) = map(x -> string(x.first), o.parts)
+
+# #-----------------------------------------------------------------------# IndexedPartition
+# # @recipe function f(o::IndexedPartition, mapfun = value)
+# #     ymap = map(x -> mapfun(x.stat), o.parts)
+# #     x = midpoints(o)
+# #     nvec = nobs.(o.parts)
+# #     xlab --> "Nobs"
+# #     x
+# # end
+
+# midpoints(o::Partition) = map(x -> x.start + x.n/2, o.parts)
+# midpoints(o::IndexedPartition{<:Number}) = map(x -> (x.first + x.last) / 2, o.parts)
+# function midpoints(o::IndexedPartition{<:Dates.TimeType}) 
+#     map(o.parts) do x 
+#         if x.first == x.last 
+#             return x.first
+#         else
+#             (x.first:x.last)[floor(Int, end/2)]
+#         end
+#     end 
+# end
+
+# const StringLike = Union{Char, AbstractString, Symbol}
+# midpoints(o::IndexedPartition{<:StringLike}) = map(x -> string(x.first), o.parts)
