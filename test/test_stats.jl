@@ -129,7 +129,7 @@ end
 end
 #-----------------------------------------------------------------------# Group 
 @testset "Group" begin 
-    o = [Mean() Mean() Mean() Variance() Variance()]
+    o = Group(Mean(), Mean(), Mean(), Variance(), Variance())
     test_exact(o, x, value, x -> vcat(mean(x,1)[1:3], var(x,1)[4:5]))
     test_merge([Mean() Variance() Sum() Moments() Mean()], x, x2)
 end
@@ -151,6 +151,10 @@ end
 @testset "HyperLogLog" begin 
     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), (a,b) -> ≈(a,b;atol=2))
     test_merge(HyperLogLog(4), y, y2)
+end
+#-----------------------------------------------------------------------# IndexedPartition 
+@testset "IndexedPartition" begin 
+    test_exact(IndexedPartition(Float64, Mean()), [y y2], o -> value(merge(o)), x->mean(y2))
 end
 #-----------------------------------------------------------------------# LinReg 
 @testset "LinReg" begin 
@@ -190,6 +194,24 @@ end
 @testset "OrderStats" begin 
     test_exact(OrderStats(100), y, value, sort)
     test_merge(OrderStats(10), y, y2, (a,b) -> ≈(a,b;atol=.1))  # Why does this need atol?
+end
+#-----------------------------------------------------------------------# Partition 
+@testset "Partition" begin 
+    # merge(o)
+    test_exact(Partition(Mean(),7), y, o -> value(merge(o)), mean)
+    test_exact(Partition(Variance(),8), y, o -> value(merge(o)), var)
+    # number of parts stays between b and 2b
+    o = Partition(Mean(), 15)
+    for i in 1:10
+        fit!(o, y)
+        @test 15 ≤ length(o.parts) ≤ 30
+    end
+    # merge(o, o2)
+    data, data2 = randn(1000), randn(1234)
+    o = Partition(Mean())
+    o2 = Partition(Mean())
+    s = merge!(Series(data, o), Series(data2, o2))
+    @test value(merge(o)) ≈ mean(vcat(data, data2))
 end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 

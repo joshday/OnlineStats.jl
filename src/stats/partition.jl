@@ -29,6 +29,7 @@ Base.first(o::Part) = o.first
 Base.last(o::Part) = o.last
 Base.isless(o::Part, o2::Part) = last(o) < first(o2)
 nobs(o::Part) = o.n
+value(o::Part) = value(o.stat)
 
 function fit!(p::Part{T}, x::T, data) where {T}
     x in p || error("$x is not between $(p.first) and $(p.last)")
@@ -159,3 +160,14 @@ function fit!(o::IndexedPartition, xy::VectorOb, ::Float64)
 end
 
 value(o::IndexedPartition) = value.(sort!(o.parts))
+
+function Base.merge(o::IndexedPartition)
+    n = first(o.parts).n
+    stat = first(o.parts).stat
+    for i in 2:length(o.parts)
+        n2 = o.parts[i].n 
+        n += n2 
+        merge!(stat, o.parts[i].stat, n2 / n)
+    end
+    stat
+end
