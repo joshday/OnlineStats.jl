@@ -140,13 +140,21 @@ end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
+    #### KnownBins
     test_exact(Hist(-5:5), y, o -> value(o)[2], y -> fit(Histogram, y, -5:5, closed=:left).weights)
     test_exact(Hist(-5:.1:5), y, extrema, extrema, (a,b)->≈(a,b;atol=.2))
     test_exact(Hist(-5:.1:5), y, mean, mean, (a,b)->≈(a,b;atol=.2))
     test_exact(Hist(-5:.1:5), y, nobs, length)
     test_exact(Hist(-5:.1:5), y, var, var, (a,b)->≈(a,b;atol=.2))
     test_merge(Hist(-5:.1:5), y, y2)
-
+    # merge with different edges
+    o, o2 = Hist(-6:.1:6), Hist(-6:.01:6)
+    Series(y, o, o2)
+    c = copy(value(o)[2])
+    merge!(o, o2, .5)
+    @test all(value(o)[2] .== 2c)
+    @test OnlineStats.discretized_pdf(o, 0.0) > .2
+    #### AdaptiveBins
     test_exact(Hist(100), y, mean, mean)
     test_exact(Hist(100), y, nobs, length)
     test_exact(Hist(100), y, var, var)
@@ -156,6 +164,8 @@ end
     test_exact(Hist(100), y, extrema, extrema, ==)
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
+    s = Series(y, Hist(20))
+    @test OnlineStats.discretized_pdf(stats(s)[1], 0.0) > .2
 end
 #-----------------------------------------------------------------------# HyperLogLog 
 @testset "HyperLogLog" begin 
