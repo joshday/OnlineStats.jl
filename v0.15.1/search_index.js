@@ -725,7 +725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.OrderStats",
     "category": "Type",
-    "text": "OrderStats(b)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
+    "text": "OrderStats(b::Int, T::Type = Float64)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
 },
 
 {
