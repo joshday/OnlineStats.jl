@@ -765,6 +765,16 @@ function fit!(o::ReservoirSample, y::ScalarOb, γ::Float64)
     end
 end
 
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:ReservoirSample}
+    length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
+    p = o.nobs / (o.nobs + o2.nobs)
+    for j in eachindex(o.value)
+        if rand() > p 
+            o.value[j] = o2.value[j]
+        end
+    end
+end
+
 #-----------------------------------------------------------------------# Sum
 """
     Sum()

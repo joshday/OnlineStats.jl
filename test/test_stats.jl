@@ -29,6 +29,7 @@ end
     s = Series([1,2,3,4], CountMap(Int))
     @test all([1,2,3,4] .∈ keys(s.stats[1]))
     @test probs(s.stats[1]) == fill(.25, 4)
+    @test probs(s.stats[1], 7:9) == zeros(3)
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin 
@@ -51,6 +52,10 @@ end
 #-----------------------------------------------------------------------# Diff 
 @testset "Diff" begin 
     test_exact(Diff(), y, value, y -> y[end] - y[end-1])
+    o = Diff(Int)
+    Series(1:10, o)
+    @test diff(o) == 1
+    @test last(o) == 10
 end
 #-----------------------------------------------------------------------# Extrema
 @testset "Extrema" begin 
@@ -138,23 +143,40 @@ end
     test_exact(Hist(-5:5), y, o -> value(o)[2], y -> fit(Histogram, y, -5:5, closed=:left).weights)
     test_exact(Hist(-5:.1:5), y, extrema, extrema, (a,b)->≈(a,b;atol=.2))
     test_exact(Hist(-5:.1:5), y, mean, mean, (a,b)->≈(a,b;atol=.2))
+    test_exact(Hist(-5:.1:5), y, nobs, length)
     test_exact(Hist(-5:.1:5), y, var, var, (a,b)->≈(a,b;atol=.2))
     test_merge(Hist(-5:.1:5), y, y2)
 
     test_exact(Hist(100), y, mean, mean)
+    test_exact(Hist(100), y, nobs, length)
     test_exact(Hist(100), y, var, var)
+    test_exact(Hist(100), y, median, median)
+    test_exact(Hist(100), y, quantile, quantile)
+    test_exact(Hist(100), y, std, std)
     test_exact(Hist(100), y, extrema, extrema, ==)
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
 end
 #-----------------------------------------------------------------------# HyperLogLog 
 @testset "HyperLogLog" begin 
-    test_exact(HyperLogLog(12), y, value, y->length(unique(y)), (a,b) -> ≈(a,b;atol=2))
+    test_exact(HyperLogLog(12), y, value, y->length(unique(y)), (a,b) -> ≈(a,b;atol=3))
     test_merge(HyperLogLog(4), y, y2)
 end
 #-----------------------------------------------------------------------# IndexedPartition 
 @testset "IndexedPartition" begin 
     test_exact(IndexedPartition(Float64, Mean()), [y y2], o -> value(merge(o)), x->mean(y2))
+end
+#-----------------------------------------------------------------------# KMeans
+@testset "KMeans" begin 
+    s = Series(x, KMeans(5, 2))
+    @test size(value(s)[1]) == (5, 2)
+    # means: [0, 0] and [10, 10]
+    data = 10rand(Bool, 1000) .+ randn(1000, 2)
+    o = KMeans(2, 2)
+    Series(LearningRate(.9), data, o)
+    m1, m2 = value(o)[:, 1], value(o)[:, 2]
+    @test ≈(m1, [0, 0]; atol=.5) || ≈(m2, [0, 0]; atol=.5)
+    @test ≈(m1, [10, 10]; atol=.5) || ≈(m2, [10, 10]; atol=.5)
 end
 #-----------------------------------------------------------------------# LinReg 
 @testset "LinReg" begin 
@@ -193,6 +215,7 @@ end
 #-----------------------------------------------------------------------# OrderStats 
 @testset "OrderStats" begin 
     test_exact(OrderStats(100), y, value, sort)
+    test_exact(OrderStats(100), y, quantile, quantile)
     test_merge(OrderStats(10), y, y2, (a,b) -> ≈(a,b;atol=.1))  # Why does this need atol?
 end
 #-----------------------------------------------------------------------# Partition 
@@ -218,9 +241,27 @@ end
     data = randn(10_000)
     data2 = randn(10_000)
     τ = .1:.1:.9
-    for o in [Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS())]
+    for o in [
+            Quantile(τ, SGD()), 
+            Quantile(τ, MSPI()), 
+            Quantile(τ, OMAS()),
+            Quantile(τ, ADAGRAD())
+            ]
         test_exact(o, data, value, x -> quantile(x,τ), (a,b) -> ≈(a,b,atol=.25))
         test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
+    end
+    for τi in τ
+        test_exact(PQuantile(τi), y, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.2))
+    end
+    @test_throws Exception Quantile(τ, ADAM())
+end
+#-----------------------------------------------------------------------# ReservoirSample
+@testset "ReservoirSample" begin 
+    test_exact(ReservoirSample(100), y, value, identity, ==)
+    o = ReservoirSample(10)
+    fit!(o, y)
+    for val in o.value 
+        @test val in y
     end
 end
 #-----------------------------------------------------------------------# StatLearn
@@ -283,6 +324,11 @@ end
         X, Y = randn(100, 5), randn(100)
         @test_throws ErrorException Series((X,Y), StatLearn(5, PoissonLoss(), OMAS()))
     end
+end
+#-----------------------------------------------------------------------# Sum 
+@testset "Sum" begin 
+    test_exact(Sum(), y, sum, sum)
+    test_exact(Sum(Int), 1:100, sum, sum)
 end
 #-----------------------------------------------------------------------# Variance 
 @testset "Variance" begin 

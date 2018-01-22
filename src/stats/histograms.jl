@@ -199,11 +199,3 @@ end
 #     end
 #     u
 # end
-
-
-
-
-
-#-----------------------------------------------------------------------# deprecations
-@deprecate OHistogram(r::Range) Hist(r::Range)
-@deprecate IHistogram(b::Int)   Hist(b::Int)

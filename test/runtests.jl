@@ -58,22 +58,23 @@ end
     @test length(b) == 6 
     @test b == vcat(v, 1.0)
     @test size(b) == (6,)
+    @test all(OnlineStats.BiasVec(v, 1.0) .== OnlineStats.BiasVec(v, 1))
 end
 
 #-----------------------------------------------------------------------# mapblocks
 @testset "mapblocks" begin 
-    x = randn(10, 5)
+    data = randn(10, 5)
     o = CovMatrix(5)
     s = Series(o)
-    mapblocks(3, x, Rows()) do xi
+    mapblocks(3, data, Rows()) do xi
         fit!(s, xi)
     end
     i = 0
-    mapblocks(2, x, Cols()) do xi 
+    mapblocks(2, data, Cols()) do xi 
         i += 1
     end
     @test i == 3
-    @test cov(o) ≈ cov(x)
+    @test cov(o) ≈ cov(data)
     i = 0
     mapblocks(3, rand(5)) do xi
         i += 1
