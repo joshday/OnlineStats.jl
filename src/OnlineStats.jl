@@ -4,9 +4,9 @@ module OnlineStats
 import SweepOperator
 import LearnBase: fit!, value, nobs, predict
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, 
-    confint, autocor, autocov, entropy, probs
+    confint, autocor, autocov, entropy
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
-    VectorOb, XyOb, Data, default_weight,
+    VectorOb, XyOb, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
     HarmonicWeight, McclainWeight, Bounded, Scaled
 

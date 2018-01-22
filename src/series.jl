@@ -37,7 +37,7 @@ function series(args::Union{OnlineStat, Weight}...; kw...)
     s = Series(args...)
     length(kw) == 0 ? s : AugmentedSeries(s; kw...)
 end
-function series(y::Data, args::Union{OnlineStat, Weight}...; kw...)
+function series(y, args::Union{OnlineStat, Weight}...; kw...)
     s = series(args...; kw...)
     fit!(s, y)
     s
@@ -75,12 +75,12 @@ end
 Series(o::OnlineStat{N}...) where {N} = Series(default_weight(o), o...)
 
 # init with data
-Series(y::Data, o::OnlineStat{N}...) where {N} = (s = Series(o...); fit!(s, y))
-function Series(y::Data, wt::WeightLike, o::OnlineStat{N}...) where {N}
+Series(y, o::OnlineStat{N}...) where {N} = (s = Series(o...); fit!(s, y))
+function Series(y, wt::WeightLike, o::OnlineStat{N}...) where {N}
     s = Series(wt, o...)
     fit!(s, y)
 end
-Series(wt::WeightLike, y::Data, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
+Series(wt::WeightLike, y, o::OnlineStat{N}...) where {N} = Series(y, wt, o...)
 
 function fit!(s::Series{0}, y)
     γ = weight!(s)
