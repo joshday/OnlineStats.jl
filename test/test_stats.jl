@@ -179,6 +179,10 @@ end
 #-----------------------------------------------------------------------# IndexedPartition 
 @testset "IndexedPartition" begin 
     test_exact(IndexedPartition(Float64, Mean()), [y y2], o -> value(merge(o)), x->mean(y2))
+    o = IndexedPartition(Int, Mean())
+    @test value(o) == []
+    fit!(o, (1, 1.0))
+    @test value(o) == [1.0]
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin 
@@ -255,11 +259,22 @@ end
 end
 #-----------------------------------------------------------------------# Partition 
 @testset "Partition" begin 
+    @testset "Part" begin 
+        o = OnlineStats.Part(Mean(), 1, 1)
+        @test first(o) == 1 
+        @test last(o) == 1
+        @test value(o) == 1
+        @test o < OnlineStats.Part(Mean(), 2, 1)
+        @test_throws Exception fit!(o, 5, 1)
+        fit!(o, 1, 3)
+        @test value(o) ≈ 2
+    end
     # merge(o)
     test_exact(Partition(Mean(),7), y, o -> value(merge(o)), mean)
     test_exact(Partition(Variance(),8), y, o -> value(merge(o)), var)
     # number of parts stays between b and 2b
     o = Partition(Mean(), 15)
+    @test value(o) == []
     for i in 1:10
         fit!(o, y)
         @test 15 ≤ length(o.parts) ≤ 30
@@ -286,7 +301,7 @@ end
         test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
     end
     for τi in τ
-        test_exact(PQuantile(τi), data, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.1))
+        test_exact(PQuantile(τi), data, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.2))
     end
     @test_throws Exception Quantile(τ, ADAM())
 end

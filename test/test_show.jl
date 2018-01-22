@@ -24,6 +24,7 @@ for o = [
         Bootstrap(Mean()),
         [Mean() Variance()], 
         Partition(Mean(), 5),
+        OnlineStats.Part(Mean(), 1, 1),
         NBClassifier(5, Int),
         2Mean(),
         25Mean(),
