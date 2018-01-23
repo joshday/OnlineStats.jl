@@ -140,6 +140,7 @@ end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
+    dpdf = OnlineStats.discretized_pdf
     #### KnownBins
     test_exact(Hist(-5:5), y, o -> value(o)[2], y -> fit(Histogram, y, -5:5, closed=:left).weights)
     test_exact(Hist(-5:.1:5), y, extrema, extrema, (a,b)->≈(a,b;atol=.2))
@@ -153,9 +154,6 @@ end
     c = copy(value(o)[2])
     merge!(o, o2, .5)
     @test all(value(o)[2] .== 2c)
-    @test OnlineStats.discretized_pdf(o, 0.0) > .1
-    @test OnlineStats.discretized_pdf(o, -10) == 0
-    @test OnlineStats.discretized_pdf(o, 10) == 0
     #### AdaptiveBins
     test_exact(Hist(100), y, mean, mean)
     test_exact(Hist(100), y, nobs, length)
@@ -167,9 +165,28 @@ end
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
     s = Series(y, Hist(5))
-    @test OnlineStats.discretized_pdf(stats(s)[1], 0.0) > .2
-    @test OnlineStats.discretized_pdf(o, -10) == 0
-    @test OnlineStats.discretized_pdf(o, 10) == 0
+    # discretized_pdf
+    data = randn(1_000)
+    for o in [Hist(-5:5), Hist(-3:.5:3), Hist(5), Hist(20), Hist(100)]
+        Series(data, o)
+        @test dpdf(o, 0) > 0 
+        @test dpdf(o, -10) == 0
+        @test dpdf(o, 10) == 0
+        @test quadgk(x -> dpdf(o, x), -10, 10)[1] ≈ 1 atol=.1
+    end
+    o = Hist(0:.05:1)
+    Series(data, o)
+    @test quadgk(x -> dpdf(o, x), collect(-10:10)...)[1] ≈ 1 atol=.1
+    # test_exact(
+    #     Hist(-5:.1:5), 
+    #     y, 
+    #     o -> quadgk(x -> dpdf(o, x), -10, 10), 
+    #     x -> 1, 
+    #     (a,b) -> ≈(a,b,atol=.01)
+    #     )
+    # s = Series(y, Hist(0:.05:3))
+    # @show dpdf(s.stats[1], 0)
+    # @show quadgk(x -> dpdf(s.stats[1], x), -10, 10)#[1] ≈ 1
 end
 #-----------------------------------------------------------------------# HyperLogLog 
 @testset "HyperLogLog" begin 

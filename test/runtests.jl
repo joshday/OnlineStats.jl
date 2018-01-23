@@ -1,8 +1,7 @@
 module OnlineStatsTest
 
-using OnlineStats, Base.Test
+using OnlineStats, StatsBase, QuadGK, Base.Test
 import OnlineStatsBase
-using StatsBase
 
 #-----------------------------------------------------------------------# helpers
 function merge_vs_fit(o, y1, y2; kw...)

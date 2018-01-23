@@ -97,9 +97,17 @@ function Base.merge!(o::Hist{<:KnownBins}, o2::Hist{<:KnownBins}, γ::Float64)
 end
 function discretized_pdf(o::Hist{<:KnownBins}, y::Real)
     b = o.method
-    i = min(searchsortedfirst(b.edges, y), length(b.counts) - 1)
-    δ = step(b.edges)
-    b.counts[i] / (δ * sum(b.counts))
+    e = b.edges
+    if y ≤ first(e)
+        return 0.0
+    elseif y ≥ last(e)
+        return 0.0 
+    else
+        c = b.counts
+        i = min(searchsortedfirst(e, y), length(c))
+        δ = step(e)
+        return c[i] / (δ * sum(c))
+    end
 end
 
 #-----------------------------------------------------------------------# AdaptiveBins
