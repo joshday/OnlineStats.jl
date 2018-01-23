@@ -109,6 +109,7 @@ end
 
 #-----------------------------------------------------------------------# Vector{<:Part}
 @recipe function f(parts::Vector{<:Part}, mapfun = value)
+    sort!(parts)
     statname = name(parts[1].stat, false, false)
     nvec = nobs.(parts)
     ymap = map(x -> mapfun(x.stat), parts)
