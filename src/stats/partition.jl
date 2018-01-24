@@ -53,9 +53,10 @@ end
 
 function squash_nearest!(v::Vector{<:Part}, b::Integer)
     sort!(v)
-    diffs = [last(v[i]) - first(v[i - 1]) for i in 2:length(v)]
+    diffs = [first(v[i]) - last(v[i - 1]) for i in 2:length(v)]
     while length(v) ≥ b
-        _, i = findmin(diffs)
+        # if equally-spaced, randomly pick bins to merge
+        i = rand(find(x -> x == minimum(diffs), diffs))
         merge!(v[i], v[i+1])
         deleteat!(v, i + 1)
         deleteat!(diffs, i)
