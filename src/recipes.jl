@@ -59,6 +59,13 @@ end
     end
 end
 
+#-----------------------------------------------------------------------# AutoCov
+@recipe function f(o::AutoCov)
+    xlabel --> "Lag"
+    ylabel --> "Autocorrelation"
+    autocor(o)
+end
+
 #-----------------------------------------------------------------------# CovMatrix
 @recipe function f(o::CovMatrix)
     seriestype --> :heatmap
