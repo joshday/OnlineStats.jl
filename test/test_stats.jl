@@ -261,14 +261,14 @@ end
 end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
-    n, p = 10000, 5
+    n, p = 20000, 5
     X = randn(n, p)
     Y = X * linspace(-1, 1, p) .> 0
     o = NBClassifier(p, Bool, 100)
     Series((X, Y), o)
     @test predict(o, [0,0,0,0,1])[2] > .5
     @test classify(o, [0,0,0,0,1])
-    X2 = [zeros(5) zeros(5) zeros(5) rand(5) 1 .+ rand(5)]
+    X2 = [zeros(p) zeros(p) zeros(p) rand(p) 1 .+ rand(p)]
     @test all(predict(o, X2)[:, end] .> .5)
     @test all(classify(o, X2))
     @test all(predict(o, X2', Cols())[end, :] .> .5)
