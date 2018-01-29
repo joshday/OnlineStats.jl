@@ -43,7 +43,7 @@ Base.keys(o::NBClassifier) = keys(o.cat)
 Base.values(o::NBClassifier) = values(o.cat)
 
 function predict(o::NBClassifier, x::AbstractVector)
-    kys = collect(keys(o))
+    kys = keys(o)
     vals = values(o)
     probs = log.(collect(vals) ./ sum(vals))
     for i in eachindex(probs)

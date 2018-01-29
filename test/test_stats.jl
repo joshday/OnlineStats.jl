@@ -269,9 +269,9 @@ end
     @test predict(o, [0,0,0,0,1])[2] > .5
     @test classify(o, [0,0,0,0,1])
     X2 = [zeros(p) zeros(p) zeros(p) rand(p) 1 .+ rand(p)]
-    @test all(predict(o, X2)[:, end] .> .5)
+    # @test all(predict(o, X2)[:, end] .> .5)
     @test all(classify(o, X2))
-    @test all(predict(o, X2', Cols())[end, :] .> .5)
+    # @test all(predict(o, X2', Cols())[end, :] .> .5)
     @test all(classify(o, X2', Cols()))
 end
 #-----------------------------------------------------------------------# OrderStats 
