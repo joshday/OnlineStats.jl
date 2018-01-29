@@ -103,8 +103,13 @@ Base.merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n)
     CountMap(T)
 
 Maintain a dictionary mapping unique values to its number of occurrences.  Equivalent to 
-`StatsBase.countmap`.  `value` returns a `Dict` of raw counts (unweighted) whereas 
-`probs` returns probabilities according to the `Weight` used.
+`StatsBase.countmap`.  
+
+# Methods
+- `value(o)`: `Dict` of raw counts
+- `keys(o)`: unique labels 
+- `values(o)`: (unweighted) counts
+- `probs(o)`: weighted probabilities
 
 # Example 
 

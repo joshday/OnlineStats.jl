@@ -215,7 +215,7 @@ end
     s = Series(x, KMeans(5, 2))
     @test size(value(s)[1]) == (5, 2)
     # means: [0, 0] and [10, 10]
-    data = 10rand(Bool, 1000) .+ randn(1000, 2)
+    data = 10rand(Bool, 2000) .+ randn(2000, 2)
     o = KMeans(2, 2)
     Series(LearningRate(.9), data, o)
     m1, m2 = value(o)[:, 1], value(o)[:, 2]
