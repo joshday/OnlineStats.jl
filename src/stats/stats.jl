@@ -153,6 +153,7 @@ function Base.sort!(o::CountMap)
     o.labels[:] = o.labels[perm]
     o.counts[:] = o.counts[perm]
     o.weights[:] = o.weights[perm]
+    o
 end
 
 function Base.merge!(o::T, o2::T, γ::Float64) where {T<:CountMap}

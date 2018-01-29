@@ -30,6 +30,17 @@ end
     @test all([1,2,3,4] .∈ keys(s.stats[1]))
     @test probs(s.stats[1]) == fill(.25, 4)
     @test probs(s.stats[1], 7:9) == zeros(3)
+    # sort 
+    o = CountMap(Int)
+    data = rand(1:20, 100)
+    data[1] = 20
+    Series(data, o) 
+    o2 = copy(o)
+    sort!(o2)
+    @test o.labels != o2.labels
+    for ky in keys(o)
+        @test probs(o, ky) == probs(o2, ky)
+    end
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin 
@@ -266,13 +277,14 @@ end
     Y = X * linspace(-1, 1, p) .> 0
     o = NBClassifier(p, Bool, 100)
     Series((X, Y), o)
-    # @test predict(o, [0,0,0,0,1])[2] > .5
     @test classify(o, [0,0,0,0,1])
     X2 = [zeros(p) zeros(p) zeros(p) rand(p) 1 .+ rand(p)]
-    # @test all(predict(o, X2)[:, end] .> .5)
     @test all(classify(o, X2))
-    # @test all(predict(o, X2', Cols())[end, :] .> .5)
     @test all(classify(o, X2', Cols()))
+    # Sanity check for predict 
+    predict(o, [0,0,0,0,1])[2]
+    predict(o, X2)
+    predict(o, X2', Cols())
 end
 #-----------------------------------------------------------------------# OrderStats 
 @testset "OrderStats" begin 
