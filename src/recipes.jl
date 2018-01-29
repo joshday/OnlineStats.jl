@@ -63,6 +63,8 @@ end
 @recipe function f(o::AutoCov)
     xlabel --> "Lag"
     ylabel --> "Autocorrelation"
+    ylim --> (0, 1)
+    seriestype --> :scatter
     autocor(o)
 end
 
