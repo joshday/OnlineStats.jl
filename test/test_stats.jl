@@ -172,7 +172,7 @@ end
         @test dpdf(o, 0) > 0 
         @test dpdf(o, -10) == 0
         @test dpdf(o, 10) == 0
-        @test quadgk(x -> dpdf(o, x), -10, 10)[1] ≈ 1 atol=.1
+        @test quadgk(x -> dpdf(o, x), collect(-10:10)...)[1] ≈ 1 atol=.1
     end
     o = Hist(0:.05:1)
     Series(data, o)
