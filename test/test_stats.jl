@@ -177,16 +177,6 @@ end
     o = Hist(0:.05:1)
     Series(data, o)
     @test quadgk(x -> dpdf(o, x), collect(-10:10)...)[1] ≈ 1 atol=.1
-    # test_exact(
-    #     Hist(-5:.1:5), 
-    #     y, 
-    #     o -> quadgk(x -> dpdf(o, x), -10, 10), 
-    #     x -> 1, 
-    #     (a,b) -> ≈(a,b,atol=.01)
-    #     )
-    # s = Series(y, Hist(0:.05:3))
-    # @show dpdf(s.stats[1], 0)
-    # @show quadgk(x -> dpdf(s.stats[1], x), -10, 10)#[1] ≈ 1
 end
 #-----------------------------------------------------------------------# HyperLogLog 
 @testset "HyperLogLog" begin 
@@ -196,6 +186,7 @@ end
 #-----------------------------------------------------------------------# IndexedPartition 
 @testset "IndexedPartition" begin 
     test_exact(IndexedPartition(Float64, Mean()), [y y2], o -> value(merge(o)), x->mean(y2))
+    test_exact(IndexedPartition(Float64, Mean(), 2), [y y2], o -> value(merge(o)), x->mean(y2))
     o = IndexedPartition(Int, Mean())
     @test value(o) == []
     fit!(o, (1, 1.0))
@@ -266,6 +257,7 @@ end
     test_exact(5Variance(), x, value, x->vec(var(x,1)))
     test_merge(5Variance(), x, x2)
     @test 4Mean() == 4Mean()
+    @test length(MV(10, Quantile())) == 10
 end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 

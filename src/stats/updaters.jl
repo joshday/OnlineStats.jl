@@ -10,11 +10,11 @@ init(typ, u::Updater, p) = init(u, p)
 #-----------------------------------------------------------------------# SGUpdater
 abstract type SGUpdater <: Updater end
 
-function update!(θ::Vector, gx::Vector, γ::Float64, u::SGUpdater)
-    for i in eachindex(θ)
-        @inbounds θ[i] = update(θ[i], gx[i], γ, u)
-    end
-end
+# function update!(θ::Vector, gx::Vector, γ::Float64, u::SGUpdater)
+#     for i in eachindex(θ)
+#         @inbounds θ[i] = update(θ[i], gx[i], γ, u)
+#     end
+# end
 
 
 #-----------------------------------------------------------------------# SGD
@@ -25,7 +25,7 @@ Stochastic gradient descent.
 """
 struct SGD <: SGUpdater end
 Base.merge!(a::SGD, b::SGD, γ::Float64) = a
-update(θ::Number, gx::Number, γ::Float64, ::SGD) = θ -= γ * gx
+# update(θ::Number, gx::Number, γ::Float64, ::SGD) = θ -= γ * gx
 
 #-----------------------------------------------------------------------# NSGD
 """
@@ -63,15 +63,15 @@ function Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ::Float64)
     smooth!(o.h, o2.h, γ)
     o
 end
-function update!(θ::Vector, g::Vector, γ::Float64, u::ADAGRAD)
-    u.nobs += 1
-    w = 1 / u.nobs
-    @inbounds for i in eachindex(θ)
-        u.h[i] = smooth(u.h[i], g[i] ^ 2, w)
-        s = γ * inv(sqrt(u.h[i] + ϵ))
-        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
-    end
-end
+# function update!(θ::Vector, g::Vector, γ::Float64, u::ADAGRAD)
+#     u.nobs += 1
+#     w = 1 / u.nobs
+#     @inbounds for i in eachindex(θ)
+#         u.h[i] = smooth(u.h[i], g[i] ^ 2, w)
+#         s = γ * inv(sqrt(u.h[i] + ϵ))
+#         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λfactor[j])
+#     end
+# end
 
 #-----------------------------------------------------------------------# ADADELTA
 """
