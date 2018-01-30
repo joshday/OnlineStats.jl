@@ -131,7 +131,7 @@ nobs(o::AdaptiveBins) = sum(last.(o.value))
 
 fit!(o::Hist{<:AdaptiveBins}, y::Number, γ::Float64) = fit!(o.method, Pair(y, 1))
 
-function fit!(o::AdaptiveBins{T}, y::Pair{T, Int}) where {T}
+function fit!(o::AdaptiveBins{<:Number}, y::Pair{<:Number, Int}) 
     v = o.value
     i = searchsortedfirst(v, y)
     insert!(v, i, y)
