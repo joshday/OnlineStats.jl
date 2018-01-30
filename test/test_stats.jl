@@ -344,10 +344,14 @@ end
 #-----------------------------------------------------------------------# ReservoirSample
 @testset "ReservoirSample" begin 
     test_exact(ReservoirSample(100), y, value, identity, ==)
-    o = ReservoirSample(10)
-    fit!(o, y)
-    for val in o.value 
-        @test val in y
+    test_exact(ReservoirSample(7), y, o -> all(in.(value(o), [y])), x->true)
+    # merge
+    s = Series(y, ReservoirSample(9))
+    s2 = Series(y2, ReservoirSample(9))
+    merge!(s, s2)
+    fit!(s2, y)
+    for yi in value(s2.stats[1])
+        @test (yi ∈ y) || (yi ∈ y2)
     end
 end
 #-----------------------------------------------------------------------# StatLearn

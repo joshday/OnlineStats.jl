@@ -576,9 +576,6 @@ end
 function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
     length(o.value) == length(o2.value) || 
         error("Merge failed.  OrderStats track different batch sizes")
-    for i in 1:o2.i 
-        o2.value[i] = smooth(o2.value[i], o2.buffer[i], 1 / o2.nreps)
-    end
     smooth!(o.value, o2.value, γ)
 end
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
@@ -665,10 +662,10 @@ function _interpolate!(q, n, di, i)
     end
 end
 
-function parabolic_interpolate(q1, q2, q3, n1, n2, n3, d)
-    qi = q2 + d / (n3 - n1) * 
-        ((n2 - n1 + d) * (q3 - q2) / (n3 - n2) + (n3 - n2 - d) * (q2 - q1) / (n2 - n1))
-end
+# function parabolic_interpolate(q1, q2, q3, n1, n2, n3, d)
+#     qi = q2 + d / (n3 - n1) * 
+#         ((n2 - n1 + d) * (q3 - q2) / (n3 - n2) + (n3 - n2 - d) * (q2 - q1) / (n2 - n1))
+# end
 
 
 
@@ -764,15 +761,15 @@ function q_fit!(o::Quantile{<:OMAS}, y, γ)
     end
 end
 
-# OMAP...why is this so bad?
-q_init(u::OMAP, p) = u
-function q_fit!(o::Quantile{<:OMAP}, y, γ)
-    for j in eachindex(o.τ)
-        w = abs(y - o.value[j]) + ϵ
-        θ = y + w * (2o.τ[j] - 1) 
-        o.value[j] = smooth(o.value[j], θ, γ)
-    end
-end
+# # OMAP...why is this so bad?
+# q_init(u::OMAP, p) = u
+# function q_fit!(o::Quantile{<:OMAP}, y, γ)
+#     for j in eachindex(o.τ)
+#         w = abs(y - o.value[j]) + ϵ
+#         θ = y + w * (2o.τ[j] - 1) 
+#         o.value[j] = smooth(o.value[j], θ, γ)
+#     end
+# end
 
 #-----------------------------------------------------------------------# ReservoirSample
 """
