@@ -509,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "Type",
-    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Ignores weight  and is equivalent to StatsBase.countmap.\n\nExample\n\ns = Series(rand(1:10, 1000), CountMap(Int))\nvalue(s)[1]\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\n\n\n\n"
+    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Equivalent to  StatsBase.countmap.  \n\nMethods\n\nvalue(o): Dict of raw counts\nkeys(o): unique labels \nvalues(o): (unweighted) counts\nprobs(o): weighted probabilities\n\nExample\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\nprobs(o)\nprobs(o, [\"small\", \"large\"])\n\n\n\n"
 },
 
 {
