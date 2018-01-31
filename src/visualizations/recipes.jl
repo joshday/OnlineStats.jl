@@ -42,18 +42,18 @@ end
 end
 
 
-#-----------------------------------------------------------------------# Series
-@recipe function f(s::Series)
+#-----------------------------------------------------------------------# AbstractSeries
+@recipe function f(s::AbstractSeries)
     if :layout in keys(plotattributes)
-        for stat in s.stats
+        for stat in stats(s)
             @series begin stat end
         end 
     else  # hack to ensure series aren't sent to wrong subplots
-        layout --> length(s.stats)
-        for i in eachindex(s.stats)
+        layout --> length(stats(s))
+        for i in eachindex(stats(s))
             @series begin 
                 subplot --> i 
-                s.stats[i]
+                stats(s)[i]
             end
         end
     end

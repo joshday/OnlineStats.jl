@@ -29,7 +29,7 @@ export
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
-    NBClassifier, Partition, Group, IndexedPartition,
+    NBClassifier, Partition, Group, IndexedPartition, Mosaic,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
 
@@ -84,10 +84,11 @@ include("stats/distributions.jl")
 include("stats/statlearn.jl")
 include("stats/wrappers.jl")
 include("stats/naivebayes.jl")
-include("stats/partition.jl")
 include("stats/decisiontree.jl")
+include("visualizations/partition.jl")
+include("visualizations/mosaic.jl")
 include("series.jl")
 include("mapblocks.jl")
-include("recipes.jl")
+include("visualizations/recipes.jl")
 
 end # module

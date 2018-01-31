@@ -471,7 +471,7 @@ function AutoCov(k::Integer, T = Float64)
         Lag(k + 1, T), Lag(k + 1, Float64), Variance()
     )
 end
-Base.show(io::IO, o::AutoCov) = println(io, "AutoCov: $(value(o))")
+Base.show(io::IO, o::AutoCov) = print(io, "AutoCov: $(value(o))")
 nobs(o::AutoCov) = nobs(o.v)
 
 function fit!(o::AutoCov, y::Real, γ::Float64)

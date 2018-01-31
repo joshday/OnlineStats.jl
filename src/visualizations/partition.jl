@@ -31,6 +31,15 @@ Base.isless(o::Part, o2::Part) = last(o) < first(o2)
 nobs(o::Part) = o.n
 value(o::Part) = value(o.stat)
 
+midpoint(p::Part{<:Number}) = smooth(first(p), last(p), .5)
+function midpoint(p::Part{<:Dates.TimeType}) 
+    v = first(p):last(p)
+    length(v) == 1 ? first(v) : v[floor(Int, length(v)/2)]
+end
+function midpoint(p::Part{T}) where {T<:Union{Char, AbstractString, Symbol}}
+    string(first(p))
+end
+
 function fit!(p::Part{T}, x::T, data) where {T}
     x in p || error("$x is not between $(p.first) and $(p.last)")
     p.n += 1
@@ -53,11 +62,12 @@ end
 
 function squash_nearest!(v::Vector{<:Part}, b::Integer)
     sort!(v)
-    diffs = [first(v[i]) - last(v[i - 1]) for i in 2:length(v)]
+    # squash_every_other!(v)
+    diffs = [midpoint(v[i]) - midpoint(v[i - 1]) for i in 2:length(v)]
     while length(v) ≥ b
         # if equally-spaced, randomly pick bins to merge
         i = rand(find(x -> x == minimum(diffs), diffs))
-        merge!(v[i], v[i+1])
+        merge!(v[i], v[i + 1])
         deleteat!(v, i + 1)
         deleteat!(diffs, i)
     end 
