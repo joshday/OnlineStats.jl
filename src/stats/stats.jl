@@ -269,7 +269,7 @@ end
 
 #-----------------------------------------------------------------------# Extrema
 """
-    Extrema()
+    Extrema(T::Type = Float64)
 
 Maximum and minimum.
 
@@ -278,11 +278,11 @@ Maximum and minimum.
     s = Series(randn(100), Extrema())
     value(s)
 """
-mutable struct Extrema <: ExactStat{0}
-    min::Float64
-    max::Float64
-    Extrema() = new(Inf, -Inf)
+mutable struct Extrema{T} <: ExactStat{0}
+    min::T
+    max::T
 end
+Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T))
 function fit!(o::Extrema, y::Real, γ::Float64)
     o.min = min(o.min, y)
     o.max = max(o.max, y)

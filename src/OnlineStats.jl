@@ -73,9 +73,10 @@ const ϵ = 1e-6
 const VecF = Vector{Float64}
 
 #-----------------------------------------------------------------------# includes
+include("utilities/biasvec.jl")
+include("utilities/mapblocks.jl")
 include("stats/updaters.jl")
 include("stats/stats.jl")
-include("stats/biasvec.jl")
 include("stats/linregbuilder.jl")
 include("stats/histograms.jl")
 include("stats/mv.jl")
@@ -87,7 +88,6 @@ include("stats/decisiontree.jl")
 include("visualizations/partition.jl")
 include("visualizations/mosaic.jl")
 include("series.jl")
-include("mapblocks.jl")
 include("visualizations/recipes.jl")
 
 end # module

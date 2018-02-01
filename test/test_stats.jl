@@ -73,6 +73,7 @@ end
     test_exact(Extrema(), y, extrema, extrema, ==)
     test_exact(Extrema(), y, maximum, maximum, ==)
     test_exact(Extrema(), y, minimum, minimum, ==)
+    test_exact(Extrema(Int), rand(Int, 100), minimum, minimum, ==)
     test_merge(Extrema(), y, y2, ==)
 end
 #-----------------------------------------------------------------------# Distributions

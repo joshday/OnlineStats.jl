@@ -1,5 +1,4 @@
 #-----------------------------------------------------------------------# AbstractSeries
-# Required methods: stats(s), nobs(s), getweight(s)
 abstract type AbstractSeries{N} end
 
 stats(s::AbstractSeries) = s.stats
@@ -127,7 +126,7 @@ function details(io::IO, s::AugmentedSeries)
     s.transform == identity || print_with_color(:green, io, " │ transform=$(s.transform)")
 end
 
-for f in [:nobs, :value, :stats, :weight, :weight!, :getweight]
+for f in [:nobs, :value, :stats, :weight!, :getweight]
     @eval $f(o::AugmentedSeries) = $f(o.series)
 end
 
