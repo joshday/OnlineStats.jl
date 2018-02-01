@@ -917,7 +917,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.ExactStat",
     "category": "Type",
-    "text": "An OnlineStat which can be updated exactly.  Subtypes of ExactStat use EqualWeight() as the default weight.\n\n\n\n"
+    "text": "An OnlineStat which can be fit!-ted and merge!-ed exactly\n\n\n\n"
 },
 
 {
@@ -973,7 +973,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
-    "text": "An OnlineStat which must be approximated.  Subtypes of StochasticStat use  LearningRate() as the default weight.  Additionally, subtypes should be parameterized by an algorithm, which is an optional last argument.  For example:\n\nstruct Quantile{T <: Updater} <: StochasticStat{0}\n    value::Vector{Float64}\n    τ::Vector{Float64}\n    updater::T \nend\nQuantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) = ...\n\n\n\n"
+    "text": "An OnlineStat that must be approximated.  Subtypes are parameterized by an Updater\n\n\n\n"
 },
 
 {
