@@ -461,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.AugmentedSeries",
     "category": "Type",
-    "text": "AugmentedSeries(s::Series; filter = x->true, transform = identity)\n\nWrapper around a Series so that for new data, fitting occurs on transform(data), but  only if filter(data) == true.\n\n\n\n"
+    "text": "AugmentedSeries(s::Series; filter = x->true, transform = identity)\n\nWrapper around a Series so that for new data, fitting occurs on transform(data), but  only if filter(data) == true.  See series.\n\n\n\n"
 },
 
 {
@@ -814,6 +814,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.mapblocks",
     "category": "Function",
     "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.series-Tuple{Vararg{Union{OnlineStatsBase.OnlineStat, OnlineStatsBase.Weight},N} where N}",
+    "page": "API",
+    "title": "OnlineStats.series",
+    "category": "Method",
+    "text": "series(o::OnlineStat...; kw...)\nseries(wt::Weight, o::OnlineStat...; kw...)\nseries(data, o::OnlineStat...; kw...)\nseries(data, wt::Weight, o::OnlineStat...; kw...)\n\nCreate a Series or AugmentedSeries based on whether keyword arguments filter and transform are present.  \n\nExample\n\nseries(-rand(100), Mean(), Variance(); filter = isfinite, transform = abs)\n\n\n\n"
 },
 
 {
