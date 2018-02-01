@@ -63,7 +63,7 @@ function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
     end
 end
 
-unbias(o) = o.nobs / (o.nobs - 1)
+unbias(o) = nobs(o) / (nobs(o) - 1)
 
 value(o::OnlineStat, args...; kw...) = _value(o, args...; kw...)
 fit!(o::OnlineStat, ob, γ::Float64) = _fit!(o, ob, γ)

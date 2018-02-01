@@ -223,6 +223,7 @@ Base.mean(o::CovMatrix) = o.b
 Base.cov(o::CovMatrix; kw...) = value(o; kw...)
 Base.var(o::CovMatrix; kw...) = diag(value(o; kw...))
 Base.std(o::CovMatrix; kw...) = sqrt.(var(o; kw...))
+nobs(o::CovMatrix) = o.nobs
 function Base.cor(o::CovMatrix; kw...)
     copy!(o.cormat, value(o; kw...))
     v = 1.0 ./ sqrt.(diag(o.cormat))
@@ -530,6 +531,7 @@ end
 Base.mean(o::Moments) = o.m[1]
 Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
 Base.std(o::Moments) = sqrt.(var(o))
+nobs(o::Moments) = o.nobs
 function skewness(o::Moments)
     v = value(o)
     (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
