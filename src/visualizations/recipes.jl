@@ -149,9 +149,9 @@ end
         sort!(lvls)
         label --> reshape(lvls, (1, length(lvls)))
         ylim --> (0, 1)
-        linewidth --> 0
+        linewidth --> .5
         seriestype --> :bar
-        # bar_width --> bar_widths
+        bar_widths --> nobs.(parts) / sum(nobs.(parts))
         y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), parts))
         x, y
     elseif first(ymap) isa VectorOb ################################# Vector value
@@ -169,15 +169,6 @@ end
         label --> statname
         x, ymap
     end
-end
-
-midpoint(p::Part{<:Number}) = smooth(first(p), last(p), .5)
-function midpoint(p::Part{<:Dates.TimeType}) 
-    v = first(p):last(p)
-    length(v) == 1 ? first(v) : v[floor(Int, length(v)/2)]
-end
-function midpoint(p::Part{T}) where {T<:Union{Char, AbstractString, Symbol}}
-    string(first(p))
 end
 
 to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]

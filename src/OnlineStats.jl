@@ -71,7 +71,6 @@ fit!(o::OnlineStat, ob, γ::Float64) = _fit!(o, ob, γ)
 const ϵ = 1e-6
 
 const VecF = Vector{Float64}
-const AVecF = AbstractVector{Float64}
 
 #-----------------------------------------------------------------------# includes
 include("stats/updaters.jl")

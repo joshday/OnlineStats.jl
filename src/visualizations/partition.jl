@@ -148,7 +148,7 @@ end
 #-----------------------------------------------------------------------# IndexedPartition 
 struct IndexedPartition{T, O <: OnlineStat} <: AbstractPartition{1}
     parts::Vector{Part{T, O}}
-    b::Int  # max partition size 
+    b::Int  # max nparts
     empty_stat::O
 end
 function IndexedPartition(T::Type, o::OnlineStat, b::Int = 100)
@@ -164,6 +164,7 @@ function fit!(o::IndexedPartition, xy::VectorOb, ::Float64)
         if x in p 
             fit!(p, x, last(xy))
             addpart = false
+            break
         end
     end
     addpart && push!(parts, Part(o.empty_stat, xy...))

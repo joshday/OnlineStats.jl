@@ -143,7 +143,8 @@ function fit!{T}(o::CountMap{T}, y::T, γ::Float64)
     end
 end
 nobs(o::CountMap) = sum(o.counts)
-_value(o::CountMap) = Dict((key,val) for (key,val) in zip(o.labels, o.counts))
+_value(o::CountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
+
 Base.keys(o::CountMap) = o.labels
 Base.values(o::CountMap) = o.counts
 Base.haskey(o::CountMap, y) = y ∈ o.labels

@@ -112,7 +112,7 @@ mutable struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{
     filter::F1 
     transform::F2 
     callback::F3
-    nfiltered::Int
+    nskipped::Int
 end
 function AugmentedSeries(s::Series{N}; filter=always, transform=identity, callback=identity) where {N}
     S, A, B, C = typeof(s), typeof(filter), typeof(transform), typeof(callback)
@@ -123,7 +123,7 @@ end
 always(args...) = true
 
 function details(io::IO, s::AugmentedSeries)
-    s.filter == always || print_with_color(:green, io, " │ filter=$(s.filter) ($(s.nfiltered))")
+    s.filter == always || print_with_color(:green, io, " │ filter=$(s.filter) ($(s.nskipped))")
     s.transform == identity || print_with_color(:green, io, " │ transform=$(s.transform)")
 end
 
@@ -132,15 +132,15 @@ for f in [:nobs, :value, :stats, :weight, :weight!, :getweight]
 end
 
 function fit!(s::AugmentedSeries{0}, y) 
-    s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nfiltered += 1)
+    s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nskipped += 1)
     s 
 end
 function fit!(s::AugmentedSeries{1}, y::VectorOb) 
-    s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nfiltered += 1)
+    s.filter(y) ? fit!(s.series, s.transform(y)) : (s.nskipped += 1)
     s
 end
 function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
-    s.filter(xy) ? fit!(s.series, s.transform(xy)) : (s.nfiltered += 1)
+    s.filter(xy) ? fit!(s.series, s.transform(xy)) : (s.nskipped += 1)
     s
 end
 
