@@ -32,6 +32,19 @@ function Base.show(io::IO, s::AbstractSeries{N}) where {N}
     end
 end
 
+"""
+    series(o::OnlineStat...; kw...)
+    series(wt::Weight, o::OnlineStat...; kw...)
+    series(data, o::OnlineStat...; kw...)
+    series(data, wt::Weight, o::OnlineStat...; kw...)
+
+Create a [`Series`](@ref) or [`AugmentedSeries`](@ref) based on whether keyword arguments
+`filter` and `transform` are present.  
+
+# Example 
+
+    series(-rand(100), Mean(), Variance(); filter = isfinite, transform = abs)
+"""
 function series(args::Union{OnlineStat, Weight}...; kw...)
     s = Series(args...)
     length(kw) == 0 ? s : AugmentedSeries(s; kw...)
@@ -104,7 +117,7 @@ end
     AugmentedSeries(s::Series; filter = x->true, transform = identity)
 
 Wrapper around a `Series` so that for new `data`, fitting occurs on `transform(data)`, but 
-only if `filter(data) == true`.
+only if `filter(data) == true`.  See [`series`](@ref).
 """
 mutable struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{N}
     series::S
