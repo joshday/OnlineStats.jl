@@ -681,6 +681,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Mosaic",
+    "page": "API",
+    "title": "OnlineStats.Mosaic",
+    "category": "Type",
+    "text": "Mosaic(T::Type, S::Type)\n\nData structure for generating a mosaic plot, a comparison between two categorical variables.\n\nExample\n\nusing OnlineStats, Plots \nx = [rand() > .8 for i in 1:10^5]\ny = rand([1,2,2,3,3,3], 10^5)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.NADAM",
     "page": "API",
     "title": "OnlineStats.NADAM",
