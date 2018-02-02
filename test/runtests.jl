@@ -36,6 +36,7 @@ const x2 = randn(100, 5)
 include("test_show.jl")
 include("test_series.jl")
 include("test_stats.jl")
+include("test_visualizations.jl")
 
 println()
 println()

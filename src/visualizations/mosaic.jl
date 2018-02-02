@@ -20,6 +20,8 @@ function Base.show(io::IO, o::Mosaic{T,S}) where {T, S}
     print(io, "Mosaic: $T × $S")
 end
 
+nobs(o::Mosaic) = sum(nobs.(last.(value(o))))
+
 function fit!(o::Mosaic{T,S}, xy::VectorOb, γ::Float64) where {T, S}
     x = first(xy)
     y = last(xy)
