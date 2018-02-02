@@ -145,6 +145,7 @@ end
 nobs(o::CountMap) = sum(o.counts)
 _value(o::CountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
 
+Base.length(o::CountMap) = length(o.labels)
 Base.keys(o::CountMap) = o.labels
 Base.values(o::CountMap) = o.counts
 Base.haskey(o::CountMap, y) = y ∈ o.labels

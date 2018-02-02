@@ -1,25 +1,62 @@
-# struct Mosaic{T, S} <: ExactStat{1}
-#     cm::CountMap{Pair{T,S}}
-# end
-# Mosaic(T, S) = Mosaic(CountMap(Pair{T,S}))
+"""
+    Mosaic(T::Type, S::Type)
 
-# function Base.show(io::IO, o::Mosaic{T,S}) where {T, S}
-#     n1 = length(labels1(o))
-#     n2 = length(labels2(o))
-#     print(io, "Mosaic: $T ($n1) × $S ($n2)")
-# end
+Data structure for generating a mosaic plot, a comparison between two categorical variables.
 
-# Base.keys(o::Mosaic) = keys(o.cm)
-# Base.values(o::Mosaic) = values(o.cm)
-# probs(o::Mosaic) = probs(o.cm)
+# Example
 
-# labels1(o::Mosaic) = unique(first.(keys(o)))
-# labels2(o::Mosaic) = unique(last.(keys(o)))
+    using OnlineStats, Plots 
+    x = [rand() > .8 for i in 1:10^5]
+    y = rand([1,2,2,3,3,3], 10^5)
+    s = series([x y], Mosaic(Bool, Int))
+    plot(s)
+"""
+struct Mosaic{T, S} <: ExactStat{1}
+    value::Vector{Pair{T, CountMap{S}}}
+end
+Mosaic(T, S) = Mosaic(Pair{T, CountMap{S}}[])
 
-# fit!(o::Mosaic, xy::VectorOb, γ::Float64) = fit!(o.cm, Pair(first(xy), last(xy)), γ)
+function Base.show(io::IO, o::Mosaic{T,S}) where {T, S}
+    print(io, "Mosaic: $T × $S")
+end
 
-# @recipe function f(o::Mosaic{T,S}) where {T,S}
-#     kys, prbs = keys(o), probs(o)
-#     l1, l2 = first.(kys), last.(kys)
-#     l1widths =
-# end
+function fit!(o::Mosaic{T,S}, xy::VectorOb, γ::Float64) where {T, S}
+    x = first(xy)
+    y = last(xy)
+    pushx = true
+    for (i, vi) in enumerate(o.value)
+        if first(vi) == x 
+            fit!(last(o.value[i]), y, γ)
+            pushx = false 
+            break
+        end
+    end
+    if pushx 
+        stat = CountMap(S)
+        fit!(stat, y, γ)
+        push!(o.value, Pair(x, stat))
+    end
+end
+
+@recipe function f(o::Mosaic{T,S}) where {T,S}
+    o.value[:] = o.value[sortperm(first.(o.value))]
+    sort!.(last.(o.value))
+    xlevels = first.(o.value)
+    xwidths = nobs.(last.(o.value)) ./ sum(nobs.(last.(o.value)))
+    xedges = vcat(0.0, cumsum(xwidths))
+
+    ylevels = unique(vcat(keys.(last.(o.value))...))
+
+    yheights = cumsum.(reverse.(probs.(last.(o.value), [ylevels])))
+
+    y = hcat(reverse.(yheights)...)
+
+    seriestype := :bar
+    bar_widths := xwidths
+    xlim := (0, 1)
+    ylim := (0, 1)
+    xticks := ([(xedges[i] + xedges[i+1])/2 for i in 1:length(xedges)-1], xlevels)
+    labels := ylevels'
+
+    xedges, y'
+end
