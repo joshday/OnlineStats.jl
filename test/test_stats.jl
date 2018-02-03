@@ -212,6 +212,9 @@ end
     o, o2 = IndexedPartition(Float64, Mean()), IndexedPartition(Float64, Mean())
     s, s2 = Series([y y2], o), Series([y y2], o2)
     merge!(s, s2)
+    # with Date 
+    data = (Date(2010):Date(2011))[1:100]
+    test_exact(IndexedPartition(Date, Mean()), [data y], o -> value(merge(o)), x->mean(y))
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin 
