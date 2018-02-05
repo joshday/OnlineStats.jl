@@ -25,6 +25,8 @@ for T in [:Mean, :Variance, :Extrema, :Moments]
     @eval MV(p::Integer, o::$T) = MV([$T() for i in 1:p])
 end
 
+Base.first(o::MV) = first(o.stats)
+Base.last(o::MV) = last(o.stats)
 Base.length(o::MV) = length(o.stats)
 Base.:*(n::Integer, o::OnlineStat{0}) = MV(n, o)
 

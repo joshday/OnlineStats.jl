@@ -161,16 +161,18 @@ function Base.merge!(o::Hist{T}, o2::Hist{T}, γ::Float64) where {T <: AdaptiveB
     fit!.(o.method, o2.method.value)
 end
 
-function discretized_pdf(o::Hist{AdaptiveBins{T}}, y::Number) where {T}
+# based on linear interpolation
+function discretized_pdf(o::Hist{<:AdaptiveBins}, y::Number)
     b = o.method
-    if y < first(b.value[1])
-        return zero(T)
-    elseif y > first(b.value[end])
-        return zero(T)
-    else
-        i = searchsortedfirst(b.value, Pair(y, 0))
-        δ = first(b.value[i]) - first(b.value[i-1])
-        return last(b.value[i]) / (δ * nobs(b)) 
+    v = b.value
+    if y < first(first(v)) || y ≥ first(last(v))
+        return 0.0
+    else 
+        i = searchsortedfirst(v, Pair(y, 0))
+        q1, k1 = v[i-1]
+        q2, k2 = v[i]
+        area = sum((first(v[i+1]) - first(v[i])) * (last(v[i]) + last(v[i+1]))/2 for i in 1:length(v)-1)
+        return smooth(k1, k2, (y - q1) / (q2 - q1)) / area
     end
 end
 

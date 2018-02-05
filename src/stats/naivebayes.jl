@@ -13,56 +13,64 @@ probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type 
     predict(o, x)
     classify(o,x)
 """
-struct NBClassifier{T} <: ExactStat{(1, 0)}
-    cat::CountMap{T}
-    h::Vector{Dict{T, Hist{AdaptiveBins{Float64}}}}
+#-----------------------------------------------------------------------# NBClassifier
+struct NBClassifier{T, S} <: ExactStat{(1,0)}
+    value::Vector{Pair{T, MV{Hist{AdaptiveBins{S}}}}}
+    p::Int 
     b::Int
 end
-function NBClassifier(p::Integer, T::Type, b::Integer = 20) 
-    cat = CountMap(T)
-    h = [Dict{T, Hist{AdaptiveBins{Float64}}}() for i in 1:p]
-    NBClassifier(cat, h, b)
+function NBClassifier(p::Integer, T::Type, b::Integer = 10, S::Type = Float64)
+    NBClassifier(Pair{T, MV{Hist{AdaptiveBins{S}}}}[], p, b)
 end
-Base.show(io::IO, o::NBClassifier) = print(io, "NBCLassifier with labels: $(keys(o.cat))")
+function Base.show(io::IO, o::NBClassifier)
+    print(io, "NBClassifier with labels: $(first.(o.value))")
+end
+Base.keys(o::NBClassifier) = first.(o.value)
 
-function fit!(o::NBClassifier, xy::Tuple{VectorOb, Any}, γ::Float64)
-    x, y = xy
-    if !haskey(o, y)
-        for j in eachindex(x)
-            o.h[j][y] = Hist(o.b)
+function probs(o::NBClassifier)
+    nvec = nobs.(first.(last.(o.value)))
+    nvec ./ sum(nvec)
+end
+
+function fit!(o::NBClassifier, xy::Tuple, γ::Float64)
+    x, y = xy 
+    addlabel = true
+    for v in o.value
+        if first(v) == y 
+            fit!(last(v), x, 1.0)
+            addlabel = false
+            break
         end
     end
-    for j in eachindex(x)
-        fit!(o.h[j][y], x[j], γ)
+    if addlabel
+        stat = MV(o.p, Hist(o.b))
+        fit!(stat, x)
+        push!(o.value, Pair(y, stat))
     end
-    fit!(o.cat, y, γ)
 end
 
-Base.haskey(o::NBClassifier, key) = haskey(o.cat, key)
-Base.keys(o::NBClassifier) = keys(o.cat)
-Base.values(o::NBClassifier) = values(o.cat)
-
-function predict(o::NBClassifier, x::AbstractVector)
-    kys = keys(o)
-    vals = values(o)
-    probs = log.(collect(vals) ./ sum(vals))
-    for i in eachindex(probs)
-        for j in eachindex(x)
-            probs[i] += log(discretized_pdf(o.h[j][kys[i]], x[j]))
+function predict(o::NBClassifier, x::VectorOb)
+    pvec = log.(probs(o))
+    buffer = zeros(length(x))
+    for i in eachindex(pvec)
+        mvhist = last(o.value[i])
+        buffer .= log.(discretized_pdf.(mvhist.stats, x))
+        pvec[i] += sum(buffer)
+    end
+    out = exp.(pvec)
+    out ./ sum(out)
+end
+function classify(o::NBClassifier, x::VectorOb) 
+    val, i = findmax(predict(o, x))
+    first(o.value[i])
+end
+for f in [:predict, :classify]
+    @eval begin 
+        function $f(o::NBClassifier, x::AbstractMatrix, dim::Rows = Rows())
+            mapslices(x -> $f(o, x), x, 2)
+        end
+        function $f(o::NBClassifier, x::AbstractMatrix, dim::Cols)
+            mapslices(x -> $f(o, x), x, 1)
         end
     end
-    probs = exp.(probs)
-    probs ./ sum(probs)
 end
-
-predict(o::NBClassifier, x::AbstractMatrix, ::Rows = Rows()) = mapslices(x -> predict(o, x), x, 2)
-predict(o::NBClassifier, x::AbstractMatrix, ::Cols) = mapslices(x -> predict(o, x), x, 1)
-
-function classify(o::NBClassifier, x::AbstractVector)
-    probs = predict(o, x)
-    p, i = findmax(probs)
-    return collect(keys(o))[i]
-end
-
-classify(o::NBClassifier, x::AbstractMatrix, ::Rows = Rows()) = mapslices(x -> classify(o, x), x, 2)
-classify(o::NBClassifier, x::AbstractMatrix, ::Cols) = mapslices(x -> classify(o, x), x, 1)
