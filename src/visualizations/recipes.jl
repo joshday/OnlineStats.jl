@@ -176,3 +176,30 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:le
 @recipe function f(o::AbstractPartition, mapfun = value)
     o.parts, mapfun
 end
+
+
+#-----------------------------------------------------------------------# NBClassifier 
+@recipe function f(o::NBClassifier)
+    kys = keys(o)
+    layout --> o.p + 1
+    alpha --> .5
+    linewidth --> 3
+    seriestype --> :line 
+    fillto --> 0
+    for j in 1:o.p 
+        for (i, ky) in enumerate(kys)
+            @series begin 
+                title --> "Variable $j"
+                legend --> false
+                subplot --> j
+                last(o.value[i]).stats[j]
+            end
+        end
+    end
+    @series begin 
+        subplot --> o.p + 1
+        label --> kys'
+        framestyle := :none
+        zeros(0, length(kys))
+    end
+end

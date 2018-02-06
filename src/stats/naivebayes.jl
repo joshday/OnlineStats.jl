@@ -14,18 +14,20 @@ probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type 
     classify(o,x)
 """
 #-----------------------------------------------------------------------# NBClassifier
-struct NBClassifier{T, S} <: ExactStat{(1,0)}
-    value::Vector{Pair{T, MV{Hist{AdaptiveBins{S}}}}}
+struct NBClassifier{T} <: ExactStat{(1,0)}
+    value::Vector{Pair{T, MV{Hist{AdaptiveBins{Float64}}}}}
     p::Int 
     b::Int
 end
-function NBClassifier(p::Integer, T::Type, b::Integer = 10, S::Type = Float64)
-    NBClassifier(Pair{T, MV{Hist{AdaptiveBins{S}}}}[], p, b)
+function NBClassifier(p::Integer, T::Type, b::Integer = 10)
+    NBClassifier(Pair{T, MV{Hist{AdaptiveBins{Float64}}}}[], p, b)
 end
 function Base.show(io::IO, o::NBClassifier)
     print(io, "NBClassifier with labels: $(first.(o.value))")
 end
 Base.keys(o::NBClassifier) = first.(o.value)
+
+nobs(o::NBClassifier) = sum(nobs.(first.(last.(o.value))))
 
 function probs(o::NBClassifier)
     nvec = nobs.(first.(last.(o.value)))

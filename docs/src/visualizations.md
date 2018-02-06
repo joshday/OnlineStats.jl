@@ -20,6 +20,21 @@ savefig("plot_series.png"); nothing # hide
 
 ![](plot_series.png)
 
+## Naive Bayes Classifier
+
+The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
+
+```@example setup 
+# make data
+x = randn(10^5, 5)
+y = x * [1,3,5,7,9] .> 0
+
+o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
+series((x,y), o)
+plot(o)
+savefig("nbclassifier.png"); nothing # hide
+```
+![](nbclassifier.png)
 
 ## Partitions
 

@@ -29,17 +29,39 @@ function fit!(o::Node, xy::Tuple, γ::Float64)
 end
 
 
+struct DTree{T} <: ExactStat{(1,0)}
+    nodes::Vector{NBClassifier{T}}
+    leaf::Vector{Bool}
+    rules::Vector
+end
+function DTree(p::Integer, T::Type)
+    DTree([NBClassifier(p, T)], [true], [(o, x) -> 1])
+end
+Base.show(io::IO, o::DTree) = print(io, "DTree of $(length(o.nodes)) leaves")
 
-# function fit!(o::Node, xy::Tuple, γ::Float64)
-#     o.nobs += 1
-#     fit!(o.nbc, xy, γ)
-#     if o.left is nothing
-#     else
-#         fit!(o.)
-#     end
-# end
+function fit!(o::DTree, xy::Tuple, γ::Float64)
+    x, y = xy 
+    i = find_node(o, x)
+    fit!(o.nodes[i], xy, γ)
+    if nobs(o.nodes[i]) % 1000 == 0  # make split
+        for j in eachindex(x)
+            
+        end
+    end
+end
 
-
+function find_node(o::DTree, x::VectorOb)
+    isleaf = false
+    i = 1
+    while !isleaf
+        if !o.leaf[i]  # if it's not a leaf, apply next rule
+            i = o.rules[i](o, x)
+        else
+            isleaf = true
+        end
+    end
+    i
+end
 
 
 # #-----------------------------------------------------------------------# Description

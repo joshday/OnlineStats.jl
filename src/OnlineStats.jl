@@ -35,17 +35,17 @@ export
 
 
 #-----------------------------------------------------------------------# ObLoc
-# if an OnlineStat{1} is given a matrix, are observations in rows or cols
+# For OnlineStat{1}
 abstract type ObLoc end 
-struct Rows <: ObLoc end 
-struct Cols <: ObLoc end
+struct Rows <: ObLoc end # Each Row of matrix is an observation
+struct Cols <: ObLoc end # Each Col ...
 
 #-----------------------------------------------------------------------# helpers
 # (1 - γ) * a + γ * b
-smooth(a::Number, b::Number, γ::Float64) = a + γ * (b - a)
-smooth!(a::Void, b::Void, γ::Float64) = a  # help with merging updaters
-smooth!(a::Number, b::Number, γ::Float64) = smooth(a, b, γ)  # help with merging updaters
-function smooth!(a, b, γ::Float64)
+smooth(a::Number, b::Number, γ::Number) = a + γ * (b - a)
+smooth!(a::Void, b::Void, γ::Number) = a  # help with merging updaters
+smooth!(a::Number, b::Number, γ::Number) = smooth(a, b, γ)  # help with merging updaters
+function smooth!(a, b, γ::Number)
     length(a) == length(b) || 
         throw(DimensionMismatch("can't smooth arrays of different length"))
     for i in eachindex(a)
@@ -53,20 +53,17 @@ function smooth!(a, b, γ::Float64)
     end
 end
 
-# (1 - γ) * A + γ * x * x'
-# TODO: make generated function for the sake of NamedTuples
-function smooth_syr!(A::AbstractMatrix, x, γ::Float64)
-    size(A, 1) == length(x) || 
-        throw(DimensionMismatch("smooth_syr! matrix/vector mismatch: $(size(A, 1)) and $(length(x))"))
+# Update upper triangle of (1 - γ) * A + γ * x * x'
+function smooth_syr!(A::AbstractMatrix, x, γ::Number)
     for j in 1:size(A, 2), i in 1:j
-        @inbounds A[i, j] = (1.0 - γ) * A[i, j] + γ * x[i] * x[j]
+        @inbounds A[i, j] = smooth(A[i,j], x[i] * x[j], γ)
     end
 end
 
 unbias(o) = nobs(o) / (nobs(o) - 1)
 
 value(o::OnlineStat, args...; kw...) = _value(o, args...; kw...)
-fit!(o::OnlineStat, ob, γ::Float64) = _fit!(o, ob, γ)
+fit!(o::OnlineStat, ob, γ) = _fit!(o, ob, γ)
 
 const ϵ = 1e-6
 
