@@ -189,7 +189,7 @@ end
     for j in 1:o.p 
         for (i, ky) in enumerate(kys)
             @series begin 
-                title --> "Variable $j"
+                title --> "Var $j"
                 legend --> false
                 subplot --> j
                 last(o.value[i]).stats[j]
