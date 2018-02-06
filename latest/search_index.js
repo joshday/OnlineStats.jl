@@ -353,6 +353,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "visualizations.html#Naive-Bayes-Classifier-1",
+    "page": "Visualizations",
+    "title": "Naive Bayes Classifier",
+    "category": "section",
+    "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nseries((x,y), o)\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )"
+},
+
+{
     "location": "visualizations.html#Partitions-1",
     "page": "Visualizations",
     "title": "Partitions",
