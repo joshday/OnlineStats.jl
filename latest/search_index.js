@@ -177,67 +177,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "weights.html#[EqualWeight()](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.EqualWeight",
     "page": "Weight",
-    "title": "EqualWeight()",
-    "category": "section",
-    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
+    "title": "OnlineStatsBase.EqualWeight",
+    "category": "Type",
+    "text": "EqualWeight()\n\nEqually weighted observations.  \n\n(t) = 1  t\n\nExample\n\nSeries(randn(100), EqualWeight(), Variance())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.ExponentialWeight",
     "page": "Weight",
-    "title": "ExponentialWeight(λ = 0.1)",
-    "category": "section",
-    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
+    "title": "OnlineStatsBase.ExponentialWeight",
+    "category": "Type",
+    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  \n\n(t) =  = 2  (lookback + 1)\n\nExample\n\nSeries(randn(100), ExponentialWeight(), Variance())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.LearningRate",
     "page": "Weight",
-    "title": "LearningRate(r = 0.6)",
-    "category": "section",
-    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
+    "title": "OnlineStatsBase.LearningRate",
+    "category": "Type",
+    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  \n\n(t) = 1  t^r\n\nExample\n\nSeries(randn(1000), LearningRate(.7), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.HarmonicWeight",
     "page": "Weight",
-    "title": "HarmonicWeight(a = 10.0)",
-    "category": "section",
-    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
+    "title": "OnlineStatsBase.HarmonicWeight",
+    "category": "Type",
+    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\n(t) = a  (a + t - 1)\n\nExample\n\nSeries(randn(1000), HarmonicWeight(), QuantileMSPI())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.McclainWeight",
     "page": "Weight",
-    "title": "McclainWeight(a = 0.1)",
-    "category": "section",
-    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+    "title": "OnlineStatsBase.McclainWeight",
+    "category": "Type",
+    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\n(t) = (t-1)  (1 + (t) - )\n\nExample\n\nSeries(randn(100), McclainWeight(), Mean())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#Weight-Wrappers-1",
+    "location": "weights.html#Weight-Types-1",
     "page": "Weight",
-    "title": "Weight Wrappers",
+    "title": "Weight Types",
     "category": "section",
-    "text": "Several types can change the behavior of a Weight."
+    "text": "EqualWeight\nExponentialWeight\nLearningRate\nHarmonicWeight\nMcclainWeight"
 },
 
 {
-    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.Bounded",
     "page": "Weight",
-    "title": "Bounded(weight, λ)",
-    "category": "section",
-    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
+    "title": "OnlineStatsBase.Bounded",
+    "category": "Type",
+    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\n_bounded(t) = max((t) )\n\nExample\n\nBounded(EqualWeight(), .1)\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.Scaled",
     "page": "Weight",
-    "title": "Scaled(weight, λ)",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "Type",
+    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\n_scaled(t) =  * (t)\n\nExample\n\nBounded(LearningRate(.5), .1)\n\nSeries(randn(1000), 2.0 * LearningRate(.9), QuantileMM())\n\n\n\n"
+},
+
+{
+    "location": "weights.html#Weight-wrappers-1",
+    "page": "Weight",
+    "title": "Weight wrappers",
     "category": "section",
-    "text": "Weights are scaled by a constant.  This should only be used with the StochasticStats  based on stochastic gradient algorithms, as it violates the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+    "text": "Bounded\nScaled"
 },
 
 {
@@ -921,107 +929,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStatsBase.Bounded",
-    "page": "API",
-    "title": "OnlineStatsBase.Bounded",
-    "category": "Type",
-    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\n_bounded(t) = max((t) )\n\nExample\n\nBounded(EqualWeight(), .1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.EqualWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.EqualWeight",
-    "category": "Type",
-    "text": "EqualWeight()\n\nEqually weighted observations.  \n\n(t) = 1  t\n\nExample\n\nSeries(randn(100), EqualWeight(), Variance())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.ExactStat",
-    "page": "API",
-    "title": "OnlineStatsBase.ExactStat",
-    "category": "Type",
-    "text": "An OnlineStat which can be fit!-ted and merge!-ed exactly\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.ExponentialWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.ExponentialWeight",
-    "category": "Type",
-    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  \n\n(t) =  = 2  (lookback + 1)\n\nExample\n\nSeries(randn(100), ExponentialWeight(), Variance())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.HarmonicWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.HarmonicWeight",
-    "category": "Type",
-    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\n(t) = a  (a + t - 1)\n\nExample\n\nSeries(randn(1000), HarmonicWeight(), QuantileMSPI())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LearningRate",
-    "page": "API",
-    "title": "OnlineStatsBase.LearningRate",
-    "category": "Type",
-    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  \n\n(t) = 1  t^r\n\nExample\n\nSeries(randn(1000), LearningRate(.7), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LearningRate2",
-    "page": "API",
-    "title": "OnlineStatsBase.LearningRate2",
-    "category": "Type",
-    "text": "LearningRate2(c = .5)\n\nSlowly decreasing weight.  \n\n(t) = 1  (1 + c * (t - 1))\n\nExample\n\nSeries(randn(1000), LearningRate2(.3), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.McclainWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.McclainWeight",
-    "category": "Type",
-    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\n(t) = (t-1)  (1 + (t) - )\n\nExample\n\nSeries(randn(100), McclainWeight(), Mean())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Scaled",
-    "page": "API",
-    "title": "OnlineStatsBase.Scaled",
-    "category": "Type",
-    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\n_scaled(t) =  * (t)\n\nExample\n\nBounded(LearningRate(.5), .1)\n\nSeries(randn(1000), 2.0 * LearningRate(.9), QuantileMM())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.StochasticStat",
-    "page": "API",
-    "title": "OnlineStatsBase.StochasticStat",
-    "category": "Type",
-    "text": "An OnlineStat that must be approximated.  Subtypes are parameterized by an Updater\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Weight",
-    "page": "API",
-    "title": "OnlineStatsBase.Weight",
-    "category": "Type",
-    "text": "Subtypes of Weight must be callable to produce the weight given the current number of  observations in an OnlineStat n and the number of new observations (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase._fit!",
-    "page": "API",
-    "title": "OnlineStatsBase._fit!",
-    "category": "Function",
-    "text": "_fit!(o::OnlineStat, observation::TypeOfObservation, γ::Float64)\n\nUpdate an OnlineStat with a single observation by a weight γ.  TypeOfObservation depends on typof(o).\n\n\n\n"
-},
-
-{
     "location": "api.html#API-1",
     "page": "API",
     "title": "API",
     "category": "section",
-    "text": "Modules = [OnlineStats, OnlineStatsBase]"
+    "text": "Modules = [OnlineStats]"
 },
 
 ]}
