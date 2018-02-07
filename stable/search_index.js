@@ -353,6 +353,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "visualizations.html#Naive-Bayes-Classifier-1",
+    "page": "Visualizations",
+    "title": "Naive Bayes Classifier",
+    "category": "section",
+    "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nseries((x,y), o)\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )"
+},
+
+{
     "location": "visualizations.html#Partitions-1",
     "page": "Visualizations",
     "title": "Partitions",
@@ -461,7 +469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.AugmentedSeries",
     "category": "Type",
-    "text": "AugmentedSeries(s::Series; filter = x->true, transform = identity)\n\nWrapper around a Series so that for new data, fitting occurs on transform(data), but  only if filter(data) == true.\n\n\n\n"
+    "text": "AugmentedSeries(s::Series; filter = x->true, transform = identity)\n\nWrapper around a Series so that for new data, fitting occurs on transform(data), but  only if filter(data) == true.  See series.\n\n\n\n"
 },
 
 {
@@ -533,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Extrema",
     "category": "Type",
-    "text": "Extrema()\n\nMaximum and minimum.\n\nExample\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
+    "text": "Extrema(T::Type = Float64)\n\nMaximum and minimum.\n\nExample\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
 },
 
 {
@@ -681,6 +689,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Mosaic",
+    "page": "API",
+    "title": "OnlineStats.Mosaic",
+    "category": "Type",
+    "text": "Mosaic(T::Type, S::Type)\n\nData structure for generating a mosaic plot, a comparison between two categorical variables.\n\nExample\n\nusing OnlineStats, Plots \nx = [rand() > .8 for i in 1:10^5]\ny = rand([1,2,2,3,3,3], 10^5)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.NADAM",
     "page": "API",
     "title": "OnlineStats.NADAM",
@@ -817,6 +833,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.series-Tuple{Vararg{Union{OnlineStatsBase.OnlineStat, OnlineStatsBase.Weight},N} where N}",
+    "page": "API",
+    "title": "OnlineStats.series",
+    "category": "Method",
+    "text": "series(o::OnlineStat...; kw...)\nseries(wt::Weight, o::OnlineStat...; kw...)\nseries(data, o::OnlineStat...; kw...)\nseries(data, wt::Weight, o::OnlineStat...; kw...)\n\nCreate a Series or AugmentedSeries based on whether keyword arguments filter and transform are present.  \n\nExample\n\nseries(-rand(100), Mean(), Variance(); filter = isfinite, transform = abs)\n\n\n\n"
+},
+
+{
     "location": "api.html#StatsBase.confint",
     "page": "API",
     "title": "StatsBase.confint",
@@ -917,7 +941,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.ExactStat",
     "category": "Type",
-    "text": "An OnlineStat which can be updated exactly.  Subtypes of ExactStat use EqualWeight() as the default weight.\n\n\n\n"
+    "text": "An OnlineStat which can be fit!-ted and merge!-ed exactly\n\n\n\n"
 },
 
 {
@@ -973,7 +997,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStatsBase.StochasticStat",
     "category": "Type",
-    "text": "An OnlineStat which must be approximated.  Subtypes of StochasticStat use  LearningRate() as the default weight.  Additionally, subtypes should be parameterized by an algorithm, which is an optional last argument.  For example:\n\nstruct Quantile{T <: Updater} <: StochasticStat{0}\n    value::Vector{Float64}\n    τ::Vector{Float64}\n    updater::T \nend\nQuantile(τ::AbstractVector = [.25, .5, .75], u::Updater = SGD()) = ...\n\n\n\n"
+    "text": "An OnlineStat that must be approximated.  Subtypes are parameterized by an Updater\n\n\n\n"
 },
 
 {
