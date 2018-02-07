@@ -2,7 +2,8 @@ __precompile__(true)
 module OnlineStats
 
 import SweepOperator
-import LearnBase: fit!, value, nobs, predict
+import NamedTuples: NamedTuple
+import LearnBase: fit!, value, nobs, predict, transform!
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, 
     confint, autocor, autocov, entropy
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
@@ -29,7 +30,7 @@ export
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
-    NBClassifier, Partition, Group, IndexedPartition, Mosaic,
+    NBClassifier, Partition, Group, IndexedPartition, Mosaic, ModelSchema,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
 
@@ -82,6 +83,7 @@ include("stats/statlearn.jl")
 include("stats/wrappers.jl")
 include("stats/naivebayes.jl")
 include("stats/decisiontree.jl")
+include("stats/model_schema.jl")
 include("visualizations/partition.jl")
 include("visualizations/mosaic.jl")
 include("series.jl")

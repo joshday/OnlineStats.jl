@@ -183,7 +183,6 @@ end
     kys = keys(o)
     layout --> o.p + 1
     alpha --> .5
-    linewidth --> 3
     seriestype --> :line 
     fillto --> 0
     for j in 1:o.p 
