@@ -26,6 +26,7 @@ function Base.show(io::IO, o::NBClassifier)
     print(io, "NBClassifier with labels: $(first.(o.value))")
 end
 Base.keys(o::NBClassifier) = first.(o.value)
+Base.length(o::NBClassifier) = o.p
 
 nobs(o::NBClassifier) = sum(nobs.(first.(last.(o.value))))
 

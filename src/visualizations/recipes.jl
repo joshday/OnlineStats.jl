@@ -147,13 +147,15 @@ end
             end
         end
         sort!(lvls)
-        label --> reshape(lvls, (1, length(lvls)))
-        ylim --> (0, 1)
-        linewidth --> .5
-        seriestype --> :bar
-        bar_widths --> nobs.(parts) / sum(nobs.(parts))
-        y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), parts))
-        x, y
+        @series begin 
+            label --> reshape(lvls, (1, length(lvls)))
+            ylim --> (0, 1)
+            linewidth --> .5
+            seriestype --> :bar
+            # bar_widths --> nobs.(parts) / sum(nobs.(parts))
+            y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), parts))
+            x, y
+        end
     elseif first(ymap) isa VectorOb ################################# Vector value
         label --> statname 
         y = to_plot_shape(ymap)

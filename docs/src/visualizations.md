@@ -93,7 +93,7 @@ o = Partition(CountMap(String), 75)
 
 s = Series(y, o)
 
-plot(o, xlab = "Nobs")
+plot(o, xlab = "Nobs", bar_widths = nobs.(o.parts))
 savefig("partition_countmap.png"); nothing # hide
 ```
 ![](partition_countmap.png)
