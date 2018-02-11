@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Categorical Data",
     "category": "section",
-    "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
+    "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o, xlab = \"Nobs\", bar_widths = nobs.(o.parts))\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
 },
 
 {
