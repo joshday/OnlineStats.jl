@@ -1,11 +1,12 @@
 hoeffding_bound(R, δ, n) = sqrt(R ^ 2 * -log(δ) / 2n)
 
 #-----------------------------------------------------------------------# Node
+# Type-stable decision tree node.
 mutable struct Node{T}
     stat::NBClassifier{T}
     split::Pair{Int, Float64}  # if x[split[1]] < split[2], go left to lr[1]
     lr::Vector{Int}  # Vector indices of left and right split
-    ind::Int
+    id::Int
     δ::Float64
 end
 function Node(p::Integer, T::Type, b::Integer; δ = .01) 
@@ -13,7 +14,7 @@ function Node(p::Integer, T::Type, b::Integer; δ = .01)
 end
 
 function Base.show(io::IO, o::Node)
-    print_with_color(:green, io, "Node $(o.ind): ")
+    print_with_color(:green, io, "Node $(o.id): ")
     if length(o.lr) == 1
         kys = keys(o)
         ps = probs(o)
@@ -26,33 +27,27 @@ function Base.show(io::IO, o::Node)
     end
 end
 
-function goto(o::Node, x::VectorOb)
-    i, v = o.split
-    ind = Int(x[i] < v) + 1
-    o.lr[ind]  # getindex 1 or 2
-end
+goto(o::Node, x::VectorOb) = o.lr[Int(x[first(o.split)] < last(o.split)) + 1]
 function goto(v::Vector{<:Node}, x::VectorOb)
-    i = 1
-    while true 
-        k = i 
+    i = 1 
+    while length(v[i].lr) > 1
         i = goto(v[i], x)
-        if k == i 
-            return i 
-        end
     end
+    return i
 end
 
 function shouldsplit(o::Node) 
-    nobs(o) > 100_000 
+    nobs(o) > 100_000  # TODO: be smarter
 end
 
 function bestsplit(o::Node)
     kys = keys(o)
     p = length(o)
     split_options = zeros(p)
-    for i in 1:p
-        # try mean for each label 
-        
+    for j in 1:p
+        val = o.stat.value
+        μ_min, μ_max = extrema(mean(last(val[k]).stats[j]) for k in 1:length(kys))
+        split_options[j] = (μ_min + μ_max) / 2
     end
 end
 
@@ -78,6 +73,7 @@ function fit!(o::DTree, xy::Tuple, γ::Float64)
     stat = node.stat
     fit!(stat, xy, γ)
     if shouldsplit(node)
+        bestsplit(node)
         # find best split for each predictor
     end
 end

@@ -837,3 +837,27 @@ Base.sum(o::Sum) = o.sum
 fit!(o::Sum{T}, x::Real, γ::Float64) where {T<:AbstractFloat} = (v = convert(T, x); o.sum += v)
 fit!(o::Sum{T}, x::Real, γ::Float64) where {T<:Integer} =       (v = round(T, x);   o.sum += v)
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: Sum} = (o.sum += o2.sum)
+
+#-----------------------------------------------------------------------# Unique 
+"""
+    Unique(T::Type)
+
+Track the unique values. 
+
+# Example 
+
+    series(rand(1:5, 100), Unique(Int))
+"""
+struct Unique{T} <: ExactStat{0}
+    value::Vector{T}
+end
+Unique(T::Type) = Unique(T[])
+fit!(o::Unique, y, γ::Number) = (y ∈ o.value || push!(o.value, y))
+value(o::Unique) = sort!(o.value)
+Base.show(io::IO, o::Unique) = print(io, "Unique($(value(o)))")
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Unique}
+    for v in o2.value 
+        fit!(o, v, 1.0)
+    end
+end
+Base.unique(o::Unique) = value(o)

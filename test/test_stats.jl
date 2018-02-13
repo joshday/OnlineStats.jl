@@ -424,6 +424,12 @@ end
 @testset "Sum" begin 
     test_exact(Sum(), y, sum, sum)
     test_exact(Sum(Int), 1:100, sum, sum)
+    test_merge(Sum(), y, y2)
+end
+#-----------------------------------------------------------------------# Unique 
+@testset "Unique" begin 
+    test_exact(Unique(Float64), y, unique, x->sort(unique(x)))
+    test_merge(Unique(Float64), y, y2)
 end
 #-----------------------------------------------------------------------# Variance 
 @testset "Variance" begin 

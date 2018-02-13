@@ -23,6 +23,7 @@ for o = [
         ReservoirSample(10), 
         StatLearn(5), 
         Sum(), 
+        Unique(Int),
         Variance(), 
         [Mean() Variance()], 
         OnlineStats.Part(Mean(), 1, 1),
