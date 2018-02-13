@@ -825,6 +825,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Unique",
+    "page": "API",
+    "title": "OnlineStats.Unique",
+    "category": "Type",
+    "text": "Unique(T::Type)\n\nTrack the unique values. \n\nExample\n\nseries(rand(1:5, 100), Unique(Int))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Variance",
     "page": "API",
     "title": "OnlineStats.Variance",
