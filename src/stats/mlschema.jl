@@ -1,3 +1,10 @@
+"""
+    MLFeature(Variance())
+    MLFeature(Unique())
+
+Track mean/std for continuous variables (`Variance`) or the unique values for categorical 
+variables (`Unique`).
+"""
 struct MLFeature{T <: Union{Variance, Unique}}
     stat::T 
     hasmissing::Bool
