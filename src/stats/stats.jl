@@ -861,3 +861,4 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Unique}
     end
 end
 Base.unique(o::Unique) = value(o)
+Base.length(o::Unique) = length(o.value)

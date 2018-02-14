@@ -429,6 +429,7 @@ end
 #-----------------------------------------------------------------------# Unique 
 @testset "Unique" begin 
     test_exact(Unique(Float64), y, unique, x->sort(unique(x)))
+    test_exact(Unique(Float64), y, length, length)
     test_merge(Unique(Float64), y, y2)
 end
 #-----------------------------------------------------------------------# Variance 
