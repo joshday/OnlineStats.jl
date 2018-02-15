@@ -1,87 +1,70 @@
-"""
-    MLFeature(Variance())
-    MLFeature(Unique())
+module ML
 
-Track mean/std for continuous variables (`Variance`) or the unique values for categorical 
-variables (`Unique`).
-"""
-struct MLFeature{T <: Union{Variance, Unique}}
-    stat::T 
-    hasmissing::Bool
+import ..Variance
+import ..Unique
+import OnlineStatsBase: ExactStat, VectorOb
+import LearnBase: fit!, value, transform
+import NamedTuples: NamedTuple
+import DataStructures: SortedDict
+export Continuous, Discrete
+
+abstract type AbstractMLColumn <: ExactStat{0} end
+fit!(o::AbstractMLColumn, y, γ::Number) = fit!(o.stat, y, γ)
+Base.merge!(o::AbstractMLColumn, o2::AbstractMLColumn, γ) = merge!(o.stat, o2.stat, γ)
+
+#-----------------------------------------------------------------------# Continuous
+struct Continuous <: AbstractMLColumn  
+    stat::Variance
 end
-MLFeature(stat::OnlineStat) = MLFeature(stat, false)
+Continuous() = Continuous(Variance())
+width(o::Continuous) = 1
+value(o::Continuous) = (mean(o.stat), std(o.stat))
+Base.show(io::IO, o::Continuous) = print(io, "Continuous: (μ, σ) = $(value(o))")
 
-fit!(o::MLFeature, y, γ::Number) = fit!(o.stat, y, γ)
-
-function Base.show(io::IO, o::MLFeature)
-    print(io, description(o))
-    o.hasmissing && print(io, " with missing.")
+#-----------------------------------------------------------------------# Discrete
+struct Discrete{T} <: AbstractMLColumn
+    stat::Unique{T} 
 end
+Discrete(T::Type = Any) = Discrete(Unique(T))
+width(o::Discrete) = min(0, length(o.stat) - 1)
+value(o::Discrete) = value(o.stat)
+Base.show(io::IO, o::Discrete) = print(io, "Discrete: $(value(o.stat))")
 
-#-----------------------------------------------------------------------# continuous
-width(o::MLFeature{Variance}) = 1 + o.hasmissing
-description(o::MLFeature{Variance}) = "📈  | μ = $(mean(o.stat)), σ = $(std(o.stat))"
-transform(o::MLFeature{Variance}, x) = (x .- mean(o.stat)) ./ std(o.stat)
-
-#-----------------------------------------------------------------------# categorical
-width(o::MLFeature{<:Unique}) = length(o.stat) + o.hasmissing - 1
-description(o::MLFeature{<:Unique}) = "📊  | $(value(o.stat))"
-transform(o::MLFeature{Unique{T}}, x::T) where {T} = [Float64(v == x) for v in unique(o.stat)]
-
+#-----------------------------------------------------------------------# Ignored 
+struct Ignored <: AbstractMLColumn end
+width(o::Ignored) = 0
+value(o::Ignored) = nothing 
+fit!(o::Ignored, y, γ::Number) = o
+Base.show(io::IO, o::Ignored) = print(io, "Ignored")
 
 #-----------------------------------------------------------------------# FeatureExtractor
-"""
-    FeatureExtractor(s::String) 
-    FeatureExtractor(d::Dict)
-
-Track the necessary values for standardizing continuous variables and/or generating one-hot 
-vectors for categorical variables.  Allowed characters in the `String` method are:
-
-- 'c': Continuous variable with missing values 
-- 'C': Continuous variable 
-- 'n': Nominal variable with missing values 
-- 'N': Nominal variable
-
-# Example
-
-    o = FeatureExtractor("CCCC")
-    series(randn(1000, 4), o)
-"""
-struct FeatureExtractor <: ExactStat{1}
-    names::Vector{Symbol}
-    schema::Vector{MLFeature}
+mutable struct FeatureExtractor <: ExactStat{1}
+    dict::SortedDict{Symbol, Any}
+    nobs::Int
 end
-function FeatureExtractor(s::String)
-    names = Symbol[]
-    schema = MLFeature[]
-    for (i, si) in enumerate(s)
-        sym = Symbol("x$i")
-        push!(names, sym)
-        if si == 'c'
-            push!(schema, MLFeature(Variance(), true))
-        elseif si == 'C'
-            push!(schema, MLFeature(Variance()))
-        elseif si == 'n'
-            push!(schema, MLFeature(Unique(Any), true))
-        elseif si == 'N'
-            push!(schema, MLFeature(Unique(Any)))
-        else 
-            error("String must only contain 'c', 'C', 'n', or 'N'")
-        end
-    end
-    FeatureExtractor(names, schema)
-end
-width(o::FeatureExtractor) = sum(width, o.schema)
+FeatureExtractor() = FeatureExtractor(SortedDict{Symbol, Any}(), 0)
 
 function fit!(o::FeatureExtractor, y::VectorOb, γ::Number)
-    for (si, yi) in zip(o.schema, y)
-        fit!(si, yi, γ)
+    o.nobs += 1
+    if o.nobs == 1
+        for (ky, val) in zip(colnames(y), values(y))
+            o.dict[ky] = guess_feature(val)
+        end
+    else
+        for (yi, oi) in zip(y, values(o.dict))
+            @show oi, yi
+            fit!(oi, yi, γ)
+        end
     end
 end
 
-function Base.show(io::IO, o::FeatureExtractor)
-    println(io, "FeatureExtractor")
-    for (ky, val) in zip(o.names, o.schema)
-        println(io, "$ky: $val")
-    end
-end
+Base.sort(o::FeatureExtractor) = sort(o.dict)
+
+guess_feature(val) = Ignored()
+guess_feature(val::Number) = (o=Continuous(); fit!(o, val, 1.0); o)
+guess_feature(val::T) where {T <: Union{AbstractString, Char, Symbol}} = (o=Discrete(T); fit!(o, val, 1.0); o)
+
+colnames(y::NamedTuple) = keys(y)
+colnames(y::VectorOb) = [Symbol("x$i") for i in 1:length(y)]
+
+end # module
