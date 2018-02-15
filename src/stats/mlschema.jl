@@ -1,3 +1,20 @@
+"""
+    ML.FeatureExtractor()
+
+Type for extracting feature vectors from continuous and discrete variables.  Under the hood,
+each variable is tracked by one of the following:
+
+- `ML.Continuous()`
+- `ML.Discrete()`
+- `ML.Ignored()`
+
+# Example 
+
+    o = ML.FeatureExtractor()
+    x = [randn(100) rand('a':'d', 100) rand(Date(2010):Date(2011), 100)]
+    series(x, o)
+    o.dict
+"""
 module ML
 
 import ..Variance
@@ -52,7 +69,6 @@ function fit!(o::FeatureExtractor, y::VectorOb, γ::Number)
         end
     else
         for (yi, oi) in zip(y, values(o.dict))
-            @show oi, yi
             fit!(oi, yi, γ)
         end
     end
