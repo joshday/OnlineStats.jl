@@ -553,14 +553,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.FeatureExtractor",
-    "page": "API",
-    "title": "OnlineStats.FeatureExtractor",
-    "category": "Type",
-    "text": "FeatureExtractor(s::String) \nFeatureExtractor(d::Dict)\n\nTrack the necessary values for standardizing continuous variables and/or generating one-hot  vectors for categorical variables.  Allowed characters in the String method are:\n\n'c': Continuous variable with missing values \n'C': Continuous variable \n'n': Nominal variable with missing values \n'N': Nominal variable\n\nExample\n\no = FeatureExtractor(\"CCCC\")\nseries(randn(1000, 4), o)\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.FitBeta",
     "page": "API",
     "title": "OnlineStats.FitBeta",
@@ -670,14 +662,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.LinRegBuilder",
     "category": "Type",
     "text": "LinRegBuilder(p)\n\nCreate an object from which any variable can be regressed on any other set of variables, optionally with ridge (PenaltyFunctions.L2Penalty) regularization.  The main function to use with LinRegBuilder is coef:\n\ncoef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)\n\nReturn the coefficients of a regressing column y on columns x with ridge (L2Penalty)  parameter λ.  An intercept (bias) term is added by default.\n\nExamples\n\nx = randn(1000, 10)\no = LinRegBuilder(10)\ns = Series(x, o)\n\n# let response = x[:, 3]\ncoef(o; y=3, verbose=true) \n\n# let response = x[:, 7], predictors = x[:, [2, 5, 4]]\ncoef(o; y = 7, x = [2, 5, 4]) \n\n#\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.MLFeature",
-    "page": "API",
-    "title": "OnlineStats.MLFeature",
-    "category": "Type",
-    "text": "MLFeature(Variance())\nMLFeature(Unique())\n\nTrack mean/std for continuous variables (Variance) or the unique values for categorical  variables (Unique).\n\n\n\n"
 },
 
 {
