@@ -119,7 +119,7 @@ end
 Wrapper around a `Series` so that for new `data`, fitting occurs on `transform(data)`, but 
 only if `filter(data) == true`.  See [`series`](@ref).
 """
-mutable struct AugmentedSeries{N, S <: Series{N}, F1, F2, F3} <: AbstractSeries{N}
+mutable struct AugmentedSeries{N, S <: AbstractSeries{N}, F1, F2, F3} <: AbstractSeries{N}
     series::S
     filter::F1 
     transform::F2 
@@ -155,6 +155,17 @@ function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
     s.filter(xy) ? fit!(s.series, s.transform(xy)) : (s.nskipped += 1)
     s
 end
+
+#-----------------------------------------------------------------------# ModelSeries
+# struct ModelSeries{S<:Series{(1,0)}, FE<:FeatureExtractor} <: AbstractSeries{1}
+#     s::S
+#     fe::FE
+#     fvec::Vector{Float64}  # featurevector
+# end
+# function fit!(s::ModelSeries, y::VectorOb)
+#     transform!(s.fvec, s.fe, y)
+#     fit!(s.s, s.fvec)
+# end
 
 #-----------------------------------------------------------------------# fit! 0
 """

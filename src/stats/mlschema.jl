@@ -31,11 +31,16 @@ transform(o::MLFeature{Unique{T}}, x::T) where {T} = [Float64(v == x) for v in u
 
 #-----------------------------------------------------------------------# FeatureExtractor
 """
-    FeatureExtractor(s::String)
+    FeatureExtractor(s::String) 
     FeatureExtractor(d::Dict)
 
 Track the necessary values for standardizing continuous variables and/or generating one-hot 
-vectors for categorical variables.  
+vectors for categorical variables.  Allowed characters in the `String` method are:
+
+- 'c': Continuous variable with missing values 
+- 'C': Continuous variable 
+- 'n': Nominal variable with missing values 
+- 'N': Nominal variable
 
 # Example
 
