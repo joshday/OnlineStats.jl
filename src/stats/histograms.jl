@@ -1,10 +1,10 @@
 # TODO: Box 2 in https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf
 
 #-----------------------------------------------------------------------# HistAlg
-abstract type HistAlg end 
+abstract type HistAlg{N} end 
+input(o::HistAlg{N}) where {N} = N
 Base.show(io::IO, o::HistAlg) = print(io, name(o, false, false))
 # get_hist_alg(args...)     --> HistAlg 
-# input(o)                  --> N
 # _midpoints(o)             --> midpoints of bins 
 # _counts(o)                --> counts in bins
 # nobs
@@ -41,8 +41,8 @@ observed.  `Hist` objects can be used to return approximate summary statistics o
 struct Hist{N, H <: HistAlg} <: ExactStat{N}
     alg::H
 end
-function Hist(args)
-    alg = get_hist_alg(args)
+function Hist(args...)
+    alg = get_hist_alg(args...)
     N = input(alg)
     Hist{N, typeof(alg)}(alg)
 end
@@ -72,13 +72,12 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
 end
 
 #-----------------------------------------------------------------------# FixedRangeBins
-mutable struct FixedRangeBins{R <: Range} <: HistAlg 
+mutable struct FixedRangeBins{R <: Range} <: HistAlg{0} 
     edges::R 
     counts::Vector{Int}
     out::Int
 end
 get_hist_alg(r::Range) = FixedRangeBins(r, zeros(Int, length(r) - 1), 0)
-input(o::FixedRangeBins) = 0
 _midpoints(o::FixedRangeBins) = _midpoints(o.edges)
 _counts(o::FixedRangeBins) = o.counts
 nobs(o::FixedRangeBins) = sum(o.counts) + o.out
@@ -118,29 +117,6 @@ function _pdf(o::FixedRangeBins, y::Real)
     end
 end
 
-#---------------------------------------------------------------------# AdaptiveRangeBins
-mutable struct AdaptiveRangeBins{R <: Range} <: HistAlg 
-    edges::R 
-    counts::Vector{Int}
-    nobs::Int
-end
-AdaptiveRangeBins(b::Int) = AdaptiveRangeBins(linspace(0, 0, b), Int[], 0)
-Base.show(io::IO, o::AdaptiveRangeBins) = print(io, "AdaptiveRangeBins over $(o.edges)")
-function fit!(o::AdaptiveRangeBins, y, γ)
-    o.nobs += 1
-    if o.nobs == 1
-        o.edges = linspace(float(y), float(y), length(o.edges))
-    elseif first(o.edges) == last(o.edges)
-        one = min(first(o.edges), y)
-        two = max(last(o.edges), y)
-        o.edges = linspace(one, two, length(o.edges))
-    elseif y ≤ first(o.edges)
-    elseif y > last(o.edges)
-    else
-
-    end
-end
-
 #-----------------------------------------------------------------------# AdaptiveBins
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
 """
@@ -148,13 +124,12 @@ Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-struct AdaptiveBins{T} <: HistAlg 
+struct AdaptiveBins{T} <: HistAlg{0} 
     value::Vector{Pair{T, Int}}
     b::Int
 end
 get_hist_alg(b::Int) = AdaptiveBins(Pair{Float64, Int}[], b)
 get_hist_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
-input(o::AdaptiveBins) = 0
 _midpoints(o::AdaptiveBins) = first.(o.value)
 _counts(o::AdaptiveBins) = last.(o.value)
 nobs(o::AdaptiveBins) = sum(last, o.value)

@@ -16,9 +16,7 @@ struct Mosaic{T, S} <: ExactStat{1}
 end
 Mosaic(T, S) = Mosaic(Pair{T, CountMap{S}}[])
 
-function Base.show(io::IO, o::Mosaic{T,S}) where {T, S}
-    print(io, "Mosaic: $T × $S")
-end
+Base.show(io::IO, o::Mosaic{T,S}) where {T, S} = print(io, "Mosaic: $T × $S")
 
 nobs(o::Mosaic) = sum(nobs.(last.(value(o))))
 
