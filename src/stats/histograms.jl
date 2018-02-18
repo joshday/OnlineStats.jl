@@ -118,28 +118,28 @@ function _pdf(o::FixedRangeBins, y::Real)
     end
 end
 
-# #---------------------------------------------------------------------# AdaptiveFixedBins
-# mutable struct AdaptiveFixedBins{R <: Range} <: HistAlg 
-#     edges::R 
-#     counts::Vector{Int}
-#     nobs::Int
-# end
-# AdaptiveFixedBins(b::Int) = AdaptiveFixedBins(linspace(0, 0, b), Int[], 0)
-# Base.show(io::IO, o::AdaptiveFixedBins) = print(io, "AdaptiveFixedBins over $(o.edges)")
-# function fit!(o::AdaptiveFixedBins, y, γ::Number)
-#     o.nobs += 1
-#     if o.nobs == 1
-#         o.edges = linspace(float(y), float(y), length(o.edges))
-#     elseif first(o.edges) == last(o.edges)
-#         one = min(first(o.edges), y)
-#         two = max(last(o.edges), y)
-#         o.edges = linspace(one, two, length(o.edges))
-#     elseif y ≤ first(o.edges)
-#     elseif y > last(o.edges)
-#     else
+#---------------------------------------------------------------------# AdaptiveRangeBins
+mutable struct AdaptiveRangeBins{R <: Range} <: HistAlg 
+    edges::R 
+    counts::Vector{Int}
+    nobs::Int
+end
+AdaptiveRangeBins(b::Int) = AdaptiveRangeBins(linspace(0, 0, b), Int[], 0)
+Base.show(io::IO, o::AdaptiveRangeBins) = print(io, "AdaptiveRangeBins over $(o.edges)")
+function fit!(o::AdaptiveRangeBins, y, γ)
+    o.nobs += 1
+    if o.nobs == 1
+        o.edges = linspace(float(y), float(y), length(o.edges))
+    elseif first(o.edges) == last(o.edges)
+        one = min(first(o.edges), y)
+        two = max(last(o.edges), y)
+        o.edges = linspace(one, two, length(o.edges))
+    elseif y ≤ first(o.edges)
+    elseif y > last(o.edges)
+    else
 
-#     end
-# end
+    end
+end
 
 #-----------------------------------------------------------------------# AdaptiveBins
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf

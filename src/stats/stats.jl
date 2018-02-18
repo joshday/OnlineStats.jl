@@ -13,8 +13,8 @@ mutable struct Mean <: ExactStat{0}
     μ::Float64
     Mean(μ = 0.0) = new(μ)
 end
-fit!(o::Mean, y::Real, γ::Float64) = (o.μ = smooth(o.μ, y, γ))
-Base.merge!(o::Mean, o2::Mean, γ::Float64) = (fit!(o, value(o2), γ); o)
+fit!(o::Mean, y, γ) = (o.μ = smooth(o.μ, y, γ))
+Base.merge!(o::Mean, o2::Mean, γ) = (fit!(o, value(o2), γ); o)
 Base.mean(o::Mean) = value(o)
 
 
