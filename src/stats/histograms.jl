@@ -2,6 +2,17 @@
 
 #-----------------------------------------------------------------------# HistAlg
 abstract type HistAlg end 
+Base.show(io::IO, o::HistAlg) = print(io, name(o, false, false))
+# get_hist_alg(args...)     --> HistAlg 
+# input(o)                  --> N
+# _midpoints(o)             --> midpoints of bins 
+# _counts(o)                --> counts in bins
+# nobs
+# fit!
+# merge!
+
+
+_midpoints(r) = r[1:length(r) - 1] + 0.5 * step(r)
 
 #-----------------------------------------------------------------------# Hist
 """
@@ -27,25 +38,26 @@ observed.  `Hist` objects can be used to return approximate summary statistics o
     extrema(o)
     quantile(o)
 """
-struct Hist{M <: HistAlg} <: ExactStat{0}
-    method::M
+struct Hist{N, H <: HistAlg} <: ExactStat{N}
+    alg::H
 end
-function Base.show(io::IO, h::Hist)
-    print(io, "Hist: $(h.method)")
+function Hist(args)
+    alg = get_hist_alg(args)
+    N = input(alg)
+    Hist{N, typeof(alg)}(alg)
 end
+Base.show(io::IO, o::Hist) = print(io, "Hist: $(o.alg)")
+fit!(o::Hist, y, γ::Number) = fit!(o.alg, y, γ)
+Base.merge!(o::Hist, o2::Hist, γ::Number) = merge!(o.alg, o2.alg, γ)
+value(o::Hist) = _midpoints(o), _counts(o)
+nobs(o::Hist) = nobs(o.alg)
+_midpoints(o::Hist) = _midpoints(o.alg)
+_counts(o::Hist) = _counts(o.alg)
+_pdf(o::Hist, y) = _pdf(o.alg, y)
 
-# method must implement value --> Tuple of (edge_midpoints, counts)
-value(o::Hist) = value(o.method)
-nobs(o::Hist) = nobs(o.method)
-
-function Base.mean(o::Hist) 
-    mids, counts = value(o)
-    mean(mids, fweights(counts))
-end
-function Base.var(o::Hist) 
-    mids, counts = value(o)
-    var(mids, fweights(counts); corrected=true)
-end
+# statistics
+Base.mean(o::Hist) = mean(_midpoints(o), fweights(_counts(o)))
+Base.var(o::Hist) = var(_midpoints(o), fweights(_counts(o)); corrected=true)
 Base.std(o::Hist) = sqrt(var(o))
 Base.median(o::Hist) = quantile(o, .5)
 function Base.extrema(o::Hist) 
@@ -53,62 +65,81 @@ function Base.extrema(o::Hist)
     inds = find(counts)  # filter out zero weights 
     mids[inds[1]], mids[inds[end]]
 end
-
 function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1]) 
     mids, counts = value(o)
     inds = find(counts)  # filter out zero weights
     quantile(mids[inds], fweights(counts[inds]), p)
 end
 
-#-----------------------------------------------------------------------# KnownBins
-"""
-Calculate a histogram over a fixed range.  
-"""
-struct KnownBins{R <: Range} <: HistAlg 
-    edges::R
+#-----------------------------------------------------------------------# FixedRangeBins
+mutable struct FixedRangeBins{R <: Range} <: HistAlg 
+    edges::R 
     counts::Vector{Int}
+    out::Int
 end
-KnownBins(r::Range) = KnownBins(r, zeros(Int, length(r) - 1))
-Base.show(io::IO, o::KnownBins) = print(io, "KnownBins(edges = $(o.edges))")
-Hist(r::Range) = Hist(KnownBins(r))
-value(o::KnownBins) = (_midpoints(o.edges), o.counts)
-nobs(o::KnownBins) = sum(o.counts)
-
-function fit!(o::Hist{<:KnownBins}, y::Real, γ::Float64)
-    x = o.method.edges 
-    a = first(x)
-    δ = step(x)
-    k = floor(Int, (y - a) / δ) + 1
-    if 1 <= k < length(x)
-        @inbounds o.method.counts[k] += 1
+get_hist_alg(r::Range) = FixedRangeBins(r, zeros(Int, length(r) - 1), 0)
+input(o::FixedRangeBins) = 0
+_midpoints(o::FixedRangeBins) = _midpoints(o.edges)
+_counts(o::FixedRangeBins) = o.counts
+nobs(o::FixedRangeBins) = sum(o.counts) + o.out
+function fit!(o::FixedRangeBins, y, γ::Number)
+    r = o.edges 
+    a = first(r)
+    δ = step(r)
+    k = floor(Int, (y-a) / δ) + 1
+    if 1 ≤ k < length(r)
+        @inbounds o.counts[k] += 1
+    else 
+        o.out += 1
     end
 end
-_midpoints(r) = r[1:length(r) - 1] + 0.5 * step(r)
-function Base.merge!(o::Hist{<:KnownBins}, o2::Hist{<:KnownBins}, γ::Float64)
-    if o.method.edges == o2.method.edges 
-        o.method.counts .+= o2.method.counts
+function Base.merge!(o::FixedRangeBins, o2::FixedRangeBins, γ::Number) 
+    if o.edges == o2.edges 
+        o.counts .+= o2.counts
     else
-        for (yi, wi) in zip(_midpoints(o2.method.edges), o2.method.counts)
+        for (yi, wi) in zip(_midpoints(o2), o2.counts)
             for k in 1:wi 
                 fit!(o, yi, .5)
             end
         end
     end
 end
-function discretized_pdf(o::Hist{<:KnownBins}, y::Real)
-    b = o.method
-    e = b.edges
+function _pdf(o::FixedRangeBins, y::Real)
+    e = o.edges
     if y ≤ first(e)
         return 0.0
     elseif y ≥ last(e)
         return 0.0 
     else
-        c = b.counts
+        c = o.counts
         i = min(searchsortedfirst(e, y), length(c))
         δ = step(e)
         return c[i] / (δ * sum(c))
     end
 end
+
+# #---------------------------------------------------------------------# AdaptiveFixedBins
+# mutable struct AdaptiveFixedBins{R <: Range} <: HistAlg 
+#     edges::R 
+#     counts::Vector{Int}
+#     nobs::Int
+# end
+# AdaptiveFixedBins(b::Int) = AdaptiveFixedBins(linspace(0, 0, b), Int[], 0)
+# Base.show(io::IO, o::AdaptiveFixedBins) = print(io, "AdaptiveFixedBins over $(o.edges)")
+# function fit!(o::AdaptiveFixedBins, y, γ::Number)
+#     o.nobs += 1
+#     if o.nobs == 1
+#         o.edges = linspace(float(y), float(y), length(o.edges))
+#     elseif first(o.edges) == last(o.edges)
+#         one = min(first(o.edges), y)
+#         two = max(last(o.edges), y)
+#         o.edges = linspace(one, two, length(o.edges))
+#     elseif y ≤ first(o.edges)
+#     elseif y > last(o.edges)
+#     else
+
+#     end
+# end
 
 #-----------------------------------------------------------------------# AdaptiveBins
 # http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
@@ -117,21 +148,20 @@ Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-struct AdaptiveBins{T <: Number} <: HistAlg 
+struct AdaptiveBins{T} <: HistAlg 
     value::Vector{Pair{T, Int}}
     b::Int
 end
-AdaptiveBins(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
-Hist(b::Int) = Hist(AdaptiveBins(Float64, b))
-Base.show(io::IO, o::AdaptiveBins) = print(io, "AdaptiveBins($(o.b))")
+get_hist_alg(b::Int) = AdaptiveBins(Pair{Float64, Int}[], b)
+get_hist_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
+input(o::AdaptiveBins) = 0
+_midpoints(o::AdaptiveBins) = first.(o.value)
+_counts(o::AdaptiveBins) = last.(o.value)
+nobs(o::AdaptiveBins) = sum(last, o.value)
 
-value(o::AdaptiveBins) = (first.(o.value), last.(o.value))
+fit!(o::AdaptiveBins, y::Number, γ::Float64) = fit!(o, Pair(y, 1))
 
-nobs(o::AdaptiveBins) = sum(last.(o.value))
-
-fit!(o::Hist{<:AdaptiveBins}, y::Number, γ::Float64) = fit!(o.method, Pair(y, 1))
-
-function fit!(o::AdaptiveBins{<:Number}, y::Pair{<:Number, Int}) 
+function fit!(o::AdaptiveBins, y::Pair{<:Any, Int}) 
     v = o.value
     i = searchsortedfirst(v, y)
     insert!(v, i, y)
@@ -157,14 +187,12 @@ function fit!(o::AdaptiveBins{<:Number}, y::Pair{<:Number, Int})
     end
 end
 
-function Base.merge!(o::Hist{T}, o2::Hist{T}, γ::Float64) where {T <: AdaptiveBins}
-    fit!.(o.method, o2.method.value)
-end
+Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.value)
+
 
 # based on linear interpolation
-function discretized_pdf(o::Hist{<:AdaptiveBins}, y::Number)
-    b = o.method
-    v = b.value
+function _pdf(o::AdaptiveBins, y::Number)
+    v = o.value
     if y < first(first(v)) || y ≥ first(last(v))
         return 0.0
     else 

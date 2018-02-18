@@ -75,14 +75,11 @@ end
 end
 
 #-----------------------------------------------------------------------# Hist 
-@recipe f(o::Hist) = o.method
+@recipe f(o::Hist) = o.alg
 
-@recipe f(o::KnownBins) = Histogram(o.edges, o.counts, :left)
+@recipe f(o::FixedRangeBins) = Histogram(o.edges, o.counts, :left)
 
 @recipe function f(o::AdaptiveBins)
-    # mids(v) = [0.5 * (v[i] + v[i + 1]) for i = 1:length(v) - 1]
-    # val = vcat(o.values[1], mids(o.values), o.values[end])
-    # Histogram(val, o.counts, :left)
     linewidth --> 2
     seriestype --> :sticks
     value(o)

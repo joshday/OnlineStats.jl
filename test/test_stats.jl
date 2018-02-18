@@ -152,7 +152,7 @@ end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
-    dpdf = OnlineStats.discretized_pdf
+    dpdf = OnlineStats._pdf
     #### KnownBins
     test_exact(Hist(-5:5), y, o -> value(o)[2], y -> fit(Histogram, y, -5:5, closed=:left).weights)
     test_exact(Hist(-5:.1:5), y, extrema, extrema, (a,b)->≈(a,b;atol=.2))
@@ -177,11 +177,11 @@ end
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
     s = Series(y, Hist(5))
-    # discretized_pdf
+    # _pdf
     data = randn(1_000)
     for o in [Hist(-5:5), Hist(-3:.5:3), Hist(5), Hist(20), Hist(100)]
         Series(data, o)
-        @test dpdf(o, 0) > 0 
+        @test dpdf(o, 0) ≥ 0 
         @test dpdf(o, -10) == 0
         @test dpdf(o, 10) == 0
         @test quadgk(x -> dpdf(o, x), collect(-10:10)...)[1] ≈ 1 atol=.1

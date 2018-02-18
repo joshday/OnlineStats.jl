@@ -15,12 +15,12 @@ probabilities are estimated using the [`Hist`](@ref) (with `AdaptiveBins`) type 
 """
 #-----------------------------------------------------------------------# NBClassifier
 struct NBClassifier{T} <: ExactStat{(1,0)}
-    value::Vector{Pair{T, MV{Hist{AdaptiveBins{Float64}}}}}
+    value::Vector{Pair{T, MV{Hist{0, AdaptiveBins{Float64}}}}}
     p::Int 
     b::Int
 end
 function NBClassifier(p::Integer, T::Type, b::Integer = 10)
-    NBClassifier(Pair{T, MV{Hist{AdaptiveBins{Float64}}}}[], p, b)
+    NBClassifier(Pair{T, MV{Hist{0, AdaptiveBins{Float64}}}}[], p, b)
 end
 function Base.show(io::IO, o::NBClassifier)
     print(io, "NBClassifier with labels: $(first.(o.value))")
@@ -47,7 +47,7 @@ function fit!(o::NBClassifier, xy::Tuple, γ::Float64)
     end
     if addlabel
         stat = MV(o.p, Hist(o.b))
-        fit!(stat, x)
+        fit!(stat, x, 1.0)
         push!(o.value, Pair(y, stat))
     end
 end
@@ -57,7 +57,7 @@ function predict(o::NBClassifier, x::VectorOb)
     buffer = zeros(length(x))
     for i in eachindex(pvec)
         mvhist = last(o.value[i])
-        buffer .= log.(discretized_pdf.(mvhist.stats, x))
+        buffer .= log.(_pdf.(mvhist.stats, x))
         pvec[i] += sum(buffer)
     end
     out = exp.(pvec)
