@@ -1,3 +1,39 @@
+struct LabelStats{T, S} <: ExactStat{(1,0)}
+    label::T 
+    stats::S
+    nobs::Int
+end
+function fit!(o::LabelStats, xy, γ) 
+    o.nobs += 1
+    x, y = xy 
+    y == o.label || error("observation label doesn't match")
+    for (oi, yi) in zip(o.stats, y)
+        fit!(oi, yi, γ)
+    end
+end
+
+struct MultiLabelStats{T, S} <: ExactStat{(1, 0)}
+    value::Vector{LabelStats{T,S}}
+    empty_stats::S
+end
+function fit!(o::MultiLabelStats, xy, γ)
+    x, y = xy 
+    addlabel = true 
+    for v in o.value 
+        if v.label == y 
+            fit!(v, xy, γ)
+            addlabel = false 
+            break
+        end
+    end
+    if addlabel 
+        ls = LabelStats(y, copy.(o.empty_stats))
+        fit!(ls, xy)
+        push!(o.value, LabelStats)
+    end
+end
+
+
 """
     NBClassifier(p, T, b = 20)
 

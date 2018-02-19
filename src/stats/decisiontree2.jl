@@ -1,3 +1,10 @@
+#-----------------------------------------------------------------------# 
+struct ConditionalStat{T, OS}
+    label::T 
+    stat::OS
+end
+
+
 #-----------------------------------------------------------------------# ColSS
 struct ColSS{L, T}
     dict::SortedDict{L, Pair{Int, T}}  # key => Pair(nobs, stat)

@@ -25,6 +25,7 @@ for T in [:Mean, :Variance, :Extrema, :Moments]
     @eval MV(p::Integer, o::$T) = MV([$T() for i in 1:p])
 end
 
+Base.getindex(o::MV, i) = o.stats[i]
 Base.first(o::MV) = first(o.stats)
 Base.last(o::MV) = last(o.stats)
 Base.length(o::MV) = length(o.stats)
@@ -46,7 +47,7 @@ function Base.show(io::IO, o::MV)
     print(io, s)
 end
 
-function fit!(o::MV, y::VectorOb, γ::Float64)
+function fit!(o::MV, y, γ)
     stats = o.stats
     for (i, yi) in enumerate(y)
         fit!(stats[i], yi, γ)
