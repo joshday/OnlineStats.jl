@@ -4,8 +4,8 @@
 Type for extracting feature vectors from continuous and discrete variables.  Under the hood,
 each variable is tracked by one of the following:
 
-- `ML.Continuous()`
-- `ML.Discrete()`
+- `ML.Numerical()`
+- `ML.Categorical()`
 - `ML.Ignored()`
 
 # Example 
@@ -23,29 +23,29 @@ import OnlineStatsBase: ExactStat, VectorOb
 import LearnBase: fit!, value, transform
 import NamedTuples: NamedTuple
 import DataStructures: SortedDict
-export Continuous, Discrete
+export Numerical, Categorical
 
 abstract type AbstractMLColumn <: ExactStat{0} end
 fit!(o::AbstractMLColumn, y, γ::Number) = fit!(o.stat, y, γ)
 Base.merge!(o::AbstractMLColumn, o2::AbstractMLColumn, γ) = merge!(o.stat, o2.stat, γ)
 
-#-----------------------------------------------------------------------# Continuous
-struct Continuous <: AbstractMLColumn  
+#-----------------------------------------------------------------------# Numerical
+struct Numerical <: AbstractMLColumn  
     stat::Variance
 end
-Continuous() = Continuous(Variance())
-width(o::Continuous) = 1
-value(o::Continuous) = (mean(o.stat), std(o.stat))
-Base.show(io::IO, o::Continuous) = print(io, "Continuous: (μ, σ) = $(value(o))")
+Numerical() = Numerical(Variance())
+width(o::Numerical) = 1
+value(o::Numerical) = (mean(o.stat), std(o.stat))
+Base.show(io::IO, o::Numerical) = print(io, "Numerical: (μ, σ) = $(value(o))")
 
-#-----------------------------------------------------------------------# Discrete
-struct Discrete{T} <: AbstractMLColumn
+#-----------------------------------------------------------------------# Categorical
+struct Categorical{T} <: AbstractMLColumn
     stat::Unique{T} 
 end
-Discrete(T::Type = Any) = Discrete(Unique(T))
-width(o::Discrete) = min(0, length(o.stat) - 1)
-value(o::Discrete) = value(o.stat)
-Base.show(io::IO, o::Discrete) = print(io, "Discrete: $(value(o.stat))")
+Categorical(T::Type = Any) = Categorical(Unique(T))
+width(o::Categorical) = min(0, length(o.stat) - 1)
+value(o::Categorical) = value(o.stat)
+Base.show(io::IO, o::Categorical) = print(io, "Categorical: $(value(o.stat))")
 
 #-----------------------------------------------------------------------# Ignored 
 struct Ignored <: AbstractMLColumn end
@@ -77,8 +77,8 @@ end
 Base.sort(o::FeatureExtractor) = sort(o.dict)
 
 guess_feature(val) = Ignored()
-guess_feature(val::Number) = (o=Continuous(); fit!(o, val, 1.0); o)
-guess_feature(val::T) where {T <: Union{AbstractString, Char, Symbol}} = (o=Discrete(T); fit!(o, val, 1.0); o)
+guess_feature(val::Number) = (o=Numerical(); fit!(o, val, 1.0); o)
+guess_feature(val::T) where {T <: Union{AbstractString, Char, Symbol}} = (o=Categorical(T); fit!(o, val, 1.0); o)
 
 colnames(y::NamedTuple) = keys(y)
 colnames(y::VectorOb) = [Symbol("x$i") for i in 1:length(y)]
