@@ -33,7 +33,7 @@ export
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
     NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique,
     # StatLearn
-    StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
+    StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI,
     # ML
     ML
 
