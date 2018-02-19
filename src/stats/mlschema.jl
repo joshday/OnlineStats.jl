@@ -30,6 +30,11 @@ fit!(o::AbstractMLColumn, y, γ::Number) = fit!(o.stat, y, γ)
 Base.merge!(o::AbstractMLColumn, o2::AbstractMLColumn, γ) = merge!(o.stat, o2.stat, γ)
 
 #-----------------------------------------------------------------------# Numerical
+"""
+    Numerical()
+
+Track a numerical variable.  Can be used to standardize future observations.
+"""
 struct Numerical <: AbstractMLColumn  
     stat::Variance
 end
@@ -39,6 +44,11 @@ value(o::Numerical) = (mean(o.stat), std(o.stat))
 Base.show(io::IO, o::Numerical) = print(io, "📈 : $(round.(value(o), 4))")
 
 #-----------------------------------------------------------------------# Categorical
+"""
+    Categorical(T::Type)
+
+Track a categorical variable.  Can be used to create one-hot vectors of future observations.
+"""
 struct Categorical{T} <: AbstractMLColumn
     stat::Unique{T} 
 end
@@ -55,6 +65,21 @@ fit!(o::Ignored, y, γ::Number) = o
 Base.show(io::IO, o::Ignored) = print(io, "Ignored")
 
 #-----------------------------------------------------------------------# FeatureExtractor
+"""
+    ML.FeatureExtractor(spec)
+
+Track any combination of [`Numerical`](@ref) and [`Categorical`](@ref) features.  The `spec`
+should be an example collection (e.g. first row of data) or a collection of data types (schema).
+
+# Example 
+
+    ML.FeatureExtractor([Float64, Bool, String])  # schema
+    
+    series(randn(100, 3), ML.FeatureExtractor(rand(3)))
+
+    using NamedTuples
+    ML.FeatureExtractor(@NT(x=Float64, y=String))  # example row
+"""
 mutable struct FeatureExtractor{T <: Tuple} <: ExactStat{1}
     colnames::Vector{Symbol}
     features::T

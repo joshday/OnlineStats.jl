@@ -32,9 +32,10 @@ export
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
     NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique,
-    ML,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI
+    # ML
+    ML
 
 
 #-----------------------------------------------------------------------# ObLoc
