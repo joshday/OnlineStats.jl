@@ -36,7 +36,7 @@ end
 Numerical() = Numerical(Variance())
 width(o::Numerical) = 1
 value(o::Numerical) = (mean(o.stat), std(o.stat))
-Base.show(io::IO, o::Numerical) = print(io, "Numerical: (μ, σ) = $(value(o))")
+Base.show(io::IO, o::Numerical) = print(io, "📈: $(round.(value(o), 4))")
 
 #-----------------------------------------------------------------------# Categorical
 struct Categorical{T} <: AbstractMLColumn
@@ -45,7 +45,7 @@ end
 Categorical(T::Type = Any) = Categorical(Unique(T))
 width(o::Categorical) = min(0, length(o.stat) - 1)
 value(o::Categorical) = value(o.stat)
-Base.show(io::IO, o::Categorical) = print(io, "Categorical: $(value(o.stat))")
+Base.show(io::IO, o::Categorical) = print(io, "📊: $(value(o.stat))")
 
 #-----------------------------------------------------------------------# Ignored 
 struct Ignored <: AbstractMLColumn end
@@ -60,6 +60,15 @@ mutable struct FeatureExtractor <: ExactStat{1}
     nobs::Int
 end
 FeatureExtractor() = FeatureExtractor(SortedDict{Symbol, Any}(), 0)
+
+function Base.show(io::IO, o::FeatureExtractor)
+    print(io, "FeatureExtractor:")
+    for di in o.dict 
+        println(io)
+        print(io, di)
+    end
+
+end
 
 function fit!(o::FeatureExtractor, y::VectorOb, γ::Number)
     o.nobs += 1
@@ -76,9 +85,10 @@ end
 
 Base.sort(o::FeatureExtractor) = sort(o.dict)
 
+const StringLike = Union{AbstractString, Char, Symbol}
 guess_feature(val) = Ignored()
-guess_feature(val::Number) = (o=Numerical(); fit!(o, val, 1.0); o)
-guess_feature(val::T) where {T <: Union{AbstractString, Char, Symbol}} = (o=Categorical(T); fit!(o, val, 1.0); o)
+guess_feature(val::Number) = (o = Numerical(); fit!(o, val, 1.0); o)
+guess_feature(val::T) where {T <: StringLike} = (o=Categorical(T); fit!(o, val, 1.0); o)
 
 colnames(y::NamedTuple) = keys(y)
 colnames(y::VectorOb) = [Symbol("x$i") for i in 1:length(y)]
