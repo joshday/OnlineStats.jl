@@ -36,7 +36,7 @@ end
 Numerical() = Numerical(Variance())
 width(o::Numerical) = 1
 value(o::Numerical) = (mean(o.stat), std(o.stat))
-Base.show(io::IO, o::Numerical) = print(io, "📈: $(round.(value(o), 4))")
+Base.show(io::IO, o::Numerical) = print(io, "📈 : $(round.(value(o), 4))")
 
 #-----------------------------------------------------------------------# Categorical
 struct Categorical{T} <: AbstractMLColumn
@@ -45,7 +45,7 @@ end
 Categorical(T::Type = Any) = Categorical(Unique(T))
 width(o::Categorical) = min(0, length(o.stat) - 1)
 value(o::Categorical) = value(o.stat)
-Base.show(io::IO, o::Categorical) = print(io, "📊: $(value(o.stat))")
+Base.show(io::IO, o::Categorical) = print(io, "📊 : $(value(o.stat))")
 
 #-----------------------------------------------------------------------# Ignored 
 struct Ignored <: AbstractMLColumn end
@@ -55,42 +55,70 @@ fit!(o::Ignored, y, γ::Number) = o
 Base.show(io::IO, o::Ignored) = print(io, "Ignored")
 
 #-----------------------------------------------------------------------# FeatureExtractor
-mutable struct FeatureExtractor <: ExactStat{1}
-    dict::SortedDict{Symbol, Any}
+mutable struct FeatureExtractor{T <: Tuple} <: ExactStat{1}
+    colnames::Vector{Symbol}
+    features::T
     nobs::Int
 end
-FeatureExtractor() = FeatureExtractor(SortedDict{Symbol, Any}(), 0)
 
-function Base.show(io::IO, o::FeatureExtractor)
-    print(io, "FeatureExtractor:")
-    for di in o.dict 
-        println(io)
-        print(io, di)
-    end
-
-end
-
-function fit!(o::FeatureExtractor, y::VectorOb, γ::Number)
-    o.nobs += 1
-    if o.nobs == 1
-        for (ky, val) in zip(colnames(y), values(y))
-            o.dict[ky] = guess_feature(val)
-        end
-    else
-        for (yi, oi) in zip(y, values(o.dict))
-            fit!(oi, yi, γ)
-        end
-    end
-end
-
-Base.sort(o::FeatureExtractor) = sort(o.dict)
-
-const StringLike = Union{AbstractString, Char, Symbol}
-guess_feature(val) = Ignored()
-guess_feature(val::Number) = (o = Numerical(); fit!(o, val, 1.0); o)
-guess_feature(val::T) where {T <: StringLike} = (o=Categorical(T); fit!(o, val, 1.0); o)
+FeatureExtractor(c::Vector{Symbol}, hints...) = FeatureExtractor(c, make_feature.(hints), 0)
+FeatureExtractor(hints::VectorOb) = FeatureExtractor(colnames(hints), hints...)
 
 colnames(y::NamedTuple) = keys(y)
 colnames(y::VectorOb) = [Symbol("x$i") for i in 1:length(y)]
+
+const StringLike = Union{AbstractString, Char, Symbol}
+make_feature(val) = Ignored() 
+make_feature(val::AbstractMLColumn) = val
+make_feature(val::Type{<:Number}) = Numerical() 
+make_feature(val::Type{T}) where {T<:StringLike} = Categorical(T)
+make_feature(val::Number) = Numerical()
+make_feature(val::T) where {T<:StringLike} = Categorical(T)
+
+
+FeatureExtractor(s::String) = FeatureExtractor(s, fill("a", length(s)))
+function FeatureExtractor(s::String, y::VectorOb)
+    out = []
+    for (si, T) in zip(s, typeof.(y))
+        if si == 'n'
+            push!(out, Numerical())
+        elseif si == 'c'
+            push!(out, Categorical(T))
+        elseif si == '-'
+            push!(out, Ignored())
+        else
+            error("must be 'n' (Numerical), 'c' (Categorical), or '-' (Ignored)")
+        end
+    end
+    FeatureExtractor(colnames(y), out...)
+end
+
+
+
+
+function Base.show(io::IO, o::FeatureExtractor)
+    print(io, "FeatureExtractor:")
+    d = maximum(length.(string.(o.colnames))) + 1
+    for (colname, feat) in zip(o.colnames, o.features)
+        print(io, "\n  > $colname: ")
+        for i in 1:(d - length(string(colname)))
+            print(io, " ")
+        end
+        print(io, feat)
+    end
+end
+
+
+width(o::FeatureExtractor) = sum(width, o.features)
+
+function fit!(o::FeatureExtractor, y::VectorOb, γ)
+    for (oi, yi) in zip(o.features, y)
+        fit!(oi, yi, γ)
+    end
+end
+
+
+
+
 
 end # module

@@ -157,13 +157,20 @@ function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
 end
 
 #-----------------------------------------------------------------------# ModelSeries
-# struct ModelSeries{S<:Series{(1,0)}, FE<:FeatureExtractor} <: AbstractSeries{1}
-#     s::S
-#     fe::FE
+# struct ModelSeries{S, L, R} <: AbstractSeries{1}
+#     series::S
+#     extractor::ML.FeatureExtractor
+#     lhs::L 
+#     rhs::R
 #     fvec::Vector{Float64}  # featurevector
 # end
+
+# for f in [:nobs, :value, :stats, :weight!, :getweight]
+#     @eval $f(o::ModelSeries) = $f(o.series)
+# end
+
 # function fit!(s::ModelSeries, y::VectorOb)
-#     transform!(s.fvec, s.fe, y)
+#     transform!(s.fvec, s.extractor, s.formula, y)
 #     fit!(s.s, s.fvec)
 # end
 
