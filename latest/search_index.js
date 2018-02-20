@@ -717,7 +717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.NBClassifier",
     "category": "Type",
-    "text": "NBClassifier(p, T, b = 20)\n\nCreate a Naive Bayes classifier for p predictors for classes of type T.  Conditional probabilities are estimated using the Hist (with AdaptiveBins) type with b bins.\n\nExample\n\nx = randn(100, 5)\ny = rand(Bool, 100)\no = NBClassifier(5, Bool)\nSeries((x,y), o)\npredict(o, x)\nclassify(o,x)\n\n\n\n"
+    "text": "NBClassifier(p, label_type::Type)\n\nNaive Bayes Classifier of p predictors for classes of type label_type.\n\n\n\n"
 },
 
 {
