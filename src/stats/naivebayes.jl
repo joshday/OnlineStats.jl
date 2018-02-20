@@ -26,28 +26,39 @@ function fitstats!(o::Tuple, x, γ)
 end
 fitstats!(o::MV, y, γ) = fit!(o, y, γ)
 
-#-----------------------------------------------------------------------# Labels 
-struct Labels{T, S} <: ExactStat{(1, 0)}
+#-----------------------------------------------------------------------# NBClassifier 
+"""
+    NBClassifier(p, label_type::Type)
+
+Naive Bayes Classifier of `p` predictors for classes of type `label_type`.
+"""
+struct NBClassifier{T, S} <: ExactStat{(1, 0)}
     value::Vector{LabelStats{T, S}}
     empty_stats::S
 end
-Labels(T::Type, stats) = Labels(LabelStats{T, typeof(stats)}[], stats)
-function Base.show(io::IO, o::Labels)
+NBClassifier(T::Type, stats) = NBClassifier(LabelStats{T, typeof(stats)}[], stats)
+NBClassifier(stats, T::Type) = NBClassifier(T, stats)
+NBClassifier(p::Int, T::Type) = NBClassifier(p * Hist(10), T)
+
+function Base.show(io::IO, o::NBClassifier)
     print(io, name(o))
     for (v, p) in zip(o.value, probs(o))
         print(io, "\n    > ", v.label, " ($(round(p, 4)))")
     end
 end
-Base.keys(o::Labels) = [ls.label for ls in o.value]
-Base.length(o::Labels) = length(o.value)
-nobs(o::Labels) = length(o) > 0 ? sum(nobs, o.value) : 0
-probs(o::Labels) = length(o) > 0 ? nobs.(o.value) ./ nobs(o) : Float64[]
+Base.keys(o::NBClassifier) = [ls.label for ls in o.value]
+Base.length(o::NBClassifier) = length(o.value)
+nobs(o::NBClassifier) = length(o) > 0 ? sum(nobs, o.value) : 0
+probs(o::NBClassifier) = length(o) > 0 ? nobs.(o.value) ./ nobs(o) : Float64[]
 
 # P(x_j | y_k)
-condprobs(o::Labels{T, <:Tuple}, k, xj) where {T} = _pdf.(o.value[k].stats, xj)
-condprobs(o::Labels{T, <:MV}, k, xj) where {T} = _pdf.(o.value[k].stats.stats, xj)
+condprobs(o::NBClassifier{T, <:Tuple}, k, xj) where {T} = _pdf.(o.value[k].stats, xj)
+condprobs(o::NBClassifier{T, <:MV}, k, xj) where {T} = _pdf.(o.value[k].stats.stats, xj)
 
-function fit!(o::Labels, xy, γ)
+entropybase2(p) = entropy(p, 2)
+impurity(o::NBClassifier, f::Function = entropybase2) = f(probs(o))
+
+function fit!(o::NBClassifier, xy, γ)
     x, y = xy 
     addlabel = true 
     for v in o.value 
@@ -63,29 +74,6 @@ function fit!(o::Labels, xy, γ)
         push!(o.value, ls)
     end
 end
-
-#------------------------------------------------------------------# NBClassifier
-"""
-    NBClassifier(p, label_type::Type)
-
-Naive Bayes Classifier of `p` predictors for classes of type `label_type`.
-"""
-struct NBClassifier{T, S} <: ExactStat{(1, 0)}
-    labels::Labels{T, S}
-end
-NBClassifier(stats, T::Type) = NBClassifier(Labels(T, stats))
-NBClassifier(p::Int, T::Type) = NBClassifier(p * Hist(10), T)
-
-for f in [:nobs, :probs, :(Base.keys), :(Base.length)]
-    @eval $f(o::NBClassifier) = $f(o.labels)
-end
-condprobs(o::NBClassifier, k, x) = condprobs(o.labels, k, x)
-
-function Base.show(io::IO, o::NBClassifier{T}) where {T}
-    println(io, "NBClassifier{$T}")
-    print(io, "  ", o.labels)
-end
-fit!(o::NBClassifier, xy, γ) = fit!(o.labels, xy, γ)
 
 function predict(o::NBClassifier{T, S}, x::VectorOb) where {T, S <: MV}
     pvec = log.(probs(o))  # prior
