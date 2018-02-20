@@ -279,7 +279,7 @@ end
     n, p = 20000, 5
     X = randn(n, p)
     Y = X * linspace(-1, 1, p) .> 0
-    o = NBClassifier(p, Bool, 100)
+    o = NBClassifier(p * Hist(100), Bool)
     Series((X, Y), o)
     @test classify(o, [0,0,0,0,1])
     X2 = [zeros(p) zeros(p) zeros(p) rand(p) 1 .+ rand(p)]

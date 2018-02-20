@@ -25,6 +25,10 @@ for T in [:Mean, :Variance, :Extrema, :Moments]
     @eval MV(p::Integer, o::$T) = MV([$T() for i in 1:p])
 end
 
+Base.start(o::MV) = start(o.stats)
+Base.next(o::MV, i) = next(o.stats, i)
+Base.done(o::MV, i) = done(o.stats, i)
+
 Base.getindex(o::MV, i) = o.stats[i]
 Base.first(o::MV) = first(o.stats)
 Base.last(o::MV) = last(o.stats)

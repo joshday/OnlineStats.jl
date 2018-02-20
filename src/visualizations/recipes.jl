@@ -82,7 +82,7 @@ end
 @recipe function f(o::AdaptiveBins)
     linewidth --> 2
     seriestype --> :sticks
-    value(o)
+    _midpoints(o), _counts(o)
 end
 
 #-----------------------------------------------------------------------# MV

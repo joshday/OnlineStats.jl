@@ -168,10 +168,11 @@ Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.va
 # based on linear interpolation
 function _pdf(o::AdaptiveBins, y::Number)
     v = o.value
-    if y < first(first(v)) || y ≥ first(last(v))
+    if y ≤ first(first(v)) || y ≥ first(last(v))
         return 0.0
     else 
-        i = searchsortedfirst(v, Pair(y, 0))
+        i = searchsortedfirst(v, Pair(y, 0)) 
+        i == 1 && error("wha")
         q1, k1 = v[i-1]
         q2, k2 = v[i]
         area = sum((first(v[i+1]) - first(v[i])) * (last(v[i]) + last(v[i+1]))/2 for i in 1:length(v)-1)

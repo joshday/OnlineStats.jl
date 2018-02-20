@@ -5,8 +5,8 @@ import SweepOperator
 import NamedTuples: NamedTuple
 import DataStructures: SortedDict
 import LearnBase: fit!, value, nobs, predict, transform!, transform
-import StatsBase: Histogram, skewness, kurtosis, coef, fweights, skewness, kurtosis, 
-    confint, autocor, autocov, entropy
+import StatsBase: Histogram, skewness, kurtosis, coef, fweights, pweights, skewness, 
+    kurtosis, confint, autocor, autocov, entropy, midpoints
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
     VectorOb, XyOb, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
