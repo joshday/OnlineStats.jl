@@ -4,13 +4,14 @@
 abstract type HistAlg{N} end 
 input(o::HistAlg{N}) where {N} = N
 Base.show(io::IO, o::HistAlg) = print(io, name(o, false, false))
+get_hist_alg(o::HistAlg) = o
+
 # get_hist_alg(args...)     --> HistAlg 
 # _midpoints(o)             --> midpoints of bins 
 # _counts(o)                --> counts in bins
 # nobs
 # fit!
 # merge!
-
 
 _midpoints(r) = r[1:length(r) - 1] + 0.5 * step(r)
 
@@ -47,13 +48,12 @@ function Hist(args...)
     Hist{N, typeof(alg)}(alg)
 end
 Base.show(io::IO, o::Hist) = print(io, "Hist: $(o.alg)")
-fit!(o::Hist, y, γ::Number) = fit!(o.alg, y, γ)
 Base.merge!(o::Hist, o2::Hist, γ::Number) = merge!(o.alg, o2.alg, γ)
 value(o::Hist) = _midpoints(o), _counts(o)
-nobs(o::Hist) = nobs(o.alg)
-_midpoints(o::Hist) = _midpoints(o.alg)
-_counts(o::Hist) = _counts(o.alg)
-_pdf(o::Hist, y) = _pdf(o.alg, y)
+
+for f in [:fit!, :nobs, :_midpoints, :_counts, :_pdf, :split_at!, :splitcounts]
+    @eval $f(o::Hist, args...) = $f(o.alg, args...)
+end
 
 # statistics
 Base.mean(o::Hist) = mean(_midpoints(o), fweights(_counts(o)))
@@ -179,6 +179,19 @@ function _pdf(o::AdaptiveBins, y::Number)
         return smooth(k1, k2, (y - q1) / (q2 - q1)) / area
     end
 end
+
+function splitcounts(o::AdaptiveBins, x)
+    i = searchsortedfirst(o.value, Pair(x, 1))
+    sum(last, o.value[1:(i-1)]), sum(last, o.value[i:end])
+end
+
+function split_at!(o::AdaptiveBins{T}, x) where {T}
+    k = searchsortedfirst(o.value, Pair(x, 1))
+    out = o.value[k:end]
+    deleteat!(o.value, k:length(o.value))
+    Hist(AdaptiveBins(out, o.b))
+end
+
 
 
 # # Algorithm 3: Sum Procedure

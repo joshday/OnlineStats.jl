@@ -180,22 +180,23 @@ end
 #-----------------------------------------------------------------------# NBClassifier 
 @recipe function f(o::NBClassifier)
     kys = keys(o)
-    layout --> o.p + 1
-    alpha --> .5
+    layout --> nparams(o) + 1
+    alpha --> .4
     seriestype --> :line 
     fillto --> 0
-    for j in 1:o.p 
-        for (i, ky) in enumerate(kys)
+    for j in 1:nparams(o) 
+        stats = o[j]
+        for (i, s) in enumerate(stats)
             @series begin 
                 title --> "Var $j"
-                legend --> false
-                subplot --> j
-                last(o.value[i]).stats[j]
+                legend --> false 
+                subplot --> j 
+                s
             end
         end
     end
     @series begin 
-        subplot --> o.p + 1
+        subplot --> nparams(o) + 1
         label --> kys'
         framestyle := :none
         zeros(0, length(kys))

@@ -47,9 +47,12 @@ function Base.show(io::IO, o::NBClassifier)
     end
 end
 Base.keys(o::NBClassifier) = [ls.label for ls in o.value]
+Base.getindex(o::NBClassifier, j) = [v.stats[j] for v in o.value]
 Base.length(o::NBClassifier) = length(o.value)
 nobs(o::NBClassifier) = length(o) > 0 ? sum(nobs, o.value) : 0
 probs(o::NBClassifier) = length(o) > 0 ? nobs.(o.value) ./ nobs(o) : Float64[]
+nparams(o::NBClassifier) = length(o.empty_stats)
+
 
 # P(x_j | y_k)
 condprobs(o::NBClassifier{T, <:Tuple}, k, xj) where {T} = _pdf.(o.value[k].stats, xj)
@@ -96,3 +99,43 @@ for f in [:predict, :classify]
         end
     end
 end
+
+
+# IG from splitting on variable j at point x
+function info_gain(o::NBClassifier, j, x)
+    stats = o[j]
+
+end
+
+
+# TODO: something smarter
+function split_candidates(o::NBClassifier, j)
+    μs = mean.(o[j])
+    sort!(μs)
+    [(mean(μs[i]) + mean(μs[i-1])) / 2 for i in 2:length(μs)]
+end
+
+
+
+
+# information gain from splitting on variable j
+function info_gain(o::NBClassifier, j)
+    xs = trysplits(o, j)
+    stats = o[j]
+
+end
+
+
+# nobs of left and right children after splitting on variable j at point x
+function split_nobs(o::NBClassifier{T, MV{S}}, j, x) where {T, S <: Hist}
+    out_left = Int[]
+    out_right = Int[]
+    stats = o[j]  # stats[1] = key 1's Hist
+    for s in stats 
+        n1, n2 = splitcounts(s, x)
+        push!(out_left, n1)
+        push!(out_right, n2)
+    end
+    out_left, out_right
+end
+
