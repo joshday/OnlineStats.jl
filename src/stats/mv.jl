@@ -87,6 +87,7 @@ end
 Group(o::OnlineStat{0}...) = Group(o)
 value(o::Group) = value.(o.stats)
 Base.show(io::IO, o::Group) = print(io, "Group : $(name.(o.stats, false, false))")
+Base.getindex(o::Group, i) = o.stats[i]
 function fit!(o::Group, y::VectorOb, γ::Float64)
     for (oi, yi) in zip(o.stats, y)
         fit!(oi, yi, γ)

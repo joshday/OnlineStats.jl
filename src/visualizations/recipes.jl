@@ -35,6 +35,10 @@ end
     end
 end
 
+@recipe function f(o::OnlineStat{(1,0)})
+    coef(o)
+end
+
 @recipe function f(o::Series{(1,0)}, x::AbstractMatrix, y::AbstractVector)
     for stat in stats(o)
         @series begin stat end
@@ -122,7 +126,7 @@ end
     x = midpoint.(parts)
     
     if first(ymap) isa Tuple{VectorOb, VectorOb} #################### Hist
-        realx, y, z = [], Float64[], Float64[]
+        realx, y, z = eltype(x)[], Float64[], Float64[]
         for i in eachindex(ymap)
             values, counts = ymap[i]
             for j in eachindex(values)
@@ -135,6 +139,7 @@ end
         seriestype --> :scatter 
         marker_z --> z
         markerstrokewidth --> 0
+        color --> :blues
         realx, y
     elseif first(ymap) isa Dict ##################################### CountMap
         lvls = []
@@ -197,7 +202,7 @@ end
     end
     @series begin 
         subplot --> nparams(o) + 1
-        label --> kys'
+        label --> reshape(kys, 1, length(kys))
         framestyle := :none
         zeros(0, length(kys))
     end

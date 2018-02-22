@@ -57,7 +57,9 @@ StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p
 function Base.show(io::IO, o::StatLearn)
     println(io, name(o))
     print(io,   "    > β       : "); showcompact(io, o.β);        println(io)
-    print(io,   "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
+    if !(o.penalty isa NoPenalty)
+        print(io,   "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
+    end
     println(io, "    > Loss    : $(o.loss)")
     println(io, "    > Penalty : $(o.penalty)")
     print(io,   "    > Updater : $(o.updater)")
@@ -65,11 +67,12 @@ end
 
 coef(o::StatLearn) = o.β
 
-predict(o::StatLearn, x::AbstractVector) = dot(x, o.β)
+predict(o::StatLearn, x::VectorOb) = _dot(x, o.β)
 predict(o::StatLearn, x::AbstractMatrix, ::Rows = Rows()) = x * o.β
 predict(o::StatLearn, x::AbstractMatrix, ::Cols) = x'o.β
 
-classify(o::StatLearn, x, dim = Rows()) = sign.(predict(o, x, dim))
+classify(o::StatLearn, x) = sign(predict(o, x))
+classify(o::StatLearn, x::AbstractMatrix, dim = Rows()) = sign.(predict(o, x, dim))
 
 loss(o::StatLearn, x, y, dim = Rows()) = value(o.loss, y, predict(o, x, dim), AvgMode.Mean())
 
@@ -85,9 +88,20 @@ function statlearnpath(o::StatLearn, αs::AbstractVector{<:Real})
     path
 end
 
-function gradient!(o::StatLearn, t::Tuple{VectorOb, Real})
+# Hacks to allow Tuples/NamedTuples
+_dot(x::AbstractVector, β) = dot(x, β)
+function _dot(x::VectorOb, β)
+    out = 0.0
+    for (xi, βi) in zip(x, β)
+        out += xi * βi
+    end
+    return out
+end
+
+# t is Tuple or NamedTuple: (x, y)
+function gradient!(o::StatLearn, t)
     x, y = t
-    xβ = dot(x, o.β)
+    xβ = _dot(x, o.β)
     g = deriv(o.loss, y, xβ)
     gx = o.gx
     for i in eachindex(gx)
@@ -119,7 +133,7 @@ function fit!(o::StatLearn{NSGD}, t::Tuple{VectorOb, Real}, γ::Float64)
     for j in eachindex(o.β)
         U.θ[j] = o.β[j] - U.α * U.v[j]
     end
-    ŷ = x'U.θ
+    ŷ = _dot(x, U.θ) 
     for j in eachindex(o.β)
         U.v[j] = U.α * U.v[j] + deriv(o.loss, y, ŷ) * x[j]
         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
@@ -206,11 +220,14 @@ end
 const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
 
 # f(θ) ≤ f(θₜ) + ∇f(θₜ)'(θ - θₜ) + (L / 2) ||θ - θₜ||^2
-lipschitz_constant(o::StatLearn{A, L}, x, y) where {A, L} = error("$A is not defined for $L")
-lipschitz_constant(o::StatLearn{A, L2Scaled{N}}, x, y) where {A, N} = 2N * x'x 
-lipschitz_constant(o::StatLearn{A, L2DistLoss}, x, y) where {A} = 2x'x
-lipschitz_constant(o::StatLearn{A, LogitMarginLoss}, x, y) where {A} = .25 * x'x
-lipschitz_constant(o::StatLearn{A, <:DWDMarginLoss}, x, y) where {A} = ((o.loss.q + 1) ^ 2 / o.loss.q) * x'x
+# lipschitz_constant
+lconst(o::StatLearn, x, y) = lconst(o.loss, x, y)
+
+lconst(o::Loss, x, y) = error("No defined Lipschitz constant for $o")
+lconst(o::L2Scaled{N}, x, y) where {N} = 2N * _dot(x, x)
+lconst(o::L2DistLoss, x, y) = 2 * _dot(x, x)
+lconst(o::LogitMarginLoss, x, y) = .25 * _dot(x, x)
+lconst(o::DWDMarginLoss, x, y) = (o.q + 1)^2 / o.q * _dot(x, x)
 
 #-----------------------------------------------------------------------# OMAS
 init(StatLearn, u::OMAS, p::Int) = OMAS(zeros(p + 1))  # buffer[end] = h
@@ -218,7 +235,7 @@ function fit!(o::StatLearn{<:OMAS}, t::Tuple{VectorOb, Real}, γ::Float64)
     x, y = t
     B = o.updater.buffer
     gradient!(o, t)
-    ht = lipschitz_constant(o, x, y)
+    ht = lconst(o, x, y)
     B[end] = smooth(B[end], ht, γ)
     h = B[end]
     for j in eachindex(o.β)
@@ -230,7 +247,7 @@ end
 function fit!(o::StatLearn{<:OMAP}, t::Tuple{VectorOb, Real}, γ::Float64)
     x, y = t
     gradient!(o, t)
-    h_inv = inv(lipschitz_constant(o, x, y))
+    h_inv = inv(lconst(o, x, y))
     for j in eachindex(o.β)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
@@ -239,7 +256,7 @@ end
 function fit!(o::StatLearn{<:MSPI}, t::Tuple{VectorOb, Real}, γ::Float64)
     gradient!(o, t)
     x, y = t
-    denom = inv(1 + γ * lipschitz_constant(o, x, y))
+    denom = inv(1 + γ * lconst(o, x, y))
     for j in eachindex(o.β)
         @inbounds o.β[j] -= γ * denom * o.gx[j]
     end

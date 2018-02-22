@@ -38,7 +38,7 @@ struct NBClassifier{T, S} <: ExactStat{(1, 0)}
 end
 NBClassifier(T::Type, stats) = NBClassifier(LabelStats{T, typeof(stats)}[], stats)
 NBClassifier(stats, T::Type) = NBClassifier(T, stats)
-NBClassifier(p::Int, T::Type) = NBClassifier(p * Hist(10), T)
+NBClassifier(p::Int, T::Type, b=10) = NBClassifier(p * Hist(b), T)
 
 function Base.show(io::IO, o::NBClassifier)
     print(io, name(o))
@@ -81,7 +81,7 @@ end
 function predict(o::NBClassifier{T, S}, x::VectorOb) where {T, S <: MV}
     pvec = log.(probs(o))  # prior
     for k in eachindex(pvec)
-        pvec[k] += sum(log, condprobs(o, k, x))
+        pvec[k] += sum(log, condprobs(o, k, x) .+ ϵ)
     end
     out = exp.(pvec)
     out ./ sum(out)
