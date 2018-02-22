@@ -36,7 +36,10 @@ fit!(o::LinReg, t::Tuple, γ::Float64) = fit!(o, t..., γ)
 function fit!(o::LinReg, x::VectorOb, y::Real, γ::Float64)
     xtx, xty = matviews(o)
     smooth_syr!(xtx, x, γ)
-    smooth!(xty, x .* y, γ)
+    for (i, xi) in enumerate(x)
+        xty[i] = smooth(xty[i], x[i] * y, γ)
+    end
+    # smooth!(xty, x .* y, γ)
     o.A[end] = smooth(o.A[end], y * y, γ)
     o.nobs += 1
 end
