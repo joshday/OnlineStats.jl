@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Creating a Series",
     "category": "section",
-    "text": "The Series constructor accepts any number of OnlineStats, optionally preceded by data  to be fitted and/or a Weight.  When a Weight isn't specified, Series will use the default weight associated with the OnlineStats."
+    "text": "The Series constructor accepts any number of OnlineStats, optionally preceded by data  to be fitted and/or a Weight.  When a Weight isn\'t specified, Series will use the default weight associated with the OnlineStats."
 },
 
 {
@@ -177,67 +177,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "weights.html#[EqualWeight()](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.EqualWeight",
     "page": "Weight",
-    "title": "EqualWeight()",
-    "category": "section",
-    "text": "Each observation has an equal amount of influence.  This is the default for subtypes of  EqualStat, which can be updated exactly as the corresponding offline algorithm .gamma_t = frac1t"
+    "title": "OnlineStatsBase.EqualWeight",
+    "category": "Type",
+    "text": "EqualWeight()\n\nEqually weighted observations.  \n\ngamma_t = frac1t\n\nExample\n\nseries(randn(100), EqualWeight(), Variance())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[ExponentialWeight(λ-0.1)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.ExponentialWeight",
     "page": "Weight",
-    "title": "ExponentialWeight(λ = 0.1)",
-    "category": "section",
-    "text": "Each observation is weighted with a constant, giving newer observations higher influence and behaves similar to a rolling window.  ExponentialWeight is a good choice for observing  real-time data streams where the true parameter may be changing over time.gamma_t = lambda"
+    "title": "OnlineStatsBase.ExponentialWeight",
+    "category": "Type",
+    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  The first weight is 1.0 and all else are  λ = 2 / (lookback + 1).\n\ngamma_1 = 1 gamma_t = lambda\n\nExample\n\nseries(randn(100), ExponentialWeight(), Variance())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[LearningRate(r-0.6)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.LearningRate",
     "page": "Weight",
-    "title": "LearningRate(r = 0.6)",
-    "category": "section",
-    "text": "Weights decrease at a slower rate than EqualWeight (if r < 1).  This is the default for StochasticStat subtypes, which are based on stochastic approximation.  For .5 < r < 1, each weight is between 1 / t and 1 / sqrt(t).gamma_t = frac1t^r"
+    "title": "OnlineStatsBase.LearningRate",
+    "category": "Type",
+    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  Satisfies the standard stochastic approximation assumption  sum gamma_t = infty sum gamma_t^2  infty if rin(5 1.\n\ngamma_t = frac1t^r\n\nExample\n\nSeries(randn(1000), LearningRate(.7), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[HarmonicWeight(a-10.0)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.HarmonicWeight",
     "page": "Weight",
-    "title": "HarmonicWeight(a = 10.0)",
-    "category": "section",
-    "text": "Weights are based on a general harmonic series.gamma_t = fracaa + t - 1"
+    "title": "OnlineStatsBase.HarmonicWeight",
+    "category": "Type",
+    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\ngamma_t = fracaa + t - 1\n\nExample\n\nSeries(randn(1000), HarmonicWeight(), QuantileMSPI())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[McclainWeight(a-0.1)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.McclainWeight",
     "page": "Weight",
-    "title": "McclainWeight(a = 0.1)",
-    "category": "section",
-    "text": "Consider McclainWeight as a smoothed version of Bounded{EqualWeight}.  Weights approach a positive constant a in the limit.gamma_t = fracgamma_t-11 + gamma_t-1 - a"
+    "title": "OnlineStatsBase.McclainWeight",
+    "category": "Type",
+    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\ngamma_t = fracgamma_t-11 + gamma_t-1 - alpha\n\nExample\n\nSeries(randn(100), McclainWeight(), Mean())\n\n\n\n"
 },
 
 {
-    "location": "weights.html#Weight-Wrappers-1",
+    "location": "weights.html#Weight-Types-1",
     "page": "Weight",
-    "title": "Weight Wrappers",
+    "title": "Weight Types",
     "category": "section",
-    "text": "Several types can change the behavior of a Weight."
+    "text": "EqualWeight\nExponentialWeight\nLearningRate\nHarmonicWeight\nMcclainWeight"
 },
 
 {
-    "location": "weights.html#[Bounded(weight,-λ)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.Bounded",
     "page": "Weight",
-    "title": "Bounded(weight, λ)",
-    "category": "section",
-    "text": "Bounded adds a minimum weight value.gamma_t = textmax(gamma_t )"
+    "title": "OnlineStatsBase.Bounded",
+    "category": "Type",
+    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\ngamma_t^* = textmax(gamma_t lambda)\n\nExample\n\nBounded(EqualWeight(), .1)\n\n\n\n"
 },
 
 {
-    "location": "weights.html#[Scaled(weight,-λ)](@ref)-1",
+    "location": "weights.html#OnlineStatsBase.Scaled",
     "page": "Weight",
-    "title": "Scaled(weight, λ)",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "Type",
+    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\ngamma_t^* = lambda * gamma_t\n\nExample\n\nBounded(LearningRate(.5), .1)\n\nSeries(randn(1000), 2.0 * LearningRate(.9), QuantileMM())\n\n\n\n"
+},
+
+{
+    "location": "weights.html#Weight-wrappers-1",
+    "page": "Weight",
+    "title": "Weight wrappers",
     "category": "section",
-    "text": "Weights are scaled by a constant.  This should only be used with the StochasticStats  based on stochastic gradient algorithms, as it violates the  weight rules at the top of this page.  OnlineStats based on stochastic gradient algorithms  are Quantile, KMeans, and StatLearn.gamma_t =  * gamma_t"
+    "text": "Bounded\nScaled"
 },
 
 {
@@ -293,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Other Merges",
     "category": "section",
-    "text": "For OnlineStats that rely on approximations, merging isn't always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+    "text": "For OnlineStats that rely on approximations, merging isn\'t always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
 },
 
 {
@@ -309,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Data Surrogates",
     "category": "section",
-    "text": "Some OnlineStats are especially useful for out-of-core computations.  After they've been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again."
+    "text": "Some OnlineStats are especially useful for out-of-core computations.  After they\'ve been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again."
 },
 
 {
@@ -317,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Linear Regressions",
     "category": "section",
-    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x's can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * linspace(-1, 1, 10) + randn(10^6)\n\no = LinRegBuilder(11)\n\ns = Series([x y], o)\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
+    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x\'s can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * linspace(-1, 1, 10) + randn(10^6)\n\no = LinRegBuilder(11)\n\ns = Series([x y], o)\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
 },
 
 {
@@ -389,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Categorical Data",
     "category": "section",
-    "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
+    "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o, xlab = \"Nobs\", bar_widths = nobs.(o.parts))\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -397,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Date, Hist(20)))\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\ns = Series([x y], IndexedPartition(Float64, Hist(20)))\n\nplot(s, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand('a':'z', 10^5)\ny = Float64.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Char, Extrema()))\n\nplot(s, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(1:5, 10^5)\ny = rand(1:5, 10^5)\n\ns = Series([x y], IndexedPartition(Int, CountMap(Int)))\n\nplot(s, bar_width = 1, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Date, Hist(20)))\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\ns = Series([x y], IndexedPartition(Float64, Hist(20)))\n\nplot(s, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Char, Extrema()))\n\nplot(s, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(1:5, 10^5)\ny = rand(1:5, 10^5)\n\ns = Series([x y], IndexedPartition(Int, CountMap(Int)))\n\nplot(s, bar_width = 1, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -581,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "Type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\no = FitMultinomial(3)\ns = Series(y', o)\nMultinomial(value(o)...)\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\no = FitMultinomial(3)\ns = Series(y\', o)\nMultinomial(value(o)...)\n\n\n\n"
 },
 
 {
@@ -589,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "Type",
-    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\no = FitMvNormal(3)\ns = Series(y', o)\nMvNormal(value(o)...)\n\n\n\n"
+    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\no = FitMvNormal(3)\ns = Series(y\', o)\nMvNormal(value(o)...)\n\n\n\n"
 },
 
 {
@@ -709,7 +717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.NBClassifier",
     "category": "Type",
-    "text": "NBClassifier(p, T, b = 20)\n\nCreate a Naive Bayes classifier for p predictors for classes of type T.  Conditional probabilities are estimated using the Hist (with AdaptiveBins) type with b bins.\n\nExample\n\nx = randn(100, 5)\ny = rand(Bool, 100)\no = NBClassifier(5, Bool)\nSeries((x,y), o)\npredict(o, x)\nclassify(o,x)\n\n\n\n"
+    "text": "NBClassifier(p, label_type::Type)\n\nNaive Bayes Classifier of p predictors for classes of type label_type.\n\n\n\n"
 },
 
 {
@@ -805,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "Type",
-    "text": "StatLearn(p::Int, args...)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Additional arguments can be given in any order (and is still type stable):\n\nloss = .5 * L2DistLoss(): any Loss from LossFunctions.jl\npenalty = L2Penalty(): any Penalty (which has a prox method) from PenaltyFunctions.jl.\nλ = fill(.1, p): a Vector of element-wise regularization parameters\nupdater = SGD(): SGD, ADAGRAD, ADAM, ADAMAX, MSPI\n\nDetails\n\nThe (offline) objective function that StatLearn approximately minimizes is\n\nfrac1nsum_i=1^n f_i(beta) + sum_j=1^p lambda_j g(beta_j)\n\nwhere the f_i's are loss functions evaluated on a single observation, g is a penalty function, and the lambda_js are nonnegative regularization parameters.\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
+    "text": "StatLearn(p::Int, args...)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Additional arguments can be given in any order (and is still type stable):\n\nloss = .5 * L2DistLoss(): any Loss from LossFunctions.jl\npenalty = L2Penalty(): any Penalty (which has a prox method) from PenaltyFunctions.jl.\nλ = fill(.1, p): a Vector of element-wise regularization parameters\nupdater = SGD(): SGD, ADAGRAD, ADAM, ADAMAX, MSPI\n\nDetails\n\nThe (offline) objective function that StatLearn approximately minimizes is\n\nfrac1nsum_i=1^n f_i(beta) + sum_j=1^p lambda_j g(beta_j)\n\nwhere the f_i\'s are loss functions evaluated on a single observation, g is a penalty function, and the lambda_js are nonnegative regularization parameters.\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
 },
 
 {
@@ -814,6 +822,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Sum",
     "category": "Type",
     "text": "Sum()\n\nTrack the overall sum.\n\nExample\n\ns = Series(randn(1000), Sum())\nvalue(s)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Unique",
+    "page": "API",
+    "title": "OnlineStats.Unique",
+    "category": "Type",
+    "text": "Unique(T::Type)\n\nTrack the unique values. \n\nExample\n\nseries(rand(1:5, 100), Unique(Int))\n\n\n\n"
 },
 
 {
@@ -829,7 +845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.mapblocks",
     "category": "Function",
-    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia's do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
+    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia\'s do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
 },
 
 {
@@ -853,7 +869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "StatsBase.fit!",
     "category": "Method",
-    "text": "fit!(s::Series, data)\n\nUpdate a Series with more data. \n\nExamples\n\n# Univariate Series \ns = Series(Mean())\nfit!(s, randn(100))\n\n# Multivariate Series\nx = randn(100, 3)\ns = Series(CovMatrix(3))\nfit!(s, x)  # Same as fit!(s, x, Rows())\nfit!(s, x', Cols())\n\n# Model Series\nx, y = randn(100, 10), randn(100)\ns = Series(LinReg(10))\nfit!(s, (x, y))\n\n\n\n"
+    "text": "fit!(s::Series, data)\n\nUpdate a Series with more data. \n\nExamples\n\n# Univariate Series \ns = Series(Mean())\nfit!(s, randn(100))\n\n# Multivariate Series\nx = randn(100, 3)\ns = Series(CovMatrix(3))\nfit!(s, x)  # Same as fit!(s, x, Rows())\nfit!(s, x\', Cols())\n\n# Model Series\nx, y = randn(100, 10), randn(100)\ns = Series(LinReg(10))\nfit!(s, (x, y))\n\n\n\n"
 },
 
 {
@@ -862,14 +878,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.BiasVec",
     "category": "Type",
     "text": "BiasVec(x, bias = 1.0)\n\nLightweight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.KnownBins",
-    "page": "API",
-    "title": "OnlineStats.KnownBins",
-    "category": "Type",
-    "text": "Calculate a histogram over a fixed range.  \n\n\n\n"
 },
 
 {
@@ -901,7 +909,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Base.merge!",
     "category": "Method",
-    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2's influence is determined by arg. Options for arg` are:\n\n:append (default)\nappends2tos1` with influence determined by number of observations.  For \nEqualWeight, this is equivalent to fit!(s1, data2) where s2 = Series(data2, o...).\n:mean\nUse the average (weighted by nobs) of the Series' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
+    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2\'s influence is determined by arg. Options for arg` are:\n\n:append (default)\nappends2tos1` with influence determined by number of observations.  For \nEqualWeight, this is equivalent to fit!(s1, data2) where s2 = Series(data2, o...).\n:mean\nUse the average (weighted by nobs) of the Series\' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
 },
 
 {
@@ -921,107 +929,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStatsBase.Bounded",
-    "page": "API",
-    "title": "OnlineStatsBase.Bounded",
-    "category": "Type",
-    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\n_bounded(t) = max((t) )\n\nExample\n\nBounded(EqualWeight(), .1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.EqualWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.EqualWeight",
-    "category": "Type",
-    "text": "EqualWeight()\n\nEqually weighted observations.  \n\n(t) = 1  t\n\nExample\n\nSeries(randn(100), EqualWeight(), Variance())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.ExactStat",
-    "page": "API",
-    "title": "OnlineStatsBase.ExactStat",
-    "category": "Type",
-    "text": "An OnlineStat which can be fit!-ted and merge!-ed exactly\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.ExponentialWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.ExponentialWeight",
-    "category": "Type",
-    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  \n\n(t) =  = 2  (lookback + 1)\n\nExample\n\nSeries(randn(100), ExponentialWeight(), Variance())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.HarmonicWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.HarmonicWeight",
-    "category": "Type",
-    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\n(t) = a  (a + t - 1)\n\nExample\n\nSeries(randn(1000), HarmonicWeight(), QuantileMSPI())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LearningRate",
-    "page": "API",
-    "title": "OnlineStatsBase.LearningRate",
-    "category": "Type",
-    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  \n\n(t) = 1  t^r\n\nExample\n\nSeries(randn(1000), LearningRate(.7), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.LearningRate2",
-    "page": "API",
-    "title": "OnlineStatsBase.LearningRate2",
-    "category": "Type",
-    "text": "LearningRate2(c = .5)\n\nSlowly decreasing weight.  \n\n(t) = 1  (1 + c * (t - 1))\n\nExample\n\nSeries(randn(1000), LearningRate2(.3), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.McclainWeight",
-    "page": "API",
-    "title": "OnlineStatsBase.McclainWeight",
-    "category": "Type",
-    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\n(t) = (t-1)  (1 + (t) - )\n\nExample\n\nSeries(randn(100), McclainWeight(), Mean())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Scaled",
-    "page": "API",
-    "title": "OnlineStatsBase.Scaled",
-    "category": "Type",
-    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\n_scaled(t) =  * (t)\n\nExample\n\nBounded(LearningRate(.5), .1)\n\nSeries(randn(1000), 2.0 * LearningRate(.9), QuantileMM())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.StochasticStat",
-    "page": "API",
-    "title": "OnlineStatsBase.StochasticStat",
-    "category": "Type",
-    "text": "An OnlineStat that must be approximated.  Subtypes are parameterized by an Updater\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase.Weight",
-    "page": "API",
-    "title": "OnlineStatsBase.Weight",
-    "category": "Type",
-    "text": "Subtypes of Weight must be callable to produce the weight given the current number of  observations in an OnlineStat n and the number of new observations (n2).\n\nMyWeight(n, n2 = 1)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStatsBase._fit!",
-    "page": "API",
-    "title": "OnlineStatsBase._fit!",
-    "category": "Function",
-    "text": "_fit!(o::OnlineStat, observation::TypeOfObservation, γ::Float64)\n\nUpdate an OnlineStat with a single observation by a weight γ.  TypeOfObservation depends on typof(o).\n\n\n\n"
-},
-
-{
     "location": "api.html#API-1",
     "page": "API",
     "title": "API",
     "category": "section",
-    "text": "Modules = [OnlineStats, OnlineStatsBase]"
+    "text": "Modules = [OnlineStats]"
 },
 
 ]}
