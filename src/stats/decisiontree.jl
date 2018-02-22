@@ -10,8 +10,7 @@ mutable struct TreeNode{T, S} <: ExactStat{(1, 0)}
 end
 TreeNode(args...) = TreeNode(NBClassifier(args...), 1, Pair(1, -Inf), Int[])
 
-for f in [:nobs, :probs, :condprobs, :impurity, :predict, :classify, :nparams, 
-          :impurity, :(Base.length)]
+for f in [:nobs,:probs,:condprobs,:impurity,:predict,:classify,:nparams,:(Base.length)]
     @eval $f(o::TreeNode, args...) = $f(o.nbc, args...)
 end
 

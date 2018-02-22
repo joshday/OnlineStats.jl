@@ -56,7 +56,7 @@ end
     xlim := (0, 1)
     ylim := (0, 1)
     xticks := ([(xedges[i] + xedges[i+1])/2 for i in 1:length(xedges)-1], xlevels)
-    labels := ylevels'
+    labels := reshape(ylevels, 1, length(ylevels))
 
     xedges, y'
 end
