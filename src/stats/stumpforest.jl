@@ -2,18 +2,20 @@
 mutable struct BinaryStump{S} <: ExactStat{(1, 0)}
     stats1::S
     stats2::S
-    split::Pair{Int, Float64}
+    split_var::Int 
+    split_loc::Float64 
+    split_lab::Float64
     featuresubset::Vector{Int}
 end
 function BinaryStump(p::Int, b::Int = 10, subset = 1:p) 
-    BinaryStump(p * Hist(b), p * Hist(b), Pair(0, Inf), collect(subset))
+    BinaryStump(p * Hist(b), p * Hist(b), 0, Inf, 0.0, collect(subset))
 end
 function Base.show(io::IO, o::BinaryStump)
     println(io, "BinaryStump:")
     println(io, "  > -1: ", name(o.stats1))
     print(io, "  >  1: ", name(o.stats2))
-    if first(o.split) > 0
-        print(io, "\n  > split on variable ", first(o.split), " at ", last(o.split))
+    if o.split_var > 0
+        print(io, "\n  > split on variable ", o.split_var, " at ", o.split_loc)
     end
 end
 
@@ -42,34 +44,40 @@ function find_split(o::BinaryStump)
     s1 = copy(o.stats1)
     s2 = copy(o.stats2)
     ig = zeros(nparams(o))  # information gain
-    x = zeros(nparams(o))
+    locs = zeros(nparams(o))
+    labs = zeros(nparams(o))
     for j in eachindex(ig)
         h1 = s1[j]
         h2 = s2[j]
-        xj = (mean(h1) + mean(h2)) / 2  # find best split location
+        locj = (mean(h1) + mean(h2)) / 2  # TODO: find best split location
 
-        n1l, n1r = splitcounts(h1, xj)
-        n2l, n2r = splitcounts(h2, xj)
+        n1l, n1r = splitcounts(h1, locj)  # number of -1s, left and right
+        n2l, n2r = splitcounts(h2, locj)  # number of 1s, left and right
 
-        counts_l = [n1l, n2l]
-        counts_r = [n1r, n2r]
+        counts_l = [n1l, n2l]  # counts of -1 and 1 in left
+        counts_r = [n1r, n2r]  # counts of -1 and 1 in right
 
-        probs_l = counts_l ./ sum(counts_l)
-        probs_r = counts_r ./ sum(counts_r)
+        probs_l = counts_l ./ sum(counts_l)  # probs of left
+        probs_r = counts_r ./ sum(counts_r)  # probs of right
 
-        left_imp = impurity(probs_l)
-        right_imp = impurity(probs_r)
+        left_imp = impurity(probs_l)  # impurity of left
+        right_imp = impurity(probs_r)  # impurity of right
         after_imp = smooth(left_imp, right_imp, (n1r + n2r) / (n1r + n2r + n1l + n2l))
 
-        x[j] = xj
+        locs[j] = locj
         ig[j] = imp_root - after_imp 
+
+        # More -1s than 1s in left?  label -1 : label 1
+        labs[j] = n1l > n2l ? -1.0 : 1.0
     end
-    j = findmin(ig)[2]
-    xj = x[j]
-    o.split = Pair(j, xj)
+    o.split_var = findmax(ig)[2]    # find largest information gain
+    o.split_loc = locs[o.split_var] # get split location
+    o.split_lab = labs[o.split_var] # get label for when split is true
 end
 
-classify(o::BinaryStump, x::VectorOb) = 2.0 * (x[o.featuresubset[first(o.split)]] < last(o.split)) - 1.0
+function classify(o::BinaryStump, x::VectorOb) 
+    x[o.featuresubset[o.split_var]] < o.split_loc ? o.split_lab : -o.split_lab
+end
 function classify(o::BinaryStump, x::AbstractMatrix, ::Rows = Rows())
     mapslices(x -> classify(o, x), x, 2)
 end
@@ -94,10 +102,20 @@ function fit!(o::BinaryStumpForest, xy, γ)
 end
 
 function predict(o::BinaryStumpForest, x::VectorOb)
-    [classify(stump, x) for stump in o.forest]
+    mean(classify(stump, x) for stump in o.forest)
 end
+classify(o::BinaryStumpForest, x::VectorOb) = sign(predict(o, x))
 
-
+for f in [:predict, :classify]
+    @eval begin 
+        function $f(o::BinaryStumpForest, x::AbstractMatrix, dim::Rows = Rows())
+            mapslices(x -> $f(o, x), x, 2)
+        end
+        function $f(o::BinaryStumpForest, x::AbstractMatrix, dim::Cols)
+            mapslices(x -> $f(o, x), x, 1)
+        end
+    end
+end
 
 
 
