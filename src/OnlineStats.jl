@@ -31,7 +31,7 @@ export
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
-    NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique,
+    NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique, StumpForest,
     # StatLearn
     StatLearn, SGD, NSGD, ADAGRAD, ADADELTA, RMSPROP, ADAM, ADAMAX, NADAM, OMAP, OMAS, MSPI,
     # ML
