@@ -86,6 +86,16 @@ function classify(o::BinaryStump, x::AbstractMatrix, ::Cols)
 end
 
 #-----------------------------------------------------------------------# BinaryStumpForest 
+"""
+    BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)
+
+Build a binary random forest based on stumps (single-split trees) where 
+
+- `p` is the number of predictors 
+- `nt` is the number of trees (stumps) in the forest 
+- `b` is the number of histogram bins used to estimate ``P(x_j | class)``
+- `np` is the number of random predictors each tree will use
+"""
 struct BinaryStumpForest{S} <: ExactStat{(1, 0)}
     forest::Vector{BinaryStump{S}}
 end
