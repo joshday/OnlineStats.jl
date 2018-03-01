@@ -889,6 +889,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.BinaryStumpForest",
+    "page": "API",
+    "title": "OnlineStats.BinaryStumpForest",
+    "category": "Type",
+    "text": "BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)\n\nBuild a random forest (for responses -1, 1) based on stumps (single-split trees) where \n\np is the number of predictors \nnt is the number of trees (stumps) in the forest \nb is the number of histogram bins used to estimate P(x_j  class)\nnp is the number of random predictors each tree will use\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.MSPI2",
     "page": "API",
     "title": "OnlineStats.MSPI2",
