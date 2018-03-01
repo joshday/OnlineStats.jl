@@ -60,6 +60,7 @@ condprobs(o::NBClassifier{T, <:MV}, k, xj) where {T} = _pdf.(o.value[k].stats.st
 
 entropybase2(p) = entropy(p, 2)
 impurity(o::NBClassifier, f::Function = entropybase2) = f(probs(o))
+impurity(probs, f::Function = entropybase2) = f(probs)
 
 function fit!(o::NBClassifier, xy, γ)
     x, y = xy 
@@ -100,12 +101,45 @@ for f in [:predict, :classify]
     end
 end
 
+# For stumpforest 
+function split(o::NBClassifier)
+    root_impurity = impurity(o)
+
+    lefts = typeof(o)[]
+    rights = typeof(o)[]
+    igs = Float64[]
+
+    for j in 1:nparams(o)
+        hs = o[j]
+        xj = mean(mean.(hs))  # TODO: something smarter
+        n1, n2 = split_nobs(o, j, xj)
+        left, right = split_at(o, j, xj)
+    end
+end
+
+# function split_at(o::NBClassifier, j, xj)
+#     left = o 
+#     right = copy(o)
+#     left, right = split_at!(copy(o))
+#     # remove bins above xj for variable j
+#     for ls in left.value 
+#         h = ls.stats[j]
+#     end
+#     # remove bins below xj for variables j
+#     for ls in right.value 
+#         h = ls.stats[j]
+#     end
+# end
+
 best_split_location(o::NBClassifier, j) = mean(mean.(o[j]))
 
 function info_gain(o::NBClassifier, j)
     x = best_split_location(o, j)
-    left = o[j]
-    right = split_at!.(left, x)
+    lefts = o[j]
+    rights = split_at!.(left, x)
+    n_left, n_right = split_nobs(o)
+
+
 end
 
 
@@ -116,9 +150,9 @@ function split_nobs(o::NBClassifier{T, MV{S}}, j, x) where {T, S <: Hist}
     stats = o[j]  # stats[1] = key 1's Hist
     for hist in stats 
         n1, n2 = splitcounts(hist, x)
-        push!(out_left, n1)
-        push!(out_right, n2)
+        push!(n_left, n1)
+        push!(n_right, n2)
     end
-    out_left, out_right
+    n_left, n_right
 end
 

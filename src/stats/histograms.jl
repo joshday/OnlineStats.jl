@@ -180,6 +180,8 @@ function _pdf(o::AdaptiveBins, y::Number)
     end
 end
 
+
+
 # Counts in left and right if split at point x
 function splitcounts(o::AdaptiveBins, x)
     i = searchsortedfirst(o.value, Pair(x, 1))
