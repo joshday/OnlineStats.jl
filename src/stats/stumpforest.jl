@@ -89,7 +89,7 @@ end
 """
     BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)
 
-Build a binary random forest based on stumps (single-split trees) where 
+Build a random forest (for responses -1, 1) based on stumps (single-split trees) where 
 
 - `p` is the number of predictors 
 - `nt` is the number of trees (stumps) in the forest 
