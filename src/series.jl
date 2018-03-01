@@ -157,11 +157,10 @@ function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
 end
 
 #-----------------------------------------------------------------------# ModelSeries
-# struct ModelSeries{S, L, R} <: AbstractSeries{1}
+# struct ModelSeries{S, F} <: AbstractSeries{1}
 #     series::S
 #     extractor::ML.FeatureExtractor
-#     lhs::L 
-#     rhs::R
+#     f!::F
 #     fvec::Vector{Float64}  # featurevector
 # end
 
@@ -173,6 +172,22 @@ end
 #     transform!(s.fvec, s.extractor, s.formula, y)
 #     fit!(s.s, s.fvec)
 # end
+
+#-----------------------------------------------------------------------# MSeries 
+struct MSeries{S, F} <: AbstractSeries{1}
+    series::S
+    transformer!::F  # 
+    x::Vector{Float64}
+end
+
+for f in [:nobs, :value, :stats, :weight!, :getweight]
+    @eval $f(o::MSeries) = $f(o.series)
+end
+function fit!(o::MSeries, x::VectorOb)
+    xy = o.transformer!(s.x, x)
+    fit!(o.series, xy)
+end
+
 
 #-----------------------------------------------------------------------# fit! 0
 """
@@ -280,8 +295,6 @@ Merge `s2` into `s1` in place where `s2`'s influence is determined by `arg`. Opt
 - `:append` (default)
     - `append `s2` to `s1` with influence determined by number of observations.  For 
     `EqualWeight`, this is equivalent to `fit!(s1, data2)` where `s2 = Series(data2, o...)`.
-- `:mean`
-    - Use the average (weighted by nobs) of the Series' generated weights.
 - `:singleton`
     - treat `s2` as a single observation.
 - any `Float64` in [0, 1]

@@ -6,7 +6,7 @@ import NamedTuples: NamedTuple
 import DataStructures: SortedDict
 import LearnBase: fit!, value, nobs, predict, transform!, transform
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, pweights, skewness, 
-    kurtosis, confint, autocor, autocov, entropy, midpoints
+    kurtosis, confint, autocor, autocov, entropy, midpoints, sample
 import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, _value, _fit!,
     VectorOb, XyOb, default_weight,
     Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, 
@@ -87,6 +87,7 @@ include("stats/wrappers.jl")
 include("stats/naivebayes.jl")
 include("stats/decisiontree.jl")
 include("stats/mlschema.jl")
+include("stats/stumpforest.jl")
 include("visualizations/partition.jl")
 include("visualizations/mosaic.jl")
 include("series.jl")

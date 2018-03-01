@@ -180,11 +180,13 @@ function _pdf(o::AdaptiveBins, y::Number)
     end
 end
 
+# Counts in left and right if split at point x
 function splitcounts(o::AdaptiveBins, x)
     i = searchsortedfirst(o.value, Pair(x, 1))
     sum(last, o.value[1:(i-1)]), sum(last, o.value[i:end])
 end
 
+# Split a histogram in two.  Original = left, new = right.
 function split_at!(o::AdaptiveBins{T}, x) where {T}
     k = searchsortedfirst(o.value, Pair(x, 1))
     out = o.value[k:end]

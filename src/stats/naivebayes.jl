@@ -100,39 +100,22 @@ for f in [:predict, :classify]
     end
 end
 
+best_split_location(o::NBClassifier, j) = mean(mean.(o[j]))
 
-# IG from splitting on variable j at point x
-function info_gain(o::NBClassifier, j, x)
-    stats = o[j]
-
-end
-
-
-# TODO: something smarter
-function split_candidates(o::NBClassifier, j)
-    μs = mean.(o[j])
-    sort!(μs)
-    [(mean(μs[i]) + mean(μs[i-1])) / 2 for i in 2:length(μs)]
-end
-
-
-
-
-# information gain from splitting on variable j
 function info_gain(o::NBClassifier, j)
-    xs = trysplits(o, j)
-    stats = o[j]
-
+    x = best_split_location(o, j)
+    left = o[j]
+    right = split_at!.(left, x)
 end
 
 
-# nobs of left and right children after splitting on variable j at point x
+# If we were to split on variable j at point x, what are the nobs of the children?
 function split_nobs(o::NBClassifier{T, MV{S}}, j, x) where {T, S <: Hist}
     out_left = Int[]
     out_right = Int[]
     stats = o[j]  # stats[1] = key 1's Hist
-    for s in stats 
-        n1, n2 = splitcounts(s, x)
+    for hist in stats 
+        n1, n2 = splitcounts(hist, x)
         push!(out_left, n1)
         push!(out_right, n2)
     end

@@ -32,7 +32,6 @@ function go_to_node(tree::Vector{<:TreeNode}, x::VectorOb)
     return i
 end
 
-# TODO: Hoeffding bound
 function shouldsplit(o::TreeNode)
     nobs(o) > 10_000
 end
@@ -42,7 +41,7 @@ function top_IGs(leaf::TreeNode, impurity = entropybase2)
     imp = impurity(probs(leaf))
     out = Pair{Float64, Float64}[]
     for j in 1:nparams(leaf)
-        tsplits = trysplits(leaf.nbc, j)
+        tsplits = split_candidates(leaf.nbc, j)
         imps = Float64[]
         for x in tsplits
             n1, n2 = split_nobs(leaf.nbc, j, x)
@@ -76,17 +75,23 @@ function Base.show(io::IO, o::CTree)
     end
 end
 
+nparams(o::CTree) = length(o.tree[1].nbc.empty_stats)
+
 get_leaf(o::CTree, x) = o.tree[go_to_node(o.tree, x)]
 
 function fit!(o::CTree, xy, γ) 
     x, class = xy
+    # find leaf
     leaf = get_leaf(o, x)
+    # update leaf sufficient statistics
     fit!(leaf, xy, γ)
-    if length(o.tree) < 25 && shouldsplit(leaf) # TODO: user-defined max tree size
-        igs = top_IGs(leaf)
-        ab = sortperm(igs)[1:2]  # Top 2 information gains
-        @show first(ab) - last(ab)
-        error("HI")
+    # If we should split the leaf
+    if length(o.tree) < o.maxsize && shouldsplit(leaf)
+        # get the top 2 information gains
+        IGs = zeros(nparams(o))
+        for j in eachindex(IGs)
+
+        end
     end
 end
 
