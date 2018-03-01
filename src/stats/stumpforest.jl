@@ -1,11 +1,10 @@
-# Assume input is -1 or 1
 mutable struct BinaryStump{S} <: ExactStat{(1, 0)}
-    stats1::S
-    stats2::S
-    split_var::Int 
-    split_loc::Float64 
-    split_lab::Float64
-    featuresubset::Vector{Int}
+    stats1::S           # summary statistics for class = -1
+    stats2::S           # summary statistics for class = 1
+    split_var::Int      # which variable to split on
+    split_loc::Float64  # location to make the split
+    split_lab::Float64  # class label when xj < split_loc
+    featuresubset::Vector{Int}  # indices of the subset of features
 end
 function BinaryStump(p::Int, b::Int = 10, subset = 1:p) 
     BinaryStump(p * Hist(b), p * Hist(b), 0, Inf, 0.0, collect(subset))
@@ -15,7 +14,7 @@ function Base.show(io::IO, o::BinaryStump)
     println(io, "  > -1: ", name(o.stats1))
     print(io, "  >  1: ", name(o.stats2))
     if o.split_var > 0
-        print(io, "\n  > split on variable ", o.split_var, " at ", o.split_loc)
+        print(io, "\n  > split on variable ", o.featuresubset[o.split_var], " at ", o.split_loc)
     end
 end
 
@@ -111,7 +110,7 @@ end
 value(o::BinaryStumpForest) = value.(o.forest)
 
 function fit!(o::BinaryStumpForest, xy, γ)
-    i = rand(1:length(o.forest))
+    i = rand(1:length(o.forest))  # TODO: other schemes for this randomization part
     fit!(o.forest[i], xy, γ)
 end
 
