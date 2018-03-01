@@ -95,6 +95,10 @@ Build a random forest (for responses -1, 1) based on stumps (single-split trees)
 - `nt` is the number of trees (stumps) in the forest 
 - `b` is the number of histogram bins used to estimate ``P(x_j | class)``
 - `np` is the number of random predictors each tree will use
+
+# Usage
+
+After fitting, you must call `value` to calculate the splits.
 """
 struct BinaryStumpForest{S} <: ExactStat{(1, 0)}
     forest::Vector{BinaryStump{S}}
