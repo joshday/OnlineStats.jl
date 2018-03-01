@@ -149,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "Merging",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Use weighted average based on nobs of each Series\nmerge!(s1, s2, :mean)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
+    "text": "Two Series can be merged if they track the same OnlineStats.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
 },
 
 {
@@ -817,6 +817,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.StumpForest",
+    "page": "API",
+    "title": "OnlineStats.StumpForest",
+    "category": "Type",
+    "text": "StumpForest(p::Int, T::Type; b=10, nt=100, np=3)\n\nOnline random forest with stumps (one-node trees) where:\n\np is the number of predictors. \nb is the number of histogram bins to estimate conditional densities.\nnt is the number of trees in the forest.\nnp is the number predictors to give to each stump.\n\nExample\n\nx = randn(10_000, 10)\ny = x * linspace(-1, 1, 10) .> 0 \n\ns = Series((x, y), StumpForest(10, Bool))\n\n# prediction accuracy\nmean(y .== classify(s.stats[1], x))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Sum",
     "page": "API",
     "title": "OnlineStats.Sum",
@@ -909,7 +917,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Base.merge!",
     "category": "Method",
-    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2\'s influence is determined by arg. Options for arg` are:\n\n:append (default)\nappends2tos1` with influence determined by number of observations.  For \nEqualWeight, this is equivalent to fit!(s1, data2) where s2 = Series(data2, o...).\n:mean\nUse the average (weighted by nobs) of the Series\' generated weights.\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
+    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2\'s influence is determined by arg. Options for arg` are:\n\n:append (default)\nappends2tos1` with influence determined by number of observations.  For \nEqualWeight, this is equivalent to fit!(s1, data2) where s2 = Series(data2, o...).\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
 },
 
 {

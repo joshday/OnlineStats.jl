@@ -27,9 +27,6 @@ s2 = Series(y2, Mean(), Variance())
 # s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)
 merge!(s1, s2, :append)
 
-# Use weighted average based on nobs of each Series
-merge!(s1, s2, :mean)
-
 # Treat s2 as a single observation.
 merge!(s1, s2, :singleton)
 
