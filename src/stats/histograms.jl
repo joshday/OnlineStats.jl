@@ -203,7 +203,11 @@ end
 # Estimated number of points in interval [-∞, b]
 # b must be inside endpoints
 function Base.sum(o::AdaptiveBins, b::Real)
-    first(o.value[1]) < b < first(o.value[end]) || error("$b isn't between endpoints")
+    if !(first(o.value[1]) < b < first(o.value[end]))
+        @show first(o.value[1]) < b
+        @show b < first(o.value[end])
+        error("$b isn't between endpoints")
+    end
     # find i such that p(i) ≤ b < p(i+1)
     i = searchsortedfirst(o.value, Pair(b, 1)) - 1
     p1, m1 = o.value[i]
@@ -213,22 +217,23 @@ function Base.sum(o::AdaptiveBins, b::Real)
     return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
 end
 
-# Algorithm 4: Uniform Procedure (locations of candidate splits)
-function split_candidates(o::AdaptiveBins, B::Integer)
-    m = nobs(o) / B
-    cs = cumsum(last.(o.value))
-    u = Vector{Float64}(B-1)
-    for j in 1:(B-1)
-        s = j * m
-        i = searchsortedfirst(cs, s) - 1
-        d = s - cs[i]
-        p1, m1 = o.value[i]
-        p2, m2 = o.value[i + 1]
-        a = m2 - m1
-        b = 2m1
-        c = -2d
-        z = a != 0 ? (-b + sqrt(b^2 - 4*a*c)) / (2a) : -c/b
-        u[j] = p1 + (p2 - p1) * z
-    end
-    u
-end
+# # Algorithm 4: Uniform Procedure (locations of candidate splits)
+# function split_candidates(o::AdaptiveBins, B::Integer)
+#     # m = nobs(o) / B
+#     # cs = cumsum(last.(o.value))
+#     # u = Vector{Float64}(B-1)
+#     # for j in 2:(B-2)
+#     #     s = j * m
+#     #     i = searchsortedfirst(cs, s) - 1
+#     #     d = s - cs[i]
+#     #     p1, m1 = o.value[i]
+#     #     p2, m2 = o.value[i + 1]
+#     #     a = m2 - m1
+#     #     b = 2m1
+#     #     c = -2d
+#     #     z = a != 0 ? (-b + sqrt(b^2 - 4*a*c)) / (2a) : -c/b
+#     #     u[j] = p1 + (p2 - p1) * z
+#     # end
+#     # u
+#     midpoints(first.(o.value))
+# end

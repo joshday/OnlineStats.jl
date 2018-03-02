@@ -4,7 +4,7 @@ struct BinarySplit
     j::Int 
     loc::Float64 
     lab::Float64
-    ig::Float64
+    ig::Float64  # information gain
 end
 classify(o::BinarySplit, x::VectorOb) = x[o.j] < o.loc ? o.lab : -o.lab
 
@@ -15,7 +15,7 @@ mutable struct BinaryStump <: ExactStat{(1, 0)}
     split::BinarySplit
     subset::Vector{Int}  # indices of the subset of features
 end
-function BinaryStump(p::Int, b::Int = 10, subset = 1:p) 
+function BinaryStump(p::Int, b::Int, subset, nc = 3) 
     BinaryStump(p * Hist(b), p * Hist(b), BinarySplit(0,0.0,0.0,0.0), collect(subset))
 end
 function Base.show(io::IO, o::BinaryStump)
@@ -46,15 +46,25 @@ function fit!(o::BinaryStump, xy, γ)
     end
 end
 
+# find split candidates based on histograms for each label
+function split_candidates(h1, h2)
+    a = max(h1.value[1][1], h2.value[1][1])
+    b = min(h1.value[end][1], h2.value[end][1])
+    out = midpoints(first.(merge(h1, h2).value))
+    out[a .< out .< b]
+end
+
 function find_split(o::BinaryStump)
     imp_root = impurity(probs(o))
     s1 = copy(o.stats1)
     s2 = copy(o.stats2)
+
+    # calculate information gain for a lot of split candidates
     trials = BinarySplit[]
     for j in 1:nparams(o)
         h1 = s1[j].alg 
         h2 = s2[j].alg
-        for loc in [-.1, 0.0, .1] #split_candidates(merge(h1, h2), 10)[2:end-1]  # make setting
+        for loc in split_candidates(h1, h2)  # make setting
             n1l = sum(h1, loc)
             n2l = sum(h2, loc)
             n1r = nobs(h1) - n1l 
@@ -72,6 +82,7 @@ function find_split(o::BinaryStump)
         end
     end
 
+    # find the best split
     max_ig = maximum(split.ig for split in trials)
     i = find(x -> x.ig == max_ig, trials)[1]
     o.split = trials[i]
@@ -100,7 +111,7 @@ Build a random forest (for responses -1, 1) based on stumps (single-split trees)
 
 # Usage
 
-After fitting, you must call `value` to calculate the splits.
+After fitting, you must call `value` to calculate the splits!
 """
 struct BinaryStumpForest <: ExactStat{(1, 0)}
     forest::Vector{BinaryStump}
