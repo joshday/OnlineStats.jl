@@ -164,6 +164,8 @@ end
 
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.value)
 
+Base.merge(o::T, o2::T) where {T<:AdaptiveBins} = (o3 = deepcopy(o); fit!.(o3, o2.value); o3)
+
 
 # based on linear interpolation
 function _pdf(o::AdaptiveBins, y::Number)
@@ -218,14 +220,14 @@ function split_candidates(o::AdaptiveBins, B::Integer)
     u = Vector{Float64}(B-1)
     for j in 1:(B-1)
         s = j * m
-        i = searchsortedfirst(cs, s)
+        i = searchsortedfirst(cs, s) - 1
         d = s - cs[i]
         p1, m1 = o.value[i]
         p2, m2 = o.value[i + 1]
         a = m2 - m1
         b = 2m1
         c = -2d
-        z = (-b + sqrt(b^2 - 4*a*c)) / (2a)
+        z = a != 0 ? (-b + sqrt(b^2 - 4*a*c)) / (2a) : -c/b
         u[j] = p1 + (p2 - p1) * z
     end
     u
