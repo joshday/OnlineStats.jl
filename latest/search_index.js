@@ -817,14 +817,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.StumpForest",
-    "page": "API",
-    "title": "OnlineStats.StumpForest",
-    "category": "Type",
-    "text": "StumpForest(p::Int, T::Type; b=10, nt=100, np=3)\n\nOnline random forest with stumps (one-node trees) where:\n\np is the number of predictors. \nb is the number of histogram bins to estimate conditional densities.\nnt is the number of trees in the forest.\nnp is the number predictors to give to each stump.\n\nExample\n\nx = randn(10_000, 10)\ny = x * linspace(-1, 1, 10) .> 0 \n\ns = Series((x, y), StumpForest(10, Bool))\n\n# prediction accuracy\nmean(y .== classify(s.stats[1], x))\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.Sum",
     "page": "API",
     "title": "OnlineStats.Sum",
@@ -893,7 +885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.BinaryStumpForest",
     "category": "Type",
-    "text": "BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)\n\nBuild a random forest (for responses -1, 1) based on stumps (single-split trees) where \n\np is the number of predictors \nnt is the number of trees (stumps) in the forest \nb is the number of histogram bins used to estimate P(x_j  class)\nnp is the number of random predictors each tree will use\n\nUsage\n\nAfter fitting, you must call value to calculate the splits.\n\n\n\n"
+    "text": "BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)\n\nBuild a random forest (for responses -1, 1) based on stumps (single-split trees) where \n\np is the number of predictors \nnt is the number of trees (stumps) in the forest \nb is the number of histogram bins used to estimate P(x_j  class)\nnp is the number of random predictors each tree will use\n\nUsage\n\nAfter fitting, you must call value to calculate the splits!\n\n\n\n"
 },
 
 {
