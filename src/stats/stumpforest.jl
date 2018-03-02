@@ -35,7 +35,8 @@ function probs(o::BinaryStump)
     n ./ sum(n)
 end
 
-value(o::BinaryStump) = find_split(o)
+# TODO: value should return object that predicts faster
+value(o::BinaryStump) = make_split(o)
 
 function fit!(o::BinaryStump, xy, γ)
     x, y = xy
@@ -51,22 +52,22 @@ end
 
 # find split candidates based on histograms for each label
 function split_candidates(h1, h2)
+    # get endpoints of both histograms
     a = max(h1.value[1][1], h2.value[1][1])
     b = min(h1.value[end][1], h2.value[end][1])
+    # midpoints of merged histograms
     out = midpoints(first.(merge(h1, h2).value))
+    # only use midpoints that are in range of both histograms
     out[a .< out .< b]
 end
 
-function find_split(o::BinaryStump)
-    imp_root = impurity(probs(o))
-    s1 = copy(o.stats1)
-    s2 = copy(o.stats2)
-
+function make_split(o::BinaryStump)
     # calculate information gain for a lot of split candidates
+    imp_root = impurity(probs(o))
     trials = BinarySplit[]
     for j in 1:nparams(o)
-        h1 = s1[j].alg 
-        h2 = s2[j].alg
+        h1 = o.stats1[j].alg 
+        h2 = o.stats2[j].alg
         for loc in split_candidates(h1, h2)  # make setting
             n1l = sum(h1, loc)
             n2l = sum(h2, loc)
