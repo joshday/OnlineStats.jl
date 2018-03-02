@@ -9,6 +9,7 @@ end
 classify(o::BinarySplit, x::VectorOb) = x[o.j] < o.loc ? o.lab : -o.lab
 
 #-----------------------------------------------------------------------# BinaryStump
+# For each label, we store the "sufficient statistics" for each variable as a histogram
 mutable struct BinaryStump <: ExactStat{(1, 0)}
     stats1::MV{Hist{0, AdaptiveBins{Float64}}} # summary statistics for class = -1
     stats2::MV{Hist{0, AdaptiveBins{Float64}}} # summary statistics for class = 1
@@ -19,10 +20,12 @@ function BinaryStump(p::Int, b::Int, subset, nc = 3)
     BinaryStump(p * Hist(b), p * Hist(b), BinarySplit(0,0.0,0.0,0.0), collect(subset))
 end
 function Base.show(io::IO, o::BinaryStump)
-    print(io, "BinaryStump")
+    print(io, "BinaryStump:")
     if o.split.j > 0 
         y = o.split.lab
-        print(io, " (x[$(o.subset[o.split.j])] < $(o.split.loc) ? ", y, " : ", -y, ")")
+        xj = "x[$(o.subset[o.split.j])]"
+        lt = y == 1 ? "<" : "≥"
+        print(io, " 1.0 if $xj $lt ", o.split.loc)
     end
 end
 
