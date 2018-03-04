@@ -73,23 +73,23 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
 end
 
 #-----------------------------------------------------------------------# FixedBins
-mutable struct FixedBins{E<:AbstractVector,closed} <: HistAlg{0}
+mutable struct FixedBins{closed,E<:AbstractVector} <: HistAlg{0}
     edges::E
     counts::Vector{Int}
     out::Int
 
-    function FixedBins{E,closed}(edges::E, counts::Vector{Int},
+    function FixedBins{closed,E}(edges::E, counts::Vector{Int},
                                  out::Int) where {E<:AbstractVector,closed}
         closed == :left || closed == :right ||
             error("closed must be left or right")
         length(edges) == length(counts) + 1 ||
             error("Histogram edge vectors must be 1 longer than corresponding count vectors")
         issorted(edges) || error("Histogram edge vectors must be sorted in ascending order")
-        new{E,closed}(edges, counts, out)
+        new{closed,E}(edges, counts, out)
     end
 end
 Base.@pure FixedBins(edges::AbstractVector, counts::Vector{Int}, out::Int; closed::Symbol = :left) =
-    FixedBins{typeof(edges),closed}(edges, counts, out)
+    FixedBins{closed,typeof(edges)}(edges, counts, out)
 
 get_hist_alg(e::AbstractVector; kwargs...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kwargs...)
 _midpoints(o::FixedBins) = _midpoints(o.edges)
@@ -104,7 +104,7 @@ function fit!(o::FixedBins, y, γ::Number)
     end
 end
 
-function _binindex(o::FixedBins{<:AbstractVector,:left}, y)
+function _binindex(o::FixedBins{:left}, y)
     edges = o.edges
     a = first(edges)
     if y < a
@@ -122,7 +122,7 @@ function _binindex(o::FixedBins{<:AbstractVector,:left}, y)
     end
 end
 
-function _binindex(o::FixedBins{<:AbstractVector,:right}, y)
+function _binindex(o::FixedBins{:right}, y)
     edges = o.edges
     a = first(edges)
     if y < a

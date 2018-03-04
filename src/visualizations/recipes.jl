@@ -81,7 +81,8 @@ end
 #-----------------------------------------------------------------------# Hist 
 @recipe f(o::Hist) = o.alg
 
-@recipe f(o::FixedBins) = Histogram(o.edges, o.counts, :left)
+@recipe f(o::FixedBins{closed}) where {closed} =
+    Histogram(o.edges, o.counts, closed)
 
 @recipe function f(o::AdaptiveBins)
     linewidth --> 2
