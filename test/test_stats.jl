@@ -153,8 +153,13 @@ end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
     dpdf = OnlineStats._pdf
-    #### KnownBins
-    test_exact(Hist(-5:5), y, o -> value(o)[2], y -> fit(Histogram, y, -5:5, closed=:left).weights)
+    #### FixedBins
+    for edges in (-5:5, collect(-5:5)), data in (y, -6:0.75:6)
+        test_exact(Hist(edges), data, o -> value(o)[2],
+                   y -> fit(Histogram, y, -5:5, closed = :left).weights)
+        test_exact(Hist(edges; closed = :right), data, o -> value(o)[2],
+                   y -> fit(Histogram, y, -5:5, closed = :right).weights)
+    end
     test_exact(Hist(-5:.1:5), y, extrema, extrema, (a,b)->≈(a,b;atol=.2))
     test_exact(Hist(-5:.1:5), y, mean, mean, (a,b)->≈(a,b;atol=.2))
     test_exact(Hist(-5:.1:5), y, nobs, length)

@@ -1,8 +1,7 @@
 # TODO: Box 2 in https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf
 
 #-----------------------------------------------------------------------# HistAlg
-abstract type HistAlg{N} end 
-input(o::HistAlg{N}) where {N} = N
+abstract type HistAlg{N} end
 Base.show(io::IO, o::HistAlg) = print(io, name(o, false, false))
 get_hist_alg(o::HistAlg) = o
 
@@ -13,16 +12,17 @@ get_hist_alg(o::HistAlg) = o
 # fit!
 # merge!
 
-_midpoints(r) = r[1:length(r) - 1] + 0.5 * step(r)
+_midpoints(e::Range) = e[1:length(e) - 1] + 0.5 * step(e)
+_midpoints(e::AbstractVector) = [(e[i+1] - e[i]) / 2 for i in 1:length(e) - 1]
 
 #-----------------------------------------------------------------------# Hist
 """
-    Hist(r::Range)
+    Hist(e::AbstractVector)
     Hist(b::Int)
 
-Calculate a histogram over bin edges fixed as `r` or adaptively find the best `b` bins.  
-The two options use [`KnownBins`](@ref) and [`AdaptiveBins`](@ref), respectively.  
-`KnownBins` is much faster, but requires the range of the data to be known before it is 
+Calculate a histogram over bin edges fixed as `e` or adaptively find the best `b` bins.  
+The two options use [`FixedBins`](@ref) and [`AdaptiveBins`](@ref), respectively.  
+`FixedBins` is much faster, but requires the range of the data to be known before it is 
 observed.  `Hist` objects can be used to return approximate summary statistics of the data.
 
 # Example 
@@ -39,13 +39,14 @@ observed.  `Hist` objects can be used to return approximate summary statistics o
     extrema(o)
     quantile(o)
 """
-struct Hist{N, H <: HistAlg} <: ExactStat{N}
+struct Hist{N,H<:HistAlg{N}} <: ExactStat{N}
     alg::H
+
+    Hist{H}(alg::H) where {N,H<:HistAlg{N}} = new{N,H}(alg)
 end
-function Hist(args...)
-    alg = get_hist_alg(args...)
-    N = input(alg)
-    Hist{N, typeof(alg)}(alg)
+function Hist(args...; kwargs...)
+    alg = get_hist_alg(args...; kwargs...)
+    Hist{typeof(alg)}(alg)
 end
 Base.show(io::IO, o::Hist) = print(io, "Hist: $(o.alg)")
 Base.merge!(o::Hist, o2::Hist, γ::Number) = merge!(o.alg, o2.alg, γ)
@@ -71,28 +72,75 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
     quantile(mids[inds], fweights(counts[inds]), p)
 end
 
-#-----------------------------------------------------------------------# FixedRangeBins
-mutable struct FixedRangeBins{R <: Range} <: HistAlg{0} 
-    edges::R 
+#-----------------------------------------------------------------------# FixedBins
+mutable struct FixedBins{E<:AbstractVector,closed} <: HistAlg{0}
+    edges::E
     counts::Vector{Int}
     out::Int
+
+    function FixedBins{E,closed}(edges::E, counts::Vector{Int},
+                                 out::Int) where {E<:AbstractVector,closed}
+        closed == :left || closed == :right ||
+            error("closed must be left or right")
+        length(edges) == length(counts) + 1 ||
+            error("Histogram edge vectors must be 1 longer than corresponding count vectors")
+        issorted(edges) || error("Histogram edge vectors must be sorted in ascending order")
+        new{E,closed}(edges, counts, out)
+    end
 end
-get_hist_alg(r::Range) = FixedRangeBins(r, zeros(Int, length(r) - 1), 0)
-_midpoints(o::FixedRangeBins) = _midpoints(o.edges)
-_counts(o::FixedRangeBins) = o.counts
-nobs(o::FixedRangeBins) = sum(o.counts) + o.out
-function fit!(o::FixedRangeBins, y, γ::Number)
-    r = o.edges 
-    a = first(r)
-    δ = step(r)
-    k = floor(Int, (y-a) / δ) + 1
-    if 1 ≤ k < length(r)
-        @inbounds o.counts[k] += 1
-    else 
+Base.@pure FixedBins(edges::AbstractVector, counts::Vector{Int}, out::Int; closed::Symbol = :left) =
+    FixedBins{typeof(edges),closed}(edges, counts, out)
+
+get_hist_alg(e::AbstractVector; kwargs...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kwargs...)
+_midpoints(o::FixedBins) = _midpoints(o.edges)
+_counts(o::FixedBins) = o.counts
+nobs(o::FixedBins) = sum(o.counts) + o.out
+function fit!(o::FixedBins, y, γ::Number)
+    idx = _binindex(o, y)
+    if 1 ≤ idx < length(o.edges)
+        @inbounds o.counts[idx] += 1
+    else
         o.out += 1
     end
 end
-function Base.merge!(o::FixedRangeBins, o2::FixedRangeBins, γ::Number) 
+
+function _binindex(o::FixedBins{<:AbstractVector,:left}, y)
+    edges = o.edges
+    a = first(edges)
+    if y < a
+        return 0
+    elseif y == last(edges)
+        # right-most bin is a closed interval [a, b]
+        return length(edges) - 1
+    else
+        # other bins are left-closed intervals [a, b)
+        if isa(edges, Range)
+            return floor(Int, (y - a) / step(edges)) + 1
+        else
+            return searchsortedlast(edges, y)
+        end
+    end
+end
+
+function _binindex(o::FixedBins{<:AbstractVector,:right}, y)
+    edges = o.edges
+    a = first(edges)
+    if y < a
+        return 0
+    elseif y == first(edges)
+        # left-most bin is a closed interval [a, b]
+        return 1
+    else
+        # other bins are right-closed intervals (a, b]
+        if isa(edges, Range)
+            return ceil(Int, (y - a) / step(edges))
+        else
+            return searchsortedfirst(edges, y) - 1
+        end
+    end
+end
+
+function Base.merge!(o::FixedBins, o2::FixedBins, γ::Number) 
     if o.edges == o2.edges 
         o.counts .+= o2.counts
     else
@@ -103,17 +151,21 @@ function Base.merge!(o::FixedRangeBins, o2::FixedRangeBins, γ::Number)
         end
     end
 end
-function _pdf(o::FixedRangeBins, y::Real)
-    e = o.edges
-    if y ≤ first(e)
+
+# No linear interpolation (in contrast to AdaptiveBins)
+function _pdf(o::FixedBins, y::Real)
+    binidx = _binindex(o, y)
+    c = o.counts
+    if binidx < 1 || binidx > length(c)
         return 0.0
-    elseif y ≥ last(e)
-        return 0.0 
     else
-        c = o.counts
-        i = min(searchsortedfirst(e, y), length(c))
-        δ = step(e)
-        return c[i] / (δ * sum(c))
+        e = o.edges
+        if isa(e, Range)
+            area = step(e) * sum(c)
+        else
+            area = sum((e[i+1] - e[i]) * c[i] for i in 1:length(c))
+        end
+        return c[binidx] / area
     end
 end
 
