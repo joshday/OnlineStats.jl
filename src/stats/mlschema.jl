@@ -19,9 +19,9 @@ module ML
 
 import ..Variance
 import ..Unique
+import NamedTuples
 import OnlineStatsBase: ExactStat, VectorOb
 import LearnBase: fit!, value, transform
-import NamedTuples: NamedTuple
 import DataStructures: SortedDict
 export Numerical, Categorical
 
@@ -89,7 +89,7 @@ end
 FeatureExtractor(c::Vector{Symbol}, hints...) = FeatureExtractor(c, make_feature.(hints), 0)
 FeatureExtractor(hints::VectorOb) = FeatureExtractor(colnames(hints), hints...)
 
-colnames(y::NamedTuple) = keys(y)
+colnames(y::NamedTuples.NamedTuple) = keys(y)
 colnames(y::VectorOb) = [Symbol("x$i") for i in 1:length(y)]
 
 const StringLike = Union{AbstractString, Char, Symbol}

@@ -2,7 +2,6 @@ __precompile__(true)
 module OnlineStats
 
 import SweepOperator
-import NamedTuples: NamedTuple
 import DataStructures: SortedDict
 import LearnBase: fit!, value, nobs, predict, transform!, transform
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, pweights, skewness, 
