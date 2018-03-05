@@ -12,8 +12,7 @@ get_hist_alg(o::HistAlg) = o
 # fit!
 # merge!
 
-_midpoints(e::Range) = e[1:length(e) - 1] + 0.5 * step(e)
-_midpoints(e::AbstractVector) = [(e[i+1] - e[i]) / 2 for i in 1:length(e) - 1]
+_midpoints(e::AbstractVector) = midpoints(e)
 
 #-----------------------------------------------------------------------# Hist
 """
