@@ -48,7 +48,7 @@ function Base.merge!(o::Variance, o2::Variance, γ::Float64)
     o.μ = smooth(o.μ, o2.μ, γ)
     o
 end
-_value(o::Variance) = o.nobs < 2 ? 0.0 : o.σ2 * unbias(o)
+value(o::Variance) = o.nobs < 2 ? 0.0 : o.σ2 * unbias(o)
 Base.var(o::Variance) = value(o)
 Base.std(o::Variance) = sqrt(var(o))
 Base.mean(o::Variance) = o.μ
@@ -143,7 +143,7 @@ function fit!{T}(o::CountMap{T}, y::T, γ::Float64)
     end
 end
 nobs(o::CountMap) = sum(o.counts)
-_value(o::CountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
+value(o::CountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
 
 Base.length(o::CountMap) = length(o.labels)
 Base.keys(o::CountMap) = o.labels
@@ -214,7 +214,7 @@ function fit!(o::CovMatrix, x::VectorOb, γ::Float64)
     o.nobs += 1
     o
 end
-function _value(o::CovMatrix; corrected::Bool = true)
+function value(o::CovMatrix; corrected::Bool = true)
     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
     corrected && scale!(o.value, unbias(o))
     o.value
@@ -295,7 +295,7 @@ function Base.merge!(o::Extrema, o2::Extrema, γ::Float64)
     o.max = max(o.max, o2.max)
     o
 end
-_value(o::Extrema) = (o.min, o.max)
+value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
 Base.maximum(o::Extrema) = o.max 
 Base.minimum(o::Extrema) = o.min
@@ -360,7 +360,7 @@ function fit!(o::HyperLogLog, v::Any, γ::Float64)
     o
 end
 
-function _value(o::HyperLogLog)
+function value(o::HyperLogLog)
     S = 0.0
     for j in eachindex(o.M)
         S += 1 / (2 ^ o.M[j])
@@ -712,7 +712,7 @@ q_init(u::Updater, p) = error("$u can't be used with Quantile")
 function fit!(o::Quantile, y::Real, γ::Float64)
     o.n += 1
     if o.n > length(o.value)
-        q_fit!(o, y, γ)
+        qfit!(o, y, γ)
     elseif o.n < length(o.value)
         o.value[o.n] = y  # initialize values with first observations
     else
@@ -723,7 +723,7 @@ end
 
 # SGD
 q_init(u::SGD, p) = u
-function q_fit!(o::Quantile{SGD}, y, γ)
+function qfit!(o::Quantile{SGD}, y, γ)
     for j in eachindex(o.value)
         @inbounds o.value[j] -= γ * ((o.value[j] > y) - o.τ[j])
     end
@@ -731,7 +731,7 @@ end
 
 # ADAGRAD
 q_init(u::ADAGRAD, p) = init(u, p)
-function q_fit!(o::Quantile{ADAGRAD}, y, γ)
+function qfit!(o::Quantile{ADAGRAD}, y, γ)
     U = o.updater
     U.nobs += 1
     w = 1 / U.nobs
@@ -744,7 +744,7 @@ end
 
 # MSPI
 q_init(u::MSPI, p) = u
-function q_fit!(o::Quantile{<:MSPI}, y, γ)
+function qfit!(o::Quantile{<:MSPI}, y, γ)
     @inbounds for i in eachindex(o.τ)
         w = inv(abs(y - o.value[i]) + ϵ)
         halfyw = .5 * y * w
@@ -755,7 +755,7 @@ end
 
 # OMAS
 q_init(u::OMAS, p) = OMAS((zeros(p), zeros(p)))
-function q_fit!(o::Quantile{<:OMAS}, y, γ)
+function qfit!(o::Quantile{<:OMAS}, y, γ)
     s, t = o.updater.buffer
     @inbounds for j in eachindex(o.τ)
         w = inv(abs(y - o.value[j]) + ϵ)
@@ -767,7 +767,7 @@ end
 
 # # OMAP...why is this so bad?
 # q_init(u::OMAP, p) = u
-# function q_fit!(o::Quantile{<:OMAP}, y, γ)
+# function qfit!(o::Quantile{<:OMAP}, y, γ)
 #     for j in eachindex(o.τ)
 #         w = abs(y - o.value[j]) + ϵ
 #         θ = y + w * (2o.τ[j] - 1) 

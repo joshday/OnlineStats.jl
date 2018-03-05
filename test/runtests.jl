@@ -41,15 +41,6 @@ include("test_visualizations.jl")
 println()
 println()
 info("Testing Everything else")
-#-----------------------------------------------------------------------# OnlineStatsBase 
-mutable struct Counter <: OnlineStatsBase.ExactStat{0}
-    value::Int
-    Counter() = new(0)
-end
-OnlineStatsBase._fit!(o::Counter, y::Real, w::Float64) = (o.value += 1)
-@testset "OnlineStatsBase" begin 
-    test_exact(Counter(), y, value, length)
-end
 #-----------------------------------------------------------------------# BiasVec
 @testset "BiasVec" begin 
     v = rand(5)

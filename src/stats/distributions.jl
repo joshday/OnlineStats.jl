@@ -15,7 +15,7 @@ struct FitBeta <: ExactStat{0}
     FitBeta() = new(Variance())
 end
 fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function _value(o::FitBeta)
+function value(o::FitBeta)
     if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
@@ -47,7 +47,7 @@ mutable struct FitCauchy{T} <: StochasticStat{0}
 end
 FitCauchy(alg = OMAS()) = FitCauchy(Quantile([.25, .5, .75], alg), 0)
 fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
-function _value(o::FitCauchy)
+function value(o::FitCauchy)
     if o.nobs > 1
         return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
     else
@@ -77,7 +77,7 @@ struct FitGamma <: ExactStat{0}
 end
 FitGamma() = FitGamma(Variance())
 fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function _value(o::FitGamma)
+function value(o::FitGamma)
     if o.var.nobs > 1
         m = mean(o.var)
         v = var(o.var)
@@ -107,7 +107,7 @@ struct FitLogNormal <: ExactStat{0}
     FitLogNormal() = new(Variance())
 end
 fit!(o::FitLogNormal, y::Real, γ::Float64) = fit!(o.var, log(y), γ)
-function _value(o::FitLogNormal)
+function value(o::FitLogNormal)
     if o.var.nobs > 1
         return mean(o.var), std(o.var)
     else
@@ -133,7 +133,7 @@ struct FitNormal <: ExactStat{0}
     FitNormal() = new(Variance())
 end
 fit!(o::FitNormal, y::Real, γ::Float64) = fit!(o.var, y, γ)
-function _value(o::FitNormal)
+function value(o::FitNormal)
     if o.var.nobs > 1
         return mean(o.var), std(o.var)
     else
@@ -167,7 +167,7 @@ function fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64)
     fit!(o.mvmean, y, γ)
     o
 end
-function _value(o::FitMultinomial)
+function value(o::FitMultinomial)
     m = value(o.mvmean)
     p = length(o.mvmean.stats)
     if o.nobs > 0
@@ -199,7 +199,7 @@ struct FitMvNormal <: ExactStat{1}
 end
 Base.length(o::FitMvNormal) = length(o.cov)
 fit!{T<:Real}(o::FitMvNormal, y::AbstractVector{T}, γ::Float64) = fit!(o.cov, y, γ)
-function _value(o::FitMvNormal)
+function value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)
         return mean(o.cov), c

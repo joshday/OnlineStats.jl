@@ -44,7 +44,7 @@ function fit!(o::LinReg, x::VectorOb, y::Real, γ::Float64)
     o.nobs += 1
 end
 
-function _value(o::LinReg)
+function value(o::LinReg)
     xtx, xty = matviews(o)
     A = Symmetric(xtx + Diagonal(o.λfactor))
     if isposdef(A)
@@ -108,7 +108,7 @@ end
 
 fit!(o::LinRegBuilder, y::VectorOb, γ::Float64) = smooth_syr!(o.A, BiasVec(y), γ)
 
-_value(o::LinRegBuilder) = coef(o)
+value(o::LinRegBuilder) = coef(o)
 
 function coef(o::LinRegBuilder, λ = 0.0; 
               y = 1, 
