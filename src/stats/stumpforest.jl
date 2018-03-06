@@ -16,18 +16,23 @@ mutable struct BinaryStump <: ExactStat{(1, 0)}
     split::BinarySplit
     subset::Vector{Int}  # indices of the subset of features
 end
-function BinaryStump(p::Int, b::Int, subset, nc = 3) 
+function BinaryStump(p::Int, b::Int, subset) 
     BinaryStump(p * Hist(b), p * Hist(b), BinarySplit(0,0.0,0.0,0.0), collect(subset))
 end
+
 function Base.show(io::IO, o::BinaryStump)
     print(io, "BinaryStump:")
     if o.split.j > 0 
         y = o.split.lab
         xj = "x[$(o.subset[o.split.j])]"
-        lt = y == 1 ? "<" : "≥"
-        print(io, " 1.0 if $xj $lt ", o.split.loc)
+        lt = y == -1 ? "<" : "≥"
+        print(io, " -1 if $xj $lt ", round(o.split.loc, 3))
+    else 
+        print(io, " split not yet determined")
     end
 end
+
+split(o::BinaryStump) = (o.subset[o.split.j], o.split.loc, o.split.lab)
 
 nparams(o::BinaryStump) = length(o.stats1)
 function probs(o::BinaryStump) 
@@ -36,7 +41,7 @@ function probs(o::BinaryStump)
 end
 
 # TODO: value should return object that predicts faster
-value(o::BinaryStump) = make_split(o)
+value(o::BinaryStump) = make_split!(o)
 
 function fit!(o::BinaryStump, xy, γ)
     x, y = xy
@@ -61,7 +66,7 @@ function split_candidates(h1, h2)
     out[a .< out .< b]
 end
 
-function make_split(o::BinaryStump)
+function make_split!(o::BinaryStump)
     # calculate information gain for a lot of split candidates
     imp_root = impurity(probs(o))
     trials = BinarySplit[]
@@ -119,21 +124,24 @@ After fitting, you must call `value` to calculate the splits!
 """
 struct BinaryStumpForest <: ExactStat{(1, 0)}
     forest::Vector{BinaryStump}
+    p::Int
 end
-function BinaryStumpForest(p::Integer; nt = 100, b = 10, np = 3)
+function BinaryStumpForest(p::Integer; nt = 1000, b = 30, np = round(Int, sqrt(p)))
     forest = [BinaryStump(np, b, sample(1:p, np; replace=false)) for i in 1:nt]
-    BinaryStumpForest(forest)
+    BinaryStumpForest(forest, p)
 end
 
 function Base.show(io::IO, o::BinaryStumpForest)
     println(io, "BinaryStumpForest")
-    for f in o.forest[1:10]
+    println(io, "  > First 5 stumps of $(length(o.forest))")
+    for f in o.forest[1:5]
         println(io, "    ", f)
     end
     print(io, "         ⋮")
 end
 
 value(o::BinaryStumpForest) = value.(o.forest)
+nparams(o::BinaryStumpForest) = o.p
 
 function fit!(o::BinaryStumpForest, xy, γ)
     i = rand(1:length(o.forest))  # TODO: other schemes for this randomization part
@@ -156,9 +164,64 @@ for f in [:predict, :classify]
     end
 end
 
+#-----------------------------------------------------------------------# BinaryStumpClassifier
+# lt[j] -> vector of points xj* such that -1 is predicted if x[j] < xj*
+# gt[j] -> vector of points xj* such that -1 is predicted if x[j] ≥ xj*
+struct BinaryStumpClassifier 
+    lt::Vector{Vector{Float64}}
+    gt::Vector{Vector{Float64}}
+end
+function BinaryStumpClassifier(o::BinaryStumpForest)
+    p = nparams(o)
+    c = BinaryStumpClassifier([Float64[] for i in 1:p], [Float64[] for i in 1:p])
+    for stump in o.forest 
+        make_split!(stump)
+        j, loc, lab = split(stump)
+        if lab == -1
+            push!(c.lt[j], loc)
+        else
+            push!(c.gt[j], loc)
+        end
+    end
+    for j in eachindex(c.lt)
+        sort!(c.lt[j])
+        sort!(c.gt[j])
+    end
+    c
+end
 
+ntrees(o::BinaryStumpClassifier) = sum(length, o.lt) + sum(length, o.gt)
 
+function Base.show(io::IO, o::BinaryStumpClassifier)
+    print(io, name(o))
+    nt = sum(length, o.lt) + sum(length, o.gt)
+    for j in eachindex(o.lt)
+        prop = (length(o.lt[j]) + length(o.gt[j])) / nt
+        print(io, "\n    > ")
+        if prop > 0
+            perc = round(Int, prop * 100)
+            for _ in 1:round(Int, prop  * 100)
+                print(io, "■")
+            end
+            print(io, " Var $j ($(round(prop*100, 2)))%)")
+        end
+    end
+end
 
+function classify(o::BinaryStumpClassifier, x::VectorOb)
+    nneg = 0
+    for (ltj, gtj, xj) in zip(o.lt, o.gt, x)
+        nneg += searchsortedfirst(ltj, xj)  # number of -1s in lt
+        nneg += searchsortedlast(gtj, xj)  # number of -1s in gt
+    end
+    nneg / ntrees(o) > .5 ? 1.0 : -1.0
+end
+function classify(o::BinaryStumpClassifier, x::AbstractMatrix, dim::Rows = Rows())
+    mapslices(x -> classify(o, x), x, 2)
+end
+function classify(o::BinaryStumpClassifier, x::AbstractMatrix, dim::Cols)
+    mapslices(x -> classify(o, x), x, 1)
+end
 
 
 
