@@ -52,11 +52,14 @@ function Base.show(io::IO, o::MV)
 end
 
 function fit!(o::MV, y, γ)
-    stats = o.stats
-    for (i, yi) in enumerate(y)
-        fit!(stats[i], yi, γ)
+    for (stat, yi) in zip(o.stats, y)
+        fit!(stat, yi, γ)
     end
-    o
+    # stats = o.stats
+    # for (i, yi) in enumerate(y)
+    #     fit!(stats[i], yi, γ)
+    # end
+    # o
 end
 
 value(o::MV) = map(value, o.stats)

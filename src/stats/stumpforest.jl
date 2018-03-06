@@ -6,7 +6,7 @@ struct BinarySplit
     lab::Float64
     ig::Float64  # information gain
 end
-classify(o::BinarySplit, x::VectorOb) = x[o.j] < o.loc ? o.lab : -o.lab
+# classify(o::BinarySplit, x::VectorOb) = x[o.j] < o.loc ? o.lab : -o.lab
 
 #-----------------------------------------------------------------------# BinaryStump
 # For each label, we store the "sufficient statistics" for each variable as a histogram
@@ -32,6 +32,7 @@ function Base.show(io::IO, o::BinaryStump)
     end
 end
 
+# j, loc, lab
 split(o::BinaryStump) = (o.subset[o.split.j], o.split.loc, o.split.lab)
 
 nparams(o::BinaryStump) = length(o.stats1)
@@ -40,7 +41,6 @@ function probs(o::BinaryStump)
     n ./ sum(n)
 end
 
-# TODO: value should return object that predicts faster
 value(o::BinaryStump) = make_split!(o)
 
 function fit!(o::BinaryStump, xy, γ)
@@ -122,13 +122,14 @@ Build a random forest (for responses -1, 1) based on stumps (single-split trees)
 
 After fitting, you must call `value` to calculate the splits!
 """
-struct BinaryStumpForest <: ExactStat{(1, 0)}
+mutable struct BinaryStumpForest <: ExactStat{(1, 0)}
     forest::Vector{BinaryStump}
     p::Int
+    n::Int
 end
-function BinaryStumpForest(p::Integer; nt = 1000, b = 30, np = round(Int, sqrt(p)))
+function BinaryStumpForest(p::Integer; nt = 1000, b = 50, np = round(Int, sqrt(p)))
     forest = [BinaryStump(np, b, sample(1:p, np; replace=false)) for i in 1:nt]
-    BinaryStumpForest(forest, p)
+    BinaryStumpForest(forest, p, 0)
 end
 
 function Base.show(io::IO, o::BinaryStumpForest)
@@ -144,7 +145,8 @@ value(o::BinaryStumpForest) = value.(o.forest)
 nparams(o::BinaryStumpForest) = o.p
 
 function fit!(o::BinaryStumpForest, xy, γ)
-    i = rand(1:length(o.forest))  # TODO: other schemes for this randomization part
+    i = (o.n % length(o.forest)) + 1
+    o.n += 1
     fit!(o.forest[i], xy, γ)
 end
 
@@ -211,7 +213,7 @@ end
 function classify(o::BinaryStumpClassifier, x::VectorOb)
     nneg = 0
     for (ltj, gtj, xj) in zip(o.lt, o.gt, x)
-        nneg += searchsortedfirst(ltj, xj)  # number of -1s in lt
+        nneg += searchsortedfirst(ltj, xj) - 1  # number of -1s in lt
         nneg += searchsortedlast(gtj, xj)  # number of -1s in gt
     end
     nneg / ntrees(o) > .5 ? 1.0 : -1.0

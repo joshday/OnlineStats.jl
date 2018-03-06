@@ -225,7 +225,6 @@ function _pdf(o::AdaptiveBins, y::Number)
         return 0.0
     else 
         i = searchsortedfirst(v, Pair(y, 0)) 
-        i == 1 && error("wha")
         q1, k1 = v[i-1]
         q2, k2 = v[i]
         area = sum((first(v[i+1]) - first(v[i])) * (last(v[i]) + last(v[i+1]))/2 for i in 1:length(v)-1)
@@ -252,20 +251,20 @@ end
 
 # Algorithm 3: Sum Procedure
 # Estimated number of points in interval [-∞, b]
-# b must be inside endpoints
-function Base.sum(o::AdaptiveBins, b::Real)
-    if !(first(o.value[1]) < b < first(o.value[end]))
-        @show first(o.value[1]) < b
-        @show b < first(o.value[end])
-        error("$b isn't between endpoints")
+function Base.sum(o::AdaptiveBins, b::Real)::Float64
+    if b < first(o.value[1])
+        return 0
+    elseif b ≥ first(o.value[end])
+        return nobs(o)
+    else
+        # find i such that p(i) ≤ b < p(i+1)
+        i = searchsortedfirst(o.value, Pair(b, 1)) - 1
+        p1, m1 = o.value[i]
+        p2, m2 = o.value[i + 1]
+        mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
+        s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
+        return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
     end
-    # find i such that p(i) ≤ b < p(i+1)
-    i = searchsortedfirst(o.value, Pair(b, 1)) - 1
-    p1, m1 = o.value[i]
-    p2, m2 = o.value[i + 1]
-    mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
-    s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
-    return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
 end
 
 # # Algorithm 4: Uniform Procedure (locations of candidate splits)
