@@ -489,6 +489,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.BinaryStumpForest",
+    "page": "API",
+    "title": "OnlineStats.BinaryStumpForest",
+    "category": "type",
+    "text": "BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)\n\nBuild a random forest (for responses -1, 1) based on stumps (single-split trees) where \n\np is the number of predictors \nnt is the number of trees (stumps) in the forest \nb is the number of histogram bins used to estimate P(x_j  class)\nnp is the number of random predictors each tree will use\n\nUsage\n\nAfter fitting, you must call value to calculate the splits!\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Bootstrap",
     "page": "API",
     "title": "OnlineStats.Bootstrap",
@@ -878,14 +886,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.BiasVec",
     "category": "type",
     "text": "BiasVec(x, bias = 1.0)\n\nLightweight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.BinaryStumpForest",
-    "page": "API",
-    "title": "OnlineStats.BinaryStumpForest",
-    "category": "type",
-    "text": "BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)\n\nBuild a random forest (for responses -1, 1) based on stumps (single-split trees) where \n\np is the number of predictors \nnt is the number of trees (stumps) in the forest \nb is the number of histogram bins used to estimate P(x_j  class)\nnp is the number of random predictors each tree will use\n\nUsage\n\nAfter fitting, you must call value to calculate the splits!\n\n\n\n"
 },
 
 {
