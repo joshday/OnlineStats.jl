@@ -155,16 +155,7 @@ function predict(o::BinaryStumpForest, x::VectorOb)
 end
 classify(o::BinaryStumpForest, x::VectorOb) = sign(predict(o, x))
 
-for f in [:predict, :classify]
-    @eval begin 
-        function $f(o::BinaryStumpForest, x::AbstractMatrix, dim::Rows = Rows())
-            mapslices(x -> $f(o, x), x, 2)
-        end
-        function $f(o::BinaryStumpForest, x::AbstractMatrix, dim::Cols)
-            mapslices(x -> $f(o, x), x, 1)
-        end
-    end
-end
+
 
 #-----------------------------------------------------------------------# BinaryStumpClassifier
 # lt[j] -> vector of points xj* such that -1 is predicted if x[j] < xj*
