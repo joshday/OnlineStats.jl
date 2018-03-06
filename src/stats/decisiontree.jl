@@ -1,10 +1,12 @@
 #-----------------------------------------------------------------------# Common
+abstract type TreePart <: ExactStat{(1, 0)} end
+
 for f in [:predict, :classify]
     @eval begin 
-        function $f(o::OnlineStat{(1,0)}, x::AbstractMatrix, dim::Rows = Rows())
+        function $f(o::TreePart, x::AbstractMatrix, dim::Rows = Rows())
             mapslices(x -> $f(o, x), x, 2)
         end
-        function $f(o::OnlineStat{(1,0)}, x::AbstractMatrix, dim::Cols)
+        function $f(o::TreePart, x::AbstractMatrix, dim::Cols)
             mapslices(x -> $f(o, x), x, 1)
         end
     end
@@ -12,7 +14,9 @@ end
 
 
 #-----------------------------------------------------------------------# NodeStats
-mutable struct NodeStats{T, O <: OnlineStat} <: OnlineStat{(1, 0)}
+# Sufficient statistics for each predictor, conditioned on label
+# In the future we can use other stats, for now we'll use Hist(b)
+mutable struct NodeStats{T, O <: OnlineStat} <: TreePart
     stats::Matrix{O}  # a row for each label
     labels::Vector{T}
     nobs::Vector{Int}
@@ -31,6 +35,7 @@ function fit!(o::NodeStats, xy, γ)
     x, y = xy 
     addrow = true
     @inbounds for (i, lab) in enumerate(o.labels)
+        # if we've already seen the label, update the sufficient statistics
         if y == lab 
             addrow = false 
             o.nobs[i] += 1
@@ -40,6 +45,7 @@ function fit!(o::NodeStats, xy, γ)
         end
     end
     if addrow 
+        # if we haven't seen the label, add a row for it
         push!(o.labels, y)
         push!(o.nobs, 1)
         newrow = [copy(o.empty_stat) for i in 1:1, j in 1:size(o.stats, 2)]
@@ -50,6 +56,8 @@ function fit!(o::NodeStats, xy, γ)
     end
 end
 
+# ns[lab] --> conditional stats for label
+# ns[:, j] --> sufficient stats of predictor j, conditioned on labels
 function Base.getindex(o::NodeStats{T}, label::T) where {T}
     i = findfirst(x -> x == label, o.labels)
     i == 0 && error("Label $label is not here")
@@ -113,7 +121,7 @@ end
 goleft(o::Split, x::VectorOb) = x[o.j] < o.loc
 
 #-----------------------------------------------------------------------# Stump
-mutable struct Stump{T, O <: OnlineStat} <: ExactStat{(1, 0)}
+mutable struct Stump{T, O <: OnlineStat} <: TreePart
     ns::NodeStats{T, O} # Sufficient statistics
     split::Split{T}
 end
@@ -186,7 +194,7 @@ function classify(o::Stump, x::AbstractMatrix, dim::Cols)
 end
 
 #-----------------------------------------------------------------------# StumpForest 
-struct StumpForest{T <: Stump} <: ExactStat{(1, 0)}
+struct StumpForest{T <: Stump} <: TreePart
     forest::Vector{T}
     subsets::Matrix{Int}  # subsets[:, k] gets setn to stump forest[k]
     p::Int
@@ -244,7 +252,7 @@ end
 
 
 #-----------------------------------------------------------------------# Node 
-mutable struct Node{T, O <: OnlineStat} <: ExactStat{(1, 0)}
+mutable struct Node{T, O <: OnlineStat} <: TreePart
     ns::NodeStats{T, O}
     id::Int 
     children::Vector{Int}
@@ -254,7 +262,7 @@ Base.show(io::IO, o::Node) = print(io, "Node $(o.id) with children: $(o.children
 shouldsplit(o::Node) = nobs(o.ns) > 1000
 
 #-----------------------------------------------------------------------# Tree
-struct Tree{T, O} <: ExactStat{(1, 0)}
+struct Tree{T, O} <: TreePart
     tree::Vector{Node{T, O}}
     maxsize::Int
     b::Int
