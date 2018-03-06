@@ -62,23 +62,41 @@ probs(o::NodeStats) = o.nobs ./ sum(o.nobs)
 nobs(o::NodeStats) = sum(o.nobs)
 
 function find_best_split(o::NodeStats{T}) where {T}
-    # splits = Split{T}[]
-    # nobs_left = zeros(Int, length(o.nobs))
-    # nobs_right = zeros(Int, length(o.nobs))
+    splits = Split{T}[]
+    imp_root = impurity(probs(o))
+    for j in 1:size(o.stats, 2)
+        nobs_left = zeros(length(o.nobs))
+        nobs_right = zeros(length(o.nobs))
+        suff_stats_j = o[:, j]
+        for loc in split_candidates(suff_stats_j)
+            for (k, hk) in enumerate(suff_stats_j)
+                nleft = sum(hk.alg, loc)
+                nobs_left[k] += nleft
+                nobs_right[k] += nobs(hk) - nleft
+            end
+            nlsum = sum(nobs_left)
+            nrsum = sum(nobs_right)
+            imp_left = impurity(nobs_left ./ sum(nlsum))
+            imp_right = impurity(nobs_right ./ sum(nrsum))
+            imp_after = smooth(imp_left, imp_right, nrsum / (nrsum + nlsum))
+            # left label
+            _, i = findmax(nobs_left)
+            lab_left = keys(o)[i]
+            # right label
+            _, i = findmax(nobs_right)
+            lab_right = keys(o)[i]
+            push!(splits, Split(j, loc, [lab_left, lab_right], imp_root - imp_after))
+        end
+    end
+    # get the best split 
+    max_ig = maximum(s.ig for s in splits)
+    i = findfirst(x -> x.ig == max_ig, splits)
+    return splits[i]
+end
 
-    # for j in 1:size(o.stats, 2)
-    #     zeros!(nobs_left)
-    #     zeros!(nobs_right)
-    #     suff_stats_j = o[:, j]
-    #     for loc in split_candidates(suff_stats_j)
-    #         for (k, hk) in enumerate(suff_stats_j)
-    #             nleft = sum(hk.alg, loc)
-    #             nobs_left[k] += nleft
-    #             nobs_right[k] += nobs(hk) - nleft
-    #         end
-
-    #     end
-    # end
+function classify(o::NodeStats)
+    _, i = findmax(o.nobs)
+    o.labels[i]
 end
 
 #-----------------------------------------------------------------------# Split
@@ -226,22 +244,23 @@ end
 
 
 #-----------------------------------------------------------------------# Node 
-struct Node{T, O <: OnlineStat} <: ExactStat{(1, 0)}
+mutable struct Node{T, O <: OnlineStat} <: ExactStat{(1, 0)}
     ns::NodeStats{T, O}
     id::Int 
     children::Vector{Int}
     split::Split{T}
 end
 Base.show(io::IO, o::Node) = print(io, "Node $(o.id) with children: $(o.children)")
-shouldsplit(o::Node) = nobs(o.ns) > 10_000
+shouldsplit(o::Node) = nobs(o.ns) > 1000
 
 #-----------------------------------------------------------------------# Tree
 struct Tree{T, O} <: ExactStat{(1, 0)}
     tree::Vector{Node{T, O}}
     maxsize::Int
+    b::Int
 end
 function Tree(p::Int, T::Type; b = 50, maxsize = 50) 
-    Tree([Node(NodeStats(p, T, Hist(b)), 1, Int[], Split(0, 0.0, T[], 0.0))], maxsize)
+    Tree([Node(NodeStats(p, T, Hist(b)), 1, Int[], Split(0, 0.0, T[], 0.0))], maxsize, b)
 end
 
 function Base.show(io::IO, o::Tree)
@@ -251,12 +270,19 @@ function Base.show(io::IO, o::Tree)
 end
 Base.keys(o::Tree) = keys(first(o.tree).ns)
 
-function fit!(o::Tree, xy, γ)
+function fit!(o::Tree{T}, xy, γ) where {T}
     x, y = xy
     node = o.tree[whichleaf(o, x)]  # Find the node to update
     fit!(node.ns, xy, γ)  # update sufficient statistics
     if length(o.tree) < o.maxsize && shouldsplit(node)
-        best_split = find_best_split(node.ns)
+        node.split = find_best_split(node.ns)
+        m = length(o.tree)
+        node.children = [m + 1, m + 2]
+        p = size(node.ns.stats, 2)
+        l = Node(NodeStats(p, T, Hist(o.b)), m + 1, Int[], Split(0, 0.0, T[], 0.0))
+        r = Node(NodeStats(p, T, Hist(o.b)), m + 2, Int[], Split(0, 0.0, T[], 0.0))
+        push!(o.tree, l)
+        push!(o.tree, r)
     end
 end
 
@@ -268,3 +294,5 @@ function whichleaf(o::Tree, x::VectorOb)
     end
     i
 end
+
+classify(o::Tree, x::VectorOb) = classify(o.tree[whichleaf(o, x)].ns)
