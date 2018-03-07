@@ -72,7 +72,7 @@ Base.merge!(o1::T, o2::T, γ::Float64) where {T <: MV} = merge!.(o1.stats, o2.st
     Group(stats...)
 
 Create an `ExactStat{1}` from several `OnlineStat{0}`s.  For a new observation `y`, `y[i]`
-is sent to `stats[i]`.  This is designed for working with data of different variable types.
+is sent to `stats[i]`. 
 
 # Example 
 
@@ -84,22 +84,29 @@ is sent to `stats[i]`.  This is designed for working with data of different vari
     
     value(o)
 """
-struct Group{T} <: ExactStat{1}
+struct Group{T} <: OnlineStatStat{1}
     stats::T
 end
 Group(o::OnlineStat{0}...) = Group(o)
+
+default_weight(o::Group) = default_weight(o.stats)
 value(o::Group) = value.(o.stats)
-Base.show(io::IO, o::Group) = print(io, "Group : $(name.(o.stats, false, false))")
+
+Base.show(io::IO, o::Group) = print(io, name(o), ": ", value(o))
+Base.length(o::Group) = length(o.stats)
 Base.getindex(o::Group, i) = o.stats[i]
+
 function fit!(o::Group, y::VectorOb, γ::Float64)
     for (oi, yi) in zip(o.stats, y)
         fit!(oi, yi, γ)
     end
 end
+
 function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Group}
     for (a, b) in zip(o.stats, o2.stats)
         merge!(a, b, γ)
     end
 end
+
 Base.hcat(o::OnlineStat{0}...) = Group(o)
 
