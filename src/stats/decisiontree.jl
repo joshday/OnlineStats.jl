@@ -323,3 +323,55 @@ function classify(o::DTree, x::VectorOb)
         return classify(o.tree[k].ns)
     end
 end
+
+#-----------------------------------------------------------------------# Forest 
+struct Forest{T <: DTree} <: TreePart
+    forest::Vector{T}
+    subsets::Matrix{Int}  # subsets[:, k] gets setn to stump forest[k]
+    p::Int
+    λ::Float64
+end
+function Forest(p::Int, T::Type, stat = Hist(10); nt = 100, np = round(Int, sqrt(p)), 
+                λ = .1, maxsize = 20, splitsize = 5000)
+    forest = [DTree(np, T, stat; maxsize=maxsize, splitsize=splitsize) for i in 1:nt]
+    subsets = Matrix{Int}(np, nt)
+    for i in 1:size(subsets, 2)
+        subsets[:, i] = sample(1:p, np; replace = false)
+    end
+    Forest(forest, subsets, p, λ)
+end
+
+Base.keys(o::Forest) = keys(first(o.forest))
+
+function Base.show(io::IO, o::Forest)
+    print(io, name(o))
+    print(io, "\n    > NTrees      : ", length(o.forest))
+    print(io, "\n    > N Predictors: ", size(o.subsets, 1), "/", o.p)
+    print(io, "\n    > λ           : ", o.λ)
+    print(io, "\n    > Max Size    : ", o.forest[1].maxsize)
+    print(io, "\n    > Split Size  : ", o.forest[1].splitsize)
+end
+function fit!(o::Forest, xy, γ)
+    x, y = xy
+    for (i, tree) in enumerate(o.forest)
+        rand() < o.λ && fit!(tree, (x[o.subsets[:, i]], y), γ)
+    end
+end
+
+function predict(o::Forest, x::VectorOb)
+    out = Dict(Pair.(keys(o), 0))
+    for (i, stump) in enumerate(o.forest)
+        vote = classify(stump, x[o.subsets[:, i]])
+        out[vote] += 1
+    end
+    out
+end
+function classify(o::Forest, x::VectorOb)
+    p = predict(o, x)
+    n = maximum(last, p)
+    for entry in p 
+        if last(entry) == n 
+            return first(entry)
+        end
+    end
+end
