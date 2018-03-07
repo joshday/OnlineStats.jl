@@ -35,6 +35,7 @@ const x2 = randn(100, 5)
 #-----------------------------------------------------------------------# test files
 include("test_show.jl")
 include("test_series.jl")
+include("test_trees.jl")
 include("test_stats.jl")
 include("test_visualizations.jl")
 

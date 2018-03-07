@@ -582,7 +582,19 @@ function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
         error("Merge failed.  OrderStats track different batch sizes")
     smooth!(o.value, o2.value, γ)
 end
+nobs(o::OrderStats) = o.nreps * length(o.value)
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
+# tree help:
+split_candidates(o::OrderStats) = midpoints(value(o))
+function Base.sum(o::OrderStats, x) 
+    if x ≤ first(o.value)
+        return 0 
+    elseif x > last(o.value)
+        return nobs(o)
+    else 
+        return searchsortedfirst(o.value, x) / nobs(o)
+    end
+end
 
 #-----------------------------------------------------------------------# PQuantile 
 """

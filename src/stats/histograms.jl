@@ -50,6 +50,7 @@ end
 Base.show(io::IO, o::Hist) = print(io, "Hist: $(o.alg)")
 Base.merge!(o::Hist, o2::Hist, γ::Number) = merge!(o.alg, o2.alg, γ)
 value(o::Hist) = _midpoints(o), _counts(o)
+split_candidates(o::Hist) = _midpoints(o)
 
 for f in [:fit!, :nobs, :_midpoints, :_counts, :_pdf, :split_at!, :splitcounts]
     @eval $f(o::Hist, args...) = $f(o.alg, args...)
@@ -70,6 +71,7 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
     inds = find(counts)  # filter out zero weights
     quantile(mids[inds], fweights(counts[inds]), p)
 end
+Base.sum(o::Hist, x) = sum(o.alg, x)
 
 #-----------------------------------------------------------------------# FixedBins
 mutable struct FixedBins{closed,E<:AbstractVector} <: HistAlg{0}
@@ -215,9 +217,6 @@ end
 
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.value)
 
-Base.merge(o::T, o2::T) where {T<:AdaptiveBins} = (o3 = deepcopy(o); fit!.(o3, o2.value); o3)
-
-
 # based on linear interpolation
 function _pdf(o::AdaptiveBins, y::Number)
     v = o.value
@@ -252,9 +251,9 @@ end
 # Algorithm 3: Sum Procedure
 # Estimated number of points in interval [-∞, b]
 function Base.sum(o::AdaptiveBins, b::Real)::Float64
-    if b < first(o.value[1])
+    if b ≤ first(o.value[1])
         return 0
-    elseif b ≥ first(o.value[end])
+    elseif b > first(o.value[end])
         return nobs(o)
     else
         # find i such that p(i) ≤ b < p(i+1)

@@ -110,3 +110,6 @@ end
 
 Base.hcat(o::OnlineStat{0}...) = Group(o)
 
+# Base.:*(n::Integer, o::OnlineStat{0}) = Group([copy(o) for i in 1:n]...)
+
+

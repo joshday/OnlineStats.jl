@@ -101,6 +101,25 @@ for f in [:predict, :classify]
     end
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # For stumpforest 
 function split(o::NBClassifier)
     root_impurity = impurity(o)
@@ -117,19 +136,7 @@ function split(o::NBClassifier)
     end
 end
 
-# function split_at(o::NBClassifier, j, xj)
-#     left = o 
-#     right = copy(o)
-#     left, right = split_at!(copy(o))
-#     # remove bins above xj for variable j
-#     for ls in left.value 
-#         h = ls.stats[j]
-#     end
-#     # remove bins below xj for variables j
-#     for ls in right.value 
-#         h = ls.stats[j]
-#     end
-# end
+
 
 best_split_location(o::NBClassifier, j) = mean(mean.(o[j]))
 

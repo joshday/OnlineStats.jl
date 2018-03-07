@@ -12,6 +12,14 @@ for f in [:predict, :classify]
     end
 end
 
+function merge(v::Vector{<:OnlineStat})
+    o = copy(v[1])
+    for o2 in v[2:end]
+        merge!(o, o2, .5)
+    end
+    o
+end
+split_candidates(v::Vector{<:OnlineStat}) = split_candidates(merge(v))
 
 #-----------------------------------------------------------------------# NodeStats
 # Sufficient statistics for each predictor, conditioned on label
@@ -79,7 +87,7 @@ function find_best_split(o::NodeStats{T}) where {T}
         suff_stats_j = o[:, j]
         for loc in split_candidates(suff_stats_j)
             for (k, hk) in enumerate(suff_stats_j)
-                nleft = sum(hk.alg, loc)
+                nleft = sum(hk, loc)
                 nobs_left[k] += nleft
                 nobs_right[k] += nobs(hk) - nleft
             end
@@ -176,17 +184,11 @@ function make_split!(o::Stump{T}) where {T}
     o
 end
 
-# TODO: split_candidates for 
-# - OrderStats
-# - FitNormal
-# - Hist{FixedBins}
-function split_candidates(v::Vector{T}) where {T <: Hist}
-    extrem = extrema.(v)
-    a = maximum(first, extrem)
-    b = minimum(last, extrem)
-    h = reduce((x,y) -> merge(x.alg, y.alg), v)
-    out = midpoints(first.(h.value))  # midpoints of merged histograms
-end
+#-----------------------------------------------------------------------# split_candidates
+
+
+
+
 function classify(o::Stump, x::AbstractMatrix, dim::Rows = Rows())
     mapslices(x -> classify(o, x), x, 2)
 end
@@ -260,16 +262,23 @@ mutable struct Node{T, O <: OnlineStat} <: TreePart
     split::Split{T}
 end
 Base.show(io::IO, o::Node) = print(io, "Node $(o.id) with children: $(o.children)")
-shouldsplit(o::Node) = nobs(o.ns) > 1000
 
 #-----------------------------------------------------------------------# DTree
+"""
+    DTree(p::Int, T::Type, stat = Hist(50); kw...)
+
+Calculate a decision tree with `p` predictor variables where classes have type `T`.  The
+"sufficient statistics" of the data are estimated by `stat`.
+"""
 struct DTree{T, O} <: TreePart
     tree::Vector{Node{T, O}}
     maxsize::Int
-    b::Int
+    splitsize::Int
+    empty_stat::O
 end
-function DTree(p::Int, T::Type; b = 50, maxsize = 50) 
-    DTree([Node(NodeStats(p, T, Hist(b)), 1, Int[], Split(0, 0.0, T[], 0.0))], maxsize, b)
+function DTree(p::Int, T::Type, o = Hist(50); maxsize = 50, splitsize = 1000) 
+    tree = [Node(NodeStats(p, T, o), 1, Int[], Split(0, 0.0, T[], 0.0))]
+    DTree(tree, maxsize, splitsize, o)
 end
 
 function Base.show(io::IO, o::DTree)
@@ -283,13 +292,13 @@ function fit!(o::DTree{T}, xy, γ) where {T}
     x, y = xy
     node = o.tree[whichleaf(o, x)]  # Find the node to update
     fit!(node.ns, xy, γ)  # update sufficient statistics
-    if length(o.tree) < o.maxsize && shouldsplit(node)
+    if length(o.tree) < o.maxsize && nobs(node.ns) > o.splitsize
         node.split = find_best_split(node.ns)
         m = length(o.tree)
         node.children = [m + 1, m + 2]
         p = size(node.ns.stats, 2)
-        l = Node(NodeStats(p, T, Hist(o.b)), m + 1, Int[], Split(0, 0.0, T[], 0.0))
-        r = Node(NodeStats(p, T, Hist(o.b)), m + 2, Int[], Split(0, 0.0, T[], 0.0))
+        l = Node(NodeStats(p, T, copy(o.empty_stat)), m + 1, Int[], Split(0, 0.0, T[], 0.0))
+        r = Node(NodeStats(p, T, copy(o.empty_stat)), m + 2, Int[], Split(0, 0.0, T[], 0.0))
         push!(o.tree, l)
         push!(o.tree, r)
     end
@@ -304,4 +313,13 @@ function whichleaf(o::DTree, x::VectorOb)
     i
 end
 
-classify(o::DTree, x::VectorOb) = classify(o.tree[whichleaf(o, x)].ns)
+function classify(o::DTree, x::VectorOb) 
+    i = whichleaf(o, x)
+    node = o.tree[i]
+    if !isempty(node.ns.nobs)
+        return classify(node.ns)
+    else
+        k = findfirst(x -> any(x.children .== i), o.tree)
+        return classify(o.tree[k].ns)
+    end
+end
