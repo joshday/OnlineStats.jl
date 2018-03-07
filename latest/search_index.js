@@ -621,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats...)\n\nCreate an ExactStat{1} from several OnlineStat{0}s.  For a new observation y, y[i] is sent to stats[i].  This is designed for working with data of different variable types.\n\nExample\n\ny = [randn(100) rand([\"a\", \"b\"], 100)]\n\no = Group(Mean(), CountMap(String))\n\nSeries(y, o)\n\nvalue(o)\n\n\n\n"
+    "text": "Group(stats...)\n\nCreate an ExactStat{1} from several OnlineStat{0}s.  For a new observation y, y[i] is sent to stats[i]. \n\nExample\n\ny = [randn(100) rand([\"a\", \"b\"], 100)]\n\no = Group(Mean(), CountMap(String))\n\nSeries(y, o)\n\nvalue(o)\n\n\n\n"
 },
 
 {
