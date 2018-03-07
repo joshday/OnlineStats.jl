@@ -545,6 +545,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.DTree",
+    "page": "API",
+    "title": "OnlineStats.DTree",
+    "category": "type",
+    "text": "DTree(p::Int, T::Type, stat = Hist(50); kw...)\n\nCalculate a decision tree with p predictor variables where classes have type T.  The \"sufficient statistics\" of the data are estimated by stat.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Diff",
     "page": "API",
     "title": "OnlineStats.Diff",
