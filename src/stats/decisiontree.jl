@@ -68,6 +68,7 @@ Base.keys(o::NodeStats) = o.labels
 
 probs(o::NodeStats) = o.nobs ./ sum(o.nobs)
 nobs(o::NodeStats) = sum(o.nobs)
+nparams(o::NodeStats) = size(o.stats, 2)
 
 function find_best_split(o::NodeStats{T}) where {T}
     splits = Split{T}[]
@@ -143,7 +144,7 @@ function make_split!(o::Stump{T}) where {T}
     imp_root = impurity(probs(o.ns))
     splits = Split{T}[]
 
-    for j in 1:size(o.ns.stats, 2)
+    for j in 1:nparams(o.ns)
         suff_stats_j = o.ns[:, j]
         for loc in split_candidates(suff_stats_j)
             nobs_left = zeros(length(o.ns.nobs))
@@ -261,24 +262,24 @@ end
 Base.show(io::IO, o::Node) = print(io, "Node $(o.id) with children: $(o.children)")
 shouldsplit(o::Node) = nobs(o.ns) > 1000
 
-#-----------------------------------------------------------------------# Tree
-struct Tree{T, O} <: TreePart
+#-----------------------------------------------------------------------# DTree
+struct DTree{T, O} <: TreePart
     tree::Vector{Node{T, O}}
     maxsize::Int
     b::Int
 end
-function Tree(p::Int, T::Type; b = 50, maxsize = 50) 
-    Tree([Node(NodeStats(p, T, Hist(b)), 1, Int[], Split(0, 0.0, T[], 0.0))], maxsize, b)
+function DTree(p::Int, T::Type; b = 50, maxsize = 50) 
+    DTree([Node(NodeStats(p, T, Hist(b)), 1, Int[], Split(0, 0.0, T[], 0.0))], maxsize, b)
 end
 
-function Base.show(io::IO, o::Tree)
-    println(io, "Tree")
+function Base.show(io::IO, o::DTree)
+    println(io, name(o))
     println(io, "    > Labels: ", keys(o))
     print(io,   "    > Size:  ", length(o.tree))
 end
-Base.keys(o::Tree) = keys(first(o.tree).ns)
+Base.keys(o::DTree) = keys(first(o.tree).ns)
 
-function fit!(o::Tree{T}, xy, γ) where {T}
+function fit!(o::DTree{T}, xy, γ) where {T}
     x, y = xy
     node = o.tree[whichleaf(o, x)]  # Find the node to update
     fit!(node.ns, xy, γ)  # update sufficient statistics
@@ -294,7 +295,7 @@ function fit!(o::Tree{T}, xy, γ) where {T}
     end
 end
 
-function whichleaf(o::Tree, x::VectorOb)
+function whichleaf(o::DTree, x::VectorOb)
     i = 1
     while length(o.tree[i].children) > 0 
         node = o.tree[i]
@@ -303,4 +304,4 @@ function whichleaf(o::Tree, x::VectorOb)
     i
 end
 
-classify(o::Tree, x::VectorOb) = classify(o.tree[whichleaf(o, x)].ns)
+classify(o::DTree, x::VectorOb) = classify(o.tree[whichleaf(o, x)].ns)

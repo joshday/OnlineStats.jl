@@ -84,7 +84,7 @@ is sent to `stats[i]`.
     
     value(o)
 """
-struct Group{T} <: OnlineStatStat{1}
+struct Group{T} <: OnlineStat{1}
     stats::T
 end
 Group(o::OnlineStat{0}...) = Group(o)
