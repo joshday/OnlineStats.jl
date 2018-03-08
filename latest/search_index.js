@@ -897,6 +897,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.NaiveBayesClassifier",
+    "page": "API",
+    "title": "OnlineStats.NaiveBayesClassifier",
+    "category": "type",
+    "text": "NaiveBayesClassifier(T::Type, group::Group)\n\nBuild a naive bayes classifier for lables with type T.  The group stores the sufficient  statistics of the predictor variables and group stats can be Hist(nbins) (continuous),  OrderStats(n) (continuous), or CountMap(type) (categorical).\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.OMAP2",
     "page": "API",
     "title": "OnlineStats.OMAP2",
