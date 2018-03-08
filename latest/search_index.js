@@ -269,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics MV and Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition, IndexedPartition"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and PQuantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nCount Count\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, mapblocks\nSummary of partition Partition, IndexedPartition"
 },
 
 {
@@ -489,14 +489,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.BinaryStumpForest",
-    "page": "API",
-    "title": "OnlineStats.BinaryStumpForest",
-    "category": "type",
-    "text": "BinaryStumpForest(p::Int; nt = 100, b = 10, np = 3)\n\nBuild a random forest (for responses -1, 1) based on stumps (single-split trees) where \n\np is the number of predictors \nnt is the number of trees (stumps) in the forest \nb is the number of histogram bins used to estimate P(x_j  class)\nnp is the number of random predictors each tree will use\n\nUsage\n\nAfter fitting, you must call value to calculate the splits!\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.Bootstrap",
     "page": "API",
     "title": "OnlineStats.Bootstrap",
@@ -629,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats...)\n\nCreate an ExactStat{1} from several OnlineStat{0}s.  For a new observation y, y[i] is sent to stats[i]. \n\nExample\n\ny = [randn(100) rand([\"a\", \"b\"], 100)]\n\no = Group(Mean(), CountMap(String))\n\nSeries(y, o)\n\nvalue(o)\n\n\n\n"
+    "text": "Group(stats...)\nGroup(n::Int, stat)\n[stat1 stat2 stat3 ...]\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y,  y[i] is sent to stats[i]. \n\nExamples\n\nSeries(randn(1000, 3), Group(3, Mean()))\n\ny = [randn(100) rand(Bool, 100)]\nSeries(y, [Mean() CountMap(Bool)])\n\n\n\n"
 },
 
 {
@@ -693,7 +685,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.MV",
     "category": "type",
-    "text": "MV(p, o)\np * o\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\nSeries(y, 5Mean())\n\n\n\n"
+    "text": "MV is deprecated.  Use Group instead.\n\nMV(p, o)\np * o\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\nSeries(y, 5Mean())\n\n\n\n"
 },
 
 {
