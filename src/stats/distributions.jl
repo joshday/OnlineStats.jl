@@ -157,29 +157,18 @@ distribution is returned as 1.
     s = Series(y', o)
     Multinomial(value(o)...)
 """
-mutable struct FitMultinomial <: ExactStat{1}
-    mvmean::MV{Mean}
-    nobs::Int
-    FitMultinomial(p::Integer) = new(MV(p, Mean()), 0)
+struct FitMultinomial{T} <: ExactStat{1}
+    mvmean::Group{T}
 end
-function fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64)
-    o.nobs += 1
-    fit!(o.mvmean, y, γ)
-    o
-end
+FitMultinomial(p::Integer) = FitMultinomial(Group(ntuple(x -> Mean(), p)))
+fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64) = fit!(o.mvmean, y, γ)
 function value(o::FitMultinomial)
     m = value(o.mvmean)
-    p = length(o.mvmean.stats)
-    if o.nobs > 0
-        return 1, m / sum(m)
-    else
-        return 1, ones(p) / p
-    end
+    p = length(o.mvmean)
+    outvec = all(x-> x==0.0, m) ? ones(p) ./ p : collect(m) ./ sum(m)
+    return 1, outvec
 end
-function Base.merge!(o::FitMultinomial, o2::FitMultinomial, γ::Float64)
-    o.nobs += o2.nobs
-    merge!(o.mvmean, o2.mvmean, γ)
-end
+Base.merge!(o::FitMultinomial, o2::FitMultinomial, γ::Float64) = merge!(o.mvmean, o2.mvmean, γ)
 
 #---------------------------------------------------------------------------------# MvNormal
 """

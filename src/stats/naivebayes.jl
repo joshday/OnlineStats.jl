@@ -1,14 +1,13 @@
 #-----------------------------------------------------------------------# LabelStats
-mutable struct LabelStats{T, S} <: ExactStat{(1, 0)}
+mutable struct LabelStats{T, G <: Group} <: ExactStat{(1, 0)}
     label::T 
-    stats::S  # Tuple or MV
+    group::G
     nobs::Int
 end
-LabelStats(label, stats::Tuple) = LabelStats(label, stats, 0)
-LabelStats(label, stats::MV) = LabelStats(label, stats, 0)
+LabelStats(label, group::Group) = LabelStats(label, group, 0)
 function Base.show(io::IO, o::LabelStats)
     print(io, "LabelStats: ")
-    for (i, s) in enumerate(o.stats)
+    for (i, s) in enumerate(o.group)
         print(io, name(s, false, false), " ")
     end
 end
@@ -17,14 +16,8 @@ function fit!(o::LabelStats, xy, γ)
     o.nobs += 1
     x, y = xy 
     y == o.label || error("observation label doesn't match")
-    fitstats!(o.stats, x, γ)
+    fit!(o.group, x, γ)
 end
-function fitstats!(o::Tuple, x, γ)
-    for (oi, xi) in zip(o.stats, x)
-        fit!(oi, xi, γ)
-    end
-end
-fitstats!(o::MV, y, γ) = fit!(o, y, γ)
 
 #-----------------------------------------------------------------------# NBClassifier 
 """
@@ -38,7 +31,7 @@ struct NBClassifier{T, S} <: ExactStat{(1, 0)}
 end
 NBClassifier(T::Type, stats) = NBClassifier(LabelStats{T, typeof(stats)}[], stats)
 NBClassifier(stats, T::Type) = NBClassifier(T, stats)
-NBClassifier(p::Int, T::Type, b=10) = NBClassifier(p * Hist(b), T)
+NBClassifier(p::Int, T::Type, b=10) = NBClassifier(Group(p, Hist(b)), T)
 
 function Base.show(io::IO, o::NBClassifier)
     print(io, name(o))
@@ -47,16 +40,14 @@ function Base.show(io::IO, o::NBClassifier)
     end
 end
 Base.keys(o::NBClassifier) = [ls.label for ls in o.value]
-Base.getindex(o::NBClassifier, j) = [v.stats[j] for v in o.value]
+Base.getindex(o::NBClassifier, j) = [v.group[j] for v in o.value]
 Base.length(o::NBClassifier) = length(o.value)
 nobs(o::NBClassifier) = length(o) > 0 ? sum(nobs, o.value) : 0
 probs(o::NBClassifier) = length(o) > 0 ? nobs.(o.value) ./ nobs(o) : Float64[]
 nparams(o::NBClassifier) = length(o.empty_stats)
 
-
-# P(x_j | y_k)
-condprobs(o::NBClassifier{T, <:Tuple}, k, xj) where {T} = _pdf.(o.value[k].stats, xj)
-condprobs(o::NBClassifier{T, <:MV}, k, xj) where {T} = _pdf.(o.value[k].stats.stats, xj)
+# P(x_j | label_k)
+condprobs(o::NBClassifier, k, xj) = _pdf.(o.value[k].group.stats, xj)
 
 entropybase2(p) = entropy(p, 2)
 impurity(o::NBClassifier, f::Function = entropybase2) = f(probs(o))
@@ -79,7 +70,7 @@ function fit!(o::NBClassifier, xy, γ)
     end
 end
 
-function predict(o::NBClassifier{T, S}, x::VectorOb) where {T, S <: MV}
+function predict(o::NBClassifier{T, S}, x::VectorOb) where {T, S <: Group}
     pvec = log.(probs(o))  # prior
     for k in eachindex(pvec)
         pvec[k] += sum(log, condprobs(o, k, x) .+ ϵ)
@@ -100,66 +91,3 @@ for f in [:predict, :classify]
         end
     end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# For stumpforest 
-function split(o::NBClassifier)
-    root_impurity = impurity(o)
-
-    lefts = typeof(o)[]
-    rights = typeof(o)[]
-    igs = Float64[]
-
-    for j in 1:nparams(o)
-        hs = o[j]
-        xj = mean(mean.(hs))  # TODO: something smarter
-        n1, n2 = split_nobs(o, j, xj)
-        left, right = split_at(o, j, xj)
-    end
-end
-
-
-
-best_split_location(o::NBClassifier, j) = mean(mean.(o[j]))
-
-function info_gain(o::NBClassifier, j)
-    x = best_split_location(o, j)
-    lefts = o[j]
-    rights = split_at!.(left, x)
-    n_left, n_right = split_nobs(o)
-
-
-end
-
-
-# If we were to split on variable j at point x, what are the nobs of the children?
-function split_nobs(o::NBClassifier{T, MV{S}}, j, x) where {T, S <: Hist}
-    out_left = Int[]
-    out_right = Int[]
-    stats = o[j]  # stats[1] = key 1's Hist
-    for hist in stats 
-        n1, n2 = splitcounts(hist, x)
-        push!(n_left, n1)
-        push!(n_right, n2)
-    end
-    n_left, n_right
-end
-

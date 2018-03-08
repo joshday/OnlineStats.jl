@@ -33,12 +33,12 @@ end
 end
 @testset "fit! 1" begin 
     # single observation
-    s = Series(MV(5, Mean()))
+    s = Series(Group(5, Mean()))
     fit!(s, x[1, :])
-    @test value(s)[1] ≈ x[1, :]
+    @test all(value(s)[1] .≈ x[1, :])
     # multiple observations
     fit!(s, x[2:10, :])
-    @test value(s)[1] ≈ vec(mean(x[1:10, :], 1))
+    @test all(value(s)[1] .≈ vec(mean(x[1:10, :], 1)))
 
     @testset "column observations" begin 
         s = Series(CovMatrix(5))
@@ -46,13 +46,13 @@ end
         @test s == Series(x, CovMatrix(5))
     end
     @testset "allocated" begin 
-        Series(x, MV(5, Mean()))
-        Series(x, ExponentialWeight(), MV(5, Mean()))
-        Series(ExponentialWeight(), x, MV(5, Mean()))
+        Series(x, Group(5, Mean()))
+        Series(x, ExponentialWeight(), Group(5, Mean()))
+        Series(ExponentialWeight(), x, Group(5, Mean()))
 
-        @test @allocated(Series(x, MV(5, Mean()))) < 800
-        @test @allocated(Series(x, ExponentialWeight(), MV(5, Mean()))) < 800
-        @test @allocated(Series(ExponentialWeight(), x, MV(5, Mean()))) < 800
+        @test @allocated(Series(x, Group(5, Mean()))) < 5000
+        @test @allocated(Series(x, ExponentialWeight(), Group(5, Mean()))) < 5000
+        @test @allocated(Series(ExponentialWeight(), x, Group(5, Mean()))) < 5000
     end
 end
 @testset "fit! (1,0)" begin 

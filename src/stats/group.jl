@@ -1,5 +1,7 @@
 #-----------------------------------------------------------------------# MV
 """
+`MV` is deprecated.  Use [`Group`](@ref) instead.
+
     MV(p, o)
     p * o
 
@@ -19,7 +21,11 @@ end
 
 default_weight(o::MV) = default_weight(first(o.stats))
 
-MV(p::Integer, o::OnlineStat{0}) = MV([copy(o) for i in 1:p])
+function MV(p::Integer, o::OnlineStat{0}) 
+    Base.depwarn("MV is deprecated.  Use Group instead.", :MV)
+    MV([copy(o) for i in 1:p])
+end
+
 
 for T in [:Mean, :Variance, :Extrema, :Moments]
     @eval MV(p::Integer, o::$T) = MV([$T() for i in 1:p])
@@ -52,9 +58,6 @@ function Base.show(io::IO, o::MV)
 end
 
 function fit!(o::MV, y, γ)
-    # for (stat, yi) in zip(o.stats, y)
-    #     fit!(stat, yi, γ)
-    # end
     stats = o.stats
     for (i, yi) in enumerate(y)
         fit!(stats[i], yi, γ)
@@ -70,24 +73,24 @@ Base.merge!(o1::T, o2::T, γ::Float64) where {T <: MV} = merge!.(o1.stats, o2.st
 #-----------------------------------------------------------------------# Group
 """
     Group(stats...)
+    Group(n::Int, stat)
+    [stat1 stat2 stat3 ...]
 
-Create an `ExactStat{1}` from several `OnlineStat{0}`s.  For a new observation `y`, `y[i]`
-is sent to `stats[i]`. 
+Create a vector-input stat from several scalar-input stats.  For a new observation `y`, 
+`y[i]` is sent to `stats[i]`. 
 
-# Example 
+# Examples
 
-    y = [randn(100) rand(["a", "b"], 100)]
+    Series(randn(1000, 3), Group(3, Mean()))
 
-    o = Group(Mean(), CountMap(String))
-
-    Series(y, o)
-    
-    value(o)
+    y = [randn(100) rand(Bool, 100)]
+    Series(y, [Mean() CountMap(Bool)])
 """
 struct Group{T} <: OnlineStat{1}
     stats::T
 end
 Group(o::OnlineStat{0}...) = Group(o)
+Group(n::Int, o::OnlineStat{0}) = Group(ntuple(x -> copy(o), n))
 
 default_weight(o::Group) = default_weight(o.stats)
 value(o::Group) = value.(o.stats)
@@ -95,21 +98,24 @@ value(o::Group) = value.(o.stats)
 Base.show(io::IO, o::Group) = print(io, name(o), ": ", value(o))
 Base.length(o::Group) = length(o.stats)
 Base.getindex(o::Group, i) = o.stats[i]
+Base.first(o::Group) = first(o.stats)
+Base.last(o::Group) = last(o.stats)
 
-function fit!(o::Group, y::VectorOb, γ::Float64)
-    for (oi, yi) in zip(o.stats, y)
-        fit!(oi, yi, γ)
+Base.start(o::Group) = start(o.stats)
+Base.next(o::Group, i) = next(o.stats, i)
+Base.done(o::Group, i) = done(o.stats, i)
+
+# generated function to unroll loop
+@generated function fit!(o::Group{T}, y::VectorOb, γ) where {T}
+    N = length(fieldnames(T))
+    quote 
+        Base.Cartesian.@nexprs $N i -> @inbounds(fit!(o.stats[i], y[i], γ))
     end
 end
 
-function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Group}
-    for (a, b) in zip(o.stats, o2.stats)
-        merge!(a, b, γ)
-    end
-end
+Base.merge!(o::T, o2::T, γ) where {T<:Group} = merge!.(o.stats, o2.stats, γ)
 
 Base.hcat(o::OnlineStat{0}...) = Group(o)
 
 # Base.:*(n::Integer, o::OnlineStat{0}) = Group([copy(o) for i in 1:n]...)
-
 

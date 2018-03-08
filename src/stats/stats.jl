@@ -126,7 +126,7 @@ struct CountMap{T} <: ExactStat{0}
     weights::Vector{Float64}    # "probabilities"
 end
 CountMap(T::Type) = CountMap(T[], Int[], Float64[])
-function fit!{T}(o::CountMap{T}, y::T, γ::Float64) 
+function fit!(o::CountMap, y, γ) 
     o.weights .*= 1 - γ
     newlabel = true
     for i in eachindex(o.labels)

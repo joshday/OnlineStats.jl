@@ -90,23 +90,13 @@ end
     _midpoints(o), _counts(o)
 end
 
-#-----------------------------------------------------------------------# MV
-@recipe function f(o::MV)
-    i = 1
-    layout --> length(o.stats)
-    for stat in o.stats
-        @series begin 
-            title --> "Stat $i"
-            stat 
-        end
-        i += 1
-    end
-end
 
 #-----------------------------------------------------------------------# Group 
-@recipe function f(o::Group)
-    for stat in o.stats 
+@recipe function f(o::Union{MV, Group})
+    layout --> length(o.stats)
+    for (i, stat) in enumerate(o.stats)
         @series begin 
+            title --> "Stat $i"
             stat
         end
     end
