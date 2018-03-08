@@ -226,7 +226,10 @@ function _pdf(o::AdaptiveBins, y::Number)
         i = searchsortedfirst(v, Pair(y, 0)) 
         q1, k1 = v[i-1]
         q2, k2 = v[i]
-        area = sum((first(v[i+1]) - first(v[i])) * (last(v[i]) + last(v[i+1]))/2 for i in 1:length(v)-1)
+        area = 0.0
+        for i in 1:length(v)-1 
+            area += (first(v[i+1]) - first(v[i])) * (last(v[i]) + last(v[i+1]))/2
+        end
         return smooth(k1, k2, (y - q1) / (q2 - q1)) / area
     end
 end

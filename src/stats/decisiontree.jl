@@ -12,13 +12,6 @@ for f in [:predict, :classify]
     end
 end
 
-function merge(v::Vector{<:OnlineStat})
-    o = copy(v[1])
-    for o2 in v[2:end]
-        merge!(o, o2, .5)
-    end
-    o
-end
 split_candidates(v::Vector{<:OnlineStat}) = split_candidates(merge(v))
 
 #-----------------------------------------------------------------------# NodeStats
