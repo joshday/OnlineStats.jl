@@ -150,6 +150,8 @@ Base.keys(o::CountMap) = o.labels
 Base.values(o::CountMap) = o.counts
 Base.haskey(o::CountMap, y) = y ∈ o.labels
 
+Base.getindex(o::CountMap{T}, lab::T) where {T} = o.counts[findfirst(x->x==lab, o.labels)]
+
 function Base.sort!(o::CountMap)
     perm = sortperm(o.labels)
     o.labels[:] = o.labels[perm]
@@ -183,6 +185,10 @@ function probs(o::CountMap, levels = o.labels)
     outsum == 0 ? zeros(length(out)) : out ./ outsum
 end
 
+# TODO: more than one label
+split_candidates(o::CountMap) = o.labels
+
+_pdf(o::CountMap, lab) = o[lab] ./ nobs(o)
 
 #-----------------------------------------------------------------------# CovMatrix
 """
@@ -584,17 +590,19 @@ function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
 end
 nobs(o::OrderStats) = o.nreps * length(o.value)
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
-# function _pdf(o::OrderStats, x)
-#     if x ≤ first(o.value) 
-#         return 0.0
-#     elseif x > last(o.value) 
-#         return 0.0 
-#     else
-#         i = searchsortedfirst(o.value, x)
-#     end
-# end
 
-# tree help:
+# tree/nbc help:
+function _pdf(o::OrderStats, x)
+    if x ≤ first(o.value) 
+        return 0.0
+    elseif x > last(o.value) 
+        return 0.0 
+    else
+        i = searchsortedfirst(o.value, x)
+        b = nobs(o) / (length(o.value) + 1)
+        return b / (o.value[i] - o.value[i-1])
+    end
+end
 split_candidates(o::OrderStats) = midpoints(value(o))
 function Base.sum(o::OrderStats, x) 
     if x ≤ first(o.value)
