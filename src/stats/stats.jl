@@ -584,6 +584,16 @@ function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
 end
 nobs(o::OrderStats) = o.nreps * length(o.value)
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
+# function _pdf(o::OrderStats, x)
+#     if x ≤ first(o.value) 
+#         return 0.0
+#     elseif x > last(o.value) 
+#         return 0.0 
+#     else
+#         i = searchsortedfirst(o.value, x)
+#     end
+# end
+
 # tree help:
 split_candidates(o::OrderStats) = midpoints(value(o))
 function Base.sum(o::OrderStats, x) 
@@ -592,7 +602,7 @@ function Base.sum(o::OrderStats, x)
     elseif x > last(o.value)
         return nobs(o)
     else 
-        return searchsortedfirst(o.value, x) / nobs(o)
+        return nobs(o) * (searchsortedfirst(o.value, x) / length(o.value))
     end
 end
 

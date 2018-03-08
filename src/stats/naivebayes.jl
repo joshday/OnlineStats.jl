@@ -100,58 +100,49 @@ end
 
 
 #-----------------------------------------------------------------------# Decision Splits
-function make_splits(o::NaiveBayesClassifier)
-    splits = []
-    impurity_root = impurity(probs(o))
-    nleft = zeros(Int, nkeys(o))
-    for j in 1:nvars(o)
-        push!(splits, best_split(o, j, nleft))
-    end
-    splits
-end
-
-# best split possible on variable j
-function best_split(o::NaiveBayesClassifier, j, nleft)
-    ss = op[j]
-    stat = merge(ss)
-    candidates = split_candidates(stat)
-    splits = [split(ss, j, candidates[1])]
-    for loc in candidates[2:end]
-        push!(splits, split(stat, j, loc, nleft))
-    end
-end
-
-function split(stat::Hist, j::Int, at, nleft::Vector{Int})
-
-end
-
-function make_splits(v::Vector{<:Hist}, nleft, ntotal, impurity_root, j)
-    splits = []
-    for loc in split_candidates(merge(v))
-        nleft .= 0
-        for (k, h) in enumerate(v)
-            nleft[k] += round(Int, sum(h, loc))
-        end
-        nleft_sum = sum(nleft)
-        impurity_left = impurity(nleft ./ nleft_sum)
-        impurity_right = impurity((ntotal .- nleft) ./ (sum(ntotal) - nleft_sum))
-        impurity_after = smooth(impurity_right, impurity_left, nleft_sum / sum(ntotal))
-        ig = impurity_root - impurity_after
-        push!(splits, ContinuousSplit())
-    end
-end
-
-
-struct ContinuousSplit{T}
+struct NBSplit 
     j::Int 
-    loc::T  
+    left::Union{Number, Vector}
     ig::Float64 
+    nleft::Vector{Int}
 end
-struct CategoricalSplit{T}
-    j::Int 
-    left::Vector{T}  # categories going into left child
-    ig::Float64
+
+
+# split(o) --> (o, left, right)
+function split(o::NaiveBayesClassifier{T}) where {T}
+    nroot = o.nobs
+    split = NBSplit(0, 0.0, -Inf, nroot)
+    imp_root = impurity(probs(o))
+    for j in 1:nvars(o)
+        ss = o[j]           # sufficient statistics for each label
+        stat = merge(ss)    # combined sufficient statistics
+        for loc in split_candidates(stat)
+            nleft = zeros(Int, nkeys(o))
+            for k in 1:nkeys(o)
+                nleft[k] = round(Int, n_sent_left(ss[k], loc))
+            end
+            imp_left = impurity(nleft ./ sum(nleft))
+            imp_right = impurity((nroot - nleft) ./ sum(nroot))
+            imp_after = smooth(imp_right, imp_left, sum(nleft) / sum(nroot))
+            newsplit = NBSplit(j, loc, imp_root - imp_after, nleft)
+            if newsplit.ig > split.ig 
+                split = newsplit 
+            end
+        end
+    end
+    info(split)
+
+    left_groups = [copy(o.empty_group) for i in 1:nkeys(o)]
+    right_groups = [copy(o.empty_group) for i in 1:nkeys(o)]
+    left = NaiveBayesClassifier(left_groups, copy(o.labels), split.nleft, copy(o.empty_group))
+    right = NaiveBayesClassifier(right_groups, copy(o.labels), nroot - split.nleft, copy(o.empty_group))
+    o, left, right
 end
+
+# TODO: CountMap
+n_sent_left(o::Union{OrderStats, Hist}, loc) = sum(o, loc)
+
+
 
 
 
