@@ -1,3 +1,39 @@
+#-----------------------------------------------------------------------# CDists 
+# Conditional Distributions
+struct CDists{T, G<:Group} <: OnlineStat{(1, 0)}
+    groups::Vector{G}
+    labels::Vector{T}
+    nobs::Vector{Int}
+    empty_group::G
+end
+CDists(T::Type, g::G) where {G} = CDists(G[], T[], Int[], g)
+default_weight(o::CDists) = default_weight(o.empty_group)
+function Base.show(io::IO, o::CDists)
+    print(io, name(o))
+    for (lab, prob) in zip(o.labels, probs(o))
+        print(io, "\n    > ", lab, "(", prob, ")")
+    end
+end
+probs(o::CDists) = length(o.nobs) > 0 ? o.nobs ./ sum(o.nobs) : [0.0]
+function fit!(o::CDists, xy, γ)
+    x, y = xy 
+    add = true 
+    for i in eachindex(o.labels)
+        if y == o.labels[i]
+            fit!(o.groups[i], x, 1 / (o.nobs[i] += 1))
+            add = false
+        end
+    end
+    if add
+        push!(o.nobs, 1)
+        push!(o.labels, y)
+        g = copy(o.empty_group)
+        fit!(g, x, 1.0)
+        push!(o.groups, g)
+    end
+end
+Base.getindex(o::CDists, i) = getindex.(o.groups, i)
+
 #-----------------------------------------------------------------------# LabelStats
 mutable struct LabelStats{T, G <: Group} <: ExactStat{(1, 0)}
     label::T 
