@@ -12,6 +12,7 @@ struct NaiveBayesClassifier{T, G<:Group} <: OnlineStat{(1, 0)}
     nobs::Vector{Int}
     empty_group::G
 end
+const NBC = NaiveBayesClassifier
 NaiveBayesClassifier(T::Type, g::G) where {G} = NaiveBayesClassifier(G[], T[], Int[], g)
 default_weight(o::NaiveBayesClassifier) = default_weight(o.empty_group)
 function Base.show(io::IO, o::NaiveBayesClassifier)
@@ -23,6 +24,7 @@ function Base.show(io::IO, o::NaiveBayesClassifier)
     end
 end
 probs(o::NaiveBayesClassifier) = length(o.nobs) > 0 ? o.nobs ./ sum(o.nobs) : Float64[]
+nobs(o::NaiveBayesClassifier) = sum(o.nobs)
 function fit!(o::NaiveBayesClassifier, xy, γ)
     x, y = xy 
     add = true 
@@ -100,18 +102,24 @@ end
 
 
 #-----------------------------------------------------------------------# Decision Splits
-struct NBSplit 
+struct NBSplit{T}
     j::Int 
-    left::Union{Number, Vector}
+    at::T
     ig::Float64 
     nleft::Vector{Int}
 end
+NBSplit(at) = NBSplit(0, at, 0.0, Int[])
+NBSplit(o::NBSplit) = NBSplit(o.at)
+Base.show(io::IO, o::NBSplit) = print(io, "NBSplit(j=", o.j, ", at=", o.at, ")")
+
+whichchild(o::NBSplit{T}, x) where {T<:Number} = x[o.j] < o.at ? 1 : 2
+whichchild(o::NBSplit{T}, x) where {T<:Vector} = x[o.j] in o.at ? 1 : 2
 
 
-# split(o) --> (o, left, right)
+# split(o) --> (o, split, left, right)
 function split(o::NaiveBayesClassifier{T}) where {T}
     nroot = o.nobs
-    split = NBSplit(0, 0.0, -Inf, nroot)
+    split = NBSplit(-Inf)
     imp_root = impurity(probs(o))
     for j in 1:nvars(o)
         ss = o[j]           # sufficient statistics for each label
@@ -119,10 +127,11 @@ function split(o::NaiveBayesClassifier{T}) where {T}
         for loc in split_candidates(stat)
             nleft = zeros(Int, nkeys(o))
             for k in 1:nkeys(o)
-                nleft[k] = round(Int, n_sent_left(ss[k], loc))
+                @inbounds nleft[k] = round(Int, n_sent_left(ss[k], loc))
             end
             imp_left = impurity(nleft ./ sum(nleft))
-            imp_right = impurity((nroot - nleft) ./ sum(nroot))
+            nright = nroot - nleft 
+            imp_right = impurity(nright ./ sum(nright))
             imp_after = smooth(imp_right, imp_left, sum(nleft) / sum(nroot))
             newsplit = NBSplit(j, loc, imp_root - imp_after, nleft)
             if newsplit.ig > split.ig 
@@ -130,16 +139,13 @@ function split(o::NaiveBayesClassifier{T}) where {T}
             end
         end
     end
-    info(split)
-
     left_groups = [copy(o.empty_group) for i in 1:nkeys(o)]
     right_groups = [copy(o.empty_group) for i in 1:nkeys(o)]
     left = NaiveBayesClassifier(left_groups, copy(o.labels), split.nleft, copy(o.empty_group))
     right = NaiveBayesClassifier(right_groups, copy(o.labels), nroot - split.nleft, copy(o.empty_group))
-    o, left, right
+    o, split, left, right
 end
 
-# TODO: CountMap
 n_sent_left(o::Union{OrderStats, Hist}, loc) = sum(o, loc)
 n_sent_left(o::CountMap, label) = o[label]
 

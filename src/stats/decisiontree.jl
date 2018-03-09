@@ -1,3 +1,92 @@
+#-----------------------------------------------------------------------# NBNode
+mutable struct NBNode{T, G}
+    nbc::NaiveBayesClassifier{T, G}
+    id::Int 
+    parent::Int 
+    children::Vector{Int}
+    split::NBSplit
+end
+function NBNode(o::NaiveBayesClassifier, id::Int, parent::Int) 
+    NBNode(o, id, parent, Int[], NBSplit(0, 0.0, -Inf, Int[]))
+end
+function Base.show(io::IO, o::NBNode)
+    println(io, name(o))
+    print(io, "    > id=", o.id, ", parent=", o.parent)
+    length(o.children) > 0 && print(io, ", children=", o.children)
+    o.split.j > 0 && prin(io, ", split=", o.split)
+end
+
+#-----------------------------------------------------------------------# NBTree 
+struct NBTree{T <: NBNode} <: OnlineStat{(1, 0)}
+    tree::Vector{T}
+    maxsize::Int
+    minsplit::Int
+    cp::Float64     # complexity parameter
+end
+function NBTree(root::NaiveBayesClassifier; maxsize = 1000, minsplit = 5000, cp = 0.01) 
+    NBTree([NBNode(root, 1, 0)], maxsize, splitsize, cp)
+end
+default_weight(o::NBTree) = default_weight(o.tree[1].nbc)
+Base.show(io::IO, o::NBTree) = print(io, name(o), " (size = ", length(o.tree), ")")
+
+function fit!(o::NBTree, xy, γ)
+    x, y = xy 
+    i, node = whichleaf(o, x)
+    fit!(node.nbc, xy, γ)
+    if length(o.tree) < o.maxsize && nobs(node.nbc) >= o.minsplit 
+        nbc, spl, left_nbc, right_nbc = split(node.nbc)
+        if spl.ig > o.cp
+            node.split = spl
+            left =  NBNode(left_nbc,  length(o.tree) + 1, i, Int[], NBSplit(spl))
+            right = NBNode(right_nbc, length(o.tree) + 2, i, Int[], NBSplit(spl))
+            push!(o.tree, left)
+            push!(o.tree, right)
+        end
+    end
+end
+
+function whichleaf(o::NBTree, x::VectorOb)
+    i = 1 
+    node = o.tree[i]
+    while length(node.children) > 0
+        i = node.children[whichchild(node, x)]
+        node = o.tree[i]
+    end
+    i, node
+end
+
+
+for f in [:predict, :classify]
+    @eval begin
+        $f(o::NBTree, x::VectorOb) = $f(whichleaf(o, x)[2].nbc, x)
+        $f(o::NBTree, x::AbstractMatrix, ::Rows = Rows()) = mapslices(xi -> $f(o, xi), x, 2)
+        $f(o::NBTree, x::AbstractMatrix, ::Cols) = mapslices(xi -> $f(o, xi), x, 1)
+    end
+end
+
+
+#-----------------------------------------------------------------------# NBForest 
+struct NBForest{T <: NBTree} <: OnlineStat{(1, 0)}
+    forest::Vector{T}
+    subsets::Vector{Vector{Int}}
+    p::Int
+    λ::Float64
+end
+# function NBForest(root; nt = 100, np = round(Int, sqrt(nvars(root))), kw...)
+#     forest = [NBTree()]
+# end
+
+
+
+#################################################################################### 
+####################################################################################
+####################################################################################
+####################################################################################
+####################################################################################
+#################################################################################### 
+############## Everything below here will be deprecated
+
+
 #-----------------------------------------------------------------------# Common
 abstract type TreePart <: ExactStat{(1, 0)} end
 
