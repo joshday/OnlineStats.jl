@@ -737,6 +737,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.NaiveBayesClassifier",
+    "page": "API",
+    "title": "OnlineStats.NaiveBayesClassifier",
+    "category": "type",
+    "text": "NaiveBayesClassifier(T::Type, group::Group)\n\nBuild a naive bayes classifier for lables with type T.  The group stores the sufficient  statistics of the predictor variables and group stats can be Hist(nbins) (continuous),  OrderStats(n) (continuous), or CountMap(type) (categorical).\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.OMAP",
     "page": "API",
     "title": "OnlineStats.OMAP",
@@ -894,14 +902,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.MSPI2",
     "category": "type",
     "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NaiveBayesClassifier",
-    "page": "API",
-    "title": "OnlineStats.NaiveBayesClassifier",
-    "category": "type",
-    "text": "NaiveBayesClassifier(T::Type, group::Group)\n\nBuild a naive bayes classifier for lables with type T.  The group stores the sufficient  statistics of the predictor variables and group stats can be Hist(nbins) (continuous),  OrderStats(n) (continuous), or CountMap(type) (categorical).\n\n\n\n"
 },
 
 {
