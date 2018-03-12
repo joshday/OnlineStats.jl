@@ -103,7 +103,7 @@ Base.merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n)
     CountMap(T)
 
 Maintain a dictionary mapping unique values to its number of occurrences.  Equivalent to 
-`StatsBase.countmap`.  
+`StatsBase.countmap`.  Ignores weight.
 
 # Methods
 - `value(o)`: `Dict` of raw counts
@@ -129,11 +129,11 @@ Base.show(io::IO, o::CountMap) = print(io, "CountMap: ", o.value)
 Base.keys(o::CountMap) = keys(o.value)
 Base.values(o::CountMap) = values(o.value)
 Base.haskey(o::CountMap, y) = haskey(o.value, y)
-function fit!(o::CountMap, y, γ)
+function fit!(o::CountMap, y, γ) 
     if haskey(o, y)
         o.value[y] += 1
-    else
-        o.value[y] = 1
+    else 
+        o.value[y] = 1 
     end
 end
 Base.merge!(o::CountMap, o2::CountMap, γ) = merge!(+, o.value, o2.value)
@@ -147,82 +147,55 @@ function probs(o::CountMap, kys = keys(o))
     sum(out) == 0 ? Float64.(out) : out ./ sum(out)
 end
 
-
-
+#-----------------------------------------------------------------------# ProbMap
 """
-    WeightedCountMap(T)
+    ProbMap(T)
+
+Maintain a dictionary mapping unique values to its probability.  Similar to [`CountMap`](@ref), 
+but tracks probabilities instead of counts and can incorporate different weights.  
+
+NOTE: Use only when weights other than `EqualWeight` are desired as `ProbMap` is slower 
+than `CountMap`.
+
+# Example 
+
+    y = vcat(zeros(Int, 100), ones(Int, 100), 2ones(Int, 100))
+
+    # give each observation an influence of 0.01
+    s = Series(y, x -> .01, ProbMap(Int))
+    sort(value(s.stats[1]))
 """
-struct WeightedCountMap{T} <: ExactStat{0}
-    labels::Vector{T}           # unique values
-    counts::Vector{Int}         # raw count
-    weights::Vector{Float64}    # "probabilities"
+struct ProbMap{T} <: ExactStat{0}
+    value::Dict{T, Float64}
 end
-WeightedCountMap(T::Type) = WeightedCountMap(T[], Int[], Float64[])
-function fit!(o::WeightedCountMap, y, γ) 
-    o.weights .*= 1 - γ
-    newlabel = true
-    for i in eachindex(o.labels)
-        if o.labels[i] == y 
-            o.weights[i] += γ
-            o.counts[i] += 1
-            newlabel = false
-        end
-    end
-    if newlabel 
-        push!(o.labels, y)
-        push!(o.counts, 1)
-        push!(o.weights, γ)
-    end
-end
-nobs(o::WeightedCountMap) = sum(o.counts)
-value(o::WeightedCountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
+ProbMap(T::Type) = ProbMap(Dict{T, Float64}())
+Base.show(io::IO, o::ProbMap) = print(io, "ProbMap: ", o.value)
+Base.haskey(o::ProbMap, y) = haskey(o.value, y)
+Base.keys(o::ProbMap) = keys(o.value)
+Base.values(o::ProbMap) = values(o.value)
 
-Base.length(o::WeightedCountMap) = length(o.labels)
-Base.keys(o::WeightedCountMap) = o.labels
-Base.values(o::WeightedCountMap) = o.counts
-Base.haskey(o::WeightedCountMap, y) = y ∈ o.labels
-
-Base.getindex(o::WeightedCountMap{T}, lab::T) where {T} = o.counts[findfirst(x->x==lab, o.labels)]
-
-function Base.sort!(o::WeightedCountMap)
-    perm = sortperm(o.labels)
-    o.labels[:] = o.labels[perm]
-    o.counts[:] = o.counts[perm]
-    o.weights[:] = o.weights[perm]
-    o
-end
-
-function Base.merge!(o::T, o2::T, γ::Float64) where {T<:WeightedCountMap}
-    o.weights .*= 1 - γ
-    for (i, key) in enumerate(o2.labels)
-        j = findfirst(x -> x == key, o.labels)
-        if j == 0 
-            push!(o.labels, key)
-            push!(o.counts, o2.counts[i])
-            push!(o.weights, o2.weights[i] * γ)
-        else
-            o.counts[j] += o2.counts[i]
-            o.weights[j] += o2.weights[i] * γ
+function fit!(o::ProbMap, y, γ)
+    get!(o.value, y, 0.0)
+    for ky in keys(o.value)
+        if ky == y 
+            o.value[ky] = smooth(o.value[ky], 1.0, γ)
+        else 
+            o.value[ky] *= (1 - γ)
         end
     end
 end
 
-function probs(o::WeightedCountMap, levels = o.labels)
-    out = Float64[]
-    for key in levels
-        i = findfirst(x -> x==key, o.labels)
-        i == 0 ? push!(out, 0.0) : push!(out, o.weights[i])
-    end
-    outsum = sum(out)
-    outsum == 0 ? zeros(length(out)) : out ./ outsum
+function Base.merge!(o::ProbMap, o2::ProbMap, γ)
+    merge!((a,b) -> smooth(a, b, γ), o.value, o2.value)
 end
 
-# TODO: more than one label
-split_candidates(o::WeightedCountMap) = o.labels
-
-_pdf(o::CountMap, lab) = o[lab] ./ nobs(o)
-
-
+function probs(o::ProbMap, levels = keys(o))
+    out = zeros(length(levels))
+    for (i, ky) in enumerate(levels)
+        out[i] = get(o.value, ky, 0.0)
+    end
+    sum(out) == 0.0 ? out : out ./ sum(out)
+end
 
 #-----------------------------------------------------------------------# CovMatrix
 """

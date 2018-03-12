@@ -335,6 +335,13 @@ end
     s = merge!(Series(data, o), Series(data2, o2))
     @test value(merge(o)) ≈ mean(vcat(data, data2))
 end
+#-----------------------------------------------------------------------# ProbMap 
+@testset "ProbMap" begin 
+    test_merge(ProbMap(Int), rand(1:5, 100), rand(1:5, 100), (a,b)->collect(keys(a))==collect(keys(b)))
+    test_merge(ProbMap(Int), rand(1:5, 100), rand(1:5, 100), (a,b)->collect(values(a))≈collect(values(b)))
+    test_exact(ProbMap(Int), [1,2,1,2,1,2], o->collect(values(sort(value(o)))), x->[.5, .5])
+    test_exact(ProbMap(Int), [1,1,1,2], o->collect(values(sort(value(o)))), x->[.75, .25])
+end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 
     data = randn(10_000)

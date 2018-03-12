@@ -29,7 +29,7 @@ export
     # Stats
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
-    Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, 
+    Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, ProbMap,
     NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique, 
     # Tree stuff
     NaiveBayesClassifier, NBC, NBNode, NBTree,
