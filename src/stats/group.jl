@@ -39,7 +39,8 @@ Base.getindex(o::MV, i) = o.stats[i]
 Base.first(o::MV) = first(o.stats)
 Base.last(o::MV) = last(o.stats)
 Base.length(o::MV) = length(o.stats)
-Base.:*(n::Integer, o::OnlineStat{0}) = MV(n, o)
+
+# Base.:*(n::Integer, o::OnlineStat{0}) = MV(n, o)
 
 function Base.show(io::IO, o::MV)
     s = name(o) * "("
@@ -90,9 +91,10 @@ struct Group{T} <: OnlineStat{1}
     stats::T
 end
 Group(o::OnlineStat{0}...) = Group(o)
-Group(n::Int, o::OnlineStat{0}) = Group(ntuple(x -> copy(o), n))
+Group(n::Int, o::OnlineStat{0}) = Group([copy(o) for i in 1:n])
 
 default_weight(o::Group) = default_weight(o.stats)
+default_weight(v::Vector) = default_weight(tuple(v...))
 value(o::Group) = value.(o.stats)
 
 Base.show(io::IO, o::Group) = print(io, name(o), ": ", value(o))
@@ -106,16 +108,24 @@ Base.next(o::Group, i) = next(o.stats, i)
 Base.done(o::Group, i) = done(o.stats, i)
 
 # generated function to unroll loop
-@generated function fit!(o::Group{T}, y::VectorOb, γ) where {T}
+@generated function fit!(o::Group{T}, y, γ) where {T<:Tuple}
     N = length(fieldnames(T))
     quote 
         Base.Cartesian.@nexprs $N i -> @inbounds(fit!(o.stats[i], y[i], γ))
     end
 end
 
+function fit!(o::Group{<:Vector}, y, γ) 
+    stats = o.stats
+    for (i, yi) in enumerate(y)
+        fit!(stats[i], yi, γ)
+    end
+    o
+end
+
 Base.merge!(o::T, o2::T, γ) where {T<:Group} = merge!.(o.stats, o2.stats, γ)
 
 Base.hcat(o::OnlineStat{0}...) = Group(o)
 
-# Base.:*(n::Integer, o::OnlineStat{0}) = Group([copy(o) for i in 1:n]...)
+Base.:*(n::Integer, o::OnlineStat{0}) = Group([copy(o) for i in 1:n])
 

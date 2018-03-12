@@ -220,7 +220,9 @@ Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.va
 # based on linear interpolation
 function _pdf(o::AdaptiveBins, y::Number)
     v = o.value
-    if y ≤ first(first(v)) || y ≥ first(last(v))
+    if isempty(o.value)
+        return 0.0
+    elseif y ≤ first(first(v)) || y ≥ first(last(v))
         return 0.0
     else 
         i = searchsortedfirst(v, Pair(y, 0)) 
@@ -254,10 +256,12 @@ end
 # Algorithm 3: Sum Procedure
 # Estimated number of points in interval [-∞, b]
 function Base.sum(o::AdaptiveBins, b::Real)::Float64
-    if b ≤ first(o.value[1])
-        return 0
-    elseif b > first(o.value[end])
-        return nobs(o)
+    if isempty(o.value)
+        return 0.0
+    elseif b ≤ first(first(o.value))
+        return 0.0
+    elseif b ≥ first(last(o.value))
+        return Float64(nobs(o))
     else
         # find i such that p(i) ≤ b < p(i+1)
         i = searchsortedfirst(o.value, Pair(b, 1)) - 1

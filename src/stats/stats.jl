@@ -606,9 +606,9 @@ end
 split_candidates(o::OrderStats) = midpoints(value(o))
 function Base.sum(o::OrderStats, x) 
     if x ≤ first(o.value)
-        return 0 
+        return 0.0 
     elseif x > last(o.value)
-        return nobs(o)
+        return Float64(nobs(o))
     else 
         return nobs(o) * (searchsortedfirst(o.value, x) / length(o.value))
     end

@@ -13,10 +13,19 @@ function Base.show(io::IO, o::NBNode)
     println(io, name(o))
     print(io, "    > id=", o.id, ", parent=", o.parent)
     length(o.children) > 0 && print(io, ", children=", o.children)
-    o.split.j > 0 && prin(io, ", split=", o.split)
+    o.split.j > 0 && print(io, ", split=", o.split)
 end
 
 #-----------------------------------------------------------------------# NBTree 
+"""
+    NBTree(root::NaiveBayesClassifier; maxsize=1000, minsplit=5000, cp=.01)
+
+Create a decision tree where each node is a naive bayes classifier.  
+
+- `maxsize` controls the size of the tree 
+- `minsplit` is the minimum number of observations in a node before attempting a split 
+- `cp` is a complexity parameter.  A split only occurs if the information gain is greater than `cp`.
+"""
 struct NBTree{T <: NBNode} <: OnlineStat{(1, 0)}
     tree::Vector{T}
     maxsize::Int
@@ -24,10 +33,11 @@ struct NBTree{T <: NBNode} <: OnlineStat{(1, 0)}
     cp::Float64     # complexity parameter
 end
 function NBTree(root::NaiveBayesClassifier; maxsize = 1000, minsplit = 5000, cp = 0.01) 
-    NBTree([NBNode(root, 1, 0)], maxsize, splitsize, cp)
+    NBTree([NBNode(root, 1, 0)], maxsize, minsplit, cp)
 end
 default_weight(o::NBTree) = default_weight(o.tree[1].nbc)
 Base.show(io::IO, o::NBTree) = print(io, name(o), " (size = ", length(o.tree), ")")
+nobs(o::NBTree) = nobs(first(o.tree).nbc)
 
 function fit!(o::NBTree, xy, γ)
     x, y = xy 
@@ -37,6 +47,7 @@ function fit!(o::NBTree, xy, γ)
         nbc, spl, left_nbc, right_nbc = split(node.nbc)
         if spl.ig > o.cp
             node.split = spl
+            node.children = [length(o.tree) + 1, length(o.tree) + 2]
             left =  NBNode(left_nbc,  length(o.tree) + 1, i, Int[], NBSplit(spl))
             right = NBNode(right_nbc, length(o.tree) + 2, i, Int[], NBSplit(spl))
             push!(o.tree, left)
@@ -49,16 +60,21 @@ function whichleaf(o::NBTree, x::VectorOb)
     i = 1 
     node = o.tree[i]
     while length(node.children) > 0
-        i = node.children[whichchild(node, x)]
+        i = node.children[whichchild(node.split, x)]
         node = o.tree[i]
     end
     i, node
 end
 
+predict(o::NBTree, x::VectorOb) = probs(whichleaf(o, x)[2].nbc)
+classify(o::NBTree, x::VectorOb) = findmax(predict(o, x))[2]
+
+
+
 
 for f in [:predict, :classify]
     @eval begin
-        $f(o::NBTree, x::VectorOb) = $f(whichleaf(o, x)[2].nbc, x)
+        # $f(o::NBTree, x::VectorOb) = $f(whichleaf(o, x)[2].nbc, x)
         $f(o::NBTree, x::AbstractMatrix, ::Rows = Rows()) = mapslices(xi -> $f(o, xi), x, 2)
         $f(o::NBTree, x::AbstractMatrix, ::Cols) = mapslices(xi -> $f(o, xi), x, 1)
     end

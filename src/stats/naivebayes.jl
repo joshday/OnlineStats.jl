@@ -108,9 +108,9 @@ struct NBSplit{T}
     ig::Float64 
     nleft::Vector{Int}
 end
-NBSplit(at) = NBSplit(0, at, 0.0, Int[])
+NBSplit(at) = NBSplit(0, at, -Inf, Int[])
 NBSplit(o::NBSplit) = NBSplit(o.at)
-Base.show(io::IO, o::NBSplit) = print(io, "NBSplit(j=", o.j, ", at=", o.at, ")")
+Base.show(io::IO, o::NBSplit) = print(io, "NBSplit(j=", o.j, ", at=", o.at, ", ig=", o.ig, ")")
 
 whichchild(o::NBSplit{T}, x) where {T<:Number} = x[o.j] < o.at ? 1 : 2
 whichchild(o::NBSplit{T}, x) where {T<:Vector} = x[o.j] in o.at ? 1 : 2
@@ -139,9 +139,9 @@ function split(o::NaiveBayesClassifier{T}) where {T}
             end
         end
     end
-    left_groups = [copy(o.empty_group) for i in 1:nkeys(o)]
+    left_groups =  [copy(o.empty_group) for i in 1:nkeys(o)]
     right_groups = [copy(o.empty_group) for i in 1:nkeys(o)]
-    left = NaiveBayesClassifier(left_groups, copy(o.labels), split.nleft, copy(o.empty_group))
+    left =  NaiveBayesClassifier(left_groups,  copy(o.labels), split.nleft, copy(o.empty_group))
     right = NaiveBayesClassifier(right_groups, copy(o.labels), nroot - split.nleft, copy(o.empty_group))
     o, split, left, right
 end
