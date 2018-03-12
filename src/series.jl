@@ -24,11 +24,10 @@ function Base.show(io::IO, s::AbstractSeries{N}) where {N}
     print_with_color(:green, io, " $(getweight(s)) | nobs=$(nobs(s))")
     details(io, s)
     n = length(stats(s))
-    i = 0
-    for o in stats(s)
-        i += 1
+    for (i, o) in enumerate(stats(s))
         char = (i == n) ? "└──" : "├──"
-        print(io, "\n$char $o")
+        print(io, "\n$char ")
+        print(io, o)
     end
 end
 

@@ -107,9 +107,9 @@ Maintain a dictionary mapping unique values to its number of occurrences.  Equiv
 
 # Methods
 - `value(o)`: `Dict` of raw counts
-- `keys(o)`: unique labels 
-- `values(o)`: (unweighted) counts
-- `probs(o)`: weighted probabilities
+- `keys(o)`: Unique values 
+- `values(o)`: Counts
+- `probs(o)`: Probabilities
 
 # Example 
 
@@ -121,12 +121,44 @@ Maintain a dictionary mapping unique values to its number of occurrences.  Equiv
     probs(o, ["small", "large"])
 """
 struct CountMap{T} <: ExactStat{0}
+    value::Dict{T, Int}
+end
+CountMap(T::Type) = CountMap(Dict{T, Int}())
+value(o::CountMap) = sort(o.value)
+Base.show(io::IO, o::CountMap) = print(io, "CountMap: ", o.value)
+Base.keys(o::CountMap) = keys(o.value)
+Base.values(o::CountMap) = values(o.value)
+Base.haskey(o::CountMap, y) = haskey(o.value, y)
+function fit!(o::CountMap, y, γ)
+    if haskey(o, y)
+        o.value[y] += 1
+    else
+        o.value[y] = 1
+    end
+end
+Base.merge!(o::CountMap, o2::CountMap, γ) = merge!(+, o.value, o2.value)
+nobs(o::CountMap) = sum(values(o))
+function probs(o::CountMap, kys = keys(o))
+    out = zeros(Int, length(kys))
+    dictkeys = keys(o.value)
+    for (i, k) in enumerate(kys)
+        out[i] = k in dictkeys ? o.value[k] : 0
+    end
+    sum(out) == 0 ? Float64.(out) : out ./ sum(out)
+end
+
+
+
+"""
+    WeightedCountMap(T)
+"""
+struct WeightedCountMap{T} <: ExactStat{0}
     labels::Vector{T}           # unique values
     counts::Vector{Int}         # raw count
     weights::Vector{Float64}    # "probabilities"
 end
-CountMap(T::Type) = CountMap(T[], Int[], Float64[])
-function fit!(o::CountMap, y, γ) 
+WeightedCountMap(T::Type) = WeightedCountMap(T[], Int[], Float64[])
+function fit!(o::WeightedCountMap, y, γ) 
     o.weights .*= 1 - γ
     newlabel = true
     for i in eachindex(o.labels)
@@ -142,17 +174,17 @@ function fit!(o::CountMap, y, γ)
         push!(o.weights, γ)
     end
 end
-nobs(o::CountMap) = sum(o.counts)
-value(o::CountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
+nobs(o::WeightedCountMap) = sum(o.counts)
+value(o::WeightedCountMap) = Dict((key,val) for (key,val) in zip(keys(o), values(o)))
 
-Base.length(o::CountMap) = length(o.labels)
-Base.keys(o::CountMap) = o.labels
-Base.values(o::CountMap) = o.counts
-Base.haskey(o::CountMap, y) = y ∈ o.labels
+Base.length(o::WeightedCountMap) = length(o.labels)
+Base.keys(o::WeightedCountMap) = o.labels
+Base.values(o::WeightedCountMap) = o.counts
+Base.haskey(o::WeightedCountMap, y) = y ∈ o.labels
 
-Base.getindex(o::CountMap{T}, lab::T) where {T} = o.counts[findfirst(x->x==lab, o.labels)]
+Base.getindex(o::WeightedCountMap{T}, lab::T) where {T} = o.counts[findfirst(x->x==lab, o.labels)]
 
-function Base.sort!(o::CountMap)
+function Base.sort!(o::WeightedCountMap)
     perm = sortperm(o.labels)
     o.labels[:] = o.labels[perm]
     o.counts[:] = o.counts[perm]
@@ -160,7 +192,7 @@ function Base.sort!(o::CountMap)
     o
 end
 
-function Base.merge!(o::T, o2::T, γ::Float64) where {T<:CountMap}
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:WeightedCountMap}
     o.weights .*= 1 - γ
     for (i, key) in enumerate(o2.labels)
         j = findfirst(x -> x == key, o.labels)
@@ -175,7 +207,7 @@ function Base.merge!(o::T, o2::T, γ::Float64) where {T<:CountMap}
     end
 end
 
-function probs(o::CountMap, levels = o.labels)
+function probs(o::WeightedCountMap, levels = o.labels)
     out = Float64[]
     for key in levels
         i = findfirst(x -> x==key, o.labels)
@@ -186,9 +218,11 @@ function probs(o::CountMap, levels = o.labels)
 end
 
 # TODO: more than one label
-split_candidates(o::CountMap) = o.labels
+split_candidates(o::WeightedCountMap) = o.labels
 
 _pdf(o::CountMap, lab) = o[lab] ./ nobs(o)
+
+
 
 #-----------------------------------------------------------------------# CovMatrix
 """

@@ -2,7 +2,7 @@ __precompile__(true)
 module OnlineStats
 
 import SweepOperator
-import DataStructures: SortedDict
+import DataStructures: SortedDict, OrderedDict
 import LearnBase: fit!, value, nobs, predict, transform!, transform
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, pweights, skewness, 
     kurtosis, confint, autocor, autocov, entropy, midpoints, sample
@@ -67,9 +67,6 @@ function smooth_syr!(A::AbstractMatrix, x, γ::Number)
 end
 
 unbias(o) = nobs(o) / (nobs(o) - 1)
-
-value(o::OnlineStat, args...; kw...) = _value(o, args...; kw...)
-fit!(o::OnlineStat, ob, γ) = _fit!(o, ob, γ)
 
 function merge(v::AbstractVector{<:OnlineStat})
     o = copy(v[1])
