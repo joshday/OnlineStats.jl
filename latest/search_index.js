@@ -525,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "type",
-    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Equivalent to  StatsBase.countmap.  \n\nMethods\n\nvalue(o): Dict of raw counts\nkeys(o): Unique values \nvalues(o): Counts\nprobs(o): Probabilities\n\nExample\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\nprobs(o)\nprobs(o, [\"small\", \"large\"])\n\n\n\n"
+    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Equivalent to  StatsBase.countmap.  Ignores weight.\n\nMethods\n\nvalue(o): Dict of raw counts\nkeys(o): Unique values \nvalues(o): Counts\nprobs(o): Probabilities\n\nExample\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\nprobs(o)\nprobs(o, [\"small\", \"large\"])\n\n\n\n"
 },
 
 {
@@ -793,6 +793,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.ProbMap",
+    "page": "API",
+    "title": "OnlineStats.ProbMap",
+    "category": "type",
+    "text": "ProbMap(T)\n\nMaintain a dictionary mapping unique values to its probability.  Similar to CountMap,  but tracks probabilities instead of counts and can incorporate different weights.  \n\nNOTE: Use only when weights other than EqualWeight are desired as ProbMap is slower  than CountMap.\n\nExample\n\ny = vcat(zeros(Int, 100), ones(Int, 100), 2ones(Int, 100))\n\n# give each observation an influence of 0.01\ns = Series(y, x -> .01, ProbMap(Int))\nsort(value(s.stats[1]))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Quantile",
     "page": "API",
     "title": "OnlineStats.Quantile",
@@ -926,14 +934,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.OMAS2",
     "category": "type",
     "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.WeightedCountMap",
-    "page": "API",
-    "title": "OnlineStats.WeightedCountMap",
-    "category": "type",
-    "text": "WeightedCountMap(T)\n\n\n\n"
 },
 
 {
