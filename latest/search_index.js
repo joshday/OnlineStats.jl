@@ -525,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "type",
-    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Equivalent to  StatsBase.countmap.  \n\nMethods\n\nvalue(o): Dict of raw counts\nkeys(o): unique labels \nvalues(o): (unweighted) counts\nprobs(o): weighted probabilities\n\nExample\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\nprobs(o)\nprobs(o, [\"small\", \"large\"])\n\n\n\n"
+    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Equivalent to  StatsBase.countmap.  \n\nMethods\n\nvalue(o): Dict of raw counts\nkeys(o): Unique values \nvalues(o): Counts\nprobs(o): Probabilities\n\nExample\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\nprobs(o)\nprobs(o, [\"small\", \"large\"])\n\n\n\n"
 },
 
 {
@@ -729,6 +729,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.NBTree",
+    "page": "API",
+    "title": "OnlineStats.NBTree",
+    "category": "type",
+    "text": "NBTree(root::NaiveBayesClassifier; maxsize=1000, minsplit=5000, cp=.01)\n\nCreate a decision tree where each node is a naive bayes classifier.  \n\nmaxsize controls the size of the tree \nminsplit is the minimum number of observations in a node before attempting a split \ncp is a complexity parameter.  A split only occurs if the information gain is greater than cp.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.NSGD",
     "page": "API",
     "title": "OnlineStats.NSGD",
@@ -918,6 +926,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.OMAS2",
     "category": "type",
     "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.WeightedCountMap",
+    "page": "API",
+    "title": "OnlineStats.WeightedCountMap",
+    "category": "type",
+    "text": "WeightedCountMap(T)\n\n\n\n"
 },
 
 {
