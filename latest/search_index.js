@@ -537,14 +537,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.DTree",
-    "page": "API",
-    "title": "OnlineStats.DTree",
-    "category": "type",
-    "text": "DTree(p::Int, T::Type, stat = Hist(50); kw...)\n\nCalculate a decision tree with p predictor variables where classes have type T.  The \"sufficient statistics\" of the data are estimated by stat.\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.Diff",
     "page": "API",
     "title": "OnlineStats.Diff",
@@ -729,27 +721,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.NBTree",
-    "page": "API",
-    "title": "OnlineStats.NBTree",
-    "category": "type",
-    "text": "NBTree(root::NaiveBayesClassifier; maxsize=1000, minsplit=5000, cp=.01)\n\nCreate a decision tree where each node is a naive bayes classifier.  \n\nmaxsize controls the size of the tree \nminsplit is the minimum number of observations in a node before attempting a split \ncp is a complexity parameter.  A split only occurs if the information gain is greater than cp.\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.NSGD",
     "page": "API",
     "title": "OnlineStats.NSGD",
     "category": "type",
     "text": "NSGD(α)\n\nNesterov accelerated Proximal Stochastic Gradient Descent.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NaiveBayesClassifier",
-    "page": "API",
-    "title": "OnlineStats.NaiveBayesClassifier",
-    "category": "type",
-    "text": "NaiveBayesClassifier(T::Type, group::Group)\n\nBuild a naive bayes classifier for lables with type T.  The group stores the sufficient  statistics of the predictor variables and group stats can be Hist(nbins) (continuous),  OrderStats(n) (continuous), or CountMap(type) (categorical).\n\n\n\n"
 },
 
 {
