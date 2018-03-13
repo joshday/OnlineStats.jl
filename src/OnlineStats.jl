@@ -30,7 +30,7 @@ export
     Mean, Variance, CStat, CovMatrix, Diff, Extrema, HyperLogLog, KMeans, Moments,
     OrderStats, Quantile, PQuantile, ReservoirSample, Lag, AutoCov, Count, CountMap,
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, ProbMap,
-    NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique, 
+    NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique, StatMap,
     # Tree stuff
     NaiveBayesClassifier, NBC, NBNode, NBTree,
     BinaryStumpForest, NodeStats, Stump, DTree, Forest,
@@ -75,6 +75,8 @@ function merge(v::AbstractVector{<:OnlineStat})
     end
     o
 end
+
+Base.length(o::OnlineStat) = 1
 
 const ϵ = 1e-6
 

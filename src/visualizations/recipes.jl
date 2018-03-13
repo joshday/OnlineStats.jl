@@ -173,28 +173,28 @@ to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:le
 end
 
 
-#-----------------------------------------------------------------------# NBClassifier 
-@recipe function f(o::NBClassifier)
-    kys = keys(o)
-    layout --> nparams(o) + 1
-    alpha --> .4
-    seriestype --> :line 
-    fillto --> 0
-    for j in 1:nparams(o) 
-        stats = o[j]
-        for (i, s) in enumerate(stats)
-            @series begin 
-                title --> "Var $j"
-                legend --> false 
-                subplot --> j 
-                s
-            end
-        end
-    end
-    @series begin 
-        subplot --> nparams(o) + 1
-        label --> reshape(kys, 1, length(kys))
-        framestyle := :none
-        zeros(0, length(kys))
-    end
-end
+# #-----------------------------------------------------------------------# NBClassifier 
+# @recipe function f(o::NBClassifier)
+#     kys = keys(o)
+#     layout --> nparams(o) + 1
+#     alpha --> .4
+#     seriestype --> :line 
+#     fillto --> 0
+#     for j in 1:nparams(o) 
+#         stats = o[j]
+#         for (i, s) in enumerate(stats)
+#             @series begin 
+#                 title --> "Var $j"
+#                 legend --> false 
+#                 subplot --> j 
+#                 s
+#             end
+#         end
+#     end
+#     @series begin 
+#         subplot --> nparams(o) + 1
+#         label --> reshape(kys, 1, length(kys))
+#         framestyle := :none
+#         zeros(0, length(kys))
+#     end
+# end

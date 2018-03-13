@@ -146,6 +146,7 @@ function probs(o::CountMap, kys = keys(o))
     end
     sum(out) == 0 ? Float64.(out) : out ./ sum(out)
 end
+_pdf(o::CountMap, y) = y in keys(o) ? o.value[y] / nobs(o) : 0.0
 
 #-----------------------------------------------------------------------# ProbMap
 """

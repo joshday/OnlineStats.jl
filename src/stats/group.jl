@@ -87,15 +87,18 @@ Create a vector-input stat from several scalar-input stats.  For a new observati
     y = [randn(100) rand(Bool, 100)]
     Series(y, [Mean() CountMap(Bool)])
 """
-struct Group{T} <: OnlineStat{1}
+mutable struct Group{T} <: OnlineStat{1}
     stats::T
+    nobs::Int
 end
-Group(o::OnlineStat{0}...) = Group(o)
-Group(n::Int, o::OnlineStat{0}) = Group([copy(o) for i in 1:n])
+Group(o::OnlineStat{0}...) = Group(o, 0)
+Group(n::Int, o::OnlineStat{0}) = Group([copy(o) for i in 1:n], 0)
+Group(stats::VectorOb) = Group(stats, 0)
 
 default_weight(o::Group) = default_weight(o.stats)
 default_weight(v::Vector) = default_weight(tuple(v...))
 value(o::Group) = value.(o.stats)
+nobs(o::Group) = o.nobs
 
 Base.show(io::IO, o::Group) = print(io, name(o), ": ", value(o))
 Base.length(o::Group) = length(o.stats)
@@ -111,11 +114,14 @@ Base.done(o::Group, i) = done(o.stats, i)
 @generated function fit!(o::Group{T}, y, γ) where {T<:Tuple}
     N = length(fieldnames(T))
     quote 
+        o.nobs += 1
         Base.Cartesian.@nexprs $N i -> @inbounds(fit!(o.stats[i], y[i], γ))
+        o
     end
 end
 
 function fit!(o::Group{<:Vector}, y, γ) 
+    o.nobs += 1
     stats = o.stats
     for (i, yi) in enumerate(y)
         fit!(stats[i], yi, γ)
