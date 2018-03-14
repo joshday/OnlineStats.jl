@@ -553,11 +553,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.FastNode",
+    "page": "API",
+    "title": "OnlineStats.FastNode",
+    "category": "type",
+    "text": "FastNode(p, nclasses; stat = FitNormal())\n\nNode of a decision tree.  Assumes each predictor variable, conditioned on any  class, has a normal distribution.  Internal structure for FastTree. Observations must be a Pair/Tuple/NamedTuple of (VectorOb, Int)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.FastTree",
     "page": "API",
     "title": "OnlineStats.FastTree",
     "category": "type",
-    "text": "FastTree(npredictors, nclasses; maxsize=5000, splitsize=2000)\n\nCreate an online decision tree under the assumption that the distribution of any predictor  conditioned on any class is Normal.  The classes must be Ints beginning at one (1, 2, 3, ...).\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastTree(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
+    "text": "FastTree(npredictors, nclasses; maxsize=5000, splitsize=2000)\n\nCreate an online decision tree under the assumption that the distribution of any predictor  conditioned on any class is Normal.  The classes must be Ints beginning at one (1, 2, 3, ...). When a node hits splitsize observations, it will be given two children.  When the number of  nodes in the tree reaches maxsize, no more splits will occur.\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastTree(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
 },
 
 {
