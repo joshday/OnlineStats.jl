@@ -141,6 +141,10 @@ function value(o::FitNormal)
     end
 end
 Base.merge!(o::FitNormal, o2::FitNormal, γ::Float64) = merge!(o.var, o2.var, γ)
+Base.mean(o::FitNormal) = mean(o.var)
+Base.std(o::FitNormal) = std(o.var)
+nobs(o::FitNormal) = nobs(o.var)
+_cdf(o::FitNormal, x::Number) = .5 * (1.0 + erf((x - mean(o)) / (std(o) * √2)))
 
 #---------------------------------------------------------------------------------# Multinomial
 # TODO: Allow each observation to have a different n
