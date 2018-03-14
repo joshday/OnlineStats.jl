@@ -553,6 +553,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.FastForest",
+    "page": "API",
+    "title": "OnlineStats.FastForest",
+    "category": "type",
+    "text": "FastForest(p, nclasses; nt, b, λ, kw...)\n\nBuild a random forest of FastTree trees with p predictors.  Each tree  in the forest recieves a random subset of predictors of size b.  For a new observation, each tree in the forest is updated with probability λ.  The keyword arguments are:\n\nnt=40: Number of trees in the forest \nb=floor(Int,sqrt(p)): Number of random predictors to use for each tree\nλ = .05: Probability of a tree being updated for any given observation\nmaxsize=1000:  Maximum number of nodes in any tree in the forest\nsplitsize=2000: How many observations a node can observe before it splits\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastForest(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.FastNode",
     "page": "API",
     "title": "OnlineStats.FastNode",
