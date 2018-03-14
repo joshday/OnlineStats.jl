@@ -169,6 +169,29 @@ classify(o::FastTree, x::AbstractMatrix, ::Cols) = mapslices(xi->classify(o,xi),
 
 
 #-----------------------------------------------------------------------# FastForest 
+"""
+    FastForest(p, nclasses; nt, b, λ, kw...)
+
+Build a random forest of [`FastTree`](@ref) trees with `p` predictors.  Each tree 
+in the forest recieves a random subset of predictors of size `b`.  For a new observation,
+each tree in the forest is updated with probability `λ`.  The keyword arguments are:
+
+- `nt=40`: Number of trees in the forest 
+- `b=floor(Int,sqrt(p))`: Number of random predictors to use for each tree
+- `λ = .05`: Probability of a tree being updated for any given observation
+- `maxsize=1000`:  Maximum number of nodes in any tree in the forest
+- `splitsize=2000`: How many observations a node can observe before it splits
+
+# Example 
+
+    x = randn(10^5, 10)
+    y = (x[:, 1] .> 0) .+ 1
+
+    s = series((x,y), FastForest(10, 2))
+
+    yhat = classify(s.stats[1], x)
+    mean(y .== yhat)
+"""
 struct FastForest{T} <: ExactStat{(1, 0)}
     forest::Vector{Pair{Vector{Int}, FastTree{T}}}  # subset => tree
     p::Int

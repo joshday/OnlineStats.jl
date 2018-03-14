@@ -599,28 +599,28 @@ end
 nobs(o::OrderStats) = o.nreps * length(o.value)
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
-# tree/nbc help:
-function _pdf(o::OrderStats, x)
-    if x ≤ first(o.value) 
-        return 0.0
-    elseif x > last(o.value) 
-        return 0.0 
-    else
-        i = searchsortedfirst(o.value, x)
-        b = nobs(o) / (length(o.value) + 1)
-        return b / (o.value[i] - o.value[i-1])
-    end
-end
-split_candidates(o::OrderStats) = midpoints(value(o))
-function Base.sum(o::OrderStats, x) 
-    if x ≤ first(o.value)
-        return 0.0 
-    elseif x > last(o.value)
-        return Float64(nobs(o))
-    else 
-        return nobs(o) * (searchsortedfirst(o.value, x) / length(o.value))
-    end
-end
+# # tree/nbc help:
+# function _pdf(o::OrderStats, x)
+#     if x ≤ first(o.value) 
+#         return 0.0
+#     elseif x > last(o.value) 
+#         return 0.0 
+#     else
+#         i = searchsortedfirst(o.value, x)
+#         b = nobs(o) / (length(o.value) + 1)
+#         return b / (o.value[i] - o.value[i-1])
+#     end
+# end
+# split_candidates(o::OrderStats) = midpoints(value(o))
+# function Base.sum(o::OrderStats, x) 
+#     if x ≤ first(o.value)
+#         return 0.0 
+#     elseif x > last(o.value)
+#         return Float64(nobs(o))
+#     else 
+#         return nobs(o) * (searchsortedfirst(o.value, x) / length(o.value))
+#     end
+# end
 
 #-----------------------------------------------------------------------# PQuantile 
 """

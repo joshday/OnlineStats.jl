@@ -23,26 +23,15 @@ end
 @testset "CountMap" begin
     test_exact(CountMap(Int), rand(1:10, 100), nobs, length, ==)
     test_exact(CountMap(Int), rand(1:10, 100), value, countmap, ==)
+    test_exact(CountMap(Int), [1,2,3,4], o->OnlineStats._pdf(o,1), x->.25, ==)
     test_merge(CountMap(Bool), rand(Bool, 100), rand(Bool, 100), ==)
     test_merge(CountMap(Bool), trues(100), falses(100), ==)
     test_merge(CountMap(Int), rand(1:4, 100), rand(5:123, 50), (a,b) -> collect(keys(a)) == collect(keys(b)))
     test_merge(CountMap(Int), rand(1:4, 100), rand(5:123, 50), (a,b) -> collect(values(a)) == collect(values(b)))
-
-    # s = Series([1,2,3,4], CountMap(Int))
-    # @test all([1,2,3,4] .∈ keys(s.stats[1]))
-    # @test probs(s.stats[1]) == fill(.25, 4)
-    # @test probs(s.stats[1], 7:9) == zeros(3)
-    # # sort 
-    # o = CountMap(Int)
-    # data = rand(1:20, 100)
-    # data[1] = 20
-    # Series(data, o) 
-    # data[1] = 5 
-    # o2 = CountMap(Int)
-    # Series(data, o2)
-    # for ky in keys(o)
-    #     @test probs(o, ky) == probs(o2, ky)
-    # end
+    s = Series([1,2,3,4], CountMap(Int))
+    @test all([1,2,3,4] .∈ keys(s.stats[1]))
+    @test probs(s.stats[1]) == fill(.25, 4)
+    @test probs(s.stats[1], 7:9) == zeros(3)
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin 
@@ -151,6 +140,11 @@ end
     o = Group(Mean(), Mean(), Mean(), Variance(), Variance())
     test_exact(o, x, value, x -> vcat(mean(x,1)[1:3], var(x,1)[4:5]))
     test_merge([Mean() Variance() Sum() Moments() Mean()], x, x2)
+    s = Series(x, 5Mean())
+    xmeans = mean(x, 1)
+    for (i, stat) in enumerate(s.stats[1])
+        @test value(stat) ≈ xmeans[i]
+    end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
@@ -305,6 +299,7 @@ end
     test_exact(OrderStats(100), y, quantile, quantile)
     test_merge(OrderStats(10), y, y2, (a,b) -> ≈(a,b;atol=.1))  # Why does this need atol?
     test_exact(OrderStats(100, Int), rand(1:10, 100), value, sort)
+    test_exact(OrderStats(100), y, nobs, length)
 end
 #-----------------------------------------------------------------------# Partition 
 @testset "Partition" begin 
@@ -341,6 +336,12 @@ end
     test_merge(ProbMap(Int), rand(1:5, 100), rand(1:5, 100), (a,b)->collect(values(a))≈collect(values(b)))
     test_exact(ProbMap(Int), [1,2,1,2,1,2], o->collect(values(sort(value(o)))), x->[.5, .5])
     test_exact(ProbMap(Int), [1,1,1,2], o->collect(values(sort(value(o)))), x->[.75, .25])
+    s = series([1,2,3,4], ProbMap(Int))
+    @test 1 in keys(s.stats[1])
+    @test haskey(s.stats[1], 2)
+    @test .25 in values(s.stats[1])
+    @test probs(s.stats[1]) == fill(.25, 4)
+    @test probs(s.stats[1], 5:7) == zeros(3)
 end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 

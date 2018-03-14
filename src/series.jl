@@ -253,7 +253,7 @@ function fit!(s::AbstractSeries{(1,0)}, xy::Tuple{<:AbstractMatrix, <:VectorOb},
     buffer = Vector{eltype(x)}(p)
     for i in 1:n 
         for j in 1:p 
-            buffer[j] = x[i, j]
+            @inbounds buffer[j] = x[i, j]
         end
         fit!(s, (buffer, y[i]))
     end

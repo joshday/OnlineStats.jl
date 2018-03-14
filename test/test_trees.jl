@@ -16,4 +16,13 @@
     yhat = classify(o, data[1])
     @test mean(yhat .== data[2]) > .25
     @test yhat' == classify(o, data[1]', Cols())
+    @test OnlineStats.nkeys(o) == 4
+    @test OnlineStats.nvars(o) == 5
+
+    @testset "FastForest" begin 
+        o = FastForest(5, 4; splitsize=500)
+        s = series(data, o)
+        yhat = classify(o, data[1])
+        # @test mean(yhat .== data[2]) > .25
+    end
 end
