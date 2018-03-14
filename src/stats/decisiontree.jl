@@ -1,4 +1,11 @@
 #-----------------------------------------------------------------------# FastNode
+"""
+    FastNode(p, nclasses; stat = FitNormal())
+
+Node of a decision tree.  Assumes each predictor variable, conditioned on any 
+class, has a normal distribution.  Internal structure for [`FastTree`](@ref).
+Observations must be a `Pair`/`Tuple`/`NamedTuple` of (`VectorOb`, `Int`)
+"""
 mutable struct FastNode{T} <: ExactStat{(1, 0)}
     data::Matrix{T}  # predictor j's stats are data[:, j]
     id::Int 
@@ -13,6 +20,8 @@ end
 function FastNode(o::FastNode; id = nothing)
     FastNode(size(o.data, 2), size(o.data, 1); id = id, children = Int[], stat = make_stat(o))
 end
+
+# TODO - others: CountMap, Hist, OrderStats
 make_stat(o::FastNode{FitNormal}) = FitNormal()
 
 function Base.show(io::IO, o::FastNode)
@@ -33,11 +42,11 @@ end
 
 function classify(o::FastNode) 
     out = 1
-    n = nobs(o.data[1])
-    for k in 1:size(o.data, 1)
+    n = nobs(o.data[1, 1])
+    for k in 2:size(o.data, 1)
         n2 = nobs(o.data[k, 1])
         if n2 > n 
-            n = n 
+            n = n2 
             out = k 
         end
     end
@@ -105,6 +114,8 @@ impurity(p) = entropy(p, 2)
 
 Create an online decision tree under the assumption that the distribution of any predictor 
 conditioned on any class is Normal.  The classes must be `Int`s beginning at one (1, 2, 3, ...).
+When a node hits `splitsize` observations, it will be given two children.  When the number of 
+nodes in the tree reaches `maxsize`, no more splits will occur.
 
 # Example 
 
@@ -154,6 +165,15 @@ function classify(o::FastTree, x::VectorOb)
 end
 classify(o::FastTree, x::AbstractMatrix, ::Rows = Rows()) = mapslices(xi->classify(o,xi), x, 2)
 classify(o::FastTree, x::AbstractMatrix, ::Cols) = mapslices(xi->classify(o,xi), x, 1)
+
+
+
+
+#-----------------------------------------------------------------------# Ensemble
+struct FastTreeEnsemble{T, M} <: ExactStat{(1, 0)}
+    trees::Vector{FastTree{T}}
+    method::M
+end
 
 
 

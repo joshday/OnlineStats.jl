@@ -8,6 +8,8 @@ for o = [
         CStat(Mean()), 
         Diff(), 
         Extrema(), 
+        FastNode(2, 5),
+        FastTree(2, 5),
         Hist(5), 
         Hist(1:5),
         HyperLogLog(4), 
