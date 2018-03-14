@@ -125,8 +125,7 @@ mutable struct AugmentedSeries{N, S <: AbstractSeries{N}, F1, F2, F3} <: Abstrac
     callback::F3
     nskipped::Int
 end
-function AugmentedSeries(s::Series{N}; filter=always, transform=identity, callback=identity) where {N}
-    S, A, B, C = typeof(s), typeof(filter), typeof(transform), typeof(callback)
+function AugmentedSeries(s::S; filter::A=always, transform::B=identity, callback::C=identity) where {N,S<:Series{N}, A, B, C}
     AugmentedSeries{N, S, A, B, C}(s, filter, transform, callback, 0)
 end
 

@@ -32,7 +32,7 @@ export
     Sum, LinReg, LinRegBuilder, Hist, AdaptiveBins, CallFun, MV, Bootstrap, ProbMap,
     NBClassifier, Partition, Group, IndexedPartition, Mosaic, Unique, StatMap,
     # Tree stuff
-    FastTree, FastNode,
+    FastNode, FastTree, FastForest,
     NaiveBayesClassifier, NBC, NBNode, NBTree,
     BinaryStumpForest, NodeStats, Stump, DTree, Forest,
     # StatLearn

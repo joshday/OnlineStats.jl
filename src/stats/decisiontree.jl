@@ -34,7 +34,7 @@ nobs(o::FastNode) = sum(nobs, o.data[:, 1])
 probs(o::FastNode) = nobs.(o.data[:, 1]) ./ nobs(o)
 function fit!(o::FastNode, xy, γ)
     x, y = xy
-    @inbounds for j in eachindex(x)
+    for j in eachindex(x)
         n = nobs(o.data[y, j])
         fit!(o.data[y, j], x[j], 1 / (n + 1))
     end
@@ -62,7 +62,7 @@ function split!(t, o::FastNode)
     ig = -Inf
     ind = 0 
     at = -Inf
-    @inbounds for j in 1:nvars(o)
+    for j in 1:nvars(o)
         stats_j = o.data[:, j]
         split_candidates = t.buffer
         k = 0 
@@ -133,7 +133,7 @@ struct FastTree{T} <: ExactStat{(1, 0)}
     splitsize::Int
     buffer::Vector{Float64}
 end
-function FastTree(p, nlab, stat=FitNormal(); maxsize=5000, splitsize=2000) 
+function FastTree(p, nlab; stat=FitNormal(), maxsize=5000, splitsize=2000) 
     FastTree([FastNode(p, nlab; stat=stat)], maxsize, splitsize, zeros(nlab * 9))
 end
 function Base.show(io::IO, o::FastTree) 
@@ -148,6 +148,9 @@ function fit!(o::FastTree, xy, γ)
         split!(o, node)
     end
 end
+
+nkeys(o::FastTree) = nkeys(first(o.tree))
+nvars(o::FastTree) = nvars(first(o.tree))
 
 function whichleaf(o, x::VectorOb)
     i = 1
@@ -169,11 +172,107 @@ classify(o::FastTree, x::AbstractMatrix, ::Cols) = mapslices(xi->classify(o,xi),
 
 
 
-#-----------------------------------------------------------------------# Ensemble
-struct FastTreeEnsemble{T, M} <: ExactStat{(1, 0)}
-    trees::Vector{FastTree{T}}
-    method::M
+#-----------------------------------------------------------------------# FastForest 
+struct FastForest{T} <: ExactStat{(1, 0)}
+    forest::Vector{Pair{Vector{Int}, FastTree{T}}}  # subset => tree
+    p::Int
+    λ::Float64
 end
+function FastForest(p::Int, nclass::Int; nt=40, b=floor(Int, sqrt(p)), λ=.05, kw...)
+    forest = [Pair(sort!(sample(1:p, b, replace=false)), FastTree(b, nclass; kw...)) for i in 1:nt]
+    FastForest(forest, p, λ)
+end
+function Base.show(io::IO, o::FastForest)
+    print(io, "FastForest(")
+    print(io, "nt = $(length(o.forest)), subset = $(length(first(o.forest[1])))/$(o.p))")
+end
+nkeys(o::FastForest) = nkeys(o.forest[1][2])
+function fit!(o::FastForest, xy, γ)
+    x, y = xy
+    for i in eachindex(o.forest)
+        if rand() < o.λ 
+            subset, tree = o.forest[i]
+            fit!(tree, (x[subset], y), γ)
+        end
+    end
+end
+
+function _predict(o::FastForest, x::VectorOb, buffer::Vector{Int})
+    for item in o.forest 
+        subset, tree = item 
+        xi = @view(x[subset])
+        buffer[classify(tree, xi)] += 1
+    end
+    buffer
+end
+_classify(o::FastForest, x::VectorOb, buffer::Vector{Int}) = findmax(_predict(o, x, buffer))[2]
+
+predict(o::FastForest, x::VectorOb) = _predict(o, x, zeros(Int, nkeys(o)))
+classify(o::FastForest, x::VectorOb) = _classify(o, x, zeros(Int, nkeys(o)))
+
+function zeros!(v::Vector{Int}) 
+    for i in eachindex(v)
+        @inbounds v[i] = 0 
+    end
+    v
+end 
+
+function classify(o::FastForest, x::AbstractMatrix, dim::Rows = Rows())
+    buffer = zeros(Int, nkeys(o))
+    mapslices(x -> _classify(o, x, zeros!(buffer)), x, 2)
+end
+function predict(o::FastForest, x::AbstractMatrix, dim::Rows = Rows())
+    buffer = zeros(Int, nkeys(o))
+    mapslices(x -> _predict(o, x, zeros!(buffer)), x, 2)
+end
+function classify(o::FastForest, x::AbstractMatrix, dim::Cols)
+    buffer = zeros(Int, nkeys(o))
+    mapslices(x -> _classify(o, x, zeros!(buffer)), x, 1)
+end
+function predict(o::FastForest, x::AbstractMatrix, dim::Cols)
+    buffer = zeros(Int, nkeys(o))
+    mapslices(x -> _predict(o, x, zeros!(buffer)), x,12)
+end
+
+
+
+# abstract type EnsembleMethod end
+
+# struct Bagging <: EnsembleMethod end
+
+# struct Forest <: EnsembleMethod
+#     subsets::Matrix{Int}
+# end
+# function Forest(p::Int, nt::Int, b::Int=floor(Int, sqrt(p)))
+#     subsets = zeros(Int, b, nt)
+#     for j in 1:nt 
+#         subsets[:, j] = sample(1:p, b, replace=false)
+#     end
+#     Forest(subsets)
+# end
+
+
+# # #-----------------------------------------------------------------------# Ensemble
+# # struct Ensemble{T<:Tuple, M<:EnsembleMethod} <: ExactStat{(1, 0)}
+# #     models::T
+# #     method::M
+# # end
+# # Ensemble(models, method::Type) = Ensemble(models, method(models))
+
+
+# struct FastTreeEnsemble{T, M <: EnsembleMethod} <: ExactStat{(1, 0)}
+#     trees::Vector{FastTree{T}}
+#     method::M
+# end
+# function FastTreeEnsemble 
+
+# end
+
+
+
+
+
+
 
 
 
