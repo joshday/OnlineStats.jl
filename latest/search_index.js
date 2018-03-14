@@ -553,6 +553,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.FastTree",
+    "page": "API",
+    "title": "OnlineStats.FastTree",
+    "category": "type",
+    "text": "FastTree(npredictors, nclasses; maxsize=5000, splitsize=2000)\n\nCreate an online decision tree under the assumption that the distribution of any predictor  conditioned on any class is Normal.  The classes must be Ints beginning at one (1, 2, 3, ...).\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastTree(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.FitBeta",
     "page": "API",
     "title": "OnlineStats.FitBeta",
