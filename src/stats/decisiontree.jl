@@ -7,7 +7,7 @@ class, has a normal distribution.  Internal structure for [`FastTree`](@ref).
 Observations must be a `Pair`/`Tuple`/`NamedTuple` of (`VectorOb`, `Int`)
 """
 mutable struct FastNode{T} <: ExactStat{(1, 0)}
-    data::Matrix{T}  # predictor j's stats are data[:, j]
+    data::Matrix{T} # keystats in columns
     id::Int 
     children::Vector{Int}
     j::Int 
@@ -15,10 +15,10 @@ mutable struct FastNode{T} <: ExactStat{(1, 0)}
     ig::Float64
 end
 function FastNode(p::Int, nlab::Int; id=1, children = Int[], stat = FitNormal()) 
-    FastNode([copy(stat) for i in 1:nlab, j in 1:p], id, children, 0, -Inf, 0.0)
+    FastNode([copy(stat) for i in 1:p, j in 1:nlab], id, children, 0, -Inf, 0.0)
 end
 function FastNode(o::FastNode; id = nothing)
-    FastNode(size(o.data, 2), size(o.data, 1); id = id, children = Int[], stat = make_stat(o))
+    FastNode(size(o.data)...; id = id, children = Int[], stat = make_stat(o))
 end
 
 # TODO - others: CountMap, Hist, OrderStats
@@ -28,23 +28,23 @@ function Base.show(io::IO, o::FastNode)
     print(io, "FastNode(nobs=$(nobs(o)), split = x[$(o.j)] < $(round(o.at,3)))")
 end
 
-nvars(o::FastNode) = size(o.data, 2)
-nkeys(o::FastNode) = size(o.data, 1)
-nobs(o::FastNode) = sum(nobs, o.data[:, 1])
-probs(o::FastNode) = nobs.(o.data[:, 1]) ./ nobs(o)
+nvars(o::FastNode) = size(o.data, 1)
+nkeys(o::FastNode) = size(o.data, 2)
+nobs(o::FastNode) = sum(nobs, o.data[1, :])
+probs(o::FastNode) = nobs.(o.data[1, :]) ./ nobs(o)
 function fit!(o::FastNode, xy, γ)
     x, y = xy
+    w = 1 / (nobs(o.data[1, y]) + 1)
     for j in eachindex(x)
-        n = nobs(o.data[y, j])
-        fit!(o.data[y, j], x[j], 1 / (n + 1))
+        fit!(o.data[j, y], x[j], w)
     end
 end
 
 function classify(o::FastNode) 
     out = 1
-    n = nobs(o.data[1, 1])
-    for k in 2:size(o.data, 1)
-        n2 = nobs(o.data[k, 1])
+    n = nobs(o.data[1])
+    for k in 2:size(o.data, 2)
+        n2 = nobs(o.data[1, k])
         if n2 > n 
             n = n2 
             out = k 
@@ -52,7 +52,7 @@ function classify(o::FastNode)
     end
     out
 end
-child(o::FastNode, x::VectorOb) = x[o.j] < o.at ? o.children[1] : o.children[2]
+child(o::FastNode, x::VectorOb) = x[o.j] < o.at ? first(o.children) : last(o.children)
 
 function split!(t, o::FastNode)
     n = nobs(o)
@@ -63,7 +63,7 @@ function split!(t, o::FastNode)
     ind = 0 
     at = -Inf
     for j in 1:nvars(o)
-        stats_j = o.data[:, j]
+        stats_j = o.data[j, :]
         split_candidates = t.buffer
         k = 0 
         for stat in stats_j 
@@ -142,7 +142,7 @@ end
 
 function fit!(o::FastTree, xy, γ)
     x, y = xy 
-    i, node = whichleaf(o, x)
+    node = whichleaf(o, x)
     fit!(node, xy, γ)
     if length(o.tree) < o.maxsize && nobs(node) > o.splitsize 
         split!(o, node)
@@ -154,18 +154,14 @@ nvars(o::FastTree) = nvars(first(o.tree))
 
 function whichleaf(o, x::VectorOb)
     i = 1
-    node = o.tree[i]
+    node = o.tree[1]
     while length(node.children) > 0
-        i = child(node, x)
-        node = o.tree[i]
+        node = o.tree[child(node, x)]
     end
-    i, node
+    node
 end
 
-function classify(o::FastTree, x::VectorOb)
-    i, node = whichleaf(o, x)
-    classify(node)
-end
+classify(o::FastTree, x::VectorOb) = classify(whichleaf(o,x))
 classify(o::FastTree, x::AbstractMatrix, ::Rows = Rows()) = mapslices(xi->classify(o,xi), x, 2)
 classify(o::FastTree, x::AbstractMatrix, ::Cols) = mapslices(xi->classify(o,xi), x, 1)
 
