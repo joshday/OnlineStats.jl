@@ -43,8 +43,8 @@ end
 Numerical() = Numerical(Variance())
 width(o::Numerical) = 1
 value(o::Numerical) = (mean(o.stat), std(o.stat))
-transform(o::Numerical, y) = (y - mean(o.stat)) / std(o.stat)
 Base.show(io::IO, o::Numerical) = print(io, "📈 : $(round.(value(o), 4))")
+transform(o::Numerical, y) = (y - mean(o.stat)) / std(o.stat)
 
 #-----------------------------------------------------------------------# Categorical
 """
@@ -59,6 +59,12 @@ Categorical(T::Type = Any) = Categorical(Unique(T))
 width(o::Categorical) = min(0, length(o.stat) - 1)
 value(o::Categorical) = value(o.stat)
 Base.show(io::IO, o::Categorical) = print(io, "📊 : $(value(o.stat))")
+function transform(o::Categorical, y)
+    for (k, ky) in enumerate(keys(o.stat.value))
+        y == ky && return k
+    end
+    return 0
+end
 
 #-----------------------------------------------------------------------# Ignored 
 struct Ignored <: AbstractMLColumn end
@@ -140,17 +146,6 @@ function fit!(o::Schema, y::VectorOb, γ)
     for (oi, yi) in zip(o.features, y)
         fit!(oi, yi, γ)
     end
-end
-
-#-----------------------------------------------------------------------# formula 
-struct FeatureMaker{F <: Function, T <: Tuple}
-    yf::F 
-    xf::T
-    x::Vector{Float64}
-end
-FeatureMaker(t::Tuple; ytransform = identity) = FeatureMaker(ytransform, t, zeros(length(t)))
-
-function transform(o::FeatureMaker, xy)
 end
 
 

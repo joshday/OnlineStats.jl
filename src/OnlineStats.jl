@@ -2,6 +2,7 @@ __precompile__(true)
 module OnlineStats
 
 import SweepOperator
+import NamedTuples
 import DataStructures: SortedDict, OrderedDict
 import LearnBase: fit!, value, nobs, predict, transform!, transform
 import StatsBase: Histogram, skewness, kurtosis, coef, fweights, pweights, skewness, 
@@ -78,7 +79,7 @@ end
 
 const ϵ = 1e-6
 
-const VecF = Vector{Float64}
+const Tup = Union{Tuple, NamedTuples.NamedTuple}
 
 #-----------------------------------------------------------------------# includes
 include("utilities/biasvec.jl")

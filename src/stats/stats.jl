@@ -887,9 +887,9 @@ Track the unique values.
     series(rand(1:5, 100), Unique(Int))
 """
 struct Unique{T} <: ExactStat{0}
-    value::Dict{T, Void}
+    value::OrderedDict{T, Void}
 end
-Unique(T::Type) = Unique(Dict{T,Void}())
+Unique(T::Type) = Unique(OrderedDict{T,Void}())
 fit!(o::Unique, y, γ::Number) = (o.value[y] = nothing)
 Base.show(io::IO, o::Unique) = print(io, "Unique: ", sort(collect(keys(o.value))))
 Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)

@@ -155,11 +155,10 @@ function fit!(s::AugmentedSeries{(1,0)}, xy::XyOb)
 end
 
 #-----------------------------------------------------------------------# ModelSeries
-# struct ModelSeries{S, F} <: AbstractSeries{1}
+# struct ModelSeries{S, F, T} <: AbstractSeries{1}
 #     series::S
-#     extractor::ML.FeatureExtractor
-#     f!::F
-#     fvec::Vector{Float64}  # featurevector
+#     modelschema::Dict{T, Any}
+#     x2::Vector{Float64}
 # end
 
 # for f in [:nobs, :value, :stats, :weight!, :getweight]
@@ -172,19 +171,19 @@ end
 # end
 
 #-----------------------------------------------------------------------# MSeries 
-struct MSeries{S, F} <: AbstractSeries{1}
-    series::S
-    transformer!::F  # 
-    x::Vector{Float64}
-end
+# struct MSeries{S, F} <: AbstractSeries{1}
+#     series::S
+#     transformer!::F  # 
+#     x::Vector{Float64}
+# end
 
-for f in [:nobs, :value, :stats, :weight!, :getweight]
-    @eval $f(o::MSeries) = $f(o.series)
-end
-function fit!(o::MSeries, x::VectorOb)
-    xy = o.transformer!(s.x, x)
-    fit!(o.series, xy)
-end
+# for f in [:nobs, :value, :stats, :weight!, :getweight]
+#     @eval $f(o::MSeries) = $f(o.series)
+# end
+# function fit!(o::MSeries, x::VectorOb)
+#     xy = o.transformer!(s.x, x)
+#     fit!(o.series, xy)
+# end
 
 
 #-----------------------------------------------------------------------# fit! 0

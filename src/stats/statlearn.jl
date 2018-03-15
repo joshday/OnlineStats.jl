@@ -28,9 +28,9 @@ where the ``f_i``'s are loss functions evaluated on a single observation, ``g`` 
     predict(o, x)
 """
 struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0)}
-    β::VecF
-    gx::VecF        # buffer for gradient
-    λfactor::VecF
+    β::Vector{Float64}
+    gx::Vector{Float64}        # buffer for gradient
+    λfactor::Vector{Float64}
     loss::L
     penalty::P
     updater::U
@@ -43,10 +43,10 @@ end
 
 d(p::Integer) = (fill(.1, p), L2DistLoss(), L2Penalty(), SGD())
 
-a(argu::VecF, t)     = (argu, t[2], t[3], t[4])
-a(argu::Loss, t)     = (t[1], argu, t[3], t[4])
-a(argu::Penalty, t)  = (t[1], t[2], argu, t[4])
-a(argu::Updater, t)  = (t[1], t[2], t[3], argu)
+a(argu::Vector{Float64}, t) = (argu, t[2], t[3], t[4])
+a(argu::Loss,            t) = (t[1], argu, t[3], t[4])
+a(argu::Penalty,         t) = (t[1], t[2], argu, t[4])
+a(argu::Updater,         t) = (t[1], t[2], t[3], argu)
 
 StatLearn(p::Integer)                 = StatLearn(p, d(p))
 StatLearn(p::Integer, a1)             = StatLearn(p, a(a1, d(p)))

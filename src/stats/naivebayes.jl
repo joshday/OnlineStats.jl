@@ -30,10 +30,10 @@ NBClassifier(p::Int, T::Type, b=20) = NBClassifier(T, p * Hist(b))
 
 
 function Base.show(io::IO, o::NBClassifier)
-    println(io, name(o))
+    print(io, name(o))
     sd = sort(o.d)
     for di in sd
-        print(io, "    > ", first(di), " (", round(nobs(last(di)) / nobs(o), 4), ")")
+        print(io, "\n    > ", first(di), " (", round(nobs(last(di)) / nobs(o), 4), ")")
     end
 end
 
@@ -64,12 +64,12 @@ function fit!(o::NBClassifier, xy, γ)
 end
 entropy(o::NBClassifier) = entropy(probs(o), 2)
 
-function predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
+function _predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
     for (k, gk) in enumerate(values(o))
         # P(Ck)
         p[k] = log(nobs(gk) / n + ϵ) 
         # P(xj | Ck)
-        for j in eachindex(x)
+        for j in 1:length(x)
             p[k] += log(pdf(gk[j], x[j]) + ϵ)
         end
         p[k] = exp(p[k])
@@ -77,15 +77,17 @@ function predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
     sp = sum(p)
     sp == 0.0 ? p : p ./= sum(p)
 end
-function classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)) 
-    _, k = findmax(predict(o, x, p, n))
+function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)) 
+    _, k = findmax(_predict(o, x, p, n))
     index_to_key(o, k)
 end
+predict(o::NBClassifier, x::VectorOb) = _predict(o, x)
+classify(o::NBClassifier, x::VectorOb) = _classify(o, x)
 function classify_node(o::NBClassifier)
     _, k = findmax([nobs(g) for g in values(o)])
     index_to_key(o, k)
 end
-for f in [:predict, :classify]
+for f in [:(_predict), :(_classify)]
     @eval begin 
         function $f(o::NBClassifier, x::AbstractMatrix, ::Rows = Rows())
             n = nobs(o)

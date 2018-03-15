@@ -35,8 +35,8 @@ Nesterov accelerated Proximal Stochastic Gradient Descent.
 """
 struct NSGD <: SGUpdater
     α::Float64
-    v::VecF
-    θ::VecF
+    v::Vector{Float64}
+    θ::Vector{Float64}
     NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
 end
 init(u::NSGD, p::Int) = NSGD(u.α, p)
@@ -53,7 +53,7 @@ end
 Adaptive (element-wise learning rate) stochastic gradient descent.
 """
 mutable struct ADAGRAD <: SGUpdater
-    h::VecF
+    h::Vector{Float64}
     nobs::Int
     ADAGRAD(p = 0) = new(zeros(p), 0)
 end
@@ -116,8 +116,8 @@ Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
 mutable struct ADAM <: SGUpdater
     β1::Float64
     β2::Float64
-    M::VecF
-    V::VecF
+    M::Vector{Float64}
+    V::Vector{Float64}
     nups::Int
     function ADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
         @assert 0 < β1 < 1
@@ -143,8 +143,8 @@ ADAMAX with step size `η` and momentum parameters `β1`, `β2`
 mutable struct ADAMAX <: SGUpdater
     β1::Float64
     β2::Float64
-    M::VecF
-    V::VecF
+    M::Vector{Float64}
+    V::Vector{Float64}
     nups::Int
     function ADAMAX(β1::Float64 = 0.9, β2::Float64 = .999, p::Integer = 0)
         @assert 0 < β1 < 1
@@ -170,8 +170,8 @@ Adaptive Moment Estimation with momentum parameters `α1` and `α2`.
 mutable struct NADAM <: SGUpdater
     β1::Float64
     β2::Float64
-    M::VecF
-    V::VecF
+    M::Vector{Float64}
+    V::Vector{Float64}
     nups::Int
     function NADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
         @assert 0 < β1 < 1

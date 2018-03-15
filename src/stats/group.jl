@@ -94,6 +94,7 @@ end
 Group(o::OnlineStat{0}...) = Group(o, 0)
 Group(n::Int, o::OnlineStat{0}) = Group([copy(o) for i in 1:n], 0)
 Group(stats::VectorOb) = Group(stats, 0)
+Group(nt::NamedTuples.NamedTuple) = Group(nt, 0)
 
 default_weight(o::Group) = default_weight(o.stats)
 default_weight(v::Vector) = default_weight(tuple(v...))
@@ -111,7 +112,7 @@ Base.next(o::Group, i) = next(o.stats, i)
 Base.done(o::Group, i) = done(o.stats, i)
 
 # generated function to unroll loop
-@generated function fit!(o::Group{T}, y, γ) where {T<:Tuple}
+@generated function fit!(o::Group{T}, y, γ) where {T<:Tup}
     N = length(fieldnames(T))
     quote 
         o.nobs += 1
