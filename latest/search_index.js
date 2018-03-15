@@ -573,7 +573,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FastTree",
     "category": "type",
-    "text": "FastTree(npredictors, nclasses; maxsize=5000, splitsize=2000)\n\nCreate an online decision tree under the assumption that the distribution of any predictor  conditioned on any class is Normal.  The classes must be Ints beginning at one (1, 2, 3, ...). When a node hits splitsize observations, it will be given two children.  When the number of  nodes in the tree reaches maxsize, no more splits will occur.\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastTree(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
+    "text": "FastTree(npredictors, nclasses; maxsize=5000, splitsize=2000)\n\nCreate an online decision tree under the assumption that the distribution of any predictor  conditioned on any class is Normal.  The classes must be Ints beginning at one (1, 2, 3, ...). When a node splits every time it reaches splitsize observations.  When the number of  nodes in the tree reaches maxsize, no more splits will occur.\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastTree(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
 },
 
 {
@@ -734,14 +734,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.NADAM",
     "category": "type",
     "text": "NADAM(α1 = .99, α2 = .999)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NBClassifier",
-    "page": "API",
-    "title": "OnlineStats.NBClassifier",
-    "category": "type",
-    "text": "NBClassifier(p, label_type::Type)\n\nNaive Bayes Classifier of p predictors for classes of type label_type.\n\n\n\n"
 },
 
 {
