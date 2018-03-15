@@ -11,7 +11,7 @@
         @test probs(o) == trueprobs
         @test classify(o) == findmax(probs(o))[2]
     end
-    o = FastTree(5, 4; splitsize=500)
+    o = FastTree(5, 4; splitsize=200)
     s = series(data, o)
     yhat = classify(o, data[1])
     @test mean(yhat .== data[2]) > .25

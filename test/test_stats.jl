@@ -1,6 +1,3 @@
-println()
-println()
-info("Testing Stats:")
 #-----------------------------------------------------------------------# AutoCov
 @testset "AutoCov" begin 
     test_exact(AutoCov(10), y, autocov, x -> autocov(x, 0:10))
@@ -354,8 +351,8 @@ end
             Quantile(τ, OMAS()),
             Quantile(τ, ADAGRAD())
             ]
-        test_exact(o, data, value, x -> quantile(x,τ), (a,b) -> ≈(a,b,atol=.25))
-        test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.25))
+        test_exact(o, data, value, x -> quantile(x,τ), (a,b) -> ≈(a,b,atol=.5))
+        test_merge(o, data, data2, (a,b) -> ≈(a,b,atol=.5))
     end
     for τi in τ
         test_exact(PQuantile(τi), data, value, x->quantile(x, τi), (a,b) -> ≈(a,b;atol=.3))
@@ -446,8 +443,8 @@ end
 #-----------------------------------------------------------------------# Unique 
 @testset "Unique" begin 
     test_exact(Unique(Float64), y, unique, x->sort(unique(x)))
-    test_exact(Unique(Float64), y, length, length)
-    test_merge(Unique(Float64), y, y2)
+    test_exact(Unique(Float64), y, length, length, ==)
+    test_merge(Unique(Float64), y, y2, ==)
 end
 #-----------------------------------------------------------------------# Variance 
 @testset "Variance" begin 

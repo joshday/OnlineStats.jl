@@ -887,16 +887,11 @@ Track the unique values.
     series(rand(1:5, 100), Unique(Int))
 """
 struct Unique{T} <: ExactStat{0}
-    value::Vector{T}
+    value::Dict{T, Void}
 end
-Unique(T::Type) = Unique(T[])
-fit!(o::Unique, y, γ::Number) = (y ∈ o.value || push!(o.value, y))
-value(o::Unique) = sort!(o.value)
-Base.show(io::IO, o::Unique) = print(io, "Unique($(value(o)))")
-function Base.merge!(o::T, o2::T, γ::Float64) where {T<:Unique}
-    for v in o2.value 
-        fit!(o, v, 1.0)
-    end
-end
-Base.unique(o::Unique) = value(o)
+Unique(T::Type) = Unique(Dict{T,Void}())
+fit!(o::Unique, y, γ::Number) = (o.value[y] = nothing)
+Base.show(io::IO, o::Unique) = print(io, "Unique: ", sort(collect(keys(o.value))))
+Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)
+Base.unique(o::Unique) = sort!(collect(keys(o.value)))
 Base.length(o::Unique) = length(o.value)
