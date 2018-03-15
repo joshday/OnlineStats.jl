@@ -737,6 +737,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.NBClassifier",
+    "page": "API",
+    "title": "OnlineStats.NBClassifier",
+    "category": "type",
+    "text": "NBClassifier(group::Group, labeltype::Type)\n\nCreate a naive bayes classifier, using the stats in group to approximate the  distributions of each predictor variable conditioned on label.\n\nFor continuous variables, use Hist(nbin). \nFor categorical variables, use CountMap(T).\n\nExample\n\nx = randn(10^5, 10)\ny = rand(1:5, 10^5)\no = NBClassifier(10Hist(20), Float64)\nseries((x, y), o)\npredict(o, x)\nclassify(o, x)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.NBTree",
+    "page": "API",
+    "title": "OnlineStats.NBTree",
+    "category": "type",
+    "text": "NBTree(o::NBClassifier; maxsize=5000, splitsize=1000)\n\nCreate a decision tree where each node is a naive bayes classifier.  A node will split  when it reaches splitsize observations and no more splits will occur once maxsize  nodes are in the tree.\n\nExample\n\nx = randn(10^5, 10)\ny = rand(Bool, 10^5)\no = NBTree(NBClassifier(10Hist(20), Bool))\nseries((x,y), o)\nclassify(o, x)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.NSGD",
     "page": "API",
     "title": "OnlineStats.NSGD",
