@@ -108,7 +108,7 @@ o = Partition(CountMap(String), 75)
 
 s = Series(y, o)
 
-plot(o, xlab = "Nobs", bar_widths = nobs.(o.parts))
+plot(o, xlab = "Nobs")
 savefig("partition_countmap.png"); nothing # hide
 ```
 ![](partition_countmap.png)
@@ -154,10 +154,10 @@ savefig("indexpart3.png"); nothing # hide
 ![](indexpart3.png)
 
 ```@example setup
-x = rand(1:5, 10^5)
+x = rand(10^5)
 y = rand(1:5, 10^5)
 
-s = Series([x y], IndexedPartition(Int, CountMap(Int)))
+s = Series([x y], IndexedPartition(Float64, CountMap(Int)))
 
 plot(s, bar_width = 1, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide

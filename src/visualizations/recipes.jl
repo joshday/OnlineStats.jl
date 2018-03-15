@@ -145,7 +145,7 @@ end
             ylim --> (0, 1)
             linewidth --> .5
             seriestype --> :bar
-            # bar_widths --> nobs.(parts) / sum(nobs.(parts))
+            bar_widths --> [p.last - p.first for p in parts]
             y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), parts))
             x, y
         end
