@@ -23,6 +23,15 @@
         o = FastForest(5, 4; splitsize=500)
         s = series(data, o)
         yhat = classify(o, data[1])
-        # @test mean(yhat .== data[2]) > .25
+        votes = predict(o, data[1])
+        @test size(votes) == (10^4, 4)
+        @test predict(o, data[1])' ≈ predict(o, data[1]', Cols())
+        @test classify(o, data[1])' ≈ classify(o, data[1]', Cols())
     end
+end
+
+
+@testset "NBTree" begin 
+    data = rand(10^4, 5), rand(1:4, 10^4)
+    series(data, NBTree(Int, 5Hist(20); splitsize=10))
 end

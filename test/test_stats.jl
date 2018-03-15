@@ -167,6 +167,7 @@ end
     merge!(o, o2, .5)
     @test all(value(o)[2] .== 2c)
     #### AdaptiveBins
+    test_exact(Hist(AdaptiveBins(Pair{Float64, Int}[], 100)), y, mean, mean)
     test_exact(Hist(100), y, mean, mean)
     test_exact(Hist(100), y, nobs, length)
     test_exact(Hist(100), y, var, var)
@@ -176,6 +177,7 @@ end
     test_exact(Hist(100), y, extrema, extrema, ==)
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
+    test_merge(Hist(200, Float32), Float32.(y), Float32.(y2))
     s = Series(y, Hist(5))
     # pdf
     data = randn(1_000)

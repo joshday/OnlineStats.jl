@@ -68,15 +68,13 @@ end
 
 unbias(o) = nobs(o) / (nobs(o) - 1)
 
-function merge(v::AbstractVector{<:OnlineStat})
+function Base.merge(v::AbstractVector{<:OnlineStat})
     o = copy(v[1])
     for (i, o2) in enumerate(v[2:end])
         merge!(o, o2, 1 / (i + 1))
     end
     o
 end
-
-Base.length(o::OnlineStat) = 1
 
 const ϵ = 1e-6
 

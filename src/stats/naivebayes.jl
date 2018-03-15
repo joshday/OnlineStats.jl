@@ -1,6 +1,22 @@
 #-----------------------------------------------------------------------# NBClassifier 
-export NBClassifier
+"""
+    NBClassifier(group::Group, labeltype::Type)
 
+Create a naive bayes classifier, using the stats in `group` to approximate the 
+distributions of each predictor variable conditioned on label.
+
+- For continuous variables, use [`Hist(nbin)`](@ref). 
+- For categorical variables, use [`CountMap(T)`](@ref).
+
+# Example
+
+    x = randn(10^5, 10)
+    y = rand(1:5, 10^5)
+    o = NBClassifier(10Hist(20), Float64)
+    series((x, y), o)
+    predict(o, x)
+    classify(o, x)
+"""
 struct NBClassifier{T, G <: Group} <: ExactStat{(1, 0)}
     d::OrderedDict{T, G}  # class => group
     init::G        # empty group
@@ -156,24 +172,39 @@ function Base.show(io::IO, o::NBNode)
 end
 
 #-----------------------------------------------------------------------# NBTree 
+"""
+    NBTree(o::NBClassifier; maxsize=5000, splitsize=1000)
+
+Create a decision tree where each node is a naive bayes classifier.  A node will split 
+when it reaches `splitsize` observations and no more splits will occur once `maxsize` 
+nodes are in the tree.
+
+# Example 
+
+    x = randn(10^5, 10)
+    y = rand(Bool, 10^5)
+    o = NBTree(NBClassifier(10Hist(20), Bool))
+    series((x,y), o)
+    classify(o, x)
+"""
 mutable struct NBTree{T<:NBNode} <: ExactStat{(1, 0)}
     tree::Vector{T}
     maxsize::Int
-    minsplit::Int
+    splitsize::Int
 end
-function NBTree(o::NBClassifier; maxsize = 5000, minsplit = 1000)
-    NBTree([NBNode(o)], maxsize, minsplit)
+function NBTree(o::NBClassifier; maxsize = 5000, splitsize = 1000)
+    NBTree([NBNode(o)], maxsize, splitsize)
 end
 NBTree(args...; kw...) = NBTree(NBClassifier(args...); kw...)
 function Base.show(io::IO, o::NBTree)
-    print(io, "NBTree(size = $(length(o.tree)), minsplit=$(o.minsplit))")
+    print(io, "NBTree(size = $(length(o.tree)), splitsize=$(o.splitsize))")
 end
 
 function fit!(o::NBTree, xy, γ)
     x, y = xy 
     i, node = whichleaf(o, x)
     fit!(node.nbc, xy, γ)
-    if length(o.tree) < o.maxsize && nobs(node.nbc) >= o.minsplit 
+    if length(o.tree) < o.maxsize && nobs(node.nbc) >= o.splitsize 
         nbc, spl, left_nbc, right_nbc = split(node.nbc)
         # if spl.ig > o.cp
             node.split = spl

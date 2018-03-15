@@ -83,4 +83,7 @@ end
     @test_throws Exception mapblocks(info, (randn(100,5), randn(3)))
     @test_throws Exception OnlineStats._nobs((randn(100,5), randn(3)), Cols())
 end
+@testset "Utils" begin 
+    @test merge([Mean(), Mean(), Mean()]) == Mean()
+end
 end #module

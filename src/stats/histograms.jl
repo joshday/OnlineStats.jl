@@ -172,7 +172,7 @@ struct AdaptiveBins{T} <: HistAlg{0}
     value::Vector{Pair{T, Int}}
     b::Int
 end
-get_hist_alg(b::Int) = AdaptiveBins(Pair{Float64, Int}[], b)
+get_hist_alg(b::Int, T::Type=Float64) = AdaptiveBins(Pair{T, Int}[], b)
 get_hist_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
 midpoints(o::AdaptiveBins) = first.(o.value)
 counts(o::AdaptiveBins) = last.(o.value)
@@ -275,33 +275,3 @@ end
 #     # u
 #     midpoints(first.(o.value))
 # end
-
-mutable struct LocCount
-    loc::Float64 
-    count::Int 
-end
-Base.isless(o::LocCount, o2::LocCount) = isless(o.loc, o2.loc)
-
-export AdaptiveHist
-
-struct AdaptiveHist <: ExactStat{0}
-    value::Vector{LocCount}
-    b::Int
-end
-AdaptiveHist(b::Int) = AdaptiveHist(LocCount[], b)
-
-function fit!(o::AdaptiveHist, y, γ)
-    if length(o.value) < o.b 
-        push!(o.value, LocCount(y, 1))
-    elseif length(o.value) == o.b 
-        sort!(o.value)
-    else
-        for (i, lcd) in enumerate(o.value)
-            if y > lcd.loc 
-                n = lcd.count + 1
-                ynew = smooth(lcd.loc, y, 1 / n)
-                o.value[i] = LocCountDiff(ynew, n)
-            end
-        end
-    end
-end
