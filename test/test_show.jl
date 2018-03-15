@@ -20,6 +20,7 @@ for o = [
         Mean(), 
         Moments(), 
         Mosaic(Int, Int),
+        MV(5, Mean()),
         OrderStats(10), 
         Partition(Mean(), 5),
         PQuantile(),

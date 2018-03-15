@@ -27,6 +27,8 @@
         @test size(votes) == (10^4, 4)
         @test predict(o, data[1])' ≈ predict(o, data[1]', Cols())
         @test classify(o, data[1])' ≈ classify(o, data[1]', Cols())
+        @test length(predict(o, randn(5))) == 4
+        @test classify(o, randn(5)) in 1:4
     end
 end
 

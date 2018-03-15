@@ -27,6 +27,7 @@ function fit!(o::Mosaic{T, S}, xy, γ) where {T, S}
     end
 end
 nobs(o::Mosaic) = sum(nobs, values(o.value))
+Base.keys(o::Mosaic) = sort!(collect(keys(o.value)))
 subkeys(o::Mosaic) = sort!(mapreduce(x->collect(keys(x)), union, values(o.value)))
 
 

@@ -135,6 +135,8 @@ end
 #-----------------------------------------------------------------------# Group 
 @testset "Group" begin 
     o = Group(Mean(), Mean(), Mean(), Variance(), Variance())
+    @test o[1] == first(o) == Mean()
+    @test o[5] == last(o) == Variance()
     test_exact(o, x, value, x -> vcat(mean(x,1)[1:3], var(x,1)[4:5]))
     test_merge([Mean() Variance() Sum() Moments() Mean()], x, x2)
     s = Series(x, 5Mean())
@@ -142,6 +144,11 @@ end
     for (i, stat) in enumerate(s.stats[1])
         @test value(stat) ≈ xmeans[i]
     end
+    test_exact(5Mean(), x, value, x->vec(mean(x,1)))
+    test_merge(5Mean(), x, x2)
+    test_exact(5Variance(), x, value, x->vec(var(x,1)))
+    test_merge(5Variance(), x, x2)
+    @test 5Mean() == 5Mean()
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
@@ -178,6 +185,7 @@ end
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
     test_merge(Hist(200, Float32), Float32.(y), Float32.(y2))
+    test_merge(Hist(Float32, 200), Float32.(y), Float32.(y2))
     s = Series(y, Hist(5))
     # pdf
     data = randn(1_000)
@@ -265,15 +273,21 @@ end
     test_exact(Moments(), y, std, std)
     test_merge(Moments(), y, y2)
 end
+@testset "Mosaic" begin 
+    data = rand(Bool, 100, 2)
+    s = series(data, Mosaic(Bool, Bool))
+    @test keys(s.stats[1]) == [false, true]
+    @test OnlineStats.subkeys(s.stats[1]) == [false, true]
+end
 #-----------------------------------------------------------------------# MV 
 @testset "MV" begin 
     o = MV(5, Mean())
     @test length(o) == 5
-    test_exact(5Mean(), x, value, x->vec(mean(x,1)))
-    test_merge(5Mean(), x, x2)
-    test_exact(5Variance(), x, value, x->vec(var(x,1)))
-    test_merge(5Variance(), x, x2)
-    @test 4Mean() == 4Mean()
+    test_exact(MV(5, Mean()), x, value, x->vec(mean(x,1)))
+    test_merge(MV(5, Mean()), x, x2)
+    test_exact(MV(5, Variance()), x, value, x->vec(var(x,1)))
+    test_merge(MV(5, Variance()), x, x2)
+    @test MV(5, Mean()) == MV(5, Mean())
     @test length(MV(10, Quantile())) == 10
 end
 #-----------------------------------------------------------------------# NBClassifier

@@ -228,13 +228,6 @@ function pdf(o::AdaptiveBins, y::Number)
 end
 
 
-
-# Counts in left and right if split at point x
-function splitcounts(o::AdaptiveBins, x)
-    i = searchsortedfirst(o.value, Pair(x, 1))
-    sum(last, o.value[1:(i-1)]), sum(last, o.value[i:end])
-end
-
 # Algorithm 3: Sum Procedure
 # Estimated number of points in interval [-∞, b]
 function Base.sum(o::AdaptiveBins, b::Real)::Float64
@@ -254,24 +247,3 @@ function Base.sum(o::AdaptiveBins, b::Real)::Float64
         return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
     end
 end
-
-# # Algorithm 4: Uniform Procedure (locations of candidate splits)
-# function split_candidates(o::AdaptiveBins, B::Integer)
-#     # m = nobs(o) / B
-#     # cs = cumsum(last.(o.value))
-#     # u = Vector{Float64}(B-1)
-#     # for j in 2:(B-2)
-#     #     s = j * m
-#     #     i = searchsortedfirst(cs, s) - 1
-#     #     d = s - cs[i]
-#     #     p1, m1 = o.value[i]
-#     #     p2, m2 = o.value[i + 1]
-#     #     a = m2 - m1
-#     #     b = 2m1
-#     #     c = -2d
-#     #     z = a != 0 ? (-b + sqrt(b^2 - 4*a*c)) / (2a) : -c/b
-#     #     u[j] = p1 + (p2 - p1) * z
-#     # end
-#     # u
-#     midpoints(first.(o.value))
-# end
