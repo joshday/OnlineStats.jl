@@ -54,7 +54,7 @@ function predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
         p[k] = log(nobs(gk) / n + ϵ) 
         # P(xj | Ck)
         for j in eachindex(x)
-            p[k] += log(_pdf(gk[j], x[j]) + ϵ)
+            p[k] += log(pdf(gk[j], x[j]) + ϵ)
         end
         p[k] = exp(p[k])
     end

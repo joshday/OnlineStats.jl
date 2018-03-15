@@ -44,7 +44,7 @@ value(o::Hist) = midpoints(o), counts(o)
 split_candidates(o::Hist) = midpoints(o)
 
 # HistAlg interface
-for f in [:fit!, :nobs, :midpoints, :counts, :_pdf, :_cdf, :(Base.sum)]
+for f in [:fit!, :nobs, :midpoints, :counts, :pdf, :cdf, :(Base.sum)]
     @eval $f(o::Hist, args...) = $f(o.alg, args...)
 end
 
@@ -145,7 +145,7 @@ function Base.merge!(o::FixedBins, o2::FixedBins, γ::Number)
 end
 
 # No linear interpolation (in contrast to AdaptiveBins)
-function _pdf(o::FixedBins, y::Real)
+function pdf(o::FixedBins, y::Real)
     binidx = _binindex(o, y)
     c = o.counts
     if binidx < 1 || binidx > length(c)
@@ -209,7 +209,7 @@ end
 Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.value)
 
 # based on linear interpolation
-function _pdf(o::AdaptiveBins, y::Number)
+function pdf(o::AdaptiveBins, y::Number)
     v = o.value
     if isempty(o.value)
         return 0.0

@@ -146,7 +146,7 @@ function probs(o::CountMap, kys = keys(o))
     end
     sum(out) == 0 ? Float64.(out) : out ./ sum(out)
 end
-_pdf(o::CountMap, y) = y in keys(o) ? o.value[y] / nobs(o) : 0.0
+pdf(o::CountMap, y) = y in keys(o) ? o.value[y] / nobs(o) : 0.0
 
 #-----------------------------------------------------------------------# ProbMap
 """
@@ -600,7 +600,7 @@ nobs(o::OrderStats) = o.nreps * length(o.value)
 Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
 # # tree/nbc help:
-# function _pdf(o::OrderStats, x)
+# function pdf(o::OrderStats, x)
 #     if x ≤ first(o.value) 
 #         return 0.0
 #     elseif x > last(o.value) 

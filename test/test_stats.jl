@@ -23,7 +23,7 @@ end
 @testset "CountMap" begin
     test_exact(CountMap(Int), rand(1:10, 100), nobs, length, ==)
     test_exact(CountMap(Int), rand(1:10, 100), value, countmap, ==)
-    test_exact(CountMap(Int), [1,2,3,4], o->OnlineStats._pdf(o,1), x->.25, ==)
+    test_exact(CountMap(Int), [1,2,3,4], o->OnlineStats.pdf(o,1), x->.25, ==)
     test_merge(CountMap(Bool), rand(Bool, 100), rand(Bool, 100), ==)
     test_merge(CountMap(Bool), trues(100), falses(100), ==)
     test_merge(CountMap(Int), rand(1:4, 100), rand(5:123, 50), (a,b) -> collect(keys(a)) == collect(keys(b)))
@@ -148,7 +148,7 @@ end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin
-    dpdf = OnlineStats._pdf
+    dpdf = OnlineStats.pdf
     #### FixedBins
     for edges in (-5:5, collect(-5:5), [-5, -3.5, 0, 1, 4, 5.5])
         for data in (y, -6:0.75:6)
@@ -180,7 +180,7 @@ end
     test_merge(Hist(200), y, y2)
     test_merge(Hist(1), y, y2)
     s = Series(y, Hist(5))
-    # _pdf
+    # pdf
     data = randn(1_000)
     for o in [Hist(-5:5), Hist(-3:.5:3), Hist(5), Hist(20), Hist(100)]
         Series(data, o)

@@ -82,7 +82,7 @@ function split!(t, o::FastNode)
         end
         for loc in split_candidates
             for k in 1:nkeys(o)
-                pl[k] = _cdf(stats_j[k], loc)
+                pl[k] = cdf(stats_j[k], loc)
                 pr[k] = 1.0 - pl[k]
             end
             ent_l = impurity(pl ./ sum(pl))
