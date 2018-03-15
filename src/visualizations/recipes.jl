@@ -132,7 +132,7 @@ end
         markerstrokewidth --> 0
         color --> :blues
         realx, y
-    elseif first(ymap) isa Dict ##################################### CountMap
+    elseif first(ymap) isa Associative ##################################### CountMap
         lvls = []
         for p in parts
             for k in keys(p.stat)
