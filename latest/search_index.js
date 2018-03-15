@@ -369,6 +369,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "visualizations.html#Mosaic-Plots-1",
+    "page": "Visualizations",
+    "title": "Mosaic Plots",
+    "category": "section",
+    "text": "The Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\nsavefig(\"mosaic.png\"); nothing # hide(Image: )"
+},
+
+{
     "location": "visualizations.html#Partitions-1",
     "page": "Visualizations",
     "title": "Partitions",
