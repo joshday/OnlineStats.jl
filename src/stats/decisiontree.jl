@@ -7,12 +7,12 @@ class, has a normal distribution.  Internal structure for [`FastTree`](@ref).
 Observations must be a `Pair`/`Tuple`/`NamedTuple` of (`VectorOb`, `Int`)
 """
 mutable struct FastNode{T} <: ExactStat{(1, 0)}
-    data::Matrix{T} # keystats in columns
-    id::Int 
-    children::Vector{Int}
-    j::Int 
-    at::Float64
-    ig::Float64
+    data::Matrix{T}         # keystats in columns
+    id::Int                 # index of node (tree stored in vector)
+    children::Vector{Int}   # indices of children (tree stored in vector)
+    j::Int                  # variable to split on
+    at::Float64             # location to split
+    ig::Float64             # information gain
 end
 function FastNode(p::Int, nlab::Int; id=1, children = Int[], stat = FitNormal()) 
     FastNode([copy(stat) for i in 1:p, j in 1:nlab], id, children, 0, -Inf, 0.0)
@@ -114,7 +114,7 @@ impurity(p) = entropy(p, 2)
 
 Create an online decision tree under the assumption that the distribution of any predictor 
 conditioned on any class is Normal.  The classes must be `Int`s beginning at one (1, 2, 3, ...).
-When a node hits `splitsize` observations, it will be given two children.  When the number of 
+When a node splits every time it reaches `splitsize` observations.  When the number of 
 nodes in the tree reaches `maxsize`, no more splits will occur.
 
 # Example 
@@ -131,7 +131,7 @@ struct FastTree{T} <: ExactStat{(1, 0)}
     tree::Vector{FastNode{T}}
     maxsize::Int
     splitsize::Int
-    buffer::Vector{Float64}
+    buffer::Vector{Float64}  # for storing split candidates
 end
 function FastTree(p, nlab; stat=FitNormal(), maxsize=5000, splitsize=2000) 
     FastTree([FastNode(p, nlab; stat=stat)], maxsize, splitsize, zeros(nlab * 9))

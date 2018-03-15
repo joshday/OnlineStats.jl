@@ -5,14 +5,6 @@ abstract type HistAlg{N} end
 Base.show(io::IO, o::HistAlg) = print(io, name(o, false, false))
 get_hist_alg(o::HistAlg) = o
 
-# get_hist_alg(args...)     --> HistAlg 
-# _midpoints(o)             --> midpoints of bins 
-# _counts(o)                --> counts in bins
-# nobs
-# fit!
-# merge!
-
-_midpoints(e::AbstractVector) = midpoints(e)
 
 #-----------------------------------------------------------------------# Hist
 """
@@ -38,27 +30,27 @@ observed.  `Hist` objects can be used to return approximate summary statistics o
     extrema(o)
     quantile(o)
 """
-struct Hist{N,H<:HistAlg{N}} <: ExactStat{N}
+struct Hist{N, H <: HistAlg{N}} <: ExactStat{N}
     alg::H
-
-    Hist{H}(alg::H) where {N,H<:HistAlg{N}} = new{N,H}(alg)
+    Hist{H}(alg::H) where {N, H <: HistAlg{N}} = new{N, H}(alg)
 end
 function Hist(args...; kwargs...)
     alg = get_hist_alg(args...; kwargs...)
     Hist{typeof(alg)}(alg)
 end
-Base.show(io::IO, o::Hist) = print(io, "Hist: $(o.alg)")
-Base.merge!(o::Hist, o2::Hist, γ::Number) = merge!(o.alg, o2.alg, γ)
-value(o::Hist) = _midpoints(o), _counts(o)
-split_candidates(o::Hist) = _midpoints(o)
+Base.show(io::IO, o::Hist) = print(io, "Hist: ", o.alg)
+Base.merge!(o::Hist, o2::Hist, γ) = merge!(o.alg, o2.alg, γ)
+value(o::Hist) = midpoints(o), counts(o)
+split_candidates(o::Hist) = midpoints(o)
 
-for f in [:fit!, :nobs, :_midpoints, :_counts, :_pdf, :split_at!, :splitcounts]
+# HistAlg interface
+for f in [:fit!, :nobs, :midpoints, :counts, :_pdf, :_cdf, :(Base.sum)]
     @eval $f(o::Hist, args...) = $f(o.alg, args...)
 end
 
 # statistics
-Base.mean(o::Hist) = mean(_midpoints(o), fweights(_counts(o)))
-Base.var(o::Hist) = var(_midpoints(o), fweights(_counts(o)); corrected=true)
+Base.mean(o::Hist) = mean(midpoints(o), fweights(counts(o)))
+Base.var(o::Hist) = var(midpoints(o), fweights(counts(o)); corrected=true)
 Base.std(o::Hist) = sqrt(var(o))
 Base.median(o::Hist) = quantile(o, .5)
 function Base.extrema(o::Hist) 
@@ -71,7 +63,6 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
     inds = find(counts)  # filter out zero weights
     quantile(mids[inds], fweights(counts[inds]), p)
 end
-Base.sum(o::Hist, x) = sum(o.alg, x)
 
 #-----------------------------------------------------------------------# FixedBins
 mutable struct FixedBins{closed,E<:AbstractVector} <: HistAlg{0}
@@ -93,8 +84,8 @@ Base.@pure FixedBins(edges::AbstractVector, counts::Vector{Int}, out::Int; close
     FixedBins{closed,typeof(edges)}(edges, counts, out)
 
 get_hist_alg(e::AbstractVector; kwargs...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kwargs...)
-_midpoints(o::FixedBins) = _midpoints(o.edges)
-_counts(o::FixedBins) = o.counts
+midpoints(o::FixedBins) = midpoints(o.edges)
+counts(o::FixedBins) = o.counts
 nobs(o::FixedBins) = sum(o.counts) + o.out
 function fit!(o::FixedBins, y, γ::Number)
     idx = _binindex(o, y)
@@ -145,7 +136,7 @@ function Base.merge!(o::FixedBins, o2::FixedBins, γ::Number)
     if o.edges == o2.edges 
         o.counts .+= o2.counts
     else
-        for (yi, wi) in zip(_midpoints(o2), o2.counts)
+        for (yi, wi) in zip(midpoints(o2), o2.counts)
             for k in 1:wi 
                 fit!(o, yi, .5)
             end
@@ -183,8 +174,8 @@ struct AdaptiveBins{T} <: HistAlg{0}
 end
 get_hist_alg(b::Int) = AdaptiveBins(Pair{Float64, Int}[], b)
 get_hist_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
-_midpoints(o::AdaptiveBins) = first.(o.value)
-_counts(o::AdaptiveBins) = last.(o.value)
+midpoints(o::AdaptiveBins) = first.(o.value)
+counts(o::AdaptiveBins) = last.(o.value)
 nobs(o::AdaptiveBins) = sum(last, o.value)
 
 fit!(o::AdaptiveBins, y::Number, γ::Float64) = fit!(o, Pair(y, 1))
@@ -244,15 +235,6 @@ function splitcounts(o::AdaptiveBins, x)
     sum(last, o.value[1:(i-1)]), sum(last, o.value[i:end])
 end
 
-# Split a histogram in two.  Original = left, new = right.
-function split_at!(o::AdaptiveBins{T}, x) where {T}
-    k = searchsortedfirst(o.value, Pair(x, 1))
-    out = o.value[k:end]
-    deleteat!(o.value, k:length(o.value))
-    Hist(AdaptiveBins(out, o.b))
-end
-
-
 # Algorithm 3: Sum Procedure
 # Estimated number of points in interval [-∞, b]
 function Base.sum(o::AdaptiveBins, b::Real)::Float64
@@ -293,3 +275,33 @@ end
 #     # u
 #     midpoints(first.(o.value))
 # end
+
+mutable struct LocCount
+    loc::Float64 
+    count::Int 
+end
+Base.isless(o::LocCount, o2::LocCount) = isless(o.loc, o2.loc)
+
+export AdaptiveHist
+
+struct AdaptiveHist <: ExactStat{0}
+    value::Vector{LocCount}
+    b::Int
+end
+AdaptiveHist(b::Int) = AdaptiveHist(LocCount[], b)
+
+function fit!(o::AdaptiveHist, y, γ)
+    if length(o.value) < o.b 
+        push!(o.value, LocCount(y, 1))
+    elseif length(o.value) == o.b 
+        sort!(o.value)
+    else
+        for (i, lcd) in enumerate(o.value)
+            if y > lcd.loc 
+                n = lcd.count + 1
+                ynew = smooth(lcd.loc, y, 1 / n)
+                o.value[i] = LocCountDiff(ynew, n)
+            end
+        end
+    end
+end
