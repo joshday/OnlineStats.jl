@@ -25,7 +25,9 @@ import LearnBase: fit!, value, transform
 import DataStructures: SortedDict
 export Numerical, Categorical
 
+# For interface: width, transform(column, y)
 abstract type AbstractMLColumn <: ExactStat{0} end
+
 fit!(o::AbstractMLColumn, y, γ::Number) = fit!(o.stat, y, γ)
 Base.merge!(o::AbstractMLColumn, o2::AbstractMLColumn, γ) = merge!(o.stat, o2.stat, γ)
 
@@ -41,6 +43,7 @@ end
 Numerical() = Numerical(Variance())
 width(o::Numerical) = 1
 value(o::Numerical) = (mean(o.stat), std(o.stat))
+transform(o::Numerical, y) = (y - mean(o.stat)) / std(o.stat)
 Base.show(io::IO, o::Numerical) = print(io, "📈 : $(round.(value(o), 4))")
 
 #-----------------------------------------------------------------------# Categorical
@@ -140,10 +143,16 @@ function fit!(o::Schema, y::VectorOb, γ)
 end
 
 #-----------------------------------------------------------------------# formula 
-struct FeatureMaker 
-    colnames 
-    schema
+struct FeatureMaker{F <: Function, T <: Tuple}
+    yf::F 
+    xf::T
+    x::Vector{Float64}
 end
+FeatureMaker(t::Tuple; ytransform = identity) = FeatureMaker(ytransform, t, zeros(length(t)))
+
+function transform(o::FeatureMaker, xy)
+end
+
 
 
 end # module

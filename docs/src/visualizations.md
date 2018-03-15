@@ -36,6 +36,21 @@ savefig("nbclassifier.png"); nothing # hide
 ```
 ![](nbclassifier.png)
 
+## Mosaic Plots
+
+The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.  
+It is typically more useful than a bar plot, as class probabilities are given by the horizontal
+widths.
+
+```@example setup 
+x = rand([true, true, false], 10^5)
+y = map(xi -> xi ? rand(1:3) : rand(1:4), x)
+s = series([x y], Mosaic(Bool, Int))
+plot(s)
+savefig("mosaic.png"); nothing # hide
+```
+![](mosaic.png)
+
 ## Partitions
 
 The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`, 

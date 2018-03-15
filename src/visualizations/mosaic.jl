@@ -12,51 +12,43 @@ Data structure for generating a mosaic plot, a comparison between two categorica
     plot(s)
 """
 struct Mosaic{T, S} <: ExactStat{1}
-    value::Vector{Pair{T, CountMap{S}}}
+    value::Dict{T, CountMap{S}}
 end
-Mosaic(T, S) = Mosaic(Pair{T, CountMap{S}}[])
-
+Mosaic(T, S) = Mosaic(Dict{T,CountMap{S}}())
 Base.show(io::IO, o::Mosaic{T,S}) where {T, S} = print(io, "Mosaic: $T × $S")
-
-nobs(o::Mosaic) = sum(nobs.(last.(value(o))))
-
-function fit!(o::Mosaic{T,S}, xy::VectorOb, γ::Float64) where {T, S}
-    x = first(xy)
-    y = last(xy)
-    pushx = true
-    for (i, vi) in enumerate(o.value)
-        if first(vi) == x 
-            fit!(last(o.value[i]), y, γ)
-            pushx = false 
-            break
-        end
-    end
-    if pushx 
+function fit!(o::Mosaic{T, S}, xy, γ) where {T, S}
+    x, y = xy
+    if haskey(o.value, x)
+        fit!(o.value[x], y, 1.0)
+    else 
         stat = CountMap(S)
-        fit!(stat, y, γ)
-        push!(o.value, Pair(x, stat))
+        fit!(stat, y, 1.0)
+        o.value[x] = stat
     end
 end
+nobs(o::Mosaic) = sum(nobs, values(o.value))
+subkeys(o::Mosaic) = sort!(mapreduce(x->collect(keys(x)), union, values(o.value)))
+
 
 @recipe function f(o::Mosaic{T,S}) where {T,S}
-    o.value[:] = o.value[sortperm(first.(o.value))]
-    sort!.(last.(o.value))
-    xlevels = first.(o.value)
-    xwidths = nobs.(last.(o.value)) ./ sum(nobs.(last.(o.value)))
+    kys = sort!(collect(keys(o.value)))
+    n = nobs(o)
+    xwidths = [nobs(o.value[ky]) / n for ky in kys]
     xedges = vcat(0.0, cumsum(xwidths))
 
-    ylevels = unique(vcat(keys.(last.(o.value))...))
-
-    yheights = cumsum.(reverse.(probs.(last.(o.value), [ylevels])))
-
-    y = hcat(reverse.(yheights)...)
+    subkys = subkeys(o)
+    y = zeros(length(subkys), length(kys))
+    for (j, ky) in enumerate(kys) 
+        y[:, j] = probs(o.value[ky], subkys)
+        y[:, j] = 1.0 - vcat(0.0, cumsum(y[1:(end-1), j]))
+    end
 
     seriestype := :bar
     bar_widths := xwidths
+    labels := subkys
+    xticks := (midpoints(xedges), kys)
     xlim := (0, 1)
     ylim := (0, 1)
-    xticks := ([(xedges[i] + xedges[i+1])/2 for i in 1:length(xedges)-1], xlevels)
-    labels := reshape(ylevels, 1, length(ylevels))
 
     xedges, y'
 end
