@@ -4,13 +4,12 @@
     test_exact(AutoCov(10), y, autocor, x -> autocor(x, 0:10))
     test_exact(AutoCov(10), y, nobs, length)
 end
-# #-----------------------------------------------------------------------# Bootstrap 
-# @testset "Bootstrap" begin 
-#     o = Bootstrap(Mean(), 100, [1])
-#     Series(y, o)
-#     @test all(value.(o.replicates) .== value(o))
-#     @test length(confint(o)) == 2
-# end
+#-----------------------------------------------------------------------# Bootstrap 
+@testset "Bootstrap" begin 
+    o = fit!(Bootstrap(Mean(), 100, [1]), y)
+    @test all(value.(o.replicates) .== value(o.stat))
+    @test length(confint(o)) == 2
+end
 #-----------------------------------------------------------------------# Count 
 @testset "Count" begin 
     test_exact(Count(), randn(100), value, length)
@@ -65,6 +64,26 @@ end
     test_exact(Extrema(Int), rand(Int, 100), minimum, minimum, ==)
     test_merge(Extrema(), y, y2, ==)
 end
+#-----------------------------------------------------------------------# Fit[Dist]
+@testset "Fit[Dist]" begin 
+@testset "FitBeta" begin 
+    @test value(FitBeta()) == (1.0, 1.0)
+    test_exact(FitBeta(), rand(100), value, x->[1,1]; atol=.3)
+    test_merge(FitBeta(), rand(100), rand(100))
+end #FitBeta
+@testset "FitCauchy" begin 
+end #FitCauchy
+@testset "FitGamma" begin 
+end #FitGamma
+@testset "FitLogNormal" begin 
+end #FitLogNormal
+@testset "FitNormal" begin 
+end #FitNormal
+@testset "FitMultinomial" begin 
+end #FitMultinomial
+@testset "FitMvNormal" begin 
+end #FitMvNormal
+end #Fit[Dist]
 # #-----------------------------------------------------------------------# Distributions
 # @testset "Fit[Distribution]" begin
 #     @testset "sanity check" begin
@@ -201,11 +220,11 @@ end
 #     Series(data, o)
 #     @test quadgk(x -> dpdf(o, x), collect(-10:10)...)[1] ≈ 1 atol=.1
 # end
-# #-----------------------------------------------------------------------# HyperLogLog 
-# @testset "HyperLogLog" begin 
-#     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), (a,b) -> ≈(a,b;atol=3))
-#     test_merge(HyperLogLog(4), y, y2)
-# end
+#-----------------------------------------------------------------------# HyperLogLog 
+@testset "HyperLogLog" begin 
+    # test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=3.0)
+    # test_merge(HyperLogLog(4), y, y2)
+end
 # #-----------------------------------------------------------------------# IndexedPartition 
 # @testset "IndexedPartition" begin 
 #     test_exact(IndexedPartition(Float64, Mean()), [y y2], o -> value(merge(o)), x->mean(y2))
@@ -259,11 +278,11 @@ end
 #     test_exact(LinRegBuilder(6), [x y], o -> coef(o;bias=false,y=6), f -> x\y)
 #     test_merge(LinRegBuilder(5), x, x2)
 # end
-# #-----------------------------------------------------------------------# Mean 
-# @testset "Mean" begin 
-#     test_exact(Mean(), y, mean, mean)
-#     test_merge(Mean(), y, y2)
-# end
+#-----------------------------------------------------------------------# Mean 
+@testset "Mean" begin 
+    test_exact(Mean(), y, mean, mean)
+    test_merge(Mean(), y, y2)
+end
 # #-----------------------------------------------------------------------# Moments
 # @testset "Moments" begin 
 #     test_exact(Moments(), y, value, x ->[mean(x), mean(x .^ 2), mean(x .^ 3), mean(x .^4) ])
@@ -451,22 +470,16 @@ end
 #         @test_throws ErrorException Series((X,Y), StatLearn(5, PoissonLoss(), OMAS()))
 #     end
 # end
-# #-----------------------------------------------------------------------# Sum 
-# @testset "Sum" begin 
-#     test_exact(Sum(), y, sum, sum)
-#     test_exact(Sum(Int), 1:100, sum, sum)
-#     test_merge(Sum(), y, y2)
-# end
-# #-----------------------------------------------------------------------# Unique 
-# @testset "Unique" begin 
-#     test_exact(Unique(Float64), y, unique, x->sort(unique(x)))
-#     test_exact(Unique(Float64), y, length, length, ==)
-#     test_merge(Unique(Float64), y, y2, ==)
-# end
-# #-----------------------------------------------------------------------# Variance 
-# @testset "Variance" begin 
-#     test_exact(Variance(), y, mean, mean)
-#     test_exact(Variance(), y, std, std)
-#     test_exact(Variance(), y, var, var)
-#     test_merge(Variance(), y, y2)
-# end
+#-----------------------------------------------------------------------# Sum 
+@testset "Sum" begin 
+    test_exact(Sum(), y, sum, sum)
+    test_exact(Sum(Int), 1:100, sum, sum)
+    test_merge(Sum(), y, y2)
+end
+#-----------------------------------------------------------------------# Variance 
+@testset "Variance" begin 
+    test_exact(Variance(), y, mean, mean)
+    test_exact(Variance(), y, std, std)
+    test_exact(Variance(), y, var, var)
+    test_merge(Variance(), y, y2)
+end

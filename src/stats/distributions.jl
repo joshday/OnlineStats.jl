@@ -8,9 +8,10 @@ struct FitBeta{V<:Variance} <: OnlineStat{0}
     var::V
 end
 FitBeta(;kw...) = FitBeta(Variance(;kw...))
+nobs(o::FitBeta) = nobs(o.var)
 _fit!(o::FitBeta, y::Real) = fit!(o.var, y)
 function value(o::FitBeta)
-    if o.var.nobs > 1
+    if o.var.n > 1
         m = mean(o.var)
         v = var(o.var)
         α = m * (m * (1 - m) / v - 1)

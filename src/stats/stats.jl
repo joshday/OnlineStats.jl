@@ -46,7 +46,7 @@ function _fit!(o::Variance, x)
     o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
 end
 function merge!(o::Variance, o2::Variance)
-    γ = o.weight(o.n += o2.n)
+    γ = o2.n / (o.n += o2.n)
     δ = o2.μ - o.μ
     o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
     o.μ = smooth(o.μ, o2.μ, γ)
@@ -55,6 +55,51 @@ end
 value(o::Variance) = o.n > 0 ? o.σ2 * unbias(o) : 0.0
 var(o::Variance) = value(o)
 mean(o::Variance) = o.μ
+
+#-----------------------------------------------------------------------# Bootstrap
+"""
+    Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
+
+Online statistical bootstrap.  Create `nreps` replicates of `o`.  For each call to `fit!`,
+a replicate will be updated `rand(d)` times.
+
+# Example
+
+    o = Bootstrap(Variance())
+    Series(randn(1000), o)
+    confint(o)
+"""
+struct Bootstrap{N, O <: OnlineStat{N}, D} <: OnlineStat{N}
+    stat::O 
+    replicates::Vector{O}
+    rnd::D
+end
+function Bootstrap(o::OnlineStat{N}, nreps::Integer = 100, d = [0, 2]) where {N}
+    Bootstrap{N, typeof(o), typeof(d)}(o, [copy(o) for i in 1:nreps], d)
+end
+Base.show(io::IO, b::Bootstrap) = print(io, "Bootstrap($(length(b.replicates))): $(b.stat)")
+"""
+    confint(b::Bootstrap, coverageprob = .95)
+
+Return a confidence interval for a Bootstrap `b`.
+"""
+function confint(b::Bootstrap, coverageprob = 0.95)
+    states = value.(b.replicates)
+    α = 1 - coverageprob
+    return (quantile(states, α / 2), quantile(states, 1 - α / 2))
+end
+function fit_replicates!(b::Bootstrap, yi)
+    for r in b.replicates
+        for _ in 1:rand(b.rnd)
+            _fit!(r, yi)
+        end
+    end
+end
+function _fit!(b::Bootstrap, y)
+    _fit!(b.stat, y)
+    fit_replicates!(b, y)
+    b
+end
 
 
 #-----------------------------------------------------------------------# Count 
@@ -303,6 +348,7 @@ mutable struct HyperLogLog <: OnlineStat{0}
     M::Vector{UInt32}
     mask::UInt32
     altmask::UInt32
+    n::Int
     function HyperLogLog(b::Integer)
         !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
         m = 0x00000001 << b
@@ -314,7 +360,7 @@ mutable struct HyperLogLog <: OnlineStat{0}
         end
         mask |= 0x00000001
         altmask = ~mask
-        new(m, M, mask, altmask)
+        new(m, M, mask, altmask, 0)
     end
 end
 function Base.show(io::IO, o::HyperLogLog)
@@ -337,7 +383,8 @@ function α(m::UInt32)
     end
 end
 
-function _fit!(o::HyperLogLog, v::Any)
+function _fit!(o::HyperLogLog, v)
+    o.n += 1
     x = hash32(v)
     j = maskadd32(x, o.mask, 0x00000001)
     w = x & o.altmask
@@ -370,12 +417,14 @@ function value(o::HyperLogLog)
     return E_star
 end
 
-function Base.merge!(o::HyperLogLog, o2::HyperLogLog, γ::Float64)
+function Base.merge!(o::HyperLogLog, o2::HyperLogLog)
     length(o.M) == length(o2.M) || 
         error("Merge failed. HyperLogLog objects have different number of registers.")
+    o.n += o2.n
     for j in eachindex(o.M)
         o.M[j] = max(o.M[j], o2.M[j])
     end
+    o
 end
 
 # #-----------------------------------------------------------------------# KMeans
@@ -834,12 +883,13 @@ Track the overall sum.
 """
 mutable struct Sum{T} <: OnlineStat{0}
     sum::T
+    n::Int
 end
-Sum(T::Type = Float64) = Sum(T(0))
+Sum(T::Type = Float64) = Sum(T(0), 0)
 Base.sum(o::Sum) = o.sum
-_fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x))
-_fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x))
-Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum)
+_fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.n += 1)
+_fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
+Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
 
 # #-----------------------------------------------------------------------# Unique 
 # """

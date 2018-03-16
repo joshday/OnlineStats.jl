@@ -5,17 +5,17 @@ using LinearAlgebra
 import OnlineStatsBase: OnlineStat, name, VectorOb, XyOb, value, _fit!
 import Base: merge, merge!, mean, var, std, cov
 import LearnBase: fit!, nobs, predict, value
-import StatsBase: autocov, autocor
+import StatsBase: autocov, autocor, confint
 import DataStructures: OrderedDict
 import NamedTuples
 
 export 
     # OnlineStats
-    AutoCov, Count, CountMap, CovMatrix, CStat, Diff, Extrema, HyperLogLog, Lag, Mean, Moments, ProbMap, ReservoirSample, Sum, Variance,
+    AutoCov, Bootstrap, Count, CountMap, CovMatrix, CStat, Diff, Extrema, FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal, HyperLogLog, Lag, Mean, Moments, ProbMap, ReservoirSample, Sum, Variance,
     # Series and Group 
     Series, FTSeries, Group,
     # methods 
-    autocov, autocor, fit!, nobs, probs, value
+    autocov, autocor, confint, fit!, nobs, probs, value
 
 #-----------------------------------------------------------------------# utils 
 smooth(a, b, γ) = a + γ * (b - a)
@@ -64,7 +64,8 @@ end
 
 
 #-----------------------------------------------------------------------# includes
-include("series.jl")
+include("stats/series.jl")
+include("stats/updaters.jl")
 include("stats/stats.jl")
 include("stats/wrappers.jl")
 include("stats/group.jl")

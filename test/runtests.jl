@@ -10,22 +10,26 @@ const y2 = randn(1000)
 const x = randn(1000, 5)
 const x2 = randn(1000, 5)
 
-function test_merge(o, y1, y2, compare = ≈)
+function test_merge(o, y1, y2, compare = ≈; kw...)
     o2 = copy(o)
     fit!(o, y1)
     fit!(o2, y2)
     merge!(o, o2)
     fit!(o2, y1)
     for (v1, v2) in zip(value(o), value(o2))
-        @test compare(v1, v2)
+        # debug
+        # if o isa FitBeta
+        #     @info("$v1 and $v2")
+        # end
+        @test compare(v1, v2; kw...)
     end
     @test nobs(o) == nobs(o2)
 end
 
-function test_exact(o, y, fo, fy, compare = ≈)
+function test_exact(o, y, fo, fy, compare = ≈; kw...)
     fit!(o, y)
     for (v1, v2) in zip(fo(o), fy(y))
-        @test compare(v1, v2)
+        @test compare(v1, v2; kw...)
     end
 end
 
