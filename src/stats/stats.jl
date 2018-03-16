@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------# Mean
 """
-    Mean()
+    Mean(; weight)
 
 Univariate mean.
 
@@ -8,22 +8,22 @@ Univariate mean.
 
     @time fit!(Mean(), randn(10^6))
 """
-mutable struct Mean{W<:Function} <: OnlineStat{0}
+mutable struct Mean{W} <: OnlineStat{0}
     μ::Float64
     weight::W
     n::Int
 end
 Mean(weight::Function = inv) = Mean(0.0, weight, 0)
-_fit!(o::Mean, x::Number) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
+_fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
 function merge!(o::Mean, o2::Mean) 
     o.n += o2.n
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
 end
-Base.mean(o::Mean) = o.μ
+mean(o::Mean) = o.μ
 
 #-----------------------------------------------------------------------# Variance 
 """
-    Variance()
+    Variance(; weight)
 
 Univariate variance.
 
@@ -38,246 +38,195 @@ mutable struct Variance{W} <: OnlineStat{0}
     n::Int
 end
 Variance(;weight = inv) = Variance(0.0, 0.0, weight, 0)
-function _fit!(o::Variance, y::Number)
+function _fit!(o::Variance, x)
     μ = o.μ
     γ = o.weight(o.n += 1)
-    o.μ = smooth(o.μ, y, γ)
-    o.σ2 = smooth(o.σ2, (y - o.μ) * (y - μ), γ)
+    o.μ = smooth(o.μ, x, γ)
+    o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
+end
+function merge!(o::Variance, o2::Variance)
+    γ = o.weight(o.n += o2.n)
+    δ = o2.μ - o.μ
+    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
+    o.μ = smooth(o.μ, o2.μ, γ)
+    o
 end
 value(o::Variance) = o.n > 0 ? o.σ2 * unbias(o) : 0.0
-Base.var(o::Variance) = value(o)
-Base.std(o) = sqrt(var(o))
-Base.mean(o::Variance) = o.μ
+var(o::Variance) = value(o)
+mean(o::Variance) = o.μ
 
 
-# #-----------------------------------------------------------------------# CStat
-# """
-#     CStat(stat)
+#-----------------------------------------------------------------------# Count 
+"""
+    Count()
 
-# Track a univariate OnlineStat for complex numbers.  A copy of `stat` is made to
-# separately track the real and imaginary parts.
+The number of things observed.
 
-# # Example
+# Example 
 
-#     y = randn(100) + randn(100)im
-#     Series(y, CStat(Mean()))
-# """
-# struct CStat{O <: OnlineStat} <: OnlineStat{0}
-#     re_stat::O
-#     im_stat::O
-# end
-# default_weight(o::CStat) = default_weight(o.re_stat)
-# CStat(o::OnlineStat{0}) = CStat(o, copy(o))
-# Base.show(io::IO, o::CStat) = print(io, "CStat: re = $(o.re_stat), im = $(o.im_stat)")
-# value(o::CStat) = value(o.re_stat), value(o.im_stat)
-# fit!(o::CStat, y::Real, γ::Float64) = fit!(o.re_stat, real(y), γ)
-# function fit!(o::CStat, y::Complex, γ::Float64) 
-#     fit!(o.re_stat, y.re, γ)
-#     fit!(o.im_stat, y.im, γ)
-# end
-# function Base.merge!(o1::T, o2::T, γ::Float64) where {T<:CStat}
-#     merge!(o1.re_stat, o2.re_stat, γ)
-#     merge!(o1.im_stat, o2.im_stat, γ)
-# end
+    fit!(Count(), 1:1000)
+"""
+mutable struct Count <: OnlineStat{0}
+    n::Int
+    Count() = new(0)
+end
+_fit!(o::Count, x) = (o.n += 1)
+merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n; o)
 
-# #-----------------------------------------------------------------------# Count 
-# """
-#     Count()
+#-----------------------------------------------------------------------# CountMap 
+"""
+    CountMap(T::Type)
+    CountMap(dict::AbstractDict{T, Int})
 
-# The number of things observed.
-# """
-# mutable struct Count <: ExactStat{0}
-#     n::Int
-#     Count() = new(0)
-# end
-# fit!(o::Count, y::Real, γ::Float64) = (o.n += 1)
-# Base.merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n)
+Track a dictionary that maps unique values to its number of occurrences.  Similar to 
+`StatsBase.countmap`.  
 
+# Example 
+    
+    fit!(CountMap(Int), rand(1:10, 1000))
+"""
+struct CountMap{A <: AbstractDict} <: OnlineStat{0}
+    value::A  # OrderedDict by default
+end
+CountMap(T::Type) = CountMap(OrderedDict{T, Int}())
+_fit!(o::CountMap, x) = haskey(o.value, x) ? o.value[x] += 1 : o.value[x] = 1
+merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o)
+nobs(o::CountMap) = sum(values(o.value))
+function probs(o::CountMap, kys = keys(o.value))
+    out = zeros(Int, length(kys))
+    valkeys = keys(o.value)
+    for (i, k) in enumerate(kys)
+        out[i] = k in valkeys ? o.value[k] : 0
+    end
+    sum(out) == 0 ? Float64.(out) : out ./ sum(out)
+end
+pdf(o::CountMap, y) = y in keys(o.value) ? o.value[y] / nobs(o) : 0.0
 
-# #-----------------------------------------------------------------------# CountMap
-# """
-#     CountMap(T)
+#-----------------------------------------------------------------------# ProbMap
+"""
+    ProbMap(T::Type; weight)
+    ProbMap(A::AbstractDict; weight)
 
-# Maintain a dictionary mapping unique values to its number of occurrences.  Equivalent to 
-# `StatsBase.countmap`.  Ignores weight.
+Track a dictionary that maps unique values to its probability.  Similar to 
+[`CountMap`](@ref), but uses a weighting mechanism.
 
-# # Methods
-# - `value(o)`: `Dict` of raw counts
-# - `keys(o)`: Unique values 
-# - `values(o)`: Counts
-# - `probs(o)`: Probabilities
+# Example 
+    
+    fit!(ProbMap(Int), rand(1:10, 1000))
+"""
+mutable struct ProbMap{A<:AbstractDict, W} <: OnlineStat{0}
+    value::A 
+    weight::W 
+    n::Int
+end
+ProbMap(T::Type; weight = inv) = ProbMap(OrderedDict{T, Float64}(), weight, 0)
+function _fit!(o::ProbMap, y)
+    γ = o.weight(o.n += 1)
+    get!(o.value, y, 0.0)   # initialize class probability at 0 if it isn't present
+    for ky in keys(o.value)
+        if ky == y 
+            o.value[ky] = smooth(o.value[ky], 1.0, γ)
+        else 
+            o.value[ky] *= (1 - γ)
+        end
+    end
+end
+function merge!(o::ProbMap, o2::ProbMap) 
+    o.n += o2.n
+    merge!((a, b)->smooth(a, b, o.n2 / o.n), o.value, o2.value)
+    o
+end
+function probs(o::ProbMap, levels = keys(o))
+    out = zeros(length(levels))
+    for (i, ky) in enumerate(levels)
+        out[i] = get(o.value, ky, 0.0)
+    end
+    sum(out) == 0.0 ? out : out ./ sum(out)
+end
 
-# # Example 
+#-----------------------------------------------------------------------# CovMatrix 
+"""
+    CovMatrix(p=0; weight)
 
-#     vals = ["small", "medium", "large"]
-#     o = CountMap(String)
-#     s = Series(rand(vals, 1000), o)
-#     value(o)
-#     probs(o)
-#     probs(o, ["small", "large"])
-# """
-# struct CountMap{T} <: ExactStat{0}
-#     value::Dict{T, Int}
-# end
-# CountMap(T::Type) = CountMap(Dict{T, Int}())
-# value(o::CountMap) = sort(o.value)
-# Base.show(io::IO, o::CountMap) = print(io, "CountMap: ", o.value)
-# Base.keys(o::CountMap) = keys(o.value)
-# Base.values(o::CountMap) = values(o.value)
-# Base.haskey(o::CountMap, y) = haskey(o.value, y)
-# function fit!(o::CountMap, y, γ) 
-#     if haskey(o, y)
-#         o.value[y] += 1
-#     else 
-#         o.value[y] = 1 
-#     end
-# end
-# Base.merge!(o::CountMap, o2::CountMap, γ) = merge!(+, o.value, o2.value)
-# nobs(o::CountMap) = sum(values(o))
-# function probs(o::CountMap, kys = keys(o))
-#     out = zeros(Int, length(kys))
-#     dictkeys = keys(o.value)
-#     for (i, k) in enumerate(kys)
-#         out[i] = k in dictkeys ? o.value[k] : 0
-#     end
-#     sum(out) == 0 ? Float64.(out) : out ./ sum(out)
-# end
-# pdf(o::CountMap, y) = y in keys(o) ? o.value[y] / nobs(o) : 0.0
+Calculate a covariance/correlation matrix of `p` variables.  If the number of variables is 
+unknown, leave the default `p=0`.
 
-# #-----------------------------------------------------------------------# ProbMap
-# """
-#     ProbMap(T)
+# Example 
 
-# Maintain a dictionary mapping unique values to its probability.  Similar to [`CountMap`](@ref), 
-# but tracks probabilities instead of counts and can incorporate different weights.  
+    fit!(CovMatrix(), randn(100, 4))
+"""
+mutable struct CovMatrix{W} <: OnlineStat{1}
+    value::Matrix{Float64}
+    A::Matrix{Float64}  # x'x/n
+    b::Vector{Float64}  # 1'x/n
+    weight::W
+    n::Int
+end
+CovMatrix(p::Int=0;weight = inv) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
+function _fit!(o::CovMatrix, x)
+    γ = o.weight(o.n += 1)
+    if isempty(o.A)
+        p = length(x)
+        o.b = Vector{Float64}(undef, p) 
+        o.A = Matrix{Float64}(undef, p, p)
+        o.value = Matrix{Float64}(undef, p, p)
+    end
+    smooth!(o.b, x, γ)
+    smooth_syr!(o.A, x, γ)
+end
+function value(o::CovMatrix; corrected::Bool = true)
+    o.value[:] = Matrix(Symmetric((o.A - o.b * o.b')))
+    corrected && rmul!(o.value, unbias(o))
+    o.value
+end
+function merge!(o::CovMatrix, o2::CovMatrix)
+    γ = o.weight(o.n += o2.n)
+    smooth!(o.A, o2.A, γ)
+    smooth!(o.b, o2.b, γ)
+    o
+end
+cov(o::CovMatrix) = value(o)
+mean(o::CovMatrix) = o.b
+var(o::CovMatrix; kw...) = diag(value(o; kw...))
+function Base.cor(o::CovMatrix; kw...)
+    value(o; kw...)
+    v = 1.0 ./ sqrt.(diag(o.value))
+    rmul!(o.value, v)
+    rmul!(v, o.value)
+    o.value
+end
 
-# NOTE: Use only when weights other than `EqualWeight` are desired as `ProbMap` is slower 
-# than `CountMap`.
+#-----------------------------------------------------------------------# Diff
+"""
+    Diff(T::Type = Float64)
 
-# # Example 
+Track the difference and the last value.
 
-#     y = vcat(zeros(Int, 100), ones(Int, 100), 2ones(Int, 100))
+# Example
 
-#     # give each observation an influence of 0.01
-#     s = Series(y, x -> .01, ProbMap(Int))
-#     sort(value(s.stats[1]))
-# """
-# struct ProbMap{T} <: ExactStat{0}
-#     value::Dict{T, Float64}
-# end
-# ProbMap(T::Type) = ProbMap(Dict{T, Float64}())
-# Base.show(io::IO, o::ProbMap) = print(io, "ProbMap: ", o.value)
-# Base.haskey(o::ProbMap, y) = haskey(o.value, y)
-# Base.keys(o::ProbMap) = keys(o.value)
-# Base.values(o::ProbMap) = values(o.value)
+    o = Diff()
+    fit!(o, [1.0, 2.0])
+    last(o)
+    diff(o)
+"""
+mutable struct Diff{T <: Real} <: OnlineStat{0}
+    diff::T
+    lastval::T
+end
+Diff(T::Type = Float64) = Diff(zero(T), zero(T))
+function _fit!(o::Diff{T}, x) where {T<:AbstractFloat}
+    v = convert(T, x)
+    o.diff = v - last(o)
+    o.lastval = v
+end
+function _fit!(o::Diff{T}, x) where {T<:Integer}
+    v = round(T, x)
+    o.diff = v - last(o)
+    o.lastval = v
+end
+Base.last(o::Diff) = o.lastval
+Base.diff(o::Diff) = o.diff
 
-# function fit!(o::ProbMap, y, γ)
-#     get!(o.value, y, 0.0)
-#     for ky in keys(o.value)
-#         if ky == y 
-#             o.value[ky] = smooth(o.value[ky], 1.0, γ)
-#         else 
-#             o.value[ky] *= (1 - γ)
-#         end
-#     end
-# end
-
-# function Base.merge!(o::ProbMap, o2::ProbMap, γ)
-#     merge!((a,b) -> smooth(a, b, γ), o.value, o2.value)
-# end
-
-# function probs(o::ProbMap, levels = keys(o))
-#     out = zeros(length(levels))
-#     for (i, ky) in enumerate(levels)
-#         out[i] = get(o.value, ky, 0.0)
-#     end
-#     sum(out) == 0.0 ? out : out ./ sum(out)
-# end
-
-# #-----------------------------------------------------------------------# CovMatrix
-# """
-#     CovMatrix(d)
-
-# Covariance Matrix of `d` variables.  Principal component analysis can be performed using
-# eigen decomposition of the covariance or correlation matrix.
-
-# # Example
-
-#     y = randn(100, 5)
-#     o = CovMatrix(5)
-#     Series(y, o)
-
-#     # PCA
-#     evals, evecs = eig(cor(o))
-# """
-# mutable struct CovMatrix <: ExactStat{1}
-#     value::Matrix{Float64}
-#     cormat::Matrix{Float64}
-#     A::Matrix{Float64}  # X'X / n
-#     b::Vector{Float64}  # X * 1' / n (column means)
-#     nobs::Int
-#     CovMatrix(p::Integer) = new(zeros(p, p), zeros(p, p), zeros(p, p), zeros(p), 0)
-# end
-# function fit!(o::CovMatrix, x::VectorOb, γ::Float64)
-#     smooth!(o.b, x, γ)
-#     smooth_syr!(o.A, x, γ)
-#     o.nobs += 1
-#     o
-# end
-# function value(o::CovMatrix; corrected::Bool = true)
-#     o.value[:] = full(Symmetric((o.A - o.b * o.b')))
-#     corrected && scale!(o.value, unbias(o))
-#     o.value
-# end
-# Base.length(o::CovMatrix) = length(o.b)
-# Base.mean(o::CovMatrix) = o.b
-# Base.cov(o::CovMatrix; kw...) = value(o; kw...)
-# Base.var(o::CovMatrix; kw...) = diag(value(o; kw...))
-# Base.std(o::CovMatrix; kw...) = sqrt.(var(o; kw...))
-# nobs(o::CovMatrix) = o.nobs
-# function Base.cor(o::CovMatrix; kw...)
-#     copy!(o.cormat, value(o; kw...))
-#     v = 1.0 ./ sqrt.(diag(o.cormat))
-#     scale!(o.cormat, v)
-#     scale!(v, o.cormat)
-#     o.cormat
-# end
-# function Base.merge!(o::CovMatrix, o2::CovMatrix, γ::Float64)
-#     smooth!(o.A, o2.A, γ)
-#     smooth!(o.b, o2.b, γ)
-#     o.nobs += o2.nobs
-#     o
-# end
-
-# #-----------------------------------------------------------------------# Diff
-# """
-#     Diff()
-
-# Track the difference and the last value.
-
-# # Example
-
-#     s = Series(randn(1000), Diff())
-#     value(s)
-# """
-# mutable struct Diff{T <: Real} <: ExactStat{0}
-#     diff::T
-#     lastval::T
-# end
-# Diff() = Diff(0.0, 0.0)
-# Diff(::Type{T}) where {T<:Real} = Diff(zero(T), zero(T))
-# Base.last(o::Diff) = o.lastval
-# Base.diff(o::Diff) = o.diff
-# function fit!(o::Diff{T}, x::Real, γ::Float64) where {T<:AbstractFloat}
-#     v = convert(T, x)
-#     o.diff = v - last(o)
-#     o.lastval = v
-# end
-# function fit!(o::Diff{T}, x::Real, γ::Float64) where {T<:Integer}
-#     v = round(T, x)
-#     o.diff = v - last(o)
-#     o.lastval = v
-# end
 
 # #-----------------------------------------------------------------------# Extrema
 # """

@@ -1,32 +1,60 @@
 module OnlineStats 
 
+using LinearAlgebra
 
-
-import OnlineStatsBase: OnlineStat, ExactStat, StochasticStat, name, VectorOb, XyOb,
-    default_weight, value, fit!
-
-import Base: merge, merge!
-
-import LearnBase: value
+import OnlineStatsBase: OnlineStat, name, VectorOb, XyOb, value, _fit!
+import Base: merge, merge!, mean, var, std, cov
+import LearnBase: value, fit!
+import DataStructures: OrderedDict
 
 #-----------------------------------------------------------------------# utils 
-smooth(a::Number, b::Number, γ::Number) = a + γ * (b - a)
+smooth(a, b, γ) = a + γ * (b - a)
+function smooth!(a::VectorOb, b::VectorOb, γ)
+    for (i, ai) in enumerate(a)
+        a[i] = smooth(ai, b[i], γ)
+    end
+end
+function smooth_syr!(A::AbstractMatrix, x, γ::Number)
+    for j in 1:size(A, 2), i in 1:j
+        @inbounds A[i, j] = smooth(A[i,j], x[i] * x[j], γ)
+    end
+end
 
 unbias(o) = nobs(o) / (nobs(o) - 1)
-
+std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
 nobs(o::OnlineStat) = o.n
 
-#-----------------------------------------------------------------------# fit!
-fit!(o::OnlineStat{0}, y) = _fit!(o, y)
+abstract type ObLoc end 
+struct Rows <: ObLoc end # Each Row of matrix is an observation
+struct Cols <: ObLoc end # Each Col ...
+
+#-----------------------------------------------------------------------# fit 0
+fit!(o::OnlineStat{0}, y) = (_fit!(o, y); o)
 function fit!(o::OnlineStat{0}, y::VectorOb)
     for yi in y 
         fit!(o, yi)
     end 
     o
 end
+#-----------------------------------------------------------------------# fit 1 
+fit!(o::OnlineStat{1}, y) = (_fit!(o, y); o)
+function fit!(s::OnlineStat{1}, y::AbstractMatrix, ::Rows = Rows())
+    n, p = size(y)
+    buffer = Vector{eltype(y)}(undef, p)
+    for i in 1:n
+        for j in 1:p
+            @inbounds buffer[j] = y[i, j]
+        end
+        fit!(s, buffer)
+    end
+    s
+end
 
+
+#-----------------------------------------------------------------------# includes
 include("series.jl")
 include("stats/stats.jl")
+include("stats/wrappers.jl")
 end
 
 # __precompile__(true)
