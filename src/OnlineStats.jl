@@ -58,6 +58,7 @@ end
 include("series.jl")
 include("stats/stats.jl")
 include("stats/wrappers.jl")
+include("stats/group.jl")
 end
 
 # __precompile__(true)

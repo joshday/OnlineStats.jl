@@ -811,22 +811,22 @@ _fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x))
 _fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x))
 Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum)
 
-#-----------------------------------------------------------------------# Unique 
-"""
-    Unique(T::Type)
+# #-----------------------------------------------------------------------# Unique 
+# """
+#     Unique(T::Type)
 
-Track the unique values. 
+# Track the unique values. 
 
-# Example 
+# # Example 
 
-    series(rand(1:5, 100), Unique(Int))
-"""
-struct Unique{T} <: OnlineStat{0}
-    value::OrderedDict{T, Nothing}
-end
-Unique(T::Type) = Unique(OrderedDict{T, Nothing}())
-_fit!(o::Unique, y) = (o.value[y] = nothing)
-value(o::Unique) = collect(keys(o.value))
-Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)
-Base.unique(o::Unique) = value(o)
-Base.length(o::Unique) = length(o.value)
+#     series(rand(1:5, 100), Unique(Int))
+# """
+# struct Unique{T} <: OnlineStat{0}
+#     value::OrderedDict{T, Nothing}
+# end
+# Unique(T::Type) = Unique(OrderedDict{T, Nothing}())
+# _fit!(o::Unique, y) = (o.value[y] = nothing)
+# value(o::Unique) = collect(keys(o.value))
+# Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)
+# Base.unique(o::Unique) = value(o)
+# Base.length(o::Unique) = length(o.value)
