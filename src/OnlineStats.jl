@@ -6,6 +6,7 @@ import OnlineStatsBase: OnlineStat, name, VectorOb, XyOb, value, _fit!
 import Base: merge, merge!, mean, var, std, cov
 import LearnBase: value, fit!
 import DataStructures: OrderedDict
+import NamedTuples
 
 #-----------------------------------------------------------------------# utils 
 smooth(a, b, γ) = a + γ * (b - a)
@@ -27,6 +28,8 @@ nobs(o::OnlineStat) = o.n
 abstract type ObLoc end 
 struct Rows <: ObLoc end # Each Row of matrix is an observation
 struct Cols <: ObLoc end # Each Col ...
+
+const Tup = Union{Tuple, NamedTuples.NamedTuple}
 
 #-----------------------------------------------------------------------# fit 0
 fit!(o::OnlineStat{0}, y) = (_fit!(o, y); o)

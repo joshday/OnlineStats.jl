@@ -1,5 +1,16 @@
 abstract type AbstractSeries{N} end 
 
+struct Series{N, T<:Tup} <: OnlineStat{N}
+    stats::T
+end
+Series(stats::OnlineStat{N}...) where {N} = Series{N, typeof(stats)}(stats)
+
+@generated function _fit!(o::Series{N, T}, y) where {N, T}
+    N = length(fieldnames(T))
+    quote 
+        Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i]))
+    end
+end
 
 
 # #-----------------------------------------------------------------------# AbstractSeries

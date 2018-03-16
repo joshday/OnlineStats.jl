@@ -228,129 +228,125 @@ Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
 
 
-# #-----------------------------------------------------------------------# Extrema
-# """
-#     Extrema(T::Type = Float64)
+#-----------------------------------------------------------------------# Extrema
+"""
+    Extrema(T::Type = Float64)
 
-# Maximum and minimum.
+Maximum and minimum.
 
-# # Example
+# Example
 
-#     s = Series(randn(100), Extrema())
-#     value(s)
-# """
-# mutable struct Extrema{T} <: ExactStat{0}
-#     min::T
-#     max::T
-# end
-# Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T))
-# function fit!(o::Extrema, y::Real, γ::Float64)
-#     o.min = min(o.min, y)
-#     o.max = max(o.max, y)
-#     o
-# end
-# function Base.merge!(o::Extrema, o2::Extrema, γ::Float64)
-#     o.min = min(o.min, o2.min)
-#     o.max = max(o.max, o2.max)
-#     o
-# end
-# value(o::Extrema) = (o.min, o.max)
-# Base.extrema(o::Extrema) = value(o)
-# Base.maximum(o::Extrema) = o.max 
-# Base.minimum(o::Extrema) = o.min
+    fit!(Extrema(), rand(10^5))
+"""
+mutable struct Extrema{T} <: OnlineStat{0}
+    min::T
+    max::T
+end
+Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T))
+function _fit!(o::Extrema, y::Real)
+    o.min = min(o.min, y)
+    o.max = max(o.max, y)
+end
+function Base.merge!(o::Extrema, o2::Extrema)
+    o.min = min(o.min, o2.min)
+    o.max = max(o.max, o2.max)
+    o
+end
+value(o::Extrema) = (o.min, o.max)
+Base.extrema(o::Extrema) = value(o)
+Base.maximum(o::Extrema) = o.max 
+Base.minimum(o::Extrema) = o.min
 
-# #-----------------------------------------------------------------------# HyperLogLog
-# # Mostly copy/pasted from StreamStats.jl
-# """
-#     HyperLogLog(b)  # 4 ≤ b ≤ 16
+#-----------------------------------------------------------------------# HyperLogLog
+# Mostly copy/pasted from StreamStats.jl
+"""
+    HyperLogLog(b)  # 4 ≤ b ≤ 16
 
-# Approximate count of distinct elements.
+Approximate count of distinct elements.
 
-# # Example
+# Example
 
-#     s = Series(rand(1:10, 1000), HyperLogLog(12))
-#     value(s)
-# """
-# mutable struct HyperLogLog <: StochasticStat{0}
-#     m::UInt32
-#     M::Vector{UInt32}
-#     mask::UInt32
-#     altmask::UInt32
-#     function HyperLogLog(b::Integer)
-#         !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
-#         m = 0x00000001 << b
-#         M = zeros(UInt32, m)
-#         mask = 0x00000000
-#         for i in 1:(b - 1)
-#             mask |= 0x00000001
-#             mask <<= 1
-#         end
-#         mask |= 0x00000001
-#         altmask = ~mask
-#         new(m, M, mask, altmask)
-#     end
-# end
-# function Base.show(io::IO, counter::HyperLogLog)
-#     print(io, "HyperLogLog($(counter.m) registers, estimate = $(value(counter)))")
-# end
+    fit!(HyperLogLog(12), rand(1:10,10^5))
+"""
+mutable struct HyperLogLog <: OnlineStat{0}
+    m::UInt32
+    M::Vector{UInt32}
+    mask::UInt32
+    altmask::UInt32
+    function HyperLogLog(b::Integer)
+        !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
+        m = 0x00000001 << b
+        M = zeros(UInt32, m)
+        mask = 0x00000000
+        for i in 1:(b - 1)
+            mask |= 0x00000001
+            mask <<= 1
+        end
+        mask |= 0x00000001
+        altmask = ~mask
+        new(m, M, mask, altmask)
+    end
+end
+function Base.show(io::IO, o::HyperLogLog)
+    print(io, "HyperLogLog($(o.m) registers, estimate = $(value(o)))")
+end
 
-# hash32(d::Any) = hash(d) % UInt32
-# maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add
-# ρ(s::UInt32) = UInt32(leading_zeros(s)) + 0x00000001
+hash32(d::Any) = hash(d) % UInt32
+maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add
+ρ(s::UInt32) = UInt32(leading_zeros(s)) + 0x00000001
 
-# function α(m::UInt32)
-#     if m == 0x00000010          # m = 16
-#         return 0.673
-#     elseif m == 0x00000020      # 
-#         return 0.697
-#     elseif m == 0x00000040
-#         return 0.709
-#     else                        # if m >= UInt32(128)
-#         return 0.7213 / (1 + 1.079 / m)
-#     end
-# end
+function α(m::UInt32)
+    if m == 0x00000010          # m = 16
+        return 0.673
+    elseif m == 0x00000020      # 
+        return 0.697
+    elseif m == 0x00000040
+        return 0.709
+    else                        # if m >= UInt32(128)
+        return 0.7213 / (1 + 1.079 / m)
+    end
+end
 
+function _fit!(o::HyperLogLog, v::Any)
+    x = hash32(v)
+    j = maskadd32(x, o.mask, 0x00000001)
+    w = x & o.altmask
+    o.M[j] = max(o.M[j], ρ(w))
+    o
+end
 
-# function fit!(o::HyperLogLog, v::Any, γ::Float64)
-#     x = hash32(v)
-#     j = maskadd32(x, o.mask, 0x00000001)
-#     w = x & o.altmask
-#     o.M[j] = max(o.M[j], ρ(w))
-#     o
-# end
+function value(o::HyperLogLog)
+    S = 0.0
+    for j in eachindex(o.M)
+        S += 1 / (2 ^ o.M[j])
+    end
+    Z = 1 / S
+    E = α(o.m) * UInt(o.m) ^ 2 * Z
+    if E <= 5//2 * o.m
+        V = 0
+        for j in 1:o.m
+            V += Int(o.M[j] == 0x00000000)
+        end
+        if V != 0
+            E_star = o.m * log(o.m / V)
+        else
+            E_star = E
+        end
+    elseif E <= 1//30 * 2 ^ 32
+        E_star = E
+    else
+        E_star = -2 ^ 32 * log(1 - E / (2 ^ 32))
+    end
+    return E_star
+end
 
-# function value(o::HyperLogLog)
-#     S = 0.0
-#     for j in eachindex(o.M)
-#         S += 1 / (2 ^ o.M[j])
-#     end
-#     Z = 1 / S
-#     E = α(o.m) * UInt(o.m) ^ 2 * Z
-#     if E <= 5//2 * o.m
-#         V = 0
-#         for j in 1:o.m
-#             V += Int(o.M[j] == 0x00000000)
-#         end
-#         if V != 0
-#             E_star = o.m * log(o.m / V)
-#         else
-#             E_star = E
-#         end
-#     elseif E <= 1//30 * 2 ^ 32
-#         E_star = E
-#     else
-#         E_star = -2 ^ 32 * log(1 - E / (2 ^ 32))
-#     end
-#     return E_star
-# end
-
-# function Base.merge!(o::HyperLogLog, o2::HyperLogLog, γ::Float64)
-#     length(o.M) == length(o2.M) || 
-#         error("Merge failed. HyperLogLog objects have different number of registers.")
-#     for j in eachindex(o.M)
-#         o.M[j] = max(o.M[j], o2.M[j])
-#     end
-# end
+function Base.merge!(o::HyperLogLog, o2::HyperLogLog, γ::Float64)
+    length(o.M) == length(o2.M) || 
+        error("Merge failed. HyperLogLog objects have different number of registers.")
+    for j in eachindex(o.M)
+        o.M[j] = max(o.M[j], o2.M[j])
+    end
+end
 
 # #-----------------------------------------------------------------------# KMeans
 # """
@@ -388,123 +384,121 @@ Base.diff(o::Diff) = o.diff
 #     end
 # end
 
-# #-----------------------------------------------------------------------# Lag 
-# """
-#     Lag(b, T = Float64)
+#-----------------------------------------------------------------------# Lag 
+"""
+    Lag(b, T = Float64)
 
-# Store the last `b` values for a data stream of type `T`.
-# """
-# struct Lag{T} <: ExactStat{0}
-#     value::Vector{T}
-# end
-# Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
-# function fit!(o::Lag{T}, y::T, γ::Float64) where {T} 
-#     for i in reverse(2:length(o.value))
-#         @inbounds o.value[i] = o.value[i - 1]
-#     end
-#     o.value[1] = y
-# end
+Store the last `b` values for a data stream of type `T`.
+"""
+struct Lag{T} <: OnlineStat{0}
+    value::Vector{T}
+end
+Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
+function _fit!(o::Lag{T}, y::T) where {T} 
+    for i in reverse(2:length(o.value))
+        @inbounds o.value[i] = o.value[i - 1]
+    end
+    o.value[1] = y
+end
 
-# #-----------------------------------------------------------------------# AutoCov 
-# """
-#     AutoCov(b, T = Float64)
+#-----------------------------------------------------------------------# AutoCov 
+"""
+    AutoCov(b, T = Float64)
 
-# Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
+Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
 
-# # Example 
+# Example 
 
-#     y = cumsum(randn(100))
-#     o = AutoCov(5)
-#     Series(y, o)
-#     autocov(o)
-#     autocor(o)
-# """
-# struct AutoCov{T} <: ExactStat{0}
-#     cross::Vector{Float64}
-#     m1::Vector{Float64}
-#     m2::Vector{Float64}
-#     lag::Lag{T}         # y_{t-1}, y_{t-2}, ...
-#     wlag::Lag{Float64}  # γ_{t-1}, γ_{t-2}, ...
-#     v::Variance
-# end
-# function AutoCov(k::Integer, T = Float64)
-#     AutoCov(
-#         zeros(k + 1), zeros(k + 1), zeros(k + 1),
-#         Lag(k + 1, T), Lag(k + 1, Float64), Variance()
-#     )
-# end
-# Base.show(io::IO, o::AutoCov) = print(io, "AutoCov: $(value(o))")
-# nobs(o::AutoCov) = nobs(o.v)
+    y = cumsum(randn(100))
+    o = AutoCov(5)
+    fit!(o, y)
+    autocov(o)
+    autocor(o)
+"""
+struct AutoCov{T, W} <: OnlineStat{0}
+    cross::Vector{Float64}
+    m1::Vector{Float64}
+    m2::Vector{Float64}
+    lag::Lag{T}         # y_{t-1}, y_{t-2}, ...
+    wlag::Lag{Float64}  # γ_{t-1}, γ_{t-2}, ...
+    v::Variance{W}
+end
+function AutoCov(k::Integer, T = Float64; kw...)
+    d = k + 1
+    AutoCov(zeros(d), zeros(d), zeros(d), Lag(d, T), Lag(d, Float64), Variance(;kw...))
+end
+nobs(o::AutoCov) = nobs(o.v)
 
-# function fit!(o::AutoCov, y::Real, γ::Float64)
-#     fit!(o.v, y, γ)
-#     fit!(o.lag, y, 1.0)     # y_t, y_{t-1}, ...
-#     fit!(o.wlag, γ, 1.0)    # γ_t, γ_{t-1}, ...
-#     # M1 ✓
-#     for k in reverse(2:length(o.m2))
-#         @inbounds o.m1[k] = o.m1[k - 1]
-#     end
-#     @inbounds o.m1[1] = smooth(o.m1[1], y, γ)
-#     # Cross ✓ and M2 ✓
-#     @inbounds for k in 1:length(o.m1)
-#         γk = value(o.wlag)[k]
-#         o.cross[k] = smooth(o.cross[k], y * value(o.lag)[k], γk)
-#         o.m2[k] = smooth(o.m2[k], y, γk)
-#     end
-# end
+function _fit!(o::AutoCov, y::Real)
+    γ = o.v.weight(o.v.n + 1)
+    _fit!(o.v, y)
+    _fit!(o.lag, y)     # y_t, y_{t-1}, ...
+    _fit!(o.wlag, γ)    # γ_t, γ_{t-1}, ...
+    # M1 ✓
+    for k in reverse(2:length(o.m2))
+        @inbounds o.m1[k] = o.m1[k - 1]
+    end
+    @inbounds o.m1[1] = smooth(o.m1[1], y, γ)
+    # Cross ✓ and M2 ✓
+    @inbounds for k in 1:length(o.m1)
+        γk = value(o.wlag)[k]
+        o.cross[k] = smooth(o.cross[k], y * value(o.lag)[k], γk)
+        o.m2[k] = smooth(o.m2[k], y, γk)
+    end
+end
 
-# function value(o::AutoCov)
-#     μ = mean(o.v)
-#     n = nobs(o)
-#     cr = o.cross
-#     m1 = o.m1
-#     m2 = o.m2
-#     [(n - k + 1) / n * (cr[k] + μ * (μ - m1[k] - m2[k])) for k in 1:length(m1)]
-# end
-# autocov(o::AutoCov) = value(o)
-# autocor(o::AutoCov) = value(o) ./ value(o)[1]
+function value(o::AutoCov)
+    μ = mean(o.v)
+    n = nobs(o)
+    cr = o.cross
+    m1 = o.m1
+    m2 = o.m2
+    [(n - k + 1) / n * (cr[k] + μ * (μ - m1[k] - m2[k])) for k in 1:length(m1)]
+end
+autocov(o::AutoCov) = value(o)
+autocor(o::AutoCov) = value(o) ./ value(o)[1]
 
 
-# #-----------------------------------------------------------------------# Moments
-# """
-#     Moments()
+#-----------------------------------------------------------------------# Moments
+"""
+    Moments(; weight)
 
-# First four non-central moments.
+First four non-central moments.
 
-# # Example
+# Example
 
-#     s = Series(randn(1000), Moments(10))
-#     value(s)
-# """
-# mutable struct Moments <: ExactStat{0}
-#     m::Vector{Float64}
-#     nobs::Int
-#     Moments() = new(zeros(4), 0)
-# end
-# function fit!(o::Moments, y::Real, γ::Float64)
-#     o.nobs += 1
-#     @inbounds o.m[1] = smooth(o.m[1], y, γ)
-#     @inbounds o.m[2] = smooth(o.m[2], y * y, γ)
-#     @inbounds o.m[3] = smooth(o.m[3], y * y * y, γ)
-#     @inbounds o.m[4] = smooth(o.m[4], y * y * y * y, γ)
-# end
-# Base.mean(o::Moments) = o.m[1]
-# Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
-# Base.std(o::Moments) = sqrt.(var(o))
-# nobs(o::Moments) = o.nobs
-# function skewness(o::Moments)
-#     v = value(o)
-#     (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
-# end
-# function kurtosis(o::Moments)
-#     v = value(o)
-#     (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
-# end
-# function Base.merge!(o1::Moments, o2::Moments, γ::Float64)
-#     smooth!(o1.m, o2.m, γ)
-#     o1.nobs += o2.nobs
-#     o1
-# end
+    s = Series(randn(1000), Moments(10))
+    value(s)
+"""
+mutable struct Moments{W} <: OnlineStat{0}
+    m::Vector{Float64}
+    weight::W
+    n::Int
+end
+Moments(;weight = inv) = Moments(zeros(4), weight, 0)
+function _fit!(o::Moments, y::Real)
+    γ = o.weight(o.n += 1)
+    y2 = y * y
+    @inbounds o.m[1] = smooth(o.m[1], y, γ)
+    @inbounds o.m[2] = smooth(o.m[2], y2, γ)
+    @inbounds o.m[3] = smooth(o.m[3], y * y2, γ)
+    @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
+end
+mean(o::Moments) = o.m[1]
+var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
+function skewness(o::Moments)
+    v = value(o)
+    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
+end
+function kurtosis(o::Moments)
+    v = value(o)
+    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+end
+function Base.merge!(o::Moments, o2::Moments)
+    γ = o.weight(o.n += o2.n)
+    smooth!(o.m, o2.m, γ)
+    o
+end
 
 # #-----------------------------------------------------------------------# OrderStats
 # """
@@ -758,85 +752,81 @@ Base.diff(o::Diff) = o.diff
 # #     end
 # # end
 
-# #-----------------------------------------------------------------------# ReservoirSample
-# """
-#     ReservoirSample(k, t = Float64)
+#-----------------------------------------------------------------------# ReservoirSample
+"""
+    ReservoirSample(k::Int, T::Type = Float64)
 
-# Reservoir sample of `k` items.
+Reservoir sample of `k` items.
 
-# # Example
+# Example
 
-#     o = ReservoirSample(k, Int)
-#     s = Series(o)
-#     fit!(s, 1:10000)
-# """
-# mutable struct ReservoirSample{T<:Number} <: ExactStat{0}
-#     value::Vector{T}
-#     nobs::Int
-# end
-# function ReservoirSample(k::Integer, ::Type{T} = Float64) where {T<:Number}
-#     ReservoirSample(zeros(T, k), 0)
-# end
+    fit!(ReservoirSample(100, Int), 1:1000)
+"""
+mutable struct ReservoirSample{T<:Number} <: OnlineStat{0}
+    value::Vector{T}
+    n::Int
+end
+function ReservoirSample(k::Int, T::Type = Float64)
+    ReservoirSample(zeros(T, k), 0)
+end
 
-# function fit!(o::ReservoirSample, y, γ::Float64)
-#     o.nobs += 1
-#     if o.nobs <= length(o.value)
-#         o.value[o.nobs] = y
-#     else
-#         j = rand(1:o.nobs)
-#         if j < length(o.value)
-#             o.value[j] = y
-#         end
-#     end
-# end
+function _fit!(o::ReservoirSample, y)
+    o.n += 1
+    if o.n <= length(o.value)
+        o.value[o.n] = y
+    else
+        j = rand(1:o.n)
+        if j < length(o.value)
+            o.value[j] = y
+        end
+    end
+end
 
-# function Base.merge!(o::T, o2::T, γ::Float64) where {T<:ReservoirSample}
-#     length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
-#     p = o.nobs / (o.nobs + o2.nobs)
-#     for j in eachindex(o.value)
-#         if rand() > p 
-#             o.value[j] = o2.value[j]
-#         end
-#     end
-# end
+function Base.merge!(o::T, o2::T, γ::Float64) where {T<:ReservoirSample}
+    length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
+    p = o.n / (o.n + o2.n)
+    for j in eachindex(o.value)
+        if rand() > p 
+            o.value[j] = o2.value[j]
+        end
+    end
+end
 
-# #-----------------------------------------------------------------------# Sum
-# """
-#     Sum()
+#-----------------------------------------------------------------------# Sum
+"""
+    Sum(T::Type = Float64)
 
-# Track the overall sum.
+Track the overall sum.
 
-# # Example
+# Example
 
-#     s = Series(randn(1000), Sum())
-#     value(s)
-# """
-# mutable struct Sum{T <: Real} <: ExactStat{0}
-#     sum::T
-# end
-# Sum() = Sum(0.0)
-# Sum(::Type{T}) where {T<:Real} = Sum(zero(T))
-# Base.sum(o::Sum) = o.sum
-# fit!(o::Sum{T}, x::Real, γ::Float64) where {T<:AbstractFloat} = (v = convert(T, x); o.sum += v)
-# fit!(o::Sum{T}, x::Real, γ::Float64) where {T<:Integer} =       (v = round(T, x);   o.sum += v)
-# Base.merge!(o::T, o2::T, γ::Float64) where {T <: Sum} = (o.sum += o2.sum)
+    fit!(Sum(Int), fill(1, 100))
+"""
+mutable struct Sum{T} <: OnlineStat{0}
+    sum::T
+end
+Sum(T::Type = Float64) = Sum(T(0))
+Base.sum(o::Sum) = o.sum
+_fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x))
+_fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x))
+Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum)
 
-# #-----------------------------------------------------------------------# Unique 
-# """
-#     Unique(T::Type)
+#-----------------------------------------------------------------------# Unique 
+"""
+    Unique(T::Type)
 
-# Track the unique values. 
+Track the unique values. 
 
-# # Example 
+# Example 
 
-#     series(rand(1:5, 100), Unique(Int))
-# """
-# struct Unique{T} <: ExactStat{0}
-#     value::OrderedDict{T, Void}
-# end
-# Unique(T::Type) = Unique(OrderedDict{T,Void}())
-# fit!(o::Unique, y, γ::Number) = (o.value[y] = nothing)
-# Base.show(io::IO, o::Unique) = print(io, "Unique: ", sort(collect(keys(o.value))))
-# Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)
-# Base.unique(o::Unique) = sort!(collect(keys(o.value)))
-# Base.length(o::Unique) = length(o.value)
+    series(rand(1:5, 100), Unique(Int))
+"""
+struct Unique{T} <: OnlineStat{0}
+    value::OrderedDict{T, Nothing}
+end
+Unique(T::Type) = Unique(OrderedDict{T, Nothing}())
+_fit!(o::Unique, y) = (o.value[y] = nothing)
+value(o::Unique) = collect(keys(o.value))
+Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)
+Base.unique(o::Unique) = value(o)
+Base.length(o::Unique) = length(o.value)
