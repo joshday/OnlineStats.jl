@@ -1,4 +1,4 @@
-julia 0.6.0
+julia 0.7.0-
 OnlineStatsBase 0.6.0
 SweepOperator
 LossFunctions
