@@ -71,7 +71,7 @@ mutable struct Count <: OnlineStat{0}
     Count() = new(0)
 end
 _fit!(o::Count, x) = (o.n += 1)
-merge!(o::Count, o2::Count, γ::Float64) = (o.n += o2.n; o)
+merge!(o::Count, o2::Count) = (o.n += o2.n; o)
 
 #-----------------------------------------------------------------------# CountMap 
 """

@@ -1,16 +1,34 @@
-abstract type AbstractSeries{N} end 
-
+#-----------------------------------------------------------------------# Series
 struct Series{N, T<:Tup} <: OnlineStat{N}
     stats::T
 end
 Series(stats::OnlineStat{N}...) where {N} = Series{N, typeof(stats)}(stats)
-
 @generated function _fit!(o::Series{N, T}, y) where {N, T}
     N = length(fieldnames(T))
-    quote 
-        Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i]))
+    :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
+end
+
+#-----------------------------------------------------------------------# FTSeries 
+struct FTSeries{N, OS<:Tup, F, T} <: OnlineStat{N}
+    stats::OS
+    filter::F 
+    transform::T 
+    nfiltered::Int
+end
+function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
+    FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
+end
+@generated function _fit!(o::FTSeries{N, OS}, y) where {N, OS}
+    N = length(fieldnames(OS))
+    quote
+        Base.Cartesian.@nexprs $N i -> @inbounds begin
+            yi = y[i]; o.filter(yi) && _fit!(o.stats[i], o.transform(yi))
+        end
     end
 end
+
+always(x) = true
+
 
 
 # #-----------------------------------------------------------------------# AbstractSeries

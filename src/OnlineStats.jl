@@ -4,9 +4,18 @@ using LinearAlgebra
 
 import OnlineStatsBase: OnlineStat, name, VectorOb, XyOb, value, _fit!
 import Base: merge, merge!, mean, var, std, cov
-import LearnBase: value, fit!
+import LearnBase: fit!, nobs, predict, value
+import StatsBase: autocov, autocor
 import DataStructures: OrderedDict
 import NamedTuples
+
+export 
+    # OnlineStats
+    AutoCov, Count, CountMap, CovMatrix, Diff, Extrema, HyperLogLog, Lag, Mean, Moments, ProbMap, ReservoirSample, Sum, Variance,
+    # Series and Group 
+    Series, FTSeries, Group,
+    # methods 
+    autocov, autocor, fit!, nobs, probs, value
 
 #-----------------------------------------------------------------------# utils 
 smooth(a, b, γ) = a + γ * (b - a)
