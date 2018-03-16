@@ -19,6 +19,7 @@ function test_merge(o, y1, y2, compare = ≈)
     for (v1, v2) in zip(value(o), value(o2))
         @test compare(v1, v2)
     end
+    @test nobs(o) == nobs(o2)
 end
 
 function test_exact(o, y, fo, fy, compare = ≈)

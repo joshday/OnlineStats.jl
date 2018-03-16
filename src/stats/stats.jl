@@ -18,6 +18,7 @@ _fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
 function merge!(o::Mean, o2::Mean) 
     o.n += o2.n
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
+    o
 end
 mean(o::Mean) = o.μ
 
@@ -102,6 +103,32 @@ function probs(o::CountMap, kys = keys(o.value))
 end
 pdf(o::CountMap, y) = y in keys(o.value) ? o.value[y] / nobs(o) : 0.0
 
+#-----------------------------------------------------------------------# CStat
+"""
+    CStat(stat)
+
+Track a univariate OnlineStat for complex numbers.  A copy of `stat` is made to
+separately track the real and imaginary parts.
+
+# Example
+    
+    y = randn(100) + randn(100)im
+    fit!(y, CStat(Mean()))
+"""
+struct CStat{O <: OnlineStat{0}} <: OnlineStat{0}
+    re_stat::O
+    im_stat::O
+end
+CStat(o::OnlineStat{0}) = CStat(o, copy(o))
+nobs(o::CStat) = nobs(o.re_stat)
+value(o::CStat) = value(o.re_stat), value(o.im_stat)
+_fit!(o::CStat, y::T) where {T<:Real} = (_fit!(o.re_stat, y); _fit!(o.im_stat, T(0)))
+_fit!(o::CStat, y::Complex) = (_fit!(o.re_stat, y.re); _fit!(o.im_stat, y.im))
+function merge!(o::T, o2::T) where {T<:CStat}
+    merge!(o.re_stat, o2.re_stat)
+    merge!(o.im_stat, o2.im_stat)
+end
+
 #-----------------------------------------------------------------------# ProbMap
 """
     ProbMap(T::Type; weight)
@@ -180,19 +207,19 @@ function value(o::CovMatrix; corrected::Bool = true)
     o.value
 end
 function merge!(o::CovMatrix, o2::CovMatrix)
-    γ = o.weight(o.n += o2.n)
+    γ = o2.n / (o.n += o2.n)
     smooth!(o.A, o2.A, γ)
     smooth!(o.b, o2.b, γ)
     o
 end
-cov(o::CovMatrix) = value(o)
+cov(o::CovMatrix; corrected::Bool = true) = value(o; corrected=corrected)
 mean(o::CovMatrix) = o.b
 var(o::CovMatrix; kw...) = diag(value(o; kw...))
 function Base.cor(o::CovMatrix; kw...)
     value(o; kw...)
     v = 1.0 ./ sqrt.(diag(o.value))
-    rmul!(o.value, v)
-    rmul!(v, o.value)
+    rmul!(o.value, Diagonal(v))
+    lmul!(Diagonal(v), o.value)
     o.value
 end
 
@@ -241,15 +268,18 @@ Maximum and minimum.
 mutable struct Extrema{T} <: OnlineStat{0}
     min::T
     max::T
+    n::Int
 end
-Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T))
+Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T), 0)
 function _fit!(o::Extrema, y::Real)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
+    o.n += 1
 end
 function Base.merge!(o::Extrema, o2::Extrema)
     o.min = min(o.min, o2.min)
     o.max = max(o.max, o2.max)
+    o.n += o2.n
     o
 end
 value(o::Extrema) = (o.min, o.max)

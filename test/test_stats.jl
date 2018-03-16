@@ -30,40 +30,41 @@ end
     @test probs(o) == fill(.25, 4)
     @test probs(o, 7:9) == zeros(3)
 end
-# #-----------------------------------------------------------------------# CovMatrix
-# @testset "CovMatrix" begin 
-#     test_exact(CovMatrix(5), x, var, x -> vec(var(x, 1)))
-#     test_exact(CovMatrix(5), x, std, x -> vec(std(x, 1)))
-#     test_exact(CovMatrix(5), x, mean, x -> vec(mean(x, 1)))
-#     test_exact(CovMatrix(5), x, cor, cor)
-#     test_exact(CovMatrix(5), x, cov, cov)
-#     test_exact(CovMatrix(5), x, o->cov(o;corrected=false), x->cov(x,1,false))
-#     test_merge(CovMatrix(5), x, x2)
-# end
-# #-----------------------------------------------------------------------# CStat 
-# @testset "CStat" begin 
-#     data = y + y2 * im 
-#     data2 = y2 + y * im
-#     test_exact(CStat(Mean()), data, o->value(o)[1], x -> mean(y))
-#     test_merge(CStat(Mean()), y, y2)
-#     test_merge(CStat(Mean()), data, data2)
-# end
-# #-----------------------------------------------------------------------# Diff 
-# @testset "Diff" begin 
-#     test_exact(Diff(), y, value, y -> y[end] - y[end-1])
-#     o = Diff(Int)
-#     Series(1:10, o)
-#     @test diff(o) == 1
-#     @test last(o) == 10
-# end
-# #-----------------------------------------------------------------------# Extrema
-# @testset "Extrema" begin 
-#     test_exact(Extrema(), y, extrema, extrema, ==)
-#     test_exact(Extrema(), y, maximum, maximum, ==)
-#     test_exact(Extrema(), y, minimum, minimum, ==)
-#     test_exact(Extrema(Int), rand(Int, 100), minimum, minimum, ==)
-#     test_merge(Extrema(), y, y2, ==)
-# end
+#-----------------------------------------------------------------------# CovMatrix
+@testset "CovMatrix" begin 
+    test_exact(CovMatrix(5), x, var, x -> var(x, dims=1))
+    test_exact(CovMatrix(), x, std, x -> std(x, dims=1))
+    test_exact(CovMatrix(5), x, mean, x -> mean(x, dims=1))
+    test_exact(CovMatrix(), x, cor, cor)
+    test_exact(CovMatrix(5), x, cov, cov)
+    test_exact(CovMatrix(), x, o->cov(o;corrected=false), x->cov(x,corrected=false))
+    test_merge(CovMatrix(), x, x2)
+end
+#-----------------------------------------------------------------------# CStat 
+@testset "CStat" begin 
+    data = y + y2 * im 
+    data2 = y2 + y * im
+    test_exact(CStat(Mean()), data, o->value(o)[1], x -> mean(y))
+    test_exact(CStat(Mean()), data, o->value(o)[2], x -> mean(y2))
+    test_exact(CStat(Mean()), data, nobs, length, ==)
+    test_merge(CStat(Mean()), y, y2)
+    test_merge(CStat(Mean()), data, data2)
+end
+#-----------------------------------------------------------------------# Diff 
+@testset "Diff" begin 
+    test_exact(Diff(), y, value, y -> y[end] - y[end-1])
+    o = fit!(Diff(Int), 1:10)
+    @test diff(o) == 1
+    @test last(o) == 10
+end
+#-----------------------------------------------------------------------# Extrema
+@testset "Extrema" begin 
+    test_exact(Extrema(), y, extrema, extrema, ==)
+    test_exact(Extrema(), y, maximum, maximum, ==)
+    test_exact(Extrema(), y, minimum, minimum, ==)
+    test_exact(Extrema(Int), rand(Int, 100), minimum, minimum, ==)
+    test_merge(Extrema(), y, y2, ==)
+end
 # #-----------------------------------------------------------------------# Distributions
 # @testset "Fit[Distribution]" begin
 #     @testset "sanity check" begin

@@ -11,7 +11,7 @@ import NamedTuples
 
 export 
     # OnlineStats
-    AutoCov, Count, CountMap, CovMatrix, Diff, Extrema, HyperLogLog, Lag, Mean, Moments, ProbMap, ReservoirSample, Sum, Variance,
+    AutoCov, Count, CountMap, CovMatrix, CStat, Diff, Extrema, HyperLogLog, Lag, Mean, Moments, ProbMap, ReservoirSample, Sum, Variance,
     # Series and Group 
     Series, FTSeries, Group,
     # methods 
@@ -19,14 +19,14 @@ export
 
 #-----------------------------------------------------------------------# utils 
 smooth(a, b, γ) = a + γ * (b - a)
-function smooth!(a::VectorOb, b::VectorOb, γ)
-    for (i, ai) in enumerate(a)
-        a[i] = smooth(ai, b[i], γ)
+function smooth!(a, b, γ)
+    for i in eachindex(a)
+        a[i] = smooth(a[i], b[i], γ)
     end
 end
 function smooth_syr!(A::AbstractMatrix, x, γ::Number)
     for j in 1:size(A, 2), i in 1:j
-        @inbounds A[i, j] = smooth(A[i,j], x[i] * x[j], γ)
+        A[i, j] = smooth(A[i,j], x[i] * x[j], γ)
     end
 end
 
@@ -68,6 +68,7 @@ include("series.jl")
 include("stats/stats.jl")
 include("stats/wrappers.jl")
 include("stats/group.jl")
+include("stats/distributions.jl")
 end
 
 # __precompile__(true)
