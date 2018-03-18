@@ -198,6 +198,19 @@ end
     test_exact(Moments(), y, std, std)
     test_merge(Moments(), y, y2)
 end
+@testset "NBClassifier" begin 
+    X, Y = randn(1000, 5), rand(Bool, 1000)
+    X2, Y2 = randn(1000, 5), rand(Bool, 1000)
+    Y[1] = Y2[1] = true
+    o = fit!(NBClassifier(Bool, ()->5FitNormal()), (X, Y))
+    o2 = fit!(NBClassifier(Bool, ()->5FitNormal()), (X2, Y2))
+    merge!(o, o2)
+    fit!(o2, (X, Y))
+    @test sort(value(o)[1]) == sort(value(o2)[1])
+    for i in 1:5, j in 1:2 
+        @test value(o.d[true][i])[j] ≈ value(o2.d[true][i])[j]
+    end
+end
 @testset "OrderStats" begin 
     test_merge(OrderStats(100), y, y2)
     test_exact(OrderStats(1000), y, value, sort, ==)

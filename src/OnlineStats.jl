@@ -34,6 +34,7 @@ export
     KMeans,
     Lag,
     Mean, Moments,
+    NBClassifier,
     OrderStats,
     ProbMap, P2Quantile,
     Quantile,
@@ -48,6 +49,7 @@ include("algorithms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")
 include("stats/hist.jl")
+include("stats/nbclassifier.jl")
 
 
 
