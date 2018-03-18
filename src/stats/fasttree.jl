@@ -33,7 +33,12 @@ function classify(o::FastNode)
     end
     out
 end
-# child(o::FastNode, x::VectorOb) = x[o.j] < o.at ? first(o.children) : last(o.children)
+
+whichchild(o::FastNode, x::VectorOb) = x[o.j] < o.at ? o.children[1] : o.children[2]
+
+function split(o::FastNode)
+
+end
 
 # # node, tree_length --> left, right
 # function split(o::FastNode, d::Int, split_candidates::Vector{Float64})

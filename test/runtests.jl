@@ -131,6 +131,14 @@ end
 end
 end
 @testset "FastNode" begin 
+    data = (x,rand(1:3,1000))
+    data2 = (x,rand(1:3,1000))
+    o = fit!(FastNode(5, 3), data)
+    o2 = fit!(FastNode(5, 3), data2)
+    merge!(o, o2)
+    fit!(o2, data)
+    @test value(o.stats[1][1])[1] ≈ value(o2.stats[1][1])[1]
+    @test value(o.stats[1][1])[2] ≈ value(o2.stats[1][1])[2]
 end
 #-----------------------------------------------------------------------# Group 
 @testset "Group" begin 
