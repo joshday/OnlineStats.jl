@@ -1,75 +1,62 @@
 module OnlineStats 
 
-using LinearAlgebra
+using Compat
+using Compat.LinearAlgebra
 
-import OnlineStatsBase: OnlineStat, name, VectorOb, XyOb, value, _fit!
-import Base: merge, merge!, mean, var, std, cov
-import LearnBase: fit!, nobs, predict, value
-import StatsBase: autocov, autocor, confint
+using Reexport 
+@reexport using OnlineStatsBase
+
+import OnlineStatsBase: OnlineStat, name, value, _fit!
+import LearnBase: fit!, nobs, value, predict
+import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, fweights
 import DataStructures: OrderedDict
-import NamedTuples
+import NamedTuples  # Remove in 0.7
 
 export 
-    # OnlineStats
-    AutoCov, Bootstrap, Count, CountMap, CovMatrix, CStat, Diff, Extrema, FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal, HyperLogLog, Lag, Mean, Moments, ProbMap, ReservoirSample, Sum, Variance,
-    # Series and Group 
-    Series, FTSeries, Group,
-    # methods 
-    autocov, autocor, confint, fit!, nobs, probs, value
+# functions 
+    fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
+    eachcol, eachrow,
+# weights 
+    EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
+    McclainWeight, Bounded, Scaled,
+# updaters 
+    ADAGRAD, ADAM, MSPI, SGD,
+# stats
+    AutoCov,
+    Bootstrap,
+    CallFun, Count, CountMap, CovMatrix, CStat,
+    Diff,
+    Extrema,
+    FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
+    FTSeries,
+    Group,
+    Hist, HyperLogLog,
+    KMeans,
+    Lag,
+    Mean, Moments,
+    OrderStats,
+    ProbMap, P2Quantile,
+    Quantile,
+    ReservoirSample,
+    Series, Sum,
+    Variance,
+# other 
+    BiasVec
 
-#-----------------------------------------------------------------------# utils 
-smooth(a, b, γ) = a + γ * (b - a)
-function smooth!(a, b, γ)
-    for i in eachindex(a)
-        a[i] = smooth(a[i], b[i], γ)
-    end
-end
-function smooth_syr!(A::AbstractMatrix, x, γ::Number)
-    for j in 1:size(A, 2), i in 1:j
-        A[i, j] = smooth(A[i,j], x[i] * x[j], γ)
-    end
-end
+include("utils.jl")
+include("algorithms.jl")
+include("stats/stats.jl")
+include("stats/distributions.jl")
+include("stats/hist.jl")
 
-unbias(o) = nobs(o) / (nobs(o) - 1)
-std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
-nobs(o::OnlineStat) = o.n
-
-abstract type ObLoc end 
-struct Rows <: ObLoc end # Each Row of matrix is an observation
-struct Cols <: ObLoc end # Each Col ...
-
-const Tup = Union{Tuple, NamedTuples.NamedTuple}
-
-#-----------------------------------------------------------------------# fit 0
-fit!(o::OnlineStat{0}, y) = (_fit!(o, y); o)
-function fit!(o::OnlineStat{0}, y::VectorOb)
-    for yi in y 
-        fit!(o, yi)
-    end 
-    o
-end
-#-----------------------------------------------------------------------# fit 1 
-fit!(o::OnlineStat{1}, y) = (_fit!(o, y); o)
-function fit!(s::OnlineStat{1}, y::AbstractMatrix, ::Rows = Rows())
-    n, p = size(y)
-    buffer = Vector{eltype(y)}(undef, p)
-    for i in 1:n
-        for j in 1:p
-            @inbounds buffer[j] = y[i, j]
-        end
-        fit!(s, buffer)
-    end
-    s
-end
 
 
 #-----------------------------------------------------------------------# includes
-include("stats/series.jl")
-include("stats/updaters.jl")
-include("stats/stats.jl")
-include("stats/wrappers.jl")
-include("stats/group.jl")
-include("stats/distributions.jl")
+# include("stats/algorithms.jl")
+# include("stats/stats.jl")
+# include("stats/wrappers.jl")
+# include("stats/group.jl")
+# include("stats/distributions.jl")
 end
 
 # __precompile__(true)

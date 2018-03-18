@@ -1,61 +1,3 @@
-#-----------------------------------------------------------------------# Mean
-"""
-    Mean(; weight)
-
-Univariate mean.
-
-# Example
-
-    @time fit!(Mean(), randn(10^6))
-"""
-mutable struct Mean{W} <: OnlineStat{0}
-    μ::Float64
-    weight::W
-    n::Int
-end
-Mean(weight::Function = inv) = Mean(0.0, weight, 0)
-_fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
-function merge!(o::Mean, o2::Mean) 
-    o.n += o2.n
-    o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
-    o
-end
-mean(o::Mean) = o.μ
-
-#-----------------------------------------------------------------------# Variance 
-"""
-    Variance(; weight)
-
-Univariate variance.
-
-# Example 
-
-    @time fit!(Variance(), randn(10^6))
-"""
-mutable struct Variance{W} <: OnlineStat{0}
-    σ2::Float64 
-    μ::Float64 
-    weight::W
-    n::Int
-end
-Variance(;weight = inv) = Variance(0.0, 0.0, weight, 0)
-function _fit!(o::Variance, x)
-    μ = o.μ
-    γ = o.weight(o.n += 1)
-    o.μ = smooth(o.μ, x, γ)
-    o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
-end
-function merge!(o::Variance, o2::Variance)
-    γ = o2.n / (o.n += o2.n)
-    δ = o2.μ - o.μ
-    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
-    o.μ = smooth(o.μ, o2.μ, γ)
-    o
-end
-value(o::Variance) = o.n > 0 ? o.σ2 * unbias(o) : 0.0
-var(o::Variance) = value(o)
-mean(o::Variance) = o.μ
-
 #-----------------------------------------------------------------------# Bootstrap
 """
     Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
@@ -101,6 +43,27 @@ function _fit!(b::Bootstrap, y)
     b
 end
 
+#-----------------------------------------------------------------------# CallFun
+"""
+    CallFun(o::OnlineStat, f::Function)
+
+Call `f(o)` every time the OnlineStat `o` gets updated.
+
+# Example
+
+    o = CallFun(Mean(), info)
+    fit!(o, [0,0,1,1])
+"""
+struct CallFun{N, O <: OnlineStat{N}, F <: Function} <: OnlineStat{N}
+    stat::O
+    f::F
+end 
+CallFun(o::O, f::F) where {N, O<:OnlineStat{N}, F} = CallFun{N, O, F}(o, f)
+nobs(o::CallFun) = nobs(o.stat)
+value(o::CallFun) = value(o.stat)
+Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
+_fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
+Base.merge!(o::CallFun, o2::CallFun) = merge!(o.stat, o2.stat)
 
 #-----------------------------------------------------------------------# Count 
 """
@@ -117,7 +80,7 @@ mutable struct Count <: OnlineStat{0}
     Count() = new(0)
 end
 _fit!(o::Count, x) = (o.n += 1)
-merge!(o::Count, o2::Count) = (o.n += o2.n; o)
+Base.merge!(o::Count, o2::Count) = (o.n += o2.n; o)
 
 #-----------------------------------------------------------------------# CountMap 
 """
@@ -136,7 +99,7 @@ struct CountMap{A <: AbstractDict} <: OnlineStat{0}
 end
 CountMap(T::Type) = CountMap(OrderedDict{T, Int}())
 _fit!(o::CountMap, x) = haskey(o.value, x) ? o.value[x] += 1 : o.value[x] = 1
-merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o)
+Base.merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o)
 nobs(o::CountMap) = sum(values(o.value))
 function probs(o::CountMap, kys = keys(o.value))
     out = zeros(Int, length(kys))
@@ -147,74 +110,6 @@ function probs(o::CountMap, kys = keys(o.value))
     sum(out) == 0 ? Float64.(out) : out ./ sum(out)
 end
 pdf(o::CountMap, y) = y in keys(o.value) ? o.value[y] / nobs(o) : 0.0
-
-#-----------------------------------------------------------------------# CStat
-"""
-    CStat(stat)
-
-Track a univariate OnlineStat for complex numbers.  A copy of `stat` is made to
-separately track the real and imaginary parts.
-
-# Example
-    
-    y = randn(100) + randn(100)im
-    fit!(y, CStat(Mean()))
-"""
-struct CStat{O <: OnlineStat{0}} <: OnlineStat{0}
-    re_stat::O
-    im_stat::O
-end
-CStat(o::OnlineStat{0}) = CStat(o, copy(o))
-nobs(o::CStat) = nobs(o.re_stat)
-value(o::CStat) = value(o.re_stat), value(o.im_stat)
-_fit!(o::CStat, y::T) where {T<:Real} = (_fit!(o.re_stat, y); _fit!(o.im_stat, T(0)))
-_fit!(o::CStat, y::Complex) = (_fit!(o.re_stat, y.re); _fit!(o.im_stat, y.im))
-function merge!(o::T, o2::T) where {T<:CStat}
-    merge!(o.re_stat, o2.re_stat)
-    merge!(o.im_stat, o2.im_stat)
-end
-
-#-----------------------------------------------------------------------# ProbMap
-"""
-    ProbMap(T::Type; weight)
-    ProbMap(A::AbstractDict; weight)
-
-Track a dictionary that maps unique values to its probability.  Similar to 
-[`CountMap`](@ref), but uses a weighting mechanism.
-
-# Example 
-    
-    fit!(ProbMap(Int), rand(1:10, 1000))
-"""
-mutable struct ProbMap{A<:AbstractDict, W} <: OnlineStat{0}
-    value::A 
-    weight::W 
-    n::Int
-end
-ProbMap(T::Type; weight = inv) = ProbMap(OrderedDict{T, Float64}(), weight, 0)
-function _fit!(o::ProbMap, y)
-    γ = o.weight(o.n += 1)
-    get!(o.value, y, 0.0)   # initialize class probability at 0 if it isn't present
-    for ky in keys(o.value)
-        if ky == y 
-            o.value[ky] = smooth(o.value[ky], 1.0, γ)
-        else 
-            o.value[ky] *= (1 - γ)
-        end
-    end
-end
-function merge!(o::ProbMap, o2::ProbMap) 
-    o.n += o2.n
-    merge!((a, b)->smooth(a, b, o.n2 / o.n), o.value, o2.value)
-    o
-end
-function probs(o::ProbMap, levels = keys(o))
-    out = zeros(length(levels))
-    for (i, ky) in enumerate(levels)
-        out[i] = get(o.value, ky, 0.0)
-    end
-    sum(out) == 0.0 ? out : out ./ sum(out)
-end
 
 #-----------------------------------------------------------------------# CovMatrix 
 """
@@ -248,24 +143,50 @@ function _fit!(o::CovMatrix, x)
 end
 function value(o::CovMatrix; corrected::Bool = true)
     o.value[:] = Matrix(Symmetric((o.A - o.b * o.b')))
-    corrected && rmul!(o.value, unbias(o))
+    corrected && scale!(o.value, unbias(o))
     o.value
 end
-function merge!(o::CovMatrix, o2::CovMatrix)
+function Base.merge!(o::CovMatrix, o2::CovMatrix)
     γ = o2.n / (o.n += o2.n)
     smooth!(o.A, o2.A, γ)
     smooth!(o.b, o2.b, γ)
     o
 end
-cov(o::CovMatrix; corrected::Bool = true) = value(o; corrected=corrected)
-mean(o::CovMatrix) = o.b
-var(o::CovMatrix; kw...) = diag(value(o; kw...))
+Base.cov(o::CovMatrix; corrected::Bool = true) = value(o; corrected=corrected)
+Base.mean(o::CovMatrix) = o.b
+Base.var(o::CovMatrix; kw...) = diag(value(o; kw...))
 function Base.cor(o::CovMatrix; kw...)
     value(o; kw...)
     v = 1.0 ./ sqrt.(diag(o.value))
-    rmul!(o.value, Diagonal(v))
-    lmul!(Diagonal(v), o.value)
+    scale!(o.value, v)
+    scale!(v, o.value)
     o.value
+end
+
+#-----------------------------------------------------------------------# CStat
+"""
+    CStat(stat)
+
+Track a univariate OnlineStat for complex numbers.  A copy of `stat` is made to
+separately track the real and imaginary parts.
+
+# Example
+    
+    y = randn(100) + randn(100)im
+    fit!(y, CStat(Mean()))
+"""
+struct CStat{O <: OnlineStat{0}} <: OnlineStat{0}
+    re_stat::O
+    im_stat::O
+end
+CStat(o::OnlineStat{0}) = CStat(o, copy(o))
+nobs(o::CStat) = nobs(o.re_stat)
+value(o::CStat) = value(o.re_stat), value(o.im_stat)
+_fit!(o::CStat, y::T) where {T<:Real} = (_fit!(o.re_stat, y); _fit!(o.im_stat, T(0)))
+_fit!(o::CStat, y::Complex) = (_fit!(o.re_stat, y.re); _fit!(o.im_stat, y.im))
+function Base.merge!(o::T, o2::T) where {T<:CStat}
+    merge!(o.re_stat, o2.re_stat)
+    merge!(o.im_stat, o2.im_stat)
 end
 
 #-----------------------------------------------------------------------# Diff
@@ -284,17 +205,20 @@ Track the difference and the last value.
 mutable struct Diff{T <: Real} <: OnlineStat{0}
     diff::T
     lastval::T
+    n::Int
 end
-Diff(T::Type = Float64) = Diff(zero(T), zero(T))
+Diff(T::Type = Float64) = Diff(zero(T), zero(T), 0)
 function _fit!(o::Diff{T}, x) where {T<:AbstractFloat}
     v = convert(T, x)
     o.diff = v - last(o)
     o.lastval = v
+    o.n += 1
 end
 function _fit!(o::Diff{T}, x) where {T<:Integer}
     v = round(T, x)
     o.diff = v - last(o)
     o.lastval = v
+    o.n += 1
 end
 Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
@@ -331,6 +255,75 @@ value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
 Base.maximum(o::Extrema) = o.max 
 Base.minimum(o::Extrema) = o.min
+
+#-----------------------------------------------------------------------# FTSeries 
+"""
+    FTSeries(stats...; filter=always, transform=identity)
+
+A series that filters and transforms the data before being fit.
+
+# Example 
+
+    fit!(FTSeries(Mean(), Variance(); transform=abs), -rand(1000))
+"""
+mutable struct FTSeries{N, OS<:Tup, F, T} <: OnlineStat{N}
+    stats::OS
+    filter::F 
+    transform::T 
+    nfiltered::Int
+end
+function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
+    FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
+end
+@generated function _fit!(o::FTSeries{N, OS}, y) where {N, OS}
+    n = length(fieldnames(OS))
+    quote
+        Base.Cartesian.@nexprs $n i -> @inbounds begin
+            yi = y[i]; o.filter(yi) ? _fit!(o.stats[i], o.transform(yi)) : o.nfiltered += 1
+        end
+    end
+end
+function Base.merge!(o::T, o2::T) where {T<:FTSeries}
+    o.nfiltered += o2.nfiltered 
+    merge!.(o.stats, o2.stats)
+    o
+end
+always(x) = true
+
+#-----------------------------------------------------------------------# Group
+"""
+    Group(stats::OnlineStat{0}...)
+    Group(tuple)
+
+Create a vector-input stat (`OnlineStat{1}`) from several scalar-input stats.  For a new 
+observation `y`, `y[i]` is sent to `stats[i]`.
+
+# Examples
+
+    fit!(Group(Mean(), Mean()), randn(100, 2))
+    fit!(Group(Mean(), Variance()), randn(100, 2))
+"""
+struct Group{T} <: OnlineStat{1}
+    stats::T
+end
+Group(o::OnlineStat{0}...) = Group(o)
+Base.hcat(o::OnlineStat{0}...) = Group(o)
+nobs(o::Group) = nobs(first(o.stats))
+
+Base.getindex(o::Group, i) = o.stats[i]
+Base.first(o::Group) = first(o.stats)
+Base.last(o::Group) = last(o.stats)
+Base.length(o::Group) = length(o.stats)
+Base.values(o::Group) = value.(o.stats)
+
+@generated function _fit!(o::Group{T}, y) where {T}
+    N = length(fieldnames(T))
+    :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
+end
+
+Base.merge!(o::Group, o2::Group) = (merge!.(o.stats, o2.stats); o)
+
+Base.:*(n::Integer, o::OnlineStat{0}) = Group([copy(o) for i in 1:n]...)
 
 #-----------------------------------------------------------------------# HyperLogLog
 # Mostly copy/pasted from StreamStats.jl
@@ -432,21 +425,13 @@ end
 #     KMeans(p, k)
 
 # Approximate K-Means clustering of `k` clusters and `p` variables.
-
-# # Example
-
-#     using OnlineStats, Distributions
-#     d = MixtureModel([Normal(0), Normal(5)])
-#     y = rand(d, 100_000, 1)
-#     s = Series(y, LearningRate(.6), KMeans(1, 2))
 # """
-# mutable struct KMeans{U <: Updater} <: StochasticStat{1}
+# mutable struct KMeans{U <: Updater} <: OnlineStat{1}
 #     value::Matrix{Float64}  # p × k
 #     v::Vector{Float64}
-#     n::Int
 #     updater::U
 # end
-# KMeans(p::Integer, k::Integer, u::Updater = SGD()) = KMeans(zeros(p, k), zeros(k), 0, u)
+# KMeans(p::Integer, k::Integer; alg=SGD()) = KMeans(zeros(p, k), zeros(k), 0, u)
 # function fit!(o::KMeans{<:SGD}, x::VectorOb, γ::Float64)
 #     o.n += 1
 #     p, k = size(o.value)
@@ -463,7 +448,437 @@ end
 #     end
 # end
 
-#-----------------------------------------------------------------------# Lag 
+#-----------------------------------------------------------------------# Mean
+"""
+    Mean(; weight)
+
+Track a univariate mean.
+
+# Update 
+
+``μ = (1 - w) * μ + w * x``
+
+# Example
+
+    @time fit!(Mean(), randn(10^6))
+
+    # exponentially-weighted mean
+    @time fit!(Mean(;weight = x -> 0.1), randn(10^6))
+"""
+mutable struct Mean{W} <: OnlineStat{0}
+    μ::Float64
+    weight::W
+    n::Int
+end
+Mean(;weight = EqualWeight()) = Mean(0.0, weight, 0)
+_fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
+function Base.merge!(o::Mean, o2::Mean) 
+    o.n += o2.n
+    o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
+    o
+end
+Base.mean(o::Mean) = o.μ
+
+#-----------------------------------------------------------------------# Moments
+"""
+    Moments(; weight)
+
+First four non-central moments.
+
+# Example
+
+    s = Series(randn(1000), Moments(10))
+    value(s)
+"""
+mutable struct Moments{W} <: OnlineStat{0}
+    m::Vector{Float64}
+    weight::W
+    n::Int
+end
+Moments(;weight = inv) = Moments(zeros(4), weight, 0)
+function _fit!(o::Moments, y::Real)
+    γ = o.weight(o.n += 1)
+    y2 = y * y
+    @inbounds o.m[1] = smooth(o.m[1], y, γ)
+    @inbounds o.m[2] = smooth(o.m[2], y2, γ)
+    @inbounds o.m[3] = smooth(o.m[3], y * y2, γ)
+    @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
+end
+Base.mean(o::Moments) = o.m[1]
+Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
+function skewness(o::Moments)
+    v = value(o)
+    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
+end
+function kurtosis(o::Moments)
+    v = value(o)
+    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+end
+function Base.merge!(o::Moments, o2::Moments)
+    γ = o2.n / (o.n += o2.n)
+    smooth!(o.m, o2.m, γ)
+    o
+end
+
+#-----------------------------------------------------------------------# OrderStats
+"""
+    OrderStats(b::Int, T::Type = Float64)
+
+Average order statistics with batches of size `b`.
+"""
+mutable struct OrderStats{T, W} <: OnlineStat{0}
+    value::Vector{T}
+    buffer::Vector{T}
+    weight::W
+    n::Int
+end
+function OrderStats(p::Integer, T::Type = Float64; weight=EqualWeight()) 
+    OrderStats(zeros(T, p), zeros(T, p), weight, 0)
+end
+function _fit!(o::OrderStats, y)
+    p = length(o.value)
+    buffer = o.buffer
+    i = (o.n % p) + 1
+    o.n += 1 
+    buffer[i] = y 
+    if i == p
+        sort!(buffer)
+        smooth!(o.value, buffer, o.weight(o.n / p))
+    end
+end
+function Base.merge!(o::OrderStats, o2::OrderStats)
+    length(o.value) == length(o2.value) || 
+        error("Merge failed.  OrderStats track different batch sizes")
+    o.n += o2.n
+    smooth!(o.value, o2.value, o2.n / o.n)
+end
+Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
+
+# # tree/nbc help:
+# function pdf(o::OrderStats, x)
+#     if x ≤ first(o.value) 
+#         return 0.0
+#     elseif x > last(o.value) 
+#         return 0.0 
+#     else
+#         i = searchsortedfirst(o.value, x)
+#         b = nobs(o) / (length(o.value) + 1)
+#         return b / (o.value[i] - o.value[i-1])
+#     end
+# end
+# split_candidates(o::OrderStats) = midpoints(value(o))
+
+
+#-----------------------------------------------------------------------# ProbMap
+"""
+    ProbMap(T::Type; weight)
+    ProbMap(A::AbstractDict; weight)
+
+Track a dictionary that maps unique values to its probability.  Similar to 
+[`CountMap`](@ref), but uses a weighting mechanism.
+
+# Example 
+    
+    fit!(ProbMap(Int), rand(1:10, 1000))
+"""
+mutable struct ProbMap{A<:AbstractDict, W} <: OnlineStat{0}
+    value::A 
+    weight::W 
+    n::Int
+end
+ProbMap(T::Type; weight = inv) = ProbMap(OrderedDict{T, Float64}(), weight, 0)
+function _fit!(o::ProbMap, y)
+    γ = o.weight(o.n += 1)
+    get!(o.value, y, 0.0)   # initialize class probability at 0 if it isn't present
+    for ky in keys(o.value)
+        if ky == y 
+            o.value[ky] = smooth(o.value[ky], 1.0, γ)
+        else 
+            o.value[ky] *= (1 - γ)
+        end
+    end
+end
+function Base.merge!(o::ProbMap, o2::ProbMap) 
+    o.n += o2.n
+    merge!((a, b)->smooth(a, b, o.n2 / o.n), o.value, o2.value)
+    o
+end
+function probs(o::ProbMap, levels = keys(o))
+    out = zeros(length(levels))
+    for (i, ky) in enumerate(levels)
+        out[i] = get(o.value, ky, 0.0)
+    end
+    sum(out) == 0.0 ? out : out ./ sum(out)
+end
+
+#-----------------------------------------------------------------------# P2Quantile 
+"""
+    P2Quantile(τ = 0.5)
+
+Calculate the approximate quantile via the P^2 algorithm.  It is more computationally
+expensive than the algorithms used by [`Quantile`](@ref), but also more exact.
+
+Ref: [https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf](https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf)
+"""
+mutable struct P2Quantile <: OnlineStat{0}
+    q::Vector{Float64}  # marker heights
+    n::Vector{Int}      # marker position
+    nprime::Vector{Float64}
+    τ::Float64
+    nobs::Int
+end
+function P2Quantile(τ::Real = 0.5)
+    @assert 0 < τ < 1
+    nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
+    P2Quantile(zeros(5), collect(1:5), nprime, τ, 0)
+end
+Base.show(io::IO, o::P2Quantile) = print(io, "P2Quantile($(o.τ), $(value(o)))")
+value(o::P2Quantile) = o.q[3]
+nobs(o::P2Quantile) = o.nobs
+function _fit!(o::P2Quantile, y::Real)
+    o.nobs += 1
+    q = o.q
+    n = o.n
+    nprime = o.nprime
+    @inbounds if o.nobs > 5
+        # B1
+        k = searchsortedfirst(q, y) - 1
+        k = min(k, 4)
+        k = max(k, 1)
+        q[1] = min(q[1], y)
+        q[5] = max(q[5], y)
+        # B2
+        for i in (k+1):5
+            n[i] += 1
+        end
+        nprime[2] += o.τ / 2
+        nprime[3] += o.τ
+        nprime[4] += (1 + o.τ) / 2
+        nprime[5] += 1
+        # B3
+        for i in 2:4
+            _interpolate!(o.q, o.n, nprime[i] - n[i], i)
+        end
+    # A
+    elseif o.nobs < 5
+        @inbounds o.q[o.nobs] = y
+    else 
+        @inbounds o.q[o.nobs] = y
+        sort!(o.q)
+    end
+end
+
+function _interpolate!(q, n, di, i)
+    @inbounds q1, q2, q3 = q[i-1], q[i], q[i+1]
+    @inbounds n1, n2, n3 = n[i-1], n[i], n[i+1]
+    @inbounds if (di ≥ 1 && n3 - n2 > 1) || (di ≤ -1 && n1 - n2 < -1)
+        d = Int(sign(di))
+        df = sign(di)
+        v1 = (n2 - n1 + d) * (q3 - q2) / (n3 - n2) 
+        v2 = (n3 - n2 - d) * (q2 - q1) / (n2 - n1) 
+        qi = q2 + df / (n3 - n1) * (v1 + v2) 
+        if q1 < qi < q3 
+            q[i] = qi
+        else
+            q[i] += df * (q[i + d] - q2) / (n[i + d] - n2)
+        end
+        n[i] += d
+    end
+end
+
+# function parabolic_interpolate(q1, q2, q3, n1, n2, n3, d)
+#     qi = q2 + d / (n3 - n1) * 
+#         ((n2 - n1 + d) * (q3 - q2) / (n3 - n2) + (n3 - n2 - d) * (q2 - q1) / (n2 - n1))
+# end
+
+#-----------------------------------------------------------------------# Quantile
+"""
+    Quantile(q = [.25, .5, .75]; alg)
+"""
+mutable struct Quantile{T <: Algorithm} <: OnlineStat{0}
+    value::Vector{Float64}
+    τ::Vector{Float64}
+    alg::T 
+end
+function Quantile(τ::AbstractVector = [.25, .5, .75]; alg = OMAS()) 
+    init!(alg, length(τ))
+    Quantile(zeros(length(τ)), sort!(collect(τ)), alg)
+end
+nobs(o::Quantile) = nobs(o.alg)
+function _fit!(o::Quantile, y)
+    n = (o.alg.n += 1) 
+    len = length(o.value)
+    if n > len 
+        qfit!(o, y)
+    else
+        o.value[n] = y 
+        n == len && sort!(o.value)
+    end
+end
+
+function qfit!(o::Quantile{SG}, y) where {SG<:SGAlgorithm}
+    for j in eachindex(o.value)
+        o.alg.δ[j] = Float64((o.value[j] > y) - o.τ[j])
+    end
+    direction!(o.alg)
+    for j in eachindex(o.value)
+        o.value[j] -= o.alg.δ[j]
+    end
+end
+function Base.merge!(o::Quantile, o2::Quantile)
+    o.τ == o2.τ || error("Merge failed. Quantile objects track different quantiles.")
+    merge!(o.alg, o2.alg)
+    smooth!(o.value, o2.value, nobs(o2) / nobs(o))
+end
+
+
+# # MSPI
+# q_init(u::MSPI, p) = u
+# function qfit!(o::Quantile{<:MSPI}, y, γ)
+#     @inbounds for i in eachindex(o.τ)
+#         w = inv(abs(y - o.value[i]) + ϵ)
+#         halfyw = .5 * y * w
+#         b = o.τ[i] - .5 + halfyw
+#         o.value[i] = (o.value[i] + γ * b) / (1 + .5 * γ * w)
+#     end
+# end
+
+# # OMAS
+# q_init(u::OMAS, p) = OMAS((zeros(p), zeros(p)))
+# function qfit!(o::Quantile{<:OMAS}, y, γ)
+#     s, t = o.updater.buffer
+#     @inbounds for j in eachindex(o.τ)
+#         w = inv(abs(y - o.value[j]) + ϵ)
+#         s[j] = smooth(s[j], w * y, γ)
+#         t[j] = smooth(t[j], w, γ)
+#         o.value[j] = (s[j] + (2.0 * o.τ[j] - 1.0)) / t[j]
+#     end
+# end
+
+# # OMAP...why is this so bad?
+# q_init(u::OMAP, p) = u
+# function qfit!(o::Quantile{<:OMAP}, y, γ)
+#     for j in eachindex(o.τ)
+#         w = abs(y - o.value[j]) + ϵ
+#         θ = y + w * (2o.τ[j] - 1) 
+#         o.value[j] = smooth(o.value[j], θ, γ)
+#     end
+# end
+
+#-----------------------------------------------------------------------# ReservoirSample
+"""
+    ReservoirSample(k::Int, T::Type = Float64)
+
+Reservoir sample of `k` items.
+
+# Example
+
+    fit!(ReservoirSample(100, Int), 1:1000)
+"""
+mutable struct ReservoirSample{T<:Number} <: OnlineStat{0}
+    value::Vector{T}
+    n::Int
+end
+function ReservoirSample(k::Int, T::Type = Float64)
+    ReservoirSample(zeros(T, k), 0)
+end
+function _fit!(o::ReservoirSample, y)
+    o.n += 1
+    if o.n <= length(o.value)
+        o.value[o.n] = y
+    else
+        j = rand(1:o.n)
+        if j < length(o.value)
+            o.value[j] = y
+        end
+    end
+end
+function Base.merge!(o::T, o2::T) where {T<:ReservoirSample}
+    length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
+    p = o.n / (o.n + o2.n)
+    for j in eachindex(o.value)
+        if rand() > p 
+            o.value[j] = o2.value[j]
+        end
+    end
+end
+
+#-----------------------------------------------------------------------# Series
+"""
+    Series(stats...)
+
+Track multiple stats for one data stream.
+
+# Example 
+
+    s = Series(Mean(), Variance())
+    fit!(s, randn(1000))
+"""
+struct Series{N, T<:Tup} <: OnlineStat{N}
+    stats::T
+end
+Series(stats::OnlineStat{N}...) where {N} = Series{N, typeof(stats)}(stats)
+@generated function _fit!(o::Series{N, T}, y) where {N, T}
+    n = length(fieldnames(T))
+    :(Base.Cartesian.@nexprs $n i -> @inbounds(_fit!(o.stats[i], y[i])))
+end
+Base.merge!(o::Series, o2::Series) = (merge!.(o.stats, o2.stats); o)
+
+#-----------------------------------------------------------------------# Sum
+"""
+    Sum(T::Type = Float64)
+
+Track the overall sum.
+
+# Example
+
+    fit!(Sum(Int), fill(1, 100))
+"""
+mutable struct Sum{T} <: OnlineStat{0}
+    sum::T
+    n::Int
+end
+Sum(T::Type = Float64) = Sum(T(0), 0)
+Base.sum(o::Sum) = o.sum
+_fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.n += 1)
+_fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
+Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
+
+#-----------------------------------------------------------------------# Variance 
+"""
+    Variance(; weight)
+
+Univariate variance.
+
+# Example 
+
+    @time fit!(Variance(), randn(10^6))
+"""
+mutable struct Variance{W} <: OnlineStat{0}
+    σ2::Float64 
+    μ::Float64 
+    weight::W
+    n::Int
+end
+Variance(;weight = inv) = Variance(0.0, 0.0, weight, 0)
+function _fit!(o::Variance, x)
+    μ = o.μ
+    γ = o.weight(o.n += 1)
+    o.μ = smooth(o.μ, x, γ)
+    o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
+end
+function Base.merge!(o::Variance, o2::Variance)
+    γ = o2.n / (o.n += o2.n)
+    δ = o2.μ - o.μ
+    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
+    o.μ = smooth(o.μ, o2.μ, γ)
+    o
+end
+value(o::Variance) = o.n > 0 ? o.σ2 * unbias(o) : 0.0
+Base.var(o::Variance) = value(o)
+Base.mean(o::Variance) = o.μ
+
+#-----------------------------------------------------------------------# AutoCov and Lag
 """
     Lag(b, T = Float64)
 
@@ -480,7 +895,6 @@ function _fit!(o::Lag{T}, y::T) where {T}
     o.value[1] = y
 end
 
-#-----------------------------------------------------------------------# AutoCov 
 """
     AutoCov(b, T = Float64)
 
@@ -536,377 +950,3 @@ function value(o::AutoCov)
 end
 autocov(o::AutoCov) = value(o)
 autocor(o::AutoCov) = value(o) ./ value(o)[1]
-
-
-#-----------------------------------------------------------------------# Moments
-"""
-    Moments(; weight)
-
-First four non-central moments.
-
-# Example
-
-    s = Series(randn(1000), Moments(10))
-    value(s)
-"""
-mutable struct Moments{W} <: OnlineStat{0}
-    m::Vector{Float64}
-    weight::W
-    n::Int
-end
-Moments(;weight = inv) = Moments(zeros(4), weight, 0)
-function _fit!(o::Moments, y::Real)
-    γ = o.weight(o.n += 1)
-    y2 = y * y
-    @inbounds o.m[1] = smooth(o.m[1], y, γ)
-    @inbounds o.m[2] = smooth(o.m[2], y2, γ)
-    @inbounds o.m[3] = smooth(o.m[3], y * y2, γ)
-    @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
-end
-mean(o::Moments) = o.m[1]
-var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
-function skewness(o::Moments)
-    v = value(o)
-    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
-end
-function kurtosis(o::Moments)
-    v = value(o)
-    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
-end
-function Base.merge!(o::Moments, o2::Moments)
-    γ = o.weight(o.n += o2.n)
-    smooth!(o.m, o2.m, γ)
-    o
-end
-
-# #-----------------------------------------------------------------------# OrderStats
-# """
-#     OrderStats(b::Int, T::Type = Float64)
-
-# Average order statistics with batches of size `b`.  Ignores weight.
-
-# # Example
-#     s = Series(randn(1000), OrderStats(10))
-#     value(s)
-# """
-# mutable struct OrderStats{T} <: ExactStat{0}
-#     value::Vector{T}
-#     buffer::Vector{T}
-#     i::Int
-#     nreps::Int 
-# end
-# OrderStats(p::Integer, T::Type = Float64) = OrderStats(zeros(T, p), zeros(T, p), 0, 0)
-# function fit!(o::OrderStats, y::Real, γ::Float64)
-#     p = length(o.value)
-#     buffer = o.buffer
-#     o.i += 1
-#     @inbounds buffer[o.i] = y
-#     if o.i == p
-#         sort!(buffer)
-#         o.nreps += 1
-#         o.i = 0
-#         smooth!(o.value, buffer, 1 / o.nreps)
-#     end
-#     o
-# end
-# function Base.merge!(o::OrderStats, o2::OrderStats, γ::Float64)
-#     length(o.value) == length(o2.value) || 
-#         error("Merge failed.  OrderStats track different batch sizes")
-#     smooth!(o.value, o2.value, γ)
-# end
-# nobs(o::OrderStats) = o.nreps * length(o.value)
-# Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
-
-# # # tree/nbc help:
-# # function pdf(o::OrderStats, x)
-# #     if x ≤ first(o.value) 
-# #         return 0.0
-# #     elseif x > last(o.value) 
-# #         return 0.0 
-# #     else
-# #         i = searchsortedfirst(o.value, x)
-# #         b = nobs(o) / (length(o.value) + 1)
-# #         return b / (o.value[i] - o.value[i-1])
-# #     end
-# # end
-# # split_candidates(o::OrderStats) = midpoints(value(o))
-# # function Base.sum(o::OrderStats, x) 
-# #     if x ≤ first(o.value)
-# #         return 0.0 
-# #     elseif x > last(o.value)
-# #         return Float64(nobs(o))
-# #     else 
-# #         return nobs(o) * (searchsortedfirst(o.value, x) / length(o.value))
-# #     end
-# # end
-
-# #-----------------------------------------------------------------------# PQuantile 
-# """
-#     PQuantile(τ = 0.5)
-
-# Calculate the approximate quantile via the P^2 algorithm.  It is more computationally
-# expensive than the algorithms used by [`Quantile`](@ref), but also more exact.
-
-# Ref: [https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf](https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf)
-
-# # Example
-
-#     y = randn(10^6)
-#     o1, o2, o3 = PQuantile(.25), PQuantile(.5), PQuantile(.75)
-#     s = Series(y, o1, o2, o3)
-#     value(s)
-#     quantile(y, [.25, .5, .75])
-# """
-# mutable struct PQuantile <: StochasticStat{0}
-#     q::Vector{Float64}  # marker heights
-#     n::Vector{Int}  # marker position
-#     nprime::Vector{Float64}
-#     τ::Float64
-#     nobs::Int
-# end
-# function PQuantile(τ::Real = 0.5)
-#     @assert 0 < τ < 1
-#     nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
-#     PQuantile(zeros(5), collect(1:5), nprime, τ, 0)
-# end
-# Base.show(io::IO, o::PQuantile) = print(io, "PQuantile($(o.τ), $(value(o)))")
-# value(o::PQuantile) = o.q[3]
-# function fit!(o::PQuantile, y::Real, γ::Float64)
-#     o.nobs += 1
-#     q = o.q
-#     n = o.n
-#     nprime = o.nprime
-#     @inbounds if o.nobs > 5
-#         # B1
-#         k = searchsortedfirst(q, y) - 1
-#         k = min(k, 4)
-#         k = max(k, 1)
-#         q[1] = min(q[1], y)
-#         q[5] = max(q[5], y)
-#         # B2
-#         for i in (k+1):5
-#             n[i] += 1
-#         end
-#         nprime[2] += o.τ / 2
-#         nprime[3] += o.τ
-#         nprime[4] += (1 + o.τ) / 2
-#         nprime[5] += 1
-#         # B3
-#         for i in 2:4
-#             _interpolate!(o.q, o.n, nprime[i] - n[i], i)
-#         end
-#     # A
-#     elseif o.nobs < 5
-#         @inbounds o.q[o.nobs] = y
-#     else 
-#         @inbounds o.q[o.nobs] = y
-#         sort!(o.q)
-#     end
-# end
-
-# function _interpolate!(q, n, di, i)
-#     @inbounds q1, q2, q3 = q[i-1], q[i], q[i+1]
-#     @inbounds n1, n2, n3 = n[i-1], n[i], n[i+1]
-#     @inbounds if (di ≥ 1 && n3 - n2 > 1) || (di ≤ -1 && n1 - n2 < -1)
-#         d = Int(sign(di))
-#         df = sign(di)
-#         v1 = (n2 - n1 + d) * (q3 - q2) / (n3 - n2) 
-#         v2 = (n3 - n2 - d) * (q2 - q1) / (n2 - n1) 
-#         qi = q2 + df / (n3 - n1) * (v1 + v2) 
-#         if q1 < qi < q3 
-#             q[i] = qi
-#         else
-#             q[i] += df * (q[i + d] - q2) / (n[i + d] - n2)
-#         end
-#         n[i] += d
-#     end
-# end
-
-# # function parabolic_interpolate(q1, q2, q3, n1, n2, n3, d)
-# #     qi = q2 + d / (n3 - n1) * 
-# #         ((n2 - n1 + d) * (q3 - q2) / (n3 - n2) + (n3 - n2 - d) * (q2 - q1) / (n2 - n1))
-# # end
-
-
-
-# #-----------------------------------------------------------------------# Quantile
-# """
-#     Quantile(q = [.25, .5, .75], alg = OMAS())
-
-# Approximate the quantiles `q` via the stochastic approximation algorithm `alg`.  Options
-# are `SGD`, `MSPI`, and `OMAS`.  In practice, `SGD` and `MSPI` only work well when the
-# variance of the data is small.
-
-# # Example
-
-#     y = randn(10_000)
-#     τ = collect(.1:.1:.0)
-#     Series(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))
-# """
-# mutable struct Quantile{T <: Updater} <: StochasticStat{0}
-#     value::Vector{Float64}
-#     τ::Vector{Float64}
-#     updater::T 
-#     n::Int
-# end
-# function Quantile(τ::AbstractVector = [.25, .5, .75], u::Updater = OMAS()) 
-#     Quantile(zeros(τ), collect(τ), q_init(u, length(τ)), 0)
-# end
-
-# function Base.show(io::IO, o::Quantile{T}) where {T} 
-#     print(io, name(o, false, false), ": ", value(o)) 
-# end
-
-# function Base.merge!(o::Quantile, o2::Quantile, γ::Float64)
-#     o.τ == o2.τ || error("Merge failed. Quantile objects track different quantiles.")
-#     merge!(o.updater, o2.updater, γ)
-#     smooth!(o.value, o2.value, γ)
-# end
-
-# q_init(u::Updater, p) = error("$u can't be used with Quantile")
-
-# function fit!(o::Quantile, y::Real, γ::Float64)
-#     o.n += 1
-#     if o.n > length(o.value)
-#         qfit!(o, y, γ)
-#     elseif o.n < length(o.value)
-#         o.value[o.n] = y  # initialize values with first observations
-#     else
-#         o.value[o.n] = y 
-#         sort!(o.value)
-#     end
-# end
-
-# # SGD
-# q_init(u::SGD, p) = u
-# function qfit!(o::Quantile{SGD}, y, γ)
-#     for j in eachindex(o.value)
-#         @inbounds o.value[j] -= γ * ((o.value[j] > y) - o.τ[j])
-#     end
-# end
-
-# # ADAGRAD
-# q_init(u::ADAGRAD, p) = init(u, p)
-# function qfit!(o::Quantile{ADAGRAD}, y, γ)
-#     U = o.updater
-#     U.nobs += 1
-#     w = 1 / U.nobs
-#     for j in eachindex(o.value)
-#         g = ((o.value[j] > y) - o.τ[j])
-#         U.h[j] = smooth(U.h[j], g ^ 2, w)
-#         @inbounds o.value[j] -= γ * g / U.h[j]
-#     end
-# end
-
-# # MSPI
-# q_init(u::MSPI, p) = u
-# function qfit!(o::Quantile{<:MSPI}, y, γ)
-#     @inbounds for i in eachindex(o.τ)
-#         w = inv(abs(y - o.value[i]) + ϵ)
-#         halfyw = .5 * y * w
-#         b = o.τ[i] - .5 + halfyw
-#         o.value[i] = (o.value[i] + γ * b) / (1 + .5 * γ * w)
-#     end
-# end
-
-# # OMAS
-# q_init(u::OMAS, p) = OMAS((zeros(p), zeros(p)))
-# function qfit!(o::Quantile{<:OMAS}, y, γ)
-#     s, t = o.updater.buffer
-#     @inbounds for j in eachindex(o.τ)
-#         w = inv(abs(y - o.value[j]) + ϵ)
-#         s[j] = smooth(s[j], w * y, γ)
-#         t[j] = smooth(t[j], w, γ)
-#         o.value[j] = (s[j] + (2.0 * o.τ[j] - 1.0)) / t[j]
-#     end
-# end
-
-# # # OMAP...why is this so bad?
-# # q_init(u::OMAP, p) = u
-# # function qfit!(o::Quantile{<:OMAP}, y, γ)
-# #     for j in eachindex(o.τ)
-# #         w = abs(y - o.value[j]) + ϵ
-# #         θ = y + w * (2o.τ[j] - 1) 
-# #         o.value[j] = smooth(o.value[j], θ, γ)
-# #     end
-# # end
-
-#-----------------------------------------------------------------------# ReservoirSample
-"""
-    ReservoirSample(k::Int, T::Type = Float64)
-
-Reservoir sample of `k` items.
-
-# Example
-
-    fit!(ReservoirSample(100, Int), 1:1000)
-"""
-mutable struct ReservoirSample{T<:Number} <: OnlineStat{0}
-    value::Vector{T}
-    n::Int
-end
-function ReservoirSample(k::Int, T::Type = Float64)
-    ReservoirSample(zeros(T, k), 0)
-end
-
-function _fit!(o::ReservoirSample, y)
-    o.n += 1
-    if o.n <= length(o.value)
-        o.value[o.n] = y
-    else
-        j = rand(1:o.n)
-        if j < length(o.value)
-            o.value[j] = y
-        end
-    end
-end
-
-function Base.merge!(o::T, o2::T, γ::Float64) where {T<:ReservoirSample}
-    length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
-    p = o.n / (o.n + o2.n)
-    for j in eachindex(o.value)
-        if rand() > p 
-            o.value[j] = o2.value[j]
-        end
-    end
-end
-
-#-----------------------------------------------------------------------# Sum
-"""
-    Sum(T::Type = Float64)
-
-Track the overall sum.
-
-# Example
-
-    fit!(Sum(Int), fill(1, 100))
-"""
-mutable struct Sum{T} <: OnlineStat{0}
-    sum::T
-    n::Int
-end
-Sum(T::Type = Float64) = Sum(T(0), 0)
-Base.sum(o::Sum) = o.sum
-_fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.n += 1)
-_fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
-Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
-
-# #-----------------------------------------------------------------------# Unique 
-# """
-#     Unique(T::Type)
-
-# Track the unique values. 
-
-# # Example 
-
-#     series(rand(1:5, 100), Unique(Int))
-# """
-# struct Unique{T} <: OnlineStat{0}
-#     value::OrderedDict{T, Nothing}
-# end
-# Unique(T::Type) = Unique(OrderedDict{T, Nothing}())
-# _fit!(o::Unique, y) = (o.value[y] = nothing)
-# value(o::Unique) = collect(keys(o.value))
-# Base.merge!(o::T, o2::T, γ) where {T<:Unique} = merge!(o.value, o2.value)
-# Base.unique(o::Unique) = value(o)
-# Base.length(o::Unique) = length(o.value)
