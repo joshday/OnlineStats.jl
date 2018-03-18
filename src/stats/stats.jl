@@ -129,7 +129,7 @@ mutable struct CovMatrix{W} <: OnlineStat{1}
     weight::W
     n::Int
 end
-CovMatrix(p::Int=0;weight = inv) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
+CovMatrix(p::Int=0;weight = EqualWeight()) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
 function _fit!(o::CovMatrix, x)
     γ = o.weight(o.n += 1)
     if isempty(o.A)
@@ -495,7 +495,7 @@ mutable struct Moments{W} <: OnlineStat{0}
     weight::W
     n::Int
 end
-Moments(;weight = inv) = Moments(zeros(4), weight, 0)
+Moments(;weight = EqualWeight()) = Moments(zeros(4), weight, 0)
 function _fit!(o::Moments, y::Real)
     γ = o.weight(o.n += 1)
     y2 = y * y
@@ -586,7 +586,7 @@ mutable struct ProbMap{A<:AbstractDict, W} <: OnlineStat{0}
     weight::W 
     n::Int
 end
-ProbMap(T::Type; weight = inv) = ProbMap(OrderedDict{T, Float64}(), weight, 0)
+ProbMap(T::Type; weight = EqualWeight()) = ProbMap(OrderedDict{T, Float64}(), weight, 0)
 function _fit!(o::ProbMap, y)
     γ = o.weight(o.n += 1)
     get!(o.value, y, 0.0)   # initialize class probability at 0 if it isn't present
@@ -860,7 +860,7 @@ mutable struct Variance{W} <: OnlineStat{0}
     weight::W
     n::Int
 end
-Variance(;weight = inv) = Variance(0.0, 0.0, weight, 0)
+Variance(;weight = EqualWeight()) = Variance(0.0, 0.0, weight, 0)
 function _fit!(o::Variance, x)
     μ = o.μ
     γ = o.weight(o.n += 1)

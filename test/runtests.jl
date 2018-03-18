@@ -130,6 +130,8 @@ end
     test_merge(FitMvNormal(2), [y y2], [y2 y])
 end
 end
+@testset "FastNode" begin 
+end
 #-----------------------------------------------------------------------# Group 
 @testset "Group" begin 
     o = Group(Mean(), Mean(), Mean(), Variance(), Variance())

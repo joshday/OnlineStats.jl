@@ -28,7 +28,7 @@ export
     Diff,
     Extrema,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
-    FTSeries,
+    FastNode, FastTree, FastForest, FTSeries, 
     Group,
     Hist, HyperLogLog,
     KMeans,
@@ -50,6 +50,7 @@ include("stats/stats.jl")
 include("stats/distributions.jl")
 include("stats/hist.jl")
 include("stats/nbclassifier.jl")
+include("stats/fasttree.jl")
 
 
 
