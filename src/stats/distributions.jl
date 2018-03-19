@@ -117,7 +117,7 @@ function pdf(o::FitNormal, x::Number)
     σ = std(o)
     return 1 / (sqrt(2π) * σ) * exp(-(x - mean(o))^2 / 2σ^2)
 end
-cdf(o::FitNormal, x::Number) = .5 * (1.0 + erf((x - mean(o)) / (std(o) * √2)))
+cdf(o::FitNormal, x::Number) = .5 * (1.0 + SpecialFunctions.erf((x - mean(o)) / (std(o) * √2)))
 
 #-----------------------------------------------------------------------# Multinomial
 """

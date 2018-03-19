@@ -316,6 +316,10 @@ Base.last(o::Group) = last(o.stats)
 Base.length(o::Group) = length(o.stats)
 Base.values(o::Group) = value.(o.stats)
 
+Base.start(o::Group) = 1 
+Base.next(o::Group, i) = o.stats[i], i + 1 
+Base.done(o::Group, i) = i > length(o.stats)
+
 @generated function _fit!(o::Group{T}, y) where {T}
     N = length(fieldnames(T))
     :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))

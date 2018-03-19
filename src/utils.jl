@@ -62,6 +62,8 @@ function Base.next(o::RowsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::RowsOf, i) = i > size(o.mat, 1)
+Base.length(o::RowsOf) = size(o.mat, 1)
+
 
 #-----------------------------------------------------------------------# eachcol
 struct ColsOf{T, M <: AbstractMatrix{T}}
@@ -80,6 +82,7 @@ function Base.next(o::ColsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::ColsOf, i) = i > size(o.mat, 2)
+Base.length(o::ColsOf) = size(o.mat, 2)
 
 #-----------------------------------------------------------------------# fit!
 fit!(o::OnlineStat{0}, y) = (_fit!(o, y); o)

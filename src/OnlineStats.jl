@@ -8,14 +8,16 @@ using Reexport
 
 import OnlineStatsBase: OnlineStat, name, value, _fit!
 import LearnBase: fit!, nobs, value, predict
-import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, fweights
+import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
+    fweights, sample
 import DataStructures: OrderedDict
 import NamedTuples  # Remove in 0.7
+import SpecialFunctions
 
 export 
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    eachcol, eachrow,
+    eachcol, eachrow, classify,
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
