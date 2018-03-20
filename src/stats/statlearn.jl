@@ -1,124 +1,115 @@
-# #-----------------------------------------------------------------------------# StatLearn
-# doc"""
-#     StatLearn(p::Int, args...)
+"""
+    StatLearn(p, args...)
 
-# Fit a statistical learning model of `p` independent variables for a given `loss`, `penalty`, and `λ`.  Additional arguments can be given in any order (and is still type stable):
+Fit a model that is linear in the parameters.  
 
-# - `loss = .5 * L2DistLoss()`: any Loss from LossFunctions.jl
-# - `penalty = L2Penalty()`: any Penalty (which has a `prox` method) from PenaltyFunctions.jl.
-# - `λ = fill(.1, p)`: a Vector of element-wise regularization parameters
-# - `updater = SGD()`: [`SGD`](@ref), [`ADAGRAD`](@ref), [`ADAM`](@ref), [`ADAMAX`](@ref), [`MSPI`](@ref)
+The (offline) objective function that StatLearn approximately minimizes is
 
-# # Details
+``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
 
-# The (offline) objective function that StatLearn approximately minimizes is
+where ``fᵢ`` are loss functions of a single response and linear predictor, ``λⱼ``s are 
+nonnegative regularization parameters, and ``g`` is a penalty function. 
 
-# ``\frac{1}{n}\sum_{i=1}^n f_i(\beta) + \sum_{j=1}^p \lambda_j g(\beta_j),``
+# Arguments 
 
-# where the ``f_i``'s are loss functions evaluated on a single observation, ``g`` is a penalty function, and the ``\lambda_j``s are nonnegative regularization parameters.
+"""
+struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty} <: OnlineStat{(1, 0)}
+    β::Vector{Float64}
+    λ::Vector{Float64}
+    gx::Vector{Float64}
+    loss::L 
+    penalty::P 
+    alg::A
+end
+function StatLearn(p::Int, args...)
+    λ, loss, pen, alg = zeros(p), .5*L2DistLoss(), NoPenalty(), SGD()
+    # for a in args 
+    #     if a isa AbstractVector 
+    #         λ = a
+    #     elseif a isa Float64 
+    #         λ = fill(a, 1)
+    #     elseif a isa Loss 
+    #         loss = a 
+    #     elseif a isa Penalty 
+    #         pen = a 
+    #     elseif a isa Algorithm 
+    #         alg = a 
+    #     end
+    # end
+    init!(alg, p)
+    StatLearn(zeros(p), λ, zeros(p), loss, pen, alg)
+end
 
-# # Example
-#     using LossFunctions, PenaltyFunctions
-#     x = randn(100_000, 10)
-#     y = x * linspace(-1, 1, 10) + randn(100_000)
-#     o = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())
-#     s = Series(o)
-#     fit!(s, x, y)
-#     coef(o)
-#     predict(o, x)
-# """
-# struct StatLearn{U <: Updater, L <: Loss, P <: Penalty} <: StochasticStat{(1, 0)}
-#     β::Vector{Float64}
-#     gx::Vector{Float64}        # buffer for gradient
-#     λfactor::Vector{Float64}
-#     loss::L
-#     penalty::P
-#     updater::U
-# end
-# function StatLearn{V,L,P,U}(p::Integer, t::Tuple{V,L,P,U})
-#     λf, loss, penalty, updater = t
-#     length(λf) == p || throw(DimensionMismatch("lengths of λfactor and β differ"))
-#     StatLearn(zeros(p), zeros(p), λf, loss, penalty, init(StatLearn, updater, p))
-# end
+function Base.show(io::IO, o::StatLearn)
+    print(io, "StatLearn: ")
+    print(io, name(o.alg, false, false))
+    print(io, " | λavg=", mean(o.λ))
+    print(io, " | ", o.loss)
+    print(io, " | ", o.penalty)
+    print(io, " | nobs=", nobs(o))
+    print(io, " | nvars=", length(o.β))
+    print(io, "")
+end
+nobs(o::StatLearn) = nobs(o.alg)
+coef(o::StatLearn) = value(o)
 
-# d(p::Integer) = (fill(.1, p), L2DistLoss(), L2Penalty(), SGD())
-
-# a(argu::Vector{Float64}, t) = (argu, t[2], t[3], t[4])
-# a(argu::Loss,            t) = (t[1], argu, t[3], t[4])
-# a(argu::Penalty,         t) = (t[1], t[2], argu, t[4])
-# a(argu::Updater,         t) = (t[1], t[2], t[3], argu)
-
-# StatLearn(p::Integer)                 = StatLearn(p, d(p))
-# StatLearn(p::Integer, a1)             = StatLearn(p, a(a1, d(p)))
-# StatLearn(p::Integer, a1, a2)         = StatLearn(p, a(a2, a(a1, d(p))))
-# StatLearn(p::Integer, a1, a2, a3)     = StatLearn(p, a(a3, a(a2, a(a1, d(p)))))
-# StatLearn(p::Integer, a1, a2, a3, a4) = StatLearn(p, a(a4, a(a3, a(a2, a(a1, d(p))))))
-
-# function Base.show(io::IO, o::StatLearn)
-#     println(io, name(o))
-#     print(io,   "    > β       : "); showcompact(io, o.β);        println(io)
-#     if !(o.penalty isa NoPenalty)
-#         print(io,   "    > λfactor : "); showcompact(io, o.λfactor);  println(io)
+# function gradient!(o::StatLearn, x, y)
+#     d_dη = deriv(o.loss, y, predict(o, x))
+#     for j in eachindex(o.gx)
+#         o.gx[j] = x[j] * d_dη
 #     end
-#     println(io, "    > Loss    : $(o.loss)")
-#     println(io, "    > Penalty : $(o.penalty)")
-#     print(io,   "    > Updater : $(o.updater)")
 # end
 
-# coef(o::StatLearn) = o.β
+# function init!(o::StatLearn, p) 
+#     init!(o.alg, p)
+#     o.β = zeros(p)
+#     if length(o.λ) == 0 
+#         o.λ = zeros(p)
+#     elseif length(o.λ) == 1 
+#         o.λ = fill(o.λ[1], p)
+#     elseif length(o.λ) == p 
+#     else
+#         Compat.@error("Size of λ is incompatible with the number of predictors.")
+#     end
+# end
+
+# function _fit!(o::StatLearn{A}, xy) where {A<:SGAlgorithm}
+#     x, y = xy
+#     alg = o.alg
+#     (alg.n += 1) == 1  && init!(o, length(x))
+#     d_dη = deriv(o.loss, y, predict(o, x))
+#     for j in eachindex(o.β)
+#         alg.δ[j] = x[j] * d_dη
+#     end
+#     γ, gx = direction!(alg)
+#     for j in eachindex(o.β)
+#         o.β[j] = prox(o.β[j] - alg.δ[j]
+#     end
+# end
 
 # predict(o::StatLearn, x::VectorOb) = _dot(x, o.β)
-# predict(o::StatLearn, x::AbstractMatrix, ::Rows = Rows()) = x * o.β
-# predict(o::StatLearn, x::AbstractMatrix, ::Cols) = x'o.β
+# predict(o::StatLearn, x::AbstractMatrix) = x * o.β
+# classify(o::StatLearn, x) = sign.(predict(o, x))
 
-# classify(o::StatLearn, x) = sign(predict(o, x))
-# classify(o::StatLearn, x::AbstractMatrix, dim = Rows()) = sign.(predict(o, x, dim))
+# function objective(o::StatLearn, x::AbstractMatrix, y::VectorOb)
+#     value(o.loss, y, predict(o, x), AvgMode.Mean()) + value(o.penalty, o.β, o.λ)
+# end
 
-# loss(o::StatLearn, x, y, dim = Rows()) = value(o.loss, y, predict(o, x, dim), AvgMode.Mean())
-
-# function value(o::StatLearn, x, y, dim = Rows())
-#     value(o.loss, y, predict(o, x, dim), AvgMode.Mean()) + value(o.penalty, o.β, o.λfactor)
+# function Base.merge!(o::StatLearn{A,L,P}, o2::StatLearn{A,L,P}) where {A,L,P}
+#     merge!(o.alg, o2.alg)
+#     smooth!(o.β, o2.β, nobs(o2) / nobs(o))
+#     smooth!(o.λ, o2.λ, nobs(o2) / nobs(o))
+#     o
 # end
 
 # function statlearnpath(o::StatLearn, αs::AbstractVector{<:Real})
 #     path = [copy(o) for i in 1:length(αs)]
 #     for i in eachindex(αs)
-#         path[i].λfactor .*= αs[i]
+#         path[i].λ .*= αs[i]
 #     end
-#     path
+#     Series(path...)
 # end
 
-# # Hacks to allow Tuples/NamedTuples
-# _dot(x::AbstractVector, β) = dot(x, β)
-# function _dot(x::VectorOb, β)
-#     out = 0.0
-#     for (xi, βi) in zip(x, β)
-#         out += xi * βi
-#     end
-#     return out
-# end
-
-# # t is Tuple or NamedTuple: (x, y)
-# function gradient!(o::StatLearn, t)
-#     x, y = t
-#     xβ = _dot(x, o.β)
-#     g = deriv(o.loss, y, xβ)
-#     gx = o.gx
-#     for i in eachindex(gx)
-#         @inbounds gx[i] = g * x[i]
-#     end
-# end
-
-# function fit!(o::StatLearn{<:SGUpdater}, t::Tuple, γ::Float64)
-#     gradient!(o, t)
-#     update!(o, γ)
-# end
-
-# function Base.merge!(o::T, o2::T, γ::Float64) where {T <: StatLearn}
-#     o.λfactor == o2.λfactor || error("Merge failed. StatLearn objects have different λs.")
-#     merge!(o.updater, o2.updater, γ)
-#     smooth!(o.β, o2.β, γ)
-# end
 
 # #-----------------------------------------------------------------------# SGD
 # function update!(o::StatLearn{SGD}, γ)

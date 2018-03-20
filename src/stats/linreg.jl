@@ -1,70 +1,67 @@
-# #-----------------------------------------------------------------------# LinReg
-# """
-#     LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters
-#     LinReg(p, λfactor::Vector{Float64})
 
-# Ridge regression of `p` variables with elementwise regularization.
 
-# # Example
+#-----------------------------------------------------------------------# LinReg
+"""
+    LinReg(p)
 
-#     x = randn(100, 10)
-#     y = x * linspace(-1, 1, 10) + randn(100)
-#     o = LinReg(10)
-#     Series((x,y), o)
-#     value(o)
-# """
-# mutable struct LinReg <: ExactStat{(1,0)}
-#     β::Vector{Float64}
-#     A::Matrix{Float64}
-#     λfactor::Vector{Float64}
-#     nobs::Int
-#     function LinReg(p::Integer, λfactor::Vector{Float64} = zeros(p))
-#         d = p + 1
-#         new(zeros(p), zeros(d, d), λfactor, 0)
-#     end
-#     LinReg(p::Integer, λ::Float64) = LinReg(p, fill(λ, p))
-# end
-# Base.show(io::IO, o::LinReg) = print(io, "LinReg: β($(mean(o.λfactor))) = $(value(o)')")
-# nobs(o::LinReg) = o.nobs
+Ridge regression of `p` variables with elementwise regularization.
 
-# function matviews(o::LinReg)
-#     p = length(o.β)
-#     @views o.A[1:p, 1:p], o.A[1:p, end]
-# end
+# Example
 
-# fit!(o::LinReg, t::Tuple, γ::Float64) = fit!(o, t..., γ)
-# function fit!(o::LinReg, x::VectorOb, y::Real, γ::Float64)
-#     xtx, xty = matviews(o)
-#     smooth_syr!(xtx, x, γ)
-#     for (i, xi) in enumerate(x)
-#         xty[i] = smooth(xty[i], x[i] * y, γ)
-#     end
-#     # smooth!(xty, x .* y, γ)
-#     o.A[end] = smooth(o.A[end], y * y, γ)
-#     o.nobs += 1
-# end
+    x = randn(100, 10)
+    y = x * linspace(-1, 1, 10) + randn(100)
+    o = LinReg(10)
+    Series((x,y), o)
+    value(o)
+"""
+mutable struct LinReg{W} <: OnlineStat{(1,0)}
+    β::Vector{Float64}
+    A::Matrix{Float64}
+    weight::W
+    n::Int
+end
+LinReg(;weight=EqualWeight()) = LinReg(zeros(0), zeros(1, 1), weight, 0)
 
-# function value(o::LinReg)
-#     xtx, xty = matviews(o)
-#     A = Symmetric(xtx + Diagonal(o.λfactor))
-#     if isposdef(A)
-#         o.β[:] = A \ xty
-#     end
-#     return o.β
-# end
+function matviews(o::LinReg)
+    p = length(o.β)
+    @views o.A[1:p, 1:p], o.A[1:p, end]
+end
+function _fit!(o::LinReg, xy)
+    γ = o.weight(o.n += 1)
+    x, y = xy 
+    if o.n == 1 
+        p = length(x)
+        o.β = zeros(p)
+        o.A = zeros(p + 1, p + 1)
+    end
+    for j in 1:(size(o.A, 2)-1)
+        xj = x[j]
+        o.A[j, end] = smooth(o.A[j, end], xj * y, γ)    # x'y
+        for i in 1:j
+            o.A[i, j] = smooth(o.A[i,j], x[i] * xj, γ)  # x'x
+        end
+    end
+    o.A[end] = smooth(o.A[end], y * y, γ)  # y'y
+end
+value(o::LinReg, args...) = coef(o, args...)
+function coef(o::LinReg) 
+    o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)]) \ o.A[1:(end-1), end]
+end
+function coef(o::LinReg, λ::Real) 
+    o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)] + λ*I) \ o.A[1:(end-1), end]
+end
+function coef(o::LinReg, λ::Vector{<:Real})
+    o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)] + Diagonal(λ)) \ o.A[1:(end-1), end]
+end
 
-# coef(o::LinReg) = value(o)
-# predict(o::LinReg, x::AbstractVector) = x'coef(o)
-# predict(o::LinReg, x::AbstractMatrix, dim::Rows = Rows()) = x * coef(o)
-# predict(o::LinReg, x::AbstractMatrix, dim::Cols) = x'coef(o)
+predict(o::LinReg, x::AbstractVector) = x'o.β
+predict(o::LinReg, x::AbstractMatrix) = x * o.β
 
-# function Base.merge!(o1::LinReg, o2::LinReg, γ::Float64)
-#     o1.λfactor == o2.λfactor || error("Merge failed. LinReg objects have different λfactor")
-#     smooth!(o1.A, o2.A, γ)
-#     o1.nobs += o2.nobs
-#     coef(o1)
-#     o1
-# end
+function Base.merge!(o::LinReg, o2::LinReg)
+    o.n += o2.n
+    smooth!(o.A, o2.A, nobs(o2) / nobs(o))
+    o
+end
 
 # #-----------------------------------------------------------------------# LinRegBuilder
 # """

@@ -4,12 +4,12 @@ using Compat
 using Compat.LinearAlgebra
 
 using Reexport 
-@reexport using OnlineStatsBase
+@reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
 import OnlineStatsBase: OnlineStat, name, value, _fit!
 import LearnBase: fit!, nobs, value, predict
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
-    fweights, sample
+    fweights, sample, coef
 import DataStructures: OrderedDict
 import NamedTuples  # Remove in 0.7
 import SpecialFunctions
@@ -17,7 +17,7 @@ import SpecialFunctions
 export 
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    eachcol, eachrow, classify,
+    eachcol, eachrow, classify, coef,
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
@@ -34,7 +34,7 @@ export
     Group,
     Hist, HyperLogLog,
     KMeans,
-    Lag,
+    Lag, LinReg,
     Mean, Moments,
     NBClassifier,
     OrderStats,
@@ -53,6 +53,8 @@ include("stats/distributions.jl")
 include("stats/hist.jl")
 include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")
+include("stats/linreg.jl")
+# include("stats/statlearn.jl")
 
 
 

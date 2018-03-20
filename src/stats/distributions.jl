@@ -23,27 +23,27 @@ function value(o::FitBeta)
 end
 Base.merge!(o::FitBeta, o2::FitBeta) = merge!(o.var, o2.var)
 
-#---------------------------------------------------------------------------------# Cauchy
-"""
-    FitCauchy(; alg, rate)
+# #---------------------------------------------------------------------------------# Cauchy
+# """
+#     FitCauchy(; alg, rate)
 
-Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
-quantiles, so that `alg` will be passed to [`Quantile`](@ref).
-"""
-mutable struct FitCauchy{T} <: OnlineStat{0}
-    q::Quantile{T}
-end
-FitCauchy(alg = SGD(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
-nobs(o::FitCauchy) = nobs(o.q)
-_fit!(o::FitCauchy, y) = _fit!(o.q, y)
-function value(o::FitCauchy)
-    if nobs(o) > 1
-        return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
-    else
-        return 0.0, 1.0
-    end
-end
-Base.merge!(o::FitCauchy, o2::FitCauchy) = merge!(o.q, o2.q)
+# Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
+# quantiles, so that `alg` will be passed to [`Quantile`](@ref).
+# """
+# mutable struct FitCauchy{T} <: OnlineStat{0}
+#     q::Quantile{T}
+# end
+# FitCauchy(alg = SGD(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
+# nobs(o::FitCauchy) = nobs(o.q)
+# _fit!(o::FitCauchy, y) = _fit!(o.q, y)
+# function value(o::FitCauchy)
+#     if nobs(o) > 1
+#         return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
+#     else
+#         return 0.0, 1.0
+#     end
+# end
+# Base.merge!(o::FitCauchy, o2::FitCauchy) = merge!(o.q, o2.q)
 
 #---------------------------------------------------------------------------------# Gamma
 """

@@ -704,24 +704,25 @@ mutable struct Quantile{T <: Algorithm} <: OnlineStat{0}
     τ::Vector{Float64}
     alg::T 
 end
-function Quantile(τ::AbstractVector = [.25, .5, .75]; alg = OMAS()) 
+function Quantile(τ::AbstractVector = [.25, .5, .75]; alg = SGD()) 
     init!(alg, length(τ))
     Quantile(zeros(length(τ)), sort!(collect(τ)), alg)
 end
-nobs(o::Quantile) = nobs(o.alg)
 function _fit!(o::Quantile, y)
-    n = (o.alg.n += 1) 
+    o.n += 1
     len = length(o.value)
     if n > len 
         qfit!(o, y)
     else
-        o.value[n] = y 
+        o.value[o.n] = y 
         n == len && sort!(o.value)
     end
 end
 
 function qfit!(o::Quantile{SG}, y) where {SG<:SGAlgorithm}
+    γ = o.weight
     for j in eachindex(o.value)
+        o.value[j] -= 
         o.alg.δ[j] = Float64((o.value[j] > y) - o.τ[j])
     end
     direction!(o.alg)
@@ -827,6 +828,13 @@ Series(stats::OnlineStat{N}...) where {N} = Series{N, typeof(stats)}(stats)
     :(Base.Cartesian.@nexprs $n i -> @inbounds(_fit!(o.stats[i], y[i])))
 end
 Base.merge!(o::Series, o2::Series) = (merge!.(o.stats, o2.stats); o)
+function Base.show(io::IO, o::Series)
+    print(io, "Series")
+    for (i, stat) in enumerate(o.stats)
+        char = i == length(o.stats) ? '└' : '├'
+        print(io, "\n  $(char)── $stat")
+    end
+end
 
 #-----------------------------------------------------------------------# Sum
 """

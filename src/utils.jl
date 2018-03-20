@@ -17,6 +17,16 @@ function smooth_syr!(A::AbstractMatrix, x, γ::Number)
     end
 end
 
+_dot(x::AbstractVector, y::AbstractVector) = dot(x, y)
+@generated function _dot(x::VectorOb, y::VectorOb)
+    n = length(fieldnames(x))
+    quote
+        out = x[1] * y[1]
+        Base.Cartesian.@nexprs $n i-> (out += x[i] * y[i])
+        out
+    end
+end
+
 unbias(o) = nobs(o) / (nobs(o) - 1)
 
 Base.std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
