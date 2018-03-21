@@ -56,22 +56,29 @@ end
 #     o
 # end
 
-# #-----------------------------------------------------------------------# ADAM 
-# mutable struct ADAM <: SGAlgorithm 
-#     m::Vector{Float64}
-#     v::Vector{Float64}
-#     β1::Float64 
-#     β2::Float64
-#     ADAM(β1 = .99, β2 = .999) = new(Float64[], Float64[], β1, β2)
-# end
-# init!(o::ADAM, p) = (o.m = zeros(p); o.v = zeros(p))
-# function Base.merge!(o::ADAM, o2::ADAM, γ)
-#     smooth!(o.m, o2.m, γ)
-#     smooth!(o.v, o2.v, γ)
-#     o.β1 = smooth(o.β1, o2.β1, γ)
-#     o.β2 = smooth(o.β2, o2.β2, γ)
-#     o
-# end
+#-----------------------------------------------------------------------# ADAM 
+mutable struct ADAM <: SGAlgorithm 
+    m::Vector{Float64}
+    v::Vector{Float64}
+    β1::Float64 
+    β2::Float64
+    ADAM(β1 = .99, β2 = .999) = new(Float64[], Float64[], β1, β2)
+end
+init!(o::ADAM, p) = (o.m = zeros(p); o.v = zeros(p))
+function Base.merge!(o::ADAM, o2::ADAM, γ)
+    smooth!(o.m, o2.m, γ)
+    smooth!(o.v, o2.v, γ)
+    o.β1 = smooth(o.β1, o2.β1, γ)
+    o.β2 = smooth(o.β2, o2.β2, γ)
+    o
+end
+function update!(o::ADAM, gx)
+    for j in eachindex(o.m)
+        g = gx[j]
+        o.m[j] = smooth(g, o.m[j], o.β1)
+        o.v[j] = smooth(g * g, o.v[j], o.β2)
+    end
+end
 
 #-----------------------------------------------------------------------# ADAMAX
 

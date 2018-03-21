@@ -90,6 +90,12 @@ function updateβ!(o::StatLearn{T}, γ) where {T<:Union{ADAGRAD, RMSPROP}}
         o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
     end
 end
+function updateβ!(o::StatLearn{ADAM}, γ)
+    for j in eachindex(o.β)
+        s = γ / sqrt(o.alg.v[j] + ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
+    end
+end
 
 
 
