@@ -102,6 +102,12 @@ function updateβ!(o::StatLearn{ADAMAX}, γ)
         o.β[j] = prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
     end
 end
+function updateβ!(o::StatLearn{ADADELTA}, γ)
+    for j in eachindex(o.β)
+        s = o.alg.δ[j]
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
+    end
+end
 
 
 

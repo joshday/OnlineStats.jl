@@ -50,20 +50,29 @@ function update!(o::RMSPROP, gx)
     end
 end
 
-# #-----------------------------------------------------------------------# ADADELTA 
-# mutable struct ADADELTA <: SGAlgorithm 
-#     v::Vector{Float64}
-#     Δ::Vector{Float64}
-#     ρ::Float64
-#     ADADELTA(ρ = .95) = new(Float64[], Float64[], ρ)
-# end
-# init!(o::ADADELTA, p) = (o.v = zeros(p); o.Δ = zeros(p))
-# function Base.merge!(o::ADADELTA, o2::ADADELTA, γ)
-#     smooth!(o.v, o2.v, γ)
-#     smooth!(o.Δ, o2.Δ, γ)
-#     o.ρ = smooth(o.ρ, o2.ρ, γ)
-#     o
-# end
+#-----------------------------------------------------------------------# ADADELTA 
+mutable struct ADADELTA <: SGAlgorithm 
+    v::Vector{Float64}
+    Δ::Vector{Float64}
+    δ::Vector{Float64}
+    ρ::Float64
+    ADADELTA(ρ = .95) = new(Float64[], Float64[], Float64[], ρ)
+end
+init!(o::ADADELTA, p) = (o.v = zeros(p); o.δ = zeros(p); o.Δ = zeros(p))
+function Base.merge!(o::ADADELTA, o2::ADADELTA, γ)
+    smooth!(o.v, o2.v, γ)
+    smooth!(o.Δ, o2.Δ, γ)
+    o.ρ = smooth(o.ρ, o2.ρ, γ)
+    o
+end
+function update!(o::ADADELTA, gx)
+    for j in eachindex(o.v)
+        g2 = gx[j] ^ 2
+        o.v[j] = smooth(g2 + ϵ, o.v[j], o.ρ)
+        o.δ[j] = sqrt(o.Δ[j] / o.v[j] + ϵ)  # not multiplied by gx[j] as in paper
+        o.Δ[j] = smooth(o.δ[j]^2 * g2, o.Δ[j], o.ρ)
+    end
+end
 
 #-----------------------------------------------------------------------# ADAM 
 """
@@ -164,24 +173,7 @@ end
 #     smooth!(o.θ, o2.θ, γ)
 # end
 
-# #-----------------------------------------------------------------------# ADADELTA
-# """
-#     ADADELTA(ρ = .95)
 
-# ADADELTA ignores weight.
-# """
-# mutable struct ADADELTA <: SGUpdater
-#     ρ::Float64
-#     g::Vector{Float64}
-#     Δβ::Vector{Float64}
-#     ADADELTA(ρ = .95, p = 0) = new(ρ, zeros(p), zeros(p))
-# end
-# init(u::ADADELTA, p) = ADADELTA(u.ρ, p)
-# function Base.merge!(o::ADADELTA, o2::ADADELTA, γ::Float64)
-#     o.ρ == o2.ρ || error("Merge failed.  ADADELTA objects use different ρ.")
-#     smooth!(o.g, o2.g, γ)
-#     smooth!(o.Δβ, o2.Δβ, γ)
-# end
 
 
 
