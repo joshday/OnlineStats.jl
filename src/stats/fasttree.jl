@@ -1,4 +1,4 @@
-mutable struct FastNode{G<:Group} <: OnlineStat{(1,0)}
+mutable struct FastNode{G<:Group} <: OnlineStat{VectorOb}
     stats::Vector{G}
     ids::Vector{Int}  # self, left, right
     j::Int
@@ -96,7 +96,7 @@ function split!(o::FastNode, tree)
 end
 
 #-----------------------------------------------------------------------# FastTree
-struct FastTree{T<:FastNode} <: OnlineStat{(1, 0)}
+struct FastTree{T<:FastNode} <: OnlineStat{VectorOb}
     tree::Vector{T}
     maxsize::Int 
     splitsize::Int
@@ -136,7 +136,7 @@ function classify(o::FastTree, x::AbstractMatrix)
 end
 
 #-----------------------------------------------------------------------# FastForest 
-struct FastForest{T<:FastTree} <: OnlineStat{(1,0)}
+struct FastForest{T<:FastTree} <: OnlineStat{VectorOb}
     forest::Vector{T}
     subsets::Matrix{Int}
     p::Int 

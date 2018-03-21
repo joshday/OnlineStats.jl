@@ -3,7 +3,7 @@ abstract type AbstractPartition{N} <: OnlineStat{N} end
 nobs(o::AbstractPartition) = isempty(o.parts) ? 0 : sum(nobs, o.parts)
 
 #-----------------------------------------------------------------------# Part 
-mutable struct Part{T, O <: OnlineStat} <: OnlineStat{1} 
+mutable struct Part{T, O <: OnlineStat} <: OnlineStat{VectorOb} 
     stat::O 
     a::T
     b::T 
@@ -32,13 +32,13 @@ function _fit!(p::Part, xy)
 end
 
 #-----------------------------------------------------------------------# Partition 
-struct Partition{N, O <: OnlineStat{N}} <: AbstractPartition{N}
+struct Partition{T, O <: OnlineStat{T}} <: AbstractPartition{T}
     parts::Vector{Part{Int, O}}
     b::Int  # max partition size 
     init::O
 end
-function Partition(o::O, b::Int=100) where {N, O<:OnlineStat{N}}
-    Partition{N, O}(Part{Int, O}[], b, o)
+function Partition(o::O, b::Int=100) where {T, O<:OnlineStat{T}}
+    Partition{T, O}(Part{Int, O}[], b, o)
 end
 function _fit!(o::Partition, y)
     isempty(o.parts) && push!(o.parts, Part(copy(o.init), 1, 1))
@@ -65,7 +65,7 @@ function _fit!(o::Partition, y)
 end
 
 #-----------------------------------------------------------------------# IndexedPartition
-struct IndexedPartition{N, O<:OnlineStat{N}, T} <: AbstractPartition{1}
+struct IndexedPartition{N, O<:OnlineStat{N}, T} <: AbstractPartition{VectorOb}
     parts::Vector{Part{T, O}}
     b::Int
     init::O

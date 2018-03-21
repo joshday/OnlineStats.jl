@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------# NBClassifier
-mutable struct NBClassifier{T, G<:Group, F} <: OnlineStat{(1, 0)}
+mutable struct NBClassifier{T, G<:Group, F} <: OnlineStat{VectorOb}
     d::OrderedDict{T, G}
     init::F
     # For trees

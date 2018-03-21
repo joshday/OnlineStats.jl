@@ -13,7 +13,7 @@ Linear regression of `p` variables, optionally with element-wise ridge regulariz
     coef(o, .1)
     coef(o, [0,0,0,0,Inf])
 """
-mutable struct LinReg{W} <: OnlineStat{(1,0)}
+mutable struct LinReg{W} <: OnlineStat{VectorOb}
     β::Vector{Float64}
     A::Matrix{Float64}
     weight::W
@@ -84,7 +84,7 @@ parameter `λ`.  An intercept (`bias`) term is added by default.
 
     coef(o; y=7, x=[2,5,4])
 """
-mutable struct LinRegBuilder{W} <: OnlineStat{1}
+mutable struct LinRegBuilder{W} <: OnlineStat{VectorOb}
     A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
     weight::W 
     n::Int

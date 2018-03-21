@@ -40,7 +40,7 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
 end
 
 #-----------------------------------------------------------------------# FixedBins
-mutable struct FixedBins{closed, E <: AbstractVector} <: HistAlgorithm{0}
+mutable struct FixedBins{closed, E <: AbstractVector} <: HistAlgorithm{Number}
     edges::E
     counts::Vector{Int}
     out::Int
@@ -144,7 +144,7 @@ Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-struct AdaptiveBins{T} <: HistAlgorithm{0} 
+struct AdaptiveBins{T} <: HistAlgorithm{Number} 
     value::Vector{Pair{T, Int}}
     b::Int
     ex::Extrema{T}
