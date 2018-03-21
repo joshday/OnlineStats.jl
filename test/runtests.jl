@@ -203,7 +203,7 @@ end
 end
 #-----------------------------------------------------------------------# HyperLogLog 
 @testset "HyperLogLog" begin 
-    test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=30)
+    test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
     test_merge(HyperLogLog(4), y, y2)
 end
 @testset "LinReg" begin 
@@ -287,13 +287,18 @@ end
     X = randn(10_000, 5)
     β = collect(-1:.5:1)
     Y = X * β + randn(10_000)
-    for A in [SGD(), ADAGRAD(), RMSPROP()]
-        # sanity checks
-        o = fit!(StatLearn(5, A), (X,Y))
-        merge!(o, copy(o))
-        @test coef(o) == o.β
-        @test predict(o, X) == X * o.β
-        @test ≈(coef(o), β; atol=.9)
+    for A in [SGD(),ADAGRAD(),ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
+        for L in [.5 * L2DistLoss(), L2DistLoss()]
+            # sanity checks
+            o = fit!(StatLearn(5, A, L), (X,Y))
+            @test o.loss isa typeof(L)
+            @test o.alg isa typeof(A)
+            any(isnan.(o.β)) && info((L, A))
+            merge!(o, copy(o))
+            @test coef(o) == o.β
+            @test predict(o, X) == X * o.β
+            @test ≈(coef(o), β; atol=.9)
+        end
     end
 end
 #-----------------------------------------------------------------------# Sum 

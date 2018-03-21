@@ -22,8 +22,8 @@ export
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
-# updaters 
-    ADAGRAD, ADAM, MSPI, OMAS, OMAP, RMSPROP, SGD,
+# algorithms 
+    ADAGRAD, ADAM, ADAMAX, ADADELTA, MSPI, OMAS, OMAP, RMSPROP, SGD,
 # stats
     AutoCov,
     Bootstrap,

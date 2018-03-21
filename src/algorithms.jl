@@ -12,6 +12,25 @@ abstract type SGAlgorithm <: Algorithm end
 """
 struct SGD <: SGAlgorithm end
 
+# #-----------------------------------------------------------------------# NSGD
+# """
+#     NSGD(α)
+
+# Nesterov accelerated Proximal Stochastic Gradient Descent.
+# """
+# struct NSGD <: SGUpdater
+#     α::Float64
+#     v::Vector{Float64}
+#     θ::Vector{Float64}
+#     NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
+# end
+# init(u::NSGD, p::Int) = NSGD(u.α, p)
+# function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
+#     o.α == o2.α || error("Merge Failed.  NSGD objects use different α.")
+#     smooth!(o.v, o2.v, γ)
+#     smooth!(o.θ, o2.θ, γ)
+# end
+
 #-----------------------------------------------------------------------# ADAGRAD 
 """
     ADAGRAD()
@@ -112,19 +131,16 @@ mutable struct ADAMAX <: SGAlgorithm
     β2::Float64
     m::Vector{Float64}
     v::Vector{Float64}
-    n::Int
     function ADAMAX(β1::Float64 = 0.9, β2::Float64 = .999)
         @assert 0 < β1 < 1
         @assert 0 < β2 < 1
-        new(β1, β2, zeros(0), zeros(0), 0)
+        new(β1, β2, zeros(0), zeros(0))
     end
 end
 init!(o::ADAMAX, p) = (o.m = zeros(p); o.v = zeros(p))
-function Base.merge!(o::ADAMAX, o2::ADAMAX, γ::Float64)
-    o.n += o2.n 
-    γ = o2.n / o.n
-    smooth!(o.M, o2.M, γ)
-    smooth!(o.V, o2.V, γ)
+function Base.merge!(o::ADAMAX, o2::ADAMAX, γ)
+    smooth!(o.m, o2.m, γ)
+    smooth!(o.v, o2.v, γ)
     o.β1 = smooth(o.β1, o2.β1, γ)
     o.β2 = smooth(o.β2, o2.β2, γ)
     o
@@ -132,52 +148,9 @@ end
 function update!(o::ADAMAX, gx)
     for j in eachindex(o.m)
         o.m[j] = smooth(gx[j], o.m[j], o.β1)
-        o.v[j] = max(abs(gx[j]), o.β2 * o.v[j])
+        o.v[j] = max(abs(gx[j]) + ϵ, o.β2 * o.v[j])
     end
 end
-
-#-----------------------------------------------------------------------# MSPI 
-struct MSPI <: SGAlgorithm end
-
-#-----------------------------------------------------------------------# OMAS
-mutable struct OMAS <: Algorithm 
-    a::Vector{Float64}
-    b::Vector{Float64}
-    OMAS() = new(zeros(0), zeros(0))
-end
-init!(o::OMAS, p) = (o.a = zeros(p); o.b = zeros(p))
-function Base.merge!(o::OMAS, o2::OMAS, γ) 
-    smooth!(o.a, o2.a, γ)
-    smooth!(o.b, o2.b, γ)
-    o 
-end
-
-
-
-# #-----------------------------------------------------------------------# NSGD
-# """
-#     NSGD(α)
-
-# Nesterov accelerated Proximal Stochastic Gradient Descent.
-# """
-# struct NSGD <: SGUpdater
-#     α::Float64
-#     v::Vector{Float64}
-#     θ::Vector{Float64}
-#     NSGD(α = 0.0, p = 0) = new(α, zeros(p), zeros(p))
-# end
-# init(u::NSGD, p::Int) = NSGD(u.α, p)
-# function Base.merge!(o::NSGD, o2::NSGD, γ::Float64)
-#     o.α == o2.α || error("Merge Failed.  NSGD objects use different α.")
-#     smooth!(o.v, o2.v, γ)
-#     smooth!(o.θ, o2.θ, γ)
-# end
-
-
-
-
-
-
 
 # #-----------------------------------------------------------------------# NADAM
 # """
@@ -206,31 +179,16 @@ end
 #     smooth!(o.V, o2.V, γ)
 # end
 
-# #-----------------------------------------------------------------------# MSPI, OMAS, OMAP
-# for T in [:OMAS, :OMAS2, :OMAP, :OMAP2, :MSPI, :MSPI2]
-#     @eval begin
-#         """
-#             MSPI()  # Majorized stochastic proximal iteration
-#             MSPI2()
-#             OMAS()  # Online MM - Averaged Surrogate
-#             OMAS2()
-#             OMAP()  # Online MM - Averaged Parameter
-#             OMAP2()
+#-----------------------------------------------------------------------# MSPI, OMAS, OMAP
+struct MSPI <: Algorithm end
 
-#         Updaters based on majorizing functions.  `MSPI`/`OMAS`/`OMAP` define a family of 
-#         algorithms and not a specific update, thus each type has two possible versions.
+struct OMAP <: Algorithm end
 
-#         - See https://arxiv.org/abs/1306.4650 for OMAS
-#         - Ask @joshday for details on OMAP and MSPI
-#         """
-#         struct $T{T} <: Algorithm
-#             buffer::T 
-#         end
-#         $T() = $T(nothing)
-#         function Base.merge!(a::S, b::S) where {S <: $T} 
-
-#             smooth!.(a.buffer, b.buffer, γ)
-#             a
-#         end
-#     end 
-# end
+mutable struct OMAS <: Algorithm  
+    a::Vector{Float64}
+    b::Vector{Float64}
+    A::Matrix{Float64}
+    B::Matrix{Float64}
+    OMAS() = new(zeros(0), zeros(0), zeros(0, 0), zeros(0, 0))
+end
+init!(o::OMAS, p) = (o.a = zeros(p); o.b = zeros(p))
