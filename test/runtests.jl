@@ -23,9 +23,18 @@ function test_merge(o, y1, y2, compare = ≈; kw...)
     @test nobs(o) == nobs(o2) == nrows(y1) + nrows(y2)
 end
 
-function test_exact(o, y, fo, fy, compare = ≈; kw...)
+function test_exact(o, y, fo, fy::Function, compare = ≈; kw...)
     fit!(o, y)
     for (v1, v2) in zip(fo(o), fy(y))
+        result = compare(v1, v2; kw...)
+        result || Compat.@warn("Test Exact Failure: $v1 != $v2")
+        @test result
+    end
+    @test nobs(o) == nrows(y)
+end
+function test_exact(o, y, fo, fy, compare = ≈; kw...)
+    fit!(o, y)
+    for (v1, v2) in zip(fo(o), fy)
         result = compare(v1, v2; kw...)
         result || Compat.@warn("Test Exact Failure: $v1 != $v2")
         @test result
@@ -41,8 +50,8 @@ println("\n\n")
 Compat.@info("Testing Stats")
 #-----------------------------------------------------------------------# AutoCov
 @testset "AutoCov" begin 
-    test_exact(AutoCov(10), y, autocov, x -> autocov(x, 0:10))
-    test_exact(AutoCov(10), y, autocor, x -> autocor(x, 0:10))
+    test_exact(AutoCov(10), y, autocov, autocov(y, 0:10))
+    test_exact(AutoCov(10), y, autocor, autocor(y, 0:10))
     test_exact(AutoCov(10), y, nobs, length)
 end
 #-----------------------------------------------------------------------# Bootstrap 
@@ -82,15 +91,15 @@ end
     test_exact(CovMatrix(5), x, mean, x -> mean(x, 1))
     test_exact(CovMatrix(), x, cor, cor)
     test_exact(CovMatrix(5), x, cov, cov)
-    test_exact(CovMatrix(), x, o->cov(o;corrected=false), x->cov(x, 1, false))
+    test_exact(CovMatrix(), x, o->cov(o;corrected=false), cov(x, 1, false))
     test_merge(CovMatrix(), x, x2)
 end
 #-----------------------------------------------------------------------# CStat 
 @testset "CStat" begin 
     data = y + y2 * im 
     data2 = y2 + y * im
-    test_exact(CStat(Mean()), data, o->value(o)[1], x -> mean(y))
-    test_exact(CStat(Mean()), data, o->value(o)[2], x -> mean(y2))
+    test_exact(CStat(Mean()), data, o->value(o)[1], mean(y))
+    test_exact(CStat(Mean()), data, o->value(o)[2], mean(y2))
     test_exact(CStat(Mean()), data, nobs, length, ==)
     test_merge(CStat(Mean()), y, y2)
     test_merge(CStat(Mean()), data, data2)
@@ -126,7 +135,7 @@ end
 end
 @testset "FitNormal" begin 
     test_merge(FitNormal(), y, y2)
-    test_exact(FitNormal(), y, value, y->(mean(y), std(y)))
+    test_exact(FitNormal(), y, value, (mean(y), std(y)))
 end
 @testset "FitMultinomial" begin 
 end
@@ -150,9 +159,9 @@ end
     @test o[1] == first(o) == Mean()
     @test o[5] == last(o) == Variance()
 
-    test_exact(o, x, values, x -> vcat(mean(x, 1)[1:3], var(x, 1)[4:5]))
-    test_exact(5Mean(), x, values, x->mean(x, 1))
-    test_exact(5Variance(), x, values, x->var(x, 1))
+    test_exact(o, x, values, vcat(mean(x, 1)[1:3], var(x, 1)[4:5]))
+    test_exact(5Mean(), x, values, mean(x, 1))
+    test_exact(5Variance(), x, values, var(x, 1))
 
     test_merge([Mean() Variance() Sum() Moments() Mean()], x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     test_merge(5Mean(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
@@ -198,7 +207,7 @@ end
     test_merge(HyperLogLog(4), y, y2)
 end
 @testset "LinReg" begin 
-    test_exact(LinReg(), (x,y), value, x->x[1]\x[2])
+    test_exact(LinReg(), (x,y), value, x\y)
     test_merge(LinReg(), (x,y), (x2,y2))
     # ridge 
     o = fit!(LinReg(), (x,y))
@@ -207,6 +216,10 @@ end
     λ = rand(5)
     @test coef(o, λ) ≈ (x'x + 1000 * Diagonal(λ)) \ x'y
 end
+@testset "LinRegBuilder" begin 
+    test_merge(LinRegBuilder(), [x y], [x2 y2])
+    test_exact(LinRegBuilder(), [x y], o->coef(o,y=6), [x ones(length(y))] \ y)
+end
 #-----------------------------------------------------------------------# Mean 
 @testset "Mean" begin 
     test_exact(Mean(), y, mean, mean)
@@ -214,7 +227,7 @@ end
 end
 #-----------------------------------------------------------------------# Moments
 @testset "Moments" begin 
-    test_exact(Moments(), y, value, x ->[mean(x), mean(x .^ 2), mean(x .^ 3), mean(x .^4) ])
+    test_exact(Moments(), y, value, [mean(y), mean(y .^ 2), mean(y .^ 3), mean(y .^4) ])
     test_exact(Moments(), y, skewness, skewness, atol = .1)
     test_exact(Moments(), y, kurtosis, kurtosis, atol = .1)
     test_exact(Moments(), y, mean, mean)
@@ -250,7 +263,7 @@ end
             Quantile(τ; alg=OMAS()),
             Quantile(τ; alg=ADAGRAD())
             ]
-        test_exact(copy(o), data, value, x -> quantile(x,τ), atol = .5)
+        test_exact(copy(o), data, value, quantile(data,τ), atol = .5)
         test_merge(copy(o), data, data2, atol = .5)
     end
     # for τi in τ

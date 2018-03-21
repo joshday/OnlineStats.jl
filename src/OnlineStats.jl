@@ -13,6 +13,7 @@ import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoi
 import DataStructures: OrderedDict
 import NamedTuples  # Remove in 0.7
 import SpecialFunctions
+import SweepOperator
 
 export 
 # functions 
@@ -34,7 +35,7 @@ export
     Group,
     Hist, HyperLogLog,
     KMeans,
-    Lag, LinReg,
+    Lag, LinReg, LinRegBuilder,
     Mean, Moments,
     NBClassifier,
     OrderStats,

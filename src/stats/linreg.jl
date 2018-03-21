@@ -1,18 +1,17 @@
-
-
 #-----------------------------------------------------------------------# LinReg
 """
     LinReg(p)
 
-Ridge regression of `p` variables with elementwise regularization.
+Linear regression of `p` variables, optionally with element-wise ridge regularization.
 
 # Example
 
-    x = randn(100, 10)
-    y = x * linspace(-1, 1, 10) + randn(100)
-    o = LinReg(10)
-    Series((x,y), o)
-    value(o)
+    x = randn(100, 5)
+    y = x * (1:5) + randn(100)
+    o = fit!(LinReg(10), (x,y))
+    coef(o)
+    coef(o, .1)
+    coef(o, [0,0,0,0,Inf])
 """
 mutable struct LinReg{W} <: OnlineStat{(1,0)}
     β::Vector{Float64}
@@ -50,7 +49,7 @@ end
 function coef(o::LinReg, λ::Real) 
     o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)] + λ*I) \ o.A[1:(end-1), end]
 end
-function coef(o::LinReg, λ::Vector{<:Real})
+function coef(o::LinReg, λ::AbstractVector{<:Real})
     o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)] + Diagonal(λ)) \ o.A[1:(end-1), end]
 end
 
@@ -63,73 +62,76 @@ function Base.merge!(o::LinReg, o2::LinReg)
     o
 end
 
-# #-----------------------------------------------------------------------# LinRegBuilder
-# """
-#     LinRegBuilder(p)
+#-----------------------------------------------------------------------# LinRegBuilder
+"""
+    LinRegBuilder(p)
 
-# Create an object from which any variable can be regressed on any other set of variables,
-# optionally with ridge (`PenaltyFunctions.L2Penalty`) regularization.  The main function
-# to use with `LinRegBuilder` is `coef`:
+Create an object from which any variable can be regressed on any other set of variables,
+optionally with element-wise ridge regularization.  The main function to use with 
+`LinRegBuilder` is `coef`:
 
-#     coef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)
+    coef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)
 
-# Return the coefficients of a regressing column `y` on columns `x` with ridge (`L2Penalty`) 
-# parameter `λ`.  An intercept (`bias`) term is added by default.
+Return the coefficients of a regressing column `y` on columns `x` with ridge (`L2Penalty`) 
+parameter `λ`.  An intercept (`bias`) term is added by default.
 
-# # Examples
+# Examples
 
-#     x = randn(1000, 10)
-#     o = LinRegBuilder(10)
-#     s = Series(x, o)
+    x = randn(1000, 10)
+    o = fit!(LinRegBuilder(), x)
 
-#     # let response = x[:, 3]
-#     coef(o; y=3, verbose=true) 
+    coef(o; y=3, verbose=true)
 
-#     # let response = x[:, 7], predictors = x[:, [2, 5, 4]]
-#     coef(o; y = 7, x = [2, 5, 4]) 
+    coef(o; y=7, x=[2,5,4])
+"""
+mutable struct LinRegBuilder{W} <: OnlineStat{1}
+    A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
+    weight::W 
+    n::Int
+end
+function LinRegBuilder(p=0; weight = EqualWeight()) 
+    LinRegBuilder(Matrix{Float64}(undef, p + 1, p + 1), weight, 0)
+end
+function Base.show(io::IO, o::LinRegBuilder) 
+    print(io, "LinRegBuilder of $(nvars(o)) variables")
+end
+nvars(o::LinRegBuilder) = size(o.A, 1) - 1
 
-#     # 
-# """
-# struct LinRegBuilder <: ExactStat{1}
-#     A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
-#     function LinRegBuilder(p::Integer) 
-#         o = new(Matrix{Float64}(p + 1, p + 1))
-#         o.A[end] = 1.0 
-#         o
-#     end
-# end
+function _fit!(o::LinRegBuilder, x) 
+    o.n += 1 
+    if o.n == 1 
+        o.A = zeros(length(x) + 1, length(x) + 1)
+        o.A[end] = 1.0
+    end
+    smooth_syr!(o.A, BiasVec(x), o.weight(o.n))
+end
+value(o::LinRegBuilder, args...) = coef(o, args...)
 
-# function Base.show(io::IO, o::LinRegBuilder) 
-#     print(io, "LinRegBuilder of $(size(o.A, 1) - 1) variables")
-# end
+xs(o::LinRegBuilder, y) = setdiff(1:size(o.A, 1) - 1, y)
+function add_diag!(S, λ::Number)
+    for i in 1:(size(S, 1) - 1)
+        S[i, i] += λ
+    end
+end
+function add_diag!(S, λ::AbstractVector)
+    for i in 1:(size(S, 1) - 1)
+        S[i, i] += λ[i]
+    end
+end
 
-# fit!(o::LinRegBuilder, y::VectorOb, γ::Float64) = smooth_syr!(o.A, BiasVec(y), γ)
+function coef(o::LinRegBuilder, λ=0.0; y=1, x=xs(o,y), bias=true, verbose=false)
+    verbose && Compat.@info("Regress $y on $x $(bias ? "with bias" : "")")
+    inds = collect(x)
+    bias && push!(inds, size(o.A, 1))
+    push!(inds, y)
+    S = Symmetric(o.A)[inds, inds]
+    add_diag!(S, λ)
+    SweepOperator.sweep!(S, 1:(length(inds)-1))
+    return S[1:(length(inds)-1), end]
+end
 
-# value(o::LinRegBuilder) = coef(o)
-
-# function coef(o::LinRegBuilder, λ = 0.0; 
-#               y = 1, 
-#               x = setdiff(1:size(o.A, 2) - 1, y), 
-#               bias::Bool = true,
-#               verbose::Bool = false
-#               )
-#     if verbose 
-#         s = "Regress $y on $x"
-#         if bias 
-#             s *= " with bias"
-#         end
-#         info(s)
-#     end
-#     if bias 
-#         x = vcat(x, size(o.A, 2))
-#     end
-#     Ainds = vcat(x, y)
-#     S = Symmetric(o.A)[Ainds, Ainds]
-#     for i in 1:length(x) - bias    
-#         S[i, i] += λ
-#     end
-#     SweepOperator.sweep!(S, 1:length(x))
-#     return S[1:length(x), end]
-# end
-
-# Base.merge!(o::LinRegBuilder, o2::LinRegBuilder, γ::Float64) = smooth!(o.A, o2.A, γ)
+function Base.merge!(o::LinRegBuilder, o2::LinRegBuilder) 
+    o.n += o2.n
+    smooth!(o.A, o2.A, nobs(o2) / nobs(o))
+    o
+end
