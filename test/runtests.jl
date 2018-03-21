@@ -297,7 +297,7 @@ end
             merge!(o, copy(o))
             @test coef(o) == o.β
             @test predict(o, X) == X * o.β
-            @test ≈(coef(o), β; atol=.9)
+            @test ≈(coef(o), β; atol=1.5)
         end
     end
 end

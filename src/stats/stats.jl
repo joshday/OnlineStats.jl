@@ -840,6 +840,7 @@ function Base.show(io::IO, o::Series)
         print(io, "\n  $(char)── $stat")
     end
 end
+@deprecate Series(data, stats::OnlineStat...) fit!(Series(stats...), data)
 
 #-----------------------------------------------------------------------# Sum
 """

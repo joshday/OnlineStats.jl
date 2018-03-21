@@ -1,9 +1,5 @@
 # Basics
 
-```@setup index
-using OnlineStats
-```
-
 **OnlineStats** is a Julia package which provides *online parallelizable algorithms* for statistics.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
 
 ## Installation
@@ -12,11 +8,13 @@ using OnlineStats
 Pkg.add("OnlineStats")
 ```
 
-## Summary of Usage
+## Usage
 
-### Every stat is a type (`<: OnlineStat`)
+### Every Stat is a Type (`<: OnlineStat`)
 
 ```@example index
+using OnlineStats
+
 m = Mean()
 ```
 

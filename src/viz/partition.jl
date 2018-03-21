@@ -65,13 +65,13 @@ function _fit!(o::Partition, y)
 end
 
 #-----------------------------------------------------------------------# IndexedPartition
-struct IndexedPartition{N, O<:OnlineStat{N}, T} <: AbstractPartition{VectorOb}
+struct IndexedPartition{IN, O<:OnlineStat{IN}, T} <: AbstractPartition{VectorOb}
     parts::Vector{Part{T, O}}
     b::Int
     init::O
 end
-function IndexedPartition(T::Type, o::O, b::Int=100) where {N, O<:OnlineStat{N}}
-    IndexedPartition{N, O, T}(Part{T, O}[], b, o)
+function IndexedPartition(T::Type, o::O, b::Int=100) where {IN, O<:OnlineStat{IN}}
+    IndexedPartition{IN, O, T}(Part{T, O}[], b, o)
 end
 function _fit!(o::IndexedPartition, xy)
     x, y = xy
