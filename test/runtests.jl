@@ -3,6 +3,16 @@ O = OnlineStats
 import StatsBase: countmap, fit, Histogram
 import DataStructures: OrderedDict, SortedDict
 
+#-----------------------------------------------------------------------# Custom Printing 
+info("Custom Printing")
+for stat in [
+        Bootstrap(Mean())
+        CallFun(Mean(), info)
+        HyperLogLog(10)
+        ]
+    println("  > ", stat)
+end
+
 #-----------------------------------------------------------------------# test utils
 const y = randn(1000)
 const y2 = randn(1000)
@@ -153,6 +163,11 @@ end
     @test value(o.stats[1][1])[1] ≈ value(o2.stats[1][1])[1]
     @test value(o.stats[1][1])[2] ≈ value(o2.stats[1][1])[2]
 end
+#-----------------------------------------------------------------------# FTSeries 
+@testset "FTSeries" begin 
+    test_merge(FTSeries(Mean(), Variance(); transform = abs), y, y2, (a,b)->≈(value(a),value(b)))
+    test_exact(FTSeries(Mean(); transform=abs), y, o->value(o.stats[1]), mean(abs, y))
+end
 #-----------------------------------------------------------------------# Group 
 @testset "Group" begin 
     o = Group(Mean(), Mean(), Mean(), Variance(), Variance())
@@ -167,6 +182,12 @@ end
     test_merge(5Mean(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     test_merge(5Variance(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     @test 5Mean() == 5Mean()
+
+    g = fit!(5Mean(), x)
+    @test length(g) == 5
+    for (i, oi) in enumerate(g) 
+        @test value(oi) ≈ mean(x[:, i])
+    end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin 
@@ -251,6 +272,7 @@ end
 @testset "OrderStats" begin 
     test_merge(OrderStats(100), y, y2)
     test_exact(OrderStats(1000), y, value, sort, ==)
+    test_exact(OrderStats(1000), y, quantile, quantile)
 end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 
@@ -282,15 +304,21 @@ end
         @test (yi ∈ y) || (yi ∈ y2)
     end
 end
+#-----------------------------------------------------------------------# Series 
+@testset "Series" begin 
+    test_merge(Series(Mean(), Variance()), y, y2, (a,b) -> ≈(value(a), value(b)))
+    test_exact(Series(Mean(), Variance()), y, o->value(o.stats[1]), mean(y))
+    test_exact(Series(Mean(), Variance()), y, o->value(o.stats[2]), var(y))
+end
 #-----------------------------------------------------------------------# StatLearn 
 @testset "StatLearn" begin 
     X = randn(10_000, 5)
     β = collect(-1:.5:1)
     Y = X * β + randn(10_000)
-    for A in [SGD(),ADAGRAD(),ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
-        for L in [.5 * L2DistLoss(), L2DistLoss()]
+    for A in [SGD(),ADAGRAD()]#,ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
+        for L in [.5 * L2DistLoss()]
             # sanity checks
-            o = fit!(StatLearn(5, A, L), (X,Y))
+            o = fit!(StatLearn(5, A, L; rate=LearningRate(.7)), (X,Y))
             @test o.loss isa typeof(L)
             @test o.alg isa typeof(A)
             any(isnan.(o.β)) && info((L, A))

@@ -276,15 +276,20 @@ end
 function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
     FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
 end
+nobs(o::FTSeries) = nobs(o.stats[1])
 @generated function _fit!(o::FTSeries{N, OS}, y) where {N, OS}
     n = length(fieldnames(OS))
     quote
         Base.Cartesian.@nexprs $n i -> @inbounds begin
-            yi = y[i]; o.filter(yi) ? _fit!(o.stats[i], o.transform(yi)) : o.nfiltered += 1
+            if o.filter(y) 
+                _fit!(o.stats[i], o.transform(y)) 
+            else 
+                o.nfiltered += 1
+            end
         end
     end
 end
-function Base.merge!(o::T, o2::T) where {T<:FTSeries}
+function Base.merge!(o::FTSeries, o2::FTSeries)
     o.nfiltered += o2.nfiltered 
     merge!.(o.stats, o2.stats)
     o
@@ -493,8 +498,7 @@ First four non-central moments.
 
 # Example
 
-    s = Series(randn(1000), Moments(10))
-    value(s)
+    fit!(Moments(), randn(1000))
 """
 mutable struct Moments{W} <: OnlineStat{Number}
     m::Vector{Float64}
@@ -824,17 +828,18 @@ Track multiple stats for one data stream.
     s = Series(Mean(), Variance())
     fit!(s, randn(1000))
 """
-struct Series{N, T<:Tup} <: OnlineStat{N}
+struct Series{IN, T<:Tup} <: OnlineStat{IN}
     stats::T
 end
-Series(stats::OnlineStat{N}...) where {N} = Series{N, typeof(stats)}(stats)
-@generated function _fit!(o::Series{N, T}, y) where {N, T}
+Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)
+nobs(o::Series) = nobs(o.stats[1])
+@generated function _fit!(o::Series{IN, T}, y) where {IN, T}
     n = length(fieldnames(T))
-    :(Base.Cartesian.@nexprs $n i -> @inbounds(_fit!(o.stats[i], y[i])))
+    :(Base.Cartesian.@nexprs $n i -> _fit!(o.stats[i], y))
 end
 Base.merge!(o::Series, o2::Series) = (merge!.(o.stats, o2.stats); o)
 function Base.show(io::IO, o::Series)
-    print(io, "Series")
+    print(io, name(o, false, false))
     for (i, stat) in enumerate(o.stats)
         char = i == length(o.stats) ? '└' : '├'
         print(io, "\n  $(char)── $stat")
