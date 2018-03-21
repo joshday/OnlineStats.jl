@@ -22,7 +22,7 @@ export
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
 # updaters 
-    ADAGRAD, ADAM, MSPI, SGD,
+    ADAGRAD, ADAM, MSPI, OMAS, OMAP, SGD,
 # stats
     AutoCov,
     Bootstrap,

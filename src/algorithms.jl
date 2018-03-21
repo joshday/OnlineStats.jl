@@ -1,18 +1,38 @@
 abstract type Algorithm end 
 nobs(o::Algorithm) = o.n
-next!(o::Algorithm) = o.rate(o.n += 1)
+init!(o::Algorithm, p) = o
+Base.merge!(o::T, o2::T, γ) where {T<:Algorithm} = o
 
-abstract type SGAlgorithm end
+abstract type SGAlgorithm <: Algorithm end
 
 #-----------------------------------------------------------------------# SGD
-mutable struct SGD{W} <: SGAlgorithm
-    rate::W 
-    n::Int
-end
-SGD(;rate = LearningRate()) = SGD(rate, 0)
-init!(o::SGD, p) = o
-Base.merge!(o::SGD, o2::SGD) = (o.n += o2.n; o)
+struct SGD <: SGAlgorithm end
 
+#-----------------------------------------------------------------------# ADAGRAD 
+mutable struct ADAGRAD <: SGAlgorithm 
+    h::Vector{Float64}
+    ADAGRAD() = new(zeros(0))
+end
+init!(o::ADAGRAD, p) = (o.h = zeros(p))
+Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ) = (smooth!(o.h, o2.h, γ); o)
+
+#-----------------------------------------------------------------------# MSPI 
+struct MSPI <: SGAlgorithm end
+
+#-----------------------------------------------------------------------# OMAS
+mutable struct OMAS <: Algorithm 
+    a::Vector{Float64}
+    b::Vector{Float64}
+    OMAS() = new(zeros(0), zeros(0))
+end
+init!(o::OMAS, p) = (o.a = zeros(p); o.b = zeros(p))
+function Base.merge!(o::OMAS, o2::OMAS, γ) 
+    smooth!(o.a, o2.a, γ)
+    smooth!(o.b, o2.b, γ)
+    o 
+end
+
+#-----------------------------------------------------------------------#  old
 # init!(o::SGD, p) = (o.δ = zeros(p))
 
 # γ, g = direction!(o)
@@ -251,11 +271,12 @@ Base.merge!(o::SGD, o2::SGD) = (o.n += o2.n; o)
 #         - See https://arxiv.org/abs/1306.4650 for OMAS
 #         - Ask @joshday for details on OMAP and MSPI
 #         """
-#         struct $T{T} <: Updater
+#         struct $T{T} <: Algorithm
 #             buffer::T 
 #         end
 #         $T() = $T(nothing)
-#         function Base.merge!(a::S, b::S, γ::Float64) where {S <: $T} 
+#         function Base.merge!(a::S, b::S) where {S <: $T} 
+
 #             smooth!.(a.buffer, b.buffer, γ)
 #             a
 #         end
