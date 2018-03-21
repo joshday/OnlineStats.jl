@@ -4,7 +4,7 @@
 
 Online parameter estimate of a Beta distribution (Method of Moments).
 """
-struct FitBeta{V<:Variance} <: OnlineStat{0}
+struct FitBeta{V<:Variance} <: OnlineStat{Number}
     var::V
 end
 FitBeta(;kw...) = FitBeta(Variance(;kw...))
@@ -30,7 +30,7 @@ Base.merge!(o::FitBeta, o2::FitBeta) = merge!(o.var, o2.var)
 # Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
 # quantiles, so that `alg` will be passed to [`Quantile`](@ref).
 # """
-# mutable struct FitCauchy{T} <: OnlineStat{0}
+# mutable struct FitCauchy{T} <: OnlineStat{Number}
 #     q::Quantile{T}
 # end
 # FitCauchy(alg = SGD(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
@@ -51,7 +51,7 @@ Base.merge!(o::FitBeta, o2::FitBeta) = merge!(o.var, o2.var)
 
 Online parameter estimate of a Gamma distribution (Method of Moments).
 """
-struct FitGamma <: OnlineStat{0}
+struct FitGamma <: OnlineStat{Number}
     v::Variance
 end
 FitGamma() = FitGamma(Variance())
@@ -75,7 +75,7 @@ Base.merge!(o::FitGamma, o2::FitGamma) = merge!(o.v, o2.v)
 
 Online parameter estimate of a LogNormal distribution (MLE).
 """
-struct FitLogNormal <: OnlineStat{0}
+struct FitLogNormal <: OnlineStat{Number}
     v::Variance
     FitLogNormal() = new(Variance())
 end
@@ -96,7 +96,7 @@ Base.merge!(o::FitLogNormal, o2::FitLogNormal) = merge!(o.v, o2.v)
 
 Calculate the parameters of a normal distribution via maximum likelihood.
 """
-struct FitNormal{V <: Variance} <: OnlineStat{0}
+struct FitNormal{V <: Variance} <: OnlineStat{Number}
     v::V
 end
 FitNormal(;kw...) = FitNormal(Variance(;kw...))
@@ -127,7 +127,7 @@ Online parameter estimate of a Multinomial distribution.  The sum of counts does
 to be consistent across observations.  Therefore, the `n` parameter of the Multinomial
 distribution is returned as 1.
 """
-struct FitMultinomial{T} <: OnlineStat{1}
+struct FitMultinomial{T} <: OnlineStat{VectorOb}
     mvmean::Group{T}
 end
 FitMultinomial(p::Integer) = FitMultinomial(p * Mean())
@@ -146,7 +146,7 @@ Base.merge!(o::FitMultinomial, o2::FitMultinomial) = merge!(o.mvmean, o2.mvmean)
 
 Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
 """
-struct FitMvNormal <: OnlineStat{1}
+struct FitMvNormal <: OnlineStat{VectorOb}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end

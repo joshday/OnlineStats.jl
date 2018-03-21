@@ -96,12 +96,20 @@ Base.length(o::ColsOf) = size(o.mat, 2)
 
 #-----------------------------------------------------------------------# fit!
 fit!(o::OnlineStat{T}, y::T) where {T} = (_fit!(o, y); o)
-function fit!(o::OnlineStat{T}, y::AbstractVector{<:T}) where {T}
+function fit!(o::OnlineStat{T}, y::AbstractArray{<:T}) where {T}
     for yi in y 
         _fit!(o, yi)
     end
     o
 end
+function fit!(o::OnlineStat{VectorOb}, y::AbstractMatrix)
+    for yi in eachrow(y)
+        fit!(o, yi)
+    end
+    o
+end
+
+
 
 fit!(o::OnlineStat{0}, y) = (_fit!(o, y); o)
 function fit!(o::OnlineStat{0}, y::Union{VectorOb, AbstractArray})

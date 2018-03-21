@@ -10,7 +10,7 @@ mutable struct Part{T, O <: OnlineStat} <: OnlineStat{1}
 end
 # Part(o::O, ab::T) where {O<:OnlineStat, T} = Part{T,O}(o, ab, ab)
 nobs(o::Part) = nobs(o.stat)
-Base.show(io::IO, o::Part) = print(io, "Part($(o.stat)) | n=$(nobs(o)) in [$(o.a), $(o.b)]")
+Base.show(io::IO, o::Part) = print(io, "Part $(o.a) to $(o.b) | $(o.stat)")
 function Base.merge!(o::Part, o2::Part)
     merge!(o.stat, o2.stat)
     o.a = min(o.a, o2.a)

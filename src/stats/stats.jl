@@ -75,7 +75,7 @@ The number of things observed.
 
     fit!(Count(), 1:1000)
 """
-mutable struct Count <: OnlineStat{0}
+mutable struct Count <: OnlineStat{Any}
     n::Int
     Count() = new(0)
 end
@@ -94,10 +94,11 @@ Track a dictionary that maps unique values to its number of occurrences.  Simila
     
     fit!(CountMap(Int), rand(1:10, 1000))
 """
-struct CountMap{A <: AbstractDict} <: OnlineStat{0}
+struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
     value::A  # OrderedDict by default
 end
-CountMap(T::Type) = CountMap(OrderedDict{T, Int}())
+CountMap(T::Type) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}())
+CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d)
 _fit!(o::CountMap, x) = haskey(o.value, x) ? o.value[x] += 1 : o.value[x] = 1
 Base.merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o)
 nobs(o::CountMap) = sum(values(o.value))
@@ -122,7 +123,7 @@ unknown, leave the default `p=0`.
 
     fit!(CovMatrix(), randn(100, 4))
 """
-mutable struct CovMatrix{W} <: OnlineStat{1}
+mutable struct CovMatrix{W} <: OnlineStat{VectorOb}
     value::Matrix{Float64}
     A::Matrix{Float64}  # x'x/n
     b::Vector{Float64}  # 1'x/n
@@ -175,11 +176,11 @@ separately track the real and imaginary parts.
     y = randn(100) + randn(100)im
     fit!(y, CStat(Mean()))
 """
-struct CStat{O <: OnlineStat{0}} <: OnlineStat{0}
+struct CStat{O <: OnlineStat{Number}} <: OnlineStat{Number}
     re_stat::O
     im_stat::O
 end
-CStat(o::OnlineStat{0}) = CStat(o, copy(o))
+CStat(o::OnlineStat{<:Number}) = CStat(o, copy(o))
 nobs(o::CStat) = nobs(o.re_stat)
 value(o::CStat) = value(o.re_stat), value(o.im_stat)
 _fit!(o::CStat, y::T) where {T<:Real} = (_fit!(o.re_stat, y); _fit!(o.im_stat, T(0)))
@@ -202,7 +203,7 @@ Track the difference and the last value.
     last(o)
     diff(o)
 """
-mutable struct Diff{T <: Real} <: OnlineStat{0}
+mutable struct Diff{T <: Number} <: OnlineStat{Number}
     diff::T
     lastval::T
     n::Int
@@ -234,7 +235,7 @@ Maximum and minimum.
 
     fit!(Extrema(), rand(10^5))
 """
-mutable struct Extrema{T} <: OnlineStat{0}
+mutable struct Extrema{T} <: OnlineStat{Any}
     min::T
     max::T
     n::Int
@@ -292,7 +293,7 @@ always(x) = true
 
 #-----------------------------------------------------------------------# Group
 """
-    Group(stats::OnlineStat{0}...)
+    Group(stats::OnlineStat...)
     Group(tuple)
 
 Create a vector-input stat (`OnlineStat{1}`) from several scalar-input stats.  For a new 
@@ -303,11 +304,11 @@ observation `y`, `y[i]` is sent to `stats[i]`.
     fit!(Group(Mean(), Mean()), randn(100, 2))
     fit!(Group(Mean(), Variance()), randn(100, 2))
 """
-struct Group{T} <: OnlineStat{1}
+struct Group{T} <: OnlineStat{VectorOb}
     stats::T
 end
-Group(o::OnlineStat{0}...) = Group(o)
-Base.hcat(o::OnlineStat{0}...) = Group(o)
+Group(o::OnlineStat...) = Group(o)
+Base.hcat(o::OnlineStat...) = Group(o)
 nobs(o::Group) = nobs(first(o.stats))
 
 Base.getindex(o::Group, i) = o.stats[i]
@@ -327,7 +328,7 @@ end
 
 Base.merge!(o::Group, o2::Group) = (merge!.(o.stats, o2.stats); o)
 
-Base.:*(n::Integer, o::OnlineStat{0}) = Group([copy(o) for i in 1:n]...)
+Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 
 #-----------------------------------------------------------------------# HyperLogLog
 # Mostly copy/pasted from StreamStats.jl
@@ -340,7 +341,7 @@ Approximate count of distinct elements.
 
     fit!(HyperLogLog(12), rand(1:10,10^5))
 """
-mutable struct HyperLogLog <: OnlineStat{0}
+mutable struct HyperLogLog <: OnlineStat{Any}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
@@ -424,33 +425,34 @@ function Base.merge!(o::HyperLogLog, o2::HyperLogLog)
     o
 end
 
-# #-----------------------------------------------------------------------# KMeans
-# """
-#     KMeans(p, k)
+#-----------------------------------------------------------------------# KMeans
+"""
+    KMeans(p, k)
 
-# Approximate K-Means clustering of `k` clusters and `p` variables.
-# """
-# mutable struct KMeans{U <: Updater} <: OnlineStat{1}
-#     value::Matrix{Float64}  # p × k
-#     v::Vector{Float64}
-#     updater::U
-# end
-# KMeans(p::Integer, k::Integer; alg=SGD()) = KMeans(zeros(p, k), zeros(k), 0, u)
-# function fit!(o::KMeans{<:SGD}, x::VectorOb, γ::Float64)
-#     o.n += 1
-#     p, k = size(o.value)
-#     if o.n <= k 
-#         o.value[:, o.n] = x
-#     else
-#         for j in 1:k
-#             o.v[j] = sum(abs2, x - view(o.value, :, j))
-#         end
-#         kstar = indmin(o.v)
-#         for i in eachindex(x)
-#             o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
-#         end
-#     end
-# end
+Approximate K-Means clustering of `k` clusters and `p` variables.
+"""
+mutable struct KMeans{W} <: OnlineStat{VectorOb}
+    value::Matrix{Float64}  # p × k
+    v::Vector{Float64}
+    rate::W
+    n::Int
+end
+KMeans(p::Integer, k::Integer; rate=LearningRate(.6)) = KMeans(zeros(p, k), zeros(k), rate, 0)
+function _fit!(o::KMeans, x::VectorOb)
+    γ = o.rate(o.n += 1)
+    p, k = size(o.value)
+    if o.n <= k 
+        o.value[:, o.n] = x
+    else
+        for j in 1:k
+            o.v[j] = sum(abs2, x - view(o.value, :, j))
+        end
+        kstar = argmin(o.v)
+        for i in eachindex(x)
+            o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
+        end
+    end
+end
 
 #-----------------------------------------------------------------------# Mean
 """
@@ -469,7 +471,7 @@ Track a univariate mean.
     # exponentially-weighted mean
     @time fit!(Mean(;weight = x -> 0.1), randn(10^6))
 """
-mutable struct Mean{W} <: OnlineStat{0}
+mutable struct Mean{W} <: OnlineStat{Number}
     μ::Float64
     weight::W
     n::Int
@@ -494,7 +496,7 @@ First four non-central moments.
     s = Series(randn(1000), Moments(10))
     value(s)
 """
-mutable struct Moments{W} <: OnlineStat{0}
+mutable struct Moments{W} <: OnlineStat{Number}
     m::Vector{Float64}
     weight::W
     n::Int
@@ -530,7 +532,7 @@ end
 
 Average order statistics with batches of size `b`.
 """
-mutable struct OrderStats{T, W} <: OnlineStat{0}
+mutable struct OrderStats{T, W} <: OnlineStat{Number}
     value::Vector{T}
     buffer::Vector{T}
     weight::W
@@ -585,12 +587,17 @@ Track a dictionary that maps unique values to its probability.  Similar to
     
     fit!(ProbMap(Int), rand(1:10, 1000))
 """
-mutable struct ProbMap{A<:AbstractDict, W} <: OnlineStat{0}
+mutable struct ProbMap{T, A<:AbstractDict{T,Float64}, W} <: OnlineStat{T}
     value::A 
     weight::W 
     n::Int
 end
-ProbMap(T::Type; weight = EqualWeight()) = ProbMap(OrderedDict{T, Float64}(), weight, 0)
+function ProbMap(T::Type; weight = EqualWeight()) 
+    ProbMap{T,OrderedDict{T,Float64}, typeof(weight)}(OrderedDict{T, Float64}(), weight, 0)
+end 
+function ProbMap(d::AbstractDict{T, Float64}; weight=EqualWeight()) where {T}
+    ProbMap{T,OrderedDict{T,Float64},typeof(weight)}(d, weight, 0)
+end
 function _fit!(o::ProbMap, y)
     γ = o.weight(o.n += 1)
     get!(o.value, y, 0.0)   # initialize class probability at 0 if it isn't present
@@ -624,7 +631,7 @@ expensive than the algorithms used by [`Quantile`](@ref), but also more exact.
 
 Ref: [https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf](https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf)
 """
-mutable struct P2Quantile <: OnlineStat{0}
+mutable struct P2Quantile <: OnlineStat{Number}
     q::Vector{Float64}  # marker heights
     n::Vector{Int}      # marker position
     nprime::Vector{Float64}
@@ -699,7 +706,7 @@ end
 """
     Quantile(q = [.25, .5, .75]; alg)
 """
-mutable struct Quantile{T <: Algorithm, W} <: OnlineStat{0}
+mutable struct Quantile{T <: Algorithm, W} <: OnlineStat{Number}
     value::Vector{Float64}
     τ::Vector{Float64}
     rate::W 
@@ -778,7 +785,7 @@ Reservoir sample of `k` items.
 
     fit!(ReservoirSample(100, Int), 1:1000)
 """
-mutable struct ReservoirSample{T<:Number} <: OnlineStat{0}
+mutable struct ReservoirSample{T<:Number} <: OnlineStat{Number}
     value::Vector{T}
     n::Int
 end
@@ -844,7 +851,7 @@ Track the overall sum.
 
     fit!(Sum(Int), fill(1, 100))
 """
-mutable struct Sum{T} <: OnlineStat{0}
+mutable struct Sum{T} <: OnlineStat{Number}
     sum::T
     n::Int
 end
@@ -864,7 +871,7 @@ Univariate variance.
 
     @time fit!(Variance(), randn(10^6))
 """
-mutable struct Variance{W} <: OnlineStat{0}
+mutable struct Variance{W} <: OnlineStat{Number}
     σ2::Float64 
     μ::Float64 
     weight::W
@@ -894,7 +901,7 @@ Base.mean(o::Variance) = o.μ
 
 Store the last `b` values for a data stream of type `T`.
 """
-struct Lag{T} <: OnlineStat{0}
+struct Lag{T} <: OnlineStat{Any}
     value::Vector{T}
 end
 Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
@@ -918,7 +925,7 @@ Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of
     autocov(o)
     autocor(o)
 """
-struct AutoCov{T, W} <: OnlineStat{0}
+struct AutoCov{T, W} <: OnlineStat{Number}
     cross::Vector{Float64}
     m1::Vector{Float64}
     m2::Vector{Float64}

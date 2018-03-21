@@ -1,29 +1,60 @@
-# """
-#     ML.Schema()
+struct ModelSchema{D<:OrderedDict} <: OnlineStat{1}
+    d::D
+end
+function ModelSchema(t::VectorOb, hints::Pair...)
+    p = Pair.(keys(t), mlstat.(values(t)))
+    d = OrderedDict{eltype(keys(t)), Any}(p...)
+    for (ky, val) in hints
+        val isa Union{Variance, CountMap, Ignored} ||
+            error("Not an allowed ModelSchema stat")
+        d[ky] = val
+    end
+    ModelSchema(d)
+end
+function Base.show(io::IO, o::ModelSchema)
+    print(io, "ModelSchema: ")
+    for (k, v) in pairs(sort(o.d))
+        s = '-'
+        if v isa Variance 
+            s = '📈' 
+        elseif v isa CountMap 
+            s = '📊'
+        end
+        @printf io "\n  %s  | %s" k s
+    end
+end
+function _fit!(o::ModelSchema, y)
+    for i in keys(o.d)
+        fit!(o.d[i], y[i])
+    end
+end
 
-# Type for extracting feature vectors from continuous and discrete variables.  Under the hood,
-# each variable is tracked by one of the following:
 
-# - `ML.Numerical()`
-# - `ML.Categorical()`
-# - `ML.Ignored()`
 
-# # Example 
+#-----------------------------------------------------------------------# Default stats
+struct Ignored <: OnlineStat{0} end 
+value(o::Ignored) = nothing
+_fit!(o::Ignored, y) = nothing
 
-#     o = ML.Schema()
-#     x = [randn(100) rand('a':'d', 100) rand(Date(2010):Date(2011), 100)]
-#     series(x, o)
-#     o.dict
-# """
+mlstat(y) = Ignored()
+mlstat(y::Number) = Variance() 
+mlstat(y::T) where {T<:Union{Bool, AbstractString, Char, Symbol}} = CountMap(T)
+
+
+_width(o::Variance) = 1 
+_width(o::CountMap) = nkeys(o) - 1 
+_width(o::Ignored) = 0
+
+
 # module ML
 
-# import ..Variance
-# import ..Unique
-# import NamedTuples
-# import OnlineStatsBase: ExactStat, VectorOb
-# import LearnBase: fit!, value, transform
-# import DataStructures: SortedDict
-# export Numerical, Categorical
+# # import ..Variance
+# # import ..Unique
+# # import NamedTuples
+# # import OnlineStatsBase: ExactStat, VectorOb
+# # import LearnBase: fit!, value, transform
+# # import DataStructures: SortedDict
+# # export Numerical, Categorical
 
 # # For interface: width, transform(column, y)
 # abstract type AbstractMLColumn <: ExactStat{0} end

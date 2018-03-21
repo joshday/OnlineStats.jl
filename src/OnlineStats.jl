@@ -2,6 +2,7 @@ module OnlineStats
 
 using Compat
 using Compat.LinearAlgebra
+using Compat.Printf
 
 using Reexport 
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
@@ -56,5 +57,6 @@ include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")
 include("stats/linreg.jl")
 include("stats/statlearn.jl")
+include("stats/ml.jl")
 include("viz/partition.jl")
 end
