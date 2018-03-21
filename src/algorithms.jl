@@ -1,6 +1,7 @@
 abstract type Algorithm end 
-nobs(o::Algorithm) = o.n
+Base.copy(o::Algorithm) = deepcopy(o)
 init!(o::Algorithm, p) = o
+update!(o::Algorithm, gx) = nothing
 Base.merge!(o::T, o2::T, γ) where {T<:Algorithm} = o
 
 abstract type SGAlgorithm <: Algorithm end
@@ -11,43 +12,66 @@ struct SGD <: SGAlgorithm end
 #-----------------------------------------------------------------------# ADAGRAD 
 mutable struct ADAGRAD <: SGAlgorithm 
     h::Vector{Float64}
-    ADAGRAD() = new(zeros(0))
+    n::Int
+    ADAGRAD() = new(zeros(0), 0)
 end
 init!(o::ADAGRAD, p) = (o.h = zeros(p))
 Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ) = (smooth!(o.h, o2.h, γ); o)
+function update!(o::ADAGRAD, gx)
+    o.n += 1
+    for j in eachindex(o.h)
+        o.h[j] = smooth(o.h[j], gx[j]^2, 1 / o.n)
+    end
+end
 
 #-----------------------------------------------------------------------# RMSPROP
-#-----------------------------------------------------------------------# ADADELTA 
-mutable struct ADADELTA <: SGAlgorithm 
-    v::Vector{Float64}
-    Δ::Vector{Float64}
-    ρ::Float64
-    ADADELTA(ρ = .95) = new(Float64[], Float64[], ρ)
+mutable struct RMSPROP <: SGAlgorithm
+    α::Float64
+    h::Vector{Float64}
+    RMSPROP(α = .9, p = 0) = new(α, zeros(p))
 end
-init!(o::ADADELTA, p) = (o.v = zeros(p); o.Δ = zeros(p))
-function Base.merge!(o::ADADELTA, o2::ADADELTA, γ)
-    smooth!(o.v, o2.v, γ)
-    smooth!(o.Δ, o2.Δ, γ)
-    o.ρ = smooth(o.ρ, o2.ρ, γ)
-    o
+init!(a::RMSPROP, p) = (a.h = zeros(p))
+function Base.merge!(o::RMSPROP, o2::RMSPROP, γ)
+    o.α = smooth(o.α, o2.α, γ)
+    smooth!(o.h, o2.h, γ)
+end
+function update!(o::RMSPROP, gx)
+    for j in eachindex(o.h)
+        o.h[j] = smooth(gx[j]^2, o.h[j], o.α)
+    end
 end
 
-#-----------------------------------------------------------------------# ADAM 
-mutable struct ADAM <: SGAlgorithm 
-    m::Vector{Float64}
-    v::Vector{Float64}
-    β1::Float64 
-    β2::Float64
-    ADAM(β1 = .99, β2 = .999) = new(Float64[], Float64[], β1, β2)
-end
-init!(o::ADAM, p) = (o.m = zeros(p); o.v = zeros(p))
-function Base.merge!(o::ADAM, o2::ADAM, γ)
-    smooth!(o.m, o2.m, γ)
-    smooth!(o.v, o2.v, γ)
-    o.β1 = smooth(o.β1, o2.β1, γ)
-    o.β2 = smooth(o.β2, o2.β2, γ)
-    o
-end
+# #-----------------------------------------------------------------------# ADADELTA 
+# mutable struct ADADELTA <: SGAlgorithm 
+#     v::Vector{Float64}
+#     Δ::Vector{Float64}
+#     ρ::Float64
+#     ADADELTA(ρ = .95) = new(Float64[], Float64[], ρ)
+# end
+# init!(o::ADADELTA, p) = (o.v = zeros(p); o.Δ = zeros(p))
+# function Base.merge!(o::ADADELTA, o2::ADADELTA, γ)
+#     smooth!(o.v, o2.v, γ)
+#     smooth!(o.Δ, o2.Δ, γ)
+#     o.ρ = smooth(o.ρ, o2.ρ, γ)
+#     o
+# end
+
+# #-----------------------------------------------------------------------# ADAM 
+# mutable struct ADAM <: SGAlgorithm 
+#     m::Vector{Float64}
+#     v::Vector{Float64}
+#     β1::Float64 
+#     β2::Float64
+#     ADAM(β1 = .99, β2 = .999) = new(Float64[], Float64[], β1, β2)
+# end
+# init!(o::ADAM, p) = (o.m = zeros(p); o.v = zeros(p))
+# function Base.merge!(o::ADAM, o2::ADAM, γ)
+#     smooth!(o.m, o2.m, γ)
+#     smooth!(o.v, o2.v, γ)
+#     o.β1 = smooth(o.β1, o2.β1, γ)
+#     o.β2 = smooth(o.β2, o2.β2, γ)
+#     o
+# end
 
 #-----------------------------------------------------------------------# ADAMAX
 
@@ -129,20 +153,7 @@ end
 #     smooth!(o.Δβ, o2.Δβ, γ)
 # end
 
-# #-----------------------------------------------------------------------# RMSPROP
-# """
-#     RMSPROP(α = .9)
-# """
-# mutable struct RMSPROP <: SGUpdater
-#     α::Float64
-#     g::Vector{Float64}
-#     RMSPROP(α = .9, p = 0) = new(α, zeros(p))
-# end
-# init(u::RMSPROP, p) = RMSPROP(u.α, p)
-# function Base.merge!(o::RMSPROP, o2::RMSPROP, γ::Float64)
-#     o.α == o2.α || error("RMSPROP objects use different α")
-#     smooth!(o.g, o2.g, γ)
-# end
+
 
 # #-----------------------------------------------------------------------# ADAM
 # """

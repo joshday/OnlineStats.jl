@@ -23,7 +23,7 @@ export
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
 # updaters 
-    ADAGRAD, ADAM, MSPI, OMAS, OMAP, SGD,
+    ADAGRAD, ADAM, MSPI, OMAS, OMAP, RMSPROP, SGD,
 # stats
     AutoCov,
     Bootstrap,
@@ -42,7 +42,7 @@ export
     ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    Series, Sum,
+    Series, StatLearn, Sum,
     Variance,
 # other 
     BiasVec
@@ -55,7 +55,7 @@ include("stats/hist.jl")
 include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")
 include("stats/linreg.jl")
-# include("stats/statlearn.jl")
+include("stats/statlearn.jl")
 
 
 

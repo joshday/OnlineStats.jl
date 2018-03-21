@@ -284,7 +284,17 @@ end
 end
 #-----------------------------------------------------------------------# StatLearn 
 @testset "StatLearn" begin 
-
+    X = randn(10_000, 5)
+    β = collect(-1:.5:1)
+    Y = X * β + randn(10_000)
+    for A in [SGD(), ADAGRAD(), RMSPROP()]
+        # sanity checks
+        o = fit!(StatLearn(5, A), (X,Y))
+        merge!(o, copy(o))
+        @test coef(o) == o.β
+        @test predict(o, X) == X * o.β
+        @test ≈(coef(o), β; atol=.9)
+    end
 end
 #-----------------------------------------------------------------------# Sum 
 @testset "Sum" begin 

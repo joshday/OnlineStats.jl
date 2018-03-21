@@ -13,52 +13,86 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
 # Arguments 
 
 """
-struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty} <: OnlineStat{(1, 0)}
+mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: OnlineStat{(1, 0)}
     β::Vector{Float64}
     λ::Vector{Float64}
     gx::Vector{Float64}
     loss::L 
     penalty::P 
     alg::A
+    rate::W 
+    n::Int
 end
-function StatLearn(p::Int, args...)
+function StatLearn(p::Int, args...; rate=LearningRate())
     λ, loss, pen, alg = zeros(p), .5*L2DistLoss(), NoPenalty(), SGD()
-    # for a in args 
-    #     if a isa AbstractVector 
-    #         λ = a
-    #     elseif a isa Float64 
-    #         λ = fill(a, 1)
-    #     elseif a isa Loss 
-    #         loss = a 
-    #     elseif a isa Penalty 
-    #         pen = a 
-    #     elseif a isa Algorithm 
-    #         alg = a 
-    #     end
-    # end
+    for a in args 
+        if a isa AbstractVector 
+            λ = a
+        elseif a isa Float64 
+            λ = fill(a, 1)
+        elseif a isa Loss 
+            loss = a 
+        elseif a isa Penalty 
+            pen = a 
+        elseif a isa Algorithm 
+            alg = a 
+        end
+    end
     init!(alg, p)
-    StatLearn(zeros(p), λ, zeros(p), loss, pen, alg)
+    StatLearn(zeros(p), λ, zeros(p), loss, pen, alg, rate, 0)
 end
 
 function Base.show(io::IO, o::StatLearn)
     print(io, "StatLearn: ")
     print(io, name(o.alg, false, false))
-    print(io, " | λavg=", mean(o.λ))
+    print(io, " | mean(λ)=", mean(o.λ))
     print(io, " | ", o.loss)
     print(io, " | ", o.penalty)
     print(io, " | nobs=", nobs(o))
     print(io, " | nvars=", length(o.β))
-    print(io, "")
 end
-nobs(o::StatLearn) = nobs(o.alg)
 coef(o::StatLearn) = value(o)
 
-# function gradient!(o::StatLearn, x, y)
-#     d_dη = deriv(o.loss, y, predict(o, x))
-#     for j in eachindex(o.gx)
-#         o.gx[j] = x[j] * d_dη
-#     end
-# end
+function gradient!(o::StatLearn, x, y)
+    d_dη = deriv(o.loss, y, predict(o, x))
+    for j in eachindex(o.gx)
+        o.gx[j] = x[j] * d_dη
+    end
+end
+function _fit!(o::StatLearn{<:SGAlgorithm}, xy)
+    x, y = xy 
+    o.n += 1
+    gradient!(o, x, y)
+    update!(o.alg, o.gx)
+    updateβ!(o, o.rate(o.n))
+end
+function Base.merge!(o::StatLearn, o2::StatLearn)
+    o.n += o2.n 
+    γ = nobs(o2) / nobs(o)
+    smooth!(o.β, o2.β, γ)
+    merge!(o.alg, o2.alg, γ)
+    smooth!(o.λ, o2.λ, γ)
+end
+
+predict(o::StatLearn, x::VectorOb) = _dot(x, o.β)
+predict(o::StatLearn, x::AbstractMatrix) = x * o.β
+classify(o::StatLearn, x) = sign.(predict(o, x))
+
+#-----------------------------------------------------------------------# updateβ!
+function updateβ!(o::StatLearn{SGD}, γ)
+    for j in eachindex(o.β)
+        o.β[j] = prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λ[j])
+    end
+end
+function updateβ!(o::StatLearn{T}, γ) where {T<:Union{ADAGRAD, RMSPROP}}
+    for j in eachindex(o.β)
+        s = γ / sqrt(o.alg.h[j] + ϵ)
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
+    end
+end
+
+
+
 
 # function init!(o::StatLearn, p) 
 #     init!(o.alg, p)
