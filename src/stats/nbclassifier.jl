@@ -1,16 +1,18 @@
 #-----------------------------------------------------------------------# NBClassifier
-mutable struct NBClassifier{T, G<:Group, F} <: OnlineStat{VectorOb}
+mutable struct NBClassifier{T, G<:Group} <: OnlineStat{VectorOb}
     d::OrderedDict{T, G}
-    init::F
+    init::G
     # For trees
     id::Int 
     j::Int 
     at::Union{Number, String, Symbol, Char}
     ig::Float64
 end
-function NBClassifier(T::Type, init::Function) 
-    G = typeof(init())
-    NBClassifier(OrderedDict{T, G}(), init, 1, 0, -Inf, -Inf)
+function NBClassifier(g::G, T::Type; id=1) where {G<:Group}
+    NBClassifier(OrderedDict{T, G}(), g, id, 0, -Inf, -Inf)
+end
+function NBClassifier(p::Int, T::Type; id=1, stat=Hist(20))
+    NBClassifier(p * stat, T; id=id)
 end
 value(o::NBClassifier) = collect(keys(o)), collect(values(o))
 function Base.show(io::IO, o::NBClassifier)
@@ -24,7 +26,7 @@ function _fit!(o::NBClassifier, xy)
     if haskey(o.d, y)
         fit!(o.d[y], x)
     else 
-        stat = o.init()
+        stat = copy(o.init)
         fit!(stat, x)
         o.d[y] = stat
     end

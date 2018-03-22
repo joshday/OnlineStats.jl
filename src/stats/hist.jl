@@ -14,12 +14,14 @@ struct Hist{N, H <: HistAlgorithm{N}} <: OnlineStat{N}
 end
 Hist(args...; kw...) = (alg = make_alg(args...; kw...); Hist{typeof(alg)}(alg))
 
-for f in [:nobs, :counts, :midpoints, :edges]
+for f in [:nobs, :counts, :midpoints, :edges, :area]
     @eval $f(o::Hist) = $f(o.alg)
+end
+for f in [:(_fit!), :pdf, :cdf, :(Base.getindex)]
+    @eval $f(o::Hist, y) = $f(o.alg, y) 
 end
 
 Base.show(io::IO, o::Hist) = print(io, "Hist: ", o.alg)
-_fit!(o::Hist, y) = _fit!(o.alg, y)
 Base.merge!(o::Hist, o2::Hist) = merge!(o.alg, o2.alg)
 value(o::Hist) = (midpoints(o), counts(o))
 
@@ -185,42 +187,50 @@ end
 
 Base.merge!(o::T, o2::T) where {T <: AdaptiveBins} = _fit!.(o, o2.value)
 
-# based on linear interpolation
-function pdf(o::AdaptiveBins, y::Number)
-    v = o.value
-    if isempty(o.value)
-        return 0.0
-    elseif y ≤ first(first(v)) || y ≥ first(last(v))
-        return 0.0
+function Base.getindex(o::AdaptiveBins, i) where {N}
+    if i == 0 
+        return Pair(minimum(o.ex), 0)
+    elseif i == (length(o.value) + 1) 
+        return Pair(maximum(o.ex), 0)
     else 
-        i = searchsortedfirst(v, Pair(y, 0)) 
-        q1, k1 = v[i-1]
-        q2, k2 = v[i]
-        area = 0.0
-        for i in 1:length(v)-1 
-            area += (first(v[i+1]) - first(v[i])) * (last(v[i]) + last(v[i+1]))/2
-        end
-        return smooth(k1, k2, (y - q1) / (q2 - q1)) / area
+        return o.value[i]
     end
 end
 
+# based on linear interpolation
+function pdf(o::AdaptiveBins, x::Number)
+    v = o.value
+    if x ≤ minimum(o.ex)
+        return 0.0 
+    elseif x ≥ maximum(o.ex)
+        return 0.0 
+    else 
+        i = searchsortedfirst(v, Pair(x, 0))
+        x1, y1 = o[i - 1]
+        x2, y2 = o[i]
+        return smooth(y1, y2, (x2 - x) / (x2 - x1)) / area(o)
+    end
+end
 
-# # Algorithm 3: Sum Procedure
-# # Estimated number of points in interval [-∞, b]
-# function Base.sum(o::AdaptiveBins, b::Real)::Float64
-#     if isempty(o.value)
-#         return 0.0
-#     elseif b ≤ first(first(o.value))
-#         return 0.0
-#     elseif b ≥ first(last(o.value))
-#         return Float64(nobs(o))
-#     else
-#         # find i such that p(i) ≤ b < p(i+1)
-#         i = searchsortedfirst(o.value, Pair(b, 1)) - 1
-#         p1, m1 = o.value[i]
-#         p2, m2 = o.value[i + 1]
-#         mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
-#         s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
-#         return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
-#     end
-# end
+function cdf(o::AdaptiveBins, x::Number)
+    if x ≤ minimum(o.ex)
+        return 0.0 
+    else 
+        i = searchsortedfirst(o.value, Pair(x, 0))
+        x1, y1 = o[i - 1]
+        x2, y2 = o[i]
+        w = x - x1
+        h = smooth(y1, y2, (x2 - x) / (x2 - x1))
+        return (area(o, i-2) + w * h) / area(o)
+    end
+end
+
+function area(o::AdaptiveBins, ind = length(o.value))
+    out = 0.0 
+    for i in 1:ind
+        w = first(o[i+1]) - first(o[i])
+        h = (last(o[i+1]) + last(o[i])) / 2
+        out += h * w
+    end
+    out
+end
