@@ -1,79 +1,53 @@
-# TODO: Box 2 in https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf
+abstract type HistAlgorithm{N} <: Algorithm end
+Base.show(io::IO, o::HistAlgorithm) = print(io, name(o, false, false))
 
-#-----------------------------------------------------------------------# HistAlg
-abstract type HistAlg{N} end
-Base.show(io::IO, o::HistAlg) = print(io, name(o, false, false))
-get_hist_alg(o::HistAlg) = o
-
-
-#-----------------------------------------------------------------------# Hist
+#-----------------------------------------------------------------------# Hist 
 """
-    Hist(e::AbstractVector)
-    Hist(b::Int)
+    Hist(nbins)
+    Hist(edges)
 
-Calculate a histogram over bin edges fixed as `e` or adaptively find the best `b` bins.  
-The two options use [`FixedBins`](@ref) and [`AdaptiveBins`](@ref), respectively.  
-`FixedBins` is much faster, but requires the range of the data to be known before it is 
-observed.  `Hist` objects can be used to return approximate summary statistics of the data.
-
-# Example 
-
-    o = Hist(-5:.1:5)
-    y = randn(1000)
-    Series(y, o)
-
-    # approximate summary statistics
-    mean(o)
-    var(o)
-    std(o)
-    median(o)
-    extrema(o)
-    quantile(o)
+Calculate a histogram over fixed `edges` or adaptive `nbins`.
 """
-struct Hist{N, H <: HistAlg{N}} <: ExactStat{N}
-    alg::H
-    Hist{H}(alg::H) where {N, H <: HistAlg{N}} = new{N, H}(alg)
+struct Hist{N, H <: HistAlgorithm{N}} <: OnlineStat{N}
+    alg::H 
+    Hist{H}(alg::H) where {N, H<:HistAlgorithm{N}} = new{N, H}(alg)
 end
-function Hist(args...; kwargs...)
-    alg = get_hist_alg(args...; kwargs...)
-    Hist{typeof(alg)}(alg)
+Hist(args...; kw...) = (alg = make_alg(args...; kw...); Hist{typeof(alg)}(alg))
+
+for f in [:nobs, :counts, :midpoints, :edges]
+    @eval $f(o::Hist) = $f(o.alg)
 end
+
 Base.show(io::IO, o::Hist) = print(io, "Hist: ", o.alg)
-Base.merge!(o::Hist, o2::Hist, γ) = merge!(o.alg, o2.alg, γ)
-value(o::Hist) = midpoints(o), counts(o)
+_fit!(o::Hist, y) = _fit!(o.alg, y)
+Base.merge!(o::Hist, o2::Hist) = merge!(o.alg, o2.alg)
+value(o::Hist) = (midpoints(o), counts(o))
+
 split_candidates(o::Hist) = midpoints(o)
-
-# HistAlg interface
-for f in [:fit!, :nobs, :midpoints, :counts, :pdf, :cdf, :(Base.sum)]
-    @eval $f(o::Hist, args...) = $f(o.alg, args...)
-end
-
-# statistics
 Base.mean(o::Hist) = mean(midpoints(o), fweights(counts(o)))
 Base.var(o::Hist) = var(midpoints(o), fweights(counts(o)); corrected=true)
 Base.std(o::Hist) = sqrt(var(o))
 Base.median(o::Hist) = quantile(o, .5)
 function Base.extrema(o::Hist) 
     mids, counts = value(o)
-    inds = find(counts)  # filter out zero weights 
+    inds = findall(x->x!=0, counts)  # filter out zero weights 
     mids[inds[1]], mids[inds[end]]
 end
 function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1]) 
     mids, counts = value(o)
-    inds = find(counts)  # filter out zero weights
+    inds = findall(x->x!=0, counts)  # filter out zero weights
     quantile(mids[inds], fweights(counts[inds]), p)
 end
 
 #-----------------------------------------------------------------------# FixedBins
-mutable struct FixedBins{closed,E<:AbstractVector} <: HistAlg{0}
+mutable struct FixedBins{closed, E <: AbstractVector} <: HistAlgorithm{Number}
     edges::E
     counts::Vector{Int}
     out::Int
 
     function FixedBins{closed,E}(edges::E, counts::Vector{Int},
                                  out::Int) where {E<:AbstractVector,closed}
-        closed == :left || closed == :right ||
-            error("closed must be left or right")
+        closed in [:left, :right] || error("closed must be left or right")
         length(edges) == length(counts) + 1 ||
             error("Histogram edge vectors must be 1 longer than corresponding count vectors")
         issorted(edges) || error("Histogram edge vectors must be sorted in ascending order")
@@ -83,11 +57,12 @@ end
 Base.@pure FixedBins(edges::AbstractVector, counts::Vector{Int}, out::Int; closed::Symbol = :left) =
     FixedBins{closed,typeof(edges)}(edges, counts, out)
 
-get_hist_alg(e::AbstractVector; kwargs...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kwargs...)
+make_alg(e::AbstractVector; kw...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kw...)
+
 midpoints(o::FixedBins) = midpoints(o.edges)
 counts(o::FixedBins) = o.counts
 nobs(o::FixedBins) = sum(o.counts) + o.out
-function fit!(o::FixedBins, y, γ::Number)
+function _fit!(o::FixedBins, y)
     idx = _binindex(o, y)
     if 1 ≤ idx < length(o.edges)
         @inbounds o.counts[idx] += 1
@@ -106,7 +81,7 @@ function _binindex(o::FixedBins{:left}, y)
         return length(edges) - 1
     else
         # other bins are left-closed intervals [a, b)
-        if isa(edges, Range)
+        if isa(edges, AbstractRange)
             return floor(Int, (y - a) / step(edges)) + 1
         else
             return searchsortedlast(edges, y)
@@ -124,7 +99,7 @@ function _binindex(o::FixedBins{:right}, y)
         return 1
     else
         # other bins are right-closed intervals (a, b]
-        if isa(edges, Range)
+        if isa(edges, AbstractRange)
             return ceil(Int, (y - a) / step(edges))
         else
             return searchsortedfirst(edges, y) - 1
@@ -132,13 +107,15 @@ function _binindex(o::FixedBins{:right}, y)
     end
 end
 
-function Base.merge!(o::FixedBins, o2::FixedBins, γ::Number) 
+function Base.merge!(o::FixedBins, o2::FixedBins) 
     if o.edges == o2.edges 
-        o.counts .+= o2.counts
+        for j in eachindex(o.counts)
+            o.counts[j] += o2.counts[j]
+        end
     else
         for (yi, wi) in zip(midpoints(o2), o2.counts)
             for k in 1:wi 
-                fit!(o, yi, .5)
+                _fit!(o, yi)
             end
         end
     end
@@ -152,7 +129,7 @@ function pdf(o::FixedBins, y::Real)
         return 0.0
     else
         e = o.edges
-        if isa(e, Range)
+        if isa(e, AbstractRange)
             area = step(e) * sum(c)
         else
             area = sum((e[i+1] - e[i]) * c[i] for i in 1:length(c))
@@ -162,25 +139,25 @@ function pdf(o::FixedBins, y::Real)
 end
 
 #-----------------------------------------------------------------------# AdaptiveBins
-# http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf
 """
 Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-struct AdaptiveBins{T} <: HistAlg{0} 
+struct AdaptiveBins{T} <: HistAlgorithm{Number} 
     value::Vector{Pair{T, Int}}
     b::Int
+    ex::Extrema{T}
 end
-get_hist_alg(b::Int, T::Type=Float64) = AdaptiveBins(Pair{T, Int}[], b)
-get_hist_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b)
+make_alg(b::Int, T::Type=Float64) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
+make_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
 midpoints(o::AdaptiveBins) = first.(o.value)
 counts(o::AdaptiveBins) = last.(o.value)
 nobs(o::AdaptiveBins) = sum(last, o.value)
 
-fit!(o::AdaptiveBins, y::Number, γ::Float64) = fit!(o, Pair(y, 1))
+_fit!(o::AdaptiveBins, y) = (_fit!(o, Pair(y, 1)); _fit!(o.ex, y))
 
-function fit!(o::AdaptiveBins, y::Pair{<:Any, Int}) 
+function _fit!(o::AdaptiveBins, y::Pair{<:Any, Int}) 
     v = o.value
     i = searchsortedfirst(v, y)
     insert!(v, i, y)
@@ -206,7 +183,7 @@ function fit!(o::AdaptiveBins, y::Pair{<:Any, Int})
     end
 end
 
-Base.merge!(o::T, o2::T, γ::Float64) where {T <: AdaptiveBins} = fit!.(o, o2.value)
+Base.merge!(o::T, o2::T) where {T <: AdaptiveBins} = _fit!.(o, o2.value)
 
 # based on linear interpolation
 function pdf(o::AdaptiveBins, y::Number)
@@ -228,22 +205,22 @@ function pdf(o::AdaptiveBins, y::Number)
 end
 
 
-# Algorithm 3: Sum Procedure
-# Estimated number of points in interval [-∞, b]
-function Base.sum(o::AdaptiveBins, b::Real)::Float64
-    if isempty(o.value)
-        return 0.0
-    elseif b ≤ first(first(o.value))
-        return 0.0
-    elseif b ≥ first(last(o.value))
-        return Float64(nobs(o))
-    else
-        # find i such that p(i) ≤ b < p(i+1)
-        i = searchsortedfirst(o.value, Pair(b, 1)) - 1
-        p1, m1 = o.value[i]
-        p2, m2 = o.value[i + 1]
-        mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
-        s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
-        return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
-    end
-end
+# # Algorithm 3: Sum Procedure
+# # Estimated number of points in interval [-∞, b]
+# function Base.sum(o::AdaptiveBins, b::Real)::Float64
+#     if isempty(o.value)
+#         return 0.0
+#     elseif b ≤ first(first(o.value))
+#         return 0.0
+#     elseif b ≥ first(last(o.value))
+#         return Float64(nobs(o))
+#     else
+#         # find i such that p(i) ≤ b < p(i+1)
+#         i = searchsortedfirst(o.value, Pair(b, 1)) - 1
+#         p1, m1 = o.value[i]
+#         p2, m2 = o.value[i + 1]
+#         mb = m1 + (m2 - m1) * (b - p1) / (p2 - p1)
+#         s = .5 * (m1 + mb) * (b - p1) / (p2 - p1)
+#         return s + sum(last.(o.value[1:(i-1)])) + m1 / 2
+#     end
+# end

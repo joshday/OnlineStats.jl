@@ -1,7 +1,6 @@
 # Weight
 
-`Series` is parameterized by a `Weight` type that controls the influence new observations.
-
+Many `OnlineStat`s are parameterized by a `Weight` that controls the influence of new observations.  If the `OnlineStat` is capable of calculating the same result as a corresponding offline estimator, it will have a keyword argument `weight`.  If the `OnlineStat` uses stochastic approximation, it will have a keyword argument `rate`.  
 
 Consider how weights affect the influence of the next observation on an online mean ``\theta^{(t)}``, as many `OnlineStat`s use updates of this form.  A larger weight  ``\gamma_t`` puts higher influence on the new observation ``x_t``:
 
@@ -37,15 +36,19 @@ Scaled
 
 ## Custom Weighting
 
-You can implement your own `Weight` type via [OnlineStatsBase.jl](https://github.com/joshday/OnlineStatsBase.jl) or pass in a function to a `Series` in place of a weight.
+The `Weight` can be any callable object that receives the number of observations as its argument.  For example:
+
+- `weight = inv` will have the same result as `weight = EqualWeight()`.
+- `weight = x -> .01` will have the same result as `weight = ExponentialWeight(.01)`
 
 ```@repl 
 using OnlineStats # hide
 
 y = randn(100);
 
-o = Mean()
-Series(y, n -> 1/n, o)
+fit!(Mean(weight = EqualWeight()))
+fit!(Mean(weight = inv))
 
-value(o) ≈ mean(y)
+fit!(Mean(weight = ExponentialWeight(.01)))
+fit!(Mean(weight = x -> .01))
 ```

@@ -10,17 +10,17 @@ gr()
 
 # Visualizations
 
-## Plotting a Series plots the contained OnlineStats
+## Many Stats Can Be Plotted
 
 ```@example setup
-s = Series(randn(10^6), Hist(25), Hist(-5:5))
+s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))
 plot(s)
 savefig("plot_series.png"); nothing # hide
 ```
 
 ![](plot_series.png)
 
-## Naive Bayes Classifier
+<!-- ## Naive Bayes Classifier
 
 The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
 
@@ -34,9 +34,9 @@ series((x,y), o)
 plot(o)
 savefig("nbclassifier.png"); nothing # hide
 ```
-![](nbclassifier.png)
+![](nbclassifier.png) -->
 
-## Mosaic Plots
+<!-- ## Mosaic Plots
 
 The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.  
 It is typically more useful than a bar plot, as class probabilities are given by the horizontal
@@ -49,9 +49,9 @@ s = series([x y], Mosaic(Bool, Int))
 plot(s)
 savefig("mosaic.png"); nothing # hide
 ```
-![](mosaic.png)
+![](mosaic.png) -->
 
-## Partitions
+<!-- ## Partitions
 
 The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`, 
 and is therefore extremely useful in visualizing huge datasets, as summaries are plotted
@@ -162,4 +162,4 @@ s = Series([x y], IndexedPartition(Float64, CountMap(Int)))
 plot(s, bar_width = 1, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide
 ```
-![](indexpart4.png)
+![](indexpart4.png) -->

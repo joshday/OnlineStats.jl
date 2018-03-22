@@ -15,23 +15,19 @@ end
     grid --> false
     ylim --> (0, 1)
     xlim --> (0, 1)
-    annotations --> [(.5, .75, name(o) * ":"), (.5, .4, string(value(o)))] #), .1, .2, string(value(o))]
+    annotations --> [(.5, .75, name(o) * ":"), (.5, .4, string(value(o)))]
     zeros(0)
 end
 
 #-----------------------------------------------------------------------# (1, 0) residual plot
-@recipe function f(o::OnlineStat{(1,0)}, x::AbstractMatrix, y::AbstractVector, dim::ObLoc = Rows())
+@recipe function f(o::OnlineStat{(1,0)}, x::AbstractMatrix, y::AbstractVector)
     ylab --> "Residual"
     xlab --> "Observation Index"
     legend --> false
     @series begin
         linetype --> :scatter
-        ŷ = predict(o, x, dim)
+        ŷ = predict(o, x)
         eachindex(y), y - ŷ
-    end
-    @series begin
-        linetype --> :hline
-        [0]
     end
 end
 

@@ -24,9 +24,7 @@ can be any variable and the `x`'s can be any subset of variables.
 x = randn(10^6, 10)
 y = x * linspace(-1, 1, 10) + randn(10^6)
 
-o = LinRegBuilder(11)
-
-s = Series([x y], o)
+o = fit!(LinRegBuilder(11), [x y])
 
 # adds intercept term by default as last coefficient
 coef(o; y = 11, verbose = true)
@@ -40,7 +38,7 @@ to calculate approximate summary statistics, without the need to revisit the act
 
 ```@example setup
 o = Hist(20)        # adaptively find bins
-o2 = Hist(-5:.5:5)  # specify the bin edges
+o2 = Hist(0:.5:5)  # specify the bin edges
 s = Series(o, o2)
 
 fit!(s, randexp(100_000))

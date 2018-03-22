@@ -1,22 +1,17 @@
 #---------------------------------------------------------------------------------# Beta
 """
-    FitBeta()
+    FitBeta(; weight)
 
 Online parameter estimate of a Beta distribution (Method of Moments).
-
-    using Distributions, OnlineStats
-    y = rand(Beta(3, 5), 1000)
-    o = FitBeta()
-    s = Series(y, o)
-    Beta(value(o)...)
 """
-struct FitBeta <: ExactStat{0}
-    var::Variance
-    FitBeta() = new(Variance())
+struct FitBeta{V<:Variance} <: OnlineStat{Number}
+    var::V
 end
-fit!(o::FitBeta, y::Real, γ::Float64) = fit!(o.var, y, γ)
+FitBeta(;kw...) = FitBeta(Variance(;kw...))
+nobs(o::FitBeta) = nobs(o.var)
+_fit!(o::FitBeta, y::Real) = fit!(o.var, y)
 function value(o::FitBeta)
-    if o.var.nobs > 1
+    if o.var.n > 1
         m = mean(o.var)
         v = var(o.var)
         α = m * (m * (1 - m) / v - 1)
@@ -26,177 +21,138 @@ function value(o::FitBeta)
         return 1.0, 1.0
     end
 end
-Base.merge!(o::FitBeta, o2::FitBeta, γ::Float64) = merge!(o.var, o2.var, γ)
+Base.merge!(o::FitBeta, o2::FitBeta) = merge!(o.var, o2.var)
 
-#---------------------------------------------------------------------------------# Cauchy
-"""
-    FitCauchy(alg = SGD())
+# #---------------------------------------------------------------------------------# Cauchy
+# """
+#     FitCauchy(; alg, rate)
 
-Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
-quantiles, so that `alg` will be passed to [`Quantile`](@ref).
-
-    using Distributions
-    y = rand(Cauchy(0, 10), 10_000)
-    o = FitCauchy(SGD())
-    s = Series(y, o)
-    Cauchy(value(o)...)
-"""
-mutable struct FitCauchy{T} <: StochasticStat{0}
-    q::Quantile{T}
-    nobs::Int
-end
-FitCauchy(alg = OMAS()) = FitCauchy(Quantile([.25, .5, .75], alg), 0)
-fit!(o::FitCauchy, y::Real, γ::Float64) = (o.nobs += 1; fit!(o.q, y, γ))
-function value(o::FitCauchy)
-    if o.nobs > 1
-        return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
-    else
-        return 0.0, 1.0
-    end
-end
-function Base.merge!(o::FitCauchy, o2::FitCauchy, γ::Float64) 
-    o.nobs += o2.nobs
-    merge!(o.q, o2.q, γ) 
-end
+# Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
+# quantiles, so that `alg` will be passed to [`Quantile`](@ref).
+# """
+# mutable struct FitCauchy{T} <: OnlineStat{Number}
+#     q::Quantile{T}
+# end
+# FitCauchy(alg = SGD(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
+# nobs(o::FitCauchy) = nobs(o.q)
+# _fit!(o::FitCauchy, y) = _fit!(o.q, y)
+# function value(o::FitCauchy)
+#     if nobs(o) > 1
+#         return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
+#     else
+#         return 0.0, 1.0
+#     end
+# end
+# Base.merge!(o::FitCauchy, o2::FitCauchy) = merge!(o.q, o2.q)
 
 #---------------------------------------------------------------------------------# Gamma
 """
-    FitGamma()
+    FitGamma(; weight)
 
 Online parameter estimate of a Gamma distribution (Method of Moments).
-
-    using Distributions
-    y = rand(Gamma(5, 1), 1000)
-    o = FitGamma()
-    s = Series(y, o)
-    Gamma(value(o)...)
 """
-# method of moments. TODO: look at Distributions for MLE
-struct FitGamma <: ExactStat{0}
-    var::Variance
+struct FitGamma <: OnlineStat{Number}
+    v::Variance
 end
 FitGamma() = FitGamma(Variance())
-fit!(o::FitGamma, y::Real, γ::Float64) = fit!(o.var, y, γ)
+nobs(o::FitGamma) = nobs(o.v)
+_fit!(o::FitGamma, y) = _fit!(o.v, y)
 function value(o::FitGamma)
-    if o.var.nobs > 1
-        m = mean(o.var)
-        v = var(o.var)
-        θ = v / m
+    if nobs(o) > 1
+        m = mean(o.v)
+        θ = var(o.v) / m
         α = m / θ
         return α, θ
     else
         return 1.0, 1.0
     end
 end
-Base.merge!(o::FitGamma, o2::FitGamma, γ::Float64) = merge!(o.var, o2.var, γ)
+Base.merge!(o::FitGamma, o2::FitGamma) = merge!(o.v, o2.v)
 
 #---------------------------------------------------------------------------------# LogNormal
 """
     FitLogNormal()
 
 Online parameter estimate of a LogNormal distribution (MLE).
-
-    using Distributions
-    y = rand(LogNormal(3, 4), 1000)
-    o = FitLogNormal()
-    s = Series(y, o)
-    LogNormal(value(o)...)
 """
-struct FitLogNormal <: ExactStat{0}
-    var::Variance
+struct FitLogNormal <: OnlineStat{Number}
+    v::Variance
     FitLogNormal() = new(Variance())
 end
-fit!(o::FitLogNormal, y::Real, γ::Float64) = fit!(o.var, log(y), γ)
+nobs(o::FitLogNormal) = nobs(o.v)
+_fit!(o::FitLogNormal, y) = _fit!(o.v, log(y))
 function value(o::FitLogNormal)
-    if o.var.nobs > 1
-        return mean(o.var), std(o.var)
+    if nobs(o) > 1
+        return mean(o.v), std(o.v)
     else
         return 0.0, 1.0
     end
 end
-Base.merge!(o::FitLogNormal, o2::FitLogNormal, γ::Float64) = merge!(o.var, o2.var, γ)
+Base.merge!(o::FitLogNormal, o2::FitLogNormal) = merge!(o.v, o2.v)
 
 #---------------------------------------------------------------------------------# Normal
 """
     FitNormal()
 
-Online parameter estimate of a Normal distribution (MLE).
-
-    using Distributions
-    y = rand(Normal(-3, 4), 1000)
-    o = FitNormal()
-    s = Series(y, o)
-    Normal(value(o)...)
+Calculate the parameters of a normal distribution via maximum likelihood.
 """
-struct FitNormal <: ExactStat{0}
-    var::Variance
-    FitNormal() = new(Variance())
+struct FitNormal{V <: Variance} <: OnlineStat{Number}
+    v::V
 end
-fit!(o::FitNormal, y::Real, γ::Float64) = fit!(o.var, y, γ)
+FitNormal(;kw...) = FitNormal(Variance(;kw...))
+_fit!(o::FitNormal, y::Real) = _fit!(o.v, y)
+nobs(o::FitNormal) = nobs(o.v)
 function value(o::FitNormal)
-    if o.var.nobs > 1
-        return mean(o.var), std(o.var)
+    if nobs(o) > 1
+        return mean(o.v), std(o.v)
     else
         return 0.0, 1.0
     end
 end
-Base.merge!(o::FitNormal, o2::FitNormal, γ::Float64) = merge!(o.var, o2.var, γ)
-Base.mean(o::FitNormal) = mean(o.var)
-Base.std(o::FitNormal) = std(o.var)
-nobs(o::FitNormal) = nobs(o.var)
+Base.merge!(o::FitNormal, o2::FitNormal) = (merge!(o.v, o2.v); o)
+Base.mean(o::FitNormal) = mean(o.v)
+Base.var(o::FitNormal) = var(o.v)
 
 function pdf(o::FitNormal, x::Number) 
     σ = std(o)
     return 1 / (sqrt(2π) * σ) * exp(-(x - mean(o))^2 / 2σ^2)
 end
-cdf(o::FitNormal, x::Number) = .5 * (1.0 + erf((x - mean(o)) / (std(o) * √2)))
+cdf(o::FitNormal, x::Number) = .5 * (1.0 + SpecialFunctions.erf((x - mean(o)) / (std(o) * √2)))
 
-#---------------------------------------------------------------------------------# Multinomial
-# TODO: Allow each observation to have a different n
+#-----------------------------------------------------------------------# Multinomial
 """
     FitMultinomial(p)
 
 Online parameter estimate of a Multinomial distribution.  The sum of counts does not need
 to be consistent across observations.  Therefore, the `n` parameter of the Multinomial
 distribution is returned as 1.
-
-    using Distributions
-    y = rand(Multinomial(10, [.2, .2, .6]), 1000)
-    o = FitMultinomial(3)
-    s = Series(y', o)
-    Multinomial(value(o)...)
 """
-struct FitMultinomial{T} <: ExactStat{1}
+struct FitMultinomial{T} <: OnlineStat{VectorOb}
     mvmean::Group{T}
 end
-FitMultinomial(p::Integer) = FitMultinomial(Group(ntuple(x -> Mean(), p)))
-fit!{T<:Real}(o::FitMultinomial, y::AbstractVector{T}, γ::Float64) = fit!(o.mvmean, y, γ)
+FitMultinomial(p::Integer) = FitMultinomial(p * Mean())
+_fit!(o::FitMultinomial, y) = _fit!(o.mvmean, y)
 function value(o::FitMultinomial)
     m = value(o.mvmean)
     p = length(o.mvmean)
     outvec = all(x-> x==0.0, m) ? ones(p) ./ p : collect(m) ./ sum(m)
     return 1, outvec
 end
-Base.merge!(o::FitMultinomial, o2::FitMultinomial, γ::Float64) = merge!(o.mvmean, o2.mvmean, γ)
+Base.merge!(o::FitMultinomial, o2::FitMultinomial) = merge!(o.mvmean, o2.mvmean)
 
 #---------------------------------------------------------------------------------# MvNormal
 """
     FitMvNormal(d)
 
 Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
-
-    using Distributions
-    y = rand(MvNormal(zeros(3), eye(3)), 1000)
-    o = FitMvNormal(3)
-    s = Series(y', o)
-    MvNormal(value(o)...)
 """
-struct FitMvNormal <: ExactStat{1}
+struct FitMvNormal <: OnlineStat{VectorOb}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end
 Base.length(o::FitMvNormal) = length(o.cov)
-fit!{T<:Real}(o::FitMvNormal, y::AbstractVector{T}, γ::Float64) = fit!(o.cov, y, γ)
+nobs(o::FitMvNormal) = nobs(o.cov)
+_fit!(o::FitMvNormal, y) = _fit!(o.cov, y)
 function value(o::FitMvNormal)
     c = cov(o.cov)
     if isposdef(c)
@@ -205,4 +161,4 @@ function value(o::FitMvNormal)
         return zeros(length(o)), eye(length(o))
     end
 end
-Base.merge!(o::FitMvNormal, o2::FitMvNormal, γ::Float64) = merge!(o.cov, o2.cov, γ)
+Base.merge!(o::FitMvNormal, o2::FitMvNormal) = merge!(o.cov, o2.cov)
