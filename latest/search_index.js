@@ -25,139 +25,83 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Summary-of-Usage-1",
+    "location": "index.html#Usage-1",
     "page": "Basics",
-    "title": "Summary of Usage",
+    "title": "Usage",
     "category": "section",
     "text": ""
 },
 
 {
-    "location": "index.html#Every-statistic/model-is-a-type-(:-OnlineStat)-1",
+    "location": "index.html#Every-Stat-is-a-Type-(:-OnlineStat)-1",
     "page": "Basics",
-    "title": "Every statistic/model is a type (<: OnlineStat)",
+    "title": "Every Stat is a Type (<: OnlineStat)",
     "category": "section",
-    "text": "using OnlineStats \n\nm = Mean()\nv = Variance()"
+    "text": "using OnlineStats\n\nm = Mean()"
 },
 
 {
-    "location": "index.html#OnlineStats-are-grouped-by-Series-1",
+    "location": "index.html#Stats-Can-Be-Updated-1",
     "page": "Basics",
-    "title": "OnlineStats are grouped by Series",
+    "title": "Stats Can Be Updated",
     "category": "section",
-    "text": "s = Series(m, v)"
+    "text": "y = randn(100)\n\nfit!(m, y)"
 },
 
 {
-    "location": "index.html#Updating-a-Series-updates-the-contained-OnlineStats-1",
+    "location": "index.html#Stats-Have-a-Value-1",
     "page": "Basics",
-    "title": "Updating a Series updates the contained OnlineStats",
+    "title": "Stats Have a Value",
     "category": "section",
-    "text": "y = randn(1000)\n\n# for yi in y\n#     fit!(s, yi)\n# end\nfit!(s, y)"
+    "text": "value(m)"
 },
 
 {
-    "location": "index.html#OnlineStats-have-a-value-1",
+    "location": "index.html#Stats-Can-Be-Merged-1",
     "page": "Basics",
-    "title": "OnlineStats have a value",
+    "title": "Stats Can Be Merged",
     "category": "section",
-    "text": "value(m) ≈ mean(y)    \nvalue(v) ≈ var(y)  "
+    "text": "y2 = randn(100)\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
 },
 
 {
-    "location": "index.html#Merging-a-Series-merges-the-contained-OnlineStats-1",
-    "page": "Basics",
-    "title": "Merging a Series merges the contained OnlineStats",
-    "category": "section",
-    "text": "See Parallel Computation.y2 = randn(123)\n\ns2 = Series(y2, Mean(), Variance())\n\nmerge!(s, s2)\n\nvalue(m) ≈ mean(vcat(y, y2))    \nvalue(v) ≈ var(vcat(y, y2))  "
-},
-
-{
-    "location": "index.html#Much-more-than-means-and-variances-1",
-    "page": "Basics",
-    "title": "Much more than means and variances",
-    "category": "section",
-    "text": "OnlineStats can do a lot.  See Statistics and Models.<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
-},
-
-{
-    "location": "series.html#",
-    "page": "Series",
-    "title": "Series",
+    "location": "collectionstats.html#",
+    "page": "Collections of Stats",
+    "title": "Collections of Stats",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "series.html#Series-1",
-    "page": "Series",
+    "location": "collectionstats.html#Collections-of-Stats-1",
+    "page": "Collections of Stats",
+    "title": "Collections of Stats",
+    "category": "section",
+    "text": "using OnlineStatsSeveral OnlineStats act as a collection of other OnlineStats."
+},
+
+{
+    "location": "collectionstats.html#Series-1",
+    "page": "Collections of Stats",
     "title": "Series",
     "category": "section",
-    "text": "The Series type is the workhorse of OnlineStats.  A Series tracksA tuple of OnlineStats.\nA Weight."
+    "text": "A Series tracks stats that should be applied to the same data stream.y = rand(1000)\n\ns = Series(Mean(), Variance())\nfit!(s, y)"
 },
 
 {
-    "location": "series.html#Creating-a-Series-1",
-    "page": "Series",
-    "title": "Creating a Series",
+    "location": "collectionstats.html#FTSeries-1",
+    "page": "Collections of Stats",
+    "title": "FTSeries",
     "category": "section",
-    "text": "The Series constructor accepts any number of OnlineStats, optionally preceded by data  to be fitted and/or a Weight.  When a Weight isn\'t specified, Series will use the default weight associated with the OnlineStats."
+    "text": "An FTSeries tracks stats that should be applied to the same data stream, but filters and transforms (hence FT) the input data before it is sent to its stats. s = FTSeries(Mean(), Variance(); filter = x->true, transform = abs)\nfit!(s, -y)"
 },
 
 {
-    "location": "series.html#Start-\"empty\"-1",
-    "page": "Series",
-    "title": "Start \"empty\"",
+    "location": "collectionstats.html#Group-1",
+    "page": "Collections of Stats",
+    "title": "Group",
     "category": "section",
-    "text": "Series(Mean(), Variance())\n\nSeries(ExponentialWeight(), Mean(), Variance())"
-},
-
-{
-    "location": "series.html#Start-with-initial-data-1",
-    "page": "Series",
-    "title": "Start with initial data",
-    "category": "section",
-    "text": "y = randn(100)\n\nSeries(y, Mean(), Variance())\n\nSeries(y, ExponentialWeight(.01), Mean(), Variance())\n\nSeries(ExponentialWeight(.01), y, Mean(), Variance())"
-},
-
-{
-    "location": "series.html#Updating-1",
-    "page": "Series",
-    "title": "Updating",
-    "category": "section",
-    "text": "Updating a Series updates the OnlineStats it contains.  A Series can be updated with a single observation or a collection of observations via the fit! function:fit!(series, data)See OnlineStatsBase.jl for a look under  the hood of the update machinery."
-},
-
-{
-    "location": "series.html#Single-observation-1",
-    "page": "Series",
-    "title": "Single observation",
-    "category": "section",
-    "text": "note: Note\nA single observation depends on the OnlineStat.  For example, a single observation for a Mean is Real and for a CovMatrix is AbstractVector or Tuple.s = Series(Mean())\nfit!(s, randn())\n\ns = Series(CovMatrix(4))\nfit!(s, randn(4))"
-},
-
-{
-    "location": "series.html#Multiple-observations-1",
-    "page": "Series",
-    "title": "Multiple observations",
-    "category": "section",
-    "text": "note: Note\nIf a single observation is a Vector, a Matrix represents multiple observations, but this is ambiguous in how the observations are stored.  A Rows() (default) or Cols() argument can be added to the fit! call to specify observations are in rows or columns, respectively.s = Series(Mean())\nfit!(s, randn(100))\n\ns = Series(CovMatrix(4))\nfit!(s, randn(100, 4))          # Obs. in rows\nfit!(s, randn(4, 100), Cols())  # Obs. in columns"
-},
-
-{
-    "location": "series.html#Merging-1",
-    "page": "Series",
-    "title": "Merging",
-    "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats.merge(series1, series2, arg)\nmerge!(series1, series2, arg)Where series1/series2 are Series that contain the same OnlineStats and arg is used to determine how series2 should be merged into series1.y1 = randn(100)\ny2 = randn(100)\n\ns1 = Series(y1, Mean(), Variance())\ns2 = Series(y2, Mean(), Variance())\n\n# Treat s2 as a new batch of data using an `EqualWeight`.  Essentially:\n# s1 = Series(Mean(), Variance()); fit!(s1, y1); fit!(s1, y2)\nmerge!(s1, s2, :append)\n\n# Treat s2 as a single observation.\nmerge!(s1, s2, :singleton)\n\n# Provide the ratio of influence s2 should have.\nmerge!(s1, s2, .5)"
-},
-
-{
-    "location": "series.html#AugmentedSeries-1",
-    "page": "Series",
-    "title": "AugmentedSeries",
-    "category": "section",
-    "text": "AugmentedSeries adds methods for filtering and applying functions to a data stream. The simplest way to constract an AugmentedSeries is through the series function:s = series(Mean(), filter = !isnan, transform = abs)\n\nfit!(s, [-1, NaN, -3])For a new data point y, the value transform(y) will be fitted, but only if filter(y) == true ."
+    "text": "A Group tracks stats that should be applied to different data streams.g = Group(Mean(), Variance())\nfit!(g, randn(1000, 2))"
 },
 
 {
@@ -173,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Weight",
     "category": "section",
-    "text": "Series is parameterized by a Weight type that controls the influence new observations.Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a Weight must follow two rules:gamma_1 = 1 (guarantees theta^(1) = x_1)\ngamma_t in (0 1) quad forall t  1 (guarantees theta^(t) stays inside a convex space)<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=450>"
+    "text": "Many OnlineStats are parameterized by a Weight that controls the influence of new observations.  If the OnlineStat is capable of calculating the same result as a corresponding offline estimator, it will have a keyword argument weight.  If the OnlineStat uses stochastic approximation, it will have a keyword argument rate.  Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a Weight must follow two rules:gamma_1 = 1 (guarantees theta^(1) = x_1)\ngamma_t in (0 1) quad forall t  1 (guarantees theta^(t) stays inside a convex space)<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=450>"
 },
 
 {
@@ -181,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "OnlineStatsBase.EqualWeight",
     "category": "type",
-    "text": "EqualWeight()\n\nEqually weighted observations.  \n\ngamma_t = frac1t\n\nExample\n\nseries(randn(100), EqualWeight(), Variance())\n\n\n\n"
+    "text": "EqualWeight()\n\nEqually weighted observations.  \n\n(t) = 1  t\n\n\n\n"
 },
 
 {
@@ -189,7 +133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "OnlineStatsBase.ExponentialWeight",
     "category": "type",
-    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  The first weight is 1.0 and all else are  λ = 2 / (lookback + 1).\n\ngamma_1 = 1 gamma_t = lambda\n\nExample\n\nseries(randn(100), ExponentialWeight(), Variance())\n\n\n\n"
+    "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  The first weight is 1.0 and all else are  λ = 2 / (lookback + 1).\n\n(t) = \n\n\n\n"
 },
 
 {
@@ -197,7 +141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "OnlineStatsBase.LearningRate",
     "category": "type",
-    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  Satisfies the standard stochastic approximation assumption  sum gamma_t = infty sum gamma_t^2  infty if rin(5 1.\n\ngamma_t = frac1t^r\n\nExample\n\nSeries(randn(1000), LearningRate(.7), QuantileMM(), QuantileMSPI(), QuantileSGD())\n\n\n\n"
+    "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  Satisfies the standard stochastic approximation assumption   (t) =   (t)^2   if r  (5 1.\n\n(t) = inv(t ^ r)\n\n\n\n"
 },
 
 {
@@ -205,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "OnlineStatsBase.HarmonicWeight",
     "category": "type",
-    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\ngamma_t = fracaa + t - 1\n\nExample\n\nSeries(randn(1000), HarmonicWeight(), QuantileMSPI())\n\n\n\n"
+    "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\n(t) = a  (a + t - 1)\n\n\n\n"
 },
 
 {
@@ -213,7 +157,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "OnlineStatsBase.McclainWeight",
     "category": "type",
-    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\ngamma_t = fracgamma_t-11 + gamma_t-1 - alpha\n\nExample\n\nSeries(randn(100), McclainWeight(), Mean())\n\n\n\n"
+    "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\n(t) = (t-1)  (1 + (t-1) - )\n\n\n\n"
 },
 
 {
@@ -222,22 +166,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Weight Types",
     "category": "section",
     "text": "EqualWeight\nExponentialWeight\nLearningRate\nHarmonicWeight\nMcclainWeight"
-},
-
-{
-    "location": "weights.html#OnlineStatsBase.Bounded",
-    "page": "Weight",
-    "title": "OnlineStatsBase.Bounded",
-    "category": "type",
-    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\ngamma_t^* = textmax(gamma_t lambda)\n\nExample\n\nBounded(EqualWeight(), .1)\n\n\n\n"
-},
-
-{
-    "location": "weights.html#OnlineStatsBase.Scaled",
-    "page": "Weight",
-    "title": "OnlineStatsBase.Scaled",
-    "category": "type",
-    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\ngamma_t^* = lambda * gamma_t\n\nExample\n\nBounded(LearningRate(.5), .1)\n\nSeries(randn(1000), 2.0 * LearningRate(.9), QuantileMM())\n\n\n\n"
 },
 
 {
@@ -253,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Custom Weighting",
     "category": "section",
-    "text": "You can implement your own Weight type via OnlineStatsBase.jl or pass in a function to a Series in place of a weight.using OnlineStats # hide\n\ny = randn(100);\n\no = Mean()\nSeries(y, n -> 1/n, o)\n\nvalue(o) ≈ mean(y)"
+    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\n\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()))\nfit!(Mean(weight = inv))\n\nfit!(Mean(weight = ExponentialWeight(.01)))\nfit!(Mean(weight = x -> .01))"
 },
 
 {
@@ -285,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Parallel Computation",
     "category": "section",
-    "text": "Two Series can be merged if they track the same OnlineStats, which facilitates embarassingly parallel computations.  Merging in OnlineStats is used by JuliaDB to run analytics in parallel on large persistent datasets.note: Note\nIn general, fit! is a cheaper operation than merge!."
+    "text": "Two OnlineStats can be merged together, which facilitates Embarassingly parallel computations.  Merging in OnlineStats is used by JuliaDB to run analytics in parallel on large persistent datasets.note: Note\nIn general, fit! is a cheaper operation than merge!."
 },
 
 {
@@ -293,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "ExactStat merges",
     "category": "section",
-    "text": "Many OnlineStats are subtypes of ExactStat, meaning the value of interest can be calculated exactly (compared to the appropriate offline algorithm).  For these OnlineStats, the order of fit!-ting and merge!-ing does not matter.  See subtypes(OnlineStats.ExactStat) for a full list.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), Hist(50))\ns2 = Series(Mean(), Variance(), Hist(50))\ns3 = Series(Mean(), Variance(), Hist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
+    "text": "Many OnlineStats are capable of calculating the exact value as a corresponding offline estimator.  For these types, the order of fit!-ting and merge!-ing does not matter.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), Hist(50))\ns2 = Series(Mean(), Variance(), Hist(50))\ns3 = Series(Mean(), Variance(), Hist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
 },
 
 {
@@ -301,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "Other Merges",
     "category": "section",
-    "text": "For OnlineStats that rely on approximations, merging isn\'t always a well-defined operation. In these cases, a warning will print that merging did not occur.  Please open an issue to discuss merging an OnlineStat if merging fails but you believe it should be merge-able."
+    "text": "For OnlineStats that rely on approximations, merging isn\'t always a well-defined operation.  OnlineStats will either make a sane choice for merging or print a warning that merging did not occur.  Please open an issue to discuss a stat you believe you should be merge-able."
 },
 
 {
@@ -325,7 +253,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Linear Regressions",
     "category": "section",
-    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x\'s can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * linspace(-1, 1, 10) + randn(10^6)\n\no = LinRegBuilder(11)\n\ns = Series([x y], o)\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
+    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x\'s can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * linspace(-1, 1, 10) + randn(10^6)\n\no = fit!(LinRegBuilder(11), [x y])\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
 },
 
 {
@@ -333,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Data Surrogates",
     "title": "Histograms",
     "category": "section",
-    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(20)        # adaptively find bins\no2 = Hist(-5:.5:5)  # specify the bin edges\ns = Series(o, o2)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
+    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(20)        # adaptively find bins\no2 = Hist(0:.5:5)  # specify the bin edges\ns = Series(o, o2)\n\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -353,35 +281,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "visualizations.html#Plotting-a-Series-plots-the-contained-OnlineStats-1",
+    "location": "visualizations.html#Many-Stats-Can-Be-Plotted-1",
     "page": "Visualizations",
-    "title": "Plotting a Series plots the contained OnlineStats",
+    "title": "Many Stats Can Be Plotted",
     "category": "section",
-    "text": "s = Series(randn(10^6), Hist(25), Hist(-5:5))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )"
-},
-
-{
-    "location": "visualizations.html#Naive-Bayes-Classifier-1",
-    "page": "Visualizations",
-    "title": "Naive Bayes Classifier",
-    "category": "section",
-    "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nseries((x,y), o)\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )"
-},
-
-{
-    "location": "visualizations.html#Mosaic-Plots-1",
-    "page": "Visualizations",
-    "title": "Mosaic Plots",
-    "category": "section",
-    "text": "The Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\nsavefig(\"mosaic.png\"); nothing # hide(Image: )"
-},
-
-{
-    "location": "visualizations.html#Partitions-1",
-    "page": "Visualizations",
-    "title": "Partitions",
-    "category": "section",
-    "text": "The Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
+    "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )<!– ## Naive Bayes ClassifierThe NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nseries((x,y), o)\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: ) –><!– ## Mosaic PlotsThe Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\nsavefig(\"mosaic.png\"); nothing # hide(Image: ) –><!– ## PartitionsThe Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
 },
 
 {
@@ -413,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Date, Hist(20)))\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\ns = Series([x y], IndexedPartition(Float64, Hist(20)))\n\nplot(s, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Char, Extrema()))\n\nplot(s, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\ns = Series([x y], IndexedPartition(Float64, CountMap(Int)))\n\nplot(s, bar_width = 1, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Date, Hist(20)))\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\ns = Series([x y], IndexedPartition(Float64, Hist(20)))\n\nplot(s, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Char, Extrema()))\n\nplot(s, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\ns = Series([x y], IndexedPartition(Float64, CountMap(Int)))\n\nplot(s, bar_width = 1, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: ) –>"
 },
 
 {
@@ -429,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Demos",
     "title": "Demos",
     "category": "section",
-    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync the notebooks to JuliaBox:Sign into https://next.juliabox.com\nClick Git in the toolbar\nAdd the git clone url https://github.com/joshday/OnlineStatsDemos.git"
+    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync the notebooks to JuliaBox:"
 },
 
 {
@@ -441,19 +345,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.ADADELTA",
-    "page": "API",
-    "title": "OnlineStats.ADADELTA",
-    "category": "type",
-    "text": "ADADELTA(ρ = .95)\n\nADADELTA ignores weight.\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.ADAGRAD",
     "page": "API",
     "title": "OnlineStats.ADAGRAD",
     "category": "type",
-    "text": "ADAGRAD()\n\nAdaptive (element-wise learning rate) stochastic gradient descent.\n\n\n\n"
+    "text": "ADAGRAD()\n\n\n\n"
 },
 
 {
@@ -461,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAM",
     "category": "type",
-    "text": "ADAM(α1 = .99, α2 = .999)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
+    "text": "ADAM(β1 = .99, β2 = .999)\n\n\n\n"
 },
 
 {
@@ -469,23 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ADAMAX",
     "category": "type",
-    "text": "ADAMAX(η, β1 = .9, β2 = .999)\n\nADAMAX with step size η and momentum parameters β1, β2\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.AdaptiveBins",
-    "page": "API",
-    "title": "OnlineStats.AdaptiveBins",
-    "category": "type",
-    "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.AugmentedSeries",
-    "page": "API",
-    "title": "OnlineStats.AugmentedSeries",
-    "category": "type",
-    "text": "AugmentedSeries(s::Series; filter = x->true, transform = identity)\n\nWrapper around a Series so that for new data, fitting occurs on transform(data), but  only if filter(data) == true.  See series.\n\n\n\n"
+    "text": "ADAMAX(η, β1 = .9, β2 = .999)\n\nADAMAX with momentum parameters β1, β2\n\n\n\n"
 },
 
 {
@@ -493,7 +373,15 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.AutoCov",
     "category": "type",
-    "text": "AutoCov(b, T = Float64)\n\nCalculate the auto-covariance/correlation for lags 0 to b for a data stream of type T.\n\nExample\n\ny = cumsum(randn(100))\no = AutoCov(5)\nSeries(y, o)\nautocov(o)\nautocor(o)\n\n\n\n"
+    "text": "AutoCov(b, T = Float64)\n\nCalculate the auto-covariance/correlation for lags 0 to b for a data stream of type T.\n\nExample\n\ny = cumsum(randn(100))\no = AutoCov(5)\nfit!(o, y)\nautocov(o)\nautocor(o)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.BiasVec",
+    "page": "API",
+    "title": "OnlineStats.BiasVec",
+    "category": "type",
+    "text": "BiasVec(x)\n\nLightweight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nBiasVec(rand(5))\n\n\n\n"
 },
 
 {
@@ -509,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CStat",
     "category": "type",
-    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nSeries(y, CStat(Mean()))\n\n\n\n"
+    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nfit!(y, CStat(Mean()))\n\n\n\n"
 },
 
 {
@@ -517,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CallFun",
     "category": "type",
-    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\nSeries(randn(5), CallFun(Mean(), info))\n\n\n\n"
+    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\no = CallFun(Mean(), info)\nfit!(o, [0,0,1,1])\n\n\n\n"
 },
 
 {
@@ -525,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Count",
     "category": "type",
-    "text": "Count()\n\nThe number of things observed.\n\n\n\n"
+    "text": "Count()\n\nThe number of things observed.\n\nExample\n\nfit!(Count(), 1:1000)\n\n\n\n"
 },
 
 {
@@ -533,7 +421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "type",
-    "text": "CountMap(T)\n\nMaintain a dictionary mapping unique values to its number of occurrences.  Equivalent to  StatsBase.countmap.  Ignores weight.\n\nMethods\n\nvalue(o): Dict of raw counts\nkeys(o): Unique values \nvalues(o): Counts\nprobs(o): Probabilities\n\nExample\n\nvals = [\"small\", \"medium\", \"large\"]\no = CountMap(String)\ns = Series(rand(vals, 1000), o)\nvalue(o)\nprobs(o)\nprobs(o, [\"small\", \"large\"])\n\n\n\n"
+    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to  StatsBase.countmap.  \n\nExample\n\nfit!(CountMap(Int), rand(1:10, 1000))\n\n\n\n"
 },
 
 {
@@ -541,7 +429,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CovMatrix",
     "category": "type",
-    "text": "CovMatrix(d)\n\nCovariance Matrix of d variables.  Principal component analysis can be performed using eigen decomposition of the covariance or correlation matrix.\n\nExample\n\ny = randn(100, 5)\no = CovMatrix(5)\nSeries(y, o)\n\n# PCA\nevals, evecs = eig(cor(o))\n\n\n\n"
+    "text": "CovMatrix(p=0; weight)\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is  unknown, leave the default p=0.\n\nExample\n\nfit!(CovMatrix(), randn(100, 4))\n\n\n\n"
 },
 
 {
@@ -549,7 +437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Diff",
     "category": "type",
-    "text": "Diff()\n\nTrack the difference and the last value.\n\nExample\n\ns = Series(randn(1000), Diff())\nvalue(s)\n\n\n\n"
+    "text": "Diff(T::Type = Float64)\n\nTrack the difference and the last value.\n\nExample\n\no = Diff()\nfit!(o, [1.0, 2.0])\nlast(o)\ndiff(o)\n\n\n\n"
 },
 
 {
@@ -557,31 +445,15 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Extrema",
     "category": "type",
-    "text": "Extrema(T::Type = Float64)\n\nMaximum and minimum.\n\nExample\n\ns = Series(randn(100), Extrema())\nvalue(s)\n\n\n\n"
+    "text": "Extrema(T::Type = Float64)\n\nMaximum and minimum.\n\nExample\n\nfit!(Extrema(), rand(10^5))\n\n\n\n"
 },
 
 {
-    "location": "api.html#OnlineStats.FastForest",
+    "location": "api.html#OnlineStats.FTSeries",
     "page": "API",
-    "title": "OnlineStats.FastForest",
+    "title": "OnlineStats.FTSeries",
     "category": "type",
-    "text": "FastForest(p, nclasses; nt, b, λ, kw...)\n\nBuild a random forest of FastTree trees with p predictors.  Each tree  in the forest recieves a random subset of predictors of size b.  For a new observation, each tree in the forest is updated with probability λ.  The keyword arguments are:\n\nnt=40: Number of trees in the forest \nb=floor(Int,sqrt(p)): Number of random predictors to use for each tree\nλ = .05: Probability of a tree being updated for any given observation\nmaxsize=1000:  Maximum number of nodes in any tree in the forest\nsplitsize=2000: How many observations a node can observe before it splits\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastForest(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.FastNode",
-    "page": "API",
-    "title": "OnlineStats.FastNode",
-    "category": "type",
-    "text": "FastNode(p, nclasses; stat = FitNormal())\n\nNode of a decision tree.  Assumes each predictor variable, conditioned on any  class, has a normal distribution.  Internal structure for FastTree. Observations must be a Pair/Tuple/NamedTuple of (VectorOb, Int)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.FastTree",
-    "page": "API",
-    "title": "OnlineStats.FastTree",
-    "category": "type",
-    "text": "FastTree(npredictors, nclasses; maxsize=5000, splitsize=2000)\n\nCreate an online decision tree under the assumption that the distribution of any predictor  conditioned on any class is Normal.  The classes must be Ints beginning at one (1, 2, 3, ...). When a node splits every time it reaches splitsize observations.  When the number of  nodes in the tree reaches maxsize, no more splits will occur.\n\nExample\n\nx = randn(10^5, 10)\ny = (x[:, 1] .> 0) .+ 1\n\ns = series((x,y), FastTree(10, 2))\n\nyhat = classify(s.stats[1], x)\nmean(y .== yhat)\n\n\n\n"
+    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nA series that filters and transforms the data before being fit.\n\nExample\n\nfit!(FTSeries(Mean(), Variance(); transform=abs), -rand(1000))\n\n\n\n"
 },
 
 {
@@ -589,15 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitBeta",
     "category": "type",
-    "text": "FitBeta()\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\nusing Distributions, OnlineStats\ny = rand(Beta(3, 5), 1000)\no = FitBeta()\ns = Series(y, o)\nBeta(value(o)...)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.FitCauchy",
-    "page": "API",
-    "title": "OnlineStats.FitCauchy",
-    "category": "type",
-    "text": "FitCauchy(alg = SGD())\n\nApproximate parameter estimation of a Cauchy distribution.  Estimates are based on quantiles, so that alg will be passed to Quantile.\n\nusing Distributions\ny = rand(Cauchy(0, 10), 10_000)\no = FitCauchy(SGD())\ns = Series(y, o)\nCauchy(value(o)...)\n\n\n\n"
+    "text": "FitBeta(; weight)\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\n\n\n"
 },
 
 {
@@ -605,7 +469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitGamma",
     "category": "type",
-    "text": "FitGamma()\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\nusing Distributions\ny = rand(Gamma(5, 1), 1000)\no = FitGamma()\ns = Series(y, o)\nGamma(value(o)...)\n\n\n\n"
+    "text": "FitGamma(; weight)\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\n\n\n"
 },
 
 {
@@ -613,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitLogNormal",
     "category": "type",
-    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\nusing Distributions\ny = rand(LogNormal(3, 4), 1000)\no = FitLogNormal()\ns = Series(y, o)\nLogNormal(value(o)...)\n\n\n\n"
+    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\n\n\n"
 },
 
 {
@@ -621,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\nusing Distributions\ny = rand(Multinomial(10, [.2, .2, .6]), 1000)\no = FitMultinomial(3)\ns = Series(y\', o)\nMultinomial(value(o)...)\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\n\n\n"
 },
 
 {
@@ -629,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "type",
-    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nusing Distributions\ny = rand(MvNormal(zeros(3), eye(3)), 1000)\no = FitMvNormal(3)\ns = Series(y\', o)\nMvNormal(value(o)...)\n\n\n\n"
+    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\n\n\n"
 },
 
 {
@@ -637,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "type",
-    "text": "FitNormal()\n\nOnline parameter estimate of a Normal distribution (MLE).\n\nusing Distributions\ny = rand(Normal(-3, 4), 1000)\no = FitNormal()\ns = Series(y, o)\nNormal(value(o)...)\n\n\n\n"
+    "text": "FitNormal()\n\nCalculate the parameters of a normal distribution via maximum likelihood.\n\n\n\n"
 },
 
 {
@@ -645,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats...)\nGroup(n::Int, stat)\n[stat1 stat2 stat3 ...]\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y,  y[i] is sent to stats[i]. \n\nExamples\n\nSeries(randn(1000, 3), Group(3, Mean()))\n\ny = [randn(100) rand(Bool, 100)]\nSeries(y, [Mean() CountMap(Bool)])\n\n\n\n"
+    "text": "Group(stats::OnlineStat...)\nGroup(tuple)\n\nCreate a vector-input stat (OnlineStat{1}) from several scalar-input stats.  For a new  observation y, y[i] is sent to stats[i].\n\nExamples\n\nfit!(Group(Mean(), Mean()), randn(100, 2))\nfit!(Group(Mean(), Variance()), randn(100, 2))\n\n\n\n"
 },
 
 {
@@ -653,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Hist",
     "category": "type",
-    "text": "Hist(e::AbstractVector)\nHist(b::Int)\n\nCalculate a histogram over bin edges fixed as e or adaptively find the best b bins.   The two options use FixedBins and AdaptiveBins, respectively.   FixedBins is much faster, but requires the range of the data to be known before it is  observed.  Hist objects can be used to return approximate summary statistics of the data.\n\nExample\n\no = Hist(-5:.1:5)\ny = randn(1000)\nSeries(y, o)\n\n# approximate summary statistics\nmean(o)\nvar(o)\nstd(o)\nmedian(o)\nextrema(o)\nquantile(o)\n\n\n\n"
+    "text": "Hist(nbins)\nHist(edges)\n\nCalculate a histogram over fixed edges or adaptive nbins.\n\n\n\n"
 },
 
 {
@@ -661,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
     "category": "type",
-    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\ns = Series(rand(1:10, 1000), HyperLogLog(12))\nvalue(s)\n\n\n\n"
+    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\nfit!(HyperLogLog(12), rand(1:10,10^5))\n\n\n\n"
 },
 
 {
@@ -669,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.KMeans",
     "category": "type",
-    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nusing OnlineStats, Distributions\nd = MixtureModel([Normal(0), Normal(5)])\ny = rand(d, 100_000, 1)\ns = Series(y, LearningRate(.6), KMeans(1, 2))\n\n\n\n"
+    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables.\n\n\n\n"
 },
 
 {
@@ -685,7 +549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.LinReg",
     "category": "type",
-    "text": "LinReg(p, λ::Float64 = 0.0)  # use λ for all parameters\nLinReg(p, λfactor::Vector{Float64})\n\nRidge regression of p variables with elementwise regularization.\n\nExample\n\nx = randn(100, 10)\ny = x * linspace(-1, 1, 10) + randn(100)\no = LinReg(10)\nSeries((x,y), o)\nvalue(o)\n\n\n\n"
+    "text": "LinReg(p)\n\nLinear regression of p variables, optionally with element-wise ridge regularization.\n\nExample\n\nx = randn(100, 5)\ny = x * (1:5) + randn(100)\no = fit!(LinReg(10), (x,y))\ncoef(o)\ncoef(o, .1)\ncoef(o, [0,0,0,0,Inf])\n\n\n\n"
 },
 
 {
@@ -693,23 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.LinRegBuilder",
     "category": "type",
-    "text": "LinRegBuilder(p)\n\nCreate an object from which any variable can be regressed on any other set of variables, optionally with ridge (PenaltyFunctions.L2Penalty) regularization.  The main function to use with LinRegBuilder is coef:\n\ncoef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)\n\nReturn the coefficients of a regressing column y on columns x with ridge (L2Penalty)  parameter λ.  An intercept (bias) term is added by default.\n\nExamples\n\nx = randn(1000, 10)\no = LinRegBuilder(10)\ns = Series(x, o)\n\n# let response = x[:, 3]\ncoef(o; y=3, verbose=true) \n\n# let response = x[:, 7], predictors = x[:, [2, 5, 4]]\ncoef(o; y = 7, x = [2, 5, 4]) \n\n#\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.MSPI",
-    "page": "API",
-    "title": "OnlineStats.MSPI",
-    "category": "type",
-    "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.MV",
-    "page": "API",
-    "title": "OnlineStats.MV",
-    "category": "type",
-    "text": "MV is deprecated.  Use Group instead.\n\nMV(p, o)\np * o\n\nTrack p univariate OnlineStats o.\n\nExample\n\ny = randn(1000, 5)\no = MV(5, Mean())\ns = Series(y, o)\n\nSeries(y, 5Mean())\n\n\n\n"
+    "text": "LinRegBuilder(p)\n\nCreate an object from which any variable can be regressed on any other set of variables, optionally with element-wise ridge regularization.  The main function to use with  LinRegBuilder is coef:\n\ncoef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)\n\nReturn the coefficients of a regressing column y on columns x with ridge (L2Penalty)  parameter λ.  An intercept (bias) term is added by default.\n\nExamples\n\nx = randn(1000, 10)\no = fit!(LinRegBuilder(), x)\n\ncoef(o; y=3, verbose=true)\n\ncoef(o; y=7, x=[2,5,4])\n\n\n\n"
 },
 
 {
@@ -717,7 +565,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Mean",
     "category": "type",
-    "text": "Mean()\n\nUnivariate mean.\n\nExample\n\ns = Series(randn(100), Mean())\nvalue(s)\n\n\n\n"
+    "text": "Mean(; weight)\n\nTrack a univariate mean.\n\nUpdate\n\n = (1 - w) *  + w * x\n\nExample\n\n@time fit!(Mean(), randn(10^6))\n\n# exponentially-weighted mean\n@time fit!(Mean(;weight = x -> 0.1), randn(10^6))\n\n\n\n"
 },
 
 {
@@ -725,63 +573,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Moments",
     "category": "type",
-    "text": "Moments()\n\nFirst four non-central moments.\n\nExample\n\ns = Series(randn(1000), Moments(10))\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Mosaic",
-    "page": "API",
-    "title": "OnlineStats.Mosaic",
-    "category": "type",
-    "text": "Mosaic(T::Type, S::Type)\n\nData structure for generating a mosaic plot, a comparison between two categorical variables.\n\nExample\n\nusing OnlineStats, Plots \nx = [rand() > .8 for i in 1:10^5]\ny = rand([1,2,2,3,3,3], 10^5)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NADAM",
-    "page": "API",
-    "title": "OnlineStats.NADAM",
-    "category": "type",
-    "text": "NADAM(α1 = .99, α2 = .999)\n\nAdaptive Moment Estimation with momentum parameters α1 and α2.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NBClassifier",
-    "page": "API",
-    "title": "OnlineStats.NBClassifier",
-    "category": "type",
-    "text": "NBClassifier(group::Group, labeltype::Type)\n\nCreate a naive bayes classifier, using the stats in group to approximate the  distributions of each predictor variable conditioned on label.\n\nFor continuous variables, use Hist(nbin). \nFor categorical variables, use CountMap(T).\n\nExample\n\nx = randn(10^5, 10)\ny = rand(1:5, 10^5)\no = NBClassifier(10Hist(20), Float64)\nseries((x, y), o)\npredict(o, x)\nclassify(o, x)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NBTree",
-    "page": "API",
-    "title": "OnlineStats.NBTree",
-    "category": "type",
-    "text": "NBTree(o::NBClassifier; maxsize=5000, splitsize=1000)\n\nCreate a decision tree where each node is a naive bayes classifier.  A node will split  when it reaches splitsize observations and no more splits will occur once maxsize  nodes are in the tree.\n\nExample\n\nx = randn(10^5, 10)\ny = rand(Bool, 10^5)\no = NBTree(NBClassifier(10Hist(20), Bool))\nseries((x,y), o)\nclassify(o, x)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.NSGD",
-    "page": "API",
-    "title": "OnlineStats.NSGD",
-    "category": "type",
-    "text": "NSGD(α)\n\nNesterov accelerated Proximal Stochastic Gradient Descent.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.OMAP",
-    "page": "API",
-    "title": "OnlineStats.OMAP",
-    "category": "type",
-    "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.OMAS",
-    "page": "API",
-    "title": "OnlineStats.OMAS",
-    "category": "type",
-    "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
+    "text": "Moments(; weight)\n\nFirst four non-central moments.\n\nExample\n\nfit!(Moments(), randn(1000))\n\n\n\n"
 },
 
 {
@@ -789,23 +581,15 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.OrderStats",
     "category": "type",
-    "text": "OrderStats(b::Int, T::Type = Float64)\n\nAverage order statistics with batches of size b.  Ignores weight.\n\nExample\n\ns = Series(randn(1000), OrderStats(10))\nvalue(s)\n\n\n\n"
+    "text": "OrderStats(b::Int, T::Type = Float64)\n\nAverage order statistics with batches of size b.\n\n\n\n"
 },
 
 {
-    "location": "api.html#OnlineStats.PQuantile",
+    "location": "api.html#OnlineStats.P2Quantile",
     "page": "API",
-    "title": "OnlineStats.PQuantile",
+    "title": "OnlineStats.P2Quantile",
     "category": "type",
-    "text": "PQuantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm.  It is more computationally expensive than the algorithms used by Quantile, but also more exact.\n\nRef: https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\nExample\n\ny = randn(10^6)\no1, o2, o3 = PQuantile(.25), PQuantile(.5), PQuantile(.75)\ns = Series(y, o1, o2, o3)\nvalue(s)\nquantile(y, [.25, .5, .75])\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Partition",
-    "page": "API",
-    "title": "OnlineStats.Partition",
-    "category": "type",
-    "text": "Partition(o::OnlineStat, b::Int)\n\nIncrementally partition a data stream where between b and 2b sections are summarized  by o. \n\nExample\n\nusing Plots\ns = Series(cumsum(randn(10^6)), Partition(Mean()))\nplot(s)\n\n\n\n"
+    "text": "P2Quantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm.  It is more computationally expensive than the algorithms used by Quantile, but also more exact.\n\nRef: https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\n\n\n"
 },
 
 {
@@ -813,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ProbMap",
     "category": "type",
-    "text": "ProbMap(T)\n\nMaintain a dictionary mapping unique values to its probability.  Similar to CountMap,  but tracks probabilities instead of counts and can incorporate different weights.  \n\nNOTE: Use only when weights other than EqualWeight are desired as ProbMap is slower  than CountMap.\n\nExample\n\ny = vcat(zeros(Int, 100), ones(Int, 100), 2ones(Int, 100))\n\n# give each observation an influence of 0.01\ns = Series(y, x -> .01, ProbMap(Int))\nsort(value(s.stats[1]))\n\n\n\n"
+    "text": "ProbMap(T::Type; weight)\nProbMap(A::AbstractDict; weight)\n\nTrack a dictionary that maps unique values to its probability.  Similar to  CountMap, but uses a weighting mechanism.\n\nExample\n\nfit!(ProbMap(Int), rand(1:10, 1000))\n\n\n\n"
 },
 
 {
@@ -821,7 +605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "type",
-    "text": "Quantile(q = [.25, .5, .75], alg = OMAS())\n\nApproximate the quantiles q via the stochastic approximation algorithm alg.  Options are SGD, MSPI, and OMAS.  In practice, SGD and MSPI only work well when the variance of the data is small.\n\nExample\n\ny = randn(10_000)\nτ = collect(.1:.1:.0)\nSeries(y, Quantile(τ, SGD()), Quantile(τ, MSPI()), Quantile(τ, OMAS()))\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75]; alg)\n\n\n\n"
 },
 
 {
@@ -837,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
     "category": "type",
-    "text": "ReservoirSample(k, t = Float64)\n\nReservoir sample of k items.\n\nExample\n\no = ReservoirSample(k, Int)\ns = Series(o)\nfit!(s, 1:10000)\n\n\n\n"
+    "text": "ReservoirSample(k::Int, T::Type = Float64)\n\nReservoir sample of k items.\n\nExample\n\nfit!(ReservoirSample(100, Int), 1:1000)\n\n\n\n"
 },
 
 {
@@ -845,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.SGD",
     "category": "type",
-    "text": "SGD()\n\nStochastic gradient descent.\n\n\n\n"
+    "text": "SGD()\n\n\n\n"
 },
 
 {
@@ -853,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Series",
     "category": "type",
-    "text": "Series(stats...)\nSeries(weight, stats...)\nSeries(data, weight, stats...)\nSeries(data, stats...)\nSeries(weight, data, stats...)\n\nTrack any number of OnlineStats.\n\nExample\n\nSeries(Mean())\nSeries(randn(100), Mean())\nSeries(randn(100), ExponentialWeight(), Mean())\n\ns = Series(Quantile([.25, .5, .75]))\nfit!(s, randn(1000))\n\n\n\n"
+    "text": "Series(stats...)\n\nTrack multiple stats for one data stream.\n\nExample\n\ns = Series(Mean(), Variance())\nfit!(s, randn(1000))\n\n\n\n"
 },
 
 {
@@ -861,7 +645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "type",
-    "text": "StatLearn(p::Int, args...)\n\nFit a statistical learning model of p independent variables for a given loss, penalty, and λ.  Additional arguments can be given in any order (and is still type stable):\n\nloss = .5 * L2DistLoss(): any Loss from LossFunctions.jl\npenalty = L2Penalty(): any Penalty (which has a prox method) from PenaltyFunctions.jl.\nλ = fill(.1, p): a Vector of element-wise regularization parameters\nupdater = SGD(): SGD, ADAGRAD, ADAM, ADAMAX, MSPI\n\nDetails\n\nThe (offline) objective function that StatLearn approximately minimizes is\n\nfrac1nsum_i=1^n f_i(beta) + sum_j=1^p lambda_j g(beta_j)\n\nwhere the f_i\'s are loss functions evaluated on a single observation, g is a penalty function, and the lambda_js are nonnegative regularization parameters.\n\nExample\n\nusing LossFunctions, PenaltyFunctions\nx = randn(100_000, 10)\ny = x * linspace(-1, 1, 10) + randn(100_000)\no = StatLearn(10, .5 * L2DistLoss(), L1Penalty(), fill(.1, 10), SGD())\ns = Series(o)\nfit!(s, x, y)\ncoef(o)\npredict(o, x)\n\n\n\n"
+    "text": "StatLearn(p, args...)\n\nFit a model that is linear in the parameters.  \n\nThe (offline) objective function that StatLearn approximately minimizes is\n\n(1n)  f(y x) +   g()\n\nwhere f are loss functions of a single response and linear predictor, s are  nonnegative regularization parameters, and g is a penalty function. \n\nArguments\n\n\n\n"
 },
 
 {
@@ -869,15 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Sum",
     "category": "type",
-    "text": "Sum()\n\nTrack the overall sum.\n\nExample\n\ns = Series(randn(1000), Sum())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Unique",
-    "page": "API",
-    "title": "OnlineStats.Unique",
-    "category": "type",
-    "text": "Unique(T::Type)\n\nTrack the unique values. \n\nExample\n\nseries(rand(1:5, 100), Unique(Int))\n\n\n\n"
+    "text": "Sum(T::Type = Float64)\n\nTrack the overall sum.\n\nExample\n\nfit!(Sum(Int), fill(1, 100))\n\n\n\n"
 },
 
 {
@@ -885,23 +661,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Variance",
     "category": "type",
-    "text": "Variance()\n\nUnivariate variance.\n\nExample\n\ns = Series(randn(100), Variance())\nvalue(s)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.mapblocks",
-    "page": "API",
-    "title": "OnlineStats.mapblocks",
-    "category": "function",
-    "text": "mapblocks(f::Function, b::Int, data, dim::ObsDimension = Rows())\n\nMap data in batches of size b to the function f.  If data includes an AbstractMatrix, the batches will be based on rows or columns, depending on dim.  Most usage is through Julia\'s do block syntax.\n\nExamples\n\ns = Series(Mean())\nmapblocks(10, randn(100)) do yi\n    fit!(s, yi)\n    info(\"nobs: $(nobs(s))\")\nend\n\nx = [1 2 3 4; \n     1 2 3 4; \n     1 2 3 4;\n     1 2 3 4]\nmapblocks(println, 2, x)\nmapblocks(println, 2, x, Cols())\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.series-Tuple{Vararg{Union{OnlineStatsBase.OnlineStat, OnlineStatsBase.Weight},N} where N}",
-    "page": "API",
-    "title": "OnlineStats.series",
-    "category": "method",
-    "text": "series(o::OnlineStat...; kw...)\nseries(wt::Weight, o::OnlineStat...; kw...)\nseries(data, o::OnlineStat...; kw...)\nseries(data, wt::Weight, o::OnlineStat...; kw...)\n\nCreate a Series or AugmentedSeries based on whether keyword arguments filter and transform are present.  \n\nExample\n\nseries(-rand(100), Mean(), Variance(); filter = isfinite, transform = abs)\n\n\n\n"
+    "text": "Variance(; weight)\n\nUnivariate variance.\n\nExample\n\n@time fit!(Variance(), randn(10^6))\n\n\n\n"
 },
 
 {
@@ -913,67 +673,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#StatsBase.fit!-Tuple{OnlineStats.Series{0,T,W} where W where T<:Tuple,Union{AbstractArray{T,1} where T, NamedTuples.NamedTuple, Tuple}}",
+    "location": "api.html#OnlineStats.AdaptiveBins",
     "page": "API",
-    "title": "StatsBase.fit!",
-    "category": "method",
-    "text": "fit!(s::Series, data)\n\nUpdate a Series with more data. \n\nExamples\n\n# Univariate Series \ns = Series(Mean())\nfit!(s, randn(100))\n\n# Multivariate Series\nx = randn(100, 3)\ns = Series(CovMatrix(3))\nfit!(s, x)  # Same as fit!(s, x, Rows())\nfit!(s, x\', Cols())\n\n# Model Series\nx, y = randn(100, 10), randn(100)\ns = Series(LinReg(10))\nfit!(s, (x, y))\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.BiasVec",
-    "page": "API",
-    "title": "OnlineStats.BiasVec",
+    "title": "OnlineStats.AdaptiveBins",
     "category": "type",
-    "text": "BiasVec(x, bias = 1.0)\n\nLightweight wrapper of a vector which adds a \"bias\" term at the end.\n\nExample\n\nOnlineStats.BiasVec(rand(5), 10)\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.MSPI2",
-    "page": "API",
-    "title": "OnlineStats.MSPI2",
-    "category": "type",
-    "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.OMAP2",
-    "page": "API",
-    "title": "OnlineStats.OMAP2",
-    "category": "type",
-    "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.OMAS2",
-    "page": "API",
-    "title": "OnlineStats.OMAS2",
-    "category": "type",
-    "text": "MSPI()  # Majorized stochastic proximal iteration\nMSPI2()\nOMAS()  # Online MM - Averaged Surrogate\nOMAS2()\nOMAP()  # Online MM - Averaged Parameter\nOMAP2()\n\nUpdaters based on majorizing functions.  MSPI/OMAS/OMAP define a family of  algorithms and not a specific update, thus each type has two possible versions.\n\nSee https://arxiv.org/abs/1306.4650 for OMAS\nAsk @joshday for details on OMAP and MSPI\n\n\n\n"
-},
-
-{
-    "location": "api.html#Base.merge!-Union{Tuple{T,T,Symbol}, Tuple{T,T}, Tuple{T}} where T<:OnlineStats.Series",
-    "page": "API",
-    "title": "Base.merge!",
-    "category": "method",
-    "text": "merge!(s1::Series, s2::Series, arg)\n\nMerge s2 into s1 in place where s2\'s influence is determined by arg. Options for arg` are:\n\n:append (default)\nappends2tos1` with influence determined by number of observations.  For \nEqualWeight, this is equivalent to fit!(s1, data2) where s2 = Series(data2, o...).\n:singleton\ntreat s2 as a single observation.\nany Float64 in [0, 1]\n\n\n\n"
-},
-
-{
-    "location": "api.html#Base.merge-Union{Tuple{T,T,Float64}, Tuple{T}} where T<:OnlineStats.AbstractSeries",
-    "page": "API",
-    "title": "Base.merge",
-    "category": "method",
-    "text": "See merge!\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.always-Tuple",
-    "page": "API",
-    "title": "OnlineStats.always",
-    "category": "method",
-    "text": "always returns true\n\n\n\n"
+    "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n"
 },
 
 {
