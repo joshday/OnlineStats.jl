@@ -9,7 +9,13 @@ for stat in [
         BiasVec([1,2,3])
         Bootstrap(Mean())
         CallFun(Mean(), info)
+        FTSeries(Variance())
+        3Mean()
+        Hist(10)
         HyperLogLog(10)
+        LinRegBuilder(4)
+        NBClassifier(Float64, x->5FitNormal())
+        Series(Mean())
         ]
     println("  > ", stat)
 end
@@ -176,13 +182,13 @@ end
     @test O.cdf(o, 0.0) ≈ 0.5
     @test O.cdf(o, -1.0) ≈ 0.15865525393145702
 end
-# @testset "FitMultinomial" begin 
-#     o = FitMultinomial(5)
-#     @test value(o)[2] == ones(5) / 5
-#     fit!(o, 1:5)
-#     @test value(o)[2] == [1, 2, 3, 4, 5] ./ 15
-#     test_merge(FitMultinomial(3), [1,2,3], [2,3,4])
-# end
+@testset "FitMultinomial" begin 
+    o = FitMultinomial(5)
+    @test value(o)[2] == ones(5) / 5
+    data = [1 2 3 4 5; 1 2 3 4 5]
+    test_exact(o, data, o->value(o)[2], collect(2:2:10) ./ sum(data))
+    test_merge(FitMultinomial(3), rand(1:4, 10, 3), rand(2:7, 11, 3))
+end
 @testset "FitMvNormal" begin 
     test_merge(FitMvNormal(2), [y y2], [y2 y])
     @test value(FitMvNormal(2)) == (zeros(2), eye(2))
@@ -202,6 +208,10 @@ end
 @testset "FTSeries" begin 
     test_merge(FTSeries(Mean(), Variance(); transform = abs), y, y2, (a,b)->≈(value(a),value(b)))
     test_exact(FTSeries(Mean(); transform=abs), y, o->value(o.stats[1]), mean(abs, y))
+    data = [-1, 1, 2]
+    o = fit!(FTSeries(Mean(); filter = x->x>0), data)
+    @test o.nfiltered == 1 
+    @test nobs(o) == 2
 end
 #-----------------------------------------------------------------------# Group 
 @testset "Group" begin 
@@ -262,6 +272,9 @@ end
     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
     test_merge(HyperLogLog(4), y, y2)
 end
+@testset "KMeans" begin 
+    o = fit!(KMeans(5,2), x)
+end
 @testset "LinReg" begin 
     test_exact(LinReg(), (x,y), value, x\y)
     test_merge(LinReg(), (x,y), (x2,y2))
@@ -271,10 +284,16 @@ end
     @test coef(o, .1) ≈ (x'x + 100 * I) \ x'y
     λ = rand(5)
     @test coef(o, λ) ≈ (x'x + 1000 * Diagonal(λ)) \ x'y
+    @test predict(o, x) == x * o.β 
+    @test predict(o, x[1,:]) == dot(o.β, x[1, :])
 end
 @testset "LinRegBuilder" begin 
     test_merge(LinRegBuilder(), [x y], [x2 y2])
     test_exact(LinRegBuilder(), [x y], o->coef(o,y=6), [x ones(length(y))] \ y)
+    o = fit!(LinRegBuilder(), [y x])
+    @test coef(o, .1; bias=false) ≈ (x'x + 100 * I) \ x'y
+    λ = rand(5)
+    @test coef(o, λ; bias=false) ≈ (x'x + 1000 * Diagonal(λ)) \ x'y
 end
 #-----------------------------------------------------------------------# Mean 
 @testset "Mean" begin 
@@ -291,6 +310,7 @@ end
     test_exact(Moments(), y, std, std)
     test_merge(Moments(), y, y2)
 end
+#-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
     X, Y = randn(1000, 5), rand(Bool, 1000)
     X2, Y2 = randn(1000, 5), rand(Bool, 1000)
@@ -304,10 +324,22 @@ end
         @test value(o.d[true][i])[j] ≈ value(o2.d[true][i])[j]
     end
 end
+#-----------------------------------------------------------------------# OrderStats
 @testset "OrderStats" begin 
     test_merge(OrderStats(100), y, y2)
     test_exact(OrderStats(1000), y, value, sort, ==)
     test_exact(OrderStats(1000), y, quantile, quantile)
+end
+#-----------------------------------------------------------------------# ProbMap 
+@testset "ProbMap" begin 
+    test_exact(ProbMap(Float64), y, o->sort(collect(keys(o.value))), sort(y))
+    # merge 
+    data, data2 = rand(1:4, 100), rand(1:4, 100)
+    o = fit!(ProbMap(Int), data)
+    o2 = fit!(ProbMap(Int), data2)
+    merge!(o, o2)
+    fit!(o2, data)
+    @test sort(collect(keys(o.value))) == sort(collect(keys(o2.value)))
 end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/PQuantile" begin 
@@ -323,9 +355,9 @@ end
         test_exact(copy(o), data, value, quantile(data,τ), atol = .5)
         test_merge(copy(o), data, data2, atol = .5)
     end
-    # for τi in τ
-    #     test_exact(P2Quantile(τi), data, value, x->quantile(x, τi), atol = .3)
-    # end
+    for τi in τ
+        test_exact(P2Quantile(τi), data, value, quantile(data, τi), atol = .2)
+    end
 end
 #-----------------------------------------------------------------------# ReservoirSample
 @testset "ReservoirSample" begin 

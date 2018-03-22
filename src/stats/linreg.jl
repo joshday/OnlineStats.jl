@@ -21,10 +21,10 @@ mutable struct LinReg{W} <: OnlineStat{VectorOb}
 end
 LinReg(;weight=EqualWeight()) = LinReg(zeros(0), zeros(1, 1), weight, 0)
 
-function matviews(o::LinReg)
-    p = length(o.β)
-    @views o.A[1:p, 1:p], o.A[1:p, end]
-end
+# function matviews(o::LinReg)
+#     p = length(o.β)
+#     @views o.A[1:p, 1:p], o.A[1:p, end]
+# end
 function _fit!(o::LinReg, xy)
     γ = o.weight(o.n += 1)
     x, y = xy 

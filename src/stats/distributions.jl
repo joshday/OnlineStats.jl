@@ -128,18 +128,19 @@ to be consistent across observations.  Therefore, the `n` parameter of the Multi
 distribution is returned as 1.
 """
 mutable struct FitMultinomial{T} <: OnlineStat{VectorOb}
-    g::Group{T}
+    grp::Group{T}
 end
 
-FitMultinomial(p::Integer) = FitMultinomial(p * Mean())
-_fit!(o::FitMultinomial, y) = _fit!(o.mvmean, y)
+FitMultinomial(p::Int=0) = FitMultinomial(p * Mean())
+_fit!(o::FitMultinomial, y) = _fit!(o.grp, y)
+nobs(o::FitMultinomial) = nobs(o.grp)
 function value(o::FitMultinomial)
-    m = value(o.mvmean)
-    p = length(o.mvmean)
+    m = value.(o.grp.stats)
+    p = length(o.grp)
     outvec = all(x-> x==0.0, m) ? ones(p) ./ p : collect(m) ./ sum(m)
     return 1, outvec
 end
-Base.merge!(o::FitMultinomial, o2::FitMultinomial) = merge!(o.mvmean, o2.mvmean)
+Base.merge!(o::FitMultinomial, o2::FitMultinomial) = merge!(o.grp, o2.grp)
 
 #---------------------------------------------------------------------------------# MvNormal
 """

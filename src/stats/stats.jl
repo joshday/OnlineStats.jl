@@ -1,3 +1,13 @@
+abstract type StatCollection{T} <: OnlineStat{T} end 
+
+function Base.show(io::IO, o::StatCollection)
+    print(io, name(o, false, false))
+    for (i, stat) in enumerate(o.stats)
+        char = i == length(o.stats) ? '└' : '├'
+        print(io, "\n  $(char)── $stat")
+    end
+end
+
 #-----------------------------------------------------------------------# Bootstrap
 """
     Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
@@ -268,7 +278,7 @@ A series that filters and transforms the data before being fit.
 
     fit!(FTSeries(Mean(), Variance(); transform=abs), -rand(1000))
 """
-mutable struct FTSeries{N, OS<:Tup, F, T} <: OnlineStat{N}
+mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     stats::OS
     filter::F 
     transform::T 
@@ -310,7 +320,7 @@ observation `y`, `y[i]` is sent to `stats[i]`.
     fit!(Group(Mean(), Mean()), randn(100, 2))
     fit!(Group(Mean(), Variance()), randn(100, 2))
 """
-struct Group{T} <: OnlineStat{VectorOb}
+struct Group{T} <: StatCollection{VectorOb}
     stats::T
 end
 Group(o::OnlineStat...) = Group(o)
@@ -616,7 +626,7 @@ function _fit!(o::ProbMap, y)
 end
 function Base.merge!(o::ProbMap, o2::ProbMap) 
     o.n += o2.n
-    merge!((a, b)->smooth(a, b, o.n2 / o.n), o.value, o2.value)
+    merge!((a, b)->smooth(a, b, o2.n / o.n), o.value, o2.value)
     o
 end
 function probs(o::ProbMap, levels = keys(o))
@@ -829,7 +839,7 @@ Track multiple stats for one data stream.
     s = Series(Mean(), Variance())
     fit!(s, randn(1000))
 """
-struct Series{IN, T<:Tup} <: OnlineStat{IN}
+struct Series{IN, T<:Tup} <: StatCollection{IN}
     stats::T
 end
 Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)
@@ -839,13 +849,6 @@ nobs(o::Series) = nobs(o.stats[1])
     :(Base.Cartesian.@nexprs $n i -> _fit!(o.stats[i], y))
 end
 Base.merge!(o::Series, o2::Series) = (merge!.(o.stats, o2.stats); o)
-function Base.show(io::IO, o::Series)
-    print(io, name(o, false, false))
-    for (i, stat) in enumerate(o.stats)
-        char = i == length(o.stats) ? '└' : '├'
-        print(io, "\n  $(char)── $stat")
-    end
-end
 @deprecate Series(data, stats::OnlineStat...) fit!(Series(stats...), data)
 
 #-----------------------------------------------------------------------# Sum
