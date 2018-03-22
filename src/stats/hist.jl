@@ -191,7 +191,7 @@ end
 
 Base.merge!(o::T, o2::T) where {T <: AdaptiveBins} = _fit!.(o, o2.value)
 
-function Base.getindex(o::AdaptiveBins, i)
+function Base.getindex(o::AdaptiveBins{T}, i) where {T}
     if i == 0 
         return Pair(minimum(o.ex), 0)
     elseif i == (length(o.value) + 1) 
