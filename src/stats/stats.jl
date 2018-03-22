@@ -142,6 +142,7 @@ function _fit!(o::CovMatrix, x)
     smooth!(o.b, x, γ)
     smooth_syr!(o.A, x, γ)
 end
+nvars(o::CovMatrix) = size(o.A, 1)
 function value(o::CovMatrix; corrected::Bool = true)
     o.value[:] = Matrix(Symmetric((o.A - o.b * o.b')))
     corrected && scale!(o.value, unbias(o))

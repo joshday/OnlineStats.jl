@@ -1,4 +1,4 @@
-using Compat, Compat.Test, OnlineStats
+using Compat, Compat.Test, Compat.LinearAlgebra, OnlineStats
 O = OnlineStats
 import StatsBase: countmap, fit, Histogram
 import DataStructures: OrderedDict, SortedDict
@@ -6,6 +6,7 @@ import DataStructures: OrderedDict, SortedDict
 #-----------------------------------------------------------------------# Custom Printing 
 info("Custom Printing")
 for stat in [
+        BiasVec([1,2,3])
         Bootstrap(Mean())
         CallFun(Mean(), info)
         HyperLogLog(10)
@@ -55,6 +56,21 @@ end
 nrows(v::O.VectorOb) = length(v)
 nrows(m::AbstractMatrix) = size(m, 1)
 nrows(t::Tuple) = length(t[2])
+
+
+#-----------------------------------------------------------------------# utils 
+@testset "utils" begin 
+    @test O._dot((1,2,3), (4,5,6)) == sum([1,2,3] .* [4,5,6])
+    @test length(BiasVec((1,2,3))) == 4
+    @test size(BiasVec([1,2,3])) == (4,)
+    for (j, xj) in enumerate(eachcol(x))
+        @test xj == x[:, j]
+    end
+    for (i, xi) in enumerate(eachrow(x))
+        @test xi == x[i, :]
+    end
+end
+
 
 println("\n\n")
 Compat.@info("Testing Stats")
@@ -133,24 +149,43 @@ end
 @testset "Fit[Dist]" begin 
 @testset "FitBeta" begin 
     test_merge(FitBeta(), rand(10), rand(10))
+    @test value(FitBeta()) == (1.0, 1.0)
 end
 # @testset "FitCauchy" begin 
 #     test_exact(FitCauchy(), y, value, y->(0,1), atol = .5)
 # end 
 @testset "FitGamma" begin 
     test_merge(FitGamma(), y, y2)
+    @test value(FitGamma()) == (1.0, 1.0)
 end
 @testset "FitLogNormal" begin 
     test_merge(FitLogNormal(), exp.(y), exp.(y2))
+    @test value(FitLogNormal()) == (0.0, 1.0)
 end
 @testset "FitNormal" begin 
     test_merge(FitNormal(), y, y2)
     test_exact(FitNormal(), y, value, (mean(y), std(y)))
+    test_exact(FitNormal(), y, mean, mean(y))
+    test_exact(FitNormal(), y, var, var(y))
+    test_exact(FitNormal(), y, std, std(y))
+    @test value(FitNormal()) == (0.0, 1.0)
+    # pdf and cdf
+    o = fit!(FitNormal(), [-1, 0, 1])
+    @test O.pdf(o, 0.0) ≈ 0.3989422804014327
+    @test O.pdf(o, -1.0) ≈ 0.24197072451914337
+    @test O.cdf(o, 0.0) ≈ 0.5
+    @test O.cdf(o, -1.0) ≈ 0.15865525393145702
 end
-@testset "FitMultinomial" begin 
-end
+# @testset "FitMultinomial" begin 
+#     o = FitMultinomial(5)
+#     @test value(o)[2] == ones(5) / 5
+#     fit!(o, 1:5)
+#     @test value(o)[2] == [1, 2, 3, 4, 5] ./ 15
+#     test_merge(FitMultinomial(3), [1,2,3], [2,3,4])
+# end
 @testset "FitMvNormal" begin 
     test_merge(FitMvNormal(2), [y y2], [y2 y])
+    @test value(FitMvNormal(2)) == (zeros(2), eye(2))
 end
 end
 @testset "FastNode" begin 

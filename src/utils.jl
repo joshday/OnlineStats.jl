@@ -20,7 +20,7 @@ _dot(x::AbstractVector, y::AbstractVector) = dot(x, y)
 @generated function _dot(x::VectorOb, y::VectorOb)
     n = length(fieldnames(x))
     quote
-        out = x[1] * y[1]
+        out = zero(promote_type(typeof(x[1]), typeof(y[1])))
         Base.Cartesian.@nexprs $n i-> (out += x[i] * y[i])
         out
     end
@@ -71,6 +71,7 @@ function Base.next(o::RowsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::RowsOf, i) = i > size(o.mat, 1)
+Base.eltype(o::Type{RowsOf{T}}) where {T} = Vector{T}
 Base.length(o::RowsOf) = size(o.mat, 1)
 
 
@@ -91,6 +92,7 @@ function Base.next(o::ColsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::ColsOf, i) = i > size(o.mat, 2)
+Base.eltype(o::Type{ColsOf{T}}) where {T} = Vector{T}
 Base.length(o::ColsOf) = size(o.mat, 2)
 
 #-----------------------------------------------------------------------# fit!

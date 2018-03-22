@@ -127,9 +127,10 @@ Online parameter estimate of a Multinomial distribution.  The sum of counts does
 to be consistent across observations.  Therefore, the `n` parameter of the Multinomial
 distribution is returned as 1.
 """
-struct FitMultinomial{T} <: OnlineStat{VectorOb}
-    mvmean::Group{T}
+mutable struct FitMultinomial{T} <: OnlineStat{VectorOb}
+    g::Group{T}
 end
+
 FitMultinomial(p::Integer) = FitMultinomial(p * Mean())
 _fit!(o::FitMultinomial, y) = _fit!(o.mvmean, y)
 function value(o::FitMultinomial)
@@ -150,7 +151,7 @@ struct FitMvNormal <: OnlineStat{VectorOb}
     cov::CovMatrix
     FitMvNormal(p::Integer) = new(CovMatrix(p))
 end
-Base.length(o::FitMvNormal) = length(o.cov)
+nvars(o::FitMvNormal) = nvars(o.cov)
 nobs(o::FitMvNormal) = nobs(o.cov)
 _fit!(o::FitMvNormal, y) = _fit!(o.cov, y)
 function value(o::FitMvNormal)
@@ -158,7 +159,7 @@ function value(o::FitMvNormal)
     if isposdef(c)
         return mean(o.cov), c
     else
-        return zeros(length(o)), eye(length(o))
+        return zeros(nvars(o)), eye(nvars(o))
     end
 end
 Base.merge!(o::FitMvNormal, o2::FitMvNormal) = merge!(o.cov, o2.cov)
