@@ -156,6 +156,10 @@ make_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
 midpoints(o::AdaptiveBins) = first.(o.value)
 counts(o::AdaptiveBins) = last.(o.value)
 nobs(o::AdaptiveBins) = sum(last, o.value)
+function Base.:(==)(a::T, b::T) where {T<:AdaptiveBins}
+    (a.value == b.value) && (a.b == b.b) && (a.ex == b.ex)
+end
+
 
 _fit!(o::AdaptiveBins, y) = (_fit!(o, Pair(y, 1)); _fit!(o.ex, y))
 

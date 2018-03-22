@@ -326,6 +326,7 @@ end
 Group(o::OnlineStat...) = Group(o)
 Base.hcat(o::OnlineStat...) = Group(o)
 nobs(o::Group) = nobs(first(o.stats))
+Base.:(==)(a::Group, b::Group) = all(a.stats .== b.stats)
 
 Base.getindex(o::Group, i) = o.stats[i]
 Base.first(o::Group) = first(o.stats)
