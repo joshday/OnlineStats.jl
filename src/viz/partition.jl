@@ -83,7 +83,7 @@ function _fit!(o::IndexedPartition, xy)
     for p in o.parts 
         if x in p 
             addpart = false 
-            fit!(p, xy)
+            _fit!(p, xy)
         end
     end
     addpart && push!(o.parts, Part(fit!(copy(o.init), y), x, x))

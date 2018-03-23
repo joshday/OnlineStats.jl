@@ -36,6 +36,7 @@ export
     FastNode, FastTree, FastForest, FTSeries, 
     Group,
     Hist, HyperLogLog,
+    IndexedPartition,
     KMeans,
     Lag, LinReg, LinRegBuilder,
     Mean, Moments,

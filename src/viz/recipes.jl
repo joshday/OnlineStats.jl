@@ -48,15 +48,15 @@ end
 #-----------------------------------------------------------------------# StatCollection
 @recipe function f(s::StatCollection)
     if :layout in keys(plotattributes)
-        for stat in stats(s)
+        for stat in s.stats
             @series begin stat end
         end 
     else  # hack to ensure series aren't sent to wrong subplots
-        layout --> length(stats(s))
-        for i in eachindex(stats(s))
+        layout --> length(s.stats)
+        for i in eachindex(s.stats)
             @series begin 
                 subplot --> i 
-                stats(s)[i]
+                s.stats[i]
             end
         end
     end
@@ -108,9 +108,10 @@ end
 end
 
 #-----------------------------------------------------------------------# Partition
-@recipe f(o::Partition, fun) = o.parts, fun
+@recipe f(o::AbstractPartition, fun=value) = o.parts, fun
 
 @recipe function f(parts::Vector{<:Part}, fun=value)
+    sort!(parts)
     y = map(part -> fun(part.stat), parts)
     x = midpoint.(parts)
     xlim --> (parts[1].a, parts[end].b)
