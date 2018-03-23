@@ -293,7 +293,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Naive Bayes Classifier",
     "category": "section",
-    "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nfit!(o, (x, y))\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )<!– ## Mosaic PlotsThe Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\nsavefig(\"mosaic.png\"); nothing # hide(Image: )  –>"
+    "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nfit!(o, (x, y))\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Mosaic-Plots-1",
+    "page": "Visualizations",
+    "title": "Mosaic Plots",
+    "category": "section",
+    "text": "The Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\no = fit!(Mosaic(Bool, Int), [x y])\nplot(o)\nsavefig(\"mosaic.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -333,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\nfit!(IndexedPartition(Date, Hist(20)), [x y])\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(20)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Date, Hist(20)), [x y])\n\nplot(o, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(20)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )"
 },
 
 {
