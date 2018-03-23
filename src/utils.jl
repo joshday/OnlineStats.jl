@@ -73,7 +73,7 @@ function Base.next(o::RowsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::RowsOf, i) = i > size(o.mat, 1)
-Base.eltype(o::Type{RowsOf{T}}) where {T} = Vector{T}
+Base.eltype(o::Type{R}) where {T, C<:RolsOf{T}} = Vector{T}
 Base.length(o::RowsOf) = size(o.mat, 1)
 
 
@@ -94,25 +94,18 @@ function Base.next(o::ColsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::ColsOf, i) = i > size(o.mat, 2)
-Base.eltype(o::Type{ColsOf{T}}) where {T} = Vector{T}
+Base.eltype(o::Type{C}) where {T, C<:ColsOf{T}} = Vector{T}
 Base.length(o::ColsOf) = size(o.mat, 2)
 
 #-----------------------------------------------------------------------# fit!
-fit!(o::OnlineStat{T}, y::T) where {T} = (_fit!(o, y); o)
-
-function fit!(o::OnlineStat{T}, y::AbstractArray{<:T}) where {T}
-    for yi in y 
-        _fit!(o, yi)
+function fit!(o::OnlineStat, itr)
+    for item in itr 
+        _fit!(o, item)
     end
     o
 end
 
-function fit!(o::OnlineStat{VectorOb}, y::AbstractMatrix)
-    for yi in eachrow(y)
-        _fit!(o, yi)
-    end
-    o
-end
+fit!(o::OnlineStat{VectorOb}, y::AbstractMatrix) = fit!(o, eachrow(y))
 
 function fit!(o::OnlineStat{VectorOb}, y::Tup)
     x, y = y 
