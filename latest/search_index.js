@@ -285,7 +285,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Many Stats Can Be Plotted",
     "category": "section",
-    "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )<!– ## Naive Bayes ClassifierThe NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nseries((x,y), o)\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: ) –><!– ## Mosaic PlotsThe Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\nsavefig(\"mosaic.png\"); nothing # hide(Image: ) –><!– ## PartitionsThe Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
+    "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )"
+},
+
+{
+    "location": "visualizations.html#Naive-Bayes-Classifier-1",
+    "page": "Visualizations",
+    "title": "Naive Bayes Classifier",
+    "category": "section",
+    "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nseries((x,y), o)\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )<!– ## Mosaic PlotsThe Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\nsavefig(\"mosaic.png\"); nothing # hide(Image: )  –>"
+},
+
+{
+    "location": "visualizations.html#Partitions-1",
+    "page": "Visualizations",
+    "title": "Partitions",
+    "category": "section",
+    "text": "The Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
 },
 
 {
@@ -317,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Date, Hist(20)))\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\ns = Series([x y], IndexedPartition(Float64, Hist(20)))\n\nplot(s, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Char, Extrema()))\n\nplot(s, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\ns = Series([x y], IndexedPartition(Float64, CountMap(Int)))\n\nplot(s, bar_width = 1, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: ) –>"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Date, Hist(20)))\n\nplot(s, xlab = \"Date\")\nsavefig(\"indexpart1.png\"); nothing # hide(Image: )x = randn(10^5)\ny = x + randn(10^5)\n\ns = Series([x y], IndexedPartition(Float64, Hist(20)))\n\nplot(s, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\ns = Series([x y], IndexedPartition(Char, Extrema()))\n\nplot(s, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\ns = Series([x y], IndexedPartition(Float64, CountMap(Int)))\n\nplot(s, bar_width = 1, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -590,6 +606,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.P2Quantile",
     "category": "type",
     "text": "P2Quantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm.  It is more computationally expensive than the algorithms used by Quantile, but also more exact.\n\nRef: https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Partition",
+    "page": "API",
+    "title": "OnlineStats.Partition",
+    "category": "type",
+    "text": "Partition(stat, nparts=100)\n\n\n\n"
 },
 
 {
