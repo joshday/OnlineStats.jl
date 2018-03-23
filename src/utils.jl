@@ -2,6 +2,8 @@
 const Tup = Union{Tuple, NamedTuples.NamedTuple}
 const VectorOb = Union{AbstractVector, Tup}
 
+abstract type XYStat <: OnlineStat{VectorOb} end
+
 smooth(a, b, γ) = a + γ * (b - a)
 
 function smooth!(a, b, γ)

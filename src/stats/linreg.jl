@@ -13,7 +13,7 @@ Linear regression of `p` variables, optionally with element-wise ridge regulariz
     coef(o, .1)
     coef(o, [0,0,0,0,Inf])
 """
-mutable struct LinReg{W} <: OnlineStat{VectorOb}
+mutable struct LinReg{W} <: XYStat
     β::Vector{Float64}
     A::Matrix{Float64}
     weight::W

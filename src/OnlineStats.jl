@@ -3,6 +3,7 @@ module OnlineStats
 using Compat
 using Compat.LinearAlgebra
 using Compat.Printf
+using RecipesBase
 
 using Reexport 
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
@@ -59,4 +60,5 @@ include("stats/linreg.jl")
 include("stats/statlearn.jl")
 include("stats/ml.jl")
 include("viz/partition.jl")
+include("viz/recipes.jl")
 end

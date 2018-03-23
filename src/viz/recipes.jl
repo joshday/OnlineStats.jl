@@ -8,8 +8,8 @@
     [wt(i) for i in 1:nobs]
 end
 
-#-----------------------------------------------------------------------# OnlineStat{0}
-@recipe function f(o::OnlineStat{0})
+#-----------------------------------------------------------------------# Fallback
+@recipe function f(o::OnlineStat)
     legend --> false
     axis --> false
     grid --> false
@@ -19,8 +19,8 @@ end
     zeros(0)
 end
 
-#-----------------------------------------------------------------------# (1, 0) residual plot
-@recipe function f(o::OnlineStat{(1,0)}, x::AbstractMatrix, y::AbstractVector)
+#-----------------------------------------------------------------------# residual plot
+@recipe function f(o::OnlineStat{VectorOb}, x::AbstractMatrix, y::AbstractVector)
     ylab --> "Residual"
     xlab --> "Observation Index"
     legend --> false
@@ -42,8 +42,8 @@ end
 end
 
 
-#-----------------------------------------------------------------------# AbstractSeries
-@recipe function f(s::AbstractSeries)
+#-----------------------------------------------------------------------# StatCollection
+@recipe function f(s::StatCollection)
     if :layout in keys(plotattributes)
         for stat in stats(s)
             @series begin stat end
@@ -84,18 +84,6 @@ end
     linewidth --> 2
     seriestype --> :sticks
     midpoints(o), counts(o)
-end
-
-
-#-----------------------------------------------------------------------# Group 
-@recipe function f(o::Union{MV, Group})
-    layout --> length(o.stats)
-    for (i, stat) in enumerate(o.stats)
-        @series begin 
-            title --> "Stat $i"
-            stat
-        end
-    end
 end
 
 #-----------------------------------------------------------------------# CountMap
