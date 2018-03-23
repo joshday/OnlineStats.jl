@@ -118,14 +118,14 @@ end
     if y[1] isa Number
         lab --> name(parts[1].stat, false, false)
         x, y
-    elseif y[1] isa Tuple
+    elseif y[1] isa Tuple{VectorOb, VectorOb}
         x2, y2, z = eltype(x)[], Float64[], Float64[]
         for i in eachindex(y)
             values, counts = y[i]
             for j in eachindex(values)
                 push!(x2, x[i])
                 push!(y2, values[j])
-                push!(z, counts[j])
+                push!(z, counts[j] / sum(counts))
             end
         end
         seriestype --> :scatter 

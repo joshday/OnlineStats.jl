@@ -249,7 +249,7 @@ Maximum and minimum.
 
     fit!(Extrema(), rand(10^5))
 """
-mutable struct Extrema{T} <: OnlineStat{Any}
+mutable struct Extrema{T} <: OnlineStat{Number}
     min::T
     max::T
     n::Int

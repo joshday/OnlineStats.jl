@@ -62,11 +62,11 @@ rather than every single observation.
 ```@example setup
 y = cumsum(randn(10^6)) + 100randn(10^6)
 
-o = Partition(Hist(50))
+o = Partition(Hist(10))
 
-s = Series(y, o)
+fit!(o, y)
 
-plot(s, xlab = "Nobs")
+plot(o, xlab = "Nobs")
 savefig("partition_hist.png"); nothing # hide
 ```
 ![](partition_hist.png)
@@ -76,7 +76,9 @@ savefig("partition_hist.png"); nothing # hide
 o = Partition(Mean())
 o2 = Partition(Extrema())
 
-s = Series(y, o, o2)
+s = Series(o, o2)
+
+fit!(s, y)
 
 plot(s, layout = 1, xlab = "Nobs")
 savefig("partition_mean_ex.png"); nothing # hide
@@ -91,7 +93,7 @@ Plot of mean +/- standard deviation:
 ```@example setup
 o = Partition(Variance())
 
-s = Series(y, o)
+fit!(o, y)
 
 plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = "Nobs")
 savefig("partition_ci.png"); nothing # hide  
@@ -106,7 +108,7 @@ y = rand(["a", "a", "b", "c"], 10^6)
 
 o = Partition(CountMap(String), 75)
 
-s = Series(y, o)
+fit!(o, y)
 
 plot(o, xlab = "Nobs")
 savefig("partition_countmap.png"); nothing # hide
