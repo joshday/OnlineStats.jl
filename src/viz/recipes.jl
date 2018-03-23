@@ -114,12 +114,14 @@ end
     sort!(parts)
     y = map(part -> fun(part.stat), parts)
     x = midpoint.(parts)
-    xlim --> (parts[1].a, parts[end].b)
+    if parts[1].a isa Number
+        xlim --> (parts[1].a, parts[end].b)
+    end
     if y[1] isa Number
         lab --> name(parts[1].stat, false, false)
         x, y
     elseif y[1] isa Tuple{VectorOb, VectorOb}
-        x2, y2, z = eltype(x)[], Float64[], Float64[]
+        x2, y2, z = eltype(x)[], [], []
         for i in eachindex(y)
             values, counts = y[i]
             for j in eachindex(values)

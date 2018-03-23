@@ -36,7 +36,7 @@ savefig("nbclassifier.png"); nothing # hide
 ```
 ![](nbclassifier.png)
 
-<!-- ## Mosaic Plots
+## Mosaic Plots
 
 The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.  
 It is typically more useful than a bar plot, as class probabilities are given by the horizontal
@@ -45,11 +45,11 @@ widths.
 ```@example setup 
 x = rand([true, true, false], 10^5)
 y = map(xi -> xi ? rand(1:3) : rand(1:4), x)
-s = series([x y], Mosaic(Bool, Int))
-plot(s)
+o = fit!(Mosaic(Bool, Int), [x y])
+plot(o)
 savefig("mosaic.png"); nothing # hide
 ```
-![](mosaic.png)  -->
+![](mosaic.png)
 
 ## Partitions
 
@@ -125,9 +125,9 @@ to plot one variable against another, you can use an `IndexedPartition`.
 x = rand(Date(2000):Date(2020), 10^5)
 y = Dates.year.(x) + randn(10^5)
 
-fit!(IndexedPartition(Date, Hist(20)), [x y])
+o = fit!(IndexedPartition(Date, Hist(20)), [x y])
 
-plot(s, xlab = "Date")
+plot(o, xlab = "Date")
 savefig("indexpart1.png"); nothing # hide
 ```
 ![](indexpart1.png)

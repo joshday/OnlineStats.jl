@@ -20,7 +20,17 @@ end
 Base.in(x, o::Part) = (o.a ≤ x ≤ o.b)
 Base.isless(o::Part, o2::Part) = o.b < o2.a
 value(o::Part) = value(o.stat)
+
 midpoint(o::Part{<:Number}) = (o.a + o.b) / 2
+
+function midpoint(o::Part) 
+    if o.a == o.b 
+        return o.a 
+    else
+        return (o.a:o.b)[round(Int, length(o.a:o.b) / 2)]
+    end
+end
+
 width(o::Part) = o.b - o.a
 
 isfull(o::Part{Int}) = (nobs(o) == o.b - o.a + 1)
@@ -93,10 +103,6 @@ function _fit!(o::IndexedPartition, xy)
         ind = 1
         for i in 2:(length(o.parts) - 1)
             newdiff = o.parts[i+1].a - o.parts[i].b
-            if newdiff < 0
-                @show o.parts[i+1].a
-                @show o.parts[i].b 
-            end
             if newdiff < diff 
                 diff = newdiff 
                 ind = i 

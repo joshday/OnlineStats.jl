@@ -15,9 +15,9 @@ mutable struct Mosaic{T, C<:CountMap} <: OnlineStat{VectorOb}
     value::OrderedDict{T, C}
     n::Int
 end
-Mosaic(T::Type, S::Type) = Mosaic(OrderedDict{T, CountMap{S, OrderedDict{S,T}}}(), 0)
+Mosaic(T::Type, S::Type) = Mosaic(OrderedDict{T, CountMap{S, OrderedDict{S,Int}}}(), 0)
 Base.show(io::IO, o::Mosaic{T,S}) where {T, S} = print(io, "Mosaic: $T × $S")
-function _fit!(o::Mosaic{T, C}, xy) where {T, S, C<:CountMap{S, OrderedDict{S,T}}}
+function _fit!(o::Mosaic{T, C}, xy) where {T, S, C<:CountMap{S, OrderedDict{S,Int}}}
     o.n += 1
     if haskey(o.value, first(xy))
         _fit!(o.value[first(xy)], last(xy))

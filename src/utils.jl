@@ -62,7 +62,7 @@ struct RowsOf{T, M <: AbstractMatrix{T}}
     buffer::Vector{T}
 end
 function RowsOf(x::M) where {T, M<:AbstractMatrix{T}}
-    RowsOf{T, M}(x, zeros(T, size(x, 2)))
+    RowsOf{T, M}(x, Vector{T}(undef, size(x, 2))) 
 end
 eachrow(x::AbstractMatrix) = RowsOf(x)
 Base.start(o::RowsOf) = 1
@@ -98,6 +98,8 @@ Base.eltype(o::Type{C}) where {T, C<:ColsOf{T}} = Vector{T}
 Base.length(o::ColsOf) = size(o.mat, 2)
 
 #-----------------------------------------------------------------------# fit!
+fit!(o::OnlineStat, item::String) = (_fit!(o, item); o)
+
 function fit!(o::OnlineStat, itr)
     for item in itr 
         _fit!(o, item)

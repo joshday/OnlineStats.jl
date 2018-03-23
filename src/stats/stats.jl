@@ -110,7 +110,14 @@ mutable struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
 end
 CountMap(T::Type) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(), 0)
 CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d, 0)
-_fit!(o::CountMap, x) = (o.n +=1; haskey(o.value, x) ? o.value[x] += 1 : o.value[x] = 1)
+function _fit!(o::CountMap, x) 
+    o.n += 1
+    if haskey(o.value, x) 
+        o.value[x] += 1
+    else 
+        o.value[x] = 1
+    end
+end
 Base.merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o.n += o2.n; o)
 function probs(o::CountMap, kys = keys(o.value))
     out = zeros(Int, length(kys))
