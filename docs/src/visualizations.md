@@ -30,7 +30,7 @@ x = randn(10^5, 5)
 y = x * [1,3,5,7,9] .> 0
 
 o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
-series((x,y), o)
+fit!(o, (x, y))
 plot(o)
 savefig("nbclassifier.png"); nothing # hide
 ```

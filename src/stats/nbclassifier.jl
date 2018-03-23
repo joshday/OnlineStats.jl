@@ -24,10 +24,10 @@ end
 function _fit!(o::NBClassifier, xy)
     x, y = xy 
     if haskey(o.d, y)
-        fit!(o.d[y], x)
+        _fit!(o.d[y], x)
     else 
         stat = copy(o.init)
-        fit!(stat, x)
+        _fit!(stat, x)
         o.d[y] = stat
     end
 end
