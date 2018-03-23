@@ -39,7 +39,7 @@ export
     IndexedPartition,
     KMeans,
     Lag, LinReg, LinRegBuilder,
-    Mean, Moments,
+    Mean, Moments, Mosaic,
     NBClassifier,
     OrderStats,
     Partition, ProbMap, P2Quantile,
@@ -61,5 +61,6 @@ include("stats/linreg.jl")
 include("stats/statlearn.jl")
 include("stats/ml.jl")
 include("viz/partition.jl")
+include("viz/mosaic.jl")
 include("viz/recipes.jl")
 end

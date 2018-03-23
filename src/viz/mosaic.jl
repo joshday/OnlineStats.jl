@@ -11,22 +11,22 @@ Data structure for generating a mosaic plot, a comparison between two categorica
     s = series([x y], Mosaic(Bool, Int))
     plot(s)
 """
-struct Mosaic{T, S} <: ExactStat{1}
-    value::Dict{T, CountMap{S}}
+mutable struct Mosaic{T, C<:CountMap} <: OnlineStat{VectorOb}
+    value::OrderedDict{T, C}
+    n::Int
 end
-Mosaic(T, S) = Mosaic(Dict{T,CountMap{S}}())
+Mosaic(T::Type, S::Type) = Mosaic(OrderedDict{T, CountMap{S, OrderedDict{S,T}}}(), 0)
 Base.show(io::IO, o::Mosaic{T,S}) where {T, S} = print(io, "Mosaic: $T × $S")
-function fit!(o::Mosaic{T, S}, xy, γ) where {T, S}
-    x, y = xy
-    if haskey(o.value, x)
-        fit!(o.value[x], y, 1.0)
+function _fit!(o::Mosaic{T, C}, xy) where {T, S, C<:CountMap{S, OrderedDict{S,T}}}
+    o.n += 1
+    if haskey(o.value, first(xy))
+        _fit!(o.value[first(xy)], last(xy))
     else 
         stat = CountMap(S)
-        fit!(stat, y, 1.0)
-        o.value[x] = stat
+        _fit!(stat, last(xy))
+        o.value[first(xy)] = stat
     end
 end
-nobs(o::Mosaic) = sum(nobs, values(o.value))
 Base.keys(o::Mosaic) = sort!(collect(keys(o.value)))
 subkeys(o::Mosaic) = sort!(mapreduce(x->collect(keys(x)), union, values(o.value)))
 
