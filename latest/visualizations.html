@@ -6,7 +6,7 @@ y = x * [1,3,5,7,9] .&gt; 0
 
 o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
 fit!(o, (x, y))
-plot(o)</code></pre></div><p><img src="nbclassifier.png" alt/></p><p>&lt;!– ## Mosaic Plots</p><p>The <a href="@ref"><code>Mosaic</code></a> type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.</p><pre><code class="language-">x = rand([true, true, false], 10^5)
+plot(o)</code></pre></div><p><img src="nbclassifier.png" alt/></p><p>&lt;!– ## Mosaic Plots</p><p>The <a href="api.html#OnlineStats.Mosaic"><code>Mosaic</code></a> type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.</p><pre><code class="language-">x = rand([true, true, false], 10^5)
 y = map(xi -&gt; xi ? rand(1:3) : rand(1:4), x)
 s = series([x y], Mosaic(Bool, Int))
 plot(s)
