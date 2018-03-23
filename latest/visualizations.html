@@ -12,46 +12,27 @@ s = series([x y], Mosaic(Bool, Int))
 plot(s)
 savefig(&quot;mosaic.png&quot;); nothing # hide</code></pre><p><img src="mosaic.png" alt/>  –&gt;</p><h2><a class="nav-anchor" id="Partitions-1" href="#Partitions-1">Partitions</a></h2><p>The <a href="api.html#OnlineStats.Partition"><code>Partition</code></a> type summarizes sections of a data stream using any <code>OnlineStat</code>,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  </p><h4><a class="nav-anchor" id="Continuous-Data-1" href="#Continuous-Data-1">Continuous Data</a></h4><div><pre><code class="language-julia">y = cumsum(randn(10^6)) + 100randn(10^6)
 
-o = Partition(Hist(50))
+o = Partition(Hist(10))
 
-s = Series(y, o)
+fit!(o, y)
 
-plot(s, xlab = &quot;Nobs&quot;)</code></pre><pre><code class="language-none">WARNING: Series(data, stats::OnlineStat...) is deprecated, use fit!(Series(stats...), data) instead.
-Stacktrace:
- [1] depwarn(::String, ::Symbol) at ./deprecated.jl:70
- [2] OnlineStats.Series(::Array{Float64,1}, ::OnlineStats.Partition{Number,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins{Float64}}}) at ./deprecated.jl:57
- [3] eval(::Module, ::Any) at ./boot.jl:235
- [4] cd(::Documenter.Expanders.##8#10, ::String) at ./file.jl:70
- [5] withoutput(::Documenter.Expanders.##7#9{Documenter.Documents.Page}) at /home/travis/.julia/v0.6/Documenter/src/Utilities/Utilities.jl:557
- [6] runner(::Type{Documenter.Expanders.ExampleBlocks}, ::Base.Markdown.Code, ::Documenter.Documents.Page, ::Documenter.Documents.Document) at /home/travis/.julia/v0.6/Documenter/src/Expanders.jl:459
- [7] dispatch(::Type{Documenter.Expanders.ExpanderPipeline}, ::Base.Markdown.Code, ::Vararg{Any,N} where N) at /home/travis/.julia/v0.6/Documenter/src/Selectors.jl:168
- [8] expand(::Documenter.Documents.Document) at /home/travis/.julia/v0.6/Documenter/src/Expanders.jl:31
- [9] runner(::Type{Documenter.Builder.ExpandTemplates}, ::Documenter.Documents.Document) at /home/travis/.julia/v0.6/Documenter/src/Builder.jl:178
- [10] dispatch(::Type{Documenter.Builder.DocumentPipeline}, ::Documenter.Documents.Document, ::Vararg{Documenter.Documents.Document,N} where N) at /home/travis/.julia/v0.6/Documenter/src/Selectors.jl:168
- [11] cd(::Documenter.##2#3{Documenter.Documents.Document}, ::String) at ./file.jl:70
- [12] #makedocs#1(::Bool, ::Array{Any,1}, ::Function) at /home/travis/.julia/v0.6/Documenter/src/Documenter.jl:204
- [13] (::Documenter.#kw##makedocs)(::Array{Any,1}, ::Documenter.#makedocs) at ./&lt;missing&gt;:0
- [14] include_from_node1(::String) at ./loading.jl:576
- [15] include(::String) at ./sysimg.jl:14
- [16] eval(::Module, ::Any) at ./boot.jl:235
- [17] process_options(::Base.JLOptions) at ./client.jl:286
- [18] _start() at ./client.jl:371
-while loading /home/travis/.julia/v0.6/OnlineStats/docs/make.jl, in expression starting on line 3</code></pre></div><p><img src="partition_hist.png" alt/></p><pre><code class="language-">o = Partition(Mean())
+plot(o, xlab = &quot;Nobs&quot;)</code></pre></div><p><img src="partition_hist.png" alt/></p><div><pre><code class="language-julia">o = Partition(Mean())
 o2 = Partition(Extrema())
 
-s = Series(y, o, o2)
+s = Series(o, o2)
 
-plot(s, layout = 1, xlab = &quot;Nobs&quot;)
-savefig(&quot;partition_mean_ex.png&quot;); nothing # hide</code></pre><p><img src="partition_mean_ex.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><p>Plot of mean +/- standard deviation:</p><div><pre><code class="language-julia">o = Partition(Variance())
+fit!(s, y)
 
-s = Series(y, o)
+plot(s, layout = 1, xlab = &quot;Nobs&quot;)</code></pre></div><p><img src="partition_mean_ex.png" alt/></p><h4><a class="nav-anchor" id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a></h4><p>Plot of mean +/- standard deviation:</p><div><pre><code class="language-julia">o = Partition(Variance())
+
+fit!(o, y)
 
 plot(o, x -&gt; [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = &quot;Nobs&quot;)
 savefig(&quot;partition_ci.png&quot;); nothing # hide</code></pre></div><p><img src="partition_ci.png" alt/></p><h4><a class="nav-anchor" id="Categorical-Data-1" href="#Categorical-Data-1">Categorical Data</a></h4><pre><code class="language-">y = rand([&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 10^6)
 
 o = Partition(CountMap(String), 75)
 
-s = Series(y, o)
+fit!(o, y)
 
 plot(o, xlab = &quot;Nobs&quot;)
 savefig(&quot;partition_countmap.png&quot;); nothing # hide</code></pre><p><img src="partition_countmap.png" alt/></p><h2><a class="nav-anchor" id="Indexed-Partitions-1" href="#Indexed-Partitions-1">Indexed Partitions</a></h2><p>The <code>Partition</code> type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an <code>IndexedPartition</code>.  </p><pre><code class="language-">x = rand(Date(2000):Date(2020), 10^5)

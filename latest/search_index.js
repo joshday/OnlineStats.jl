@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Continuous Data",
     "category": "section",
-    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(50))\n\ns = Series(y, o)\n\nplot(s, xlab = \"Nobs\")\nsavefig(\"partition_hist.png\"); nothing # hide(Image: )o = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(y, o, o2)\n\nplot(s, layout = 1, xlab = \"Nobs\")\nsavefig(\"partition_mean_ex.png\"); nothing # hide(Image: )"
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(10))\n\nfit!(o, y)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_hist.png\"); nothing # hide(Image: )o = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(o, o2)\n\nfit!(s, y)\n\nplot(s, layout = 1, xlab = \"Nobs\")\nsavefig(\"partition_mean_ex.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Plot a custom function of the OnlineStats (default is value)",
     "category": "section",
-    "text": "Plot of mean +/- standard deviation:o = Partition(Variance())\n\ns = Series(y, o)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = \"Nobs\")\nsavefig(\"partition_ci.png\"); nothing # hide  (Image: )"
+    "text": "Plot of mean +/- standard deviation:o = Partition(Variance())\n\nfit!(o, y)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = \"Nobs\")\nsavefig(\"partition_ci.png\"); nothing # hide  (Image: )"
 },
 
 {
@@ -325,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Categorical Data",
     "category": "section",
-    "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\ns = Series(y, o)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
+    "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\nfit!(o, y)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
 },
 
 {
