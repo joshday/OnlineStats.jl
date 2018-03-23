@@ -125,7 +125,7 @@ to plot one variable against another, you can use an `IndexedPartition`.
 x = rand(Date(2000):Date(2020), 10^5)
 y = Dates.year.(x) + randn(10^5)
 
-s = Series([x y], IndexedPartition(Date, Hist(20)))
+fit!(IndexedPartition(Date, Hist(20)), [x y])
 
 plot(s, xlab = "Date")
 savefig("indexpart1.png"); nothing # hide
@@ -137,9 +137,9 @@ savefig("indexpart1.png"); nothing # hide
 x = randn(10^5)
 y = x + randn(10^5)
 
-s = Series([x y], IndexedPartition(Float64, Hist(20)))
+o = fit!(IndexedPartition(Float64, Hist(20)), [x y])
 
-plot(s, ylab = "Y", xlab = "X")
+plot(o, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
 ```
 ![](indexpart2.png)
@@ -148,9 +148,9 @@ savefig("indexpart2.png"); nothing # hide
 x = rand('a':'z', 10^5)
 y = Float64.(x) + randn(10^5)
 
-s = Series([x y], IndexedPartition(Char, Extrema()))
+o = fit!(IndexedPartition(Char, Extrema()), [x y])
 
-plot(s, xlab = "Category")
+plot(o, xlab = "Category")
 savefig("indexpart3.png"); nothing # hide
 ```
 ![](indexpart3.png)
@@ -159,9 +159,9 @@ savefig("indexpart3.png"); nothing # hide
 x = rand(10^5)
 y = rand(1:5, 10^5)
 
-s = Series([x y], IndexedPartition(Float64, CountMap(Int)))
+o = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])
 
-plot(s, bar_width = 1, xlab = "X", ylab = "Y")
+plot(o, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide
 ```
 ![](indexpart4.png)
