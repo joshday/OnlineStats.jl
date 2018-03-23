@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Many Stats Can Be Plotted",
     "category": "section",
-    "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\"); nothing # hide(Image: )"
+    "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\") # hide(Image: )"
 },
 
 {
