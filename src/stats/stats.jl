@@ -630,7 +630,7 @@ function Base.merge!(o::ProbMap, o2::ProbMap)
     merge!((a, b)->smooth(a, b, o2.n / o.n), o.value, o2.value)
     o
 end
-function probs(o::ProbMap, levels = keys(o))
+function probs(o::ProbMap, levels = keys(o.value))
     out = zeros(length(levels))
     for (i, ky) in enumerate(levels)
         out[i] = get(o.value, ky, 0.0)

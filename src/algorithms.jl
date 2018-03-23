@@ -3,6 +3,7 @@ Base.copy(o::Algorithm) = deepcopy(o)
 init!(o::Algorithm, p) = o
 update!(o::Algorithm, gx) = nothing
 Base.merge!(o::T, o2::T, γ) where {T<:Algorithm} = o
+Base.show(io::IO, o::Algorithm) = print(io, name(o, false, false))
 
 abstract type SGAlgorithm <: Algorithm end
 
