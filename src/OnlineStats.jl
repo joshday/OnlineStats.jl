@@ -11,7 +11,7 @@ using Reexport
 import OnlineStatsBase: OnlineStat, name, value, _fit!
 import LearnBase: fit!, nobs, value, predict
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
-    fweights, sample, coef
+    fweights, sample, coef, Histogram
 import DataStructures: OrderedDict
 import NamedTuples  # Remove in 0.7
 import SpecialFunctions
@@ -41,7 +41,7 @@ export
     Mean, Moments,
     NBClassifier,
     OrderStats,
-    ProbMap, P2Quantile,
+    Partition, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
     Series, StatLearn, Sum,

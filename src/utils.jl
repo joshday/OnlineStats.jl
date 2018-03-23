@@ -73,7 +73,7 @@ function Base.next(o::RowsOf, i)
     o.buffer, i + 1
 end
 Base.done(o::RowsOf, i) = i > size(o.mat, 1)
-Base.eltype(o::Type{R}) where {T, C<:RolsOf{T}} = Vector{T}
+Base.eltype(o::Type{R}) where {T, R<:RowsOf{T}} = Vector{T}
 Base.length(o::RowsOf) = size(o.mat, 1)
 
 

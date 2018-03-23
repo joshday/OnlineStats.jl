@@ -20,7 +20,7 @@ savefig("plot_series.png"); nothing # hide
 
 ![](plot_series.png)
 
-<!-- ## Naive Bayes Classifier
+## Naive Bayes Classifier
 
 The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
 
@@ -34,7 +34,7 @@ series((x,y), o)
 plot(o)
 savefig("nbclassifier.png"); nothing # hide
 ```
-![](nbclassifier.png) -->
+![](nbclassifier.png)
 
 <!-- ## Mosaic Plots
 
@@ -49,9 +49,9 @@ s = series([x y], Mosaic(Bool, Int))
 plot(s)
 savefig("mosaic.png"); nothing # hide
 ```
-![](mosaic.png) -->
+![](mosaic.png)  -->
 
-<!-- ## Partitions
+## Partitions
 
 The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`, 
 and is therefore extremely useful in visualizing huge datasets, as summaries are plotted
@@ -162,4 +162,4 @@ s = Series([x y], IndexedPartition(Float64, CountMap(Int)))
 plot(s, bar_width = 1, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide
 ```
-![](indexpart4.png) -->
+![](indexpart4.png)

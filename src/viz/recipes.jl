@@ -31,12 +31,15 @@ end
     end
 end
 
-@recipe function f(o::OnlineStat{(1,0)})
+@recipe function f(o::XYStat)
+    ylab --> "beta_j"
+    xlab --> "j"
+    seriestype --> :scatter
     coef(o)
 end
 
-@recipe function f(o::Series{(1,0)}, x::AbstractMatrix, y::AbstractVector)
-    for stat in stats(o)
+@recipe function f(o::Series{VectorOb}, x::AbstractMatrix, y::AbstractVector)
+    for stat in o.stats
         @series begin stat end
     end
 end
@@ -69,9 +72,9 @@ end
 end
 
 #-----------------------------------------------------------------------# CovMatrix
-@recipe function f(o::CovMatrix)
+@recipe function f(o::CovMatrix; corr = false)
     seriestype --> :heatmap
-    cov(o)
+    corr ? cor(o) : cov(o)
 end
 
 #-----------------------------------------------------------------------# Hist 
@@ -80,10 +83,22 @@ end
 @recipe f(o::FixedBins{closed}) where {closed} =
     Histogram(o.edges, o.counts, closed)
 
-@recipe function f(o::AdaptiveBins)
-    linewidth --> 2
-    seriestype --> :sticks
-    midpoints(o), counts(o)
+@recipe function f(o::AdaptiveBins; sticks=false)
+    y = [o[i] for i in 0:(length(o.value) + 1)]
+    out = first.(y), last.(y) 
+    @series begin 
+        seriestype --> :line
+        fillto --> 0 
+        alpha --> .4
+        linewidth --> 0
+        out
+    end 
+    if sticks 
+        @series begin 
+            seriestype --> :sticks 
+            out
+        end
+    end
 end
 
 #-----------------------------------------------------------------------# CountMap
@@ -92,78 +107,66 @@ end
     collect(keys(o)), collect(values(o))
 end
 
-#-----------------------------------------------------------------------# Vector{<:Part}
-@recipe function f(parts::Vector{<:Part}, mapfun = value)
-    sort!(parts)
-    statname = name(parts[1].stat, false, false)
-    nvec = nobs.(parts)
-    ymap = map(x -> mapfun(x.stat), parts)
+#-----------------------------------------------------------------------# Partition
+@recipe f(o::Partition, fun) = o.parts, fun
+
+@recipe function f(parts::Vector{<:Part}, fun=value)
+    y = map(part -> fun(part.stat), parts)
     x = midpoint.(parts)
-    
-    if first(ymap) isa Tuple{VectorOb, VectorOb} #################### Hist
-        realx, y, z = eltype(x)[], Float64[], Float64[]
-        for i in eachindex(ymap)
-            values, counts = ymap[i]
+    xlim --> (parts[1].a, parts[end].b)
+    if y[1] isa Number
+        lab --> name(parts[1].stat, false, false)
+        x, y
+    elseif y[1] isa Tuple
+        x2, y2, z = eltype(x)[], Float64[], Float64[]
+        for i in eachindex(y)
+            values, counts = y[i]
             for j in eachindex(values)
-                push!(realx, x[i])
-                push!(y, values[j])
+                push!(x2, x[i])
+                push!(y2, values[j])
                 push!(z, counts[j])
             end
         end
-        label --> statname
         seriestype --> :scatter 
         marker_z --> z
         markerstrokewidth --> 0
         color --> :blues
-        realx, y
-    elseif first(ymap) isa Associative ##################################### CountMap
-        lvls = []
-        for p in parts
-            for k in keys(p.stat)
-                k ∉ lvls && push!(lvls, k)
-            end
+        x2, y2
+    elseif y[1] isa VectorOb
+        lab --> name(parts[1].stat, false, false)
+        y2 = plotshape(y)
+        if length(y[1]) == 2 
+            fillto --> y2[:, 1]
+            alpha --> .4
+            x, y2[:, 2]
+        else
+            x, y2 
         end
-        sort!(lvls)
+    elseif y[1] isa AbstractDict
+        kys = []
+        for item in y, ky in keys(item)
+            ky ∉ kys && push!(kys, ky)
+        end
+        sort!(kys)
+        y2 = 
         @series begin 
-            label --> reshape(lvls, (1, length(lvls)))
+            lab --> reshape(kys, (1, length(kys)))
             ylim --> (0, 1)
             linewidth --> .5
             seriestype --> :bar
-            bar_widths --> [p.last - p.first for p in parts]
-            y = to_plot_shape(map(x -> reverse(cumsum(probs(x.stat, reverse(lvls)))), parts))
+            bar_widths --> [p.b - p.a for p in parts]
+            y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
             x, y
         end
-    elseif first(ymap) isa VectorOb ################################# Vector value
-        label --> statname 
-        y = to_plot_shape(ymap)
-        if size(y, 2) == 2
-            fillto --> y[:, 2]
-            fillalpha --> .6
-            linewidth --> 0
-            x, y[:, 1]
-        else
-            x, y
-        end
-    else ############################################################ Scalar value
-        label --> statname
-        x, ymap
     end
 end
 
-to_plot_shape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in 1:length(v[1])]
-
-@recipe function f(o::AbstractPartition, mapfun = value)
-    o.parts, mapfun
-end
-
+plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
 
 #-----------------------------------------------------------------------# NBClassifier 
 @recipe function f(o::NBClassifier)
     kys = collect(keys(o))
     layout --> nvars(o) + 1
-    alpha --> .4
-    seriestype --> :line 
-    fillto --> 0
     for j in 1:nvars(o) 
         stats = o[j]
         for (i, s) in enumerate(stats)

@@ -20,7 +20,7 @@ end
 Base.in(x, o::Part) = (o.a ≤ x ≤ o.b)
 Base.isless(o::Part, o2::Part) = o.b < o2.a
 value(o::Part) = value(o.stat)
-midpoint(o::Part{<:Any, <:Number}) = (o.a + o.b) / 2
+midpoint(o::Part{<:Number}) = (o.a + o.b) / 2
 width(o::Part) = o.b - o.a
 
 isfull(o::Part{Int}) = (nobs(o) == o.b - o.a + 1)
@@ -32,6 +32,9 @@ function _fit!(p::Part, xy)
 end
 
 #-----------------------------------------------------------------------# Partition 
+"""
+    Partition(stat, nparts=100)
+"""
 struct Partition{T, O <: OnlineStat{T}} <: AbstractPartition{T}
     parts::Vector{Part{Int, O}}
     b::Int  # max partition size 
@@ -45,7 +48,7 @@ function _fit!(o::Partition, y)
     lastpart = last(o.parts)
     n = nobs(o)
     if (n + 1) ∈ lastpart 
-        fit!(lastpart, (n+1, y))
+        _fit!(lastpart, (n+1, y))
     else
         stat = fit!(copy(o.init), y)
         push!(o.parts, Part(stat, n + 1, n + nobs(lastpart)))

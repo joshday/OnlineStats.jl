@@ -155,7 +155,7 @@ make_alg(b::Int, T::Type=Float64) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
 make_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
 midpoints(o::AdaptiveBins) = first.(o.value)
 counts(o::AdaptiveBins) = last.(o.value)
-nobs(o::AdaptiveBins) = sum(last, o.value)
+nobs(o::AdaptiveBins) = isempty(o.value) ? 0 : sum(last, o.value)
 function Base.:(==)(a::T, b::T) where {T<:AdaptiveBins}
     (a.value == b.value) && (a.b == b.b) && (a.ex == b.ex)
 end

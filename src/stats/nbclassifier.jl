@@ -34,6 +34,7 @@ end
 function Base.merge!(o::NBClassifier, o2::NBClassifier)
     merge!(merge!, o.d, o2.d)
 end
+Base.getindex(o::NBClassifier, j) = [stat[j] for stat in values(o.d)]
 
 Base.keys(o::NBClassifier) = keys(o.d)
 Base.values(o::NBClassifier) = values(o.d)
