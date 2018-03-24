@@ -5,34 +5,14 @@ ExponentialWeight(lookback::Int)</code></pre><p>Exponentially weighted observati
 Scaled</code></pre><h2><a class="nav-anchor" id="Custom-Weighting-1" href="#Custom-Weighting-1">Custom Weighting</a></h2><p>The <code>Weight</code> can be any callable object that receives the number of observations as its argument.  For example:</p><ul><li><p><code>weight = inv</code> will have the same result as <code>weight = EqualWeight()</code>.</p></li><li><p><code>weight = x -&gt; .01</code> will have the same result as <code>weight = ExponentialWeight(.01)</code></p></li></ul><pre><code class="language-julia-repl">
 julia&gt; y = randn(100);
 
-julia&gt; fit!(Mean(weight = EqualWeight()))
-ERROR: MethodError: no method matching fit!(::OnlineStats.Mean{OnlineStatsBase.EqualWeight})
-Closest candidates are:
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::String) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:101
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::Any) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:104
-  fit!(!Matched::StatsBase.StatisticalModel, !Matched::Any...) at /home/travis/.julia/v0.6/StatsBase/src/statmodels.jl:104
-  ...
+julia&gt; fit!(Mean(weight = EqualWeight()), y)
+Mean: -0.165585
 
-julia&gt; fit!(Mean(weight = inv))
-ERROR: MethodError: no method matching fit!(::OnlineStats.Mean{Base.#inv})
-Closest candidates are:
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::String) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:101
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::Any) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:104
-  fit!(!Matched::StatsBase.StatisticalModel, !Matched::Any...) at /home/travis/.julia/v0.6/StatsBase/src/statmodels.jl:104
-  ...
+julia&gt; fit!(Mean(weight = inv), y)
+Mean: -0.165585
 
-julia&gt; fit!(Mean(weight = ExponentialWeight(.01)))
-ERROR: MethodError: no method matching fit!(::OnlineStats.Mean{OnlineStatsBase.ExponentialWeight})
-Closest candidates are:
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::String) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:101
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::Any) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:104
-  fit!(!Matched::StatsBase.StatisticalModel, !Matched::Any...) at /home/travis/.julia/v0.6/StatsBase/src/statmodels.jl:104
-  ...
+julia&gt; fit!(Mean(weight = ExponentialWeight(.01)), y)
+Mean: -0.416768
 
-julia&gt; fit!(Mean(weight = x -&gt; .01))
-ERROR: MethodError: no method matching fit!(::OnlineStats.Mean{##ex-#882.##1#2})
-Closest candidates are:
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::String) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:101
-  fit!(::OnlineStatsBase.OnlineStat, !Matched::Any) at /home/travis/.julia/v0.6/OnlineStats/src/utils.jl:104
-  fit!(!Matched::StatsBase.StatisticalModel, !Matched::Any...) at /home/travis/.julia/v0.6/StatsBase/src/statmodels.jl:104
-  ...</code></pre><footer><hr/><a class="previous" href="collectionstats.html"><span class="direction">Previous</span><span class="title">Collections of Stats</span></a><a class="next" href="stats_and_models.html"><span class="direction">Next</span><span class="title">Statistics and Models</span></a></footer></article></body></html>
+julia&gt; fit!(Mean(weight = x -&gt; .01), y)
+Mean: -0.101265</code></pre><footer><hr/><a class="previous" href="collectionstats.html"><span class="direction">Previous</span><span class="title">Collections of Stats</span></a><a class="next" href="stats_and_models.html"><span class="direction">Next</span><span class="title">Statistics and Models</span></a></footer></article></body></html>
