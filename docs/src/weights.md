@@ -46,9 +46,9 @@ using OnlineStats # hide
 
 y = randn(100);
 
-fit!(Mean(weight = EqualWeight()))
-fit!(Mean(weight = inv))
+fit!(Mean(weight = EqualWeight()), y)
+fit!(Mean(weight = inv), y)
 
-fit!(Mean(weight = ExponentialWeight(.01)))
-fit!(Mean(weight = x -> .01))
+fit!(Mean(weight = ExponentialWeight(.01)), y)
+fit!(Mean(weight = x -> .01), y)
 ```
