@@ -1,4 +1,9 @@
 #-----------------------------------------------------------------------# NBClassifier
+"""
+    NBClassifier(p::Int, T::Type; stat = Hist(15))
+
+Calculate a naive bayes classifier for classes of type `T` and `p` predictors.
+"""
 mutable struct NBClassifier{T, G<:Group} <: XYStat
     d::OrderedDict{T, G}
     init::G
@@ -11,10 +16,9 @@ end
 function NBClassifier(g::G, T::Type; id=1) where {G<:Group}
     NBClassifier(OrderedDict{T, G}(), g, id, 0, -Inf, -Inf)
 end
-function NBClassifier(p::Int, T::Type; id=1, stat=Hist(20))
+function NBClassifier(p::Int, T::Type; id=1, stat=Hist(15))
     NBClassifier(p * stat, T; id=id)
 end
-value(o::NBClassifier) = collect(keys(o)), collect(values(o))
 function Base.show(io::IO, o::NBClassifier)
     print(io, "NBClassifier")
     for (k, p) in zip(keys(o), probs(o))

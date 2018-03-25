@@ -165,6 +165,32 @@ end
     test_exact(Extrema(Int), rand(Int, 100), minimum, minimum, ==)
     test_merge(Extrema(), y, y2, ==)
 end
+#-----------------------------------------------------------------------# FastNode
+@testset "FastNode" begin 
+    data = (x,rand(1:3,1000))
+    data2 = (x,rand(1:3,1000))
+    Y = vcat(data, data2)
+    o = fit!(FastNode(5, 3), data)
+    o2 = fit!(FastNode(5, 3), data2)
+    merge!(o, o2)
+    fit!(o2, data)
+    for k in 1:3, j in 1:5
+        @test value(o.stats[k][j])[1] ≈ value(o2.stats[k][j])[1]
+        @test value(o.stats[k][j])[2] ≈ value(o2.stats[k][j])[2]
+    end
+    @test length(o[1]) == 3
+    pvec = [mean(data[2] .== 1), mean(data[2] .== 2), mean(data[2] .== 3)]
+    test_exact(FastNode(5, 3), data, probs, pvec)
+    test_exact(FastNode(5, 3), data, nobs, 1000)
+    test_exact(FastNode(5, 3), data, O.nkeys, 3)
+    test_exact(FastNode(5, 3), data, O.nvars, 5)
+    @test classify(o) ∈ [1, 2, 3]
+end
+#-----------------------------------------------------------------------# FastTree 
+@testset "FastTree" begin 
+    data = (x,rand(1:3,1000))
+    o = fit!(FastTree(5, 3), data; splitsize=50)
+end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin 
 @testset "FitBeta" begin 
@@ -207,25 +233,6 @@ end
     test_merge(FitMvNormal(2), [y y2], [y2 y])
     @test value(FitMvNormal(2)) == (zeros(2), eye(2))
 end
-end
-@testset "FastNode" begin 
-    data = (x,rand(1:3,1000))
-    data2 = (x,rand(1:3,1000))
-    Y = vcat(data, data2)
-    o = fit!(FastNode(5, 3), data)
-    o2 = fit!(FastNode(5, 3), data2)
-    merge!(o, o2)
-    fit!(o2, data)
-    for k in 1:3, j in 1:5
-        @test value(o.stats[k][j])[1] ≈ value(o2.stats[k][j])[1]
-        @test value(o.stats[k][j])[2] ≈ value(o2.stats[k][j])[2]
-    end
-    @test length(o[1]) == 3
-    pvec = [mean(data[2] .== 1), mean(data[2] .== 2), mean(data[2] .== 3)]
-    test_exact(FastNode(5, 3), data, probs, pvec)
-    test_exact(FastNode(5, 3), data, nobs, 1000)
-    test_exact(FastNode(5, 3), data, O.nkeys, 3)
-    test_exact(FastNode(5, 3), data, O.nvars, 5)
 end
 #-----------------------------------------------------------------------# FTSeries 
 @testset "FTSeries" begin 
@@ -341,12 +348,22 @@ end
 @testset "NBClassifier" begin 
     X, Y = randn(1000, 5), rand(Bool, 1000)
     X2, Y2 = randn(1000, 5), rand(Bool, 1000)
+    o = fit!(NBClassifier(5, Bool), (X,Y))
+    merge!(o, fit!(NBClassifier(5, Bool), (X2,Y2)))
+    @test nobs(o) == 2000
+    @test length(probs(o)) == 2
+    @test sum(predict(o, x[1,:])) ≈ 1
+    @test classify(o, x[1, :]) || !classify(o, x[1, :])
 end
 #-----------------------------------------------------------------------# OrderStats
 @testset "OrderStats" begin 
     test_merge(OrderStats(100), y, y2)
     test_exact(OrderStats(1000), y, value, sort, ==)
     test_exact(OrderStats(1000), y, quantile, quantile)
+end
+#-----------------------------------------------------------------------# Partition 
+@testset "Partition" begin 
+
 end
 #-----------------------------------------------------------------------# ProbMap 
 @testset "ProbMap" begin 

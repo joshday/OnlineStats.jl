@@ -12,13 +12,13 @@ end
 """
     Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
 
-Online statistical bootstrap.  Create `nreps` replicates of `o`.  For each call to `fit!`,
-a replicate will be updated `rand(d)` times.
+Calculate an nline statistical bootstrap of nreps` replicates of `o`.  For each call to `fit!`,
+any given replicate will be updated `rand(d)` times (default is double or nothing).
 
 # Example
 
     o = Bootstrap(Variance())
-    Series(randn(1000), o)
+    fit!(o, randn(1000))
     confint(o)
 """
 struct Bootstrap{N, O <: OnlineStat{N}, D} <: OnlineStat{N}
@@ -102,7 +102,8 @@ Track a dictionary that maps unique values to its number of occurrences.  Simila
 
 # Example 
     
-    fit!(CountMap(Int), rand(1:10, 1000))
+    o = fit!(CountMap(Int), rand(1:10, 1000))
+    value(o)
 """
 mutable struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
     value::A  # OrderedDict by default
@@ -134,14 +135,15 @@ Base.getindex(o::CountMap, i) = o.value[i]
 
 #-----------------------------------------------------------------------# CovMatrix 
 """
-    CovMatrix(p=0; weight)
+    CovMatrix(p=0; weight=EqualWeight())
 
 Calculate a covariance/correlation matrix of `p` variables.  If the number of variables is 
 unknown, leave the default `p=0`.
 
 # Example 
 
-    fit!(CovMatrix(), randn(100, 4))
+    o = fit!(CovMatrix(), randn(100, 4))
+    cor(o)
 """
 mutable struct CovMatrix{W} <: OnlineStat{VectorOb}
     value::Matrix{Float64}
@@ -195,7 +197,7 @@ separately track the real and imaginary parts.
 # Example
     
     y = randn(100) + randn(100)im
-    fit!(y, CStat(Mean()))
+    fit!(CStat(Mean()), y)
 """
 struct CStat{O <: OnlineStat{Number}} <: OnlineStat{Number}
     re_stat::O
@@ -282,11 +284,13 @@ Base.minimum(o::Extrema) = o.min
 """
     FTSeries(stats...; filter=always, transform=identity)
 
-A series that filters and transforms the data before being fit.
+Track multiple stats for one data stream that is filtered and transformed before being 
+fitted.
 
 # Example 
 
-    fit!(FTSeries(Mean(), Variance(); transform=abs), -rand(1000))
+    o = FTSeries(Mean(), Variance(); transform=abs)
+    fit!(o, -rand(1000))
 """
 mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     stats::OS
@@ -322,13 +326,16 @@ always(x) = true
     Group(stats::OnlineStat...)
     Group(tuple)
 
-Create a vector-input stat (`OnlineStat{1}`) from several scalar-input stats.  For a new 
+Create a vector-input stat from several scalar-input stats.  For a new 
 observation `y`, `y[i]` is sent to `stats[i]`.
 
 # Examples
 
     fit!(Group(Mean(), Mean()), randn(100, 2))
     fit!(Group(Mean(), Variance()), randn(100, 2))
+
+    o = [Mean() CountMap(Int)]
+    fit!(o, zip(randn(100), rand(1:5, 100)))
 """
 struct Group{T} <: StatCollection{VectorOb}
     stats::T
@@ -454,9 +461,17 @@ end
 
 #-----------------------------------------------------------------------# KMeans
 """
-    KMeans(p, k)
+    KMeans(p, k; rate=LearningRate(.6))
 
 Approximate K-Means clustering of `k` clusters and `p` variables.
+
+# Example 
+
+    clusters = rand(Bool, 10^5)
+
+    x = [clusters[i] > .5 ? randn(): 5 + randn() for i in 1:10^5, j in 1:2]
+
+    o = fit!(KMeans(2, 2), x)
 """
 mutable struct KMeans{W} <: OnlineStat{VectorOb}
     value::Matrix{Float64}  # p × k
@@ -483,20 +498,17 @@ end
 
 #-----------------------------------------------------------------------# Mean
 """
-    Mean(; weight)
+    Mean(; weight=EqualWeight())
 
 Track a univariate mean.
 
 # Update 
 
-``μ = (1 - w) * μ + w * x``
+``μ = (1 - γ) * μ + γ * x``
 
 # Example
 
     @time fit!(Mean(), randn(10^6))
-
-    # exponentially-weighted mean
-    @time fit!(Mean(;weight = x -> 0.1), randn(10^6))
 """
 mutable struct Mean{W} <: OnlineStat{Number}
     μ::Float64
@@ -514,7 +526,7 @@ Base.mean(o::Mean) = o.μ
 
 #-----------------------------------------------------------------------# Moments
 """
-    Moments(; weight)
+    Moments(; weight=EqualWeight())
 
 First four non-central moments.
 
@@ -554,9 +566,13 @@ end
 
 #-----------------------------------------------------------------------# OrderStats
 """
-    OrderStats(b::Int, T::Type = Float64)
+    OrderStats(b::Int, T::Type = Float64; weight=EqualWeight())
 
 Average order statistics with batches of size `b`.
+
+# Example 
+
+    fit!(OrderStats(100), randn(10^5))
 """
 mutable struct OrderStats{T, W} <: OnlineStat{Number}
     value::Vector{T}
@@ -603,15 +619,16 @@ Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
 #-----------------------------------------------------------------------# ProbMap
 """
-    ProbMap(T::Type; weight)
-    ProbMap(A::AbstractDict; weight)
+    ProbMap(T::Type; weight=EqualWeight())
+    ProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())
 
 Track a dictionary that maps unique values to its probability.  Similar to 
 [`CountMap`](@ref), but uses a weighting mechanism.
 
 # Example 
     
-    fit!(ProbMap(Int), rand(1:10, 1000))
+    o = ProbMap(Int)
+    fit!(o, rand(1:10, 1000))
 """
 mutable struct ProbMap{T, A<:AbstractDict{T,Float64}, W} <: OnlineStat{T}
     value::A 
@@ -656,6 +673,10 @@ Calculate the approximate quantile via the P^2 algorithm.  It is more computatio
 expensive than the algorithms used by [`Quantile`](@ref), but also more exact.
 
 Ref: [https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf](https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf)
+
+# Example 
+
+    fit!(P2Quantile(.5), rand(10^5))
 """
 mutable struct P2Quantile <: OnlineStat{Number}
     q::Vector{Float64}  # marker heights
@@ -730,7 +751,14 @@ end
 
 #-----------------------------------------------------------------------# Quantile
 """
-    Quantile(q = [.25, .5, .75]; alg)
+    Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))
+
+Calculate quantiles via a stochastic approximation algorithm `OMAS`, `SGD`, `ADAGRAD`, or 
+`MSPI`.
+
+# Example 
+
+    fit!(Quantile(), randn(10^5))
 """
 mutable struct Quantile{T <: Algorithm, W} <: OnlineStat{Number}
     value::Vector{Float64}
@@ -739,7 +767,7 @@ mutable struct Quantile{T <: Algorithm, W} <: OnlineStat{Number}
     n::Int
     alg::T 
 end
-function Quantile(τ::AbstractVector = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6)) 
+function Quantile(τ::AbstractVector = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6)) 
     init!(alg, length(τ))
     Quantile(zeros(length(τ)), sort!(collect(τ)), rate, 0, alg)
 end
@@ -791,7 +819,7 @@ function qfit!(o::Quantile{OMAS}, y, γ)
     end
 end
 
-# # OMAP...why is this so bad?
+# # OMAP...why is this bad?
 # q_init(u::OMAP, p) = u
 # function qfit!(o::Quantile{<:OMAP}, y, γ)
 #     for j in eachindex(o.τ)
@@ -805,7 +833,8 @@ end
 """
     ReservoirSample(k::Int, T::Type = Float64)
 
-Reservoir sample of `k` items.
+Create a sample without replacement of size `k`.  After running through `n` observations, 
+the probability of an observation being in the sample is `1 / n`.
 
 # Example
 
@@ -884,7 +913,7 @@ Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
 
 #-----------------------------------------------------------------------# Variance 
 """
-    Variance(; weight)
+    Variance(; weight=EqualWeight())
 
 Univariate variance.
 
@@ -934,7 +963,7 @@ function _fit!(o::Lag{T}, y::T) where {T}
 end
 
 """
-    AutoCov(b, T = Float64)
+    AutoCov(b, T = Float64; weight=EqualWeight())
 
 Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
 

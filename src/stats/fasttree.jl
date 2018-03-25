@@ -96,6 +96,13 @@ function split!(o::FastNode, tree)
 end
 
 #-----------------------------------------------------------------------# FastTree
+"""
+    FastTree(p::Int, nclasses=2; stat=FitNormal(), maxsize=5000, splitsize=1000)
+
+Calculate a decision tree of `p` predictors variables and classes `1, 2, …, nclasses`.  
+Nodes split when they reach `splitsize` observations until `maxsize` nodes are in the tree.
+Each variable is summarized by `stat`, which can be `FitNormal()` or `Hist(nbins)`.
+"""
 struct FastTree{T<:FastNode} <: XYStat
     tree::Vector{T}
     maxsize::Int 

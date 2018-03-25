@@ -110,7 +110,7 @@ end
 #-----------------------------------------------------------------------# Partition
 @recipe f(o::AbstractPartition, fun=value) = o.parts, fun
 
-@recipe function f(parts::Vector{<:Part}, fun=value)
+@recipe function f(parts::Vector{Part{T, O}}, fun) where {T, O}
     sort!(parts)
     y = map(part -> fun(part.stat), parts)
     x = midpoint.(parts)
@@ -135,6 +135,8 @@ end
         markerstrokewidth --> 0
         color --> :blues
         x2, y2
+        # line_z --> plotshape([yi[2] for yi in y])
+        # x, plotshape([yi[1] for yi in y])
     elseif y[1] isa VectorOb
         lab --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
