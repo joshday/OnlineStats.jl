@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.AutoCov",
     "category": "type",
-    "text": "AutoCov(b, T = Float64)\n\nCalculate the auto-covariance/correlation for lags 0 to b for a data stream of type T.\n\nExample\n\ny = cumsum(randn(100))\no = AutoCov(5)\nfit!(o, y)\nautocov(o)\nautocor(o)\n\n\n\n"
+    "text": "AutoCov(b, T = Float64; weight=EqualWeight())\n\nCalculate the auto-covariance/correlation for lags 0 to b for a data stream of type T.\n\nExample\n\ny = cumsum(randn(100))\no = AutoCov(5)\nfit!(o, y)\nautocov(o)\nautocor(o)\n\n\n\n"
 },
 
 {
@@ -413,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Bootstrap",
     "category": "type",
-    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nOnline statistical bootstrap.  Create nreps replicates of o.  For each call to fit!, a replicate will be updated rand(d) times.\n\nExample\n\no = Bootstrap(Variance())\nSeries(randn(1000), o)\nconfint(o)\n\n\n\n"
+    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nCalculate an nline statistical bootstrap of nrepsreplicates ofo.  For each call tofit!, any given replicate will be updatedrand(d)` times (default is double or nothing).\n\nExample\n\no = Bootstrap(Variance())\nfit!(o, randn(1000))\nconfint(o)\n\n\n\n"
 },
 
 {
@@ -421,7 +421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CStat",
     "category": "type",
-    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nfit!(y, CStat(Mean()))\n\n\n\n"
+    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nfit!(CStat(Mean()), y)\n\n\n\n"
 },
 
 {
@@ -445,7 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "type",
-    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to  StatsBase.countmap.  \n\nExample\n\nfit!(CountMap(Int), rand(1:10, 1000))\n\n\n\n"
+    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to  StatsBase.countmap.  \n\nExample\n\no = fit!(CountMap(Int), rand(1:10, 1000))\nvalue(o)\n\n\n\n"
 },
 
 {
@@ -453,7 +453,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CovMatrix",
     "category": "type",
-    "text": "CovMatrix(p=0; weight)\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is  unknown, leave the default p=0.\n\nExample\n\nfit!(CovMatrix(), randn(100, 4))\n\n\n\n"
+    "text": "CovMatrix(p=0; weight=EqualWeight())\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is  unknown, leave the default p=0.\n\nExample\n\no = fit!(CovMatrix(), randn(100, 4))\ncor(o)\n\n\n\n"
 },
 
 {
@@ -477,7 +477,15 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FTSeries",
     "category": "type",
-    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nA series that filters and transforms the data before being fit.\n\nExample\n\nfit!(FTSeries(Mean(), Variance(); transform=abs), -rand(1000))\n\n\n\n"
+    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.FastTree",
+    "page": "API",
+    "title": "OnlineStats.FastTree",
+    "category": "type",
+    "text": "FastTree(p::Int, nclasses=2; stat=FitNormal(), maxsize=5000, splitsize=1000)\n\nCalculate a decision tree of p predictors variables and classes 1, 2, …, nclasses.   Nodes split when they reach splitsize observations until maxsize nodes are in the tree. Each variable is summarized by stat, which can be FitNormal() or Hist(nbins).\n\n\n\n"
 },
 
 {
@@ -533,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats::OnlineStat...)\nGroup(tuple)\n\nCreate a vector-input stat (OnlineStat{1}) from several scalar-input stats.  For a new  observation y, y[i] is sent to stats[i].\n\nExamples\n\nfit!(Group(Mean(), Mean()), randn(100, 2))\nfit!(Group(Mean(), Variance()), randn(100, 2))\n\n\n\n"
+    "text": "Group(stats::OnlineStat...)\nGroup(tuple)\n\nCreate a vector-input stat from several scalar-input stats.  For a new  observation y, y[i] is sent to stats[i].\n\nExamples\n\nfit!(Group(Mean(), Mean()), randn(100, 2))\nfit!(Group(Mean(), Variance()), randn(100, 2))\n\no = [Mean() CountMap(Int)]\nfit!(o, zip(randn(100), rand(1:5, 100)))\n\n\n\n"
 },
 
 {
@@ -557,7 +565,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.KMeans",
     "category": "type",
-    "text": "KMeans(p, k)\n\nApproximate K-Means clustering of k clusters and p variables.\n\n\n\n"
+    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nclusters = rand(Bool, 10^5)\n\nx = [clusters[i] > .5 ? randn(): 5 + randn() for i in 1:10^5, j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\n\n\n"
 },
 
 {
@@ -589,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Mean",
     "category": "type",
-    "text": "Mean(; weight)\n\nTrack a univariate mean.\n\nUpdate\n\n = (1 - w) *  + w * x\n\nExample\n\n@time fit!(Mean(), randn(10^6))\n\n# exponentially-weighted mean\n@time fit!(Mean(;weight = x -> 0.1), randn(10^6))\n\n\n\n"
+    "text": "Mean(; weight=EqualWeight())\n\nTrack a univariate mean.\n\nUpdate\n\n = (1 - ) *  +  * x\n\nExample\n\n@time fit!(Mean(), randn(10^6))\n\n\n\n"
 },
 
 {
@@ -597,7 +605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Moments",
     "category": "type",
-    "text": "Moments(; weight)\n\nFirst four non-central moments.\n\nExample\n\nfit!(Moments(), randn(1000))\n\n\n\n"
+    "text": "Moments(; weight=EqualWeight())\n\nFirst four non-central moments.\n\nExample\n\nfit!(Moments(), randn(1000))\n\n\n\n"
 },
 
 {
@@ -609,11 +617,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.NBClassifier",
+    "page": "API",
+    "title": "OnlineStats.NBClassifier",
+    "category": "type",
+    "text": "NBClassifier(p::Int, T::Type; stat = Hist(15))\n\nCalculate a naive bayes classifier for classes of type T and p predictors.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.OrderStats",
     "page": "API",
     "title": "OnlineStats.OrderStats",
     "category": "type",
-    "text": "OrderStats(b::Int, T::Type = Float64)\n\nAverage order statistics with batches of size b.\n\n\n\n"
+    "text": "OrderStats(b::Int, T::Type = Float64; weight=EqualWeight())\n\nAverage order statistics with batches of size b.\n\nExample\n\nfit!(OrderStats(100), randn(10^5))\n\n\n\n"
 },
 
 {
@@ -621,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.P2Quantile",
     "category": "type",
-    "text": "P2Quantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm.  It is more computationally expensive than the algorithms used by Quantile, but also more exact.\n\nRef: https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\n\n\n"
+    "text": "P2Quantile(τ = 0.5)\n\nCalculate the approximate quantile via the P^2 algorithm.  It is more computationally expensive than the algorithms used by Quantile, but also more exact.\n\nRef: https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf\n\nExample\n\nfit!(P2Quantile(.5), rand(10^5))\n\n\n\n"
 },
 
 {
@@ -637,7 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ProbMap",
     "category": "type",
-    "text": "ProbMap(T::Type; weight)\nProbMap(A::AbstractDict; weight)\n\nTrack a dictionary that maps unique values to its probability.  Similar to  CountMap, but uses a weighting mechanism.\n\nExample\n\nfit!(ProbMap(Int), rand(1:10, 1000))\n\n\n\n"
+    "text": "ProbMap(T::Type; weight=EqualWeight())\nProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())\n\nTrack a dictionary that maps unique values to its probability.  Similar to  CountMap, but uses a weighting mechanism.\n\nExample\n\no = ProbMap(Int)\nfit!(o, rand(1:10, 1000))\n\n\n\n"
 },
 
 {
@@ -645,7 +661,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "type",
-    "text": "Quantile(q = [.25, .5, .75]; alg)\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or  MSPI.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n"
 },
 
 {
@@ -661,7 +677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
     "category": "type",
-    "text": "ReservoirSample(k::Int, T::Type = Float64)\n\nReservoir sample of k items.\n\nExample\n\nfit!(ReservoirSample(100, Int), 1:1000)\n\n\n\n"
+    "text": "ReservoirSample(k::Int, T::Type = Float64)\n\nCreate a sample without replacement of size k.  After running through n observations,  the probability of an observation being in the sample is 1 / n.\n\nExample\n\nfit!(ReservoirSample(100, Int), 1:1000)\n\n\n\n"
 },
 
 {
@@ -701,7 +717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Variance",
     "category": "type",
-    "text": "Variance(; weight)\n\nUnivariate variance.\n\nExample\n\n@time fit!(Variance(), randn(10^6))\n\n\n\n"
+    "text": "Variance(; weight=EqualWeight())\n\nUnivariate variance.\n\nExample\n\n@time fit!(Variance(), randn(10^6))\n\n\n\n"
 },
 
 {
