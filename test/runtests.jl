@@ -10,6 +10,7 @@ for stat in [
         Bootstrap(Mean())
         CallFun(Mean(), info)
         FastNode(5)
+        FastTree(5)
         FTSeries(Variance())
         3Mean()
         Hist(10)
@@ -188,9 +189,20 @@ end
 end
 #-----------------------------------------------------------------------# FastTree 
 @testset "FastTree" begin 
-    data = (x,rand(1:3,1000))
-    o = fit!(FastTree(5, 3), data; splitsize=50)
+    X = randn(10^4, 10)
+    Y = [rand() < 1 / (1 + exp(-η)) for η in X*(1:10)] .+ 1
+    o = fit!(FastTree(10; splitsize=100), (X,Y))
+    @test classify(o, X[1,:]) ∈ [1, 2]
+    @test all(0 .< classify(o, X) .< 3)
+    @test O.nkeys(o) == 2 
+    @test O.nvars(o) == 10
 end
+#-----------------------------------------------------------------------# FastForest 
+# @testset "FastForest" begin 
+#     X = randn(10^4, 10)
+#     Y = [rand() < 1 / (1 + exp(-η)) for η in X*(1:10)] .+ 1
+#     o = fit!(FastForest(10; splitsize = 100), (X,Y))
+# end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin 
 @testset "FitBeta" begin 
