@@ -196,7 +196,7 @@ end
 #-----------------------------------------------------------------------# FastForest 
 @testset "FastForest" begin 
     X, Y = O.fakedata(FastNode, 10^4, 10)
-    o = fit!(FastForest(10), (X, Y))
+    o = fit!(FastForest(10; splitsize=1000), (X, Y))
     @test mean(classify(o, X) .== Y) > .5
 end
 #-----------------------------------------------------------------------# Fit[Dist]
