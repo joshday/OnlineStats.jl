@@ -48,7 +48,7 @@ export
     Series, StatLearn, Sum,
     Variance,
 # other 
-    BiasVec
+    OnlineStat, BiasVec
 
 include("utils.jl")
 include("algorithms.jl")
