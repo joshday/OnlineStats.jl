@@ -10,7 +10,8 @@ The master branch of OnlineStats has some considerable differences from the late
         - Old: `Series(data, Mean(), Variance())`
         - New: `fit!(Series(Mean(), Variance()), data)`
 - Stats are now subtypes of `OnlineStat{T}` where `T` is the type of a single observation.  As a result, some constructors require additional information in order for `fit!` to dispatch correctly.
-    - Example: `Mean <: OnlineStat{Number}`.
+    - Exmaple `HyperLogLog(b)` is now `HyperLogLog(b, T=Number)`.
+    - Example: `Mean` is now a subtype of `OnlineStat{Number}`.
 - Some constructors no longer require size-of-the-input information.
     - Old: `Series(randn(10, 2), CovMatrix(2))`
     - New: `fit!(CovMatrix(), randn(10, 2))`
