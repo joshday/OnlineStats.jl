@@ -12,8 +12,8 @@ The master branch of OnlineStats has some considerable differences from the late
 - Stats are now subtypes of `OnlineStat{T}` where `T` is the type of a single observation.  As a result, some constructors require additional information in order for `fit!` to dispatch correctly.
     - Example: `Mean <: OnlineStat{Number}`.
 - Some constructors no longer require size-of-the-input information.
-    - Old: `Series(randn(10, 2), CovMatrix(2))
-    - New: `fit!(CovMatrix(), randn(10, 2))
+    - Old: `Series(randn(10, 2), CovMatrix(2))`
+    - New: `fit!(CovMatrix(), randn(10, 2))`
 - If a stat can use a weighting mechanism, it will have one of the following keyword arguments:
     - `weight = EqualWeight()` for stats that can be calculated the same as offline counterparts.
     - `rate = LearningRate(.6)` for stats that use stochastic approximation.
