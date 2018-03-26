@@ -26,7 +26,7 @@ for stat in [
     println("  > ", stat)
 end
 
-#-----------------------------------------------------------------------# test utils
+#-----------------------------------------------------------------------# test helpers
 const y = randn(1000)
 const y2 = randn(1000)
 const x = randn(1000, 5)
@@ -82,6 +82,9 @@ nrows(t::Tuple) = length(t[2])
     for (i, xi) in enumerate(eachrow(x))
         @test xi == x[i, :]
     end
+    @inferred eachrow(x)
+    @inferred eachrow(x, y)
+    @inferred eachcol(x)
 end
 
 

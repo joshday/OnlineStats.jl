@@ -90,7 +90,7 @@ eachrow(x::AbstractMatrix, y::AbstractVector) = XYRows(x, y)
 Base.start(o::XYRows) = 1 
 Base.next(o::XYRows, i) = o[i], i + 1
 Base.done(o::XYRows, i) = i > size(o.mat, 1)
-Base.eltype(o::Type{XYRows{T,M,S,V}}) where {T,M,S,V} = Vector{T}
+Base.eltype(o::Type{XYRows{T,M,S,V}}) where {T,M,S,V} = Tuple{Vector{T}, S}
 Base.length(o::XYRows) = size(o.mat, 1)
 
 function Base.getindex(o::XYRows, i) 
@@ -136,7 +136,7 @@ end
 
 function fit!(o::OnlineStat, y)
     for yi in y 
-        fit!(o, yi)
+        _fit!(o, yi)
     end
     o
 end
