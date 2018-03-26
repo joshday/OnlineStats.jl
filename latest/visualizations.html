@@ -53,9 +53,8 @@ y = Dates.year.(x) + randn(10^5)
 
 o = fit!(IndexedPartition(Date, Hist(20)), [x y])
 
-plot(o, xlab = &quot;Date&quot;)</code></pre></div><p><img src="indexpartequal.png" alt/></p><pre><code class="language-">x2 = Dates.value.(x)
+plot(o, xlab = &quot;Date&quot;)</code></pre></div><p><img src="indexpartequal.png" alt/></p><div><pre><code class="language-julia">x2 = Dates.value.(x)
 
-o2 = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
+o = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
 
-plot(o, xlab = &quot;Date as Number)
-savefig(&quot;indexpartequal2.png&quot;); nothing # hide</code></pre><p><img src="indexpartequal2.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
+plot(o, xlab = &quot;Date as Number&quot;)</code></pre></div><p><img src="indexpartequal2.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>

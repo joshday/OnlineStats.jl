@@ -341,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )note: Note\nIndexedPartition is designed to work with Number index types.  While other types may work, you may get some unexpected behavior.x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Date, Hist(20)), [x y])\n\nplot(o, xlab = \"Date\")\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )x2 = Dates.value.(x)\n\no2 = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])\n\nplot(o, xlab = \"Date as Number)\nsavefig(\"indexpartequal2.png\"); nothing # hide(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )note: Note\nIndexedPartition is designed to work with Number index types.  While other types may work, you may get some unexpected behavior.x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Date, Hist(20)), [x y])\n\nplot(o, xlab = \"Date\")\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )x2 = Dates.value.(x)\n\no = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])\n\nplot(o, xlab = \"Date as Number\")\nsavefig(\"indexpartequal2.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -470,6 +470,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.FTSeries",
     "category": "type",
     "text": "FTSeries(stats...; filter=always, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.FastForest",
+    "page": "API",
+    "title": "OnlineStats.FastForest",
+    "category": "type",
+    "text": "FastForest(p, nkeys=2; stat=FitNormal(), kw...)\n\nCalculate a random forest where each variable is summarized by stat.  \n\nKeyword Arguments\n\nnt=100): Number of trees in the forest\nb=floor(Int, sqrt(p)): Number of random features for each tree to receive\nmaxsize=1000: Maximum size for any tree in the forest\nsplitsize=5000: Number of observations in any given node before splitting\nλ = .05: Probability that each tree is updated on a new observation\n\n\n\n"
 },
 
 {
