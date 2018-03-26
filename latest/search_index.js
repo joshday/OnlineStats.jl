@@ -181,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Custom Weighting",
     "category": "section",
-    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\n\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> .01), y)"
+    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> x == 1 ? 1.0 : .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\n\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)"
 },
 
 {
