@@ -49,9 +49,10 @@ y = Float64.(x) + randn(10^5)
 o = fit!(IndexedPartition(Char, Extrema()), [x y])
 
 plot(o, xlab = &quot;Category&quot;)
-savefig(&quot;indexpart3.png&quot;); nothing # hide</code></pre><p><img src="indexpart3.png" alt/></p><div><pre><code class="language-julia">x = rand(10^5)
+savefig(&quot;indexpart3.png&quot;); nothing # hide</code></pre><p><img src="indexpart3.png" alt/></p><pre><code class="language-">x = rand(10^5)
 y = rand(1:5, 10^5)
 
 o = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])
 
-plot(o, xlab = &quot;X&quot;, ylab = &quot;Y&quot;)</code></pre></div><p><img src="indexpart4.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
+plot(o, xlab = &quot;X&quot;, ylab = &quot;Y&quot;)
+savefig(&quot;indexpart4.png&quot;); nothing # hide</code></pre><p><img src="indexpart4.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>

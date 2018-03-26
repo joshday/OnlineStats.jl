@@ -433,14 +433,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Count",
-    "page": "API",
-    "title": "OnlineStats.Count",
-    "category": "type",
-    "text": "Count()\n\nThe number of things observed.\n\nExample\n\nfit!(Count(), 1:1000)\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.CountMap",
     "page": "API",
     "title": "OnlineStats.CountMap",
@@ -557,7 +549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
     "category": "type",
-    "text": "HyperLogLog(b)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\nfit!(HyperLogLog(12), rand(1:10,10^5))\n\n\n\n"
+    "text": "HyperLogLog(b, T::Type = Number)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\nfit!(HyperLogLog(12), rand(1:10,10^5))\n\n\n\n"
 },
 
 {
@@ -605,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Moments",
     "category": "type",
-    "text": "Moments(; weight=EqualWeight())\n\nFirst four non-central moments.\n\nExample\n\nfit!(Moments(), randn(1000))\n\n\n\n"
+    "text": "Moments(; weight=EqualWeight())\n\nFirst four non-central moments.\n\nExample\n\no = fit!(Moments(), randn(1000))\nmean(o)\nvar(o)\nskewness(o)\nkurtosis(o)\n\n\n\n"
 },
 
 {
@@ -726,6 +718,14 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.confint",
     "category": "function",
     "text": "confint(b::Bootstrap, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n"
+},
+
+{
+    "location": "api.html#StatsBase.fit!-Union{Tuple{OnlineStatsBase.OnlineStat{T},T}, Tuple{T}} where T",
+    "page": "API",
+    "title": "StatsBase.fit!",
+    "category": "method",
+    "text": "fit!(o::OnlineStat, data)\n\nUpdate a stat with more data.\n\n\n\n"
 },
 
 {
