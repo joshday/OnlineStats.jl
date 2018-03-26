@@ -489,6 +489,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.FitCauchy",
+    "page": "API",
+    "title": "OnlineStats.FitCauchy",
+    "category": "type",
+    "text": "FitCauchy(; alg, rate)\n\nApproximate parameter estimation of a Cauchy distribution.  Estimates are based on quantiles, so that alg will be passed to Quantile.\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.FitGamma",
     "page": "API",
     "title": "OnlineStats.FitGamma",
