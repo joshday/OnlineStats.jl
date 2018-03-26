@@ -39,7 +39,7 @@ Scaled
 The `Weight` can be any callable object that receives the number of observations as its argument.  For example:
 
 - `weight = inv` will have the same result as `weight = EqualWeight()`.
-- `weight = x -> .01` will have the same result as `weight = ExponentialWeight(.01)`
+- `weight = x -> x == 1 ? 1.0 : .01` will have the same result as `weight = ExponentialWeight(.01)`
 
 ```@repl 
 using OnlineStats # hide
@@ -50,5 +50,5 @@ fit!(Mean(weight = EqualWeight()), y)
 fit!(Mean(weight = inv), y)
 
 fit!(Mean(weight = ExponentialWeight(.01)), y)
-fit!(Mean(weight = x -> .01), y)
+fit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)
 ```
