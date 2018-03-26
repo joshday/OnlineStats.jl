@@ -191,11 +191,13 @@ end
     @test all(0 .< classify(o, X) .< 3)
     @test O.nkeys(o) == 2 
     @test O.nvars(o) == 10
+    @test mean(classify(o, X) .== Y) > .5
 end
 #-----------------------------------------------------------------------# FastForest 
 @testset "FastForest" begin 
     X, Y = O.fakedata(FastNode, 10^4, 10)
-    o = fit!(FastForest(10), (X,Y))
+    o = fit!(FastForest(10), (X, Y))
+    @test mean(classify(o, X) .== Y) > .5
 end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin 
@@ -203,9 +205,9 @@ end
     test_merge(FitBeta(), rand(10), rand(10))
     @test value(FitBeta()) == (1.0, 1.0)
 end
-# @testset "FitCauchy" begin 
-#     test_exact(FitCauchy(), y, value, y->(0,1), atol = .5)
-# end 
+@testset "FitCauchy" begin 
+    test_exact(FitCauchy(), y, value, y->(0,1), atol = .5)
+end 
 @testset "FitGamma" begin 
     test_merge(FitGamma(), y, y2)
     @test value(FitGamma()) == (1.0, 1.0)
