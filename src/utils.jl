@@ -63,7 +63,6 @@ end
 function RowsOf(x::M) where {T, M<:AbstractMatrix{T}}
     RowsOf{T, M}(x, Vector{T}(undef, size(x, 2))) 
 end
-eachrow(x::AbstractMatrix) = RowsOf(x)
 Base.start(o::RowsOf) = 1
 Base.next(o::RowsOf, i) = o[i], i + 1
 Base.done(o::RowsOf, i) = i > size(o.mat, 1)
@@ -86,7 +85,6 @@ function XYRows(x::M, y::V) where {T,S,M<:AbstractMatrix{T},V<:AbstractVector{S}
     size(x,1) == length(y) || error("incompatible dimensions")
     XYRows{T,M,S,V}(x, y, zeros(T, size(x, 2)))
 end
-eachrow(x::AbstractMatrix, y::AbstractVector) = XYRows(x, y)
 Base.start(o::XYRows) = 1 
 Base.next(o::XYRows, i) = o[i], i + 1
 Base.done(o::XYRows, i) = i > size(o.mat, 1)
@@ -109,19 +107,37 @@ end
 function ColsOf(x::M) where {T, M<:AbstractMatrix{T}}
     ColsOf{T, M}(x, zeros(T, size(x, 1)))
 end
-eachcol(x::AbstractMatrix) = ColsOf(x)
 Base.start(o::ColsOf) = 1
-function Base.next(o::ColsOf, i) 
-    for j in eachindex(o.buffer)
-        o.buffer[j] = o.mat[j, i]
-    end
-    o.buffer, i + 1
-end
+Base.next(o::ColsOf, i) = o[i], i + 1
 Base.done(o::ColsOf, i) = i > size(o.mat, 2)
 Base.eltype(o::Type{C}) where {T, C<:ColsOf{T}} = Vector{T}
 Base.length(o::ColsOf) = size(o.mat, 2)
+function Base.getindex(o::ColsOf, i)
+    for j in eachindex(o.buffer)
+        o.buffer[j] = o.mat[j, i]
+    end
+    o.buffer
+end
 
+#-----------------------------------------------------------------------# eachrow
+"""
+    eachrow(x::AbstractMatrix)
 
+Create an iterator over the rows of a matrix as `Vector`s.
+
+    eachrow(x::AbstractMatrix, y::Vector)
+
+Create an iterator over the rows of a matrix/vector as `Tuple{Vector, eltype(y)}`s.
+"""
+eachrow(x::AbstractMatrix) = RowsOf(x)
+eachrow(x::AbstractMatrix, y::AbstractVector) = XYRows(x, y)
+
+"""
+    eachcol(x::AbstractMatrix)
+
+Create an iterator over the columns of a matrix as `Vector`s.
+"""
+eachcol(x::AbstractMatrix) = ColsOf(x)
 
 #-----------------------------------------------------------------------# fit!
 """

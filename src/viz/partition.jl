@@ -3,6 +3,11 @@ abstract type AbstractPartition{N} <: OnlineStat{N} end
 nobs(o::AbstractPartition) = isempty(o.parts) ? 0 : sum(nobs, o.parts)
 
 #-----------------------------------------------------------------------# Part 
+"""
+    Part(stat, a, b)
+
+`stat` summarizes a Y variable over an X variable's range `a` to `b`.
+"""
 mutable struct Part{T, O <: OnlineStat} <: OnlineStat{XY} 
     stat::O 
     a::T
@@ -60,6 +65,16 @@ end
 #-----------------------------------------------------------------------# Partition 
 """
     Partition(stat, nparts=100)
+
+Split a data stream into `nparts` where each part is summarized by `stat`.
+
+# Example 
+
+    o = Partition(Extrema())
+    fit!(o, cumsum(randn(10^5)))
+
+    using Plots
+    plot(o)
 """
 struct Partition{T, O <: OnlineStat{T}} <: AbstractPartition{T}
     parts::Vector{Part{Int, O}}
