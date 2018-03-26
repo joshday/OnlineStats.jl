@@ -653,7 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Partition",
     "category": "type",
-    "text": "Partition(stat, nparts=100)\n\n\n\n"
+    "text": "Partition(stat, nparts=100)\n\nSplit a data stream into nparts where each part is summarized by stat.\n\nExample\n\no = Partition(Extrema())\nfit!(o, cumsum(randn(10^5)))\n\nusing Plots\nplot(o)\n\n\n\n"
 },
 
 {
@@ -729,6 +729,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.eachcol-Tuple{AbstractArray{T,2} where T}",
+    "page": "API",
+    "title": "OnlineStats.eachcol",
+    "category": "method",
+    "text": "eachcol(x::AbstractMatrix)\n\nCreate an iterator over the columns of a matrix as Vectors.\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.eachrow-Tuple{AbstractArray{T,2} where T}",
+    "page": "API",
+    "title": "OnlineStats.eachrow",
+    "category": "method",
+    "text": "eachrow(x::AbstractMatrix)\n\nCreate an iterator over the rows of a matrix as Vectors.\n\neachrow(x::AbstractMatrix, y::Vector)\n\nCreate an iterator over the rows of a matrix/vector as Tuple{Vector, eltype(y)}s.\n\n\n\n"
+},
+
+{
     "location": "api.html#StatsBase.confint",
     "page": "API",
     "title": "StatsBase.confint",
@@ -750,6 +766,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.AdaptiveBins",
     "category": "type",
     "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Part",
+    "page": "API",
+    "title": "OnlineStats.Part",
+    "category": "type",
+    "text": "Part(stat, a, b)\n\nstat summarizes a Y variable over an X variable\'s range a to b.\n\n\n\n"
 },
 
 {
