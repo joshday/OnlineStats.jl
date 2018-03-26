@@ -22,7 +22,7 @@ for f in [:(_fit!), :pdf, :cdf, :(Base.getindex)]
 end
 
 Base.show(io::IO, o::Hist) = print(io, "Hist: ", o.alg)
-Base.merge!(o::Hist, o2::Hist) = merge!(o.alg, o2.alg)
+Base.merge!(o::Hist, o2::Hist) = (merge!(o.alg, o2.alg); o)
 value(o::Hist) = (midpoints(o), counts(o))
 
 split_candidates(o::Hist) = midpoints(o)

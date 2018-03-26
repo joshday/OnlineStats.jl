@@ -290,6 +290,11 @@ end
     test_exact(Hist(-5:.1:5), y, nobs, length)
     test_exact(Hist(-5:.1:5), y, var, var, atol=.2)
     test_merge(Hist(-5:.1:5), y, y2)
+    # merge unequal bins 
+    r1, r2 = -5:.2:5, -5:.1:5
+    @test merge!(fit!(Hist(r1), y), fit!(Hist(r2), y2)) == fit!(Hist(r1), vcat(y, y2))
+    @test O.pdf(fit!(Hist(-5:.1:5), y), 0) > 0
+    @test O.pdf(fit!(Hist(-5:.1:5), y), 100) == 0
 end 
 @testset "AdaptiveBins" begin 
     test_exact(Hist(1000), y, mean, mean)
@@ -307,6 +312,8 @@ end
     data = randn(10_000)
     test_exact(Hist(100), data, o->O.pdf(o,0), 0.3989422804014327, atol=.2)
     test_exact(Hist(100), data, o->O.cdf(o,0), .5, atol=.1)
+
+    @test Hist(10) == Hist(10)
 end
 end
 #-----------------------------------------------------------------------# HyperLogLog 
