@@ -352,6 +352,10 @@ end
     test_exact(Moments(), y, std, std)
     test_merge(Moments(), y, y2)
 end
+#-----------------------------------------------------------------------# Mosaic 
+@testset "Mosaic" begin 
+    test_merge(Mosaic(Int,Int), rand(1:5, 100, 2), rand(1:5, 100, 2), ==)
+end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
     X, Y = randn(1000, 5), rand(Bool, 1000)
