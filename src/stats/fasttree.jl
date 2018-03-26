@@ -151,6 +151,20 @@ function classify(o::FastTree, x::AbstractMatrix)
 end
 
 #-----------------------------------------------------------------------# FastForest 
+"""
+    FastForest(p, nkeys=2; stat=FitNormal(), kw...)
+
+Calculate a random forest where each variable is summarized by `stat`.  
+
+# Keyword Arguments 
+
+- `nt=100)`: Number of trees in the forest
+- `b=floor(Int, sqrt(p))`: Number of random features for each tree to receive
+- `maxsize=1000`: Maximum size for any tree in the forest
+- `splitsize=5000`: Number of observations in any given node before splitting
+- `λ = .05`: Probability that each tree is updated on a new observation
+
+"""
 mutable struct FastForest{T<:FastTree} <: OnlineStat{XY}
     forest::Vector{T}
     subsets::Matrix{Int}
