@@ -3,6 +3,9 @@
     FitBeta(; weight)
 
 Online parameter estimate of a Beta distribution (Method of Moments).
+
+# Example 
+    o = fit!(FitBeta(), rand(1000))
 """
 struct FitBeta{V<:Variance} <: OnlineStat{Number}
     var::V
@@ -29,11 +32,14 @@ Base.merge!(o::FitBeta, o2::FitBeta) = merge!(o.var, o2.var)
 
 Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
 quantiles, so that `alg` will be passed to [`Quantile`](@ref).
+
+# Example 
+    o = fit!(FitCauchy(), randn(1000))
 """
 mutable struct FitCauchy{T} <: OnlineStat{Number}
     q::Quantile{T}
 end
-FitCauchy(alg = SGD(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
+FitCauchy(alg = OMAS(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
 nobs(o::FitCauchy) = nobs(o.q)
 _fit!(o::FitCauchy, y) = _fit!(o.q, y)
 function value(o::FitCauchy)
@@ -50,6 +56,9 @@ Base.merge!(o::FitCauchy, o2::FitCauchy) = merge!(o.q, o2.q)
     FitGamma(; weight)
 
 Online parameter estimate of a Gamma distribution (Method of Moments).
+
+# Example 
+    o = fit!(FitGamma(), randexp(10^5))
 """
 struct FitGamma <: OnlineStat{Number}
     v::Variance
@@ -74,6 +83,9 @@ Base.merge!(o::FitGamma, o2::FitGamma) = merge!(o.v, o2.v)
     FitLogNormal()
 
 Online parameter estimate of a LogNormal distribution (MLE).
+
+# Example 
+    o = fit!(FitLogNormal(), exp.(randn(10^5)))
 """
 struct FitLogNormal <: OnlineStat{Number}
     v::Variance
@@ -95,6 +107,9 @@ Base.merge!(o::FitLogNormal, o2::FitLogNormal) = merge!(o.v, o2.v)
     FitNormal()
 
 Calculate the parameters of a normal distribution via maximum likelihood.
+
+# Example 
+    o = fit!(FitNormal(), randn(1000))
 """
 struct FitNormal{V <: Variance} <: OnlineStat{Number}
     v::V
@@ -126,6 +141,10 @@ cdf(o::FitNormal, x::Number) = .5 * (1.0 + SpecialFunctions.erf((x - mean(o)) / 
 Online parameter estimate of a Multinomial distribution.  The sum of counts does not need
 to be consistent across observations.  Therefore, the `n` parameter of the Multinomial
 distribution is returned as 1.
+
+# Example 
+    x = [1 2 3; 4 8 12]
+    fit!(FitMultinomial(3), x)
 """
 mutable struct FitMultinomial{T} <: OnlineStat{VectorOb}
     grp::Group{T}
@@ -147,6 +166,11 @@ Base.merge!(o::FitMultinomial, o2::FitMultinomial) = merge!(o.grp, o2.grp)
     FitMvNormal(d)
 
 Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
+
+# Example 
+
+    y = randn(100, 2)
+    o = fit!(FitMvNormal(2), y)
 """
 struct FitMvNormal <: OnlineStat{VectorOb}
     cov::CovMatrix

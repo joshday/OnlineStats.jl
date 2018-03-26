@@ -8,8 +8,8 @@ Data structure for generating a mosaic plot, a comparison between two categorica
     using OnlineStats, Plots 
     x = [rand() > .8 for i in 1:10^5]
     y = rand([1,2,2,3,3,3], 10^5)
-    s = series([x y], Mosaic(Bool, Int))
-    plot(s)
+    o = fit!(Mosaic(Bool, Int), zip(x, y))
+    plot(o)
 """
 mutable struct Mosaic{T, C<:CountMap} <: OnlineStat{VectorOb}
     value::OrderedDict{T, C}
