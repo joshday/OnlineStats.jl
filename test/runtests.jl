@@ -1,3 +1,4 @@
+module OnlineStatsTests
 using Compat, Compat.Test, Compat.LinearAlgebra, OnlineStats
 O = OnlineStats
 import StatsBase: countmap, fit, Histogram
@@ -81,15 +82,6 @@ nrows(t::Tuple) = length(t[2])
     for (i, xi) in enumerate(eachrow(x))
         @test xi == x[i, :]
     end
-    @testset "==" begin 
-        @test AutoCov(5) == AutoCov(5)
-        @test Bootstrap(Mean()) == Bootstrap(Mean())
-        @test Count() == Count()
-        @test CountMap(Int) == CountMap(Int)
-        @test Hist(5) == Hist(5)
-        Mean() == Mean()
-        Variance() == Variance()
-    end
 end
 
 
@@ -112,11 +104,11 @@ end
     test_merge(CallFun(Mean(), x->nothing), y, y2)
     test_exact(CallFun(Mean(), x->nothing), y, value, mean)
 end
-#-----------------------------------------------------------------------# Count 
-@testset "Count" begin 
-    test_exact(Count(), y, value, length)
-    test_merge(Count(), y, y2, ==)
-end
+# #-----------------------------------------------------------------------# Count 
+# @testset "Count" begin 
+#     test_exact(Count(), y, value, length)
+#     test_merge(Count(), y, y2, ==)
+# end
 #-----------------------------------------------------------------------# CountMap
 @testset "CountMap" begin
     test_exact(CountMap(Int), rand(1:10, 100), nobs, length, ==)
@@ -470,3 +462,5 @@ end
     test_exact(Variance(), y, var, var)
     test_merge(Variance(), y, y2)
 end
+
+end #module

@@ -60,6 +60,9 @@ Base.@pure FixedBins(edges::AbstractVector, counts::Vector{Int}, out::Int; close
     FixedBins{closed,typeof(edges)}(edges, counts, out)
 
 make_alg(e::AbstractVector; kw...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kw...)
+function Base.:(==)(o::FixedBins, o2::FixedBins)
+    o.edges == o2.edges && o.counts == o2.counts && o.out == o2.out
+end
 
 midpoints(o::FixedBins) = midpoints(o.edges)
 counts(o::FixedBins) = o.counts

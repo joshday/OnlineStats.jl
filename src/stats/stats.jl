@@ -21,13 +21,13 @@ any given replicate will be updated `rand(d)` times (default is double or nothin
     fit!(o, randn(1000))
     confint(o)
 """
-struct Bootstrap{N, O <: OnlineStat{N}, D} <: OnlineStat{N}
+struct Bootstrap{T, O <: OnlineStat{T}, D} <: OnlineStat{T}
     stat::O 
     replicates::Vector{O}
     rnd::D
 end
-function Bootstrap(o::OnlineStat{N}, nreps::Integer = 100, d = [0, 2]) where {N}
-    Bootstrap{N, typeof(o), typeof(d)}(o, [copy(o) for i in 1:nreps], d)
+function Bootstrap(o::OnlineStat{T}, nreps::Integer = 100, d = [0, 2]) where {T}
+    Bootstrap{T, typeof(o), typeof(d)}(o, [copy(o) for i in 1:nreps], d)
 end
 Base.show(io::IO, b::Bootstrap) = print(io, "Bootstrap($(length(b.replicates))): $(b.stat)")
 """
@@ -64,33 +64,33 @@ Call `f(o)` every time the OnlineStat `o` gets updated.
     o = CallFun(Mean(), info)
     fit!(o, [0,0,1,1])
 """
-struct CallFun{N, O <: OnlineStat{N}, F <: Function} <: OnlineStat{N}
+struct CallFun{T, O <: OnlineStat{T}, F <: Function} <: OnlineStat{T}
     stat::O
     f::F
 end 
-CallFun(o::O, f::F) where {N, O<:OnlineStat{N}, F} = CallFun{N, O, F}(o, f)
+CallFun(o::O, f::F) where {T, O<:OnlineStat{T}, F} = CallFun{T, O, F}(o, f)
 nobs(o::CallFun) = nobs(o.stat)
 value(o::CallFun) = value(o.stat)
 Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
 _fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
 Base.merge!(o::CallFun, o2::CallFun) = merge!(o.stat, o2.stat)
 
-#-----------------------------------------------------------------------# Count 
-"""
-    Count()
+# #-----------------------------------------------------------------------# Count 
+# """
+#     Count()
 
-The number of things observed.
+# The number of things observed.
 
-# Example 
+# # Example 
 
-    fit!(Count(), 1:1000)
-"""
-mutable struct Count <: OnlineStat{Any}
-    n::Int
-    Count() = new(0)
-end
-_fit!(o::Count, x) = (o.n += 1)
-Base.merge!(o::Count, o2::Count) = (o.n += o2.n; o)
+#     fit!(Count(), 1:1000)
+# """
+# mutable struct Count <: OnlineStat{Nothing}
+#     n::Int
+#     Count() = new(0)
+# end
+# _fit!(o::Count, x) = (o.n += 1)
+# Base.merge!(o::Count, o2::Count) = (o.n += o2.n; o)
 
 #-----------------------------------------------------------------------# CountMap 
 """
@@ -367,7 +367,7 @@ Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 #-----------------------------------------------------------------------# HyperLogLog
 # Mostly copy/pasted from StreamStats.jl
 """
-    HyperLogLog(b)  # 4 ≤ b ≤ 16
+    HyperLogLog(b, T::Type = Number)  # 4 ≤ b ≤ 16
 
 Approximate count of distinct elements.
 
@@ -375,13 +375,14 @@ Approximate count of distinct elements.
 
     fit!(HyperLogLog(12), rand(1:10,10^5))
 """
-mutable struct HyperLogLog <: OnlineStat{Any}
+mutable struct HyperLogLog{T} <: OnlineStat{T}
     m::UInt32
     M::Vector{UInt32}
     mask::UInt32
     altmask::UInt32
     n::Int
-    function HyperLogLog(b::Integer)
+end
+function HyperLogLog(b::Integer, S::Type = Number)
         !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
         m = 0x00000001 << b
         M = zeros(UInt32, m)
@@ -392,11 +393,10 @@ mutable struct HyperLogLog <: OnlineStat{Any}
         end
         mask |= 0x00000001
         altmask = ~mask
-        new(m, M, mask, altmask, 0)
+        HyperLogLog{S}(m, M, mask, altmask, 0)
     end
-end
-function Base.show(io::IO, o::HyperLogLog)
-    print(io, "HyperLogLog($(o.m) registers, estimate = $(value(o)))")
+function Base.show(io::IO, o::HyperLogLog{T}) where {T}
+    print(io, "HyperLogLog($(o.m) registers, input = $T, estimate = $(value(o)))")
 end
 
 hash32(d::Any) = hash(d) % UInt32

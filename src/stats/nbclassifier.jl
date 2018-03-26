@@ -4,7 +4,7 @@
 
 Calculate a naive bayes classifier for classes of type `T` and `p` predictors.
 """
-mutable struct NBClassifier{T, G<:Group} <: XYStat
+mutable struct NBClassifier{T, G<:Group} <: OnlineStat{XY}
     d::OrderedDict{T, G}
     init::G
     # For trees

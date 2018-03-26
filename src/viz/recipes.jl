@@ -31,7 +31,7 @@ end
     end
 end
 
-@recipe function f(o::XYStat)
+@recipe function f(o::OnlineStat{XY})
     ylab --> "beta_j"
     xlab --> "j"
     seriestype --> :scatter

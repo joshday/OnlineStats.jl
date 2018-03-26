@@ -13,7 +13,7 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
 # Arguments 
 
 """
-mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: XYStat
+mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: OnlineStat{XY}
     β::Vector{Float64}
     λ::Vector{Float64}
     gx::Vector{Float64}

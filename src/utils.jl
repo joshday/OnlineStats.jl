@@ -1,8 +1,7 @@
 #-----------------------------------------------------------------------# General
 const Tup = Union{Tuple, NamedTuples.NamedTuple}
+const XY = Union{Pair{AbstractVector, Any}, Tuple{AbstractVector, Any}}
 const VectorOb = Union{AbstractVector, Tup}
-
-abstract type XYStat <: OnlineStat{VectorOb} end
 
 smooth(a, b, γ) = a + γ * (b - a)
 
@@ -66,20 +65,21 @@ function RowsOf(x::M) where {T, M<:AbstractMatrix{T}}
 end
 eachrow(x::AbstractMatrix) = RowsOf(x)
 Base.start(o::RowsOf) = 1
-function Base.next(o::RowsOf, i) 
-    for j in eachindex(o.buffer)
-        o.buffer[j] = o.mat[i, j]
-    end
-    o.buffer, i + 1
-end
+Base.next(o::RowsOf, i) = o[i], i + 1
 Base.done(o::RowsOf, i) = i > size(o.mat, 1)
 Base.eltype(o::Type{R}) where {T, R<:RowsOf{T}} = Vector{T}
 Base.length(o::RowsOf) = size(o.mat, 1)
+function Base.getindex(o::RowsOf, i)
+    for j in eachindex(o.buffer)
+        o.buffer[j] = o.mat[i, j]
+    end
+    o.buffer
+end
 
 #-----------------------------------------------------------------------# xyrows
 struct XYRows{T, M <: AbstractMatrix{T}, S, V <: AbstractVector{S}}
     mat::M 
-    vec::V 
+    y::V 
     buffer::Vector{T}
 end
 function XYRows(x::M, y::V) where {T,S,M<:AbstractMatrix{T},V<:AbstractVector{S}}
@@ -88,15 +88,17 @@ function XYRows(x::M, y::V) where {T,S,M<:AbstractMatrix{T},V<:AbstractVector{S}
 end
 eachrow(x::AbstractMatrix, y::AbstractVector) = XYRows(x, y)
 Base.start(o::XYRows) = 1 
-function Base.next(o::XYRows, i)
-    for j in eachindex(o.buffer)
-        o.buffer[j] = o.mat[i, j]
-    end
-    (o.buffer, o.vec[i]), i + 1
-end
+Base.next(o::XYRows, i) = o[i], i + 1
 Base.done(o::XYRows, i) = i > size(o.mat, 1)
 Base.eltype(o::Type{XYRows{T,M,S,V}}) where {T,M,S,V} = Vector{T}
 Base.length(o::XYRows) = size(o.mat, 1)
+
+function Base.getindex(o::XYRows, i) 
+    for j in eachindex(o.buffer)
+        o.buffer[j] = o.mat[i, j]
+    end
+    (o.buffer, o.y[i])
+end
 
 
 #-----------------------------------------------------------------------# eachcol
@@ -127,39 +129,18 @@ Base.length(o::ColsOf) = size(o.mat, 2)
 
 Update a stat with more data.
 """
-fit!(o::OnlineStat, item::String) = (_fit!(o, item); o)
+function fit!(o::OnlineStat{T}, yi::T) where {T}
+    _fit!(o, yi)
+    o
+end
 
-function fit!(o::OnlineStat, itr)
-    for item in itr 
-        _fit!(o, item)
+function fit!(o::OnlineStat, y)
+    for yi in y 
+        fit!(o, yi)
     end
     o
 end
 
-fit!(o::OnlineStat{VectorOb}, y::AbstractMatrix) = fit!(o, eachrow(y))
-
-function fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix, y::AbstractVector)
-    size(x, 1) == length(y) || error("Incompatible data sizes")
-    for (xi, yi) in zip(eachrow(x), y)
-        _fit!(o, (xi, yi))
-    end
-end
-
-# function fit!(o::XYStat, x::AbstractMatrix, y::AbstractVector)
-#     for (xi,yi) in zip(eachrow(x, y))
-#         _fit!(o, (xi, yi))
-#     end
-# end
-
-# function fit!(o::OnlineStat{VectorOb}, xy::Tuple{AbstractMatrix, AbstractVector})
-#     x, y = xy 
-#     n, p = size(x)
-#     buffer = Vector{eltype(x)}(undef, p)
-#     for i in 1:n 
-#         for j in 1:p 
-#             @inbounds buffer[j] = x[i, j]
-#         end
-#         _fit!(o, (buffer, y[i]))
-#     end
-#     o
-# end
+# convenience methods
+fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, eachrow(x))
+fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, eachrow(xy...))

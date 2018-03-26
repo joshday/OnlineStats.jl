@@ -13,18 +13,14 @@ Linear regression of `p` variables, optionally with element-wise ridge regulariz
     coef(o, .1)
     coef(o, [0,0,0,0,Inf])
 """
-mutable struct LinReg{W} <: XYStat
+mutable struct LinReg{W} <: OnlineStat{XY}
     β::Vector{Float64}
     A::Matrix{Float64}
     weight::W
     n::Int
 end
-LinReg(;weight=EqualWeight()) = LinReg(zeros(0), zeros(1, 1), weight, 0)
+LinReg(p=0;weight=EqualWeight()) = LinReg(zeros(p), zeros(1, 1), weight, 0)
 
-# function matviews(o::LinReg)
-#     p = length(o.β)
-#     @views o.A[1:p, 1:p], o.A[1:p, end]
-# end
 function _fit!(o::LinReg, xy)
     γ = o.weight(o.n += 1)
     x, y = xy 

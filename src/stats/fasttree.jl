@@ -1,4 +1,4 @@
-mutable struct FastNode{G<:Group} <: XYStat
+mutable struct FastNode{G<:Group} <: OnlineStat{XY}
     stats::Vector{G}
     ids::Vector{Int}  # self, left, right
     j::Int
@@ -11,7 +11,10 @@ end
 Base.show(io::IO, o::FastNode) = 
     print(io, "FastNode | $(nkeys(o)) keys × $(nvars(o)) vars | at=$((o.j, o.at))")
 
-_fit!(o::FastNode, xy) = _fit!(o.stats[last(xy)], first(xy))
+function _fit!(o::FastNode, xy) 
+    last(xy) in 1:nkeys(o) || error("y must be an integer in 1:nkeys")
+    _fit!(o.stats[last(xy)], first(xy))
+end
 nobs(o::FastNode) = sum(nobs, o.stats)
 probs(o::FastNode) = nobs.(o.stats) ./ nobs(o)
 nkeys(o::FastNode) = length(o.stats)
@@ -103,7 +106,7 @@ Calculate a decision tree of `p` predictors variables and classes `1, 2, …, nc
 Nodes split when they reach `splitsize` observations until `maxsize` nodes are in the tree.
 Each variable is summarized by `stat`, which can be `FitNormal()` or `Hist(nbins)`.
 """
-struct FastTree{T<:FastNode} <: XYStat
+struct FastTree{T<:FastNode} <: OnlineStat{XY}
     tree::Vector{T}
     maxsize::Int 
     splitsize::Int
@@ -143,7 +146,7 @@ function classify(o::FastTree, x::AbstractMatrix)
 end
 
 #-----------------------------------------------------------------------# FastForest 
-struct FastForest{T<:FastTree} <: XYStat
+struct FastForest{T<:FastTree} <: OnlineStat{XY}
     forest::Vector{T}
     subsets::Matrix{Int}
     p::Int 
