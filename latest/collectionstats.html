@@ -3,14 +3,14 @@
 
 s = Series(Mean(), Variance())
 fit!(s, y)</code></pre><pre><code class="language-none">Series
-  ├── Mean: 0.491257
-  └── Variance: 0.086594</code></pre></div><h2><a class="nav-anchor" id="FTSeries-1" href="#FTSeries-1"><code>FTSeries</code></a></h2><p>An <code>FTSeries</code> tracks stats that should be applied to the <strong>same</strong> data stream, but filters and transforms (hence <code>FT</code>) the input data before it is sent to its stats. </p><div><pre><code class="language-julia">s = FTSeries(Mean(), Variance(); filter = x-&gt;true, transform = abs)
+  ├── Mean: n=1000 | value=0.491257
+  └── Variance: n=1000 | value=0.086594</code></pre></div><h2><a class="nav-anchor" id="FTSeries-1" href="#FTSeries-1"><code>FTSeries</code></a></h2><p>An <code>FTSeries</code> tracks stats that should be applied to the <strong>same</strong> data stream, but filters and transforms (hence <code>FT</code>) the input data before it is sent to its stats. </p><div><pre><code class="language-julia">s = FTSeries(Mean(), Variance(); filter = x-&gt;true, transform = abs)
 fit!(s, -y)</code></pre><pre><code class="language-none">FTSeries
-  ├── Mean: 0.491257
-  └── Variance: 0.086594</code></pre></div><h2><a class="nav-anchor" id="Group-1" href="#Group-1"><code>Group</code></a></h2><p>A <code>Group</code> tracks stats that should be applied to <strong>different</strong> data streams.</p><div><pre><code class="language-julia">g = Group(Mean(), CountMap(Bool))
+  ├── Mean: n=1000 | value=0.491257
+  └── Variance: n=1000 | value=0.086594</code></pre></div><h2><a class="nav-anchor" id="Group-1" href="#Group-1"><code>Group</code></a></h2><p>A <code>Group</code> tracks stats that should be applied to <strong>different</strong> data streams.</p><div><pre><code class="language-julia">g = Group(Mean(), CountMap(Bool))
 
 itr = zip(randn(100), rand(Bool, 100))
 
 fit!(g, itr)</code></pre><pre><code class="language-none">Group
-  ├── Mean: -0.0635903
-  └── CountMap: DataStructures.OrderedDict(true=&gt;43,false=&gt;57)</code></pre></div><footer><hr/><a class="previous" href="index.html"><span class="direction">Previous</span><span class="title">Basics</span></a><a class="next" href="weights.html"><span class="direction">Next</span><span class="title">Weight</span></a></footer></article></body></html>
+  ├── Mean: n=100 | value=-0.0635903
+  └── CountMap: n=100 | value=DataStructures.OrderedDict(true=&gt;43,false=&gt;57)</code></pre></div><footer><hr/><a class="previous" href="index.html"><span class="direction">Previous</span><span class="title">Basics</span></a><a class="next" href="weights.html"><span class="direction">Next</span><span class="title">Weight</span></a></footer></article></body></html>
