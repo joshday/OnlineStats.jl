@@ -375,7 +375,17 @@ end
 end
 #-----------------------------------------------------------------------# Partition 
 @testset "Partition" begin 
-
+    test_exact(Partition(Mean()), y, nobs, length)
+    # merging
+    o = fit!(Partition(Mean(), 1000), y)
+    o2 = fit!(Partition(Mean(), 1000), y2)
+    merge!(o, o2)
+    fit!(o2, y)
+    @test nobs(o) == nobs(o2)
+    @test all(nobs.(o.parts) .== nobs.(o2.parts))
+    for i in 1:5
+        @test value(o.parts[i]) ≈ value(o2.parts[500 + i])
+    end
 end
 #-----------------------------------------------------------------------# ProbMap 
 @testset "ProbMap" begin 

@@ -3,7 +3,7 @@ abstract type AbstractPartition{N} <: OnlineStat{N} end
 nobs(o::AbstractPartition) = isempty(o.parts) ? 0 : sum(nobs, o.parts)
 
 #-----------------------------------------------------------------------# Part 
-mutable struct Part{T, O <: OnlineStat} <: OnlineStat{VectorOb} 
+mutable struct Part{T, O <: OnlineStat} <: OnlineStat{XY} 
     stat::O 
     a::T
     b::T 
@@ -41,6 +41,22 @@ function _fit!(p::Part, xy)
     _fit!(p.stat, y)
 end
 
+function merge_next!(parts::Vector{<:Part})
+    n = nobs(parts[1])
+    ind = 1
+    for (i, p) in enumerate(parts)
+        if nobs(p) < n 
+            ind = i 
+            break
+        end
+    end
+    if ind == length(parts)
+        ind -= 1
+    end
+    merge!(parts[ind], parts[ind+1])
+    deleteat!(parts, ind + 1)
+end
+
 #-----------------------------------------------------------------------# Partition 
 """
     Partition(stat, nparts=100)
@@ -63,22 +79,21 @@ function _fit!(o::Partition, y)
         stat = fit!(copy(o.init), y)
         push!(o.parts, Part(stat, n + 1, n + nobs(lastpart)))
     end
-    if (length(o.parts) > o.b) && isfull(o.parts[end])
-        n = nobs(o.parts[1])
-        ind = 1
-        for (i, p) in enumerate(o.parts)
-            if nobs(p) < n 
-                ind = i 
-                break
-            end
-        end
-        merge!(o.parts[ind], o.parts[ind+1])
-        deleteat!(o.parts, ind+1)
+    (length(o.parts) > o.b) && isfull(o.parts[end]) && merge_next!(o.parts)
+end
+function Base.merge!(o::Partition, o2::Partition)
+    n = nobs(o)
+    for p in o2.parts
+        push!(o.parts, Part(copy(p.stat), p.a + n, p.b + n))
     end
+    while length(o.parts) > o.b
+        merge_next!(o.parts)
+    end
+    o
 end
 
 #-----------------------------------------------------------------------# IndexedPartition
-struct IndexedPartition{IN, O<:OnlineStat{IN}, T} <: AbstractPartition{VectorOb}
+struct IndexedPartition{IN, O<:OnlineStat{IN}, T} <: AbstractPartition{XY}
     parts::Vector{Part{T, O}}
     b::Int
     init::O
@@ -97,7 +112,7 @@ function _fit!(o::IndexedPartition, xy)
         end
     end
     addpart && push!(o.parts, Part(fit!(copy(o.init), y), x, x))
-    if length(o.parts) > o.b 
+    if length(o.parts) > o.b
         sort!(o.parts)
         diff = o.parts[2].a - o.parts[1].b
         ind = 1
