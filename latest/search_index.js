@@ -33,9 +33,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Every-Stat-is-a-Type-(:-OnlineStat)-1",
+    "location": "index.html#Every-Stat-is-:-OnlineStat-1",
     "page": "Basics",
-    "title": "Every Stat is a Type (<: OnlineStat)",
+    "title": "Every Stat is <: OnlineStat",
     "category": "section",
     "text": "using OnlineStats\n\nm = Mean()"
 },
@@ -49,19 +49,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Stats-Have-a-Value-1",
-    "page": "Basics",
-    "title": "Stats Have a Value",
-    "category": "section",
-    "text": "value(m)"
-},
-
-{
     "location": "index.html#Stats-Can-Be-Merged-1",
     "page": "Basics",
     "title": "Stats Can Be Merged",
     "category": "section",
-    "text": "y2 = randn(100)\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
+    "text": "y2 = randn(100)\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)"
+},
+
+{
+    "location": "index.html#Stats-Have-a-Value-1",
+    "page": "Basics",
+    "title": "Stats Have a Value",
+    "category": "section",
+    "text": "value(m)<img width = 200 src = \"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\">"
 },
 
 {
@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Collections of Stats",
     "title": "Collections of Stats",
     "category": "section",
-    "text": "using OnlineStatsSeveral OnlineStats act as a collection of other OnlineStats."
+    "text": "using OnlineStats"
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Collections of Stats",
     "title": "Group",
     "category": "section",
-    "text": "A Group tracks stats that should be applied to different data streams.g = Group(Mean(), Variance())\nfit!(g, randn(1000, 2))"
+    "text": "A Group tracks stats that should be applied to different data streams.g = Group(Mean(), CountMap(Bool))\n\nitr = zip(randn(100), rand(Bool, 100))\n\nfit!(g, itr)"
 },
 
 {
@@ -357,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Demos",
     "title": "Demos",
     "category": "section",
-    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.   To sync the notebooks to JuliaBox:"
+    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.  "
 },
 
 {
