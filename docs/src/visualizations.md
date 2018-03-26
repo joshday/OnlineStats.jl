@@ -173,9 +173,9 @@ savefig("indexpartequal.png"); nothing # hide
 ```@example setup 
 x2 = Dates.value.(x)
 
-o2 = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
+o = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
 
-plot(o, xlab = "Date as Number)
+plot(o, xlab = "Date as Number")
 savefig("indexpartequal2.png"); nothing # hide
 ```
 ![](indexpartequal2.png)
