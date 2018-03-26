@@ -532,7 +532,11 @@ First four non-central moments.
 
 # Example
 
-    fit!(Moments(), randn(1000))
+    o = fit!(Moments(), randn(1000))
+    mean(o)
+    var(o)
+    skewness(o)
+    kurtosis(o)
 """
 mutable struct Moments{W} <: OnlineStat{Number}
     m::Vector{Float64}
@@ -552,7 +556,8 @@ Base.mean(o::Moments) = o.m[1]
 Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
 function skewness(o::Moments)
     v = value(o)
-    (v[3] - 3.0 * v[1] * var(o) - v[1] ^ 3) / var(o) ^ 1.5
+    vr = o.m[2] - o.m[1]^2
+    (v[3] - 3.0 * v[1] * vr - v[1] ^ 3) / vr ^ 1.5
 end
 function kurtosis(o::Moments)
     v = value(o)

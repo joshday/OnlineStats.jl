@@ -76,6 +76,28 @@ Base.done(o::RowsOf, i) = i > size(o.mat, 1)
 Base.eltype(o::Type{R}) where {T, R<:RowsOf{T}} = Vector{T}
 Base.length(o::RowsOf) = size(o.mat, 1)
 
+#-----------------------------------------------------------------------# xyrows
+struct XYRows{T, M <: AbstractMatrix{T}, S, V <: AbstractVector{S}}
+    mat::M 
+    vec::V 
+    buffer::Vector{T}
+end
+function XYRows(x::M, y::V) where {T,S,M<:AbstractMatrix{T},V<:AbstractVector{S}}
+    size(x,1) == length(y) || error("incompatible dimensions")
+    XYRows{T,M,S,V}(x, y, zeros(T, size(x, 2)))
+end
+eachrow(x::AbstractMatrix, y::AbstractVector) = XYRows(x, y)
+Base.start(o::XYRows) = 1 
+function Base.next(o::XYRows, i)
+    for j in eachindex(o.buffer)
+        o.buffer[j] = o.mat[i, j]
+    end
+    (o.buffer, o.vec[i]), i + 1
+end
+Base.done(o::XYRows, i) = i > size(o.mat, 1)
+Base.eltype(o::Type{XYRows{T,M,S,V}}) where {T,M,S,V} = Vector{T}
+Base.length(o::XYRows) = size(o.mat, 1)
+
 
 #-----------------------------------------------------------------------# eachcol
 struct ColsOf{T, M <: AbstractMatrix{T}}
@@ -97,7 +119,14 @@ Base.done(o::ColsOf, i) = i > size(o.mat, 2)
 Base.eltype(o::Type{C}) where {T, C<:ColsOf{T}} = Vector{T}
 Base.length(o::ColsOf) = size(o.mat, 2)
 
+
+
 #-----------------------------------------------------------------------# fit!
+"""
+    fit!(o::OnlineStat, data)
+
+Update a stat with more data.
+"""
 fit!(o::OnlineStat, item::String) = (_fit!(o, item); o)
 
 function fit!(o::OnlineStat, itr)
@@ -109,15 +138,28 @@ end
 
 fit!(o::OnlineStat{VectorOb}, y::AbstractMatrix) = fit!(o, eachrow(y))
 
-function fit!(o::OnlineStat{VectorOb}, y::Tup)
-    x, y = y 
-    n, p = size(x)
-    buffer = Vector{eltype(x)}(undef, p)
-    for i in 1:n 
-        for j in 1:p 
-            @inbounds buffer[j] = x[i, j]
-        end
-        _fit!(o, (buffer, y[i]))
+function fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix, y::AbstractVector)
+    size(x, 1) == length(y) || error("Incompatible data sizes")
+    for (xi, yi) in zip(eachrow(x), y)
+        _fit!(o, (xi, yi))
     end
-    o
 end
+
+# function fit!(o::XYStat, x::AbstractMatrix, y::AbstractVector)
+#     for (xi,yi) in zip(eachrow(x, y))
+#         _fit!(o, (xi, yi))
+#     end
+# end
+
+# function fit!(o::OnlineStat{VectorOb}, xy::Tuple{AbstractMatrix, AbstractVector})
+#     x, y = xy 
+#     n, p = size(x)
+#     buffer = Vector{eltype(x)}(undef, p)
+#     for i in 1:n 
+#         for j in 1:p 
+#             @inbounds buffer[j] = x[i, j]
+#         end
+#         _fit!(o, (buffer, y[i]))
+#     end
+#     o
+# end

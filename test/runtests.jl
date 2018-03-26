@@ -126,6 +126,7 @@ end
     test_merge(CountMap(SortedDict{Bool, Int}()), trues(100), falses(100), ==)
     test_merge(CountMap(SortedDict{Int, Int}()), rand(1:4, 100), rand(5:123, 50), ==)
     test_merge(CountMap(SortedDict{Int, Int}()), rand(1:4, 100), rand(5:123, 50), ==)
+    test_merge(CountMap(SortedDict{String,Int}()), rand(["A","B"], 100), rand(["A","C"], 100), ==)
     o = fit!(CountMap(Int), [1,2,3,4])
     @test all([1,2,3,4] .∈ keys(o.value))
     @test probs(o) == fill(.25, 4)
