@@ -111,7 +111,6 @@ end
 @recipe f(o::AbstractPartition, fun=value) = o.parts, fun
 
 @recipe function f(parts::Vector{Part{T, O}}, fun) where {T, O}
-    color --> :viridis
     sort!(parts)
     y = map(part -> fun(part.stat), parts)
     x = midpoint.(parts)
@@ -136,6 +135,7 @@ end
         marker_z --> log.(z)
         ylab --> "log(prob)"
         markerstrokewidth --> 0
+        color --> :viridis
         x2, y2
     elseif y[1] isa VectorOb
         lab --> name(parts[1].stat, false, false)
