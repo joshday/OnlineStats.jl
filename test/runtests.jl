@@ -185,8 +185,7 @@ end
 end
 #-----------------------------------------------------------------------# FastTree 
 @testset "FastTree" begin 
-    X = randn(10^4, 10)
-    Y = [rand() < 1 / (1 + exp(-η)) for η in X*(1:10)] .+ 1
+    X, Y = O.fakedata(FastNode, 10^4, 10)
     o = fit!(FastTree(10; splitsize=100), (X,Y))
     @test classify(o, X[1,:]) ∈ [1, 2]
     @test all(0 .< classify(o, X) .< 3)
@@ -194,11 +193,10 @@ end
     @test O.nvars(o) == 10
 end
 #-----------------------------------------------------------------------# FastForest 
-# @testset "FastForest" begin 
-#     X = randn(10^4, 10)
-#     Y = [rand() < 1 / (1 + exp(-η)) for η in X*(1:10)] .+ 1
-#     o = fit!(FastForest(10; splitsize = 100), (X,Y))
-# end
+@testset "FastForest" begin 
+    X, Y = O.fakedata(FastNode, 10^4, 10)
+    o = fit!(FastForest(10), (X,Y))
+end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin 
 @testset "FitBeta" begin 

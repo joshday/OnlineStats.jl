@@ -115,8 +115,13 @@ function FastTree(p, nkeys=2; stat = FitNormal(), maxsize=5000, splitsize=1000)
     tree = [FastNode(p, nkeys; stat=stat)]
     FastTree(tree, maxsize, splitsize)
 end
-Base.show(io::IO, o::FastTree) = 
-    print(io, "FastTree(size=$(length(o.tree)), maxsize=$(o.maxsize), splitsize=$(o.splitsize))")
+function Base.show(io::IO, o::FastTree)
+    print(io, "FastTree(n=", nobs(o))
+    print(io, ", size=", length(o.tree))
+    print(io, ", maxsize=", o.maxsize)
+    print(io, ", splitsize=", o.splitsize)
+end
+nobs(o::FastTree) = nobs(o.tree[1])
 nkeys(o::FastTree) = nkeys(o.tree[1])
 nvars(o::FastTree) = nvars(o.tree[1])
 Base.length(o::FastTree) = length(o.tree)
@@ -146,11 +151,12 @@ function classify(o::FastTree, x::AbstractMatrix)
 end
 
 #-----------------------------------------------------------------------# FastForest 
-struct FastForest{T<:FastTree} <: OnlineStat{XY}
+mutable struct FastForest{T<:FastTree} <: OnlineStat{XY}
     forest::Vector{T}
     subsets::Matrix{Int}
     p::Int 
     λ::Float64
+    n::Int
 end
 function FastForest(p, nkeys=2; stat = FitNormal(), maxsize=1000, splitsize = 5000,
                     nt=100, b=floor(Int, sqrt(p)), λ = .05)
@@ -159,18 +165,20 @@ function FastForest(p, nkeys=2; stat = FitNormal(), maxsize=1000, splitsize = 50
     for j in 1:size(subsets, 2)
         subsets[:, j] = sample(1:p, b; replace=false)
     end
-    FastForest(forest, subsets, p, λ)
+    FastForest(forest, subsets, p, λ, 0)
 end
 nkeys(o::FastForest) = maximum(nkeys(tree) for tree in o.forest)
 function Base.show(io::IO, o::FastForest)
     print(io, "FastForest(")
-    print(io, "nt=", length(o.forest))
+    print(io, "n=", nobs(o))
+    print(io, ", nt=", length(o.forest))
     print(io, ", b=", size(o.subsets, 1))
     print(io, ", avg_size=", mean(length, o.forest))
     print(io, ")")
 end
 function _fit!(o::FastForest, xy)
     x, y = xy
+    o.n += 1
     for (tree, subset) in zip(o.forest, eachcol(o.subsets))
         rand() < o.λ && fit!(tree, (x[subset], y))
     end
