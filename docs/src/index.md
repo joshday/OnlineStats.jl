@@ -10,7 +10,7 @@ Pkg.add("OnlineStats")
 
 ## Usage
 
-### Every Stat is a Type (`<: OnlineStat`)
+### Every Stat is `<: OnlineStat`
 
 ```@example index
 using OnlineStats
@@ -26,12 +26,6 @@ y = randn(100)
 fit!(m, y)
 ```
 
-### Stats Have a Value 
-
-```@example index
-value(m)
-```
-
 ### Stats Can Be Merged 
 
 ```@example index 
@@ -40,6 +34,12 @@ y2 = randn(100)
 m2 = fit!(Mean(), y2)
 
 merge!(m, m2)
+```
+
+### Stats Have a Value 
+
+```@example index
+value(m)
 ```
 
 ```@raw html

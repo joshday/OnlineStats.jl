@@ -4,8 +4,6 @@
 using OnlineStats
 ```
 
-Several `OnlineStat`s act as a collection of other `OnlineStat`s.
-
 ## `Series`
 A `Series` tracks stats that should be applied to the **same** data stream.
 
@@ -30,6 +28,9 @@ fit!(s, -y)
 A `Group` tracks stats that should be applied to **different** data streams.
 
 ```@example collections 
-g = Group(Mean(), Variance())
-fit!(g, randn(1000, 2))
+g = Group(Mean(), CountMap(Bool))
+
+itr = zip(randn(100), rand(Bool, 100))
+
+fit!(g, itr)
 ```
