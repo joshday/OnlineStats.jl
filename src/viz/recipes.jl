@@ -120,34 +120,36 @@ end
     if y[1] isa Number
         lab --> name(parts[1].stat, false, false)
         x, y
-    elseif y[1] isa Tuple{VectorOb, VectorOb}
+    elseif y[1] isa Tuple{VectorOb, VectorOb}  # Histogram
         x2, y2, z = eltype(x)[], [], []
+        n = sum(nobs, parts)
         for i in eachindex(y)
             values, counts = y[i]
             for j in eachindex(values)
                 push!(x2, x[i])
                 push!(y2, values[j])
-                push!(z, counts[j] / sum(counts))
+                push!(z, counts[j] / n)
             end
         end
         seriestype --> :scatter 
-        marker_z --> z
+        marker_z --> log.(z)
+        ylab --> "log(prob)"
         markerstrokewidth --> 0
-        color --> :blues
+        color --> :viridis
         x2, y2
-        # line_z --> plotshape([yi[2] for yi in y])
-        # x, plotshape([yi[1] for yi in y])
     elseif y[1] isa VectorOb
         lab --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
+        x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
+        @show x2
         if length(y[1]) == 2 
             fillto --> y2[:, 1]
             alpha --> .4
-            x, y2[:, 2]
+            x2, y2[:, 2]
         else
-            x, y2 
+            x2, y2 
         end
-    elseif y[1] isa AbstractDict
+    elseif y[1] isa AbstractDict  # CountMap
         kys = []
         for item in y, ky in keys(item)
             ky ∉ kys && push!(kys, ky)

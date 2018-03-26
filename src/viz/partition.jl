@@ -93,7 +93,21 @@ function Base.merge!(o::Partition, o2::Partition)
 end
 
 #-----------------------------------------------------------------------# IndexedPartition
-struct IndexedPartition{IN, O<:OnlineStat{IN}, T} <: AbstractPartition{XY}
+"""
+    IndexedPartition(T, stat, b=100)
+
+Summarize data with `stat` over a partition of size `b` where the data is indexed by a 
+variable of type `T`.
+
+# Example 
+
+    o = IndexedPartition(Float64, Hist(10))
+    fit!(o, randn(10^4, 2))
+
+    using Plots 
+    plot(o)
+"""
+struct IndexedPartition{IN, O<:OnlineStat{IN}, T} <: AbstractPartition{VectorOb}
     parts::Vector{Part{T, O}}
     b::Int
     init::O
@@ -114,10 +128,10 @@ function _fit!(o::IndexedPartition, xy)
     addpart && push!(o.parts, Part(fit!(copy(o.init), y), x, x))
     if length(o.parts) > o.b
         sort!(o.parts)
-        diff = o.parts[2].a - o.parts[1].b
+        diff = get_diff(o.parts[1], o.parts[2])
         ind = 1
         for i in 2:(length(o.parts) - 1)
-            newdiff = o.parts[i+1].a - o.parts[i].b
+            newdiff = get_diff(o.parts[i], o.parts[i+1])
             if newdiff < diff 
                 diff = newdiff 
                 ind = i 
@@ -127,3 +141,7 @@ function _fit!(o::IndexedPartition, xy)
         deleteat!(o.parts, ind + 1)
     end
 end
+
+get_diff(a::Part{T}, b::Part{T}) where {T<:Dates.TimeType} = b.a - a.b
+
+get_diff(a::Part{T}, b::Part{T}) where {T<:Number} = (b.a - a.b) * (nobs(a) + nobs(b)) / 2

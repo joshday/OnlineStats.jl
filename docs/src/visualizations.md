@@ -121,23 +121,12 @@ savefig("partition_countmap.png"); nothing # hide
 The `Partition` type can only track the number of observations in the x-axis.  If you wish
 to plot one variable against another, you can use an `IndexedPartition`.  
 
-```@example setup
-x = rand(Date(2000):Date(2020), 10^5)
-y = Dates.year.(x) + randn(10^5)
-
-o = fit!(IndexedPartition(Date, Hist(20)), [x y])
-
-plot(o, xlab = "Date")
-savefig("indexpart1.png"); nothing # hide
-```
-![](indexpart1.png)
-
 
 ```@example setup
 x = randn(10^5)
 y = x + randn(10^5)
 
-o = fit!(IndexedPartition(Float64, Hist(20)), [x y])
+o = fit!(IndexedPartition(Float64, Hist(10)), [x y])
 
 plot(o, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
@@ -165,3 +154,28 @@ plot(o, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide
 ```
 ![](indexpart4.png)
+
+!!! note
+    `IndexedPartition` is designed to work with `Number` index types.  While other types may work, you may get some unexpected behavior.
+
+```@example setup
+x = rand(Date(2000):Date(2020), 10^5)
+y = Dates.year.(x) + randn(10^5)
+
+o = fit!(IndexedPartition(Date, Hist(20)), [x y])
+
+plot(o, xlab = "Date")
+savefig("indexpartequal.png"); nothing # hide
+
+```
+![](indexpartequal.png)
+
+```@example setup 
+x2 = Dates.value.(x)
+
+o2 = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
+
+plot(o, xlab = "Date as Number)
+savefig("indexpartequal2.png"); nothing # hide
+```
+![](indexpartequal2.png)

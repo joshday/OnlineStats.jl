@@ -321,9 +321,16 @@ end
     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
     test_merge(HyperLogLog(4), y, y2)
 end
+#-----------------------------------------------------------------------# IndexedPartition 
+@testset "IndexedPartition" begin 
+    o = IndexedPartition(Float64, Mean())
+    fit!(o, [y y2])
+end
+#-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin 
     o = fit!(KMeans(5,2), x)
 end
+#-----------------------------------------------------------------------# LinReg
 @testset "LinReg" begin 
     test_exact(LinReg(), (x,y), value, x\y)
     test_merge(LinReg(), (x,y), (x2,y2))
