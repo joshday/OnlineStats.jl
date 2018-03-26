@@ -485,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitBeta",
     "category": "type",
-    "text": "FitBeta(; weight)\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\n\n\n"
+    "text": "FitBeta(; weight)\n\nOnline parameter estimate of a Beta distribution (Method of Moments).\n\nExample\n\no = fit!(FitBeta(), rand(1000))\n\n\n\n"
 },
 
 {
@@ -493,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitCauchy",
     "category": "type",
-    "text": "FitCauchy(; alg, rate)\n\nApproximate parameter estimation of a Cauchy distribution.  Estimates are based on quantiles, so that alg will be passed to Quantile.\n\n\n\n"
+    "text": "FitCauchy(; alg, rate)\n\nApproximate parameter estimation of a Cauchy distribution.  Estimates are based on quantiles, so that alg will be passed to Quantile.\n\nExample\n\no = fit!(FitCauchy(), randn(1000))\n\n\n\n"
 },
 
 {
@@ -501,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitGamma",
     "category": "type",
-    "text": "FitGamma(; weight)\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\n\n\n"
+    "text": "FitGamma(; weight)\n\nOnline parameter estimate of a Gamma distribution (Method of Moments).\n\nExample\n\no = fit!(FitGamma(), randexp(10^5))\n\n\n\n"
 },
 
 {
@@ -509,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitLogNormal",
     "category": "type",
-    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\n\n\n"
+    "text": "FitLogNormal()\n\nOnline parameter estimate of a LogNormal distribution (MLE).\n\nExample\n\no = fit!(FitLogNormal(), exp.(randn(10^5)))\n\n\n\n"
 },
 
 {
@@ -517,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMultinomial",
     "category": "type",
-    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\n\n\n"
+    "text": "FitMultinomial(p)\n\nOnline parameter estimate of a Multinomial distribution.  The sum of counts does not need to be consistent across observations.  Therefore, the n parameter of the Multinomial distribution is returned as 1.\n\nExample\n\nx = [1 2 3; 4 8 12]\nfit!(FitMultinomial(3), x)\n\n\n\n"
 },
 
 {
@@ -525,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitMvNormal",
     "category": "type",
-    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\n\n\n"
+    "text": "FitMvNormal(d)\n\nOnline parameter estimate of a d-dimensional MvNormal distribution (MLE).\n\nExample\n\ny = randn(100, 2)\no = fit!(FitMvNormal(2), y)\n\n\n\n"
 },
 
 {
@@ -533,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FitNormal",
     "category": "type",
-    "text": "FitNormal()\n\nCalculate the parameters of a normal distribution via maximum likelihood.\n\n\n\n"
+    "text": "FitNormal()\n\nCalculate the parameters of a normal distribution via maximum likelihood.\n\nExample\n\no = fit!(FitNormal(), randn(1000))\n\n\n\n"
 },
 
 {
@@ -621,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Mosaic",
     "category": "type",
-    "text": "Mosaic(T::Type, S::Type)\n\nData structure for generating a mosaic plot, a comparison between two categorical variables.\n\nExample\n\nusing OnlineStats, Plots \nx = [rand() > .8 for i in 1:10^5]\ny = rand([1,2,2,3,3,3], 10^5)\ns = series([x y], Mosaic(Bool, Int))\nplot(s)\n\n\n\n"
+    "text": "Mosaic(T::Type, S::Type)\n\nData structure for generating a mosaic plot, a comparison between two categorical variables.\n\nExample\n\nusing OnlineStats, Plots \nx = [rand() > .8 for i in 1:10^5]\ny = rand([1,2,2,3,3,3], 10^5)\no = fit!(Mosaic(Bool, Int), zip(x, y))\nplot(o)\n\n\n\n"
 },
 
 {
