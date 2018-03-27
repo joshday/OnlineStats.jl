@@ -777,6 +777,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.GroupProcessor",
+    "page": "API",
+    "title": "OnlineStats.GroupProcessor",
+    "category": "type",
+    "text": "GroupProcessor(group)\nOnlineStats.preprocess(itr, hints::Pair...)\n\nAn object for standardizing continuous variables and creating one-hot vectors of  categorical variables.\n\nExample\n\ngp = OnlineStats.preprocess(zip(randn(1000), rand(\'a\':\'f\', 1000)))\ntransform!(gp, [1.0, \'a\'])\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Part",
     "page": "API",
     "title": "OnlineStats.Part",
