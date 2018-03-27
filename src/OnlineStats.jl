@@ -9,7 +9,7 @@ using Reexport
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
 import OnlineStatsBase: OnlineStat, name, value, _fit!
-import LearnBase: fit!, nobs, value, predict
+import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
     fweights, sample, coef, Histogram
 import DataStructures: OrderedDict
@@ -20,7 +20,7 @@ import SweepOperator
 export 
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    eachcol, eachrow, classify, coef, transform!,
+    eachcol, eachrow, classify, coef, transform, transform!,
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,

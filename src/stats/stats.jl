@@ -499,6 +499,22 @@ end
 GroupProcessor(g::Group) = GroupProcessor(g, zeros(sum(_width, g.stats)))
 nobs(o::GroupProcessor) = nobs(o.group)
 
+function Base.show(io::IO, o::GroupProcessor)
+    print(io, "GroupProcessor:")
+    for (i, stat) in enumerate(o.group.stats)
+        char = i == length(o.group.stats) ? '└' : '├'
+        s = ""
+        if stat isa Variance 
+            s = "📈 | μ = $(mean(stat)), σ = $(std(stat))"
+        elseif stat isa CountMap 
+            s = "📊 | ncategories = $(nkeys(stat))"
+        else
+            s = "-"
+        end
+        print(io, "\n  $(char)── $s")
+    end
+end
+
 function transform!(o::GroupProcessor, x::VectorOb)
     i = 0
     for (xi, stat) in zip(x, o.group.stats)
@@ -508,6 +524,17 @@ function transform!(o::GroupProcessor, x::VectorOb)
         end
     end
     o.x
+end
+
+function transform(o::GroupProcessor, x::AbstractMatrix)
+    out = zeros(size(x, 1), _width(o))
+    for (i, row) in enumerate(eachrow(x))
+        transform!(o, row)
+        for j in 1:size(out, 2)
+            out[i, j] = o.x[j]
+        end
+    end
+    out
 end
 
 function preprocess(itr, hints::Pair...) 
@@ -535,6 +562,7 @@ mlstat(y) = Ignored()
 mlstat(y::Number) = Variance() 
 mlstat(y::T) where {T<:Union{Bool, AbstractString, Char, Symbol}} = CountMap(T)
 
+_width(o::GroupProcessor) = sum(_width, o.group.stats)
 _width(o::Variance) = 1 
 _width(o::CountMap) = nkeys(o) - 1 
 _width(o::Ignored) = 0

@@ -281,6 +281,14 @@ end
     @test length(o.group) == 2 
 
     @test length(transform!(o, ['a','b'])) == 6
+
+    o = OnlineStats.preprocess(eachrow(x))
+    for m in mean(transform(o, x), 1)
+        @test ≈(m, 0; atol=1e-8)
+    end
+    for s in std(transform(o, x), 1)
+        @test ≈(s, 1; atol=1e-8)
+    end
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin 
