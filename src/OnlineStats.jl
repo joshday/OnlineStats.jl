@@ -20,7 +20,7 @@ import SweepOperator
 export 
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    eachcol, eachrow, classify, coef,
+    eachcol, eachrow, classify, coef, transform!,
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
@@ -36,10 +36,10 @@ export
     FastNode, FastTree, FastForest, FTSeries, 
     Group,
     Hist, HyperLogLog,
-    IndexedPartition,
+    Ignored, IndexedPartition,
     KMeans,
     Lag, LinReg, LinRegBuilder,
-    Mean, Moments, Mosaic,
+    Mean, ModelSchema, Moments, Mosaic,
     NBClassifier,
     OrderStats,
     Partition, ProbMap, P2Quantile,
@@ -59,7 +59,6 @@ include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")
 include("stats/linreg.jl")
 include("stats/statlearn.jl")
-include("stats/ml.jl")
 include("viz/partition.jl")
 include("viz/mosaic.jl")
 include("viz/recipes.jl")

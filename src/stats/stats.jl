@@ -8,6 +8,113 @@ function Base.show(io::IO, o::StatCollection)
     end
 end
 
+#-----------------------------------------------------------------------# Variance 
+"""
+    Variance(; weight=EqualWeight())
+
+Univariate variance.
+
+# Example 
+
+    @time fit!(Variance(), randn(10^6))
+"""
+mutable struct Variance{W} <: OnlineStat{Number}
+    σ2::Float64 
+    μ::Float64 
+    weight::W
+    n::Int
+end
+Variance(;weight = EqualWeight()) = Variance(0.0, 0.0, weight, 0)
+function _fit!(o::Variance, x)
+    μ = o.μ
+    γ = o.weight(o.n += 1)
+    o.μ = smooth(o.μ, x, γ)
+    o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
+end
+function Base.merge!(o::Variance, o2::Variance)
+    γ = o2.n / (o.n += o2.n)
+    δ = o2.μ - o.μ
+    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
+    o.μ = smooth(o.μ, o2.μ, γ)
+    o
+end
+value(o::Variance) = o.n > 0 ? o.σ2 * unbias(o) : 0.0
+Base.var(o::Variance) = value(o)
+Base.mean(o::Variance) = o.μ
+
+#-----------------------------------------------------------------------# AutoCov and Lag
+"""
+    Lag(b, T = Float64)
+
+Store the last `b` values for a data stream of type `T`.
+"""
+struct Lag{T} <: OnlineStat{Any}
+    value::Vector{T}
+end
+Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
+function _fit!(o::Lag{T}, y::T) where {T} 
+    for i in reverse(2:length(o.value))
+        @inbounds o.value[i] = o.value[i - 1]
+    end
+    o.value[1] = y
+end
+
+"""
+    AutoCov(b, T = Float64; weight=EqualWeight())
+
+Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
+
+# Example 
+
+    y = cumsum(randn(100))
+    o = AutoCov(5)
+    fit!(o, y)
+    autocov(o)
+    autocor(o)
+"""
+struct AutoCov{T, W} <: OnlineStat{Number}
+    cross::Vector{Float64}
+    m1::Vector{Float64}
+    m2::Vector{Float64}
+    lag::Lag{T}         # y_{t-1}, y_{t-2}, ...
+    wlag::Lag{Float64}  # γ_{t-1}, γ_{t-2}, ...
+    v::Variance{W}
+end
+function AutoCov(k::Integer, T = Float64; kw...)
+    d = k + 1
+    AutoCov(zeros(d), zeros(d), zeros(d), Lag(d, T), Lag(d, Float64), Variance(;kw...))
+end
+nobs(o::AutoCov) = nobs(o.v)
+
+function _fit!(o::AutoCov, y::Real)
+    γ = o.v.weight(o.v.n + 1)
+    _fit!(o.v, y)
+    _fit!(o.lag, y)     # y_t, y_{t-1}, ...
+    _fit!(o.wlag, γ)    # γ_t, γ_{t-1}, ...
+    # M1 ✓
+    for k in reverse(2:length(o.m2))
+        @inbounds o.m1[k] = o.m1[k - 1]
+    end
+    @inbounds o.m1[1] = smooth(o.m1[1], y, γ)
+    # Cross ✓ and M2 ✓
+    @inbounds for k in 1:length(o.m1)
+        γk = value(o.wlag)[k]
+        o.cross[k] = smooth(o.cross[k], y * value(o.lag)[k], γk)
+        o.m2[k] = smooth(o.m2[k], y, γk)
+    end
+end
+
+function value(o::AutoCov)
+    μ = mean(o.v)
+    n = nobs(o)
+    cr = o.cross
+    m1 = o.m1
+    m2 = o.m2
+    [(n - k + 1) / n * (cr[k] + μ * (μ - m1[k] - m2[k])) for k in 1:length(m1)]
+end
+autocov(o::AutoCov) = value(o)
+autocor(o::AutoCov) = value(o) ./ value(o)[1]
+
 #-----------------------------------------------------------------------# Bootstrap
 """
     Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
@@ -130,6 +237,7 @@ function probs(o::CountMap, kys = keys(o.value))
 end
 pdf(o::CountMap, y) = y in keys(o.value) ? o.value[y] / nobs(o) : 0.0
 Base.keys(o::CountMap) = keys(o.value)
+nkeys(o::CountMap) = length(o.value)
 Base.values(o::CountMap) = values(o.value)
 Base.getindex(o::CountMap, i) = o.value[i]
 
@@ -363,6 +471,75 @@ end
 Base.merge!(o::Group, o2::Group) = (merge!.(o.stats, o2.stats); o)
 
 Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
+
+#-----------------------------------------------------------------------# GroupProcessor
+mutable struct Ignored <: OnlineStat{0} 
+    n::Int
+end 
+Ignored() = Ignored(0)
+value(o::Ignored) = nothing
+_fit!(o::Ignored, y) = (o.n += 1)
+
+"""
+    GroupProcessor(group)
+    OnlineStats.preprocess(itr, hints::Pair...)
+
+An object for standardizing continuous variables and creating one-hot vectors of 
+categorical variables.
+
+# Example
+
+    gp = OnlineStats.preprocess(zip(randn(1000), rand('a':'f', 1000)))
+    transform!(gp, [1.0, 'a'])
+"""
+struct GroupProcessor{G} <: OnlineStat{VectorOb}
+    group::G 
+    x::Vector{Float64}
+end
+GroupProcessor(g::Group) = GroupProcessor(g, zeros(sum(_width, g.stats)))
+nobs(o::GroupProcessor) = nobs(o.group)
+
+function transform!(o::GroupProcessor, x::VectorOb)
+    i = 0
+    for (xi, stat) in zip(x, o.group.stats)
+        for j in 1:_width(stat)
+            i += 1 
+            o.x[i] = transform(stat, xi, j)
+        end
+    end
+    o.x
+end
+
+function preprocess(itr, hints::Pair...) 
+    row = first(itr)
+    p = Pair.(_keys(row), mlstat.(values(row)))
+    d = OrderedDict{Any, Any}(p...)
+    for (k,v) in hints 
+        d[k] = v
+    end
+    g = fit!(Group(collect(values(d))...), itr)
+    GroupProcessor(g)
+end
+
+_keys(o) = keys(o)
+_keys(o::Tuple) = 1:length(o)
+
+transform(o::Variance, xi, j) = (xi - mean(o)) / std(o)
+function transform(o::CountMap, xi, j) 
+    for (i,k) in enumerate(keys(o))
+        i == j && return xi == k ? 1.0 : 0.0
+    end
+end
+
+mlstat(y) = Ignored()
+mlstat(y::Number) = Variance() 
+mlstat(y::T) where {T<:Union{Bool, AbstractString, Char, Symbol}} = CountMap(T)
+
+_width(o::Variance) = 1 
+_width(o::CountMap) = nkeys(o) - 1 
+_width(o::Ignored) = 0
+
+
 
 #-----------------------------------------------------------------------# HyperLogLog
 # Mostly copy/pasted from StreamStats.jl
@@ -916,109 +1093,6 @@ _fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.
 _fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
 Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
 
-#-----------------------------------------------------------------------# Variance 
-"""
-    Variance(; weight=EqualWeight())
 
-Univariate variance.
 
-# Example 
 
-    @time fit!(Variance(), randn(10^6))
-"""
-mutable struct Variance{W} <: OnlineStat{Number}
-    σ2::Float64 
-    μ::Float64 
-    weight::W
-    n::Int
-end
-Variance(;weight = EqualWeight()) = Variance(0.0, 0.0, weight, 0)
-function _fit!(o::Variance, x)
-    μ = o.μ
-    γ = o.weight(o.n += 1)
-    o.μ = smooth(o.μ, x, γ)
-    o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
-end
-function Base.merge!(o::Variance, o2::Variance)
-    γ = o2.n / (o.n += o2.n)
-    δ = o2.μ - o.μ
-    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
-    o.μ = smooth(o.μ, o2.μ, γ)
-    o
-end
-value(o::Variance) = o.n > 0 ? o.σ2 * unbias(o) : 0.0
-Base.var(o::Variance) = value(o)
-Base.mean(o::Variance) = o.μ
-
-#-----------------------------------------------------------------------# AutoCov and Lag
-"""
-    Lag(b, T = Float64)
-
-Store the last `b` values for a data stream of type `T`.
-"""
-struct Lag{T} <: OnlineStat{Any}
-    value::Vector{T}
-end
-Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
-function _fit!(o::Lag{T}, y::T) where {T} 
-    for i in reverse(2:length(o.value))
-        @inbounds o.value[i] = o.value[i - 1]
-    end
-    o.value[1] = y
-end
-
-"""
-    AutoCov(b, T = Float64; weight=EqualWeight())
-
-Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
-
-# Example 
-
-    y = cumsum(randn(100))
-    o = AutoCov(5)
-    fit!(o, y)
-    autocov(o)
-    autocor(o)
-"""
-struct AutoCov{T, W} <: OnlineStat{Number}
-    cross::Vector{Float64}
-    m1::Vector{Float64}
-    m2::Vector{Float64}
-    lag::Lag{T}         # y_{t-1}, y_{t-2}, ...
-    wlag::Lag{Float64}  # γ_{t-1}, γ_{t-2}, ...
-    v::Variance{W}
-end
-function AutoCov(k::Integer, T = Float64; kw...)
-    d = k + 1
-    AutoCov(zeros(d), zeros(d), zeros(d), Lag(d, T), Lag(d, Float64), Variance(;kw...))
-end
-nobs(o::AutoCov) = nobs(o.v)
-
-function _fit!(o::AutoCov, y::Real)
-    γ = o.v.weight(o.v.n + 1)
-    _fit!(o.v, y)
-    _fit!(o.lag, y)     # y_t, y_{t-1}, ...
-    _fit!(o.wlag, γ)    # γ_t, γ_{t-1}, ...
-    # M1 ✓
-    for k in reverse(2:length(o.m2))
-        @inbounds o.m1[k] = o.m1[k - 1]
-    end
-    @inbounds o.m1[1] = smooth(o.m1[1], y, γ)
-    # Cross ✓ and M2 ✓
-    @inbounds for k in 1:length(o.m1)
-        γk = value(o.wlag)[k]
-        o.cross[k] = smooth(o.cross[k], y * value(o.lag)[k], γk)
-        o.m2[k] = smooth(o.m2[k], y, γk)
-    end
-end
-
-function value(o::AutoCov)
-    μ = mean(o.v)
-    n = nobs(o)
-    cr = o.cross
-    m1 = o.m1
-    m2 = o.m2
-    [(n - k + 1) / n * (cr[k] + μ * (μ - m1[k] - m2[k])) for k in 1:length(m1)]
-end
-autocov(o::AutoCov) = value(o)
-autocor(o::AutoCov) = value(o) ./ value(o)[1]

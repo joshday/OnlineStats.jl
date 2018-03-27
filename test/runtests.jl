@@ -272,6 +272,16 @@ end
         @test value(oi) ≈ mean(x[:, i])
     end
 end
+#-----------------------------------------------------------------------# GroupProcessor 
+@testset "GroupProcessor" begin 
+    o = OnlineStats.preprocess(eachrow(x))
+    @test length(o.group) == 5
+    @test length(transform!(o, randn(5))) == 5
+    o = OnlineStats.preprocess(eachrow(rand('a':'d', 100, 2)))
+    @test length(o.group) == 2 
+
+    @test length(transform!(o, ['a','b'])) == 6
+end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin 
 @testset "FixedBins" begin
