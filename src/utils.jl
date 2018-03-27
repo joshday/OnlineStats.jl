@@ -159,5 +159,5 @@ end
 
 # convenience methods
 fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, eachrow(x))
+
 fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, eachrow(xy...))
-fit!(o::OnlineStat{XY}, xy::AbstractMatrix) = fit!(o, eachrow(xy...))
