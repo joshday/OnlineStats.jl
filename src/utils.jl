@@ -140,24 +140,8 @@ Create an iterator over the columns of a matrix as `Vector`s.
 eachcol(x::AbstractMatrix) = ColsOf(x)
 
 #-----------------------------------------------------------------------# fit!
-"""
-    fit!(o::OnlineStat, data)
-
-Update a stat with more data.
-"""
-function fit!(o::OnlineStat{T}, yi::T) where {T}
-    _fit!(o, yi)
-    o
-end
-
-function fit!(o::OnlineStat, y)
-    for yi in y 
-        _fit!(o, yi)
-    end
-    o
-end
-
 # convenience methods
+# deprecate?
 fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, eachrow(x))
 
 fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, eachrow(xy...))

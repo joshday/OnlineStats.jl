@@ -8,7 +8,7 @@ using RecipesBase
 using Reexport 
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
-import OnlineStatsBase: OnlineStat, name, value, _fit!
+import OnlineStatsBase: OnlineStat, name, _fit!
 import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
     fweights, sample, coef, Histogram

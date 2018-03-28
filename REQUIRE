@@ -1,7 +1,9 @@
 julia 0.6.0
-OnlineStatsBase 0.7.0
+OnlineStatsBase 0.7.0 0.8.0
 SweepOperator
 LossFunctions
 PenaltyFunctions
 RecipesBase
 Reexport
+NamedTuples
+Compat
