@@ -46,22 +46,6 @@ function _fit!(p::Part, xy)
     _fit!(p.stat, y)
 end
 
-function merge_next!(parts::Vector{<:Part})
-    n = nobs(parts[1])
-    ind = 1
-    for (i, p) in enumerate(parts)
-        if nobs(p) < n 
-            ind = i 
-            break
-        end
-    end
-    if ind == length(parts)
-        ind -= 1
-    end
-    merge!(parts[ind], parts[ind+1])
-    deleteat!(parts, ind + 1)
-end
-
 #-----------------------------------------------------------------------# Partition 
 """
     Partition(stat, nparts=100)
@@ -106,6 +90,21 @@ function Base.merge!(o::Partition, o2::Partition)
     end
     o
 end
+function merge_next!(parts::Vector{<:Part})
+    n = nobs(parts[1])
+    ind = 1
+    for (i, p) in enumerate(parts)
+        if nobs(p) < n 
+            ind = i 
+            break
+        end
+    end
+    if ind == length(parts)
+        ind -= 1
+    end
+    merge!(parts[ind], parts[ind+1])
+    deleteat!(parts, ind + 1)
+end
 
 #-----------------------------------------------------------------------# IndexedPartition
 """
@@ -141,22 +140,53 @@ function _fit!(o::IndexedPartition, xy)
         end
     end
     addpart && push!(o.parts, Part(fit!(copy(o.init), y), x, x))
-    if length(o.parts) > o.b
-        sort!(o.parts)
-        diff = get_diff(o.parts[1], o.parts[2])
-        ind = 1
-        for i in 2:(length(o.parts) - 1)
-            newdiff = get_diff(o.parts[i], o.parts[i+1])
-            if newdiff < diff 
-                diff = newdiff 
-                ind = i 
-            end
+    length(o.parts) > o.b && merge_nearest!(sort!(o.parts))
+end
+
+function merge_nearest!(parts::Vector{<:Part})
+    diff = get_diff(parts[1], parts[2])
+    ind = 1
+    for i in 2:(length(parts) - 1)
+        newdiff = get_diff(parts[i], parts[i+1])
+        if newdiff < diff 
+            diff = newdiff 
+            ind = i 
         end
-        merge!(o.parts[ind], o.parts[ind + 1])
-        deleteat!(o.parts, ind + 1)
     end
+    merge!(parts[ind], parts[ind + 1])
+    deleteat!(parts, ind + 1)
 end
 
 get_diff(a::Part{T}, b::Part{T}) where {T<:Dates.TimeType} = b.a - a.b
 
 get_diff(a::Part{T}, b::Part{T}) where {T<:Number} = (b.a - a.b) * (nobs(a) + nobs(b)) / 2
+
+function Base.merge!(o::IndexedPartition, o2::IndexedPartition)
+    # If there's any overlap, merge
+    for p2 in o2.parts 
+        pushpart = true
+        for p in o.parts 
+            if (p2.a ∈ p) || (p2.b ∈ p)
+                pushpart = false
+                merge!(p, p2) 
+                break               
+            end
+        end
+        pushpart && push!(o.parts, p2)
+    end
+    # merge parts that overlap 
+    for i in reverse(2:length(o.parts))
+        p1, p2 = o.parts[i-1], o.parts[i]
+        if p1.a > p2.b
+            info("hey I deleted something at $i")
+            merge!(p1, p2)
+            deleteat!(o.parts, i)
+        end
+    end
+    # merge until there's b left
+    sort!(o.parts)
+    while length(o.parts) > o.b 
+        merge_nearest!(o.parts)
+    end
+    o
+end

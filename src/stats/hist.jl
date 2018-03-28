@@ -192,7 +192,11 @@ function _fit!(o::AdaptiveBins, y::Pair{<:Any, Int})
     end
 end
 
-Base.merge!(o::T, o2::T) where {T <: AdaptiveBins} = _fit!.(o, o2.value)
+function Base.merge!(o::T, o2::T) where {T <: AdaptiveBins} 
+    for v in o2.value
+        _fit!(o, v)
+    end
+end
 
 function Base.getindex(o::AdaptiveBins{T}, i) where {T}
     if i == 0 
