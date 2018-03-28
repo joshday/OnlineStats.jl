@@ -141,7 +141,6 @@ end
         lab --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
-        @show x2
         if length(y[1]) == 2 
             fillto --> y2[:, 1]
             alpha --> .4
