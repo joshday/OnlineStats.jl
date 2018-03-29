@@ -92,3 +92,10 @@ _width(o::DataPreprocessor) = sum(_width, o.group.stats)
 _width(o::Variance) = 1 
 _width(o::CountMap) = nkeys(o) - 1 
 _width(o::Ignored) = 0
+
+
+
+#-----------------------------------------------------------------------# DataCol 
+struct DataCol{O<:OnlineStat}
+    
+end

@@ -455,11 +455,11 @@ observation `y`, `y[i]` is sent to `stats[i]`.
     o = [Mean() CountMap(Int)]
     fit!(o, zip(randn(100), rand(1:5, 100)))
 """
-struct Group{T} <: StatCollection{VectorOb}
+struct Group{T<:Tuple} <: StatCollection{VectorOb}
     stats::T
 end
 Group(o::OnlineStat...) = Group(o)
-Base.hcat(o::OnlineStat...) = Group(o)
+Group(v::AbstractArray{<:OnlineStat}) = Group(v...)
 nobs(o::Group) = nobs(first(o.stats))
 Base.:(==)(a::Group, b::Group) = all(a.stats .== b.stats)
 

@@ -191,7 +191,7 @@ end
     @test all(0 .< classify(o, X) .< 3)
     @test O.nkeys(o) == 2 
     @test O.nvars(o) == 10
-    @test mean(classify(o, X) .== Y) > .5
+    @test mean(classify(o, X) .== Y) > .4
 end
 #-----------------------------------------------------------------------# FastForest 
 @testset "FastForest" begin 
@@ -244,8 +244,8 @@ end
 end
 #-----------------------------------------------------------------------# FTSeries 
 @testset "FTSeries" begin 
-    test_merge(FTSeries(Mean(), Variance(); transform = abs), y, y2, (a,b)->≈(value(a),value(b)))
-    test_exact(FTSeries(Mean(); transform=abs), y, o->value(o.stats[1]), mean(abs, y))
+    test_merge(FTSeries(Mean(), Variance(); transform = abs), y, y2)
+    test_exact(FTSeries(Mean(); transform=abs), y, o->value(o)[1], mean(abs, y))
     data = [-1, 1, 2]
     o = fit!(FTSeries(Mean(); filter = x->x>0), data)
     @test o.nfiltered == 1 
@@ -261,7 +261,7 @@ end
     test_exact(5Mean(), x, values, mean(x, 1))
     test_exact(5Variance(), x, values, var(x, 1))
 
-    test_merge([Mean() Variance() Sum() Moments() Mean()], x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
+    test_merge(Group([Mean() Variance() Sum() Moments() Mean()]), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     test_merge(5Mean(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     test_merge(5Variance(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     @test 5Mean() == 5Mean()
@@ -271,6 +271,9 @@ end
     for (i, oi) in enumerate(g) 
         @test value(oi) ≈ mean(x[:, i])
     end
+end
+#-----------------------------------------------------------------------# Group 
+@testset "GroupBy" begin 
 end
 #-----------------------------------------------------------------------# GroupProcessor 
 @testset "GroupProcessor" begin 
@@ -464,9 +467,9 @@ end
 end
 #-----------------------------------------------------------------------# Series 
 @testset "Series" begin 
-    test_merge(Series(Mean(), Variance()), y, y2, (a,b) -> ≈(value(a), value(b)))
-    test_exact(Series(Mean(), Variance()), y, o->value(o.stats[1]), mean(y))
-    test_exact(Series(Mean(), Variance()), y, o->value(o.stats[2]), var(y))
+    test_merge(Series(Mean(), Variance()), y, y2)
+    test_exact(Series(Mean(), Variance()), y, o->value(o)[1], mean(y))
+    test_exact(Series(Mean(), Variance()), y, o->value(o)[2], var(y))
 end
 #-----------------------------------------------------------------------# StatLearn 
 @testset "StatLearn" begin 
