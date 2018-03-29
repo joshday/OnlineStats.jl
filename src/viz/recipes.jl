@@ -62,6 +62,26 @@ end
     end
 end
 
+#-----------------------------------------------------------------------# GroupBy 
+@recipe function f(o::GroupBy; overlay = false)
+    if overlay
+        for (k,v) in Compat.pairs(o.value)
+            @series begin 
+                label --> k 
+                v
+            end
+        end
+    else 
+        @series begin 
+            label --> name.(collect(values(o.value)))
+            x = collect(keys(o.value))
+            @show map(value, collect(values(o.value)))
+            y = plotshape(map(value, collect(values(o.value))))
+            x, y
+        end
+    end
+end
+
 #-----------------------------------------------------------------------# AutoCov
 @recipe function f(o::AutoCov)
     xlabel --> "Lag"
@@ -132,10 +152,12 @@ end
             end
         end
         seriestype --> :scatter 
-        marker_z --> log.(z)
+        logz = log.(z)
+        marker_z --> logz
         ylab --> "log(prob)"
         markerstrokewidth --> 0
         color --> :viridis
+        hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)]
         x2, y2
     elseif y[1] isa VectorOb
         lab --> name(parts[1].stat, false, false)
@@ -167,7 +189,9 @@ end
     end
 end
 
+plotshape(v::Vector) = v
 plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
+
 
 #-----------------------------------------------------------------------# NBClassifier 
 @recipe function f(o::NBClassifier)
