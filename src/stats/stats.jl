@@ -1,5 +1,9 @@
 abstract type StatCollection{T} <: OnlineStat{T} end 
 
+abstract type AbstractSeries{T} <: StatCollection{T} end
+stats(o) = o.stats
+value(o::AbstractSeries) = value.(stats(o))
+
 function Base.show(io::IO, o::StatCollection)
     print(io, name(o, false, false))
     for (i, stat) in enumerate(o.stats)
@@ -400,7 +404,7 @@ fitted.
     o = FTSeries(Mean(), Variance(); transform=abs)
     fit!(o, -rand(1000))
 """
-mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
+mutable struct FTSeries{N, OS<:Tup, F, T} <: AbstractSeries{N}
     stats::OS
     filter::F 
     transform::T 
@@ -428,6 +432,12 @@ function Base.merge!(o::FTSeries, o2::FTSeries)
     o
 end
 always(x) = true
+
+@deprecate(
+    series(stats::OnlineStat...; filter = always, transform = identity),
+    FTSeries(stats...; filter=filter, transform=transform)
+)
+
 
 #-----------------------------------------------------------------------# Group
 """
@@ -1089,7 +1099,7 @@ Track multiple stats for one data stream.
     s = Series(Mean(), Variance())
     fit!(s, randn(1000))
 """
-struct Series{IN, T<:Tup} <: StatCollection{IN}
+struct Series{IN, T<:Tup} <: AbstractSeries{IN}
     stats::T
 end
 Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)

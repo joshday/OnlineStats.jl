@@ -20,7 +20,7 @@ import SweepOperator
 export 
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    eachcol, eachrow, classify, coef, transform, transform!,
+    eachcol, eachrow, classify, coef, transform, transform!, stats, series,
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,
