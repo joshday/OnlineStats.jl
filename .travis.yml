@@ -11,7 +11,7 @@ notifications:
   email: true
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --check-bounds=yes --depwarn=no -e 'Pkg.clone(pwd()); Pkg.build("OnlineStats"); Pkg.checkout("OnlineStatsBase"); Pkg.test("OnlineStats"; coverage=true)'
+  - julia --check-bounds=yes --depwarn=no -e 'Pkg.clone(pwd()); Pkg.build("OnlineStats"); Pkg.test("OnlineStats"; coverage=true)'
 after_success:
   - julia -e 'Pkg.add("Documenter")'
   - julia -e 'cd(Pkg.dir("OnlineStats")); include(joinpath("docs", "make.jl"))'
