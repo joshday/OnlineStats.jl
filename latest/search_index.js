@@ -761,14 +761,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#StatsBase.fit!-Union{Tuple{OnlineStatsBase.OnlineStat{T},T}, Tuple{T}} where T",
-    "page": "API",
-    "title": "StatsBase.fit!",
-    "category": "method",
-    "text": "fit!(o::OnlineStat, data)\n\nUpdate a stat with more data.\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.AdaptiveBins",
     "page": "API",
     "title": "OnlineStats.AdaptiveBins",
@@ -777,11 +769,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.GroupProcessor",
+    "location": "api.html#OnlineStats.DataPreprocessor",
     "page": "API",
-    "title": "OnlineStats.GroupProcessor",
+    "title": "OnlineStats.DataPreprocessor",
     "category": "type",
-    "text": "GroupProcessor(group)\nOnlineStats.preprocess(itr, hints::Pair...)\n\nAn object for standardizing continuous variables and creating one-hot vectors of  categorical variables.\n\nExample\n\ngp = OnlineStats.preprocess(zip(randn(1000), rand(\'a\':\'f\', 1000)))\ntransform!(gp, [1.0, \'a\'])\n\n\n\n"
+    "text": "DataPreprocessor(group)\nOnlineStats.preprocess(itr, hints::Pair...)\n\nAn object for standardizing continuous variables and creating one-hot vectors of  categorical variables.\n\nExample\n\ngp = OnlineStats.preprocess(zip(randn(1000), rand(\'a\':\'f\', 1000)))\ntransform!(gp, [1.0, \'a\'])\n\n\n\n"
 },
 
 {
