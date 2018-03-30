@@ -122,9 +122,22 @@ end
 end
 
 #-----------------------------------------------------------------------# CountMap
-@recipe function f(o::CountMap)
+@recipe function f(o::CountMap; sortby = :none)
     seriestype --> :bar 
-    collect(keys(o)), collect(values(o))
+    kys = collect(keys(o))
+    vls = collect(values(o))
+    if sortby == :none
+        hover --> kys
+        kys, vls
+    elseif sortby == :keys 
+        sp = sortperm(kys)
+        hover --> kys[sp]
+        kys[sp], vls[sp]
+    elseif sortby == :values 
+        sp = sortperm(vls)
+        hover --> kys[sp]
+        kys[sp], vls[sp]
+    end    
 end
 
 #-----------------------------------------------------------------------# Partition
