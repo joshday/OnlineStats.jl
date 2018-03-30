@@ -154,7 +154,6 @@ end
         seriestype --> :scatter 
         logz = log.(z)
         marker_z --> logz
-        ylab --> "log(prob)"
         markerstrokewidth --> 0
         color --> :viridis
         hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)]
