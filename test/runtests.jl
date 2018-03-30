@@ -261,7 +261,7 @@ end
     test_exact(5Mean(), x, values, mean(x, 1))
     test_exact(5Variance(), x, values, var(x, 1))
 
-    test_merge(Group([Mean() Variance() Sum() Moments() Mean()]), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
+    test_merge(Group(Mean(),Variance(),Sum(),Moments(),Mean()), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     test_merge(5Mean(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     test_merge(5Variance(), x, x2, (a,b) -> all(value.(a) .≈ value.(b)))
     @test 5Mean() == 5Mean()
