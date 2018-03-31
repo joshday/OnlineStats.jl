@@ -16,12 +16,12 @@ using OnlineStats
 
 y = randn(1000)
 
-s1 = Series(EqualWeight(), Mean())
-s2 = Series(ExponentialWeight(.1), Mean())
+o1 = Mean()
+o2 = Mean(weight = x -> .1)
 
 for yi in y
-    fit!(s1, yi)
-    fit!(s2, yi)
+    fit!(o1, yi)
+    fit!(o2, yi)
 end
 ```
 
