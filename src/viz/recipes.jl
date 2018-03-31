@@ -122,22 +122,15 @@ end
 end
 
 #-----------------------------------------------------------------------# CountMap
-@recipe function f(o::CountMap; sortby = :none)
+@recipe function f(o::CountMap, kys = keys(o); sortby = :keys)
     seriestype --> :bar 
-    kys = collect(keys(o))
-    vls = collect(values(o))
-    if sortby == :none
-        hover --> kys
-        kys, vls
-    elseif sortby == :keys 
-        sp = sortperm(kys)
-        hover --> kys[sp]
-        kys[sp], vls[sp]
-    elseif sortby == :values 
-        sp = sortperm(vls)
-        hover --> kys[sp]
-        kys[sp], vls[sp]
-    end    
+    kys = collect(kys)
+    vls = [o.value[ky] for ky in kys]
+    sortby in [:keys, :values] || Compat.@warn("sortby = :$sortby not recognized")
+    sp = sortby == :keys ? sortperm(kys) : sortperm(vls)
+    x, y = string.(kys[sp]), vls[sp]
+    hover --> ["($xi, $yi)" for (xi,yi) in zip(x, y)]
+    x, y
 end
 
 #-----------------------------------------------------------------------# Partition
