@@ -12,10 +12,6 @@
 
 
 ```julia
-using OnlineStats
-
-y = randn(1000)
-
 o1 = Mean()
 o2 = Mean(weight = x -> .1)
 
