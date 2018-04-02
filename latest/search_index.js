@@ -589,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Lag",
     "category": "type",
-    "text": "Lag(b, T = Float64)\n\nStore the last b values for a data stream of type T.\n\n\n\n"
+    "text": "Lag{T}(b::Integer)\n\nStore the last b values for a data stream of type T.  Values are stored as \n\nv(t) v(t-1) v(t-2)  v(t-b+1)\n\nExample\n\nfit!(Lag{Int}(10), 1:12)\n\n\n\n"
 },
 
 {
