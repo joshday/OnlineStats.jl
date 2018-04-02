@@ -423,12 +423,12 @@ nobs(o::FTSeries) = nobs(o.stats[1])
 @generated function _fit!(o::FTSeries{N, OS}, y) where {N, OS}
     n = length(fieldnames(OS))
     quote
-        Base.Cartesian.@nexprs $n i -> @inbounds begin
-            if o.filter(y) 
+        if o.filter(y)
+            Base.Cartesian.@nexprs $n i -> @inbounds begin
                 _fit!(o.stats[i], o.transform(y)) 
-            else 
-                o.nfiltered += 1
             end
+        else
+            o.nfiltered += 1
         end
     end
 end

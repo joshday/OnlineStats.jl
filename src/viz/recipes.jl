@@ -121,6 +121,13 @@ end
     end
 end
 
+@recipe function f(o::FixedBins2)
+    seriestype --> :heatmap 
+    z = Float64.(o.z)
+    z[z .== 0] = NaN
+    o.x, o.y, z
+end
+
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap, kys = keys(o); sortby = :keys)
     seriestype --> :bar 
@@ -129,7 +136,7 @@ end
     sortby in [:keys, :values] || Compat.@warn("sortby = :$sortby not recognized")
     sp = sortby == :keys ? sortperm(kys) : sortperm(vls)
     x, y = string.(kys[sp]), vls[sp]
-    hover --> ["($xi, $yi)" for (xi,yi) in zip(x, y)]
+    hover --> ["($xi, $yi)" for (xi,yi) in zip(x, y)], :quiet
     x, y
 end
 
@@ -161,8 +168,8 @@ end
         logz = log.(z)
         marker_z --> logz
         markerstrokewidth --> 0
-        color --> :viridis
-        hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)]
+        # color --> :viridis
+        hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)], :quiet
         x2, y2
     elseif y[1] isa VectorOb
         lab --> name(parts[1].stat, false, false)

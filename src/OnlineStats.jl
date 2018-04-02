@@ -63,4 +63,5 @@ include("stats/statlearn.jl")
 include("viz/partition.jl")
 include("viz/mosaic.jl")
 include("viz/recipes.jl")
+include("viz/hexbin.jl")
 end

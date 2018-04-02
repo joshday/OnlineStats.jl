@@ -69,6 +69,7 @@ end
 nrows(v::O.VectorOb) = length(v)
 nrows(m::AbstractMatrix) = size(m, 1)
 nrows(t::Tuple) = length(t[2])
+nrows(y::Base.Iterators.Zip2) = length(y)
 
 
 #-----------------------------------------------------------------------# utils 
@@ -299,6 +300,9 @@ end
     @test O.pdf(fit!(Hist(-5:.1:5), y), 0) > 0
     @test O.pdf(fit!(Hist(-5:.1:5), y), 100) == 0
 end 
+@testset "FixedBins2" begin 
+    o = test_exact(Hist(-5:.1:5, -5:.1:5), zip(y, y2), nobs, length(y))
+end
 @testset "AdaptiveBins" begin 
     test_exact(Hist(1000), y, mean, mean)
     test_exact(Hist(1000), y, nobs, length)

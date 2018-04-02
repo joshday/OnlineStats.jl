@@ -41,6 +41,30 @@ function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1])
     quantile(mids[inds], fweights(counts[inds]), p)
 end
 
+#-----------------------------------------------------------------------# FixedBins2 
+# left-closed only
+mutable struct FixedBins2{E1, E2} <: HistAlgorithm{VectorOb}
+    x::E1 
+    y::E2 
+    z::Matrix{Int}
+    out::Int
+end
+function make_alg(e::AbstractVector, e2::AbstractVector; kw...) 
+    FixedBins2(e, e2, zeros(Int, length(e2), length(e)), 0)
+end
+nobs(o::FixedBins2) = sum(o.z) + o.out
+
+function _fit!(o::FixedBins2, xy)
+    x, y = xy 
+    if x > maximum(o.x) || x < minimum(o.x) || y > maximum(o.y) || y < minimum(o.y)
+        o.out += 1
+    else
+        j = searchsortedfirst(o.x, x)
+        i = searchsortedfirst(o.y, y)
+        o.z[i-1, j-1] += 1
+    end 
+end
+
 #-----------------------------------------------------------------------# FixedBins
 mutable struct FixedBins{closed, E <: AbstractVector} <: HistAlgorithm{Number}
     edges::E
