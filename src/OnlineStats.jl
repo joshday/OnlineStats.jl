@@ -12,7 +12,7 @@ import OnlineStatsBase: OnlineStat, name, _fit!
 import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
     fweights, sample, coef, Histogram
-import DataStructures: OrderedDict
+import DataStructures: OrderedDict, CircularBuffer
 import NamedTuples  # Remove in 0.7
 import SpecialFunctions
 import SweepOperator

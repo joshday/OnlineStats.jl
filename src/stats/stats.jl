@@ -48,20 +48,25 @@ Base.mean(o::Variance) = o.μ
 
 #-----------------------------------------------------------------------# AutoCov and Lag
 """
-    Lag(b, T = Float64)
+    Lag{T}(b::Integer)
 
-Store the last `b` values for a data stream of type `T`.
+Store the last `b` values for a data stream of type `T`.  Values are stored as 
+
+``v(t), v(t-1), v(t-2), …, v(t-b+1)``
+
+# Example 
+
+    fit!(Lag{Int}(10), 1:12)
 """
-struct Lag{T} <: OnlineStat{Any}
-    value::Vector{T}
+mutable struct Lag{T} <: OnlineStat{T}
+    buffer::CircularBuffer{T}
+    n::Int
+    Lag{T}(b::Integer) where {T} = new{T}(CircularBuffer{T}(b), 0)
 end
-Lag(b::Integer, T::Type = Float64) = Lag(zeros(T, b))
-function _fit!(o::Lag{T}, y::T) where {T} 
-    for i in reverse(2:length(o.value))
-        @inbounds o.value[i] = o.value[i - 1]
-    end
-    o.value[1] = y
-end
+Lag(b::Integer, T = Float64) = Lag{T}(b)
+_fit!(o::Lag, y) = (o.n += 1; unshift!(o.buffer, y))
+Base.length(o::Lag) = length(o.buffer)
+Base.getindex(o::Lag, i) = o.buffer[i]
 
 """
     AutoCov(b, T = Float64; weight=EqualWeight())
@@ -76,7 +81,7 @@ Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of
     autocov(o)
     autocor(o)
 """
-struct AutoCov{T, W} <: OnlineStat{Number}
+struct AutoCov{T, W} <: OnlineStat{T}
     cross::Vector{Float64}
     m1::Vector{Float64}
     m2::Vector{Float64}
@@ -86,11 +91,11 @@ struct AutoCov{T, W} <: OnlineStat{Number}
 end
 function AutoCov(k::Integer, T = Float64; kw...)
     d = k + 1
-    AutoCov(zeros(d), zeros(d), zeros(d), Lag(d, T), Lag(d, Float64), Variance(;kw...))
+    AutoCov(zeros(d), zeros(d), zeros(d), Lag{T}(d), Lag{Float64}(d), Variance(;kw...))
 end
 nobs(o::AutoCov) = nobs(o.v)
 
-function _fit!(o::AutoCov, y::Real)
+function _fit!(o::AutoCov{T}, y) where {T}
     γ = o.v.weight(o.v.n + 1)
     _fit!(o.v, y)
     _fit!(o.lag, y)     # y_t, y_{t-1}, ...
@@ -102,8 +107,9 @@ function _fit!(o::AutoCov, y::Real)
     @inbounds o.m1[1] = smooth(o.m1[1], y, γ)
     # Cross ✓ and M2 ✓
     @inbounds for k in 1:length(o.m1)
-        γk = value(o.wlag)[k]
-        o.cross[k] = smooth(o.cross[k], y * value(o.lag)[k], γk)
+        γk = k ≤ length(o.wlag) ? o.wlag[k] : 0.0
+        lagk = k ≤ length(o.lag) ? o.lag[k] : zero(T)
+        o.cross[k] = smooth(o.cross[k], y * lagk, γk)
         o.m2[k] = smooth(o.m2[k], y, γk)
     end
 end
@@ -473,7 +479,7 @@ Base.next(o::Group, i) = o.stats[i], i + 1
 Base.done(o::Group, i) = i > length(o.stats)
 
 @generated function _fit!(o::Group{T}, y) where {T}
-    N = length(fieldnames(T))
+    N = fieldcount(T)#length(fieldnames(T))
     :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
 end
 function _fit!(o::Group{T}, y) where {T<:AbstractVector}

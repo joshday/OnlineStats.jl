@@ -173,20 +173,27 @@ function width(o::DataPreprocessor, lhs::Expr)
     out = 0 
     for ex in lhs.args[2:end]
         if ex isa Symbol 
+
         end
     end
 end
 
-#-----------------------------------------------------------------------# FeatureMaker
-struct FeatureMaker{T, L, R, D<:DataProcessor} <: OnlineStat{VectorOb}
-    lhs::L
-    rhs::R
-    processor::D
-    x::Vector{T}
-end
-function FeatureMaker(lhs::L, rhs::R, processor::D; outtype=Float64) where {L,R,D}
-    FeatureMaker(lhs, rhs, processor, zeros(T, width(processor, rhs)))
-end
+# #-----------------------------------------------------------------------# Terms
+# struct Interaction{V1, V2}
+#     v1::V1
+#     v2::V2
+# end
+
+# #-----------------------------------------------------------------------# FeatureMaker
+# struct FeatureMaker{T, L, R, D<:DataPrerocessor} <: OnlineStat{VectorOb}
+#     lhs::L
+#     rhs::R
+#     processor::D
+#     x::Vector{T}
+# end
+# function FeatureMaker(lhs::L, rhs::R, processor::D; outtype=Float64) where {L,R,D}
+#     FeatureMaker(lhs, rhs, processor, zeros(T, width(processor, rhs)))
+# end
 
 
 
