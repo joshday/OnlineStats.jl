@@ -476,6 +476,11 @@ Base.done(o::Group, i) = i > length(o.stats)
     N = length(fieldnames(T))
     :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
 end
+function _fit!(o::Group{T}, y) where {T<:AbstractVector}
+    for (i,yi) in enumerate(y)
+        _fit!(o.stats[i], yi)
+    end
+end
 
 Base.merge!(o::Group, o2::Group) = (merge!.(o.stats, o2.stats); o)
 

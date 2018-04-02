@@ -95,23 +95,6 @@
 
 
 
-#-----------------------------------------------------------------------# Formula 
-# Borrowed from StatsModels
-mutable struct Formula
-    lhs::Union{Symbol, Expr, Void}
-    rhs::Union{Symbol, Expr, Integer}
-end
-
-macro formula(ex)
-    if (ex.head === :macrocall && ex.args[1] === Symbol("@~")) || (ex.head === :call && ex.args[1] === :(~))
-        length(ex.args) == 3 || error("malformed expression in formula")
-        lhs = Base.Meta.quot(ex.args[2])
-        rhs = Base.Meta.quot(ex.args[3])
-    else
-        return :(error($("expected formula separator ~, got $(ex.head)")))
-    end
-    return Expr(:call, :Formula, lhs, rhs)
-end
 
 #-----------------------------------------------------------------------# ModelingType
 abstract type ModelingType{T} <: OnlineStat{T} end
@@ -173,7 +156,39 @@ make_modeling_type(x::T) where {T<:Union{AbstractString, Bool, Char}} = Categori
 
 _fit!(o::DataPreprocessor, y) = _fit!(o.group, y)
 
-preprocess(itr) = fit!(DataPreprocessor(first(itr)), itr)
+function preprocess(itr, hints::Pair...; kw...) 
+    row = first(itr)
+    p = Pair.(_keys(row), make_modeling_type.(values(row)))
+    d = OrderedDict{Any, Any}(p...)
+    for (k,v) in hints 
+        d[k] = v
+    end
+    g = fit!(Group(collect(values(d))...), itr)
+    DataPreprocessor(g; kw...)
+end
+_keys(o) = keys(o)
+_keys(o::Tuple) = 1:length(o)
+
+function width(o::DataPreprocessor, lhs::Expr)
+    out = 0 
+    for ex in lhs.args[2:end]
+        if ex isa Symbol 
+        end
+    end
+end
+
+#-----------------------------------------------------------------------# FeatureMaker
+struct FeatureMaker{T, L, R, D<:DataProcessor} <: OnlineStat{VectorOb}
+    lhs::L
+    rhs::R
+    processor::D
+    x::Vector{T}
+end
+function FeatureMaker(lhs::L, rhs::R, processor::D; outtype=Float64) where {L,R,D}
+    FeatureMaker(lhs, rhs, processor, zeros(T, width(processor, rhs)))
+end
+
+
 
 # @generated function transform!(o::DataPre)
 # @generated function _fit!(o::DataPreprocessor{S, G}, y) where {S, G}
