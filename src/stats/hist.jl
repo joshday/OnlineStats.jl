@@ -269,3 +269,8 @@ function area(o::AdaptiveBins, ind = length(o.value))
     end
     out
 end
+
+
+#-----------------------------------------------------------------------# Hexbin 
+struct HexBin <: HistAlgorithm{VectorOb}
+end
