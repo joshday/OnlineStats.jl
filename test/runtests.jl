@@ -12,6 +12,7 @@ for stat in [
         CallFun(Mean(), info)
         FastNode(5)
         FastTree(5)
+        FastForest(5)
         FTSeries(Variance())
         3Mean()
         Hist(10)
@@ -196,11 +197,13 @@ end
     @test O.nkeys(o) == 2 
     @test O.nvars(o) == 10
     @test mean(classify(o, X) .== Y) > .4
+    test_exact(FastTree(10), (X[1,:],Y[1]), length, 1)
 end
 #-----------------------------------------------------------------------# FastForest 
 @testset "FastForest" begin 
     X, Y = O.fakedata(FastNode, 10^4, 10)
     o = fit!(FastForest(10; splitsize=1000), (X, Y))
+    @test classify(o, randn(10)) in 1:2
     @test mean(classify(o, X) .== Y) > .4
 end
 #-----------------------------------------------------------------------# Fit[Dist]
