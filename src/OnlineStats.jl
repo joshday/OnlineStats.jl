@@ -45,7 +45,7 @@ export
     Partition, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    Series, StatLearn, Sum,
+    Series, StatLearn, StatHistory, Sum,
     Variance,
 # other 
     OnlineStat, BiasVec

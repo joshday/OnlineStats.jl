@@ -6,8 +6,12 @@ value(o::AbstractSeries) = value.(stats(o))
 
 function Base.show(io::IO, o::StatCollection)
     print(io, name(o, false, false))
-    for (i, stat) in enumerate(o.stats)
-        char = i == length(o.stats) ? '└' : '├'
+    print_stat_tree(io, o.stats)
+end
+
+function print_stat_tree(io::IO, stats)
+    for (i, stat) in enumerate(stats)
+        char = i == length(stats) ? '└' : '├'
         print(io, "\n  $(char)── $stat")
     end
 end
@@ -493,23 +497,59 @@ Base.merge!(o::Group, o2::Group) = (merge!.(o.stats, o2.stats); o)
 Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 
 #-----------------------------------------------------------------------# GroupBy 
+"""
+    GroupBy{T}(stat)
+
+Update `stat` for each group (of type `T`).
+
+# Example 
+
+    x = rand(1:10, 10^5)
+    y = x .+ randn(10^5)
+    fit!(GroupBy{Int}(Extrema()), zip(x,y))
+"""
 mutable struct GroupBy{T, O <: OnlineStat} <: OnlineStat{VectorOb}
     value::OrderedDict{T, O}
     init::O
     n::Int
 end
-GroupBy(T::Type, stat::O) where {O} = GroupBy(OrderedDict{T, O}(), stat, 0)
+GroupBy{T}(stat::O) where {T, O} = GroupBy{T,O}(OrderedDict{T, O}(), stat, 0)
 function _fit!(o::GroupBy, xy)
     o.n += 1
     x, y = xy 
     x in keys(o.value) ? fit!(o.value[x], y) : (o.value[x] = fit!(copy(o.init), y))
 end
 function Base.show(io::IO, o::GroupBy)
-    print(io, name(o, false, false))
+    print(io, name(o, false, true))
     for (i, (k,v)) in enumerate(o.value)
         char = i == length(o.value) ?  '└' : '├'
         print(io, "\n  $(char)── $k: $v")
     end
+end
+
+#-----------------------------------------------------------------------# StatHistory 
+"""
+    StatHistory(stat, b)
+
+Track a moving window (previous `b` copies) of `stat`. 
+
+# Example 
+
+    fit!(StatHistory(Mean(), 10), 1:20)
+"""
+struct StatHistory{T, O<:OnlineStat{T}} <: OnlineStat{T}
+    stat::O
+    lag::Lag{O}
+end
+StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}} = StatHistory{T,O}(stat, Lag{O}(b))
+nobs(o::StatHistory) = nobs(o.stat)
+function _fit!(o::StatHistory, y)
+    _fit!(o.stat, y)
+    _fit!(o.lag, copy(o.stat))
+end
+function Base.show(io::IO, o::StatHistory)
+    print(io, name(o, false, true))
+    print_stat_tree(io, o.lag.buffer)
 end
 
 #-----------------------------------------------------------------------# HyperLogLog
