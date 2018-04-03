@@ -282,10 +282,6 @@ end
 # HexBin(x,y) = HexBin(x, y, zeros(Int, length(y), length(x)), 0)
 # Base.show(io::IO, o::HexBin) = print(io, "HexBin(x_edge = $(o.x), y_edge = $(o.y))")
 
-# function _fit!(o::HexBin, xy)
-#     x, y = xy 
-# end
-
 # nobs(o::HexBin) = sum(o.z) + o.out
 
 # function _fit!(o::HexBin, xy)
@@ -293,12 +289,12 @@ end
 #     if x > maximum(o.x) || x < minimum(o.x) || y > maximum(o.y) || y < minimum(o.y)
 #         o.out += 1
 #     else
-#         j = searchsortedfirst(o.x, x)
-#         i = searchsortedfirst(o.y, y)
-#         if iseven(i)
-#             if y > 
+#         j = searchsortedfirst(o.x, x) - 1
+#         i = searchsortedfirst(o.y, y) - 1
+#         if i == 1
+      
 #         else 
 #         end
-#         o.z[i-1, j-1] += 1
+#         o.z[i, j] += 1
 #     end 
 # end

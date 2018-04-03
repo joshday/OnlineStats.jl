@@ -1,9 +1,5 @@
 abstract type StatCollection{T} <: OnlineStat{T} end 
 
-abstract type AbstractSeries{T} <: StatCollection{T} end
-stats(o) = o.stats
-value(o::AbstractSeries) = value.(stats(o))
-
 function Base.show(io::IO, o::StatCollection)
     print(io, name(o, false, false))
     print_stat_tree(io, o.stats)
@@ -415,7 +411,7 @@ fitted.
     o = FTSeries(Mean(), Variance(); transform=abs)
     fit!(o, -rand(1000))
 """
-mutable struct FTSeries{N, OS<:Tup, F, T} <: AbstractSeries{N}
+mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     stats::OS
     filter::F 
     transform::T 
@@ -424,6 +420,7 @@ end
 function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
     FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
 end
+value(o::FTSeries) = value.(o.stats)
 nobs(o::FTSeries) = nobs(o.stats[1])
 @generated function _fit!(o::FTSeries{N, OS}, y) where {N, OS}
     n = length(fieldnames(OS))
@@ -1073,9 +1070,10 @@ Track multiple stats for one data stream.
     s = Series(Mean(), Variance())
     fit!(s, randn(1000))
 """
-struct Series{IN, T<:Tup} <: AbstractSeries{IN}
+struct Series{IN, T<:Tup} <: StatCollection{IN}
     stats::T
 end
+value(o::Series) = value.(o.stats)
 Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)
 nobs(o::Series) = nobs(o.stats[1])
 @generated function _fit!(o::Series{IN, T}, y) where {IN, T}

@@ -89,6 +89,7 @@ nrows(y::Base.Iterators.Zip2) = length(y)
     @inferred eachcol(x)
     @test length(eachcol(x)) == 5
     @test length(eachrow(x)) == 1000
+    @test length(eachrow(x, y)) == 1000
     @test Base.IndexStyle(BiasVec{Float64, Vector{Float64}}) == IndexLinear()
 end
 
@@ -313,7 +314,8 @@ end
     @test O.pdf(fit!(Hist(-5:.1:5), y), 100) == 0
 end 
 @testset "FixedBins2" begin 
-    o = test_exact(Hist(-5:.1:5, -5:.1:5), zip(y, y2), nobs, length(y))
+    test_exact(Hist(-5:.1:5, -5:.1:5), zip(y, y2), nobs, length(y))
+    test_exact(Hist(-5:5,-5:5), zip([1,10, 10], [10, 1, 10]), x->x.alg.out, 3)
 end
 @testset "AdaptiveBins" begin 
     test_exact(Hist(1000), y, mean, mean)
@@ -375,6 +377,20 @@ end
     test_exact(Mean(), y, mean, mean)
     test_merge(Mean(), y, y2)
 end
+#-----------------------------------------------------------------------# ML 
+@testset "ML" begin 
+    o = OnlineStats.preprocess(eachrow(x))
+    for i in 1:5 
+        @test o.group[i] isa OnlineStats.Numerical
+    end
+    o = OnlineStats.preprocess(eachrow(rand(Bool, 100, 2)))
+    for i in 1:2 
+        @test o.group[i] isa OnlineStats.Categorical
+    end
+    o = OnlineStats.preprocess(eachrow(rand(1:5, 100, 5)), 3=>OnlineStats.Categorical(Int))
+    @test o.group[3] isa OnlineStats.Categorical
+    @test o.group[1] isa OnlineStats.Numerical
+end
 #-----------------------------------------------------------------------# Moments
 @testset "Moments" begin 
     test_exact(Moments(), y, value, [mean(y), mean(y .^ 2), mean(y .^ 3), mean(y .^4) ])
@@ -399,6 +415,9 @@ end
     @test length(probs(o)) == 2
     @test sum(predict(o, x[1,:])) ≈ 1
     @test classify(o, x[1, :]) || !classify(o, x[1, :])
+    @test OnlineStats.nvars(o) == 5
+    @test OnlineStats.nkeys(o) == 2
+    @test length(o[2]) == 2
 end
 #-----------------------------------------------------------------------# OrderStats
 @testset "OrderStats" begin 

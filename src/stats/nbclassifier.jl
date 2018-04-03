@@ -12,9 +12,13 @@ mutable struct NBClassifier{T, G<:Group} <: OnlineStat{XY}
     j::Int 
     at::Union{Number, String, Symbol, Char}
     ig::Float64
+    children::Vector{Int}
+end
+function NBClassifier{T}(g::G; id=1) where {T,G} 
+    NBClassifier{T,G}(OrderedDict{T,G}(), g, id, 0, -Inf, -Inf, Int[])
 end
 function NBClassifier(g::G, T::Type; id=1) where {G<:Group}
-    NBClassifier(OrderedDict{T, G}(), g, id, 0, -Inf, -Inf)
+    NBClassifier(OrderedDict{T, G}(), g, id, 0, -Inf, -Inf, Int[])
 end
 function NBClassifier(p::Int, T::Type; id=1, stat=Hist(15))
     NBClassifier(p * stat, T; id=id)
@@ -71,20 +75,68 @@ function index_to_key(d, i)
 end
 predict(o::NBClassifier, x::VectorOb) = _predict(o, x)
 classify(o::NBClassifier, x::VectorOb) = _classify(o, x)
+
+
 function predict(o::NBClassifier, x::AbstractMatrix)
     n = nobs(o)
     p = zeros(nkeys(o))
-    mapslices(xi -> _predict(o, xi, p, n), x, 2)
+    mapslices(x -> _predict(o, x, p, n), x, 2)
 end
 function classify(o::NBClassifier, x::AbstractMatrix)
     n = nobs(o)
     p = zeros(nkeys(o))
-    mapslices(xi -> _classify(o, xi, p, n), x, 2)
+    mapslices(x -> _classify(o, x, p, n), x, 2)
 end
+
 function classify_node(o::NBClassifier)
     _, k = findmax([nobs(g) for g in values(o)])
     index_to_key(o, k)
 end
+
+function split!(o::NBClassifier)
+    nroot = [nobs(g) for g in values(o)]
+    nleft, nright = copy(nroot), copy(nroot)
+    entropy_root = entropy(o)
+end
+
+entropy(o::NBClassifier) = entropy(probs(o), 2)
+
+#  function split(o::NBClassifier)
+#     nroot = [nobs(g) for g in values(o)]
+#     nleft = copy(nroot)
+#     nright = copy(nroot)
+#     split = NBSplit(length(nroot))
+#     entropy_root = entropy(o)
+#     for j in 1:nvars(o)
+#         ss = o[j]
+#         stat = merge(ss)
+#         for loc in split_candidates(stat)
+#             for k in 1:nkeys(o)
+#                 nleft[k] = round(Int, n_sent_left(ss[k], loc))
+#             end
+#             entropy_left = entropy(nleft ./ sum(nleft))
+#             @. nright = nroot - nleft
+#             entropy_right = entropy(nright ./ sum(nright))
+#             entropy_after = smooth(entropy_right, entropy_left, sum(nleft) / sum(nroot))
+#             ig = entropy_root - entropy_after
+#             if ig > split.ig
+#                 split.j = j
+#                 split.at = loc
+#                 split.ig = ig 
+#                 split.nleft .= nleft
+#             end
+#         end
+#     end
+#     left = NBClassifier(collect(keys(o)), o.init)
+#     right = NBClassifier(collect(keys(o)), o.init)
+#     for (i, g) in enumerate(values(left.d))
+#         g.nobs = split.nleft[i]
+#     end
+#     for (i, g) in enumerate(values(right.d))
+#         g.nobs = nroot[i] - split.nleft[i]
+#     end
+#     o, split, left, right
+# end
 
 # #-----------------------------------------------------------------------# NBClassifier 
 # """

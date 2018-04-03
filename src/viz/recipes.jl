@@ -31,14 +31,14 @@ end
     end
 end
 
-@recipe function f(o::OnlineStat{VectorOb})
+@recipe function f(o::OnlineStat{XY})
     ylab --> "beta_j"
     xlab --> "j"
     seriestype --> :scatter
     coef(o)
 end
 
-@recipe function f(o::Series{VectorOb}, x::AbstractMatrix, y::AbstractVector)
+@recipe function f(o::Series, x::AbstractMatrix, y::AbstractVector)
     for stat in o.stats
         @series begin stat end
     end
