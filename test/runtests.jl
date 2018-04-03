@@ -86,6 +86,9 @@ nrows(y::Base.Iterators.Zip2) = length(y)
     @inferred eachrow(x)
     @inferred eachrow(x, y)
     @inferred eachcol(x)
+    @test length(eachcol(x)) == 5
+    @test length(eachrow(x)) == 1000
+    @test Base.IndexStyle(BiasVec{Float64, Vector{Float64}}) == IndexLinear()
 end
 
 
@@ -208,6 +211,8 @@ end
 end
 @testset "FitCauchy" begin 
     test_exact(FitCauchy(), y, value, y->(0,1), atol = .5)
+    test_merge(FitCauchy(), y, y2, atol = .5)
+    @test value(FitCauchy()) == (0.0, 1.0)
 end 
 @testset "FitGamma" begin 
     test_merge(FitGamma(), y, y2)
