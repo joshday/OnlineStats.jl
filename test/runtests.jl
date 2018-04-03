@@ -275,6 +275,10 @@ end
 end
 #-----------------------------------------------------------------------# Group 
 @testset "GroupBy" begin 
+    o = GroupBy{Int}(Mean())
+    fit!(o, zip([1,1,2,2], 1:4))
+    @test value(value(o)[1]) ≈ 1.5
+    @test value(value(o)[2]) ≈ 3.5
 end
 #-----------------------------------------------------------------------# Hist 
 @testset "Hist" begin 
@@ -456,6 +460,14 @@ end
     test_merge(Series(Mean(), Variance()), y, y2)
     test_exact(Series(Mean(), Variance()), y, o->value(o)[1], mean(y))
     test_exact(Series(Mean(), Variance()), y, o->value(o)[2], var(y))
+end
+#-----------------------------------------------------------------------# StatHistory 
+@testset "StatHistory" begin 
+    o = fit!(StatHistory(Mean(), 10), 1:20)
+    @test length(o.lag) == 10
+    for (i, m) in enumerate(reverse(o.lag.buffer))
+        @test nobs(m) == 10 + i
+    end
 end
 #-----------------------------------------------------------------------# StatLearn 
 @testset "StatLearn" begin 

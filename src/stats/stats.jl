@@ -51,6 +51,7 @@ Base.var(o::Variance) = value(o)
 Base.mean(o::Variance) = o.μ
 
 #-----------------------------------------------------------------------# AutoCov and Lag
+# Lag
 """
     Lag{T}(b::Integer)
 
