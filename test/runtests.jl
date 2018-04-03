@@ -331,8 +331,14 @@ end
     test_merge(Hist(Float32, 2000), Float32.(y), Float32.(y2))
 
     data = randn(10_000)
+    
+    test_exact(Hist(100), data, o->O.pdf(o, -10), 0.0)
     test_exact(Hist(100), data, o->O.pdf(o,0), 0.3989422804014327, atol=.2)
+    test_exact(Hist(100), data, o->O.pdf(o, 10), 0.0)
+
+    test_exact(Hist(100), data, o->O.cdf(o,-10), 0)
     test_exact(Hist(100), data, o->O.cdf(o,0), .5, atol=.1)
+    test_exact(Hist(100), data, o->O.cdf(o,10), 1)
 
     @test Hist(10) == Hist(10)
 end

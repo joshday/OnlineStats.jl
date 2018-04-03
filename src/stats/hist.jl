@@ -244,14 +244,16 @@ function pdf(o::AdaptiveBins, x::Number)
         i = searchsortedfirst(v, Pair(x, 0))
         x1, y1 = o[i - 1]
         x2, y2 = o[i]
-        return smooth(y1, y2, (x2 - x) / (x2 - x1)) / area(o)
+        return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
     end
 end
 
 function cdf(o::AdaptiveBins, x::Number)
     if x ≤ minimum(o.ex)
         return 0.0 
-    else 
+    elseif x ≥ maximum(o.ex)
+        return 1.0 
+    else
         i = searchsortedfirst(o.value, Pair(x, 0))
         x1, y1 = o[i - 1]
         x2, y2 = o[i]
