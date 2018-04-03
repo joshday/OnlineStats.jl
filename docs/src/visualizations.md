@@ -148,7 +148,7 @@ savefig("indexpart3.png"); nothing # hide
 x = rand(10^5)
 y = rand(1:5, 10^5)
 
-o = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])
+o = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))
 
 plot(o, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide

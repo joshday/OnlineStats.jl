@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------# General
 const Tup = Union{Tuple, NamedTuples.NamedTuple}
-const XY = Union{Pair{AbstractVector, Any}, Tuple{AbstractVector, Any}}
+const XY = Union{Pair{AbstractVector, Any}, Tuple{AbstractVector, Any}, NamedTuples.NamedTuple}
 const VectorOb = Union{AbstractVector, Tup}
 
 smooth(a, b, γ) = a + γ * (b - a)

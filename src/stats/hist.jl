@@ -1,5 +1,6 @@
 abstract type HistAlgorithm{N} <: Algorithm end
 Base.show(io::IO, o::HistAlgorithm) = print(io, name(o, false, false))
+make_alg(o::HistAlgorithm) = o
 
 #-----------------------------------------------------------------------# Hist 
 """
@@ -271,6 +272,33 @@ function area(o::AdaptiveBins, ind = length(o.value))
 end
 
 
-#-----------------------------------------------------------------------# Hexbin 
-struct HexBin <: HistAlgorithm{VectorOb}
-end
+# #-----------------------------------------------------------------------# Hexbin 
+# struct HexBin{E1,E2} <: HistAlgorithm{VectorOb}
+#     x::E1 
+#     y::E2 
+#     z::Matrix{Int}
+#     nout::Int
+# end
+# HexBin(x,y) = HexBin(x, y, zeros(Int, length(y), length(x)), 0)
+# Base.show(io::IO, o::HexBin) = print(io, "HexBin(x_edge = $(o.x), y_edge = $(o.y))")
+
+# function _fit!(o::HexBin, xy)
+#     x, y = xy 
+# end
+
+# nobs(o::HexBin) = sum(o.z) + o.out
+
+# function _fit!(o::HexBin, xy)
+#     x, y = xy 
+#     if x > maximum(o.x) || x < minimum(o.x) || y > maximum(o.y) || y < minimum(o.y)
+#         o.out += 1
+#     else
+#         j = searchsortedfirst(o.x, x)
+#         i = searchsortedfirst(o.y, y)
+#         if iseven(i)
+#             if y > 
+#         else 
+#         end
+#         o.z[i-1, j-1] += 1
+#     end 
+# end
