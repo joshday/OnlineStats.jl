@@ -553,6 +553,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.GroupBy",
+    "page": "API",
+    "title": "OnlineStats.GroupBy",
+    "category": "type",
+    "text": "GroupBy{T}(stat)\n\nUpdate stat for each group (of type T).\n\nExample\n\nx = rand(1:10, 10^5)\ny = x .+ randn(10^5)\nfit!(GroupBy{Int}(Extrema()), zip(x,y))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Hist",
     "page": "API",
     "title": "OnlineStats.Hist",
@@ -710,6 +718,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Series",
     "category": "type",
     "text": "Series(stats...)\n\nTrack multiple stats for one data stream.\n\nExample\n\ns = Series(Mean(), Variance())\nfit!(s, randn(1000))\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.StatHistory",
+    "page": "API",
+    "title": "OnlineStats.StatHistory",
+    "category": "type",
+    "text": "StatHistory(stat, b)\n\nTrack a moving window (previous b copies) of stat. \n\nExample\n\nfit!(StatHistory(Mean(), 10), 1:20)\n\n\n\n"
 },
 
 {
