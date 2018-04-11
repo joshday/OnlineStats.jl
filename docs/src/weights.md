@@ -30,8 +30,8 @@ McclainWeight
 ## Weight wrappers
 
 ```@docs
-Bounded
-Scaled
+OnlineStatsBase.Bounded
+OnlineStatsBase.Scaled
 ```
 
 ## Custom Weighting
