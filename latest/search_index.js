@@ -169,11 +169,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "weights.html#OnlineStatsBase.Bounded",
+    "page": "Weight",
+    "title": "OnlineStatsBase.Bounded",
+    "category": "type",
+    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\n(t) = max((t) )\n\n\n\n"
+},
+
+{
+    "location": "weights.html#OnlineStatsBase.Scaled",
+    "page": "Weight",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "type",
+    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\n(t) =  * (t)\n\n\n\n"
+},
+
+{
     "location": "weights.html#Weight-wrappers-1",
     "page": "Weight",
     "title": "Weight wrappers",
     "category": "section",
-    "text": "Bounded\nScaled"
+    "text": "OnlineStatsBase.Bounded\nOnlineStatsBase.Scaled"
 },
 
 {
