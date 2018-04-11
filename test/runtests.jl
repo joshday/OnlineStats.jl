@@ -1,8 +1,13 @@
 module OnlineStatsTests
-using Compat, Compat.Test, Compat.LinearAlgebra, OnlineStats
+using Compat, Compat.Test, Compat.LinearAlgebra, OnlineStats, Plots
 O = OnlineStats
 import StatsBase: countmap, fit, Histogram
 import DataStructures: OrderedDict, SortedDict
+
+const y = randn(1000)
+const y2 = randn(1000)
+const x = randn(1000, 5)
+const x2 = randn(1000, 5)
 
 #-----------------------------------------------------------------------# Custom Printing 
 info("Custom Printing")
@@ -27,12 +32,20 @@ for stat in [
     println("  > ", stat)
 end
 
-#-----------------------------------------------------------------------# test helpers
-const y = randn(1000)
-const y2 = randn(1000)
-const x = randn(1000, 5)
-const x2 = randn(1000, 5)
+#-----------------------------------------------------------------------# Plots 
+info("Sanity checking Plots")
+plot(Mean())
+plot(EqualWeight())
+plot(fit!(LinReg(), (x,y)))
+plot(Series(Mean(), Variance()))
+plot(fit!(GroupBy{Int}(Mean()), zip(rand(1:2, 10), randn(10))))
+plot(AutoCov(10))
+plot(fit!(Hist(10), y))
+plot(fit!(Hist(-5:5), y))
+plot(fit!(Hist(-5:5, -5:5), zip(y, y2)))
+plot(fit!(Partition(Hist(5)), y))
 
+#-----------------------------------------------------------------------# test helpers
 
 function test_merge(o, y1, y2, compare = ≈; kw...)
     o2 = copy(o)
