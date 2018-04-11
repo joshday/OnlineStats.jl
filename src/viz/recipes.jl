@@ -63,21 +63,30 @@ end
 end
 
 #-----------------------------------------------------------------------# GroupBy 
-@recipe function f(o::GroupBy; overlay = false)
-    if overlay
-        for (k,v) in Compat.pairs(o.value)
-            @series begin 
-                label --> k 
-                v
-            end
-        end
-    else 
+@recipe function f(o::GroupBy{T, <:Hist}) where {T}
+    sort!(o.value)
+    link --> :all
+    for (k, v) in Compat.pairs(o.value)
         @series begin 
-            label --> name.(collect(values(o.value)))
-            x = collect(keys(o.value))
-            @show map(value, collect(values(o.value)))
-            y = plotshape(map(value, collect(values(o.value))))
-            x, y
+            label --> k 
+            v
+        end
+    end
+end
+@recipe function f(o::GroupBy)
+    sort!(o.value)
+    link --> :all
+    collect(keys(o.value)), value.(collect(values(o.value)))
+end
+
+#-----------------------------------------------------------------------# StatHistory 
+@recipe function f(o::StatHistory)
+    layout --> length(o.circbuff)
+    for i in 1:length(o.circbuff)
+        @series begin 
+            subplot --> i 
+            label --> "Current - $(i-1)"
+            o.circbuff[i]
         end
     end
 end
@@ -106,18 +115,17 @@ end
 @recipe function f(o::AdaptiveBins; sticks=false)
     y = [o[i] for i in 0:(length(o.value) + 1)]
     out = first.(y), last.(y) 
-    @series begin 
+    if !sticks
         seriestype --> :line
         fillto --> 0 
         alpha --> .4
         linewidth --> 0
         out
-    end 
-    if sticks 
-        @series begin 
-            seriestype --> :sticks 
-            out
-        end
+    elseif sticks 
+        seriestype --> :sticks 
+        out 
+    else 
+        error("sticks must be a Bool")
     end
 end
 

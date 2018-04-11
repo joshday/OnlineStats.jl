@@ -497,8 +497,8 @@ end
 #-----------------------------------------------------------------------# StatHistory 
 @testset "StatHistory" begin 
     o = fit!(StatHistory(Mean(), 10), 1:20)
-    @test length(o.lag) == 10
-    for (i, m) in enumerate(reverse(o.lag.buffer))
+    @test length(o.circbuff) == 10
+    for (i, m) in enumerate(reverse(o.circbuff))
         @test nobs(m) == 10 + i
     end
 end

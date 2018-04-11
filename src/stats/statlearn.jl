@@ -12,6 +12,18 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
 
 # Arguments 
 
+- `loss = .5 * L2DistLoss()`
+- `penalty = NoPenalty()`
+- `algorithm = SGD()`
+- `rate = LearningRate(.6)` (keyword arg)
+
+# Example 
+
+    x = randn(1000, 5)
+    y = x * linspace(-1, 1, 5) + randn(1000)
+
+    o = fit!(StatLearn(5, MSPI()), (x, y))
+    coef(o)
 """
 mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: OnlineStat{XY}
     β::Vector{Float64}
@@ -26,17 +38,11 @@ end
 function StatLearn(p::Int, args...; rate=LearningRate())
     λ, loss, pen, alg = zeros(p), .5*L2DistLoss(), NoPenalty(), SGD()
     for a in args 
-        if a isa AbstractVector 
-            λ = a
-        elseif a isa Float64 
-            λ = fill(a, 1)
-        elseif a isa Loss 
-            loss = a 
-        elseif a isa Penalty 
-            pen = a 
-        elseif a isa Algorithm 
-            alg = a 
-        end
+        a isa AbstractVector && (λ = a)
+        a isa Float64        && (λ = fill(a, 1))
+        a isa Loss           && (loss = a)
+        a isa Penalty        && (pen = a)
+        a isa Algorithm      && (alg = a)
     end
     init!(alg, p)
     StatLearn(zeros(p), λ, zeros(p), loss, pen, alg, rate, 0)
@@ -187,8 +193,8 @@ function _fit!(o::StatLearn{MSPI}, xy)
     γ = o.rate(o.n += 1)
     x, y = xy
     gradient!(o, x, y)
-    denom = inv(1 + γ * lconst(o, x, y))
+    γ2 = γ / (1 + γ * lconst(o, x, y))
     for j in eachindex(o.β)
-        @inbounds o.β[j] -= γ * denom * o.gx[j]
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ2 * o.gx[j], γ2 * o.λ[j])
     end
 end

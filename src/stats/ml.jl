@@ -71,61 +71,30 @@ end
 _keys(o) = keys(o)
 _keys(o::Tuple) = 1:length(o)
 
-function width(o::DataPreprocessor, lhs::Expr)
-    out = 0 
-    for ex in lhs.args[2:end]
-        if ex isa Symbol 
+# function width(o::DataPreprocessor, lhs::Expr)
+#     out = 0 
+#     for ex in lhs.args[2:end]
+#         if ex isa Symbol 
 
-        end
-    end
-end
-
-# #-----------------------------------------------------------------------# Terms
-# struct Interaction{V1, V2}
-#     v1::V1
-#     v2::V2
-# end
-
-# #-----------------------------------------------------------------------# FeatureMaker
-# struct FeatureMaker{T, L, R, D<:DataPrerocessor} <: OnlineStat{VectorOb}
-#     lhs::L
-#     rhs::R
-#     processor::D
-#     x::Vector{T}
-# end
-# function FeatureMaker(lhs::L, rhs::R, processor::D; outtype=Float64) where {L,R,D}
-#     FeatureMaker(lhs, rhs, processor, zeros(T, width(processor, rhs)))
-# end
-
-
-
-# @generated function transform!(o::DataPre)
-# @generated function _fit!(o::DataPreprocessor{S, G}, y) where {S, G}
-#     N = length(fieldnames(T))
-#     :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
-# end
-
-# @generated function transform!(o::DataPreprocessor{true, Group{T}}, x::VectorOb) where {T}
-#     N = fieldcount(T)
-#     println(N)
-#     quote 
-#         Base.Cartesian.@nexprs $N i -> updatex!(o, i, x[i])
-#     end
-# end
-
-# function update_x!(o::DataPreprocessor, i, xi)
-#     ind = s
-# end
-
-
-
-# function transform!(o::DataPreprocessor{true}, x::VectorOb)
-#     i = 0
-#     for (xi, stat) in zip(x, o.group.stats)
-#         for j in 1:_width(stat)
-#             i += 1 
-#             o.x[i] = transform(stat, xi, j)
 #         end
 #     end
-#     o.x
+# end
+
+# #-----------------------------------------------------------------------# Terms
+# abstract type ModelTerm end
+
+# struct SingleTerm{T <: ModelingType} <: ModelTerm
+#     a::T 
+# end
+
+# struct Interaction{A<:ModelingType, B <: ModelingType} <: ModelTerm
+#     a::A
+#     b::B
+# end
+# Interaction(a::Numerical, b::Categorical) = Interaction(b, a)
+
+# #-----------------------------------------------------------------------# Formula 
+# struct ModelFormula{L,R,D<:DataPreprocessor}
+#     lhs 
+#     rhs::Vector{ModelTerm}
 # end

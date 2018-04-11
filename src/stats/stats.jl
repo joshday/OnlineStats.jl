@@ -517,6 +517,7 @@ function _fit!(o::GroupBy, xy)
     x, y = xy 
     x in keys(o.value) ? fit!(o.value[x], y) : (o.value[x] = fit!(copy(o.init), y))
 end
+Base.getindex(o::GroupBy{T}, i::T) where {T} = o.value[i]
 function Base.show(io::IO, o::GroupBy)
     print(io, name(o, false, true))
     for (i, (k,v)) in enumerate(o.value)
@@ -537,17 +538,19 @@ Track a moving window (previous `b` copies) of `stat`.
 """
 struct StatHistory{T, O<:OnlineStat{T}} <: OnlineStat{T}
     stat::O
-    lag::Lag{O}
+    circbuff::CircularBuffer{O}
 end
-StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}} = StatHistory{T,O}(stat, Lag{O}(b))
+function StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}} 
+    StatHistory{T,O}(stat, CircularBuffer{O}(b))
+end
 nobs(o::StatHistory) = nobs(o.stat)
 function _fit!(o::StatHistory, y)
     _fit!(o.stat, y)
-    _fit!(o.lag, copy(o.stat))
+    unshift!(o.circbuff, copy(o.stat))
 end
 function Base.show(io::IO, o::StatHistory)
     print(io, name(o, false, true))
-    print_stat_tree(io, o.lag.buffer)
+    print_stat_tree(io, o.circbuff)
 end
 
 #-----------------------------------------------------------------------# HyperLogLog
@@ -1102,7 +1105,3 @@ Base.sum(o::Sum) = o.sum
 _fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.n += 1)
 _fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
 Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
-
-
-
-
