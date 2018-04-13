@@ -210,7 +210,7 @@ end
     @test all(0 .< classify(o, X) .< 3)
     @test O.nkeys(o) == 2 
     @test O.nvars(o) == 10
-    @test mean(classify(o, X) .== Y) > .45
+    @test mean(classify(o, X) .== Y) > .5
     test_exact(FastTree(10), (X[1,:],Y[1]), length, 1)
 
     # Issue 116
@@ -223,7 +223,7 @@ end
     X, Y = O.fakedata(FastNode, 10^4, 10)
     o = fit!(FastForest(10; splitsize=1000), (X, Y))
     @test classify(o, randn(10)) in 1:2
-    @test mean(classify(o, X) .== Y) > .45
+    @test mean(classify(o, X) .== Y) > .5
 end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin 

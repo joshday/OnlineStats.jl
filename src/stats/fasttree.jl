@@ -174,7 +174,7 @@ mutable struct FastForest{T<:FastTree} <: OnlineStat{XY}
     n::Int
 end
 function FastForest(p, nkeys=2; stat = FitNormal(), maxsize=1000, splitsize = 5000,
-                    nt=100, b=floor(Int, sqrt(p)), λ = .05)
+                    nt=100, b=floor(Int, sqrt(p)), λ = 5 * (1 / nt))
     forest = [FastTree(b, nkeys; stat=stat, maxsize=maxsize, splitsize=splitsize) for i in 1:nt]
     subsets = fill(0, b, nt)
     for j in 1:size(subsets, 2)
@@ -200,8 +200,9 @@ function _fit!(o::FastForest, xy)
 end
 
 function _classify(o::FastForest, x::VectorOb, buffer::Vector{Int})
-    for tree in o.forest 
-        buffer[classify(tree, x)] += 1
+    buffer[:] = 0
+    for (i, tree) in enumerate(o.forest)
+        buffer[classify(tree, x[o.subsets[:, i]])] += 1
     end
     findmax(buffer)[2]
 end
