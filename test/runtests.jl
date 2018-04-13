@@ -562,6 +562,11 @@ end
     test_exact(Variance(), y, std, std)
     test_exact(Variance(), y, var, var)
     test_merge(Variance(), y, y2)
+
+    # Issue 116
+    @test std(Variance()) == 1 
+    @test std(fit!(Variance(), 1)) == 1 
+    @test std(fit!(Variance(), [1, 2])) == sqrt(.5)
 end
 
 end #module
