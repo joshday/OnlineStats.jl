@@ -58,7 +58,7 @@ function split!(o::FastNode, tree)
     for j in 1:nvars(o)
         stats_j = o[j]
         k = 0 
-        for stat in stats_j 
+        for stat in stats_j # split candidates
             μ = mean(stat)
             σ = std(stat)
             sc[k+1] = μ - 2σ
@@ -76,7 +76,7 @@ function split!(o::FastNode, tree)
             for k in 1:nkeys(o)
                 fitnormal_kj = stats_j[k]
                 nl[k] = cdf(fitnormal_kj, loc) * nobs(fitnormal_kj)
-                nr[k] = 1.0 - nl[k]
+                nr[k] = nobs(fitnormal_kj) - nl[k]
             end
             imp_l = impurity(nl ./ sum(nl))
             imp_r = impurity(nr ./ sum(nr))
@@ -137,7 +137,6 @@ function _fit!(o::FastTree, xy)
 end
 
 function whichleaf(o, x::VectorOb)
-    i = 1
     node = o.tree[1]
     while length(node.ids) > 1
         node = o.tree[whichchild(node, x)]
