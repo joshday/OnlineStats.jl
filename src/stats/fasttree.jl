@@ -12,8 +12,9 @@ Base.show(io::IO, o::FastNode) =
     print(io, "FastNode | $(nkeys(o)) keys × $(nvars(o)) vars | at=$((o.j, o.at))")
 
 function _fit!(o::FastNode, xy) 
-    last(xy) in 1:nkeys(o) || error("y must be an integer in 1:nkeys")
-    _fit!(o.stats[last(xy)], first(xy))
+    x, y = xy
+    y in 1:nkeys(o) || error("y must be an integer in 1:nkeys")
+    _fit!(o.stats[y], x)
 end
 nobs(o::FastNode) = sum(nobs, o.stats)
 probs(o::FastNode) = nobs.(o.stats) ./ nobs(o)
@@ -74,9 +75,10 @@ function split!(o::FastNode, tree)
         end
         for loc in sc
             for k in 1:nkeys(o)
-                fitnormal_kj = stats_j[k]
-                nl[k] = cdf(fitnormal_kj, loc) * nobs(fitnormal_kj)
-                nr[k] = nobs(fitnormal_kj) - nl[k]
+                stat_kj = stats_j[k]  # summarizes variable j for label k
+                # @show cdf(stat_kj, loc), std(stat_kj), nobs(stat_kj)
+                nl[k] = cdf(stat_kj, loc) * nobs(stat_kj)
+                nr[k] = nobs(stat_kj) - nl[k]
             end
             imp_l = impurity(nl ./ sum(nl))
             imp_r = impurity(nr ./ sum(nr))

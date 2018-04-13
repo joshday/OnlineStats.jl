@@ -129,10 +129,15 @@ Base.mean(o::FitNormal) = mean(o.v)
 Base.var(o::FitNormal) = var(o.v)
 
 function pdf(o::FitNormal, x::Number) 
+    # nobs(o) < 2 && return 0.0
     σ = std(o)
     return 1 / (sqrt(2π) * σ) * exp(-(x - mean(o))^2 / 2σ^2)
 end
-cdf(o::FitNormal, x::Number) = .5 * (1.0 + SpecialFunctions.erf((x - mean(o)) / (std(o) * √2)))
+function cdf(o::FitNormal, x::Number) 
+    # nobs(o) == 0 && return 0.0 
+    # nobs(o) == 1 && return Float64(x > mean(o))
+    .5 * (1.0 + SpecialFunctions.erf((x - mean(o)) / (std(o) * √2)))
+end
 
 #-----------------------------------------------------------------------# Multinomial
 """
