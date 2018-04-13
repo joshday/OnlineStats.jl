@@ -297,9 +297,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "visualizations.html#Many-Stats-Can-Be-Plotted-1",
+    "location": "visualizations.html#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1",
     "page": "Visualizations",
-    "title": "Many Stats Can Be Plotted",
+    "title": "Many Stats Can Be Plotted via Plot Recipes",
     "category": "section",
     "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\") # hide(Image: )"
 },
