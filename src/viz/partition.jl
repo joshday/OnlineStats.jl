@@ -157,7 +157,9 @@ function merge_nearest!(parts::Vector{<:Part})
     deleteat!(parts, ind + 1)
 end
 
-get_diff(a::Part{T}, b::Part{T}) where {T<:Dates.TimeType} = b.a - a.b
+
+get_diff(a::Part{T}, b::Part{T}) where {T<:Dates.TimeType} = 
+    (Dates.value(b.a) - Dates.value(a.b)) * (nobs(a) + nobs(b)) / 2
 
 get_diff(a::Part{T}, b::Part{T}) where {T<:Number} = (b.a - a.b) * (nobs(a) + nobs(b)) / 2
 
@@ -178,7 +180,7 @@ function Base.merge!(o::IndexedPartition, o2::IndexedPartition)
     for i in reverse(2:length(o.parts))
         p1, p2 = o.parts[i-1], o.parts[i]
         if p1.a > p2.b
-            info("hey I deleted something at $i")
+            # info("hey I deleted something at $i")
             merge!(p1, p2)
             deleteat!(o.parts, i)
         end

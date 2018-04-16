@@ -186,6 +186,7 @@ end
         if length(y[1]) == 2 
             fillto --> y2[:, 1]
             alpha --> .4
+            linewidth --> 0
             x2, y2[:, 2]
         else
             x2, y2 
