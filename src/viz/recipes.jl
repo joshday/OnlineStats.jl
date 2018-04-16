@@ -159,7 +159,7 @@ end
         xlim --> (parts[1].a, parts[end].b)
     end
     if y[1] isa Number
-        lab --> name(parts[1].stat, false, false)
+        label --> name(parts[1].stat, false, false)
         x, y
     elseif y[1] isa Tuple{VectorOb, VectorOb}  # Histogram
         x2, y2, z = eltype(x)[], [], []
@@ -180,7 +180,7 @@ end
         hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)], :quiet
         x2, y2
     elseif y[1] isa VectorOb
-        lab --> name(parts[1].stat, false, false)
+        label --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
         if length(y[1]) == 2 
@@ -199,7 +199,7 @@ end
         sort!(kys)
         y2 = 
         @series begin 
-            lab --> reshape(kys, (1, length(kys)))
+            label --> reshape(kys, (1, length(kys)))
             ylim --> (0, 1)
             linewidth --> .5
             seriestype --> :bar
