@@ -14,7 +14,6 @@ import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoi
     fweights, sample, coef, Histogram
 import DataStructures: OrderedDict, CircularBuffer
 import NamedTuples  # Remove in 0.7
-import SpecialFunctions
 import SweepOperator
 
 export 

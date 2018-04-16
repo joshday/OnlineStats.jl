@@ -129,14 +129,23 @@ Base.mean(o::FitNormal) = mean(o.v)
 Base.var(o::FitNormal) = var(o.v)
 
 function pdf(o::FitNormal, x::Number) 
-    # nobs(o) < 2 && return 0.0
     σ = std(o)
-    return 1 / (sqrt(2π) * σ) * exp(-(x - mean(o))^2 / 2σ^2)
+    1 / (sqrt(2π) * σ) * exp(-(x - mean(o))^2 / 2σ^2)
 end
 function cdf(o::FitNormal, x::Number) 
-    # nobs(o) == 0 && return 0.0 
-    # nobs(o) == 1 && return Float64(x > mean(o))
-    .5 * (1.0 + SpecialFunctions.erf((x - mean(o)) / (std(o) * √2)))
+    .5 * (1.0 + erf_approx((x - mean(o)) / (std(o) * √2)))
+end
+# https://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions
+function erf_approx(x)
+    s = sign(x)
+    p = 0.3275911
+    a1 = 0.254829592
+    a2 = -0.284496736
+    a3 = 1.421413741
+    a4 = -1.453152027
+    a5 = 1.061405429
+    t = 1 / (1 + p * s * x)
+    s * (1 - (a1*t + a2*t^2 + a3*t^3 + a4*t^4 + a5*t^5) * exp(-x^2))
 end
 
 #-----------------------------------------------------------------------# Multinomial

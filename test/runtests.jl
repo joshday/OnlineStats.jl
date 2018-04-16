@@ -33,6 +33,7 @@ for stat in [
 end
 
 #-----------------------------------------------------------------------# Plots 
+println("\n\n")
 info("Sanity checking Plots")
 plot(Mean())
 plot(EqualWeight())
@@ -87,6 +88,8 @@ nrows(y::Base.Iterators.Zip2) = length(y)
 
 
 #-----------------------------------------------------------------------# utils 
+println("\n\n")
+info("Testing Utils")
 @testset "utils" begin 
     @test O._dot((1,2,3), (4,5,6)) == sum([1,2,3] .* [4,5,6])
     @test length(BiasVec((1,2,3))) == 4
@@ -256,7 +259,7 @@ end
     @test O.pdf(o, 0.0) ≈ 0.3989422804014327
     @test O.pdf(o, -1.0) ≈ 0.24197072451914337
     @test O.cdf(o, 0.0) ≈ 0.5
-    @test O.cdf(o, -1.0) ≈ 0.15865525393145702
+    @test ≈(O.cdf(o, -1.0), 0.15865525393145702; atol=.001)
 end
 @testset "FitMultinomial" begin 
     o = FitMultinomial(5)
