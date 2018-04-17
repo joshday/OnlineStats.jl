@@ -169,11 +169,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "weights.html#OnlineStatsBase.Bounded",
+    "page": "Weight",
+    "title": "OnlineStatsBase.Bounded",
+    "category": "type",
+    "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\n(t) = max((t) )\n\n\n\n"
+},
+
+{
+    "location": "weights.html#OnlineStatsBase.Scaled",
+    "page": "Weight",
+    "title": "OnlineStatsBase.Scaled",
+    "category": "type",
+    "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\n(t) =  * (t)\n\n\n\n"
+},
+
+{
     "location": "weights.html#Weight-wrappers-1",
     "page": "Weight",
     "title": "Weight wrappers",
     "category": "section",
-    "text": "Bounded\nScaled"
+    "text": "OnlineStatsBase.Bounded\nOnlineStatsBase.Scaled"
 },
 
 {
@@ -281,9 +297,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "visualizations.html#Many-Stats-Can-Be-Plotted-1",
+    "location": "visualizations.html#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1",
     "page": "Visualizations",
-    "title": "Many Stats Can Be Plotted",
+    "title": "Many Stats Can Be Plotted via Plot Recipes",
     "category": "section",
     "text": "s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\") # hide(Image: )"
 },
@@ -341,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), [x y])\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )note: Note\nIndexedPartition is designed to work with Number index types.  While other types may work, you may get some unexpected behavior.x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Date, Hist(20)), [x y])\n\nplot(o, xlab = \"Date\")\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )x2 = Dates.value.(x)\n\no = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])\n\nplot(o, xlab = \"Date as Number\")\nsavefig(\"indexpartequal2.png\"); nothing # hide(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )note: Note\nIndexedPartition is designed to work with Number index types.  While other types may work, you may get some unexpected behavior.x = rand(Date(2000):Date(2020), 10^5)\ny = Dates.year.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Date, Hist(20)), [x y])\n\nplot(o, xlab = \"Date\")\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )x2 = Dates.value.(x)\n\no = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])\n\nplot(o, xlab = \"Date as Number\")\nsavefig(\"indexpartequal2.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -553,6 +569,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.GroupBy",
+    "page": "API",
+    "title": "OnlineStats.GroupBy",
+    "category": "type",
+    "text": "GroupBy{T}(stat)\n\nUpdate stat for each group (of type T).\n\nExample\n\nx = rand(1:10, 10^5)\ny = x .+ randn(10^5)\nfit!(GroupBy{Int}(Extrema()), zip(x,y))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Hist",
     "page": "API",
     "title": "OnlineStats.Hist",
@@ -589,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Lag",
     "category": "type",
-    "text": "Lag(b, T = Float64)\n\nStore the last b values for a data stream of type T.\n\n\n\n"
+    "text": "Lag{T}(b::Integer)\n\nStore the last b values for a data stream of type T.  Values are stored as \n\nv(t) v(t-1) v(t-2)  v(t-b+1)\n\nExample\n\nfit!(Lag{Int}(10), 1:12)\n\n\n\n"
 },
 
 {
@@ -713,11 +737,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.StatHistory",
+    "page": "API",
+    "title": "OnlineStats.StatHistory",
+    "category": "type",
+    "text": "StatHistory(stat, b)\n\nTrack a moving window (previous b copies) of stat. \n\nExample\n\nfit!(StatHistory(Mean(), 10), 1:20)\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.StatLearn",
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "type",
-    "text": "StatLearn(p, args...)\n\nFit a model that is linear in the parameters.  \n\nThe (offline) objective function that StatLearn approximately minimizes is\n\n(1n)  f(y x) +   g()\n\nwhere f are loss functions of a single response and linear predictor, s are  nonnegative regularization parameters, and g is a penalty function. \n\nArguments\n\n\n\n"
+    "text": "StatLearn(p, args...)\n\nFit a model that is linear in the parameters.  \n\nThe (offline) objective function that StatLearn approximately minimizes is\n\n(1n)  f(y x) +   g()\n\nwhere f are loss functions of a single response and linear predictor, s are  nonnegative regularization parameters, and g is a penalty function. \n\nArguments\n\nloss = .5 * L2DistLoss()\npenalty = NoPenalty()\nalgorithm = SGD()\nrate = LearningRate(.6) (keyword arg)\n\nExample\n\nx = randn(1000, 5)\ny = x * linspace(-1, 1, 5) + randn(1000)\n\no = fit!(StatLearn(5, MSPI()), (x, y))\ncoef(o)\n\n\n\n"
 },
 
 {

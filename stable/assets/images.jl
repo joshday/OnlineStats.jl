@@ -1,4 +1,5 @@
 using OnlineStats, Plots, Colors
+gr()
 
 # #-----------------------------------------------------------------------# logo
 # x = [0. 10. 20.]
@@ -16,54 +17,56 @@ using OnlineStats, Plots, Colors
 # gif(a, @__DIR__() * "/logo.gif", fps=100)
 
 #-----------------------------------------------------------------------# Weight animation
+# n = 100
+# srand(123)
+# y = .5cumsum(rand(n)) + 3randn(n)
+
+# s1 = Series(EqualWeight(),              Mean())
+# s2 = Series(ExponentialWeight(.1),      Mean())
+# s3 = Series(Bounded(EqualWeight(), .1), Mean())
+# s4 = Series(LearningRate(.6),           Mean())
+# s5 = Series(HarmonicWeight(10.),        Mean())
+# s6 = Series(McclainWeight(.1),          Mean())
+
+# p = plot(zeros(0), zeros(0, 7), seriestype = [:scatter :line :line :line :line :line :line], w=1,
+#     label = ["data" "EqualWeight" "ExponentialWeight(.1)" "Bounded(EqualWeight(), .1)" "LearningRate(.6)" "HarmonicWeight(10)" "McclainWeight(.1)"], ms=2, linestyle=:auto,
+#     grid=false, legend = :topleft, xlab = "Number of Observations", title="Means",
+#     palette = :darktest, ylim = (-5, 30))
+
+# s = [s1, s2, s3, s4, s5, s6]
+# a = @animate for yi in y
+#     for si in s
+#         fit!(si, yi)
+#     end
+#     vals = vcat(yi, map(x -> value(x)[1], s)...)
+#     # @show typeof(vals)
+#     push!(p, nobs(s1), vals)
+# end
+
+# gif(a, @__DIR__() * "/weights.gif")
+
+
+#-----------------------------------------------------------------------# readme animation
+# Updated 3/31/18
 n = 100
 srand(123)
 y = .5cumsum(rand(n)) + 3randn(n)
 
-s1 = Series(EqualWeight(),              Mean())
-s2 = Series(ExponentialWeight(.1),      Mean())
-s3 = Series(Bounded(EqualWeight(), .1), Mean())
-s4 = Series(LearningRate(.6),           Mean())
-s5 = Series(HarmonicWeight(10.),        Mean())
-s6 = Series(McclainWeight(.1),          Mean())
+o1 = Mean()
+o2 = Mean(weight = x -> .1)
+p = plot(zeros(0), zeros(0, 3), seriestype = [:scatter :line :line], w=3,
+    label = ["data", "equally weighted", "exponentially weighted"],
+    grid=false, legend = :topleft, xlab = "Number of Observations",
+    title = "Means", ylim = (-5, 30), color = :viridis
+)
 
-p = plot(zeros(0), zeros(0, 7), seriestype = [:scatter :line :line :line :line :line :line], w=1,
-    label = ["data" "EqualWeight" "ExponentialWeight(.1)" "Bounded(EqualWeight(), .1)" "LearningRate(.6)" "HarmonicWeight(10)" "McclainWeight(.1)"], ms=2, linestyle=:auto,
-    grid=false, legend = :topleft, xlab = "Number of Observations", title="Means",
-    palette = :darktest, ylim = (-5, 30))
-
-s = [s1, s2, s3, s4, s5, s6]
 a = @animate for yi in y
-    for si in s
-        fit!(si, yi)
-    end
-    vals = vcat(yi, map(x -> value(x)[1], s)...)
-    # @show typeof(vals)
-    push!(p, nobs(s1), vals)
+    fit!(o1, yi)
+    fit!(o2, yi)
+    push!(p, nobs(o1), vcat(yi, value(o1), value(o2)))
 end
 
-gif(a, @__DIR__() * "/weights.gif")
-
-
-#-----------------------------------------------------------------------# readme animation
-# n = 100
-# srand(123)
-# y = .5cumsum(rand(n)) + 3randn(n)
-#
-# s1 = Series(EqualWeight(), Mean())
-# s2 = Series(ExponentialWeight(), Mean())
-# p = plot(zeros(0), zeros(0, 3), seriestype = [:scatter :line :line], w=4,
-#     label = ["data" "EqualWeight" "ExponentialWeight(.1)"],
-#     grid=false, legend = :topleft, xlab = "Number of Observations", title="Means",
-#     color = [:black :darkblue :darkred], ylim = (-5, 30))
-#
-# a = @animate for yi in y
-#     fit!(s1, yi)
-#     fit!(s2, yi)
-#     push!(p, nobs(s1), vcat(yi, value(s1), value(s2)))
-# end
-#
-# gif(a, @__DIR__() * "/readme.gif")
+gif(a, "/Users/joshday/Desktop/readme.gif")
 
 
 
