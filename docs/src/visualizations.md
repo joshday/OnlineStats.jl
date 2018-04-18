@@ -155,9 +155,6 @@ savefig("indexpart4.png"); nothing # hide
 ```
 ![](indexpart4.png)
 
-!!! note
-    `IndexedPartition` is designed to work with `Number` index types.  While other types may work, you may get some unexpected behavior.
-
 ```@example setup
 x = rand(Date(2000):Date(2020), 10^5)
 y = Dates.year.(x) + randn(10^5)
@@ -169,13 +166,3 @@ savefig("indexpartequal.png"); nothing # hide
 
 ```
 ![](indexpartequal.png)
-
-```@example setup 
-x2 = Dates.value.(x)
-
-o = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
-
-plot(o, xlab = "Date as Number")
-savefig("indexpartequal2.png"); nothing # hide
-```
-![](indexpartequal2.png)
