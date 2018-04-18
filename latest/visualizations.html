@@ -48,13 +48,9 @@ y = rand(1:5, 10^5)
 
 o = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))
 
-plot(o, xlab = &quot;X&quot;, ylab = &quot;Y&quot;)</code></pre></div><p><img src="indexpart4.png" alt/></p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p><code>IndexedPartition</code> is designed to work with <code>Number</code> index types.  While other types may work, you may get some unexpected behavior.</p></div></div><div><pre><code class="language-julia">x = rand(Date(2000):Date(2020), 10^5)
+plot(o, xlab = &quot;X&quot;, ylab = &quot;Y&quot;)</code></pre></div><p><img src="indexpart4.png" alt/></p><div><pre><code class="language-julia">x = rand(Date(2000):Date(2020), 10^5)
 y = Dates.year.(x) + randn(10^5)
 
 o = fit!(IndexedPartition(Date, Hist(20)), [x y])
 
-plot(o, xlab = &quot;Date&quot;)</code></pre></div><p><img src="indexpartequal.png" alt/></p><div><pre><code class="language-julia">x2 = Dates.value.(x)
-
-o = fit!(IndexedPartition(Float64, Hist(20)), [x2 y])
-
-plot(o, xlab = &quot;Date as Number&quot;)</code></pre></div><p><img src="indexpartequal2.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
+plot(o, xlab = &quot;Date&quot;)</code></pre></div><p><img src="indexpartequal.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
