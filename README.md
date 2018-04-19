@@ -1,4 +1,4 @@
-![](https://user-images.githubusercontent.com/8075494/38769710-631a2a7c-3fd5-11e8-9a81-6bcc120d65ea.png)
+![](https://user-images.githubusercontent.com/8075494/38999873-bf79385a-43c0-11e8-91d5-228fc5a1f23e.png)
 
 | Documentation | Release | Master Build | Test Coverage |
 |:-------------:|:-------:|:-----:|:-------------:|
