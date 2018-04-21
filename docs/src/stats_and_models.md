@@ -9,7 +9,6 @@
 | Maximum/Minimum                    | [`Extrema`](@ref)          |
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
-| Count                              | [`Count`](@ref)            |
 | **Time Series:**                   |                            |
 | Difference                         | [`Diff`](@ref)             |
 | Lag                                | [`Lag`](@ref)              |
@@ -44,5 +43,5 @@
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
-| Callbacks                          | [`CallFun`](@ref), [`mapblocks`](@ref) |
+| Callbacks                          | [`CallFun`](@ref), [`eachrow`](@ref), [`eachcol`](@ref)|
 | Summary of partition               | [`Partition`](@ref), [`IndexedPartition`](@ref) |
