@@ -5,7 +5,7 @@
 | **Univariate Statistics:**         |                            |
 | Mean                               | [`Mean`](@ref)             |
 | Variance                           | [`Variance`](@ref)         |
-| Quantiles                          | [`Quantile`](@ref) and [`PQuantile`](@ref) |
+| Quantiles                          | [`Quantile`](@ref) and [`P2Quantile`](@ref) |
 | Maximum/Minimum                    | [`Extrema`](@ref)          |
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
