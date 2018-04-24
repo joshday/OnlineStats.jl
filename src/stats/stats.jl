@@ -60,14 +60,15 @@ Store the last `b` values for a data stream of type `T`.  Values are stored as
     fit!(Lag{Int}(10), 1:12)
 """
 mutable struct Lag{T} <: OnlineStat{T}
-    buffer::CircularBuffer{T}
+    circbuff::CircularBuffer{T}
     n::Int
     Lag{T}(b::Integer) where {T} = new{T}(CircularBuffer{T}(b), 0)
 end
 Lag(b::Integer, T = Float64) = Lag{T}(b)
-_fit!(o::Lag, y) = (o.n += 1; unshift!(o.buffer, y))
-Base.length(o::Lag) = length(o.buffer)
-Base.getindex(o::Lag, i) = o.buffer[i]
+value(o::Lag) = reverse(o.circbuff)
+_fit!(o::Lag, y) = (o.n += 1; push!(o.circbuff, y))
+Base.length(o::Lag) = length(o.circbuff)
+Base.getindex(o::Lag, i) = o.circbuff[end - i + 1]
 
 """
     AutoCov(b, T = Float64; weight=EqualWeight())
