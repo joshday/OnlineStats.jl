@@ -82,3 +82,9 @@ gif(a, "/Users/joshday/Desktop/readme.gif")
 # p = plot(p1, p2, p3, p4, p5, p6, size = (1200, 800), legendfont = font(12))
 #
 # png(p, @__DIR__() * "/weights.png")
+
+
+#-----------------------------------------------------------------------# Logo
+# o = fit!(Partition(Hist(8)), sin.(0:.001:2π) + .4randn(length(0:.001:2π)))
+# p = plot(o, color = :viridis, grid=false, axis=false, legend=false, ms=4
+# png(p, "/Users/joshday/Desktop/logo.png")
