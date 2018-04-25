@@ -60,9 +60,9 @@ We can also explictly iterate over the **rows** or **columns** with [`eachrow`](
 [`eachcol`](@ref), respectively.
 
 ```@repl index
-fit!(CovMatrix(), eachrow(randn(100, 2)))
+fit!(CovMatrix(), eachrow(randn(1000, 2)))
 ```
 
 ```@repl index
-fit!(CovMatrix(), eachcol(randn(2, 100)))
+fit!(CovMatrix(), eachcol(randn(2, 1000)))
 ```
