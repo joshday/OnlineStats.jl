@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Details of fit!-ting",
     "category": "section",
-    "text": "The second argument to fit! can be either a single observation or an iterator of observations. Naturally, a Mean accepts a number as its input, so when a vector of numbers is provided, fit! updates the Mean one element at a time by iterating through the vector.A slightly more complicated example is when the input is a vector, such as a covariance  matrix (`CovMatrix).  When a matrix is provided, OnlineStats will iterate over the  rows of the matrix.fit!(CovMatrix(), randn(100, 2))We can also explictly iterate over the rows or columns with eachrow and  eachcol, respectively.fit!(CovMatrix(), eachrow(randn(100, 2)))fit!(CovMatrix(), eachcol(randn(2, 100)))"
+    "text": "The second argument to fit! can be either a single observation or an iterator of observations. Naturally, a Mean accepts a number as its input, so when a vector of numbers is provided, fit! updates the Mean one element at a time by iterating through the vector.A slightly more complicated example is when the input is a vector, such as a covariance  matrix (`CovMatrix).  When a matrix is provided, OnlineStats will iterate over the  rows of the matrix.fit!(CovMatrix(), randn(100, 2))We can also explictly iterate over the rows or columns with eachrow and  eachcol, respectively.fit!(CovMatrix(), eachrow(randn(1000, 2)))fit!(CovMatrix(), eachcol(randn(2, 1000)))"
 },
 
 {
