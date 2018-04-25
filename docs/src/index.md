@@ -12,7 +12,7 @@ Pkg.add("OnlineStats")
 
 ### Every Stat is `<: OnlineStat`
 
-```@example index
+```@repl index
 using OnlineStats
 
 m = Mean()
@@ -20,7 +20,7 @@ m = Mean()
 
 ### Stats Can Be Updated
 
-```@example index
+```@repl index
 y = randn(100)
 
 fit!(m, y)
@@ -28,7 +28,7 @@ fit!(m, y)
 
 ### Stats Can Be Merged 
 
-```@example index 
+```@repl index 
 y2 = randn(100)
 
 m2 = fit!(Mean(), y2)
@@ -38,7 +38,7 @@ merge!(m, m2)
 
 ### Stats Have a Value 
 
-```@example index
+```@repl index
 value(m)
 ```
 
@@ -52,17 +52,17 @@ A slightly more complicated example is when the input is a vector, such as a cov
 matrix ([`CovMatrix](@ref)).  When a matrix is provided, OnlineStats will iterate over the 
 **rows** of the matrix.
 
-```@example index
+```@repl index
 fit!(CovMatrix(), randn(100, 2))
 ```
 
 We can also explictly iterate over the **rows** or **columns** with [`eachrow`](@ref) and 
 [`eachcol`](@ref), respectively.
 
-```@example index
+```@repl index
 fit!(CovMatrix(), eachrow(randn(100, 2)))
 ```
 
-```@example index
+```@repl index
 fit!(CovMatrix(), eachcol(randn(100, 2)))
 ```

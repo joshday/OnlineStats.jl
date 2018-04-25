@@ -228,6 +228,7 @@ mutable struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
     value::A  # OrderedDict by default
     n::Int
 end
+CountMap{T}() where {T} = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T,Int}(), 0)
 CountMap(T::Type) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(), 0)
 CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d, 0)
 function _fit!(o::CountMap, x) 
