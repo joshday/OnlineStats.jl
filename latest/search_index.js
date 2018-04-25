@@ -45,7 +45,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Stats Can Be Updated",
     "category": "section",
-    "text": "y = randn(100)\n\nfit!(m, y)"
+    "text": "y = randn(100);\n\nfit!(m, y)"
 },
 
 {
@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Stats Can Be Merged",
     "category": "section",
-    "text": "y2 = randn(100)\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)"
+    "text": "y2 = randn(100);\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)"
 },
 
 {
@@ -205,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Custom Weighting",
     "category": "section",
-    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> x == 1 ? 1.0 : .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\n\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)"
+    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> x == 1 ? 1.0 : .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)"
 },
 
 {
@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, eachrow, eachcol\nSummary of partition Partition, IndexedPartition"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nTracked history StatHistory\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, eachrow, eachcol\nBig Data Viz Partition, IndexedPartition\nCollections of Stats: \nApplied to same data stream Series, FTSeries\nApplied to different data streams `Group\nCalculated stat by group GroupBy"
 },
 
 {
