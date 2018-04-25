@@ -13,6 +13,7 @@
 | Difference                         | [`Diff`](@ref)             |
 | Lag                                | [`Lag`](@ref)              |
 | Autocorrelation/autocovariance     | [`AutoCov`](@ref)          |
+| Tracked history                    | [`StatHistory`](@ref)      |
 | **Multivariate Analysis:**         |                            |
 | Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
 | Principal components analysis      | [`CovMatrix`](@ref)        |
@@ -44,4 +45,8 @@
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
 | Callbacks                          | [`CallFun`](@ref), [`eachrow`](@ref), [`eachcol`](@ref)|
-| Summary of partition               | [`Partition`](@ref), [`IndexedPartition`](@ref) |
+| Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref) |
+| **Collections of Stats:**          |                            |
+| Applied to same data stream        | [`Series`](@ref), [`FTSeries`](@ref) |
+| Applied to different data streams  | [`Group](@ref)
+| Calculated stat by group           | [`GroupBy`](@ref)          |

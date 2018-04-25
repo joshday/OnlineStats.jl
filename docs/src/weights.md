@@ -43,7 +43,6 @@ The `Weight` can be any callable object that receives the number of observations
 
 ```@repl 
 using OnlineStats # hide
-
 y = randn(100);
 
 fit!(Mean(weight = EqualWeight()), y)

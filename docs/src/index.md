@@ -21,7 +21,7 @@ m = Mean()
 ### Stats Can Be Updated
 
 ```@repl index
-y = randn(100)
+y = randn(100);
 
 fit!(m, y)
 ```
@@ -29,7 +29,7 @@ fit!(m, y)
 ### Stats Can Be Merged 
 
 ```@repl index 
-y2 = randn(100)
+y2 = randn(100);
 
 m2 = fit!(Mean(), y2)
 
