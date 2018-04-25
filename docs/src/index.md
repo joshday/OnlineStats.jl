@@ -64,5 +64,5 @@ fit!(CovMatrix(), eachrow(randn(100, 2)))
 ```
 
 ```@repl index
-fit!(CovMatrix(), eachcol(randn(100, 2)))
+fit!(CovMatrix(), eachcol(randn(2, 100)))
 ```
