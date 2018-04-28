@@ -229,7 +229,7 @@ mutable struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
     n::Int
 end
 CountMap{T}() where {T} = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T,Int}(), 0)
-CountMap(T::Type) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(), 0)
+CountMap(T::Type = Any) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(), 0)
 CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d, 0)
 function _fit!(o::CountMap, x) 
     o.n += 1
@@ -428,8 +428,9 @@ nobs(o::FTSeries) = nobs(o.stats[1])
     n = length(fieldnames(OS))
     quote
         if o.filter(y)
+            yt = o.transform(y)
             Base.Cartesian.@nexprs $n i -> @inbounds begin
-                _fit!(o.stats[i], o.transform(y)) 
+                _fit!(o.stats[i], yt) 
             end
         else
             o.nfiltered += 1
