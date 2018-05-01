@@ -48,5 +48,5 @@
 | Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref) |
 | **Collections of Stats:**          |                            |
 | Applied to same data stream        | [`Series`](@ref), [`FTSeries`](@ref) |
-| Applied to different data streams  | [`Group](@ref)
+| Applied to different data streams  | [`Group`](@ref)
 | Calculated stat by group           | [`GroupBy`](@ref)          |
