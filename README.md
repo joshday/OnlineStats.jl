@@ -1,4 +1,4 @@
-![](https://user-images.githubusercontent.com/8075494/39086572-80874e5a-4561-11e8-9a05-e52b21a3e580.png)
+<img src="https://user-images.githubusercontent.com/8075494/39086572-80874e5a-4561-11e8-9a05-e52b21a3e580.png" width=450>
 
 | Documentation | Release | Master Build | Test Coverage |
 |:-------------:|:-------:|:-----:|:-------------:|
