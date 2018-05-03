@@ -254,6 +254,12 @@ nkeys(o::CountMap) = length(o.value)
 Base.values(o::CountMap) = values(o.value)
 Base.getindex(o::CountMap, i) = o.value[i]
 
+#-----------------------------------------------------------------------# Counter 
+mutable struct Counter <: OnlineStat{Any}
+    n::Int
+end
+_fit!(o::Counter) = (o.n += 1)
+
 #-----------------------------------------------------------------------# CovMatrix 
 """
     CovMatrix(p=0; weight=EqualWeight())
@@ -379,13 +385,13 @@ Maximum and minimum.
 
     fit!(Extrema(), rand(10^5))
 """
-mutable struct Extrema{T} <: OnlineStat{Number}
+mutable struct Extrema{T} <: OnlineStat{T}
     min::T
     max::T
     n::Int
 end
 Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T), 0)
-function _fit!(o::Extrema, y::Real)
+function _fit!(o::Extrema{T}, y::T) where {T}
     o.min = min(o.min, y)
     o.max = max(o.max, y)
     o.n += 1

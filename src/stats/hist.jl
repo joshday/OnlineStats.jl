@@ -174,7 +174,7 @@ Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-struct AdaptiveBins{T} <: HistAlgorithm{Number} 
+struct AdaptiveBins{T} <: HistAlgorithm{T} 
     value::Vector{Pair{T, Int}}
     b::Int
     ex::Extrema{T}
