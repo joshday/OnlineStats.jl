@@ -197,13 +197,14 @@ end
             ky ∉ kys && push!(kys, ky)
         end
         sort!(kys)
-        y2 = 
         @series begin 
             label --> reshape(kys, (1, length(kys)))
             ylim --> (0, 1)
             linewidth --> .5
             seriestype --> :bar
-            bar_widths --> [p.b - p.a for p in parts]
+            if parts[1].a isa Number 
+                bar_widths --> [p.b - p.a for p in parts]
+            end
             y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
             x, y
         end

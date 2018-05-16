@@ -390,7 +390,8 @@ mutable struct Extrema{T} <: OnlineStat{T}
     max::T
     n::Int
 end
-Extrema(T::Type = Float64) = Extrema{T}(typemax(T), typemin(T), 0)
+Extrema(T::Type = Float64) = Extrema{T}(typemax.(T), typemin.(T), 0)
+Extrema(initmin::T, initmax::T) where {T} = Extrema{T}(initmin, initmax, 0)
 function _fit!(o::Extrema{T}, y::T) where {T}
     o.min = min(o.min, y)
     o.max = max(o.max, y)
