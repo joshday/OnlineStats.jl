@@ -122,6 +122,7 @@ function Base.show(io::IO, o::FastTree)
     print(io, ", size=", length(o.tree))
     print(io, ", maxsize=", o.maxsize)
     print(io, ", splitsize=", o.splitsize)
+    print(io, ")")
 end
 nobs(o::FastTree) = nobs(o.tree[1])
 nkeys(o::FastTree) = nkeys(o.tree[1])

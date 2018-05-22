@@ -61,7 +61,6 @@ include("stats/fasttree.jl")
 include("stats/linreg.jl")
 include("stats/statlearn.jl")
 include("viz/partition.jl")
-include("viz/mosaic.jl")
+include("viz/mosaicplot.jl")
 include("viz/recipes.jl")
-include("viz/plotmaker.jl")
 end

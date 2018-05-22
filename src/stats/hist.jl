@@ -158,13 +158,17 @@ function pdf(o::FixedBins, y::Real)
     if binidx < 1 || binidx > length(c)
         return 0.0
     else
-        e = o.edges
-        if isa(e, AbstractRange)
-            area = step(e) * sum(c)
-        else
-            area = sum((e[i+1] - e[i]) * c[i] for i in 1:length(c))
-        end
-        return c[binidx] / area
+        return c[binidx] / area(o)
+    end
+end
+
+function area(o::FixedBins) 
+    c = o.counts 
+    e = o.edges
+    if isa(e, AbstractRange)
+        return step(e) * sum(c)
+    else
+        return sum((e[i+1] - e[i]) * c[i] for i in 1:length(c))
     end
 end
 

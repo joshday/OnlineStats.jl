@@ -110,11 +110,11 @@ end
 @recipe f(o::Hist) = o.alg
 
 @recipe f(o::FixedBins{closed}) where {closed} =
-    Histogram(o.edges, o.counts, closed)
+    Histogram(o.edges, o.counts ./ area(o), closed)
 
 @recipe function f(o::AdaptiveBins; sticks=false)
     y = [o[i] for i in 0:(length(o.value) + 1)]
-    out = first.(y), last.(y) 
+    out = first.(y), last.(y) ./ area(o)
     if !sticks
         seriestype --> :line
         fillto --> 0 
@@ -159,6 +159,7 @@ end
         xlim --> (parts[1].a, parts[end].b)
     end
     if y[1] isa Number
+        seriestype --> :step
         label --> name(parts[1].stat, false, false)
         x, y
     elseif y[1] isa Tuple{VectorOb, VectorOb}  # Histogram
@@ -184,6 +185,7 @@ end
         y2 = plotshape(y)
         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
         if length(y[1]) == 2 
+            seriestype --> :step
             fillto --> y2[:, 1]
             alpha --> .4
             linewidth --> 0
