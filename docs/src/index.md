@@ -44,25 +44,48 @@ value(m)
 
 ## Details of `fit!`-ting
 
-The second argument to `fit!` can be either a single observation or an iterator of observations.
-Naturally, a `Mean` accepts a number as its input, so when a vector of numbers is provided,
-`fit!` updates the `Mean` one element at a time by iterating through the vector.
+Stats are subtypes of the parametric abstract type `OnlineStat{T}`, where `T` is the type of a single observation.  For example, `Mean <: OnlineStat{Number}`.  
 
-A slightly more complicated example is when the input is a vector, such as a covariance 
-matrix ([`CovMatrix](@ref)).  When a matrix is provided, OnlineStats will iterate over the 
-**rows** of the matrix.
+- One of the two `fit!` methods updates the stat from a single observation:
 
-```@repl index
-fit!(CovMatrix(), randn(100, 2))
+```
+fit!(::OnlineStat{T}, x::T) = ...
 ```
 
-We can also explictly iterate over the **rows** or **columns** with [`eachrow`](@ref) and 
-[`eachcol`](@ref), respectively.
+- In any other case, OnlineStats will attempt to iterate through `x` and `fit!` each element.
 
-```@repl index
-fit!(CovMatrix(), eachrow(randn(1000, 2)))
+```
+function fit!(o::OnlineStat{I}, y::T) where {I, T}
+    for yi in y 
+        fit!(o, yi)
+    end
+    o
+end
 ```
 
+### A Common Error
+
 ```@repl index
-fit!(CovMatrix(), eachcol(randn(2, 1000)))
+fit!(Mean(), "asdf")
+```
+
+Here is what's happening:
+
+1. `String` is not a subtype of `Number`, so OnlineStats attempts to iterate through "asdf". 
+1. The first element of `"asdf"` is the `Char` `'a'`.
+1. The above error is produced (rather than a stack overflow).
+
+When you see this error:
+
+1. Check that `eltype(x)` in `fit!(stat, x)` is what you think it is.
+1. Check if the stat is parameterized by observation type (use `?Stat`)
+    - i.e. `Extrema` is a parametric type that defaults to `Float64`.  If my data is 
+    `Int64`, I need to use `Extrema(Int64)`.
+
+### Helper functions
+
+To iterate over the rows/columns of a matrix, use [`eachrow`](@ref) or [`eachcol`](@ref), respectively.
+
+```@example index
+fit!(CovMatrix(), eachrow(randn(100,2)))
 ```
