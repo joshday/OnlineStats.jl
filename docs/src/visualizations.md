@@ -4,7 +4,6 @@ Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
 using OnlineStats
 using Plots
-using Dates
 srand(1234)
 gr()
 ```
