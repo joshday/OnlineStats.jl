@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Visualizations",
     "category": "page",
-    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nusing Dates\nsrand(1234)\ngr()"
+    "text": "Pkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nsrand(1234)\ngr()"
 },
 
 {
