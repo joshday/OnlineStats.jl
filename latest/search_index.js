@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Collections of Stats",
     "title": "Collections of Stats",
     "category": "section",
-    "text": "<img src=\"https://user-images.githubusercontent.com/8075494/40438658-3c4e8592-5e7e-11e8-97f1-76a749163de9.png\" width=500>using OnlineStats"
+    "text": "(Image: )using OnlineStats"
 },
 
 {
