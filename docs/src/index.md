@@ -52,10 +52,11 @@ Stats are subtypes of the parametric abstract type `OnlineStat{T}`, where `T` is
 fit!(::OnlineStat{T}, x::T) = ...
 ```
 
-- In any other case, OnlineStats will attempt to iterate through `x` and `fit!` each element.
+- In any other case, OnlineStats will attempt to iterate through `x` and `fit!` each 
+  element (with checks to avoid stack overflows).
 
 ```
-function fit!(o::OnlineStat{I}, y::T) where {I, T}
+function fit!(o::OnlineStat{T}, y::S) where {T, S}
     for yi in y 
         fit!(o, yi)
     end
@@ -80,7 +81,7 @@ When you see this error:
 1. Check that `eltype(x)` in `fit!(stat, x)` is what you think it is.
 1. Check if the stat is parameterized by observation type (use `?Stat`)
     - i.e. `Extrema` is a parametric type that defaults to `Float64`.  If my data is 
-    `Int64`, I need to use `Extrema(Int64)`.
+      `Int64`, I need to use `Extrema(Int64)`.
 
 ### Helper functions
 
