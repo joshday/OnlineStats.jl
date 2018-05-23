@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Details of fit!-ting",
     "category": "section",
-    "text": "Stats are subtypes of the parametric abstract type OnlineStat{T}, where T is the type of a single observation.  For example, Mean <: OnlineStat{Number}.  One of the two fit! methods updates the stat from a single observation:fit!(::OnlineStat{T}, x::T) = ...In any other case, OnlineStats will attempt to iterate through x and fit! each element.function fit!(o::OnlineStat{I}, y::T) where {I, T}\n    for yi in y \n        fit!(o, yi)\n    end\n    o\nend"
+    "text": "Stats are subtypes of the parametric abstract type OnlineStat{T}, where T is the type of a single observation.  For example, Mean <: OnlineStat{Number}.  One of the two fit! methods updates the stat from a single observation:fit!(::OnlineStat{T}, x::T) = ...In any other case, OnlineStats will attempt to iterate through x and fit! each  element (with checks to avoid stack overflows).function fit!(o::OnlineStat{T}, y::S) where {T, S}\n    for yi in y \n        fit!(o, yi)\n    end\n    o\nend"
 },
 
 {
@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "A Common Error",
     "category": "section",
-    "text": "fit!(Mean(), \"asdf\")Here is what\'s happening:String is not a subtype of Number, so OnlineStats attempts to iterate through \"asdf\". \nThe first element of \"asdf\" is the Char \'a\'.\nThe above error is produced (rather than a stack overflow).When you see this error:Check that eltype(x) in fit!(stat, x) is what you think it is.\nCheck if the stat is parameterized by observation type (use ?Stat)\ni.e. Extrema is a parametric type that defaults to Float64.  If my data is \nInt64, I need to use Extrema(Int64)."
+    "text": "fit!(Mean(), \"asdf\")Here is what\'s happening:String is not a subtype of Number, so OnlineStats attempts to iterate through \"asdf\". \nThe first element of \"asdf\" is the Char \'a\'.\nThe above error is produced (rather than a stack overflow).When you see this error:Check that eltype(x) in fit!(stat, x) is what you think it is.\nCheck if the stat is parameterized by observation type (use ?Stat)\ni.e. Extrema is a parametric type that defaults to Float64.  If my data is  Int64, I need to use Extrema(Int64)."
 },
 
 {
