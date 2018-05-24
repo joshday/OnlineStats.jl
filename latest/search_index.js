@@ -833,6 +833,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.PlotNN",
+    "page": "API",
+    "title": "OnlineStats.PlotNN",
+    "category": "type",
+    "text": "PlotNN(b)\n\nApproximate scatterplot of b centers.  This implementation is too slow to be useful.\n\n\n\n"
+},
+
+{
     "location": "api.html#API-1",
     "page": "API",
     "title": "API",
