@@ -63,4 +63,5 @@ include("stats/statlearn.jl")
 include("viz/partition.jl")
 include("viz/mosaicplot.jl")
 include("viz/recipes.jl")
+include("viz/plotbivariate.jl")
 end
