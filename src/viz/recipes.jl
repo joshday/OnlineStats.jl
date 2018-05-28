@@ -193,7 +193,7 @@ end
             x, y
         end
     else 
-        error("No plot recipe exists for this partition type")
+        error("No plot recipe exists for this kind of partition")
     end
 end
 
@@ -201,7 +201,7 @@ plotshape(v::Vector) = v
 plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
 
 
-#------------------------------------------------------------------# [Indexed]Partition Hist
+#---------------------------------------------------------------# [Indexed]Partition Hist
 @recipe f(o::IndexedPartition{T,O}) where {T, O<:Hist} = o.parts
 @recipe f(o::Partition{T,O}) where {T, O<:Hist} = o.parts
 
@@ -230,7 +230,7 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
     end
     @series begin 
         seriestype := :shape
-        # linewidth --> 0
+        linewidth --> 0
         legend --> false
         fillz := fillz
         x, y
