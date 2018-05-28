@@ -1088,6 +1088,8 @@ struct Series{IN, T<:Tup} <: StatCollection{IN}
 end
 value(o::Series) = value.(o.stats)
 Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)
+input(o::OnlineStat{T}) where {T} = T
+Series(stats::OnlineStat...) = Series{promote_type(input.(stats)...), typeof(stats)}(stats)
 nobs(o::Series) = nobs(o.stats[1])
 @generated function _fit!(o::Series{IN, T}, y) where {IN, T}
     n = length(fieldnames(T))
