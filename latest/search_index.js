@@ -713,6 +713,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.PlotNN",
+    "page": "API",
+    "title": "OnlineStats.PlotNN",
+    "category": "type",
+    "text": "PlotNN(b=300)\n\nApproximate scatterplot of b centers.  This implementation is too slow to be useful.\n\nExample\n\nx = randn(10^4)\ny = x + randn(10^4)\nplot(fit!(PlotNN(), zip(x, y)))\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.ProbMap",
     "page": "API",
     "title": "OnlineStats.ProbMap",
@@ -830,14 +838,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Part",
     "category": "type",
     "text": "Part(stat, a, b)\n\nstat summarizes a Y variable over an X variable\'s range a to b.\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.PlotNN",
-    "page": "API",
-    "title": "OnlineStats.PlotNN",
-    "category": "type",
-    "text": "PlotNN(b)\n\nApproximate scatterplot of b centers.  This implementation is too slow to be useful.\n\n\n\n"
 },
 
 {
