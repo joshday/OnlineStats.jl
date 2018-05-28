@@ -42,7 +42,7 @@ export
     Mean, ModelSchema, Moments, Mosaic,
     NBClassifier,
     OrderStats,
-    Partition, ProbMap, P2Quantile,
+    Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
     Series, StatLearn, StatHistory, Sum,

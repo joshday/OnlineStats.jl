@@ -189,7 +189,7 @@ end
             fillto --> y2[:, 1]
             alpha --> .4
             linewidth --> 0
-            x2, y2[:, 2]
+            map(x->x.a, parts), y2[:, 2]
         else
             x2, y2 
         end
@@ -215,6 +215,41 @@ end
 
 plotshape(v::Vector) = v
 plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
+
+
+#------------------------------------------------------------------# IndexedPartition Hist
+@recipe function f(o::IndexedPartition{<:Number, <:Hist})
+    parts = sort!(o.parts)
+    x = Float64[]
+    y = Float64[]
+    fillz = Float64[]
+    for part in parts 
+        alg = part.stat.alg
+        _min, _max = extrema(part.stat)
+        edges = vcat(_min, midpoints(midpoints(part.stat)), _max)
+        counts = map(last, value(part.stat)[2])
+        # edges is one more than counts 
+        for i in 1:length(counts)
+            if counts[i] > 0
+                # rectangle
+                push!(x, part.a); push!(y, edges[i])   
+                push!(x, part.a); push!(y, edges[i+1]) 
+                push!(x, part.b); push!(y, edges[i+1]) 
+                push!(x, part.b); push!(y, edges[i])   
+                push!(x, NaN); push!(y, NaN);
+                # fill color
+                push!(fillz, counts[i])
+            end
+        end
+    end
+    seriestype := :shape
+    color --> :blues
+    linewidth --> 0
+    legend --> false
+    fillz := fillz
+    x, y
+end
+
 
 
 #-----------------------------------------------------------------------# NBClassifier 

@@ -19,15 +19,21 @@ nobs(o::Bin2D) = o.z
 
 #-----------------------------------------------------------------------# Hist2D
 """
-    PlotNN(b)
+    PlotNN(b=300)
 
 Approximate scatterplot of `b` centers.  This implementation is too slow to be useful.
+
+# Example
+
+    x = randn(10^4)
+    y = x + randn(10^4)
+    plot(fit!(PlotNN(), zip(x, y)))
 """
 struct PlotNN <: OnlineStat{VectorOb}
     value::Vector{Bin2D}
     b::Int
 end
-PlotNN(b::Int, T=Float64, S=Float64) = PlotNN(Bin2D[], b)
+PlotNN(b::Int=300) = PlotNN(Bin2D[], b)
 
 nobs(o::PlotNN) = length(o.value) > 0 ? sum(nobs, o.value) : 0
 
@@ -39,8 +45,9 @@ function _fit!(o::PlotNN, xy)
         i, j = 1, 2 
         mindist = Inf
         for _i in 1:o.b 
+            v1 = o.value[_i]
             for _j in (_i + 1):o.b
-                dist = distance(o.value[_i], o.value[_j])
+                dist = distance(v1, o.value[_j])
                 if dist < mindist 
                     mindist = dist 
                     i = _i 

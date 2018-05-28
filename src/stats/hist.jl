@@ -191,6 +191,7 @@ nobs(o::AdaptiveBins) = isempty(o.value) ? 0 : sum(last, o.value)
 function Base.:(==)(a::T, b::T) where {T<:AdaptiveBins}
     (a.value == b.value) && (a.b == b.b) && (a.ex == b.ex)
 end
+Base.extrema(o::Hist{<:Any, <:AdaptiveBins}) = extrema(o.alg.ex)
 
 
 _fit!(o::AdaptiveBins, y) = (_fit!(o, Pair(y, 1)); _fit!(o.ex, y))
