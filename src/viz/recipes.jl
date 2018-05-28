@@ -228,13 +228,12 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
         _min, _max = extrema(part.stat)
         edges = vcat(_min, midpoints(midpoints(part.stat)), _max)
         counts = map(last, value(part.stat)[2])
-        # edges is one more than counts 
         for i in 1:length(counts)
             if counts[i] > 0
                 # rectangle
                 push!(x, part.a); push!(y, edges[i])   
-                push!(x, part.a); push!(y, edges[i+1]) 
-                push!(x, part.b); push!(y, edges[i+1]) 
+                push!(x, part.a); push!(y, edges[i + 1]) 
+                push!(x, part.b); push!(y, edges[i + 1]) 
                 push!(x, part.b); push!(y, edges[i])   
                 push!(x, NaN); push!(y, NaN);
                 # fill color
@@ -242,9 +241,9 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
             end
         end
     end
+    
     seriestype := :shape
-    color --> :blues
-    linewidth --> 0
+    # linewidth --> 0
     legend --> false
     fillz := fillz
     x, y

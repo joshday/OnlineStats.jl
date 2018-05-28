@@ -194,9 +194,10 @@ end
 Base.extrema(o::Hist{<:Any, <:AdaptiveBins}) = extrema(o.alg.ex)
 
 
-_fit!(o::AdaptiveBins, y) = (_fit!(o, Pair(y, 1)); _fit!(o.ex, y))
+_fit!(o::AdaptiveBins, y) = _fit!(o, Pair(y, 1))
 
 function _fit!(o::AdaptiveBins, y::Pair{<:Any, Int}) 
+    fit!(o.ex, first(y))
     v = o.value
     i = searchsortedfirst(v, y)
     insert!(v, i, y)
@@ -226,6 +227,7 @@ function Base.merge!(o::T, o2::T) where {T <: AdaptiveBins}
     for v in o2.value
         _fit!(o, v)
     end
+    fit!(o.ex, extrema(o2.ex))
 end
 
 function Base.getindex(o::AdaptiveBins{T}, i) where {T}
