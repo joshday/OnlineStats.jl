@@ -163,23 +163,24 @@ end
         label --> name(parts[1].stat, false, false)
         x, y
     elseif y[1] isa Tuple{VectorOb, VectorOb}  # Histogram
-        x2, y2, z = eltype(x)[], [], []
-        n = sum(nobs, parts)
-        for i in eachindex(y)
-            values, counts = y[i]
-            for j in eachindex(values)
-                push!(x2, x[i])
-                push!(y2, values[j])
-                push!(z, counts[j] / n)
-            end
-        end
-        seriestype --> :scatter 
-        logz = log.(z)
-        marker_z --> logz
-        markerstrokewidth --> 0
-        # color --> :viridis
-        hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)], :quiet
-        x2, y2
+        error("this shouldn't happen")
+        # x2, y2, z = eltype(x)[], [], []
+        # n = sum(nobs, parts)
+        # for i in eachindex(y)
+        #     values, counts = y[i]
+        #     for j in eachindex(values)
+        #         push!(x2, x[i])
+        #         push!(y2, values[j])
+        #         push!(z, counts[j] / n)
+        #     end
+        # end
+        # seriestype --> :scatter 
+        # logz = log.(z)
+        # marker_z --> logz
+        # markerstrokewidth --> 0
+        # # color --> :viridis
+        # hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)], :quiet
+        # x2, y2
     elseif y[1] isa VectorOb
         label --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
@@ -217,9 +218,12 @@ plotshape(v::Vector) = v
 plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
 
 
-#------------------------------------------------------------------# IndexedPartition Hist
-@recipe function f(o::IndexedPartition{<:Number, <:Hist})
-    parts = sort!(o.parts)
+#------------------------------------------------------------------# [Indexed]Partition Hist
+@recipe f(o::IndexedPartition{T,O}) where {T, O<:Hist} = o.parts
+@recipe f(o::Partition{T,O}) where {T, O<:Hist} = o.parts
+
+@recipe function f(parts::Vector{Part{T, O}}) where {T, O<:Hist}
+    sort!(parts)
     x = Float64[]
     y = Float64[]
     fillz = Float64[]
@@ -241,12 +245,13 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
             end
         end
     end
-    
-    seriestype := :shape
-    # linewidth --> 0
-    legend --> false
-    fillz := fillz
-    x, y
+    @series begin 
+        seriestype := :shape
+        # linewidth --> 0
+        legend --> false
+        fillz := fillz
+        x, y
+    end
 end
 
 
