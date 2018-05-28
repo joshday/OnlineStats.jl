@@ -162,35 +162,16 @@ end
         seriestype --> :step
         label --> name(parts[1].stat, false, false)
         x, y
-    elseif y[1] isa Tuple{VectorOb, VectorOb}  # Histogram
-        error("this shouldn't happen")
-        # x2, y2, z = eltype(x)[], [], []
-        # n = sum(nobs, parts)
-        # for i in eachindex(y)
-        #     values, counts = y[i]
-        #     for j in eachindex(values)
-        #         push!(x2, x[i])
-        #         push!(y2, values[j])
-        #         push!(z, counts[j] / n)
-        #     end
-        # end
-        # seriestype --> :scatter 
-        # logz = log.(z)
-        # marker_z --> logz
-        # markerstrokewidth --> 0
-        # # color --> :viridis
-        # hover --> ["x=$x, log(prob)=$(round(y,5))" for (x,y) in zip(x2, logz)], :quiet
-        # x2, y2
     elseif y[1] isa VectorOb
         label --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
         if length(y[1]) == 2 
-            seriestype --> :step
+            # seriestype --> :step
             fillto --> y2[:, 1]
             alpha --> .4
             linewidth --> 0
-            map(x->x.a, parts), y2[:, 2]
+            x2, y2[:, 2]
         else
             x2, y2 
         end
@@ -211,6 +192,8 @@ end
             y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
             x, y
         end
+    else 
+        error("No plot recipe exists for this partition type")
     end
 end
 
