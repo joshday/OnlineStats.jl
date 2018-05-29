@@ -385,14 +385,14 @@ Maximum and minimum.
 
     fit!(Extrema(), rand(10^5))
 """
-mutable struct Extrema{T} <: OnlineStat{T}
+mutable struct Extrema{T} <: OnlineStat{Number}
     min::T
     max::T
     n::Int
 end
-Extrema(T::Type = Float64) = Extrema{T}(typemax.(T), typemin.(T), 0)
+Extrema(T::Type{<:Number} = Float64) = Extrema{T}(typemax.(T), typemin.(T), 0)
 Extrema(initmin::T, initmax::T) where {T} = Extrema{T}(initmin, initmax, 0)
-function _fit!(o::Extrema{T}, y::T) where {T}
+function _fit!(o::Extrema, y)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
     o.n += 1
