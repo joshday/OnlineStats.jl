@@ -178,13 +178,12 @@ Calculate a histogram adaptively.
 
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 """
-struct AdaptiveBins{T} <: HistAlgorithm{T} 
-    value::Vector{Pair{T, Int}}
+struct AdaptiveBins <: HistAlgorithm{Number} 
+    value::Vector{Pair{Float64, Int}}
     b::Int
-    ex::Extrema{T}
+    ex::Extrema{Float64}
 end
-make_alg(b::Int, T::Type=Float64) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
-make_alg(T::Type, b::Int) = AdaptiveBins(Pair{T, Int}[], b, Extrema(T))
+make_alg(b::Int) = AdaptiveBins(Pair{Float64, Int}[], b, Extrema(Float64))
 midpoints(o::AdaptiveBins) = first.(o.value)
 counts(o::AdaptiveBins) = last.(o.value)
 nobs(o::AdaptiveBins) = isempty(o.value) ? 0 : sum(last, o.value)
@@ -230,7 +229,7 @@ function Base.merge!(o::T, o2::T) where {T <: AdaptiveBins}
     fit!(o.ex, extrema(o2.ex))
 end
 
-function Base.getindex(o::AdaptiveBins{T}, i) where {T}
+function Base.getindex(o::AdaptiveBins, i)
     if i == 0 
         return Pair(minimum(o.ex), 0)
     elseif i == (length(o.value) + 1) 
