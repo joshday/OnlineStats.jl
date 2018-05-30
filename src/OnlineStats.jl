@@ -50,6 +50,8 @@ export
 # other 
     OnlineStat, BiasVec
 
+input(o::OnlineStat{T}) where {T} = T
+
 include("utils.jl")
 include("algorithms.jl")
 include("stats/stats.jl")

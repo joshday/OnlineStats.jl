@@ -426,8 +426,12 @@ mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     transform::T 
     nfiltered::Int
 end
-function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
-    FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
+# function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
+#     FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
+# end
+function FTSeries(stats::OnlineStat...; filter=always, transform=identity)
+    Ts = input.(stats)
+    FTSeries{promote_type(Ts...), typeof(stats), typeof(filter)}(stats, filter, transform, 0)
 end
 value(o::FTSeries) = value.(o.stats)
 nobs(o::FTSeries) = nobs(o.stats[1])
@@ -1088,7 +1092,6 @@ struct Series{IN, T<:Tup} <: StatCollection{IN}
 end
 value(o::Series) = value.(o.stats)
 Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)
-input(o::OnlineStat{T}) where {T} = T
 Series(stats::OnlineStat...) = Series{promote_type(input.(stats)...), typeof(stats)}(stats)
 nobs(o::Series) = nobs(o.stats[1])
 @generated function _fit!(o::Series{IN, T}, y) where {IN, T}
