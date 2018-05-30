@@ -45,7 +45,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Stats Can Be Updated",
     "category": "section",
-    "text": "y = randn(100)\n\nfit!(m, y)"
+    "text": "y = randn(100);\n\nfit!(m, y)"
 },
 
 {
@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Stats Can Be Merged",
     "category": "section",
-    "text": "y2 = randn(100)\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)"
+    "text": "y2 = randn(100);\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)"
 },
 
 {
@@ -69,7 +69,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Basics",
     "title": "Details of fit!-ting",
     "category": "section",
-    "text": "The second argument to fit! can be either a single observation or an iterator of observations. Naturally, a Mean accepts a number as its input, so when a vector of numbers is provided, fit! updates the Mean one element at a time by iterating through the vector.A slightly more complicated example is when the input is a vector, such as a covariance  matrix (`CovMatrix).  When a matrix is provided, OnlineStats will iterate over the  rows of the matrix.fit!(CovMatrix(), randn(100, 2))We can also explictly iterate over the rows or columns with eachrow and  eachcol, respectively.fit!(CovMatrix(), eachrow(randn(100, 2)))fit!(CovMatrix(), eachcol(randn(100, 2)))"
+    "text": "Stats are subtypes of the parametric abstract type OnlineStat{T}, where T is the type of a single observation.  For example, Mean <: OnlineStat{Number}.  One of the two fit! methods updates the stat from a single observation:fit!(::OnlineStat{T}, x::T) = ...In any other case, OnlineStats will attempt to iterate through x and fit! each  element (with checks to avoid stack overflows).function fit!(o::OnlineStat{T}, y::S) where {T, S}\n    for yi in y \n        fit!(o, yi)\n    end\n    o\nend"
+},
+
+{
+    "location": "index.html#A-Common-Error-1",
+    "page": "Basics",
+    "title": "A Common Error",
+    "category": "section",
+    "text": "fit!(Mean(), \"asdf\")Here is what\'s happening:String is not a subtype of Number, so OnlineStats attempts to iterate through \"asdf\". \nThe first element of \"asdf\" is the Char \'a\'.\nThe above error is produced (rather than a stack overflow).When you see this error:Check that eltype(x) in fit!(stat, x) is what you think it is.\nCheck if the stat is parameterized by observation type (use ?Stat)\ni.e. Extrema is a parametric type that defaults to Float64.  If my data is  Int64, I need to use Extrema(Int64)."
+},
+
+{
+    "location": "index.html#Helper-functions-1",
+    "page": "Basics",
+    "title": "Helper functions",
+    "category": "section",
+    "text": "To iterate over the rows/columns of a matrix, use eachrow or eachcol, respectively.fit!(CovMatrix(), eachrow(randn(100,2)))"
 },
 
 {
@@ -85,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Collections of Stats",
     "title": "Collections of Stats",
     "category": "section",
-    "text": "using OnlineStats"
+    "text": "(Image: )using OnlineStats"
 },
 
 {
@@ -205,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Weight",
     "title": "Custom Weighting",
     "category": "section",
-    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> x == 1 ? 1.0 : .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\n\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)"
+    "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> x == 1 ? 1.0 : .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)"
 },
 
 {
@@ -221,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, eachrow, eachcol\nSummary of partition Partition, IndexedPartition"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nTracked history StatHistory\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun, eachrow, eachcol\nBig Data Viz Partition, IndexedPartition\nCollections of Stats: \nApplied to same data stream Series, FTSeries\nApplied to different data streams Group\nCalculated stat by group GroupBy"
 },
 
 {
@@ -493,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FTSeries",
     "category": "type",
-    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n\n\n"
+    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nIf the transformed value has a different type than the original, provide an argument to  the constructor to specify the type of an input observation.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isnull)\nfit!(o, y)\n\n\n\n"
 },
 
 {
@@ -694,6 +710,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Partition",
     "category": "type",
     "text": "Partition(stat, nparts=100)\n\nSplit a data stream into nparts where each part is summarized by stat.\n\nExample\n\no = Partition(Extrema())\nfit!(o, cumsum(randn(10^5)))\n\nusing Plots\nplot(o)\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.PlotNN",
+    "page": "API",
+    "title": "OnlineStats.PlotNN",
+    "category": "type",
+    "text": "PlotNN(b=300)\n\nApproximate scatterplot of b centers.  This implementation is too slow to be useful.\n\nExample\n\nx = randn(10^4)\ny = x + randn(10^4)\nplot(fit!(PlotNN(), zip(x, y)))\n\n\n\n"
 },
 
 {

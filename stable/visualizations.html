@@ -53,4 +53,30 @@ y = Dates.year.(x) + randn(10^5)
 
 o = fit!(IndexedPartition(Date, Hist(20)), [x y])
 
-plot(o, xlab = &quot;Date&quot;)</code></pre></div><p><img src="indexpartequal.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
+plot(o, xlab = &quot;Date&quot;)</code></pre><pre><code class="language-none">WARNING: convert(::Type{R}, x::Dates.Date) where R &lt;: Real is deprecated, use R(Dates.value(x)) instead.
+Stacktrace:
+ [1] depwarn(::String, ::Symbol) at ./deprecated.jl:70
+ [2] convert(::Type{Float64}, ::Date) at ./deprecated.jl:57
+ [3] push!(::Array{Float64,1}, ::Date) at ./array.jl:651
+ [4] macro expansion at /home/travis/.julia/v0.6/OnlineStats/src/viz/recipes.jl:221 [inlined]
+ [5] apply_recipe(::Dict{Symbol,Any}, ::Array{OnlineStats.Part{Date,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins}},1}) at /home/travis/.julia/v0.6/RecipesBase/src/RecipesBase.jl:291
+ [6] _process_userrecipes(::Plots.Plot{Plots.GRBackend}, ::Dict{Symbol,Any}, ::Tuple{OnlineStats.IndexedPartition{Number,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins},Date}}) at /home/travis/.julia/v0.6/Plots/src/pipeline.jl:81
+ [7] _plot!(::Plots.Plot{Plots.GRBackend}, ::Dict{Symbol,Any}, ::Tuple{OnlineStats.IndexedPartition{Number,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins},Date}}) at /home/travis/.julia/v0.6/Plots/src/plot.jl:179
+ [8] (::RecipesBase.#kw##plot)(::Array{Any,1}, ::RecipesBase.#plot, ::OnlineStats.IndexedPartition{Number,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins},Date}) at ./&lt;missing&gt;:0
+ [9] cd(::Documenter.Expanders.##8#10{Module}, ::String) at ./file.jl:70
+ [10] (::Documenter.Utilities.##19#20{Documenter.Expanders.##7#9{Documenter.Documents.Page,Module},Base.PipeEndpoint,Base.PipeEndpoint,Pipe,Array{UInt8,1}})() at /home/travis/.julia/v0.6/Documenter/src/Utilities/Utilities.jl:593
+ [11] withoutput(::Documenter.Expanders.##7#9{Documenter.Documents.Page,Module}) at /home/travis/.julia/v0.6/Documenter/src/Utilities/Utilities.jl:591
+ [12] runner(::Type{Documenter.Expanders.ExampleBlocks}, ::Base.Markdown.Code, ::Documenter.Documents.Page, ::Documenter.Documents.Document) at /home/travis/.julia/v0.6/Documenter/src/Expanders.jl:478
+ [13] dispatch(::Type{Documenter.Expanders.ExpanderPipeline}, ::Base.Markdown.Code, ::Vararg{Any,N} where N) at /home/travis/.julia/v0.6/Documenter/src/Selectors.jl:168
+ [14] expand(::Documenter.Documents.Document) at /home/travis/.julia/v0.6/Documenter/src/Expanders.jl:31
+ [15] runner(::Type{Documenter.Builder.ExpandTemplates}, ::Documenter.Documents.Document) at /home/travis/.julia/v0.6/Documenter/src/Builder.jl:178
+ [16] dispatch(::Type{Documenter.Builder.DocumentPipeline}, ::Documenter.Documents.Document, ::Vararg{Documenter.Documents.Document,N} where N) at /home/travis/.julia/v0.6/Documenter/src/Selectors.jl:168
+ [17] cd(::Documenter.##2#3{Documenter.Documents.Document}, ::String) at ./file.jl:70
+ [18] #makedocs#1(::Bool, ::Array{Any,1}, ::Function) at /home/travis/.julia/v0.6/Documenter/src/Documenter.jl:203
+ [19] (::Documenter.#kw##makedocs)(::Array{Any,1}, ::Documenter.#makedocs) at ./&lt;missing&gt;:0
+ [20] include_from_node1(::String) at ./loading.jl:576
+ [21] include(::String) at ./sysimg.jl:14
+ [22] eval(::Module, ::Any) at ./boot.jl:235
+ [23] process_options(::Base.JLOptions) at ./client.jl:286
+ [24] _start() at ./client.jl:371
+while loading /home/travis/.julia/v0.6/OnlineStats/docs/make.jl, in expression starting on line 3</code></pre></div><p><img src="indexpartequal.png" alt/></p><footer><hr/><a class="previous" href="datasurrogates.html"><span class="direction">Previous</span><span class="title">Data Surrogates</span></a><a class="next" href="demos.html"><span class="direction">Next</span><span class="title">Demos</span></a></footer></article></body></html>
