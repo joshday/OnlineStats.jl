@@ -426,9 +426,6 @@ mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     transform::T 
     nfiltered::Int
 end
-# function FTSeries(stats::OnlineStat{N}...; filter=always, transform=identity) where {N}
-#     FTSeries{N, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
-# end
 function FTSeries(stats::OnlineStat...; filter=always, transform=identity)
     Ts = input.(stats)
     FTSeries{promote_type(Ts...), typeof(stats), typeof(filter)}(stats, filter, transform, 0)
