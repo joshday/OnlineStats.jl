@@ -348,8 +348,8 @@ end
     test_exact(Hist(1000), y, extrema, extrema, ==)
     test_merge(Hist(2000), y, y2)
     test_merge(Hist(1), y, y2)
-    test_merge(Hist(2000, Float32), Float32.(y), Float32.(y2))
-    test_merge(Hist(Float32, 2000), Float32.(y), Float32.(y2))
+    # test_merge(Hist(2000, Float32), Float32.(y), Float32.(y2))
+    # test_merge(Hist(Float32, 2000), Float32.(y), Float32.(y2))
 
     data = randn(10_000)
     

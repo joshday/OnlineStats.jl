@@ -415,10 +415,21 @@ Base.minimum(o::Extrema) = o.min
 Track multiple stats for one data stream that is filtered and transformed before being 
 fitted.
 
+    FTSeries(T, stats...; filter, transform)
+
+If the transformed value has a different type than the original, provide an argument to 
+the constructor to specify the type of an input observation.
+
 # Example 
 
     o = FTSeries(Mean(), Variance(); transform=abs)
     fit!(o, -rand(1000))
+
+    # Remove missing values represented as DataValues
+    using DataValues
+    y = DataValueArray(randn(100), rand(Bool, 100))
+    o = FTSeries(DataValue, Mean(); transform=get, filter=!isnull)
+    fit!(o, y)
 """
 mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     stats::OS
@@ -428,7 +439,12 @@ mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
 end
 function FTSeries(stats::OnlineStat...; filter=always, transform=identity)
     Ts = input.(stats)
-    FTSeries{promote_type(Ts...), typeof(stats), typeof(filter)}(stats, filter, transform, 0)
+    FTSeries{promote_type(Ts...), typeof(stats), typeof(filter), typeof(transform)}(
+        stats, filter, transform, 0
+    )
+end
+function FTSeries(T::Type, stats::OnlineStat...; filter=always, transform=identity)
+    FTSeries{T, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
 end
 value(o::FTSeries) = value.(o.stats)
 nobs(o::FTSeries) = nobs(o.stats[1])
