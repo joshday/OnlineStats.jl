@@ -509,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FTSeries",
     "category": "type",
-    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n\n\n"
+    "text": "FTSeries(stats...; filter=always, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nIf the transformed value has a different type than the original, provide an argument to  the constructor to specify the type of an input observation.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isnull)\nfit!(o, y)\n\n\n\n"
 },
 
 {
