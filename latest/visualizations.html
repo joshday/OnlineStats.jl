@@ -57,8 +57,8 @@ plot(o, xlab = &quot;Date&quot;)</code></pre><pre><code class="language-none">WA
 Stacktrace:
  [1] depwarn(::String, ::Symbol) at ./deprecated.jl:70
  [2] convert(::Type{Float64}, ::Date) at ./deprecated.jl:57
- [3] push!(::Array{Float64,1}, ::Date) at ./array.jl:651
- [4] macro expansion at /home/travis/.julia/v0.6/OnlineStats/src/viz/recipes.jl:221 [inlined]
+ [3] push!(::Array{Float64,1}, ::Date) at ./array.jl:646
+ [4] macro expansion at /home/travis/.julia/v0.6/OnlineStats/src/viz/recipes.jl:223 [inlined]
  [5] apply_recipe(::Dict{Symbol,Any}, ::Array{OnlineStats.Part{Date,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins}},1}) at /home/travis/.julia/v0.6/RecipesBase/src/RecipesBase.jl:291
  [6] _process_userrecipes(::Plots.Plot{Plots.GRBackend}, ::Dict{Symbol,Any}, ::Tuple{OnlineStats.IndexedPartition{Number,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins},Date}}) at /home/travis/.julia/v0.6/Plots/src/pipeline.jl:81
  [7] _plot!(::Plots.Plot{Plots.GRBackend}, ::Dict{Symbol,Any}, ::Tuple{OnlineStats.IndexedPartition{Number,OnlineStats.Hist{Number,OnlineStats.AdaptiveBins},Date}}) at /home/travis/.julia/v0.6/Plots/src/plot.jl:179
