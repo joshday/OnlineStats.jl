@@ -155,9 +155,9 @@ end
     sort!(parts)
     y = map(part -> fun(part.stat), parts)
     x = midpoint.(parts)
-    if parts[1].a isa Number
-        xlim --> (parts[1].a, parts[end].b)
-    end
+    # if parts[1].a isa Number
+    #     xlim --> (parts[1].a, parts[end].b)
+    # end
     if y[1] isa Number
         seriestype --> :step
         label --> name(parts[1].stat, false, false)
@@ -199,6 +199,8 @@ end
 
 plotshape(v::Vector) = v
 plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
+
+
 
 
 #---------------------------------------------------------------# [Indexed]Partition Hist

@@ -129,9 +129,9 @@ end
 function IndexedPartition(T::Type, o::O, b::Int=100) where {IN, O<:OnlineStat{IN}}
     IndexedPartition{IN, O, T}(Part{T, O}[], b, o)
 end
-function _fit!(o::IndexedPartition, xy)
+function _fit!(o::IndexedPartition{I,O,T}, xy) where {I,O,T}
     x, y = xy
-    isempty(o.parts) && push!(o.parts, Part(copy(o.init), x, x))
+    isempty(o.parts) && push!(o.parts, Part(copy(o.init), T(x), T(x)))
     addpart = true
     for p in o.parts 
         if x in p 
