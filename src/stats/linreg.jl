@@ -52,10 +52,9 @@ end
 predict(o::LinReg, x::AbstractVector) = x'o.β
 predict(o::LinReg, x::AbstractMatrix) = x * o.β
 
-function Base.merge!(o::LinReg, o2::LinReg)
+function _merge!(o::LinReg, o2::LinReg)
     o.n += o2.n
     smooth!(o.A, o2.A, nobs(o2) / nobs(o))
-    o
 end
 
 #-----------------------------------------------------------------------# LinRegBuilder
@@ -126,8 +125,7 @@ function coef(o::LinRegBuilder, λ=0.0; y=1, x=xs(o,y), bias=true, verbose=false
     return S[1:(length(inds)-1), end]
 end
 
-function Base.merge!(o::LinRegBuilder, o2::LinRegBuilder) 
+function _merge!(o::LinRegBuilder, o2::LinRegBuilder) 
     o.n += o2.n
     smooth!(o.A, o2.A, nobs(o2) / nobs(o))
-    o
 end

@@ -24,7 +24,7 @@ function value(o::FitBeta)
         return 1.0, 1.0
     end
 end
-Base.merge!(o::FitBeta, o2::FitBeta) = merge!(o.var, o2.var)
+_merge!(o::FitBeta, o2::FitBeta) = _merge!(o.var, o2.var)
 
 #---------------------------------------------------------------------------------# Cauchy
 """
@@ -49,7 +49,7 @@ function value(o::FitCauchy)
         return 0.0, 1.0
     end
 end
-Base.merge!(o::FitCauchy, o2::FitCauchy) = merge!(o.q, o2.q)
+_merge!(o::FitCauchy, o2::FitCauchy) = _merge!(o.q, o2.q)
 
 #---------------------------------------------------------------------------------# Gamma
 """
@@ -76,7 +76,7 @@ function value(o::FitGamma)
         return 1.0, 1.0
     end
 end
-Base.merge!(o::FitGamma, o2::FitGamma) = merge!(o.v, o2.v)
+_merge!(o::FitGamma, o2::FitGamma) = _merge!(o.v, o2.v)
 
 #---------------------------------------------------------------------------------# LogNormal
 """
@@ -100,7 +100,7 @@ function value(o::FitLogNormal)
         return 0.0, 1.0
     end
 end
-Base.merge!(o::FitLogNormal, o2::FitLogNormal) = merge!(o.v, o2.v)
+_merge!(o::FitLogNormal, o2::FitLogNormal) = _merge!(o.v, o2.v)
 
 #---------------------------------------------------------------------------------# Normal
 """
@@ -124,7 +124,7 @@ function value(o::FitNormal)
         return 0.0, 1.0
     end
 end
-Base.merge!(o::FitNormal, o2::FitNormal) = (merge!(o.v, o2.v); o)
+_merge!(o::FitNormal, o2::FitNormal) = _merge!(o.v, o2.v)
 Base.mean(o::FitNormal) = mean(o.v)
 Base.var(o::FitNormal) = var(o.v)
 
@@ -173,7 +173,7 @@ function value(o::FitMultinomial)
     outvec = all(x-> x==0.0, m) ? ones(p) ./ p : collect(m) ./ sum(m)
     return 1, outvec
 end
-Base.merge!(o::FitMultinomial, o2::FitMultinomial) = merge!(o.grp, o2.grp)
+_merge!(o::FitMultinomial, o2::FitMultinomial) = _merge!(o.grp, o2.grp)
 
 #---------------------------------------------------------------------------------# MvNormal
 """
@@ -201,4 +201,4 @@ function value(o::FitMvNormal)
         return zeros(nvars(o)), eye(nvars(o))
     end
 end
-Base.merge!(o::FitMvNormal, o2::FitMvNormal) = merge!(o.cov, o2.cov)
+_merge!(o::FitMvNormal, o2::FitMvNormal) = _merge!(o.cov, o2.cov)

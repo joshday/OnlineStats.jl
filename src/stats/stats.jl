@@ -35,7 +35,7 @@ function _fit!(o::Variance, x)
     o.μ = smooth(o.μ, x, γ)
     o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
 end
-function Base.merge!(o::Variance, o2::Variance)
+function _merge!(o::Variance, o2::Variance)
     γ = o2.n / (o.n += o2.n)
     δ = o2.μ - o.μ
     o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
@@ -192,7 +192,7 @@ nobs(o::CallFun) = nobs(o.stat)
 value(o::CallFun) = value(o.stat)
 Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
 _fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
-Base.merge!(o::CallFun, o2::CallFun) = merge!(o.stat, o2.stat)
+_merge!(o::CallFun, o2::CallFun) = _merge!(o.stat, o2.stat)
 
 # #-----------------------------------------------------------------------# Count 
 # """
@@ -209,7 +209,7 @@ Base.merge!(o::CallFun, o2::CallFun) = merge!(o.stat, o2.stat)
 #     Count() = new(0)
 # end
 # _fit!(o::Count, x) = (o.n += 1)
-# Base.merge!(o::Count, o2::Count) = (o.n += o2.n; o)
+# _merge!(o::Count, o2::Count) = (o.n += o2.n; o)
 
 #-----------------------------------------------------------------------# CountMap 
 """
@@ -239,7 +239,7 @@ function _fit!(o::CountMap, x)
         o.value[x] = 1
     end
 end
-Base.merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o.n += o2.n; o)
+_merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o.n += o2.n)
 function probs(o::CountMap, kys = keys(o.value))
     out = zeros(Int, length(kys))
     valkeys = keys(o.value)
@@ -297,7 +297,7 @@ function value(o::CovMatrix; corrected::Bool = true)
     corrected && scale!(o.value, unbias(o))
     o.value
 end
-function Base.merge!(o::CovMatrix, o2::CovMatrix)
+function _merge!(o::CovMatrix, o2::CovMatrix)
     γ = o2.n / (o.n += o2.n)
     smooth!(o.A, o2.A, γ)
     smooth!(o.b, o2.b, γ)
@@ -335,9 +335,9 @@ nobs(o::CStat) = nobs(o.re_stat)
 value(o::CStat) = value(o.re_stat), value(o.im_stat)
 _fit!(o::CStat, y::T) where {T<:Real} = (_fit!(o.re_stat, y); _fit!(o.im_stat, T(0)))
 _fit!(o::CStat, y::Complex) = (_fit!(o.re_stat, y.re); _fit!(o.im_stat, y.im))
-function Base.merge!(o::T, o2::T) where {T<:CStat}
-    merge!(o.re_stat, o2.re_stat)
-    merge!(o.im_stat, o2.im_stat)
+function _merge!(o::T, o2::T) where {T<:CStat}
+    _merge!(o.re_stat, o2.re_stat)
+    _merge!(o.im_stat, o2.im_stat)
 end
 
 #-----------------------------------------------------------------------# Diff
@@ -397,7 +397,7 @@ function _fit!(o::Extrema, y)
     o.max = max(o.max, y)
     o.n += 1
 end
-function Base.merge!(o::Extrema, o2::Extrema)
+function _merge!(o::Extrema, o2::Extrema)
     o.min = min(o.min, o2.min)
     o.max = max(o.max, o2.max)
     o.n += o2.n
@@ -461,9 +461,9 @@ nobs(o::FTSeries) = nobs(o.stats[1])
         end
     end
 end
-function Base.merge!(o::FTSeries, o2::FTSeries)
+function _merge!(o::FTSeries, o2::FTSeries)
     o.nfiltered += o2.nfiltered 
-    merge!.(o.stats, o2.stats)
+    _merge!.(o.stats, o2.stats)
     o
 end
 always(x) = true
@@ -517,7 +517,7 @@ function _fit!(o::Group{T}, y) where {T<:AbstractVector}
     end
 end
 
-Base.merge!(o::Group, o2::Group) = (merge!.(o.stats, o2.stats); o)
+_merge!(o::Group, o2::Group) = _merge!.(o.stats, o2.stats)
 
 Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 
@@ -665,7 +665,7 @@ function value(o::HyperLogLog)
     return E_star
 end
 
-function Base.merge!(o::HyperLogLog, o2::HyperLogLog)
+function _merge!(o::HyperLogLog, o2::HyperLogLog)
     length(o.M) == length(o2.M) || 
         error("Merge failed. HyperLogLog objects have different number of registers.")
     o.n += o2.n
@@ -733,10 +733,9 @@ mutable struct Mean{W} <: OnlineStat{Number}
 end
 Mean(;weight = EqualWeight()) = Mean(0.0, weight, 0)
 _fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
-function Base.merge!(o::Mean, o2::Mean) 
+function _merge!(o::Mean, o2::Mean) 
     o.n += o2.n
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
-    o
 end
 Base.mean(o::Mean) = o.μ
 
@@ -779,7 +778,7 @@ function kurtosis(o::Moments)
     v = value(o)
     (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
 end
-function Base.merge!(o::Moments, o2::Moments)
+function _merge!(o::Moments, o2::Moments)
     γ = o2.n / (o.n += o2.n)
     smooth!(o.m, o2.m, γ)
     o
@@ -815,7 +814,7 @@ function _fit!(o::OrderStats, y)
         smooth!(o.value, buffer, o.weight(o.n / p))
     end
 end
-function Base.merge!(o::OrderStats, o2::OrderStats)
+function _merge!(o::OrderStats, o2::OrderStats)
     length(o.value) == length(o2.value) || 
         error("Merge failed.  OrderStats track different batch sizes")
     o.n += o2.n
@@ -873,7 +872,7 @@ function _fit!(o::ProbMap, y)
         end
     end
 end
-function Base.merge!(o::ProbMap, o2::ProbMap) 
+function _merge!(o::ProbMap, o2::ProbMap) 
     o.n += o2.n
     merge!((a, b)->smooth(a, b, o2.n / o.n), o.value, o2.value)
     o
@@ -1002,7 +1001,7 @@ function _fit!(o::Quantile, y)
         o.n == len && sort!(o.value)
     end
 end
-function Base.merge!(o::Quantile, o2::Quantile)
+function _merge!(o::Quantile, o2::Quantile)
     o.τ == o2.τ || error("Merge failed. Quantile objects track different quantiles.")
     o.n += o2.n
     γ = nobs(o2) / nobs(o)
@@ -1079,7 +1078,7 @@ function _fit!(o::ReservoirSample, y)
         end
     end
 end
-function Base.merge!(o::T, o2::T) where {T<:ReservoirSample}
+function _merge!(o::T, o2::T) where {T<:ReservoirSample}
     length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
     p = o.n / (o.n + o2.n)
     for j in eachindex(o.value)
@@ -1111,7 +1110,7 @@ nobs(o::Series) = nobs(o.stats[1])
     n = length(fieldnames(T))
     :(Base.Cartesian.@nexprs $n i -> _fit!(o.stats[i], y))
 end
-Base.merge!(o::Series, o2::Series) = (merge!.(o.stats, o2.stats); o)
+_merge!(o::Series, o2::Series) = _merge!.(o.stats, o2.stats)
 @deprecate Series(data, stats::OnlineStat...) fit!(Series(stats...), data)
 
 #-----------------------------------------------------------------------# Sum
@@ -1132,4 +1131,4 @@ Sum(T::Type = Float64) = Sum(T(0), 0)
 Base.sum(o::Sum) = o.sum
 _fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.n += 1)
 _fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
-Base.merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
+_merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)

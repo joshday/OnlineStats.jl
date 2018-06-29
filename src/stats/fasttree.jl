@@ -22,7 +22,7 @@ nkeys(o::FastNode) = length(o.stats)
 nvars(o::FastNode) = length(o.stats[1])
 Base.getindex(o::FastNode, i) = [stat[i] for stat in o.stats]
 
-Base.merge!(o::FastNode, o2::FastNode) = (merge!.(o.stats, o2.stats); o)
+_merge!(o::FastNode, o2::FastNode) = _merge!.(o.stats, o2.stats)
 
 function fakedata(::Type{FastNode}, n, p) 
     x = randn(n, p)

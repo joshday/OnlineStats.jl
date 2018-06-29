@@ -23,7 +23,7 @@ for f in [:(_fit!), :pdf, :cdf, :(Base.getindex)]
 end
 
 # Base.show(io::IO, o::Hist) = print(io, "Hist: ", o.alg)
-Base.merge!(o::Hist, o2::Hist) = (merge!(o.alg, o2.alg); o)
+_merge!(o::Hist, o2::Hist) = _merge!(o.alg, o2.alg)
 value(o::Hist) = (midpoints(o), counts(o))
 
 split_candidates(o::Hist) = midpoints(o)
@@ -137,7 +137,7 @@ function _binindex(o::FixedBins{:right}, y)
     end
 end
 
-function Base.merge!(o::FixedBins, o2::FixedBins) 
+function _merge!(o::FixedBins, o2::FixedBins) 
     if o.edges == o2.edges 
         for j in eachindex(o.counts)
             o.counts[j] += o2.counts[j]
@@ -222,7 +222,7 @@ function _fit!(o::AdaptiveBins, y::Pair{<:Any, Int})
     end
 end
 
-function Base.merge!(o::T, o2::T) where {T <: AdaptiveBins} 
+function _merge!(o::T, o2::T) where {T <: AdaptiveBins} 
     for v in o2.value
         _fit!(o, v)
     end

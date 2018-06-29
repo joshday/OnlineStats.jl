@@ -72,7 +72,7 @@ function _fit!(o::StatLearn{<:SGAlgorithm}, xy)
     update!(o.alg, o.gx)
     updateβ!(o, o.rate(o.n))
 end
-function Base.merge!(o::StatLearn, o2::StatLearn)
+function _merge!(o::StatLearn, o2::StatLearn)
     o.n += o2.n 
     γ = nobs(o2) / nobs(o)
     smooth!(o.β, o2.β, γ)

@@ -38,7 +38,7 @@ end
 value(o::Mosaic) = sort!(o.value)
 Base.keys(o::Mosaic) = sort!(collect(keys(o.value)))
 subkeys(o::Mosaic) = sort!(mapreduce(x->collect(keys(x)), union, values(o.value)))
-Base.merge!(o::Mosaic, o2::Mosaic) = (o.n += o2.n; merge!(merge!, o.value, o2.value); o)
+_merge!(o::Mosaic, o2::Mosaic) = (o.n += o2.n; merge!(merge!, o.value, o2.value))
 
 
 @recipe function f(o::Mosaic{T,S}) where {T,S}

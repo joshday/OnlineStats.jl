@@ -39,9 +39,7 @@ function _fit!(o::NBClassifier, xy)
         o.d[y] = stat
     end
 end
-function Base.merge!(o::NBClassifier, o2::NBClassifier)
-    merge!(merge!, o.d, o2.d)
-end
+_merge!(o::NBClassifier, o2::NBClassifier) = merge!(merge!, o.d, o2.d)
 Base.getindex(o::NBClassifier, j) = [stat[j] for stat in values(o.d)]
 
 Base.keys(o::NBClassifier) = keys(o.d)

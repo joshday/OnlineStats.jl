@@ -9,11 +9,10 @@ mutable struct Bin2D
     z::Int
 end
 distance(a::Bin2D, b::Bin2D) = sqrt((a.x - b.x)^2 + (a.y - b.y)^2)
-function Base.merge!(a::Bin2D, b::Bin2D)
+function _merge!(a::Bin2D, b::Bin2D)
     γ = b.z / (a.z += b.z)
     a.x = smooth(a.x, b.x, γ)
     a.y = smooth(a.y, b.y, γ)
-    a
 end
 nobs(o::Bin2D) = o.z
 

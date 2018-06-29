@@ -16,8 +16,8 @@ end
 # Part(o::O, ab::T) where {O<:OnlineStat, T} = Part{T,O}(o, ab, ab)
 nobs(o::Part) = nobs(o.stat)
 Base.show(io::IO, o::Part) = print(io, "Part $(o.a) to $(o.b) | $(o.stat)")
-function Base.merge!(o::Part, o2::Part)
-    merge!(o.stat, o2.stat)
+function _merge!(o::Part, o2::Part)
+    _merge!(o.stat, o2.stat)
     o.a = min(o.a, o2.a)
     o.b = max(o.b, o2.b)
     o
@@ -80,7 +80,7 @@ function _fit!(o::Partition, y)
     end
     (length(o.parts) > o.b) && isfull(o.parts[end]) && merge_next!(o.parts)
 end
-function Base.merge!(o::Partition, o2::Partition)
+function _merge!(o::Partition, o2::Partition)
     n = nobs(o)
     for p in o2.parts
         push!(o.parts, Part(copy(p.stat), p.a + n, p.b + n))
@@ -164,7 +164,7 @@ get_diff(a::Part{T}, b::Part{T}) where {T<:Dates.TimeType} =
 
 get_diff(a::Part{T}, b::Part{T}) where {T<:Number} = (b.a - a.b) * (nobs(a) + nobs(b)) / 2
 
-function Base.merge!(o::IndexedPartition, o2::IndexedPartition)
+function _merge!(o::IndexedPartition, o2::IndexedPartition)
     # If there's any overlap, merge
     for p2 in o2.parts 
         pushpart = true
