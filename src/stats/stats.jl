@@ -696,17 +696,20 @@ mutable struct KMeans{W} <: OnlineStat{VectorOb}
     n::Int
 end
 KMeans(p::Integer, k::Integer; rate=LearningRate(.6)) = KMeans(zeros(p, k), zeros(k), rate, 0)
-function _fit!(o::KMeans, x::VectorOb)
+function _fit!(o::KMeans, x)
     γ = o.rate(o.n += 1)
     p, k = size(o.value)
     if o.n <= k 
-        o.value[:, o.n] = x
+        o.value[:, o.n] = collect(x)
     else
         for j in 1:k
-            o.v[j] = sum(abs2, x - view(o.value, :, j))
+            o.v[j] = 0.0 
+            for i in 1:p
+                o.v[j] += abs2(x[i] - o.value[i, j])
+            end
         end
         kstar = argmin(o.v)
-        for i in eachindex(x)
+        for i in 1:p
             o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
         end
     end
