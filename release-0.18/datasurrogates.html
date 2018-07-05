@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Data Surrogates · OnlineStats.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="index.html"><img class="logo" src="assets/logo.png" alt="OnlineStats.jl logo"/></a><h1>OnlineStats.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="index.html">Basics</a></li><li><a class="toctext" href="collectionstats.html">Collections of Stats</a></li><li><a class="toctext" href="weights.html">Weight</a></li><li><a class="toctext" href="stats_and_models.html">Statistics and Models</a></li><li><a class="toctext" href="parallel.html">Parallel Computation</a></li><li class="current"><a class="toctext" href="datasurrogates.html">Data Surrogates</a><ul class="internal"><li><a class="toctext" href="#Linear-Regressions-1">Linear Regressions</a></li><li><a class="toctext" href="#Histograms-1">Histograms</a></li></ul></li><li><a class="toctext" href="visualizations.html">Visualizations</a></li><li><a class="toctext" href="demos.html">Demos</a></li><li><a class="toctext" href="api.html">API</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="datasurrogates.html">Data Surrogates</a></li></ul><a class="edit-page" href="https://github.com/joshday/OnlineStats.jl/blob/master/docs/src/datasurrogates.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Data Surrogates</span><a class="fa fa-bars" href="#"></a></div></header><div></div><h1><a class="nav-anchor" id="Data-Surrogates-1" href="#Data-Surrogates-1">Data Surrogates</a></h1><p>Some <code>OnlineStat</code>s are especially useful for out-of-core computations.  After they&#39;ve been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again.</p><h2><a class="nav-anchor" id="Linear-Regressions-1" href="#Linear-Regressions-1">Linear Regressions</a></h2><p>The <a href="api.html#OnlineStats.LinRegBuilder"><code>LinRegBuilder</code></a> type allows you to fit any linear regression model where <code>y</code> can be any variable and the <code>x</code>&#39;s can be any subset of variables.</p><div><pre><code class="language-julia"># make some data
+x = randn(10^6, 10)
+y = x * linspace(-1, 1, 10) + randn(10^6)
+
+o = fit!(LinRegBuilder(11), [x y])
+
+# adds intercept term by default as last coefficient
+coef(o; y = 11, verbose = true)</code></pre><pre><code class="language-none">Info: Regress 11 on [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] with bias
+11-element Array{Float64,1}:
+ -0.999761
+ -0.777846
+ -0.555731
+ -0.33458
+ -0.108652
+  0.11223
+  0.332653
+  0.553821
+  0.776638
+  0.999295
+  0.000142742</code></pre></div><h2><a class="nav-anchor" id="Histograms-1" href="#Histograms-1">Histograms</a></h2><p>The <a href="api.html#OnlineStats.Hist"><code>Hist</code></a> type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  <code>Hist</code> can be used  to calculate approximate summary statistics, without the need to revisit the actual data.</p><div><pre><code class="language-julia">o = Hist(20)        # adaptively find bins
+o2 = Hist(0:.5:5)  # specify the bin edges
+s = Series(o, o2)
+
+fit!(s, randexp(100_000))
+
+quantile(o, .5)
+quantile(o, [.2, .8])
+mean(o)
+var(o)
+std(o)
+
+using Plots
+plot(s)</code></pre></div><p><img src="hist.png" alt/></p><footer><hr/><a class="previous" href="parallel.html"><span class="direction">Previous</span><span class="title">Parallel Computation</span></a><a class="next" href="visualizations.html"><span class="direction">Next</span><span class="title">Visualizations</span></a></footer></article></body></html>
