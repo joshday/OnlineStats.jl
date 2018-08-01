@@ -26,7 +26,7 @@ end
 function Base.show(io::IO, o::NBClassifier)
     print(io, "NBClassifier")
     for (k, p) in zip(keys(o), probs(o))
-        print(io, "\n    > $k ($(round(p, 4)))")
+        print(io, "\n    > $k ($(round(p, digits=4)))")
     end
 end
 function _fit!(o::NBClassifier, xy)
