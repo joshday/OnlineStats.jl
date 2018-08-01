@@ -43,8 +43,8 @@ function _merge!(o::Variance, o2::Variance)
     o
 end
 value(o::Variance) = o.n > 1 ? o.σ2 * unbias(o) : 1.0
-Base.var(o::Variance) = value(o)
-Base.mean(o::Variance) = o.μ
+Statistics.var(o::Variance) = value(o)
+Statistics.mean(o::Variance) = o.μ
 
 #-----------------------------------------------------------------------# AutoCov and Lag
 # Lag
@@ -294,7 +294,7 @@ end
 nvars(o::CovMatrix) = size(o.A, 1)
 function value(o::CovMatrix; corrected::Bool = true)
     o.value[:] = Matrix(Symmetric((o.A - o.b * o.b')))
-    corrected && scale!(o.value, unbias(o))
+    corrected && rmul!(o.value, unbias(o))
     o.value
 end
 function _merge!(o::CovMatrix, o2::CovMatrix)
@@ -303,14 +303,14 @@ function _merge!(o::CovMatrix, o2::CovMatrix)
     smooth!(o.b, o2.b, γ)
     o
 end
-Base.cov(o::CovMatrix; corrected::Bool = true) = value(o; corrected=corrected)
-Base.mean(o::CovMatrix) = o.b
-Base.var(o::CovMatrix; kw...) = diag(value(o; kw...))
-function Base.cor(o::CovMatrix; kw...)
+Statistics.cov(o::CovMatrix; corrected::Bool = true) = value(o; corrected=corrected)
+Statistics.mean(o::CovMatrix) = o.b
+Statistics.var(o::CovMatrix; kw...) = diag(value(o; kw...))
+function Statistics.cor(o::CovMatrix; kw...)
     value(o; kw...)
     v = 1.0 ./ sqrt.(diag(o.value))
-    scale!(o.value, v)
-    scale!(v, o.value)
+    rmul!(o.value, Diagonal(v))
+    lmul!(Diagonal(v), o.value)
     o.value
 end
 
@@ -573,7 +573,7 @@ end
 nobs(o::StatHistory) = nobs(o.stat)
 function _fit!(o::StatHistory, y)
     _fit!(o.stat, y)
-    unshift!(o.circbuff, copy(o.stat))
+    pushfirst!(o.circbuff, copy(o.stat))
 end
 function Base.show(io::IO, o::StatHistory)
     print(io, name(o, false, true))
@@ -740,7 +740,7 @@ function _merge!(o::Mean, o2::Mean)
     o.n += o2.n
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
 end
-Base.mean(o::Mean) = o.μ
+Statistics.mean(o::Mean) = o.μ
 
 #-----------------------------------------------------------------------# Moments
 """
@@ -770,8 +770,8 @@ function _fit!(o::Moments, y::Real)
     @inbounds o.m[3] = smooth(o.m[3], y * y2, γ)
     @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
 end
-Base.mean(o::Moments) = o.m[1]
-Base.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
+Statistics.mean(o::Moments) = o.m[1]
+Statistics.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
 function skewness(o::Moments)
     v = value(o)
     vr = o.m[2] - o.m[1]^2
@@ -823,7 +823,7 @@ function _merge!(o::OrderStats, o2::OrderStats)
     o.n += o2.n
     smooth!(o.value, o2.value, o2.n / o.n)
 end
-Base.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
+Statistics.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
 # # tree/nbc help:
 # function pdf(o::OrderStats, x)

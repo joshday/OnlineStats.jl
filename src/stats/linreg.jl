@@ -115,7 +115,7 @@ function add_diag!(S, λ::AbstractVector)
 end
 
 function coef(o::LinRegBuilder, λ=0.0; y=1, x=xs(o,y), bias=true, verbose=false)
-    verbose && Compat.@info("Regress $y on $x $(bias ? "with bias" : "")")
+    verbose && @info("Regress $y on $x $(bias ? "with bias" : "")")
     inds = collect(x)
     bias && push!(inds, size(o.A, 1))
     push!(inds, y)

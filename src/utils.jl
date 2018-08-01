@@ -1,7 +1,6 @@
 #-----------------------------------------------------------------------# General
-const Tup = Union{Tuple, NamedTuples.NamedTuple}
-# const XY = Union{Pair{AbstractVector, Any}, Tuple{AbstractVector, Any}, NamedTuples.NamedTuple}
-const XY = Union{AbstractVector, Tup}
+const Tup = Union{Tuple, NamedTuple}
+const XY = Union{AbstractVector, Tup} # Also Pair?
 const VectorOb = Union{AbstractVector, Tup}
 
 smooth(a, b, γ) = a + γ * (b - a)
@@ -30,7 +29,7 @@ end
 
 unbias(o) = nobs(o) / (nobs(o) - 1)
 
-Base.std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
+Statistics.std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
 
 const ϵ = 1e-7
 

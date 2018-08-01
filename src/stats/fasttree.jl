@@ -201,7 +201,7 @@ function _fit!(o::FastForest, xy)
 end
 
 function _classify(o::FastForest, x::VectorOb, buffer::Vector{Int})
-    buffer[:] = 0
+    buffer[:] .= 0
     for (i, tree) in enumerate(o.forest)
         buffer[classify(tree, x[o.subsets[:, i]])] += 1
     end

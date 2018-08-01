@@ -1,12 +1,8 @@
 __precompile__(true)
 module OnlineStats 
 
-using Compat
-using Compat.LinearAlgebra
-using Compat.Printf
-using RecipesBase
-
-using Reexport 
+using RecipesBase, Reexport
+using Statistics, LinearAlgebra, Dates  # Stdlib
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
 import OnlineStatsBase: OnlineStat, name, _fit!, _merge!
@@ -14,10 +10,11 @@ import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
     fweights, sample, coef, Histogram
 import DataStructures: OrderedDict, CircularBuffer
-import NamedTuples  # Remove in 0.7
 import SweepOperator
 
 export 
+# Statistics 
+    mean, var, std, cov, cor,
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
     eachcol, eachrow, classify, coef, transform, transform!, stats, series,

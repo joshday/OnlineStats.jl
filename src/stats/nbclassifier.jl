@@ -60,7 +60,7 @@ function _predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)
         p[k] = exp(p[k])
     end
     sp = sum(p)
-    sp == 0.0 ? p : scale!(p, inv(sp))
+    sp == 0.0 ? p : rmul!(p, inv(sp))
 end
 function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)) 
     _, k = findmax(_predict(o, x, p, n))
