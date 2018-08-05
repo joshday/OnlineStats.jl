@@ -54,7 +54,7 @@ function _fit!(o::PlotNN, xy)
                 end
             end
         end
-        merge!(o.value[i], o.value[j])
+        _merge!(o.value[i], o.value[j])
         deleteat!(o.value, j)
     end
 end
