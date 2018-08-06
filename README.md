@@ -19,4 +19,6 @@ for yi in y
 end
 ```
 
+# Big Data Visualizations
+
 ![](https://user-images.githubusercontent.com/8075494/38169834-e15b1b32-3542-11e8-8789-e6f6e3296e8e.gif)
