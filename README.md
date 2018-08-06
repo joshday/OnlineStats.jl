@@ -22,6 +22,3 @@ end
 # Big Data Visualizations
 
 ![](https://user-images.githubusercontent.com/8075494/38169834-e15b1b32-3542-11e8-8789-e6f6e3296e8e.gif)
-
-
-![](https://user-images.githubusercontent.com/8075494/43725168-b1d469a8-9993-11e8-9d7d-2b0abad2e1e3.png)
