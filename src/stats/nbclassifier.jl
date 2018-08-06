@@ -26,7 +26,7 @@ end
 function Base.show(io::IO, o::NBClassifier)
     print(io, "NBClassifier")
     for (k, p) in zip(keys(o), probs(o))
-        print(io, "\n    > $k ($(round(p, 4)))")
+        print(io, "\n    > $k ($(round(p, digits=4)))")
     end
 end
 function _fit!(o::NBClassifier, xy)
@@ -60,7 +60,7 @@ function _predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)
         p[k] = exp(p[k])
     end
     sp = sum(p)
-    sp == 0.0 ? p : scale!(p, inv(sp))
+    sp == 0.0 ? p : rmul!(p, inv(sp))
 end
 function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)) 
     _, k = findmax(_predict(o, x, p, n))

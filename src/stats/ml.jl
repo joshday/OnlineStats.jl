@@ -11,8 +11,8 @@ Numerical() = Numerical(Variance())
 function Base.show(io::IO, o::Numerical)
     print(io, "📈  Numerical: μ=", mean(o), ", σ=", std(o))
 end
-Base.mean(o::Numerical) = mean(o.stat)
-Base.std(o::Numerical) = std(o.stat)
+Statistics.mean(o::Numerical) = mean(o.stat)
+Statistics.std(o::Numerical) = std(o.stat)
 width(o::Numerical) = 1
 transform(o::Numerical, xi, j) = (xi - mean(o)) / std(o)
 

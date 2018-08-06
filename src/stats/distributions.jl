@@ -125,8 +125,8 @@ function value(o::FitNormal)
     end
 end
 _merge!(o::FitNormal, o2::FitNormal) = _merge!(o.v, o2.v)
-Base.mean(o::FitNormal) = mean(o.v)
-Base.var(o::FitNormal) = var(o.v)
+Statistics.mean(o::FitNormal) = mean(o.v)
+Statistics.var(o::FitNormal) = var(o.v)
 
 function pdf(o::FitNormal, x::Number) 
     σ = std(o)
@@ -198,7 +198,7 @@ function value(o::FitMvNormal)
     if isposdef(c)
         return mean(o.cov), c
     else
-        return zeros(nvars(o)), eye(nvars(o))
+        return zeros(nvars(o)), Matrix(1.0I, nvars(o), nvars(o))
     end
 end
 _merge!(o::FitMvNormal, o2::FitMvNormal) = _merge!(o.cov, o2.cov)

@@ -27,16 +27,16 @@ _merge!(o::Hist, o2::Hist) = _merge!(o.alg, o2.alg)
 value(o::Hist) = (midpoints(o), counts(o))
 
 split_candidates(o::Hist) = midpoints(o)
-Base.mean(o::Hist) = mean(midpoints(o), fweights(counts(o)))
-Base.var(o::Hist) = var(midpoints(o), fweights(counts(o)); corrected=true)
-Base.std(o::Hist) = sqrt(var(o))
-Base.median(o::Hist) = quantile(o, .5)
+Statistics.mean(o::Hist) = mean(midpoints(o), fweights(counts(o)))
+Statistics.var(o::Hist) = var(midpoints(o), fweights(counts(o)); corrected=true)
+Statistics.std(o::Hist) = sqrt(var(o))
+Statistics.median(o::Hist) = quantile(o, .5)
 function Base.extrema(o::Hist) 
     mids, counts = value(o)
     inds = findall(x->x!=0, counts)  # filter out zero weights 
     mids[inds[1]], mids[inds[end]]
 end
-function Base.quantile(o::Hist, p = [0, .25, .5, .75, 1]) 
+function Statistics.quantile(o::Hist, p = [0, .25, .5, .75, 1]) 
     mids, counts = value(o)
     inds = findall(x->x!=0, counts)  # filter out zero weights
     quantile(mids[inds], fweights(counts[inds]), p)

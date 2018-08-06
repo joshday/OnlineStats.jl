@@ -66,7 +66,7 @@ end
 @recipe function f(o::GroupBy{T, <:Hist}) where {T}
     sort!(o.value)
     link --> :all
-    for (k, v) in Compat.pairs(o.value)
+    for (k, v) in pairs(o.value)
         @series begin 
             label --> k 
             v
@@ -141,7 +141,7 @@ end
     seriestype --> :bar 
     kys = collect(kys)
     vls = [o.value[ky] for ky in kys]
-    sortby in [:keys, :values] || Compat.@warn("sortby = :$sortby not recognized")
+    sortby in [:keys, :values] || @warn("sortby = :$sortby not recognized")
     sp = sortby == :keys ? sortperm(kys) : sortperm(vls)
     x, y = string.(kys[sp]), vls[sp]
     hover --> ["($xi, $yi)" for (xi,yi) in zip(x, y)], :quiet
