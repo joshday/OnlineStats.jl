@@ -6,7 +6,7 @@
 
 # Online algorithms for statistics
 
-**OnlineStats** is a Julia package which provides online algorithms for statistical models.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.  
+**OnlineStats** is a Julia package which provides online algorithms for statistics, models, and data visualization.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.  
 
 
 ```julia
@@ -21,5 +21,6 @@ end
 
 ![](https://user-images.githubusercontent.com/8075494/38169834-e15b1b32-3542-11e8-8789-e6f6e3296e8e.gif)
 
+# Big Data Visualizations
 
 ![](https://user-images.githubusercontent.com/8075494/43725168-b1d469a8-9993-11e8-9d7d-2b0abad2e1e3.png)
