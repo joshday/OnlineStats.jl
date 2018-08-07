@@ -63,9 +63,9 @@ end
 function RowsOf(x::M) where {T, M<:AbstractMatrix{T}}
     RowsOf{T, M}(x, Vector{T}(undef, size(x, 2))) 
 end
-Base.start(o::RowsOf) = 1
-Base.next(o::RowsOf, i) = o[i], i + 1
-Base.done(o::RowsOf, i) = i > size(o.mat, 1)
+
+Base.iterate(o::RowsOf) = (o[1], 2)
+Base.iterate(o::RowsOf, i) = i > length(o) ? nothing : (o[i], i+1)
 Base.eltype(o::Type{R}) where {T, R<:RowsOf{T}} = Vector{T}
 Base.length(o::RowsOf) = size(o.mat, 1)
 function Base.getindex(o::RowsOf, i)
@@ -85,9 +85,8 @@ function XYRows(x::M, y::V) where {T,S,M<:AbstractMatrix{T},V<:AbstractVector{S}
     size(x,1) == length(y) || error("incompatible dimensions")
     XYRows{T,M,S,V}(x, y, zeros(T, size(x, 2)))
 end
-Base.start(o::XYRows) = 1 
-Base.next(o::XYRows, i) = o[i], i + 1
-Base.done(o::XYRows, i) = i > size(o.mat, 1)
+Base.iterate(o::XYRows) = (o[1], 2)
+Base.iterate(o::XYRows, i) = i > length(o) ? nothing : (o[i], i+1)
 Base.eltype(o::Type{XYRows{T,M,S,V}}) where {T,M,S,V} = Tuple{Vector{T}, S}
 Base.length(o::XYRows) = size(o.mat, 1)
 
@@ -107,9 +106,9 @@ end
 function ColsOf(x::M) where {T, M<:AbstractMatrix{T}}
     ColsOf{T, M}(x, zeros(T, size(x, 1)))
 end
-Base.start(o::ColsOf) = 1
-Base.next(o::ColsOf, i) = o[i], i + 1
-Base.done(o::ColsOf, i) = i > size(o.mat, 2)
+
+Base.iterate(o::ColsOf) = (o[1], 2)
+Base.iterate(o::ColsOf, i) = i > length(o) ? nothing : (o[i], i+1)
 Base.eltype(o::Type{C}) where {T, C<:ColsOf{T}} = Vector{T}
 Base.length(o::ColsOf) = size(o.mat, 2)
 function Base.getindex(o::ColsOf, i)

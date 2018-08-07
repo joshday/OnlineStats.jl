@@ -1,7 +1,7 @@
 module OnlineStats 
 
 using RecipesBase, Reexport
-using Statistics, LinearAlgebra, Dates  # Stdlib
+using Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
 import OnlineStatsBase: OnlineStat, name, _fit!, _merge!

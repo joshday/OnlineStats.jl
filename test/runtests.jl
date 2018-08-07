@@ -219,7 +219,7 @@ end
     test_exact(FastTree(10), (X[1,:],Y[1]), length, 1)
 
     # Issue 116
-    srand(218)
+    Random.seed!(218)
     X,Y = OnlineStats.fakedata(FastNode, 10^4, 1)
     fit!(FastTree(1, splitsize=100),(X,Y))
 end

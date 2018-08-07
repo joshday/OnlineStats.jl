@@ -410,7 +410,7 @@ Base.minimum(o::Extrema) = o.min
 
 #-----------------------------------------------------------------------# FTSeries 
 """
-    FTSeries(stats...; filter=always, transform=identity)
+    FTSeries(stats...; filter=x->true, transform=identity)
 
 Track multiple stats for one data stream that is filtered and transformed before being 
 fitted.
@@ -437,13 +437,13 @@ mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     transform::T 
     nfiltered::Int
 end
-function FTSeries(stats::OnlineStat...; filter=always, transform=identity)
+function FTSeries(stats::OnlineStat...; filter=x->true, transform=identity)
     Ts = input.(stats)
     FTSeries{promote_type(Ts...), typeof(stats), typeof(filter), typeof(transform)}(
         stats, filter, transform, 0
     )
 end
-function FTSeries(T::Type, stats::OnlineStat...; filter=always, transform=identity)
+function FTSeries(T::Type, stats::OnlineStat...; filter=x->true, transform=identity)
     FTSeries{T, typeof(stats), typeof(filter), typeof(transform)}(stats, filter, transform, 0)
 end
 value(o::FTSeries) = value.(o.stats)
@@ -466,13 +466,6 @@ function _merge!(o::FTSeries, o2::FTSeries)
     _merge!.(o.stats, o2.stats)
     o
 end
-always(x) = true
-
-@deprecate(
-    series(stats::OnlineStat...; filter = always, transform = identity),
-    FTSeries(stats...; filter=filter, transform=transform)
-)
-
 
 #-----------------------------------------------------------------------# Group
 """
@@ -503,12 +496,11 @@ Base.last(o::Group) = last(o.stats)
 Base.length(o::Group) = length(o.stats)
 Base.values(o::Group) = value.(o.stats)
 
-Base.start(o::Group) = 1 
-Base.next(o::Group, i) = o.stats[i], i + 1 
-Base.done(o::Group, i) = i > length(o.stats)
+Base.iterate(o::Group) = (o.stats[1], 2)
+Base.iterate(o::Group, i) = i > length(o) ? nothing : (o.stats[i], i + 1)
 
 @generated function _fit!(o::Group{T}, y) where {T}
-    N = fieldcount(T)#length(fieldnames(T))
+    N = fieldcount(T)
     :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
 end
 function _fit!(o::Group{T}, y) where {T<:AbstractVector}
@@ -517,7 +509,7 @@ function _fit!(o::Group{T}, y) where {T<:AbstractVector}
     end
 end
 
-_merge!(o::Group, o2::Group) = _merge!.(o.stats, o2.stats)
+_merge!(o::Group, o2::Group) = merge!.(o.stats, o2.stats)
 
 Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 
