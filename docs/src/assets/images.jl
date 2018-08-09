@@ -49,7 +49,7 @@ gr()
 #-----------------------------------------------------------------------# readme animation
 # Updated 3/31/18
 n = 100
-srand(123)
+Random.seed!(123)
 y = .5cumsum(rand(n)) + 3randn(n)
 
 o1 = Mean()
