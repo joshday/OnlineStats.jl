@@ -1,4 +1,4 @@
-julia 0.7-beta
+julia 1.0
 OnlineStatsBase 0.8 0.9
 LearnBase
 StatsBase
