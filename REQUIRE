@@ -1,5 +1,5 @@
 julia 0.7
-OnlineStatsBase 0.8 0.9
+OnlineStatsBase 0.9 0.10
 LearnBase
 StatsBase
 DataStructures
