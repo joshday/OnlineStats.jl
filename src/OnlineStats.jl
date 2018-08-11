@@ -1,10 +1,9 @@
 module OnlineStats 
 
-using RecipesBase, Reexport
-using Statistics, LinearAlgebra, Dates
+using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
-import OnlineStatsBase: OnlineStat, name, _fit!, _merge!
+import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, eachcol
 import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
     fweights, sample, coef, Histogram
@@ -16,7 +15,7 @@ export
     mean, var, std, cov, cor,
 # functions 
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    eachcol, eachrow, classify, coef, transform, transform!, stats, series,
+    classify, coef, transform, transform!, stats, series,
 # weights 
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
     McclainWeight, Bounded, Scaled,

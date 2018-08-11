@@ -96,18 +96,6 @@ println("\n\n")
     @test O._dot((1,2,3), (4,5,6)) == sum([1,2,3] .* [4,5,6])
     @test length(BiasVec((1,2,3))) == 4
     @test size(BiasVec([1,2,3])) == (4,)
-    for (j, xj) in enumerate(eachcol(x))
-        @test xj == x[:, j]
-    end
-    for (i, xi) in enumerate(eachrow(x))
-        @test xi == x[i, :]
-    end
-    @inferred eachrow(x)
-    @inferred eachrow(x, y)
-    @inferred eachcol(x)
-    @test length(eachcol(x)) == 5
-    @test length(eachrow(x)) == 1000
-    @test length(eachrow(x, y)) == 1000
     @test Base.IndexStyle(BiasVec{Float64, Vector{Float64}}) == IndexLinear()
 end
 
