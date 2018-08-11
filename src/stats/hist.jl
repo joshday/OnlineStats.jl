@@ -172,6 +172,67 @@ function area(o::FixedBins)
     end
 end
 
+#-----------------------------------------------------------------------# P2Bins 
+mutable struct P2Bins <: HistAlgorithm{Number}
+    q::Vector{Float64}
+    n::Vector{Int}
+    nobs::Int
+    P2Bins(b::Int) = new(zeros(b+1), collect(1:(b+1)), 0)
+end
+nobs(o::P2Bins) = o.nobs
+
+# https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf     page 1084
+function _fit!(o::P2Bins, y)
+    q = o.q 
+    n = o.n
+    o.nobs += 1 
+    b = length(o.q) - 1
+    # A
+    o.nobs <= length(o.q) && (o.q[o.nobs] = y)
+    o.nobs == length(o.q) && sort!(o.q)
+    # B1 
+    k = if y < o.q[1]
+        o.q[1] = y 
+        1
+    elseif y > o.q[end]
+        o.q[end] = y 
+        b
+    elseif o.q[end-1] <= y <= o.q[end]
+        b
+    else
+        searchsortedfirst(o.q, y)
+    end
+    # B2 
+    for i in (k+1):length(o.q)
+        o.n[i] += 1
+    end
+    # B3 
+    for i in 2:b
+        nprime = 1 + (i-1) * (nobs(o)-1) / b
+        di = nprime - n[i]
+        if (di >= 1 && n[i+1] - n[i] > 1) || (i <= -1 && n[i-1] - n[i] < -1)
+            d = Int(sign(di))
+            qiprime = parabolic_prediction(q[i-1],q[i],q[i+1],n[i-1],n[i],n[i+1],d)
+            if q[i-1] < qiprime < q[i]
+                q[i] = qiprime
+            else
+                q[i] += d * (q[i+d] - q[i]) / (n[i+d] - n[i])
+            end
+            o.n[i] += d
+        end
+    end
+end
+
+# return qi, ni
+function parabolic_prediction(q1, q2, q3, n1, n2, n3, d)
+    qi = q2 + d / (n3 - n1)
+    qi *= ((n2-n1+d) * (q3-q2) / (n3-n2) + (n3-n2-d) * (q2-q1) / (n2-n1))
+    qi
+end
+
+midpoints(o::P2Bins) = o.q
+counts(o::P2Bins) = o.n ./ nobs(o)
+
 #-----------------------------------------------------------------------# AdaptiveBins
 """
 Calculate a histogram adaptively.

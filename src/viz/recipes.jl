@@ -128,6 +128,19 @@ end
         error("sticks must be a Bool")
     end
 end
+@recipe function f(o::P2Bins; sticks=false)
+    x, y = midpoints(o), counts(o)
+    if !sticks
+        seriestype --> :line
+        fillto --> 0 
+        alpha --> .4 
+        linewidth --> 0 
+    else 
+        seriestype --> :sticks
+    end
+    x, y
+end
+
 
 @recipe function f(o::FixedBins2)
     seriestype --> :heatmap 
