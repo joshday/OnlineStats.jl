@@ -1,5 +1,5 @@
 ---
-title: 'OnlineStats: A Paradigm for Large Scale Statistics'
+title: 'OnlineStats: A Framework for Large-Scale Statistics'
 tags:
   - statistics
   - big data
@@ -23,7 +23,8 @@ bibliography: paper.bib
 
 # Summary
 
-OnlineStats is a Julia [@Julia] package that implements a variety of on-line algorithms for statistics in a unified framework.
+OnlineStats is a Julia [@Julia] package that offers a unifying framework of on-line algorithms for statistcs, models, and visualizations.  Each algorithm is built around a common interface.
+
 
 
 # References
