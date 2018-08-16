@@ -29,6 +29,7 @@ mutable struct Variance{W} <: OnlineStat{Number}
     n::Int
 end
 Variance(;weight = EqualWeight()) = Variance(0.0, 0.0, weight, 0)
+Base.copy(o::Variance) = Variance(o.σ2, o.μ, o.weight, o.n)
 function _fit!(o::Variance, x)
     μ = o.μ
     γ = o.weight(o.n += 1)
@@ -733,6 +734,7 @@ function _merge!(o::Mean, o2::Mean)
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
 end
 Statistics.mean(o::Mean) = o.μ
+Base.copy(o::Mean) = Mean(o.μ, o.weight, o.n)
 
 #-----------------------------------------------------------------------# Moments
 """
