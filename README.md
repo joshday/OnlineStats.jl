@@ -23,4 +23,4 @@ end
 
 # Tutorials
 
-![https://github.com/joshday/OnlineStatsDemos](https://github.com/joshday/OnlineStatsDemos)
+[https://github.com/joshday/OnlineStatsDemos](https://github.com/joshday/OnlineStatsDemos)
