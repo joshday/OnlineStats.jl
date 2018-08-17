@@ -55,6 +55,8 @@ function make_alg(e::AbstractVector, e2::AbstractVector; kw...)
 end
 nobs(o::FixedBins2) = sum(o.z) + o.out
 
+value(o::Hist{N, <:FixedBins2}) where {N} = (o.alg.x, o.alg.y, o.alg.z)
+
 function _fit!(o::FixedBins2, xy)
     x, y = xy 
     if x > maximum(o.x) || x < minimum(o.x) || y > maximum(o.y) || y < minimum(o.y)

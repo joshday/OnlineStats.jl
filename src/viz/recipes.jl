@@ -132,7 +132,7 @@ end
 @recipe function f(o::FixedBins2)
     seriestype --> :heatmap 
     z = Float64.(o.z)
-    z[z .== 0] = NaN
+    z[z .== 0] .= NaN
     o.x, o.y, z
 end
 
