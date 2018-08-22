@@ -51,7 +51,7 @@ _merge!(o::Mosaic, o2::Mosaic) = (o.n += o2.n; merge!(merge!, o.value, o2.value)
     y = zeros(length(subkys), length(kys))
     for (j, ky) in enumerate(kys) 
         y[:, j] = probs(o.value[ky], subkys)
-        y[:, j] = 1.0 - vcat(0.0, cumsum(y[1:(end-1), j]))
+        y[:, j] = 1.0 .- vcat(0.0, cumsum(y[1:(end-1), j]))
     end
 
     seriestype := :bar
