@@ -71,20 +71,16 @@ function index_to_key(d, i)
         k == i && return ky 
     end
 end
+
 predict(o::NBClassifier, x::VectorOb) = _predict(o, x)
+predict(o::NBClassifier, x) = [predict(o, xi) for xi in x]
+predict(o::NBClassifier, x::AbstractMatrix) = predict(o, eachrow(x))
+
 classify(o::NBClassifier, x::VectorOb) = _classify(o, x)
+classify(o::NBClassifier, x) = [classify(o, xi) for xi in x]
+classify(o::NBClassifier, x::AbstractMatrix) = classify(o, eachrow(x))
 
-
-function predict(o::NBClassifier, x::AbstractMatrix)
-    n = nobs(o)
-    p = zeros(nkeys(o))
-    mapslices(x -> _predict(o, x, p, n), x, 2)
-end
-function classify(o::NBClassifier, x::AbstractMatrix)
-    n = nobs(o)
-    p = zeros(nkeys(o))
-    mapslices(x -> _classify(o, x, p, n), x, 2)
-end
+# Tree stuff
 
 function classify_node(o::NBClassifier)
     _, k = findmax([nobs(g) for g in values(o)])
