@@ -1,6 +1,6 @@
 # Basics
 
-**OnlineStats** is a Julia package for statistical analysis with algorithms that run both **online** and **in parallel**..  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
+**OnlineStats** is a Julia package for statistical analysis with algorithms that run both **online** and **in parallel**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
 
 ## Installation
 
@@ -80,7 +80,7 @@ When you see this error:
 
 1. Check that `eltype(x)` in `fit!(stat, x)` is what you think it is.
 1. Check if the stat is parameterized by observation type (use `?Stat`)
-    - i.e. `Extrema` is a parametric type that defaults to `Float64`.  If my data is 
+    - E.g. `Extrema` is a parametric type that defaults to `Float64`.  If my data is 
       `Int64`, I need to use `Extrema(Int64)`.
 
 ### Helper functions
