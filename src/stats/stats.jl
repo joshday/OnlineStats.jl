@@ -132,7 +132,7 @@ autocor(o::AutoCov) = value(o) ./ value(o)[1]
 """
     Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])
 
-Calculate an nline statistical bootstrap of nreps` replicates of `o`.  For each call to `fit!`,
+Calculate an online statistical bootstrap of nreps` replicates of `o`.  For each call to `fit!`,
 any given replicate will be updated `rand(d)` times (default is double or nothing).
 
 # Example
