@@ -234,11 +234,7 @@ CountMap(T::Type = Any) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(),
 CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d, 0)
 function _fit!(o::CountMap, x) 
     o.n += 1
-    if haskey(o.value, x) 
-        o.value[x] += 1
-    else 
-        o.value[x] = 1
-    end
+    o.value[x] = get!(o.value, x, 0) + 1
 end
 _merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o.n += o2.n)
 function probs(o::CountMap, kys = keys(o.value))
