@@ -28,6 +28,8 @@ import Pkg
 
 Pkg.add("OnlineStats")
 
+using OnlineStats
+
 o = Series(Mean(), Variance(), P2Quantile(), Extrema())
 
 fit!(o, randn(10^6))
