@@ -21,6 +21,18 @@ end
 
 ![](https://user-images.githubusercontent.com/8075494/38169834-e15b1b32-3542-11e8-8789-e6f6e3296e8e.gif)
 
+# Quickstart
+
+```julia
+import Pkg
+
+Pkg.add("OnlineStats")
+
+o = Series(Mean(), Variance(), P2Quantile(), Extrema())
+
+fit!(o, randn(10^6))
+```
+
 # Tutorials
 
 [https://github.com/joshday/OnlineStatsDemos](https://github.com/joshday/OnlineStatsDemos)
