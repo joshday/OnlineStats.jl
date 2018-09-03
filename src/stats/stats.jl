@@ -811,6 +811,12 @@ function _fit!(o::MovingWindow, y)
         o.first = (o.first == o.b) ? 1 : o.first + 1
     end
 end
+function Base.getindex(o::MovingWindow, i::Int)
+    i2 = i + o.first - 1
+    i2 = i2 > o.b ? i2 - o.b : i2 
+    o.value[i2]
+end
+Base.lastindex(o::MovingWindow) = o.b
 
 #-----------------------------------------------------------------------# OrderStats
 """

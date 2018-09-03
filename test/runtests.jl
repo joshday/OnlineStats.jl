@@ -425,6 +425,9 @@ end
 #-----------------------------------------------------------------------# MovingWindow
 @testset "MovingWindow" begin 
     test_exact(MovingWindow(10,Int), 1:12, value, 3:12)
+    for i in 1:10 
+        test_exact(MovingWindow(10,Int), 1:12, o -> o[i], i + 2)
+    end
 end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
