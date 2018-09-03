@@ -777,6 +777,41 @@ function _merge!(o::Moments, o2::Moments)
     o
 end
 
+#-----------------------------------------------------------------------# MovingWindow 
+"""
+    MovingWindow(b, T)
+    MovingWindow(T, b)
+
+Track a moving window of `b` items of type `T`.
+
+# Example 
+
+    o = MovingWindow(10, Int)
+    fit!z
+"""
+mutable struct MovingWindow{T} <: OnlineStat{T}
+    value::Vector{T}
+    b::Int
+    first::Int
+    n::Int
+end
+MovingWindow(b::Int, T::Type) = MovingWindow(T[], b, 1, 0)
+MovingWindow(T::Type, b::Int) = MovingWindow(b, T)
+function value(o::MovingWindow)
+    perm = vcat(collect(o.first:o.b), collect(1:(o.first-1)))
+    o.first = 1
+    permute!(o.value, perm)
+end
+function _fit!(o::MovingWindow, y)
+    o.n += 1 
+    if length(o.value) < o.b 
+        push!(o.value, y)
+    else
+        o.value[o.first] = y 
+        o.first = (o.first == o.b) ? 1 : o.first + 1
+    end
+end
+
 #-----------------------------------------------------------------------# OrderStats
 """
     OrderStats(b::Int, T::Type = Float64; weight=EqualWeight())

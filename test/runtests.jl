@@ -422,6 +422,10 @@ end
 @testset "Mosaic" begin 
     test_merge(Mosaic(Int,Int), rand(1:5, 100, 2), rand(1:5, 100, 2), ==)
 end
+#-----------------------------------------------------------------------# MovingWindow
+@testset "MovingWindow" begin 
+    test_exact(MovingWindow(10,Int), 1:12, value, 3:12)
+end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin 
     X, Y = randn(1000, 5), rand(Bool, 1000)
