@@ -5,6 +5,7 @@
 ## Installation
 
 ```
+import Pkg
 Pkg.add("OnlineStats")
 ```
 
@@ -42,46 +43,6 @@ merge!(m, m2)
 value(m)
 ```
 
-## Details of `fit!`-ting
-
-Stats are subtypes of the parametric abstract type `OnlineStat{T}`, where `T` is the type of a single observation.  For example, `Mean <: OnlineStat{Number}`.  
-
-- One of the two `fit!` methods updates the stat from a single observation:
-
-```
-fit!(::OnlineStat{T}, x::T) = ...
-```
-
-- In any other case, OnlineStats will attempt to iterate through `x` and `fit!` each 
-  element (with checks to avoid stack overflows).
-
-```
-function fit!(o::OnlineStat{T}, y::S) where {T, S}
-    for yi in y 
-        fit!(o, yi)
-    end
-    o
-end
-```
-
-### A Common Error
-
-```@repl index
-fit!(Mean(), "asdf")
-```
-
-Here is what's happening:
-
-1. `String` is not a subtype of `Number`, so OnlineStats attempts to iterate through "asdf". 
-1. The first element of `"asdf"` is the `Char` `'a'`.
-1. The above error is produced (rather than a stack overflow).
-
-When you see this error:
-
-1. Check that `eltype(x)` in `fit!(stat, x)` is what you think it is.
-1. Check if the stat is parameterized by observation type (use `?Stat`)
-    - E.g. `Extrema` is a parametric type that defaults to `Float64`.  If my data is 
-      `Int64`, I need to use `Extrema(Int64)`.
 
 ### Helper functions
 

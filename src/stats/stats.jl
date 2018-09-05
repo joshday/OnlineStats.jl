@@ -1166,3 +1166,10 @@ Base.sum(o::Sum) = o.sum
 _fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.n += 1)
 _fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
 _merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
+
+#-----------------------------------------------------------------------# Summarizer
+mutable struct Summarizer{T} <: OnlineStat{T}
+    group::Group
+end
+nobs(o::Summarizer) = nobs(o.group)
+

@@ -9,6 +9,7 @@ makedocs(
         "index.md",
         "collectionstats.md",
         "weights.md",
+        "howfitworks.md"
         "stats_and_models.md",
         "parallel.md",
         "datasurrogates.md",
