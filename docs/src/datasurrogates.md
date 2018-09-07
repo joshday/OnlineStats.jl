@@ -42,7 +42,7 @@ o = Hist(20)        # adaptively find bins
 o2 = Hist(0:.5:5)  # specify the bin edges
 s = Series(o, o2)
 
-using Random
+using Random, Statistics
 fit!(s, randexp(100_000))
 
 quantile(o, .5)
