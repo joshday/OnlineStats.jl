@@ -1,6 +1,7 @@
 language: julia
 os:
   - linux
+  - osx
 julia:
   - 0.7
   - 1.0
@@ -14,6 +15,6 @@ notifications:
 #   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 #   - julia --check-bounds=yes --depwarn=no -e 'Pkg.clone(pwd()); Pkg.build("OnlineStats"); Pkg.test("OnlineStats"; coverage=true)'
 after_success:
-  - julia -e 'import Pkg; Pkg.add("Documenter")'
+  - julia -e 'import Pkg; Pkg.add("Documenter"); Pkg.add("OnlineStatsBase")'
   - julia -e 'import Pkg; cd(Pkg.dir("OnlineStats")); include(joinpath("docs", "make.jl"))'
   - julia -e 'import Pkg; cd(Pkg.dir("OnlineStats")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
