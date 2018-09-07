@@ -1,11 +1,11 @@
 ```@setup setup
-import Pkg
+import Pkg, Random
 Pkg.add("GR")
 Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
 using OnlineStats
 using Plots
-srand(123)
+Random.seed!(123)
 gr()
 ```
 
