@@ -1,3 +1,7 @@
+```@setup howfitworks
+using OnlineStats
+```
+
 # How `fit!` Works
 
 - Stats are subtypes of `OnlineStat{T}` where `T` is the type of a single observation.
@@ -19,7 +23,7 @@ use the [`eachrow`](@ref) and [`eachcol`](@ref) functions, which efficiently ite
 the rows or columns of the matrix, respectively.
 
 
-```@example index
+```@example howfitworks
 fit!(CovMatrix(), eachrow(randn(1000,2)))
 
 fit!(CovMatrix(), eachcol(randn(2,1000)))
