@@ -1,5 +1,6 @@
 ```@setup setup
 import Pkg, Random
+using Dates
 Pkg.add("GR")
 Pkg.add("Plots")
 ENV["GKSwstype"] = "100"

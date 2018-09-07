@@ -48,7 +48,7 @@ p
 
 #-----------------------------------------------------------------------# Weight animation
 # n = 100
-# srand(123)
+# Random.seed!(123)
 # y = .5cumsum(rand(n)) + 3randn(n)
 
 # s1 = Series(EqualWeight(),              Mean())

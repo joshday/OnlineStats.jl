@@ -20,7 +20,7 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
 # Example 
 
     x = randn(1000, 5)
-    y = x * linspace(-1, 1, 5) + randn(1000)
+    y = x * range(-1, stop=1, length=5) + randn(1000)
 
     o = fit!(StatLearn(5, MSPI()), (x, y))
     coef(o)
