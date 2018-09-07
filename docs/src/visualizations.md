@@ -158,7 +158,7 @@ savefig("indexpart4.png"); nothing # hide
 ![](indexpart4.png)
 
 ```@example setup
-x = rand(Date(2000):Date(2020), 10^5)
+x = rand(Date(2000):Dates.Day(1):Date(2020), 10^5)
 y = Dates.year.(x) + randn(10^5)
 
 o = fit!(IndexedPartition(Date, Hist(20)), [x y])

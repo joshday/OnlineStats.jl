@@ -23,7 +23,7 @@ can be any variable and the `x`'s can be any subset of variables.
 ```@example setup
 # make some data
 x = randn(10^6, 10)
-y = x * linspace(-1, 1, 10) + randn(10^6)
+y = x * range(-1, stop=1, length=10) + randn(10^6)
 
 o = fit!(LinRegBuilder(11), [x y])
 
