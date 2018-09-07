@@ -58,6 +58,7 @@ _merge!(o::FitCauchy, o2::FitCauchy) = _merge!(o.q, o2.q)
 Online parameter estimate of a Gamma distribution (Method of Moments).
 
 # Example 
+    using Random
     o = fit!(FitGamma(), randexp(10^5))
 """
 struct FitGamma <: OnlineStat{Number}
