@@ -1,5 +1,35 @@
-using OnlineStats, Plots, Colors
+using OnlineStats, Plots, Colors, Random, CSV
 gr()
+Random.seed!(123)
+
+#-----------------------------------------------------------------------# readme plot
+@info "Plot 1"
+y = cumsum(randn(10^6)) + 100randn(10^6)
+o = Partition(Hist(10))
+fit!(o, y)
+p1 = plot(o)
+
+@info "Plot 2"
+p2 = plot(
+    plot(fit!(Hist(50), y[1:5_000])),
+    plot(fit!(Hist(50), y[1:200_000])),
+    plot(fit!(Hist(50), y[1:500_000])),
+    plot(fit!(Hist(50), y))
+)
+
+@info "Plot 3"
+p3 = plot(fit!(PlotNN(200), randn(10^5, 2)), colorbar=false)
+
+
+@info "Plot 4"
+df = CSV.read("/Users/joshday/datasets/diamonds.csv"; allowmissing=:none)
+o = Partition(CountMap(String), 75)
+p4 = plot(fit!(o, string.(df[:cut])), ylim = (0, df[1][end]))
+
+@info "Joining Plots"
+p = plot(p1, p2, p4, p3; xaxis=false, yaxis=false,xticks=[], yticks=[], size=(1000,800), legend=false)
+png("/Users/joshday/Desktop/readme.png")
+p
 
 # #-----------------------------------------------------------------------# logo
 # x = [0. 10. 20.]
@@ -48,25 +78,25 @@ gr()
 
 #-----------------------------------------------------------------------# readme animation
 # Updated 3/31/18
-n = 100
-Random.seed!(123)
-y = .5cumsum(rand(n)) + 3randn(n)
+# n = 100
+# Random.seed!(123)
+# y = .5cumsum(rand(n)) + 3randn(n)
 
-o1 = Mean()
-o2 = Mean(weight = x -> .1)
-p = plot(zeros(0), zeros(0, 3), seriestype = [:scatter :line :line], w=3,
-    label = ["data", "equally weighted", "exponentially weighted"],
-    grid=false, legend = :topleft, xlab = "Number of Observations",
-    title = "Means", ylim = (-5, 30), color = :viridis
-)
+# o1 = Mean()
+# o2 = Mean(weight = x -> .1)
+# p = plot(zeros(0), zeros(0, 3), seriestype = [:scatter :line :line], w=3,
+#     label = ["data", "equally weighted", "exponentially weighted"],
+#     grid=false, legend = :topleft, xlab = "Number of Observations",
+#     title = "Means", ylim = (-5, 30), color = :viridis
+# )
 
-a = @animate for yi in y
-    fit!(o1, yi)
-    fit!(o2, yi)
-    push!(p, nobs(o1), vcat(yi, value(o1), value(o2)))
-end
+# a = @animate for yi in y
+#     fit!(o1, yi)
+#     fit!(o2, yi)
+#     push!(p, nobs(o1), vcat(yi, value(o1), value(o2)))
+# end
 
-gif(a, "/Users/joshday/Desktop/readme.gif")
+# gif(a, "/Users/joshday/Desktop/readme.gif")
 
 
 
