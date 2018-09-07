@@ -159,7 +159,7 @@ savefig("indexpart4.png"); nothing # hide
 
 ```@example setup
 x = rand(1:1000, 10^5)
-y = x .+ 10randn(10^5)
+y = x .+ 30randn(10^5)
 
 o = fit!(IndexedPartition(Int, Hist(20)), zip(x,y))
 
