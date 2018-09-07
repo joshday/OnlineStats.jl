@@ -209,9 +209,9 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
 
 @recipe function f(parts::Vector{Part{T, O}}) where {T, O<:Hist}
     sort!(parts)
-    x = Float64[]
-    y = Float64[]
-    fillz = Float64[]
+    x = []
+    y = []
+    fillz = Int[]
     for part in parts 
         alg = part.stat.alg
         _min, _max = extrema(part.stat)
