@@ -1,4 +1,5 @@
 ```@setup setup
+import Pkg
 Pkg.add("GR")
 Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
