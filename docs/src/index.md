@@ -42,12 +42,3 @@ merge!(m, m2)
 ```@repl index
 value(m)
 ```
-
-
-### Helper functions
-
-To iterate over the rows/columns of a matrix, use [`eachrow`](@ref) or [`eachcol`](@ref), respectively.
-
-```@example index
-fit!(CovMatrix(), eachrow(randn(100,2)))
-```

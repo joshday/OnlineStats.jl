@@ -787,7 +787,7 @@ Track a moving window of `b` items of type `T`.
 # Example 
 
     o = MovingWindow(10, Int)
-    fit!z
+    fit!(o, 1:14)
 """
 mutable struct MovingWindow{T} <: OnlineStat{T}
     value::Vector{T}

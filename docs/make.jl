@@ -1,7 +1,7 @@
 using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
-    modules = [OnlineStats, OnlineStatsBase],
+    modules = [OnlineStats],
     format = [:html],
     sitename = "OnlineStats.jl",
     authors = "Josh Day",
