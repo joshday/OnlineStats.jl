@@ -1,5 +1,5 @@
 module OnlineStatsTests
-using OnlineStats, Test, Statistics, Random, LinearAlgebra
+using OnlineStats, Test, Statistics, Random, LinearAlgebra, Dates
 # using Plots
 O = OnlineStats
 import StatsBase: countmap, fit, Histogram
@@ -421,6 +421,14 @@ end
 #-----------------------------------------------------------------------# Mosaic 
 @testset "Mosaic" begin 
     test_merge(Mosaic(Int,Int), rand(1:5, 100, 2), rand(1:5, 100, 2), ==)
+end
+#-----------------------------------------------------------------------# MovingTimeWindow
+@testset "MovingTimeWindow" begin 
+    dates = Date(2010):Day(1):Date(2011)
+    data = 1:length(dates)
+    o = MovingTimeWindow(Day(4); timetype=Date, valtype=Int)
+    test_exact(copy(o), zip(dates, data), value, Pair.(dates[end-4:end], data[end-4:end]), ==)
+    test_merge(o, zip(dates[1:2], data[1:2]), zip(dates[3:4], data[3:4]), ==)
 end
 #-----------------------------------------------------------------------# MovingWindow
 @testset "MovingWindow" begin 

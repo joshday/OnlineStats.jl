@@ -34,7 +34,7 @@ export
     Ignored, IndexedPartition,
     KMeans,
     Lag, LinReg, LinRegBuilder,
-    Mean, ModelSchema, Moments, Mosaic, MovingWindow,
+    Mean, ModelSchema, Moments, Mosaic, MovingTimeWindow, MovingWindow, 
     NBClassifier,
     OrderStats,
     Partition, PlotNN, ProbMap, P2Quantile,

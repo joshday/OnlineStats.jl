@@ -777,6 +777,55 @@ function _merge!(o::Moments, o2::Moments)
     o
 end
 
+#-----------------------------------------------------------------------# MovingTimeWindow
+"""
+    MovingTimeWindow{T<:TimeType, S}(window::DatePeriod)
+    MovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)
+
+Fit a moving window of data based on time stamps.  Each observation must be a `Tuple`, 
+`NamedTuple`, or `Pair` where the first item is `<: Dates.TimeType`.  Only observations 
+with time stamps in the range
+
+``most_recent_datetime - window <= time_stamp <= most_recent_datetime``
+
+are kept track of.
+
+# Example
+
+    using Dates
+    dts = Date(2010):Day(1):Date(2011)
+    y = rand(length(dts))
+
+    o = MovingTimeWindow(Day(4); timetype=Date, valtype=Float64)
+    fit!(o, zip(dts, y))
+"""
+mutable struct MovingTimeWindow{T<:TimeType, S, D<:DatePeriod} <: OnlineStat{TwoThings{T,S}}
+    values::Vector{Pair{T,S}}
+    window::D
+    n::Int
+end
+function MovingTimeWindow{T,S}(window::DatePeriod) where {T<:TimeType, S}
+    MovingTimeWindow(Pair{T,S}[], window, 0)
+end
+function MovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)
+    MovingTimeWindow{timetype, valtype}(window)
+end
+value(o::MovingTimeWindow) = sort!(o.values)
+function _fit!(o::MovingTimeWindow, y)
+    o.n += 1
+    push!(o.values, Pair(y...))
+    cutoff = maximum(first, o.values) - o.window
+    filter!(x -> x[1] >= cutoff, o.values)
+end
+function _merge!(a::MovingTimeWindow, b::MovingTimeWindow)
+    a.n += (nobs(b) - length(value(b)))
+    for y in value(b)
+        fit!(a, y)
+    end
+end
+
+
+
 #-----------------------------------------------------------------------# MovingWindow 
 """
     MovingWindow(b, T)

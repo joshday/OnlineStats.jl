@@ -2,6 +2,7 @@
 const Tup = Union{Tuple, NamedTuple}
 const XY = Union{AbstractVector, Tup} # Also Pair?
 const VectorOb = Union{AbstractVector, Tup}
+const TwoThings{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names, Tuple{T,S}}} where names
 
 smooth(a, b, γ) = a + γ * (b - a)
 
