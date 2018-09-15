@@ -548,7 +548,7 @@ end
             @test coef(o) == o.β
             @test predict(o, X) == X * o.β
             @test ≈(coef(o), β; atol=1.5)
-            @test O.objective(o, X, Y) ≈ value(o.loss, Y, predict(o, X), AvgMode.Mean()) + value(o.penalty, o.β, o.λ)
+            @test O.objective(o, X, Y) ≈ value(o.loss, Y, predict(o, X), AggMode.Mean()) + value(o.penalty, o.β, o.λ)
         end
         for L in [LogitMarginLoss(), DWDMarginLoss(1.0)]
             print(" | $L")
