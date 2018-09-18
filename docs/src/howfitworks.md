@@ -37,7 +37,7 @@ iterate over named tuples of rows, so things like this just work:
 ```julia
 using JuliaDB
 
-t = table(randn(100, randn(100)))
+t = table(randn(100), randn(100))
 
 fit!(2Mean(), t)
 ```
