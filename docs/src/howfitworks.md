@@ -47,7 +47,7 @@ fit!(2Mean(), t)
 
 Consider the following example:
 
-```@repl
+```@repl howfitworks
 fit!(Mean(), "asdf")
 ```
 

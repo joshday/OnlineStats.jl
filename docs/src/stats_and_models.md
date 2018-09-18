@@ -40,6 +40,9 @@
 | Distance-weighted discrimination   | [`StatLearn`](@ref)        |
 | Huber-loss regression              | [`StatLearn`](@ref)        |
 | Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
+| Decision Trees                     | [`FastTree`](@ref)         |
+| Random Forest                      | [`FastForest`](@ref)       |
+| Naive Bayes Classifier             | [`NBClassifier`](@ref)     |
 | **Other:**                         |                            |
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |

@@ -233,6 +233,7 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
     @series begin 
         seriestype := :shape
         linewidth --> 0
+        linealpha --> 0
         legend --> false
         fillz := fillz
         x, y
