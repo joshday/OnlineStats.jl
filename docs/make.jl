@@ -1,11 +1,12 @@
 using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
-    modules = [OnlineStats],
+    modules = [OnlineStats, OnlineStatsBase],
     format = [:html],
     sitename = "OnlineStats.jl",
     authors = "Josh Day",
     clean = true,
+    debug = true,
     pages = [
         "index.md",
         "collectionstats.md",
