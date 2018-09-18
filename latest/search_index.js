@@ -217,9 +217,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "howfitworks.html#Why-Base-Fitting-on-Iteration?-1",
+    "location": "howfitworks.html#Why-is-Fitting-Based-on-Iteration?-1",
     "page": "How fit! Works",
-    "title": "Why Base Fitting on Iteration?",
+    "title": "Why is Fitting Based on Iteration?",
     "category": "section",
     "text": ""
 },
@@ -229,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "How fit! Works",
     "title": "Reason 1: OnlineStats doesn\'t want to make assumptions on the shape of your data",
     "category": "section",
-    "text": "Consider CovMatrix, for which a single observation is an AbstractVector, Tuple, or NamedTuple. If I try to update it with a Matrix, it\'s ambiguous whether I want rows or columns of  the matrix to be treated as individual observations.  By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly  use the eachrow and eachcol functions, which efficiently iterate over  the rows or columns of the matrix, respectively.fit!(CovMatrix(), eachrow(randn(1000,2)))\n\nfit!(CovMatrix(), eachcol(randn(2,1000)))"
+    "text": "Consider CovMatrix, for which a single observation is an AbstractVector, Tuple, or NamedTuple. If I try to update it with a Matrix, it\'s ambiguous whether I want rows or columns of  the matrix to be treated as individual observations.  By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly  use the OnlineStatsBase.eachrow and OnlineStatsBase.eachcol functions, which efficiently iterate over  the rows or columns of the matrix, respectively.fit!(CovMatrix(), eachrow(randn(1000,2)))\n\nfit!(CovMatrix(), eachcol(randn(2,1000)))"
 },
 
 {
