@@ -10,7 +10,7 @@ using OnlineStats
 - When you try to `fit!(o::OnlineStat{T}, data::S)`, OnlineStats will attempt to iterate through `data` and `fit!` each item.
 
 
-## Why Base Fitting on Iteration?
+## Why is Fitting Based on Iteration?
 
 ### Reason 1: OnlineStats doesn't want to make assumptions on the shape of your data
 
@@ -19,7 +19,7 @@ If I try to update it with a `Matrix`, it's ambiguous whether I want *rows* or *
 the matrix to be treated as individual observations.  
 
 By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly 
-use the [`eachrow`](@ref) and [`eachcol`](@ref) functions, which efficiently iterate over 
+use the [`OnlineStatsBase.eachrow`](@ref) and [`OnlineStatsBase.eachcol`](@ref) functions, which efficiently iterate over 
 the rows or columns of the matrix, respectively.
 
 
