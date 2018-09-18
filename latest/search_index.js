@@ -237,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "How fit! Works",
     "title": "Reason 2: OnlineStats naturally works out-of-the-box with many data structures",
     "category": "section",
-    "text": "Tabular data structures such as those in JuliaDB iterate over named tuples of rows, so things like this just work:using JuliaDB\n\nt = table(randn(100, randn(100)))\n\nfit!(2Mean(), t)"
+    "text": "Tabular data structures such as those in JuliaDB iterate over named tuples of rows, so things like this just work:using JuliaDB\n\nt = table(randn(100), randn(100))\n\nfit!(2Mean(), t)"
 },
 
 {

@@ -3,7 +3,7 @@
 
 fit!(CovMatrix(), eachcol(randn(2,1000)))</code></pre><pre><code class="language-none">CovMatrix: n=1000 | value=[0.954284 0.0104256; 0.0104256 0.95253]</code></pre></div><h3><a class="nav-anchor" id="Reason-2:-OnlineStats-naturally-works-out-of-the-box-with-many-data-structures-1" href="#Reason-2:-OnlineStats-naturally-works-out-of-the-box-with-many-data-structures-1">Reason 2: OnlineStats naturally works out-of-the-box with many data structures</a></h3><p>Tabular data structures such as those in <a href="https://github.com/JuliaComputing/JuliaDB.jl">JuliaDB</a> iterate over named tuples of rows, so things like this just work:</p><pre><code class="language-julia">using JuliaDB
 
-t = table(randn(100, randn(100)))
+t = table(randn(100), randn(100))
 
 fit!(2Mean(), t)</code></pre><h2><a class="nav-anchor" id="A-Common-Error-1" href="#A-Common-Error-1">A Common Error</a></h2><p>Consider the following example:</p><pre><code class="language-julia-repl">julia&gt; fit!(Mean(), &quot;asdf&quot;)
 ERROR: The input for Mean is a Number.  Found Char.</code></pre><p>This causes an error because:</p><ol><li><code>&quot;asdf&quot;</code> is not a <code>Number</code>, so OnlineStats attempts to iterate through it</li><li>Iterating through <code>&quot;asdf&quot;</code> begins with the character <code>&#39;a&#39;</code></li></ol><footer><hr/><a class="previous" href="weights.html"><span class="direction">Previous</span><span class="title">Weight</span></a><a class="next" href="stats_and_models.html"><span class="direction">Next</span><span class="title">Statistics and Models</span></a></footer></article></body></html>
