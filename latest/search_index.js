@@ -509,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "type",
-    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to  StatsBase.countmap.  \n\nExample\n\no = fit!(CountMap(Int), rand(1:10, 1000))\nvalue(o)\n\n\n\n\n\n"
+    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to StatsBase.countmap.\n\nExample\n\no = fit!(CountMap(Int), rand(1:10, 1000))\nvalue(o)\n\n\n\n\n\n"
 },
 
 {
@@ -517,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CovMatrix",
     "category": "type",
-    "text": "CovMatrix(p=0; weight=EqualWeight())\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is  unknown, leave the default p=0.\n\nExample\n\no = fit!(CovMatrix(), randn(100, 4))\ncor(o)\n\n\n\n\n\n"
+    "text": "CovMatrix(p=0; weight=EqualWeight())\nCovMatrix(::Type{T}, p=0; weight=EqualWeight())\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is unknown, leave the default p=0.\n\nExample\n\no = fit!(CovMatrix(), randn(100, 4))\ncor(o)\n\n\n\n\n\n"
 },
 
 {
@@ -541,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FTSeries",
     "category": "type",
-    "text": "FTSeries(stats...; filter=x->true, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being  fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nIf the transformed value has a different type than the original, provide an argument to  the constructor to specify the type of an input observation.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isnull)\nfit!(o, y)\n\n\n\n\n\n"
+    "text": "FTSeries(stats...; filter=x->true, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nIf the transformed value has a different type than the original, provide an argument to the constructor to specify the type of an input observation.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isnull)\nfit!(o, y)\n\n\n\n\n\n"
 },
 
 {
@@ -621,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats::OnlineStat...)\nGroup(tuple)\n\nCreate a vector-input stat from several scalar-input stats.  For a new  observation y, y[i] is sent to stats[i].\n\nExamples\n\nfit!(Group(Mean(), Mean()), randn(100, 2))\nfit!(Group(Mean(), Variance()), randn(100, 2))\n\no = [Mean() CountMap(Int)]\nfit!(o, zip(randn(100), rand(1:5, 100)))\n\n\n\n\n\n"
+    "text": "Group(stats::OnlineStat...)\nGroup(tuple)\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y, y[i] is sent to stats[i].\n\nExamples\n\nfit!(Group(Mean(), Mean()), randn(100, 2))\nfit!(Group(Mean(), Variance()), randn(100, 2))\n\no = [Mean() CountMap(Int)]\nfit!(o, zip(randn(100), rand(1:5, 100)))\n\n\n\n\n\n"
 },
 
 {
@@ -669,7 +669,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Lag",
     "category": "type",
-    "text": "Lag{T}(b::Integer)\n\nStore the last b values for a data stream of type T.  Values are stored as \n\nv(t) v(t-1) v(t-2)  v(t-b+1)\n\nExample\n\nfit!(Lag{Int}(10), 1:12)\n\n\n\n\n\n"
+    "text": "Lag{T}(b::Integer)\n\nStore the last b values for a data stream of type T.  Values are stored as\n\nv(t) v(t-1) v(t-2)  v(t-b+1)\n\nExample\n\nfit!(Lag{Int}(10), 1:12)\n\n\n\n\n\n"
 },
 
 {
@@ -725,7 +725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.MovingTimeWindow",
     "category": "type",
-    "text": "MovingTimeWindow{T<:TimeType, S}(window::DatePeriod)\nMovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)\n\nFit a moving window of data based on time stamps.  Each observation must be a Tuple,  NamedTuple, or Pair where the first item is <: Dates.TimeType.  Only observations  with time stamps in the range\n\nmost_recent_datetime - window = time_stamp = most_recent_datetime\n\nare kept track of.\n\nExample\n\nusing Dates\ndts = Date(2010):Day(1):Date(2011)\ny = rand(length(dts))\n\no = MovingTimeWindow(Day(4); timetype=Date, valtype=Float64)\nfit!(o, zip(dts, y))\n\n\n\n\n\n"
+    "text": "MovingTimeWindow{T<:TimeType, S}(window::DatePeriod)\nMovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)\n\nFit a moving window of data based on time stamps.  Each observation must be a Tuple, NamedTuple, or Pair where the first item is <: Dates.TimeType.  Only observations with time stamps in the range\n\nmost_recent_datetime - window = time_stamp = most_recent_datetime\n\nare kept track of.\n\nExample\n\nusing Dates\ndts = Date(2010):Day(1):Date(2011)\ny = rand(length(dts))\n\no = MovingTimeWindow(Day(4); timetype=Date, valtype=Float64)\nfit!(o, zip(dts, y))\n\n\n\n\n\n"
 },
 
 {
@@ -797,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ProbMap",
     "category": "type",
-    "text": "ProbMap(T::Type; weight=EqualWeight())\nProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())\n\nTrack a dictionary that maps unique values to its probability.  Similar to  CountMap, but uses a weighting mechanism.\n\nExample\n\no = ProbMap(Int)\nfit!(o, rand(1:10, 1000))\n\n\n\n\n\n"
+    "text": "ProbMap(T::Type; weight=EqualWeight())\nProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())\n\nTrack a dictionary that maps unique values to its probability.  Similar to CountMap, but uses a weighting mechanism.\n\nExample\n\no = ProbMap(Int)\nfit!(o, rand(1:10, 1000))\n\n\n\n\n\n"
 },
 
 {
@@ -805,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "type",
-    "text": "Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or  MSPI.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or MSPI.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n\n\n"
 },
 
 {
@@ -821,7 +821,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ReservoirSample",
     "category": "type",
-    "text": "ReservoirSample(k::Int, T::Type = Float64)\n\nCreate a sample without replacement of size k.  After running through n observations,  the probability of an observation being in the sample is 1 / n.\n\nExample\n\nfit!(ReservoirSample(100, Int), 1:1000)\n\n\n\n\n\n"
+    "text": "ReservoirSample(k::Int, T::Type = Float64)\n\nCreate a sample without replacement of size k.  After running through n observations, the probability of an observation being in the sample is 1 / n.\n\nExample\n\nfit!(ReservoirSample(100, Int), 1:1000)\n\n\n\n\n\n"
 },
 
 {
@@ -845,7 +845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatHistory",
     "category": "type",
-    "text": "StatHistory(stat, b)\n\nTrack a moving window (previous b copies) of stat. \n\nExample\n\nfit!(StatHistory(Mean(), 10), 1:20)\n\n\n\n\n\n"
+    "text": "StatHistory(stat, b)\n\nTrack a moving window (previous b copies) of stat.\n\nExample\n\nfit!(StatHistory(Mean(), 10), 1:20)\n\n\n\n\n\n"
 },
 
 {
