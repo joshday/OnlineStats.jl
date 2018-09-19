@@ -1,4 +1,4 @@
-abstract type StatCollection{T} <: OnlineStat{T} end 
+abstract type StatCollection{T} <: OnlineStat{T} end
 
 function Base.show(io::IO, o::StatCollection)
     print(io, name(o, false, false))
@@ -12,19 +12,19 @@ function print_stat_tree(io::IO, stats)
     end
 end
 
-#-----------------------------------------------------------------------# Variance 
+#-----------------------------------------------------------------------# Variance
 """
     Variance(; weight=EqualWeight())
 
 Univariate variance.
 
-# Example 
+# Example
 
     @time fit!(Variance(), randn(10^6))
 """
 mutable struct Variance{W} <: OnlineStat{Number}
-    σ2::Float64 
-    μ::Float64 
+    σ2::Float64
+    μ::Float64
     weight::W
     n::Int
 end
@@ -52,11 +52,11 @@ Statistics.mean(o::Variance) = o.μ
 """
     Lag{T}(b::Integer)
 
-Store the last `b` values for a data stream of type `T`.  Values are stored as 
+Store the last `b` values for a data stream of type `T`.  Values are stored as
 
 ``v(t), v(t-1), v(t-2), …, v(t-b+1)``
 
-# Example 
+# Example
 
     fit!(Lag{Int}(10), 1:12)
 """
@@ -76,7 +76,7 @@ Base.getindex(o::Lag, i) = o.circbuff[end - i + 1]
 
 Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of type `T`.
 
-# Example 
+# Example
 
     y = cumsum(randn(100))
     o = AutoCov(5)
@@ -142,7 +142,7 @@ any given replicate will be updated `rand(d)` times (default is double or nothin
     confint(o)
 """
 struct Bootstrap{T, O <: OnlineStat{T}, D} <: OnlineStat{T}
-    stat::O 
+    stat::O
     replicates::Vector{O}
     rnd::D
 end
@@ -187,7 +187,7 @@ Call `f(o)` every time the OnlineStat `o` gets updated.
 struct CallFun{T, O <: OnlineStat{T}, F <: Function} <: OnlineStat{T}
     stat::O
     f::F
-end 
+end
 CallFun(o::O, f::F) where {T, O<:OnlineStat{T}, F} = CallFun{T, O, F}(o, f)
 nobs(o::CallFun) = nobs(o.stat)
 value(o::CallFun) = value(o.stat)
@@ -195,13 +195,13 @@ Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
 _fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
 _merge!(o::CallFun, o2::CallFun) = _merge!(o.stat, o2.stat)
 
-# #-----------------------------------------------------------------------# Count 
+# #-----------------------------------------------------------------------# Count
 # """
 #     Count()
 
 # The number of things observed.
 
-# # Example 
+# # Example
 
 #     fit!(Count(), 1:1000)
 # """
@@ -212,16 +212,16 @@ _merge!(o::CallFun, o2::CallFun) = _merge!(o.stat, o2.stat)
 # _fit!(o::Count, x) = (o.n += 1)
 # _merge!(o::Count, o2::Count) = (o.n += o2.n; o)
 
-#-----------------------------------------------------------------------# CountMap 
+#-----------------------------------------------------------------------# CountMap
 """
     CountMap(T::Type)
     CountMap(dict::AbstractDict{T, Int})
 
-Track a dictionary that maps unique values to its number of occurrences.  Similar to 
-`StatsBase.countmap`.  
+Track a dictionary that maps unique values to its number of occurrences.  Similar to
+`StatsBase.countmap`.
 
-# Example 
-    
+# Example
+
     o = fit!(CountMap(Int), rand(1:10, 1000))
     value(o)
 """
@@ -232,7 +232,7 @@ end
 CountMap{T}() where {T} = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T,Int}(), 0)
 CountMap(T::Type = Any) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(), 0)
 CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d, 0)
-function _fit!(o::CountMap, x) 
+function _fit!(o::CountMap, x)
     o.n += 1
     o.value[x] = get!(o.value, x, 0) + 1
 end
@@ -251,46 +251,51 @@ nkeys(o::CountMap) = length(o.value)
 Base.values(o::CountMap) = values(o.value)
 Base.getindex(o::CountMap, i) = o.value[i]
 
-#-----------------------------------------------------------------------# Counter 
+#-----------------------------------------------------------------------# Counter
 mutable struct Counter <: OnlineStat{Any}
     n::Int
 end
 _fit!(o::Counter) = (o.n += 1)
 
-#-----------------------------------------------------------------------# CovMatrix 
+#-----------------------------------------------------------------------# CovMatrix
 """
     CovMatrix(p=0; weight=EqualWeight())
+    CovMatrix(::Type{T}, p=0; weight=EqualWeight())
 
-Calculate a covariance/correlation matrix of `p` variables.  If the number of variables is 
+Calculate a covariance/correlation matrix of `p` variables.  If the number of variables is
 unknown, leave the default `p=0`.
 
-# Example 
+# Example
 
     o = fit!(CovMatrix(), randn(100, 4))
     cor(o)
 """
-mutable struct CovMatrix{W} <: OnlineStat{VectorOb}
-    value::Matrix{Float64}
-    A::Matrix{Float64}  # x'x/n
-    b::Vector{Float64}  # 1'x/n
+mutable struct CovMatrix{T,W} <: OnlineStat{VectorOb} where T<:Number
+    value::Matrix{T}
+    A::Matrix{T}  # x'x/n
+    b::Vector{T}  # 1'x/n
     weight::W
     n::Int
 end
+function CovMatrix(::Type{T}, p::Int=0;weight = EqualWeight()) where T<:Number
+    CovMatrix(zeros(T,p,p), zeros(T,p,p), zeros(T,p), weight, 0)
+end
 CovMatrix(p::Int=0;weight = EqualWeight()) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
-function _fit!(o::CovMatrix, x)
+function _fit!(o::CovMatrix{T,W}, x) where {T,W}
+    T == eltype(x) || throw(ArgumentError("$(typeof(o)) cannot be fit to data with type $(eltype(x)). Create a CovMatrix with the correct type using the constructor CovMatrix($(eltype(x)), p, weight)."))
     γ = o.weight(o.n += 1)
     if isempty(o.A)
         p = length(x)
-        o.b = Vector{Float64}(undef, p) 
-        o.A = Matrix{Float64}(undef, p, p)
-        o.value = Matrix{Float64}(undef, p, p)
+        o.b = Vector{T}(undef, p)
+        o.A = Matrix{T}(undef, p, p)
+        o.value = Matrix{T}(undef, p, p)
     end
     smooth!(o.b, x, γ)
     smooth_syr!(o.A, x, γ)
 end
 nvars(o::CovMatrix) = size(o.A, 1)
 function value(o::CovMatrix; corrected::Bool = true)
-    o.value[:] = Matrix(Symmetric((o.A - o.b * o.b')))
+    o.value[:] = Matrix(Hermitian((o.A - o.b * o.b')))
     corrected && rmul!(o.value, unbias(o))
     o.value
 end
@@ -319,7 +324,7 @@ Track a univariate OnlineStat for complex numbers.  A copy of `stat` is made to
 separately track the real and imaginary parts.
 
 # Example
-    
+
     y = randn(100) + randn(100)im
     fit!(CStat(Mean()), y)
 """
@@ -402,22 +407,22 @@ function _merge!(o::Extrema, o2::Extrema)
 end
 value(o::Extrema) = (o.min, o.max)
 Base.extrema(o::Extrema) = value(o)
-Base.maximum(o::Extrema) = o.max 
+Base.maximum(o::Extrema) = o.max
 Base.minimum(o::Extrema) = o.min
 
-#-----------------------------------------------------------------------# FTSeries 
+#-----------------------------------------------------------------------# FTSeries
 """
     FTSeries(stats...; filter=x->true, transform=identity)
 
-Track multiple stats for one data stream that is filtered and transformed before being 
+Track multiple stats for one data stream that is filtered and transformed before being
 fitted.
 
     FTSeries(T, stats...; filter, transform)
 
-If the transformed value has a different type than the original, provide an argument to 
+If the transformed value has a different type than the original, provide an argument to
 the constructor to specify the type of an input observation.
 
-# Example 
+# Example
 
     o = FTSeries(Mean(), Variance(); transform=abs)
     fit!(o, -rand(1000))
@@ -430,8 +435,8 @@ the constructor to specify the type of an input observation.
 """
 mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
     stats::OS
-    filter::F 
-    transform::T 
+    filter::F
+    transform::T
     nfiltered::Int
 end
 function FTSeries(stats::OnlineStat...; filter=x->true, transform=identity)
@@ -451,7 +456,7 @@ nobs(o::FTSeries) = nobs(o.stats[1])
         if o.filter(y)
             yt = o.transform(y)
             Base.Cartesian.@nexprs $n i -> @inbounds begin
-                _fit!(o.stats[i], yt) 
+                _fit!(o.stats[i], yt)
             end
         else
             o.nfiltered += 1
@@ -459,7 +464,7 @@ nobs(o::FTSeries) = nobs(o.stats[1])
     end
 end
 function _merge!(o::FTSeries, o2::FTSeries)
-    o.nfiltered += o2.nfiltered 
+    o.nfiltered += o2.nfiltered
     _merge!.(o.stats, o2.stats)
     o
 end
@@ -469,7 +474,7 @@ end
     Group(stats::OnlineStat...)
     Group(tuple)
 
-Create a vector-input stat from several scalar-input stats.  For a new 
+Create a vector-input stat from several scalar-input stats.  For a new
 observation `y`, `y[i]` is sent to `stats[i]`.
 
 # Examples
@@ -510,13 +515,13 @@ _merge!(o::Group, o2::Group) = merge!.(o.stats, o2.stats)
 
 Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 
-#-----------------------------------------------------------------------# GroupBy 
+#-----------------------------------------------------------------------# GroupBy
 """
     GroupBy{T}(stat)
 
 Update `stat` for each group (of type `T`).
 
-# Example 
+# Example
 
     x = rand(1:10, 10^5)
     y = x .+ randn(10^5)
@@ -530,7 +535,7 @@ end
 GroupBy{T}(stat::O) where {T, O} = GroupBy{T,O}(OrderedDict{T, O}(), stat, 0)
 function _fit!(o::GroupBy, xy)
     o.n += 1
-    x, y = xy 
+    x, y = xy
     x in keys(o.value) ? fit!(o.value[x], y) : (o.value[x] = fit!(copy(o.init), y))
 end
 Base.getindex(o::GroupBy{T}, i::T) where {T} = o.value[i]
@@ -542,13 +547,13 @@ function Base.show(io::IO, o::GroupBy)
     end
 end
 
-#-----------------------------------------------------------------------# StatHistory 
+#-----------------------------------------------------------------------# StatHistory
 """
     StatHistory(stat, b)
 
-Track a moving window (previous `b` copies) of `stat`. 
+Track a moving window (previous `b` copies) of `stat`.
 
-# Example 
+# Example
 
     fit!(StatHistory(Mean(), 10), 1:20)
 """
@@ -556,7 +561,7 @@ struct StatHistory{T, O<:OnlineStat{T}} <: OnlineStat{T}
     stat::O
     circbuff::CircularBuffer{O}
 end
-function StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}} 
+function StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}}
     StatHistory{T,O}(stat, CircularBuffer{O}(b))
 end
 nobs(o::StatHistory) = nobs(o.stat)
@@ -611,7 +616,7 @@ maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add
 function α(m::UInt32)
     if m == 0x00000010          # m = 16
         return 0.673
-    elseif m == 0x00000020      # 
+    elseif m == 0x00000020      #
         return 0.697
     elseif m == 0x00000040
         return 0.709
@@ -655,7 +660,7 @@ function value(o::HyperLogLog)
 end
 
 function _merge!(o::HyperLogLog, o2::HyperLogLog)
-    length(o.M) == length(o2.M) || 
+    length(o.M) == length(o2.M) ||
         error("Merge failed. HyperLogLog objects have different number of registers.")
     o.n += o2.n
     for j in eachindex(o.M)
@@ -670,7 +675,7 @@ end
 
 Approximate K-Means clustering of `k` clusters and `p` variables.
 
-# Example 
+# Example
 
     clusters = rand(Bool, 10^5)
 
@@ -688,11 +693,11 @@ KMeans(p::Integer, k::Integer; rate=LearningRate(.6)) = KMeans(zeros(p, k), zero
 function _fit!(o::KMeans, x)
     γ = o.rate(o.n += 1)
     p, k = size(o.value)
-    if o.n <= k 
+    if o.n <= k
         o.value[:, o.n] = collect(x)
     else
         for j in 1:k
-            o.v[j] = 0.0 
+            o.v[j] = 0.0
             for i in 1:p
                 o.v[j] += abs2(x[i] - o.value[i, j])
             end
@@ -710,7 +715,7 @@ end
 
 Track a univariate mean.
 
-# Update 
+# Update
 
 ``μ = (1 - γ) * μ + γ * x``
 
@@ -725,7 +730,7 @@ mutable struct Mean{W} <: OnlineStat{Number}
 end
 Mean(;weight = EqualWeight()) = Mean(0.0, weight, 0)
 _fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
-function _merge!(o::Mean, o2::Mean) 
+function _merge!(o::Mean, o2::Mean)
     o.n += o2.n
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)
 end
@@ -782,8 +787,8 @@ end
     MovingTimeWindow{T<:TimeType, S}(window::DatePeriod)
     MovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)
 
-Fit a moving window of data based on time stamps.  Each observation must be a `Tuple`, 
-`NamedTuple`, or `Pair` where the first item is `<: Dates.TimeType`.  Only observations 
+Fit a moving window of data based on time stamps.  Each observation must be a `Tuple`,
+`NamedTuple`, or `Pair` where the first item is `<: Dates.TimeType`.  Only observations
 with time stamps in the range
 
 ``most_recent_datetime - window <= time_stamp <= most_recent_datetime``
@@ -826,14 +831,14 @@ end
 
 
 
-#-----------------------------------------------------------------------# MovingWindow 
+#-----------------------------------------------------------------------# MovingWindow
 """
     MovingWindow(b, T)
     MovingWindow(T, b)
 
 Track a moving window of `b` items of type `T`.
 
-# Example 
+# Example
 
     o = MovingWindow(10, Int)
     fit!(o, 1:14)
@@ -852,17 +857,17 @@ function value(o::MovingWindow)
     permute!(o.value, perm)
 end
 function _fit!(o::MovingWindow, y)
-    o.n += 1 
-    if length(o.value) < o.b 
+    o.n += 1
+    if length(o.value) < o.b
         push!(o.value, y)
     else
-        o.value[o.first] = y 
+        o.value[o.first] = y
         o.first = (o.first == o.b) ? 1 : o.first + 1
     end
 end
 function Base.getindex(o::MovingWindow, i::Int)
     i2 = i + o.first - 1
-    i2 = i2 > o.b ? i2 - o.b : i2 
+    i2 = i2 > o.b ? i2 - o.b : i2
     o.value[i2]
 end
 Base.lastindex(o::MovingWindow) = o.b
@@ -873,7 +878,7 @@ Base.lastindex(o::MovingWindow) = o.b
 
 Average order statistics with batches of size `b`.
 
-# Example 
+# Example
 
     fit!(OrderStats(100), randn(10^5))
 """
@@ -883,22 +888,22 @@ mutable struct OrderStats{T, W} <: OnlineStat{Number}
     weight::W
     n::Int
 end
-function OrderStats(p::Integer, T::Type = Float64; weight=EqualWeight()) 
+function OrderStats(p::Integer, T::Type = Float64; weight=EqualWeight())
     OrderStats(zeros(T, p), zeros(T, p), weight, 0)
 end
 function _fit!(o::OrderStats, y)
     p = length(o.value)
     buffer = o.buffer
     i = (o.n % p) + 1
-    o.n += 1 
-    buffer[i] = y 
+    o.n += 1
+    buffer[i] = y
     if i == p
         sort!(buffer)
         smooth!(o.value, buffer, o.weight(o.n / p))
     end
 end
 function _merge!(o::OrderStats, o2::OrderStats)
-    length(o.value) == length(o2.value) || 
+    length(o.value) == length(o2.value) ||
         error("Merge failed.  OrderStats track different batch sizes")
     o.n += o2.n
     smooth!(o.value, o2.value, o2.n / o.n)
@@ -907,10 +912,10 @@ Statistics.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
 # # tree/nbc help:
 # function pdf(o::OrderStats, x)
-#     if x ≤ first(o.value) 
+#     if x ≤ first(o.value)
 #         return 0.0
-#     elseif x > last(o.value) 
-#         return 0.0 
+#     elseif x > last(o.value)
+#         return 0.0
 #     else
 #         i = searchsortedfirst(o.value, x)
 #         b = nobs(o) / (length(o.value) + 1)
@@ -925,22 +930,22 @@ Statistics.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
     ProbMap(T::Type; weight=EqualWeight())
     ProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())
 
-Track a dictionary that maps unique values to its probability.  Similar to 
+Track a dictionary that maps unique values to its probability.  Similar to
 [`CountMap`](@ref), but uses a weighting mechanism.
 
-# Example 
-    
+# Example
+
     o = ProbMap(Int)
     fit!(o, rand(1:10, 1000))
 """
 mutable struct ProbMap{T, A<:AbstractDict{T,Float64}, W} <: OnlineStat{T}
-    value::A 
-    weight::W 
+    value::A
+    weight::W
     n::Int
 end
-function ProbMap(T::Type; weight = EqualWeight()) 
+function ProbMap(T::Type; weight = EqualWeight())
     ProbMap{T,OrderedDict{T,Float64}, typeof(weight)}(OrderedDict{T, Float64}(), weight, 0)
-end 
+end
 function ProbMap(d::AbstractDict{T, Float64}; weight=EqualWeight()) where {T}
     ProbMap{T,OrderedDict{T,Float64},typeof(weight)}(d, weight, 0)
 end
@@ -948,14 +953,14 @@ function _fit!(o::ProbMap, y)
     γ = o.weight(o.n += 1)
     get!(o.value, y, 0.0)   # initialize class probability at 0 if it isn't present
     for ky in keys(o.value)
-        if ky == y 
+        if ky == y
             o.value[ky] = smooth(o.value[ky], 1.0, γ)
-        else 
+        else
             o.value[ky] *= (1 - γ)
         end
     end
 end
-function _merge!(o::ProbMap, o2::ProbMap) 
+function _merge!(o::ProbMap, o2::ProbMap)
     o.n += o2.n
     merge!((a, b)->smooth(a, b, o2.n / o.n), o.value, o2.value)
     o
@@ -968,7 +973,7 @@ function probs(o::ProbMap, levels = keys(o.value))
     sum(out) == 0.0 ? out : out ./ sum(out)
 end
 
-#-----------------------------------------------------------------------# P2Quantile 
+#-----------------------------------------------------------------------# P2Quantile
 """
     P2Quantile(τ = 0.5)
 
@@ -977,7 +982,7 @@ expensive than the algorithms used by [`Quantile`](@ref), but also more exact.
 
 Ref: [https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf](https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf)
 
-# Example 
+# Example
 
     fit!(P2Quantile(.5), rand(10^5))
 """
@@ -1023,7 +1028,7 @@ function _fit!(o::P2Quantile, y::Real)
     # A
     elseif o.nobs < 5
         @inbounds o.q[o.nobs] = y
-    else 
+    else
         @inbounds o.q[o.nobs] = y
         sort!(o.q)
     end
@@ -1035,10 +1040,10 @@ function _interpolate!(q, n, di, i)
     @inbounds if (di ≥ 1 && n3 - n2 > 1) || (di ≤ -1 && n1 - n2 < -1)
         d = Int(sign(di))
         df = sign(di)
-        v1 = (n2 - n1 + d) * (q3 - q2) / (n3 - n2) 
-        v2 = (n3 - n2 - d) * (q2 - q1) / (n2 - n1) 
-        qi = q2 + df / (n3 - n1) * (v1 + v2) 
-        if q1 < qi < q3 
+        v1 = (n2 - n1 + d) * (q3 - q2) / (n3 - n2)
+        v2 = (n3 - n2 - d) * (q2 - q1) / (n2 - n1)
+        qi = q2 + df / (n3 - n1) * (v1 + v2)
+        if q1 < qi < q3
             q[i] = qi
         else
             q[i] += df * (q[i + d] - q2) / (n[i + d] - n2)
@@ -1048,7 +1053,7 @@ function _interpolate!(q, n, di, i)
 end
 
 # function parabolic_interpolate(q1, q2, q3, n1, n2, n3, d)
-#     qi = q2 + d / (n3 - n1) * 
+#     qi = q2 + d / (n3 - n1) *
 #         ((n2 - n1 + d) * (q3 - q2) / (n3 - n2) + (n3 - n2 - d) * (q2 - q1) / (n2 - n1))
 # end
 
@@ -1056,31 +1061,31 @@ end
 """
     Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))
 
-Calculate quantiles via a stochastic approximation algorithm `OMAS`, `SGD`, `ADAGRAD`, or 
+Calculate quantiles via a stochastic approximation algorithm `OMAS`, `SGD`, `ADAGRAD`, or
 `MSPI`.
 
-# Example 
+# Example
 
     fit!(Quantile(), randn(10^5))
 """
 mutable struct Quantile{T <: Algorithm, W} <: OnlineStat{Number}
     value::Vector{Float64}
     τ::Vector{Float64}
-    rate::W 
+    rate::W
     n::Int
-    alg::T 
+    alg::T
 end
-function Quantile(τ::AbstractVector = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6)) 
+function Quantile(τ::AbstractVector = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))
     init!(alg, length(τ))
     Quantile(zeros(length(τ)), sort!(collect(τ)), rate, 0, alg)
 end
 function _fit!(o::Quantile, y)
     γ = o.rate(o.n += 1)
     len = length(o.value)
-    if o.n > len 
+    if o.n > len
         qfit!(o, y, γ)
     else
-        o.value[o.n] = y 
+        o.value[o.n] = y
         o.n == len && sort!(o.value)
     end
 end
@@ -1127,7 +1132,7 @@ end
 # function qfit!(o::Quantile{<:OMAP}, y, γ)
 #     for j in eachindex(o.τ)
 #         w = abs(y - o.value[j]) + ϵ
-#         θ = y + w * (2o.τ[j] - 1) 
+#         θ = y + w * (2o.τ[j] - 1)
 #         o.value[j] = smooth(o.value[j], θ, γ)
 #     end
 # end
@@ -1136,7 +1141,7 @@ end
 """
     ReservoirSample(k::Int, T::Type = Float64)
 
-Create a sample without replacement of size `k`.  After running through `n` observations, 
+Create a sample without replacement of size `k`.  After running through `n` observations,
 the probability of an observation being in the sample is `1 / n`.
 
 # Example
@@ -1165,7 +1170,7 @@ function _merge!(o::T, o2::T) where {T<:ReservoirSample}
     length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
     p = o.n / (o.n + o2.n)
     for j in eachindex(o.value)
-        if rand() > p 
+        if rand() > p
             o.value[j] = o2.value[j]
         end
     end
@@ -1177,7 +1182,7 @@ end
 
 Track multiple stats for one data stream.
 
-# Example 
+# Example
 
     s = Series(Mean(), Variance())
     fit!(s, randn(1000))
@@ -1221,4 +1226,3 @@ mutable struct Summarizer{T} <: OnlineStat{T}
     group::Group
 end
 nobs(o::Summarizer) = nobs(o.group)
-

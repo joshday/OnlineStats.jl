@@ -14,7 +14,7 @@ end
 
 function smooth_syr!(A::AbstractMatrix, x, γ::Number)
     for j in 1:size(A, 2), i in 1:j
-        A[i, j] = smooth(A[i,j], x[i] * x[j], γ)
+        A[i, j] = smooth(A[i,j], x[i] * conj(x[j]), γ)
     end
 end
 
@@ -34,7 +34,7 @@ Statistics.std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
 
 const ϵ = 1e-7
 
-#-----------------------------------------------------------------------# BiasVec 
+#-----------------------------------------------------------------------# BiasVec
 """
     BiasVec(x)
 
