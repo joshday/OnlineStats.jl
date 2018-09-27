@@ -485,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Bootstrap",
     "category": "type",
-    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nCalculate an online statistical bootstrap of nrepsreplicates ofo.  For each call tofit!, any given replicate will be updatedrand(d)` times (default is double or nothing).\n\nExample\n\no = Bootstrap(Variance())\nfit!(o, randn(1000))\nconfint(o)\n\n\n\n\n\n"
+    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nCalculate an online statistical bootstrap of nreps replicates of o.  For each call to fit!, any given replicate will be updated rand(d) times (default is double or nothing).\n\nExample\n\no = Bootstrap(Variance())\nfit!(o, randn(1000))\nconfint(o)\n\n\n\n\n\n"
 },
 
 {
