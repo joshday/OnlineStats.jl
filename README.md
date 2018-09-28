@@ -8,18 +8,9 @@
 
 **OnlineStats** is a Julia package which provides online algorithms for statistics, models, and data visualization.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.  
 
-
-```julia
-o1 = Mean()
-o2 = Mean(weight = n -> .1)
-
-for yi in y
-    fit!(o1, yi)
-    fit!(o2, yi)
-end
-```
-
+![](https://user-images.githubusercontent.com/8075494/46229806-d55a9800-c334-11e8-8616-e4e27e58d66d.gif)
 ![](https://user-images.githubusercontent.com/8075494/38169834-e15b1b32-3542-11e8-8789-e6f6e3296e8e.gif)
+
 
 # Quickstart
 
