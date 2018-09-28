@@ -1,5 +1,5 @@
 """
-    StatLearn(p, args...)
+    StatLearn(p, args...; rate=LearningRate())
 
 Fit a model that is linear in the parameters.  
 
