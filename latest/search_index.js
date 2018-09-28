@@ -853,7 +853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.StatLearn",
     "category": "type",
-    "text": "StatLearn(p, args...)\n\nFit a model that is linear in the parameters.  \n\nThe (offline) objective function that StatLearn approximately minimizes is\n\n(1n) ᵢ f(yᵢ xᵢβ) + ⱼ λⱼ g(βⱼ)\n\nwhere fᵢ are loss functions of a single response and linear predictor, λⱼs are  nonnegative regularization parameters, and g is a penalty function. \n\nArguments\n\nloss = .5 * L2DistLoss()\npenalty = NoPenalty()\nalgorithm = SGD()\nrate = LearningRate(.6) (keyword arg)\n\nExample\n\nx = randn(1000, 5)\ny = x * range(-1, stop=1, length=5) + randn(1000)\n\no = fit!(StatLearn(5, MSPI()), (x, y))\ncoef(o)\n\n\n\n\n\n"
+    "text": "StatLearn(p, args...; rate=LearningRate())\n\nFit a model that is linear in the parameters.  \n\nThe (offline) objective function that StatLearn approximately minimizes is\n\n(1n) ᵢ f(yᵢ xᵢβ) + ⱼ λⱼ g(βⱼ)\n\nwhere fᵢ are loss functions of a single response and linear predictor, λⱼs are  nonnegative regularization parameters, and g is a penalty function. \n\nArguments\n\nloss = .5 * L2DistLoss()\npenalty = NoPenalty()\nalgorithm = SGD()\nrate = LearningRate(.6) (keyword arg)\n\nExample\n\nx = randn(1000, 5)\ny = x * range(-1, stop=1, length=5) + randn(1000)\n\no = fit!(StatLearn(5, MSPI()), (x, y))\ncoef(o)\n\n\n\n\n\n"
 },
 
 {
