@@ -1178,28 +1178,34 @@ end
 
 #-----------------------------------------------------------------------# Series
 """
+    Series(stats)
     Series(stats...)
+    Series(; stats...)
 
-Track multiple stats for one data stream.
+Track a collection stats for one data stream.
 
 # Example
 
     s = Series(Mean(), Variance())
     fit!(s, randn(1000))
 """
-struct Series{IN, T<:Tup} <: StatCollection{IN}
+struct Series{IN, T} <: StatCollection{IN}
     stats::T
+    function Series(stats::T) where T
+        IN = promote_type(map(input, values(stats))...)
+        new{IN, T}(stats)
+    end
 end
-value(o::Series) = value.(o.stats)
-Series(stats::OnlineStat{IN}...) where {IN} = Series{IN, typeof(stats)}(stats)
-Series(stats::OnlineStat...) = Series{promote_type(input.(stats)...), typeof(stats)}(stats)
+Series(t::OnlineStat...) = Series(t)
+Series(; t...) = Series(t.data)
+
+value(o::Series) = map(value, o.stats)
 nobs(o::Series) = nobs(o.stats[1])
 @generated function _fit!(o::Series{IN, T}, y) where {IN, T}
     n = length(fieldnames(T))
     :(Base.Cartesian.@nexprs $n i -> _fit!(o.stats[i], y))
 end
-_merge!(o::Series, o2::Series) = _merge!.(o.stats, o2.stats)
-@deprecate Series(data, stats::OnlineStat...) fit!(Series(stats...), data)
+_merge!(o::Series, o2::Series) = map(_merge!, o.stats, o2.stats)
 
 #-----------------------------------------------------------------------# Sum
 """

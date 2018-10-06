@@ -528,8 +528,11 @@ end
 #-----------------------------------------------------------------------# Series
 @testset "Series" begin
     test_merge(Series(Mean(), Variance()), y, y2)
+    test_merge(Series(m=Mean(), v=Variance()), y, y2)
     test_exact(Series(Mean(), Variance()), y, o->value(o)[1], mean(y))
+    test_exact(Series(m=Mean(), v=Variance()), y, o->value(o)[1], mean(y))
     test_exact(Series(Mean(), Variance()), y, o->value(o)[2], var(y))
+    test_exact(Series(m=Mean(), v=Variance()), y, o->value(o)[2], var(y))
 end
 #-----------------------------------------------------------------------# StatHistory
 @testset "StatHistory" begin
