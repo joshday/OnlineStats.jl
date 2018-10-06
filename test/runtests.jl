@@ -9,8 +9,8 @@ const y = randn(1000)
 const y2 = randn(1000)
 const x = randn(1000, 5)
 const x2 = randn(1000, 5)
-const z = Complex.(randn(1000, 5), randn(1000, 5))
-const z2 = Complex.(randn(1000, 5), randn(1000, 5))
+const z = Complex.(randn(10000, 5), randn(10000, 5))
+const z2 = Complex.(randn(10000, 5), randn(10000, 5))
 #-----------------------------------------------------------------------# Custom Printing
 @info("Custom Printing")
 for stat in [
