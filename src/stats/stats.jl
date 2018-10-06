@@ -277,12 +277,11 @@ mutable struct CovMatrix{T,W} <: OnlineStat{VectorOb} where T<:Number
     weight::W
     n::Int
 end
-function CovMatrix(::Type{T}, p::Int=0;weight = EqualWeight()) where T<:Number
+function CovMatrix(::Type{T}, p::Int=0; weight = EqualWeight()) where T<:Number
     CovMatrix(zeros(T,p,p), zeros(T,p,p), zeros(T,p), weight, 0)
 end
-CovMatrix(p::Int=0;weight = EqualWeight()) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
-function _fit!(o::CovMatrix{T,W}, x) where {T,W}
-    T == eltype(x) || throw(ArgumentError("$(typeof(o)) cannot be fit to data with type $(eltype(x)). Create a CovMatrix with the correct type using the constructor CovMatrix($(eltype(x)), p, weight)."))
+CovMatrix(p::Int=0; weight = EqualWeight()) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
+function _fit!(o::CovMatrix{T}, x) where {T}
     γ = o.weight(o.n += 1)
     if isempty(o.A)
         p = length(x)
