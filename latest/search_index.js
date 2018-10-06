@@ -621,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats::OnlineStat...)\nGroup(tuple)\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y, y[i] is sent to stats[i].\n\nExamples\n\nfit!(Group(Mean(), Mean()), randn(100, 2))\nfit!(Group(Mean(), Variance()), randn(100, 2))\n\no = [Mean() CountMap(Int)]\nfit!(o, zip(randn(100), rand(1:5, 100)))\n\n\n\n\n\n"
+    "text": "Group(stats::OnlineStat...)\nGroup(; stats...)\nGroup(tuple)\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y, y[i] is sent to stats[i].\n\nExamples\n\nx = randn(100, 2)\n\nfit!(Group(Mean(), Mean()), x)\nfit!(Group(Mean(), Variance()), x)\n\nfit!(Group(m1 = Mean(), m2 = Mean()), x)\n\n\n\n\n\n"
 },
 
 {
