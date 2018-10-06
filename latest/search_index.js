@@ -837,7 +837,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Series",
     "category": "type",
-    "text": "Series(stats...)\n\nTrack multiple stats for one data stream.\n\nExample\n\ns = Series(Mean(), Variance())\nfit!(s, randn(1000))\n\n\n\n\n\n"
+    "text": "Series(stats)\nSeries(stats...)\nSeries(; stats...)\n\nTrack a collection stats for one data stream.\n\nExample\n\ns = Series(Mean(), Variance())\nfit!(s, randn(1000))\n\n\n\n\n\n"
 },
 
 {
