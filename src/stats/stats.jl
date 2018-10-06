@@ -430,7 +430,7 @@ the constructor to specify the type of an input observation.
     # Remove missing values represented as DataValues
     using DataValues
     y = DataValueArray(randn(100), rand(Bool, 100))
-    o = FTSeries(DataValue, Mean(); transform=get, filter=!isnull)
+    o = FTSeries(DataValue, Mean(); transform=get, filter=!isna)
     fit!(o, y)
 """
 mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
