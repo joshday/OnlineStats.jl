@@ -471,6 +471,7 @@ end
 #-----------------------------------------------------------------------# Group
 """
     Group(stats::OnlineStat...)
+    Group(; stats...)
     Group(tuple)
 
 Create a vector-input stat from several scalar-input stats.  For a new
@@ -478,16 +479,18 @@ observation `y`, `y[i]` is sent to `stats[i]`.
 
 # Examples
 
-    fit!(Group(Mean(), Mean()), randn(100, 2))
-    fit!(Group(Mean(), Variance()), randn(100, 2))
+    x = randn(100, 2)
+    
+    fit!(Group(Mean(), Mean()), x)
+    fit!(Group(Mean(), Variance()), x)
 
-    o = [Mean() CountMap(Int)]
-    fit!(o, zip(randn(100), rand(1:5, 100)))
+    fit!(Group(m1 = Mean(), m2 = Mean()), x)
 """
 struct Group{T} <: StatCollection{VectorOb}
     stats::T
 end
 Group(o::OnlineStat...) = Group(o)
+Group(;o...) = Group(o.data)
 nobs(o::Group) = nobs(first(o.stats))
 Base.:(==)(a::Group, b::Group) = all(a.stats .== b.stats)
 
@@ -495,7 +498,7 @@ Base.getindex(o::Group, i) = o.stats[i]
 Base.first(o::Group) = first(o.stats)
 Base.last(o::Group) = last(o.stats)
 Base.length(o::Group) = length(o.stats)
-Base.values(o::Group) = value.(o.stats)
+Base.values(o::Group) = map(value, o.stats)
 
 Base.iterate(o::Group) = (o.stats[1], 2)
 Base.iterate(o::Group, i) = i > length(o) ? nothing : (o.stats[i], i + 1)
@@ -510,7 +513,7 @@ function _fit!(o::Group{T}, y) where {T<:AbstractVector}
     end
 end
 
-_merge!(o::Group, o2::Group) = merge!.(o.stats, o2.stats)
+_merge!(o::Group, o2::Group) = map(merge!, o.stats, o2.stats)
 
 Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 

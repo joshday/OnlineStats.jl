@@ -293,6 +293,10 @@ end
     test_exact(5Mean(), x, values, mean(x, dims=1))
     test_exact(5Variance(), x, values, var(x, dims=1))
 
+    o2 = Group(m1=Mean(), m2=Mean(), m3=Mean(), m4=Mean(), m5=Mean())
+    test_exact(copy(o2), x, values, mean(x, dims=1))
+    test_merge(o2, x, x2, (a,b) -> value(a) ≈ value(b))
+
     test_merge(Group(Mean(),Variance(),Sum(),Moments(),Mean()), x, x2, (a,b) -> value(a) ≈ value(b))
     test_merge(5Mean(), x, x2, (a,b) -> value(a) ≈ value(b))
     test_merge(5Variance(), x, x2, (a,b) -> value(a) ≈ value(b))
