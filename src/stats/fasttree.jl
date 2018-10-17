@@ -107,6 +107,16 @@ end
 Calculate a decision tree of `p` predictors variables and classes `1, 2, …, nclasses`.  
 Nodes split when they reach `splitsize` observations until `maxsize` nodes are in the tree.
 Each variable is summarized by `stat`, which can be `FitNormal()` or `Hist(nbins)`.
+
+# Example
+
+    x = randn(10^5, 10)
+    y = rand([1,2], 10^5)
+
+    o = fit!(FastTree(10), (x,y))
+
+    xi = randn(10)
+    classify(o, xi)
 """
 struct FastTree{T<:FastNode} <: OnlineStat{XY}
     tree::Vector{T}
@@ -166,6 +176,13 @@ Calculate a random forest where each variable is summarized by `stat`.
 - `splitsize=5000`: Number of observations in any given node before splitting
 - `λ = .05`: Probability that each tree is updated on a new observation
 
+# Example 
+
+    x, y = randn(10^5, 10), rand(1:2, 10^5)
+
+    o = fit!(FastForest(10), (x,y))
+
+    classify(o, x[1,:])
 """
 mutable struct FastForest{T<:FastTree} <: OnlineStat{XY}
     forest::Vector{T}

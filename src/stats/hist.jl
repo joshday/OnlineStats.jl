@@ -8,6 +8,20 @@ make_alg(o::HistAlgorithm) = o
     Hist(edges)
 
 Calculate a histogram over fixed `edges` or adaptive `nbins`.
+
+# Example
+
+    using OnlineStats, Statistics
+    y = randn(10^6)
+
+    o = fit!(Hist(20), y)
+    quantile(o)
+    mean(o)
+    var(o)
+    std(o)
+    extrema(o)
+    OnlineStats.pdf(o, 0.0)
+    OnlineStats.cdf(o, 0.0)
 """
 struct Hist{N, H <: HistAlgorithm{N}} <: OnlineStat{N}
     alg::H 

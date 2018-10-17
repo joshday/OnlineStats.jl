@@ -1,3 +1,4 @@
+#-----------------------------------------------------# StatCollection (Series and Group)
 abstract type StatCollection{T} <: OnlineStat{T} end
 
 function Base.show(io::IO, o::StatCollection)
@@ -20,7 +21,10 @@ Univariate variance.
 
 # Example
 
-    @time fit!(Variance(), randn(10^6))
+    o = fit!(Variance(), randn(10^6))
+    mean(o)
+    var(o)
+    std(o)
 """
 mutable struct Variance{W} <: OnlineStat{Number}
     σ2::Float64
@@ -58,7 +62,9 @@ Store the last `b` values for a data stream of type `T`.  Values are stored as
 
 # Example
 
-    fit!(Lag{Int}(10), 1:12)
+    o = fit!(Lag{Int}(10), 1:12)
+    o[1]
+    o[end]
 """
 mutable struct Lag{T} <: OnlineStat{T}
     circbuff::CircularBuffer{T}
@@ -70,6 +76,7 @@ value(o::Lag) = reverse(o.circbuff)
 _fit!(o::Lag, y) = (o.n += 1; push!(o.circbuff, y))
 Base.length(o::Lag) = length(o.circbuff)
 Base.getindex(o::Lag, i) = o.circbuff[end - i + 1]
+Base.lastindex(o::Lag) = length(o)
 
 """
     AutoCov(b, T = Float64; weight=EqualWeight())
@@ -139,7 +146,7 @@ any given replicate will be updated `rand(d)` times (default is double or nothin
 
     o = Bootstrap(Variance())
     fit!(o, randn(1000))
-    confint(o)
+    confint(o, .95)
 """
 struct Bootstrap{T, O <: OnlineStat{T}, D} <: OnlineStat{T}
     stat::O
@@ -181,7 +188,7 @@ Call `f(o)` every time the OnlineStat `o` gets updated.
 
 # Example
 
-    o = CallFun(Mean(), info)
+    o = CallFun(Mean(), println)
     fit!(o, [0,0,1,1])
 """
 struct CallFun{T, O <: OnlineStat{T}, F <: Function} <: OnlineStat{T}
@@ -195,23 +202,6 @@ Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
 _fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
 _merge!(o::CallFun, o2::CallFun) = _merge!(o.stat, o2.stat)
 
-# #-----------------------------------------------------------------------# Count
-# """
-#     Count()
-
-# The number of things observed.
-
-# # Example
-
-#     fit!(Count(), 1:1000)
-# """
-# mutable struct Count <: OnlineStat{Nothing}
-#     n::Int
-#     Count() = new(0)
-# end
-# _fit!(o::Count, x) = (o.n += 1)
-# _merge!(o::Count, o2::Count) = (o.n += o2.n; o)
-
 #-----------------------------------------------------------------------# CountMap
 """
     CountMap(T::Type)
@@ -224,6 +214,9 @@ Track a dictionary that maps unique values to its number of occurrences.  Simila
 
     o = fit!(CountMap(Int), rand(1:10, 1000))
     value(o)
+    probs(o)
+    OnlineStats.pdf(o, 1)
+    collect(keys(o))
 """
 mutable struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
     value::A  # OrderedDict by default
@@ -269,6 +262,9 @@ unknown, leave the default `p=0`.
 
     o = fit!(CovMatrix(), randn(100, 4))
     cor(o)
+    cov(o)
+    mean(o)
+    var(o)
 """
 mutable struct CovMatrix{T,W} <: OnlineStat{VectorOb} where T<:Number
     value::Matrix{T}
@@ -384,7 +380,10 @@ Maximum and minimum.
 
 # Example
 
-    fit!(Extrema(), rand(10^5))
+    o = fit!(Extrema(), rand(10^5))
+    extrema(o)
+    maximum(o)
+    minimum(o)
 """
 mutable struct Extrema{T} <: OnlineStat{Number}
     min::T
@@ -418,8 +417,7 @@ fitted.
 
     FTSeries(T, stats...; filter, transform)
 
-If the transformed value has a different type than the original, provide an argument to
-the constructor to specify the type of an input observation.
+Create an FTSeries and specify the type `T` of the transformed values.
 
 # Example
 
@@ -472,7 +470,7 @@ end
 """
     Group(stats::OnlineStat...)
     Group(; stats...)
-    Group(tuple)
+    Group(collection)
 
 Create a vector-input stat from several scalar-input stats.  For a new
 observation `y`, `y[i]` is sent to `stats[i]`.
@@ -484,7 +482,9 @@ observation `y`, `y[i]` is sent to `stats[i]`.
     fit!(Group(Mean(), Mean()), x)
     fit!(Group(Mean(), Variance()), x)
 
-    fit!(Group(m1 = Mean(), m2 = Mean()), x)
+    o = fit!(Group(m1 = Mean(), m2 = Mean()), x)
+    o.stats.m1
+    o.stats.m2
 """
 struct Group{T} <: StatCollection{VectorOb}
     stats::T
@@ -681,7 +681,7 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
 
     clusters = rand(Bool, 10^5)
 
-    x = [clusters[i] > .5 ? randn(): 5 + randn() for i in 1:10^5, j in 1:2]
+    x = [clusters[i] > .5 ? randn() : 5 + randn() for i in 1:10^5, j in 1:2]
 
     o = fit!(KMeans(2, 2), x)
 """
@@ -750,6 +750,7 @@ First four non-central moments.
     o = fit!(Moments(), randn(1000))
     mean(o)
     var(o)
+    std(o)
     skewness(o)
     kurtosis(o)
 """
@@ -882,7 +883,8 @@ Average order statistics with batches of size `b`.
 
 # Example
 
-    fit!(OrderStats(100), randn(10^5))
+    o = fit!(OrderStats(100), randn(10^5))
+    quantile(o, [.25, .5, .75])
 """
 mutable struct OrderStats{T, W} <: OnlineStat{Number}
     value::Vector{T}
@@ -939,6 +941,7 @@ Track a dictionary that maps unique values to its probability.  Similar to
 
     o = ProbMap(Int)
     fit!(o, rand(1:10, 1000))
+    probs(o)
 """
 mutable struct ProbMap{T, A<:AbstractDict{T,Float64}, W} <: OnlineStat{T}
     value::A
@@ -1000,9 +1003,16 @@ function P2Quantile(τ::Real = 0.5)
     nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
     P2Quantile(zeros(5), collect(1:5), nprime, τ, 0)
 end
-Base.show(io::IO, o::P2Quantile) = print(io, "P2Quantile($(o.τ), $(value(o)))")
+Base.show(io::IO, o::P2Quantile) = print(io, "P2Quantile ($(o.τ)): n=$(nobs(o)) | value=$(value(o))")
 value(o::P2Quantile) = o.q[3]
 nobs(o::P2Quantile) = o.nobs
+# function _merge!(a::P2Quantile, b::P2Quantile)
+#     a.τ == b.τ || error("Quantiles are not the same: $(a.τ) != $(b.τ)")
+#     a.nobs += b.nobs
+#     # q
+#     a.q[1] = min(a.q[1], b.q[1])
+#     a.q[5] = max(a.q[5], b.q[5])
+# end
 function _fit!(o::P2Quantile, y::Real)
     o.nobs += 1
     q = o.q
@@ -1061,10 +1071,11 @@ end
 
 #-----------------------------------------------------------------------# Quantile
 """
-    Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))
+    Quantile(q = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))
 
 Calculate quantiles via a stochastic approximation algorithm `OMAS`, `SGD`, `ADAGRAD`, or
-`MSPI`.
+`MSPI`.  For better (although slower) approximations, see [`P2Quantile`](@ref) and 
+[`Hist`](@ref).
 
 # Example
 
@@ -1229,8 +1240,8 @@ _fit!(o::Sum{T}, x::Real) where {T<:AbstractFloat} = (o.sum += convert(T, x); o.
 _fit!(o::Sum{T}, x::Real) where {T<:Integer} =       (o.sum += round(T, x); o.n += 1)
 _merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
 
-#-----------------------------------------------------------------------# Summarizer
-mutable struct Summarizer{T} <: OnlineStat{T}
-    group::Group
-end
-nobs(o::Summarizer) = nobs(o.group)
+# #-----------------------------------------------------------------------# Summarizer
+# mutable struct Summarizer{T} <: OnlineStat{T}
+#     group::Group
+# end
+# nobs(o::Summarizer) = nobs(o.group)
