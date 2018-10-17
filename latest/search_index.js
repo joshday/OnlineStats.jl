@@ -485,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Bootstrap",
     "category": "type",
-    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nCalculate an online statistical bootstrap of nreps replicates of o.  For each call to fit!, any given replicate will be updated rand(d) times (default is double or nothing).\n\nExample\n\no = Bootstrap(Variance())\nfit!(o, randn(1000))\nconfint(o)\n\n\n\n\n\n"
+    "text": "Bootstrap(o::OnlineStat, nreps = 100, d = [0, 2])\n\nCalculate an online statistical bootstrap of nreps replicates of o.  For each call to fit!, any given replicate will be updated rand(d) times (default is double or nothing).\n\nExample\n\no = Bootstrap(Variance())\nfit!(o, randn(1000))\nconfint(o, .95)\n\n\n\n\n\n"
 },
 
 {
@@ -501,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CallFun",
     "category": "type",
-    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\no = CallFun(Mean(), info)\nfit!(o, [0,0,1,1])\n\n\n\n\n\n"
+    "text": "CallFun(o::OnlineStat, f::Function)\n\nCall f(o) every time the OnlineStat o gets updated.\n\nExample\n\no = CallFun(Mean(), println)\nfit!(o, [0,0,1,1])\n\n\n\n\n\n"
 },
 
 {
@@ -509,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CountMap",
     "category": "type",
-    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to StatsBase.countmap.\n\nExample\n\no = fit!(CountMap(Int), rand(1:10, 1000))\nvalue(o)\n\n\n\n\n\n"
+    "text": "CountMap(T::Type)\nCountMap(dict::AbstractDict{T, Int})\n\nTrack a dictionary that maps unique values to its number of occurrences.  Similar to StatsBase.countmap.\n\nExample\n\no = fit!(CountMap(Int), rand(1:10, 1000))\nvalue(o)\nprobs(o)\nOnlineStats.pdf(o, 1)\ncollect(keys(o))\n\n\n\n\n\n"
 },
 
 {
@@ -517,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.CovMatrix",
     "category": "type",
-    "text": "CovMatrix(p=0; weight=EqualWeight())\nCovMatrix(::Type{T}, p=0; weight=EqualWeight())\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is unknown, leave the default p=0.\n\nExample\n\no = fit!(CovMatrix(), randn(100, 4))\ncor(o)\n\n\n\n\n\n"
+    "text": "CovMatrix(p=0; weight=EqualWeight())\nCovMatrix(::Type{T}, p=0; weight=EqualWeight())\n\nCalculate a covariance/correlation matrix of p variables.  If the number of variables is unknown, leave the default p=0.\n\nExample\n\no = fit!(CovMatrix(), randn(100, 4))\ncor(o)\ncov(o)\nmean(o)\nvar(o)\n\n\n\n\n\n"
 },
 
 {
@@ -533,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Extrema",
     "category": "type",
-    "text": "Extrema(T::Type = Float64)\n\nMaximum and minimum.\n\nExample\n\nfit!(Extrema(), rand(10^5))\n\n\n\n\n\n"
+    "text": "Extrema(T::Type = Float64)\n\nMaximum and minimum.\n\nExample\n\no = fit!(Extrema(), rand(10^5))\nextrema(o)\nmaximum(o)\nminimum(o)\n\n\n\n\n\n"
 },
 
 {
@@ -541,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FTSeries",
     "category": "type",
-    "text": "FTSeries(stats...; filter=x->true, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nIf the transformed value has a different type than the original, provide an argument to the constructor to specify the type of an input observation.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isna)\nfit!(o, y)\n\n\n\n\n\n"
+    "text": "FTSeries(stats...; filter=x->true, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nCreate an FTSeries and specify the type T of the transformed values.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isna)\nfit!(o, y)\n\n\n\n\n\n"
 },
 
 {
@@ -549,7 +549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FastForest",
     "category": "type",
-    "text": "FastForest(p, nkeys=2; stat=FitNormal(), kw...)\n\nCalculate a random forest where each variable is summarized by stat.  \n\nKeyword Arguments\n\nnt=100): Number of trees in the forest\nb=floor(Int, sqrt(p)): Number of random features for each tree to receive\nmaxsize=1000: Maximum size for any tree in the forest\nsplitsize=5000: Number of observations in any given node before splitting\nλ = .05: Probability that each tree is updated on a new observation\n\n\n\n\n\n"
+    "text": "FastForest(p, nkeys=2; stat=FitNormal(), kw...)\n\nCalculate a random forest where each variable is summarized by stat.  \n\nKeyword Arguments\n\nnt=100): Number of trees in the forest\nb=floor(Int, sqrt(p)): Number of random features for each tree to receive\nmaxsize=1000: Maximum size for any tree in the forest\nsplitsize=5000: Number of observations in any given node before splitting\nλ = .05: Probability that each tree is updated on a new observation\n\nExample\n\nx, y = randn(10^5, 10), rand(1:2, 10^5)\n\no = fit!(FastForest(10), (x,y))\n\nclassify(o, x[1,:])\n\n\n\n\n\n"
 },
 
 {
@@ -557,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.FastTree",
     "category": "type",
-    "text": "FastTree(p::Int, nclasses=2; stat=FitNormal(), maxsize=5000, splitsize=1000)\n\nCalculate a decision tree of p predictors variables and classes 1, 2, …, nclasses.   Nodes split when they reach splitsize observations until maxsize nodes are in the tree. Each variable is summarized by stat, which can be FitNormal() or Hist(nbins).\n\n\n\n\n\n"
+    "text": "FastTree(p::Int, nclasses=2; stat=FitNormal(), maxsize=5000, splitsize=1000)\n\nCalculate a decision tree of p predictors variables and classes 1, 2, …, nclasses.   Nodes split when they reach splitsize observations until maxsize nodes are in the tree. Each variable is summarized by stat, which can be FitNormal() or Hist(nbins).\n\nExample\n\nx = randn(10^5, 10)\ny = rand([1,2], 10^5)\n\no = fit!(FastTree(10), (x,y))\n\nxi = randn(10)\nclassify(o, xi)\n\n\n\n\n\n"
 },
 
 {
@@ -621,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Group",
     "category": "type",
-    "text": "Group(stats::OnlineStat...)\nGroup(; stats...)\nGroup(tuple)\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y, y[i] is sent to stats[i].\n\nExamples\n\nx = randn(100, 2)\n\nfit!(Group(Mean(), Mean()), x)\nfit!(Group(Mean(), Variance()), x)\n\nfit!(Group(m1 = Mean(), m2 = Mean()), x)\n\n\n\n\n\n"
+    "text": "Group(stats::OnlineStat...)\nGroup(; stats...)\nGroup(collection)\n\nCreate a vector-input stat from several scalar-input stats.  For a new observation y, y[i] is sent to stats[i].\n\nExamples\n\nx = randn(100, 2)\n\nfit!(Group(Mean(), Mean()), x)\nfit!(Group(Mean(), Variance()), x)\n\no = fit!(Group(m1 = Mean(), m2 = Mean()), x)\no.stats.m1\no.stats.m2\n\n\n\n\n\n"
 },
 
 {
@@ -637,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Hist",
     "category": "type",
-    "text": "Hist(nbins)\nHist(edges)\n\nCalculate a histogram over fixed edges or adaptive nbins.\n\n\n\n\n\n"
+    "text": "Hist(nbins)\nHist(edges)\n\nCalculate a histogram over fixed edges or adaptive nbins.\n\nExample\n\nusing OnlineStats, Statistics\ny = randn(10^6)\n\no = fit!(Hist(20), y)\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\nextrema(o)\nOnlineStats.pdf(o, 0.0)\nOnlineStats.cdf(o, 0.0)\n\n\n\n\n\n"
 },
 
 {
@@ -661,7 +661,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.KMeans",
     "category": "type",
-    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nclusters = rand(Bool, 10^5)\n\nx = [clusters[i] > .5 ? randn(): 5 + randn() for i in 1:10^5, j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\n\n\n\n\n"
+    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nclusters = rand(Bool, 10^5)\n\nx = [clusters[i] > .5 ? randn() : 5 + randn() for i in 1:10^5, j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\n\n\n\n\n"
 },
 
 {
@@ -669,7 +669,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Lag",
     "category": "type",
-    "text": "Lag{T}(b::Integer)\n\nStore the last b values for a data stream of type T.  Values are stored as\n\nv(t) v(t-1) v(t-2)  v(t-b+1)\n\nExample\n\nfit!(Lag{Int}(10), 1:12)\n\n\n\n\n\n"
+    "text": "Lag{T}(b::Integer)\n\nStore the last b values for a data stream of type T.  Values are stored as\n\nv(t) v(t-1) v(t-2)  v(t-b+1)\n\nExample\n\no = fit!(Lag{Int}(10), 1:12)\no[1]\no[end]\n\n\n\n\n\n"
 },
 
 {
@@ -709,7 +709,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Moments",
     "category": "type",
-    "text": "Moments(; weight=EqualWeight())\n\nFirst four non-central moments.\n\nExample\n\no = fit!(Moments(), randn(1000))\nmean(o)\nvar(o)\nskewness(o)\nkurtosis(o)\n\n\n\n\n\n"
+    "text": "Moments(; weight=EqualWeight())\n\nFirst four non-central moments.\n\nExample\n\no = fit!(Moments(), randn(1000))\nmean(o)\nvar(o)\nstd(o)\nskewness(o)\nkurtosis(o)\n\n\n\n\n\n"
 },
 
 {
@@ -741,7 +741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.NBClassifier",
     "category": "type",
-    "text": "NBClassifier(p::Int, T::Type; stat = Hist(15))\n\nCalculate a naive bayes classifier for classes of type T and p predictors.\n\n\n\n\n\n"
+    "text": "NBClassifier(p::Int, T::Type; stat = Hist(15))\n\nCalculate a naive bayes classifier for classes of type T and p predictors.  For each class K, predictor variables are summarized by the stat.\n\nExample\n\nx, y = randn(10^4, 10), rand(Bool, 10^4)\n\no = fit!(NBClassifier(10, Bool), (x,y))\ncollect(keys(o))\nprobs(o)\n\nxi = randn(10)\npredict(o, xi)\nclassify(o, xi)\n\n\n\n\n\n"
 },
 
 {
@@ -765,7 +765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.OrderStats",
     "category": "type",
-    "text": "OrderStats(b::Int, T::Type = Float64; weight=EqualWeight())\n\nAverage order statistics with batches of size b.\n\nExample\n\nfit!(OrderStats(100), randn(10^5))\n\n\n\n\n\n"
+    "text": "OrderStats(b::Int, T::Type = Float64; weight=EqualWeight())\n\nAverage order statistics with batches of size b.\n\nExample\n\no = fit!(OrderStats(100), randn(10^5))\nquantile(o, [.25, .5, .75])\n\n\n\n\n\n"
 },
 
 {
@@ -797,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.ProbMap",
     "category": "type",
-    "text": "ProbMap(T::Type; weight=EqualWeight())\nProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())\n\nTrack a dictionary that maps unique values to its probability.  Similar to CountMap, but uses a weighting mechanism.\n\nExample\n\no = ProbMap(Int)\nfit!(o, rand(1:10, 1000))\n\n\n\n\n\n"
+    "text": "ProbMap(T::Type; weight=EqualWeight())\nProbMap(A::AbstractDict{T, Float64}; weight=EqualWeight())\n\nTrack a dictionary that maps unique values to its probability.  Similar to CountMap, but uses a weighting mechanism.\n\nExample\n\no = ProbMap(Int)\nfit!(o, rand(1:10, 1000))\nprobs(o)\n\n\n\n\n\n"
 },
 
 {
@@ -805,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "type",
-    "text": "Quantile(q = [.25, .5, .75]; alg=SGD(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or MSPI.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or MSPI.  For better (although slower) approximations, see P2Quantile and  Hist.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n\n\n"
 },
 
 {
@@ -869,7 +869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Variance",
     "category": "type",
-    "text": "Variance(; weight=EqualWeight())\n\nUnivariate variance.\n\nExample\n\n@time fit!(Variance(), randn(10^6))\n\n\n\n\n\n"
+    "text": "Variance(; weight=EqualWeight())\n\nUnivariate variance.\n\nExample\n\no = fit!(Variance(), randn(10^6))\nmean(o)\nvar(o)\nstd(o)\n\n\n\n\n\n"
 },
 
 {
