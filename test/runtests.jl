@@ -151,14 +151,14 @@ end
     test_exact(CovMatrix(), x, o->cov(o; corrected=false), cov(x, dims=1, corrected=false))
     test_merge(CovMatrix(), x, x2)
     # Complex values
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}), z, std, z -> std(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, mean, z -> mean(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}), z, cor, cor)
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, cov, cov)
-    # test_exact(CovMatrix(Complex{Float64}), z, o->cov(o; corrected=false), cov(z, dims=1, corrected=false))
-    # test_merge(CovMatrix(Complex{Float64}), z, z2)
+    test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
+    test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
+    test_exact(CovMatrix(Complex{Float64}), z, std, z -> std(z, dims=1))
+    test_exact(CovMatrix(Complex{Float64}, 5), z, mean, z -> mean(z, dims=1))
+    test_exact(CovMatrix(Complex{Float64}), z, cor, cor)
+    test_exact(CovMatrix(Complex{Float64}, 5), z, cov, cov)
+    test_exact(CovMatrix(Complex{Float64}), z, o->cov(o; corrected=false), cov(z, dims=1, corrected=false))
+    test_merge(CovMatrix(Complex{Float64}), z, z2)
 end
 #-----------------------------------------------------------------------# CStat
 @testset "CStat" begin
