@@ -889,6 +889,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.Hist2",
+    "page": "API",
+    "title": "OnlineStats.Hist2",
+    "category": "type",
+    "text": "Hist2(nbins)\n\nA faster adaptive histogram than Hist(nbins), but can end up with many bin counts of  zero on both sides of the distribution.\n\nExample\n\ny = randn(10^7)\nfit!(OnlineStats.Hist2(100), y)\n\n\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Part",
     "page": "API",
     "title": "OnlineStats.Part",
