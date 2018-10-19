@@ -385,71 +385,78 @@ end
 # end
 
 
-# #-----------------------------------------------------------------------# Hist2 
-# # Idea: Any time an observation is outside of the bins, keep doubling the bin widths
-# # (and merging adjacent counts) until it fits.
-# """
-#     Hist2(nbins)
+#-----------------------------------------------------------------------# Hist2 
+# Idea: Any time an observation is outside of the bins, keep doubling the bin widths
+# (and merging adjacent counts) until it fits.
+"""
+    Hist2(nbins)
 
-# A faster adaptive histogram than `Hist(nbins)`, but can end up with many bin counts of 
-# zero on both sides of the distribution.
+A faster adaptive histogram than `Hist(nbins)`, but can end up with many bin counts of 
+zero on both sides of the distribution.
 
-# # Example 
+# Example 
 
-#     y = randn(10^7)
-#     fit!(OnlineStats.Hist2(100), y)
-# """
-# mutable struct Hist2 <: OnlineStat{Real}
-#     rng::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}}
-#     counts::Vector{Int}
-#     ex::Extrema{Float64}
-#     n::Int
-# end
-# Hist2(b::Int) = Hist2(0.0:0.0, zeros(Int, b), Extrema(), 0)
-# value(o::Hist2) = (o.rng, o.counts)
+    y = randn(10^7)
+    fit!(OnlineStats.Hist2(100), y)
+"""
+mutable struct Hist2 <: OnlineStat{Real}
+    rng::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}}
+    counts::Vector{Int}
+    ex::Extrema{Float64}
+    n::Int
+end
+Hist2(b::Int) = Hist2(0.0:0.0, zeros(Int, b), Extrema(), 0)
+value(o::Hist2) = (o.rng, o.counts)
 
-# function _fit!(o::Hist2, y)
-#     o.n += 1
-#     fit!(o.ex, y)
-#     if nobs(o) < 3
-#         o.rng = range(minimum(o.ex), stop=maximum(o.ex), length=length(o.counts) + 1)
-#     else
-#         while y < minimum(o.rng)
-#             o.rng = extendleft(o.rng)
-#             collapseright!(o.counts) 
-#         end
-#         while y > maximum(o.rng)
-#             o.rng = extendright(o.rng)
-#             collapseleft!(o.counts)
-#         end
-#         o.counts[searchsortedfirst(o.rng, y)] += 1
-#     end
-# end
+function _fit!(o::Hist2, y)
+    o.n += 1
+    fit!(o.ex, y)
+    if nobs(o) < 2
+    elseif nobs(o) == 2
+        a, b = extrema(o.ex)
+        o.rng = range(a, stop = b + eps(b), length = length(o.counts) + 1)
+        o.counts[1] += 1
+        o.counts[end] += 1
+    else
+        while y < minimum(o.rng)
+            o.rng = extendleft(o.rng)
+            collapseright!(o.counts) 
+        end
+        while y > maximum(o.rng)
+            o.rng = extendright(o.rng)
+            collapseleft!(o.counts)
+        end
+        o.counts[searchsortedfirst(o.rng, y) - 1] += 1
+    end
+end
 
-# width(rng) = rng[end] - rng[1]
-# extendleft(rng) = range(minimum(rng) - 2 * width(rng), stop=maximum(rng), length=length(rng))
-# extendright(rng) = range(minimum(rng), stop=maximum(rng) + 2 * width(rng), length=length(rng))
+width(rng) = rng[end] - rng[1]
+extendleft(rng) = range(minimum(rng) - width(rng), stop=maximum(rng), length=length(rng))
+extendright(rng) = range(minimum(rng), stop=maximum(rng) + width(rng), length=length(rng))
 
-# function collapseleft!(x)
-#     for i in eachindex(x)
-#         if i <= ceil(Int, length(x) / 2)
-#             x[i] = x[2i - 1] + x[min(2i, length(x))]
-#         else 
-#             x[i] = 0.0
-#         end
-#     end
-# end
-# function collapseright!(x)
-#     # x[end] = x[end] + x[end-1]
-#     # x[end-1] = x[end-2] + x[end-3]
-#     # x[end-2] = x[end-4] + x[end-5]
-
-#     for i in eachindex(x)
-#         j = i - 1
-#         if i <= ceil(Int, length(x) / 2)
-#             x[end-j] = x[end-2j] + x[max(end-2j - 1, 1)]
-#         else
-#             x[i] = 0.0
-#         end
-#     end
-# end
+function collapseleft!(x)
+    for i in eachindex(x)
+        j = 2i - 1
+        if j <= length(x)
+            x[i] = x[j]
+            if j < length(x) 
+                x[i] += x[j + 1]
+            end
+        else
+            x[i] = 0
+        end
+    end
+end
+function collapseright!(x)
+    for i in reverse(eachindex(x))
+        j = 2i - length(x)
+        if j >= 1
+            x[i] = x[j]
+            if j > 1
+                x[i] += x[j - 1]
+            end
+        else
+            x[i] = 0
+        end
+    end
+end

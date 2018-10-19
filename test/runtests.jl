@@ -369,6 +369,7 @@ end
     @test Hist(10) == Hist(10)
 end
 end
+
 #-----------------------------------------------------------------------# HyperLogLog
 @testset "HyperLogLog" begin
     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
