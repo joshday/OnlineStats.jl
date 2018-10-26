@@ -17,7 +17,7 @@ end
 KahanSum(T::Type = Float64) = KahanSum(T(0), T(0), 0)
 Base.sum(o::KahanSum) = o.sum
 function _fit!(o::KahanSum{T}, x::Number) where {T<:Number}
-    y = convert(T, x)
+    y = convert(T, x) - o.c
     t = o.sum + y
     o.c = (t - o.sum) - y
     o.sum = t
