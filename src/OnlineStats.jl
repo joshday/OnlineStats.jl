@@ -42,6 +42,7 @@ export
     ReservoirSample,
     Series, StatLearn, StatHistory, Sum,
     Variance,
+    KahanSum,
 # other 
     OnlineStat, BiasVec
 
@@ -57,6 +58,7 @@ include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")
 include("stats/linreg.jl")
 include("stats/statlearn.jl")
+include("stats/kahan.jl")
 include("viz/partition.jl")
 include("viz/mosaicplot.jl")
 include("viz/recipes.jl")

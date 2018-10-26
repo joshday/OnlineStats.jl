@@ -596,4 +596,11 @@ end
     @test std(fit!(Variance(), [1, 2])) == sqrt(.5)
 end
 
+#-----------------------------------------------------------------------# KahanSum
+@testset "KahanSum" begin
+    test_exact(KahanSum(), y, sum, sum)
+    test_exact(KahanSum(Int), 1:100, sum, sum)
+    test_merge(KahanSum(), y, y2)
+end
+
 end #module
