@@ -42,7 +42,7 @@ export
     ReservoirSample,
     Series, StatLearn, StatHistory, Sum,
     Variance,
-    KahanSum,
+    KahanSum, KahanMean, KahanVariance,
 # other 
     OnlineStat, BiasVec
 

@@ -83,8 +83,10 @@ mutable struct KahanVariance{W, T<:Number} <: OnlineStat{Number}
     weight::W
     n::Int
 end
-KahanVariance(;T::Type = Float64, weight = EqualWeight()) = KahanVariance(T(0.0), T(0.0), T(0.0), T(0.0), weight, 0)
-Base.copy(o::KahanVariance) = KahanVariance(o.σ2, o.μ, o.weight, o.n)
+KahanVariance(;T::Type = Float64, weight = EqualWeight()) =
+    KahanVariance(T(0.0), T(0.0), T(0.0), T(0.0), weight, 0)
+Base.copy(o::KahanVariance) =
+    KahanVariance(o.σ2, o.μ, o.cμ, o.cσ2, o.weight, o.n)
 function _fit!(o::KahanVariance{W, T}, x) where {W, T}
 
     xx = convert(T, x)

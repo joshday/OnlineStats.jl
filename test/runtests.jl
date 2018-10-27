@@ -602,5 +602,22 @@ end
     test_exact(KahanSum(Int), 1:100, sum, sum)
     test_merge(KahanSum(), y, y2)
 end
+#-----------------------------------------------------------------------# Mean
+@testset "KahanMean" begin
+    test_exact(KahanMean(), y, mean, mean)
+    test_merge(KahanMean(), y, y2)
+end
+#-----------------------------------------------------------------------# Variance
+@testset "KahanVariance" begin
+    test_exact(KahanVariance(), y, mean, mean)
+    test_exact(KahanVariance(), y, std, std)
+    test_exact(KahanVariance(), y, var, var)
+    test_merge(KahanVariance(), y, y2)
+
+    # Issue 116
+    @test std(KahanVariance()) == 1
+    @test std(fit!(KahanVariance(), 1)) == 1
+    @test std(fit!(KahanVariance(), [1, 2])) == sqrt(.5)
+end
 
 end #module
