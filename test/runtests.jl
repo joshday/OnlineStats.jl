@@ -620,4 +620,6 @@ end
     @test std(fit!(KahanVariance(), [1, 2])) == sqrt(.5)
 end
 
+include("test_kahan.jl")
+
 end #module
