@@ -665,6 +665,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.KahanMean",
+    "page": "API",
+    "title": "OnlineStats.KahanMean",
+    "category": "type",
+    "text": "KahanMean(; T=Float64, weight=EqualWeight())\n\nTrack a univariate mean. Uses a compensation term for the update.\n\n#Note\n\nThis should be more accurate as Mean in most cases but the guarantees of KahanSum do not apply. merge! can have some accuracy issues.\n\nUpdate\n\nμ = (1 - γ) * μ + γ * x\n\nExample\n\n@time fit!(KahanMean(), randn(10^6))\n\n\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.KahanSum",
+    "page": "API",
+    "title": "OnlineStats.KahanSum",
+    "category": "type",
+    "text": "KahanSum(T::Type = Float64)\n\nTrack the overall sum. Includes a compensation term that effectively doubles precision, see Wikipedia for details.\n\nExample\n\nfit!(KahanSum(Float64), fill(1, 100))\n\n\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.KahanVariance",
+    "page": "API",
+    "title": "OnlineStats.KahanVariance",
+    "category": "type",
+    "text": "KahanVariance(; T=Float64, weight=EqualWeight())\n\nTrack the univariate variance. Uses compensation terms for a higher accuracy.\n\n#Note\n\nThis should be more accurate as Variance in most cases but the guarantees of KahanSum do not apply. merge! can have accuracy issues.\n\nExample\n\no = fit!(KahanVariance(), randn(10^6))\nmean(o)\nvar(o)\nstd(o)\n\n\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Lag",
     "page": "API",
     "title": "OnlineStats.Lag",
