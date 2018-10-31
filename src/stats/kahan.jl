@@ -3,7 +3,10 @@
 """
     KahanSum(T::Type = Float64)
 
-Track the overall sum.
+Track the overall sum. Includes a compensation term that effectively doubles
+precision, see
+[Wikipedia](https://en.wikipedia.org/wiki/Kahan_summation_algorithm) for
+details.
 
 # Example
 
@@ -49,7 +52,13 @@ end
 """
     KahanMean(; T=Float64, weight=EqualWeight())
 
-Track a univariate mean.
+Track a univariate mean. Uses a compensation term for the update.
+
+#Note
+
+This should be more accurate as [`Mean`](@ref) in most cases but the guarantees
+of [`KahanSum`](@ref) do not apply. [`merge!`](@ref) can have some accuracy
+issues.
 
 # Update
 
@@ -71,20 +80,27 @@ function _fit!(o::KahanMean{W, T}, x) where {W, T}
     o.n += 1
 
     # This acts under the assumption that the mean and all values are
-    # approximately of the same size order
+    # approximately of the same order
     # o.μ = o.μ + T(o.weight(o.n)) * (convert(T, x) - o.μ) - o.c
     y = T(o.weight(o.n)) * (convert(T, x) - o.μ) - o.c
     t = o.μ + y
     o.c = (t - o.μ) - y
     o.μ = t
 end
-function _merge!(o::KahanMean, o2::KahanMean)
+function _merge!(o::KahanMean{W1, T}, o2::KahanMean{W2, T}) where {W1, W2, T}
 
     o.n += o2.n
-    y = (o2.n / o.n) * (o2.μ - o.μ) - o.c - o2.c
-    t = o.μ + y
+    # y = (T(o2.n / o.n) * (o2.μ - o.μ) - o.c) - o2.c
+    x1 = o.μ - o2.c
+    y = T(o2.n / o.n) * (o2.μ - x1) - o.c
+    t = x1 + y
 
-    o.c = (t - o.μ) - y
+    if abs(x1) < abs(y)
+        o.c = (t - y) - x1
+    else
+        o.c = (t - x1) - y
+    end
+
     o.μ = t
 
     o
@@ -96,7 +112,13 @@ Base.copy(o::KahanMean) = KahanMean(o.μ, o.c, o.weight, o.n)
 """
     KahanVariance(; T=Float64, weight=EqualWeight())
 
-Univariate variance.
+Track the univariate variance. Uses compensation terms for a higher accuracy.
+
+#Note
+
+This should be more accurate as [`Variance`](@ref) in most cases but the
+guarantees of [`KahanSum`](@ref) do not apply. [`merge!`](@ref) can have
+accuracy issues.
 
 # Example
 
@@ -113,17 +135,19 @@ mutable struct KahanVariance{W, T<:Number} <: OnlineStat{Number}
     weight::W
     n::Int
 end
+KahanVariance(T::Type) =
+    KahanVariance(T(0.0), T(0.0), T(0.0), T(0.0), EqualWeight(), 0)
 KahanVariance(;T::Type = Float64, weight = EqualWeight()) =
     KahanVariance(T(0.0), T(0.0), T(0.0), T(0.0), weight, 0)
 Base.copy(o::KahanVariance) =
     KahanVariance(o.σ2, o.μ, o.cμ, o.cσ2, o.weight, o.n)
 function _fit!(o::KahanVariance{W, T}, x) where {W, T}
 
-    xx = convert(T, x)
     o.n += 1
     γ = T(o.weight(o.n))
     μ = o.μ
 
+    xx = convert(T, x)
     # o.μ = μ + γ * (xx - μ)
     y = γ * (xx - μ) - o.cμ
     t = μ + y
@@ -138,13 +162,49 @@ function _fit!(o::KahanVariance{W, T}, x) where {W, T}
 
     return nothing
 end
-function _merge!(o::KahanVariance, o2::KahanVariance)
-    γ = o2.n / (o.n += o2.n)
-    δ = o2.μ - o.μ
-    o.σ2 = smooth(o.σ2, o2.σ2, γ) + δ ^ 2 * γ * (1.0 - γ)
-    o.μ = smooth(o.μ, o2.μ, γ)
-    o.cμ += o2.cμ
-    o.cσ2 += o2.cσ2
+function _merge!(o::KahanVariance{W1, T}, o2::KahanVariance{W2, T}) where {W1, W2, T}
+    o.n += o2.n
+
+    γ = T(o2.n / o.n)
+
+    μ1 = o.μ - o2.cμ
+    μ2 = o2.μ - o.cμ
+    # Δμ = μ2 - μ1
+    Δμ = μ2 - o.μ
+
+    σ1 = o.σ2 - o2.cσ2
+    σ2 = o2.σ2 - o.cσ2
+    # Δσ = σ2 - σ1
+    Δσ = σ2 - o.σ2
+
+    # o.σ2 = γ * (o2.σ2 - o.σ2) + δ ^ 2 * γ * (1.0 - γ)
+    # xx = (γ * Δσ) + ((Δμ ^ 2) * γ * (T(1.0) - γ))
+    xx = γ * (Δσ + (Δμ ^ 2) * (T(1.0) - γ))
+    y = xx - o.cσ2
+    t = o.σ2 + y
+
+    if abs(σ1) < abs(y)
+        o.cσ2 = (t - y) - σ1
+    else
+        o.cσ2 = (t - σ1)  - y
+    end
+
+    o.σ2 = t
+
+    # o.μ = o.μ + γ * (o2.μ - o.μ)
+    # xx = γ * δ
+    xx = γ * Δμ
+    y = xx - o.cμ
+    t = o.μ + y
+
+    if abs(μ1) < abs(y)
+        o.cμ = (t - y) - μ1
+    else
+        o.cμ = (t - μ1) - y
+    end
+
+    o.μ = t
+
     o
 end
 value(o::KahanVariance{W, T}) where {W, T} =
