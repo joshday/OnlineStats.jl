@@ -22,7 +22,6 @@ for stat in [
         FastForest(5)
         FTSeries(Variance())
         3Mean()
-        Hist(10)
         HyperLogLog(10)
         LinRegBuilder(4)
         NBClassifier(5, Float64)
@@ -33,21 +32,6 @@ for stat in [
         ]
     println("  > ", stat)
 end
-
-# TODO: uncomment when Plots release for 0.7 is available
-# #-----------------------------------------------------------------------# Plots
-# println("\n\n")
-# @info("Sanity checking Plots")
-# plot(Mean())
-# plot(EqualWeight())
-# plot(fit!(LinReg(), (x,y)))
-# plot(Series(Mean(), Variance()))
-# plot(fit!(GroupBy{Int}(Mean()), zip(rand(1:2, 10), randn(10))))
-# plot(AutoCov(10))
-# plot(fit!(Hist(10), y))
-# plot(fit!(Hist(-5:5), y))
-# plot(fit!(Hist(-5:5, -5:5), zip(y, y2)))
-# plot(fit!(Partition(Hist(5)), y))
 
 #-----------------------------------------------------------------------# test helpers
 
@@ -120,11 +104,6 @@ end
     test_merge(CallFun(Mean(), x->nothing), y, y2)
     test_exact(CallFun(Mean(), x->nothing), y, value, mean)
 end
-# #-----------------------------------------------------------------------# Count
-# @testset "Count" begin
-#     test_exact(Count(), y, value, length)
-#     test_merge(Count(), y, y2, ==)
-# end
 #-----------------------------------------------------------------------# CountMap
 @testset "CountMap" begin
     test_exact(CountMap(Int), rand(1:10, 100), nobs, length, ==)
@@ -149,6 +128,12 @@ end
     test_exact(CovMatrix(), x, cor, cor)
     test_exact(CovMatrix(5), x, cov, cov)
     test_exact(CovMatrix(), x, o->cov(o; corrected=false), cov(x, dims=1, corrected=false))
+    a = fit!(CovMatrix(), x)
+    b = fit!(CovMatrix(), x2)
+    c = merge(a, b)
+    if any(isnan, value(c))
+        @warn "Covariance value is NaN" a b c
+    end
     test_merge(CovMatrix(), x, x2)
     # Complex values
     # test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
@@ -315,19 +300,24 @@ end
     @test value(value(o)[1]) ≈ 1.5
     @test value(value(o)[2]) ≈ 3.5
 end
+#-----------------------------------------------------------------------# HeatMap
+@testset "HeatMap" begin 
+    test_merge(HeatMap(-5:.1:5, -5:.1:5), x[:, 1:2], x2[:, 1:2])
+end
+
 #-----------------------------------------------------------------------# Hist
 @testset "Hist" begin
-@testset "FixedBins" begin
     test_merge(Hist(-5:.1:5), y, y2)
-    for edges in (-5:5, collect(-5:5), [-5, -3.5, 0, 1, 4, 5.5])
-        for data in (y, -6:0.75:6)
-            h1 = fit(Histogram, data, edges, closed = :left).weights
-            test_exact(Hist(edges), data, o -> O.counts(o), y -> h1)
-
-            h2 = fit(Histogram, data, edges, closed = :right).weights
-            test_exact(Hist(edges; closed = :right), data, o -> O.counts(o), y -> h2)
+    @testset "Compare with StatsBase.Histogram" begin
+        for edges in (-5:5, collect(-5:5), [-5, -3.5, 0, 1, 4, 5.5])
+            for data in (y, -6:.75:6)
+                h1 = fit(Histogram, data, edges, closed = :left)
+                test_exact(Hist(edges, Number; closed=false), data, o -> o.counts, y -> h1.weights)
+                h2 = fit(Histogram, data, edges, closed = :right)
+                test_exact(Hist(edges, Number; left=false, closed=false), data, o -> o.counts, y -> h2.weights)
+            end
         end
-    end
+    end 
     test_exact(Hist(-5:.1:5), y, extrema, extrema, atol=.2)
     test_exact(Hist(-5:.1:5), y, mean, mean, atol=.2)
     test_exact(Hist(-5:.1:5), y, nobs, length)
@@ -339,35 +329,30 @@ end
     @test O.pdf(fit!(Hist(-5:.1:5), y), 0) > 0
     @test O.pdf(fit!(Hist(-5:.1:5), y), 100) == 0
 end
-@testset "FixedBins2" begin
-    test_exact(Hist(-5:.1:5, -5:.1:5), zip(y, y2), nobs, length(y))
-    test_exact(Hist(-5:5,-5:5), zip([1,10, 10], [10, 1, 10]), x->x.alg.out, 3)
-end
-@testset "AdaptiveBins" begin
-    test_exact(Hist(1000), y, mean, mean)
-    test_exact(Hist(1000), y, nobs, length)
-    test_exact(Hist(1000), y, var, var)
-    test_exact(Hist(1000), y, median, median)
-    test_exact(Hist(1000), y, quantile, quantile)
-    test_exact(Hist(1000), y, std, std)
-    test_exact(Hist(1000), y, extrema, extrema, ==)
-    test_merge(Hist(2000), y, y2)
-    test_merge(Hist(1), y, y2)
-    # test_merge(Hist(2000, Float32), Float32.(y), Float32.(y2))
-    # test_merge(Hist(Float32, 2000), Float32.(y), Float32.(y2))
+#-----------------------------------------------------------------------# KHist
+@testset "KHist" begin
+    test_exact(KHist(1000), y, mean, mean)
+    test_exact(KHist(1000), y, nobs, length)
+    test_exact(KHist(1000), y, var, var)
+    test_exact(KHist(1000), y, median, median)
+    test_exact(KHist(1000), y, quantile, quantile)
+    test_exact(KHist(1000), y, std, std)
+    test_exact(KHist(1000), y, extrema, extrema, ==)
+    test_merge(KHist(2000), y, y2)
+    test_merge(KHist(1), y, y2)
+    test_merge(KHist(2000, Float32), Float32.(y), Float32.(y2))
 
     data = randn(10_000)
 
-    test_exact(Hist(100), data, o->O.pdf(o, -10), 0.0)
-    test_exact(Hist(100), data, o->O.pdf(o,0), 0.3989422804014327, atol=.2)
-    test_exact(Hist(100), data, o->O.pdf(o, 10), 0.0)
+    test_exact(KHist(100), data, o->O.pdf(o, -10), 0.0)
+    test_exact(KHist(100), data, o->O.pdf(o,0), 0.3989422804014327, atol=.2)
+    test_exact(KHist(100), data, o->O.pdf(o, 10), 0.0)
 
-    test_exact(Hist(100), data, o->O.cdf(o,-10), 0)
-    test_exact(Hist(100), data, o->O.cdf(o,0), .5, atol=.1)
-    test_exact(Hist(100), data, o->O.cdf(o,10), 1)
+    test_exact(KHist(100), data, o->O.cdf(o,-10), 0)
+    test_exact(KHist(100), data, o->O.cdf(o,0), .5, atol=.1)
+    test_exact(KHist(100), data, o->O.cdf(o,10), 1)
 
-    @test Hist(10) == Hist(10)
-end
+    @test KHist(10) == KHist(10)
 end
 
 #-----------------------------------------------------------------------# HyperLogLog

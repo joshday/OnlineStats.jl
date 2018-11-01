@@ -14,9 +14,9 @@ y1 = randn(10_000)
 y2 = randn(10_000)
 y3 = randn(10_000)
 
-s1 = Series(Mean(), Variance(), Hist(50))
-s2 = Series(Mean(), Variance(), Hist(50))
-s3 = Series(Mean(), Variance(), Hist(50))
+s1 = Series(Mean(), Variance(), KHist(50))
+s2 = Series(Mean(), Variance(), KHist(50))
+s3 = Series(Mean(), Variance(), KHist(50))
 
 fit!(s1, y1)
 fit!(s2, y2)

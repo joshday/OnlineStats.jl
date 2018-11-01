@@ -33,7 +33,7 @@ end
 function NBClassifier(g::G, T::Type; id=1) where {G<:Group}
     NBClassifier(OrderedDict{T, G}(), g, id, 0, -Inf, -Inf, Int[])
 end
-function NBClassifier(p::Int, T::Type; id=1, stat=Hist(15))
+function NBClassifier(p::Int, T::Type; id=1, stat=KHist(10))
     NBClassifier(p * stat, T; id=id)
 end
 function Base.show(io::IO, o::NBClassifier)

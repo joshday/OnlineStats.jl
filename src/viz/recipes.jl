@@ -106,34 +106,31 @@ end
     corr ? cor(o) : cov(o)
 end
 
-#-----------------------------------------------------------------------# Hist 
-@recipe f(o::Hist) = o.alg
+#-----------------------------------------------------------------------# Histograms
+@recipe function f(o::Hist)
+    inds = findfirst(x -> x > 0, o.counts):findlast(x -> x > 0, o.counts)
+    closed = o.left ? :left : :right
+    Histogram(o.edges[vcat(inds, inds[end] + 1)], o.counts[inds], closed)
+end
 
-@recipe f(o::FixedBins{closed}) where {closed} =
-    Histogram(o.edges, o.counts ./ area(o), closed)
-
-@recipe function f(o::AdaptiveBins; sticks=false)
-    y = [o[i] for i in 0:(length(o.value) + 1)]
-    out = first.(y), last.(y) ./ area(o)
-    if !sticks
-        seriestype --> :line
-        fillto --> 0 
-        alpha --> .4
-        linewidth --> 0
-        out
-    elseif sticks 
+@recipe function f(o::KHist; normed=true)
+    x, y = value(o)
+    y2 = normed ? y ./ area(o) : y
+    xlim --> extrema(o.ex)
+    @series begin
+        x, y2
+    end
+    @series begin 
         seriestype --> :sticks 
-        out 
-    else 
-        error("sticks must be a Bool")
+        x, y2
     end
 end
 
-@recipe function f(o::FixedBins2)
+@recipe function f(o::HeatMap)
     seriestype --> :heatmap 
-    z = Float64.(o.z)
+    z = Float64.(o.counts)
     z[z .== 0] .= NaN
-    o.x, o.y, z
+    midpoints(o.xedges), midpoints(o.yedges), z
 end
 
 #-----------------------------------------------------------------------# CountMap
@@ -145,6 +142,7 @@ end
     sp = sortby == :keys ? sortperm(kys) : sortperm(vls)
     x, y = string.(kys[sp]), vls[sp]
     hover --> ["($xi, $yi)" for (xi,yi) in zip(x, y)], :quiet
+    label --> "Count"
     x, y
 end
 
@@ -204,29 +202,27 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
 
 
 #---------------------------------------------------------------# [Indexed]Partition Hist
-@recipe f(o::IndexedPartition{T,O}) where {T, O<:Hist} = o.parts
-@recipe f(o::Partition{T,O}) where {T, O<:Hist} = o.parts
+@recipe f(o::IndexedPartition{T,O}) where {T, O<:HistogramStat} = o.parts
+@recipe f(o::Partition{T,O}) where {T, O<:HistogramStat} = o.parts
 
-@recipe function f(parts::Vector{Part{T, O}}) where {T, O<:Hist}
+@recipe function f(parts::Vector{Part{T, O}}) where {T, O<:HistogramStat}
     sort!(parts)
     x = []
     y = []
     fillz = Int[]
     for part in parts 
-        alg = part.stat.alg
-        _min, _max = extrema(part.stat)
-        edges = vcat(_min, midpoints(midpoints(part.stat)), _max)
-        counts = map(last, value(part.stat)[2])
-        for i in 1:length(counts)
-            if counts[i] > 0
+        edg = edges(part.stat)
+        cnts = counts(part.stat)
+        for i in eachindex(cnts)
+            if cnts[i] > 0
                 # rectangle
-                push!(x, part.a); push!(y, edges[i])   
-                push!(x, part.a); push!(y, edges[i + 1]) 
-                push!(x, part.b); push!(y, edges[i + 1]) 
-                push!(x, part.b); push!(y, edges[i])   
+                push!(x, part.a); push!(y, edg[i])   
+                push!(x, part.a); push!(y, edg[i + 1]) 
+                push!(x, part.b); push!(y, edg[i + 1]) 
+                push!(x, part.b); push!(y, edg[i])   
                 push!(x, NaN); push!(y, NaN);
                 # fill color
-                push!(fillz, counts[i])
+                push!(fillz, cnts[i])
             end
         end
     end

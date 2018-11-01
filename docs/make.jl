@@ -14,7 +14,6 @@ makedocs(
         "howfitworks.md",
         "stats_and_models.md",
         "parallel.md",
-        "datasurrogates.md",
         "visualizations.md",
         "demos.md",
         "api.md",

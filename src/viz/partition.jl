@@ -26,7 +26,7 @@ Base.in(x, o::Part) = (o.a ≤ x ≤ o.b)
 Base.isless(o::Part, o2::Part) = o.b < o2.a
 value(o::Part) = value(o.stat)
 
-midpoint(o::Part{<:Number}) = (o.a + o.b) / 2
+midpoint(o::Part{<:Number}) = middle(o.a, o.b)
 
 function midpoint(o::Part) 
     if o.a == o.b 

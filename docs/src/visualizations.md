@@ -161,7 +161,7 @@ savefig("indexpart4.png"); nothing # hide
 x = rand(1:1000, 10^5)
 y = x .+ 30randn(10^5)
 
-o = fit!(IndexedPartition(Int, Hist(20)), zip(x,y))
+o = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))
 
 plot(o)
 savefig("indexpartequal.png"); nothing # hide
