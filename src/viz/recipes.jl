@@ -107,10 +107,12 @@ end
 end
 
 #-----------------------------------------------------------------------# Histograms
-@recipe function f(o::Hist)
-    inds = findfirst(x -> x > 0, o.counts):findlast(x -> x > 0, o.counts)
+@recipe function f(o::HistogramStat; normed=true)
+    e, c = edges(o), counts(o)
+    inds = findfirst(x -> x > 0, c):findlast(x -> x > 0, c)
     closed = o.left ? :left : :right
-    Histogram(o.edges[vcat(inds, inds[end] + 1)], o.counts[inds], closed)
+    normed --> normed
+    Histogram(e[vcat(inds, inds[end] + 1)], c[inds], closed)
 end
 
 @recipe function f(o::KHist; normed=true)

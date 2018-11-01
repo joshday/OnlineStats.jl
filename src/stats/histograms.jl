@@ -28,7 +28,7 @@ function binindex(edges::AbstractVector, y, left::Bool, closed::Bool)
     end
 end
 
-# requires: midpoints(o), counts(o)
+# requires: edges(o), midpoints(o), counts(o)
 split_candidates(o::HistogramStat) = midpoints(o)
 Statistics.mean(o::HistogramStat) = mean(midpoints(o), fweights(counts(o)))
 Statistics.var(o::HistogramStat) = var(midpoints(o), fweights(counts(o)); corrected=true)
@@ -133,40 +133,57 @@ end
 
 
 
-# #-----------------------------------------------------------------------# ExpandingHist
-# const ExpandableRange = Union{StepRange, StepRangeLen, LinRange}
+#-----------------------------------------------------------------------# ExpandingHist
+const ExpandableRange = Union{StepRange, StepRangeLen, LinRange}
 
-# mutable struct ExpandingHist{T, R <: ExpandableRange} <: OnlineStat{T}
-#     edges::R
-#     counts::Vector{Int}
-#     left::Bool
-#     n::Int
-#     function ExpandingHist(init::R, T::Type=Number; left::Bool = true) where {R <: ExpandableRange}
-#         new{T, R}(init, zeros(Int, length(init) - 1), left, 0)
-#     end
-# end
-# function ExpandingHist(b::Int; left::Bool=true) 
-#     new(range(0, stop = 1, length = b + 1), zeros(Int, b), left, 0)
-# end
+mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
+    edges::R
+    counts::Vector{Int}
+    left::Bool
+    n::Int
+    function ExpandingHist(init::R, T::Type=Number; left::Bool = true) where {R <: ExpandableRange}
+        new{T, R}(init, zeros(Int, length(init) - 1), left, 0)
+    end
+end
+function ExpandingHist(b::Int; left::Bool=true) 
+    ExpandingHist(range(0, stop = 0, length = b + 1), Number; left=left)
+end
 
-# function Base.in(x, o::ExpandingHist) 
-#     a, b = extrema(o.edges)
-#     o.left ? (a ≤ y < b) : (a < y ≤ b)
-# end
+midpoints(o::ExpandingHist) = midpoints(o.edges)
+counts(o::ExpandingHist) = o.counts
+edges(o::ExpandingHist) = o.edges
 
+function Base.in(y, o::ExpandingHist) 
+    a, b = extrema(o.edges)
+    o.left ? (a ≤ y < b) : (a < y ≤ b)
+end
 
+function _fit!(o::ExpandingHist, y)
+    o.n += 1
 
-# function _fit!(o::ExpandingHist, y)
-#     if (o.n += 1) < 3
-#         o.edges = _init_edges(o.edges, y)
-#     end
-# end
+    # init
+    if nobs(o) == 1
+        o.edges = range(y, stop=y, length=length(o.edges))
+    elseif nobs(o) == 2
+        a, b = extrema(o.edges)
+        ey = eps(float(y))
+        o.edges = range(min(a,y) - ey, stop=max(b, y) + ey, length=length(o.edges))
+    end
 
-# function _init_edges(r::StepRange)
+    expand!(o, y)
+    o.counts[binindex(o.edges, y, o.left, false)] += 1
+end
 
-# end
-
-
+function expand!(o::ExpandingHist, y)
+    a, b = extrema(o.edges)
+    if y > b  # find C such that y <= a + 2^C * (b - a)
+        C = ceil(Int, log2((y - a) / (b - a)))
+        o.edges = range(a, stop = a + 2^C * (b - a), length = length(o.edges))
+    elseif y < a  # find C such that y >= b - 2^C * (b - a)
+        C = ceil(Int, log2((b - y) / (b - a)))
+        o.edges = range(b - 2^C * (b - a), stop = b, length = length(o.edges))
+    end
+end
 
 
 # function adapt!(o::Hist, y)
