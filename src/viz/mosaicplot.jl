@@ -1,9 +1,9 @@
-struct MosaicPlot{T, S} <: OnlineStat{VectorOb}
-    stat::GroupBy{T,CountMap{S,OrderedDict{S,Int}}}
-end
-MosaicPlot(T, S) = MosaicPlot(GroupBy{T}(CountMap(S)))
-nobs(o::MosaicPlot) = nobs(o.stat)
-_fit!(o::MosaicPlot, xy) = _fit!(o.stat, xy)
+# struct MosaicPlot{T, S} <: OnlineStat{VectorOb}
+#     stat::GroupBy{T,CountMap{S,OrderedDict{S,Int}}}
+# end
+# MosaicPlot(T, S) = MosaicPlot(GroupBy{T}(CountMap(S)))
+# nobs(o::MosaicPlot) = nobs(o.stat)
+# _fit!(o::MosaicPlot, xy) = _fit!(o.stat, xy)
 
 
 """

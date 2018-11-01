@@ -45,6 +45,29 @@ function Statistics.quantile(o::HistogramStat, p = [0, .25, .5, .75, 1])
 end
 
 #-----------------------------------------------------------------------# Hist 
+"""
+    Hist(edges; left = true, closed = true)
+
+Create a histogram with bin partition defined by `edges`.
+
+- If `left`, the bins will be left-closed.
+- If `closed`, the bin on the end will be closed.
+    - E.g. for a two bin histogram ``[a, b), [b, c)`` vs. ``[a, b), [b, c]``
+
+# Example 
+
+    o = fit!(Hist(-5:.1:5), randn(10^6))
+    
+    # approximate statistics 
+    using Statistics
+
+    mean(o)
+    var(o)
+    std(o)
+    quantile(o)
+    median(o)
+    extrema(o)
+"""
 struct Hist{T, R} <: HistogramStat{T}
     edges::R 
     counts::Vector{Int} 
@@ -61,6 +84,7 @@ value(o::Hist) = (x=o.edges, y=o.counts)
 
 midpoints(o::Hist) = midpoints(o.edges)
 counts(o::Hist) = o.counts
+edges(o::Hist) = o.edges
 
 function area(o::Hist) 
     c = o.counts 
@@ -108,6 +132,22 @@ end
 
 
 #-----------------------------------------------------------------------# HeatMap
+"""
+    Heatmap(xedges, yedges; left = true, closed = true)
+
+Create a two dimensional histogram with the bin partition created by `xedges` and `yedges`.  
+When fitting a new observation, the first value will be associated with X, the second with Y.
+
+- If `left`, the bins will be left-closed.
+- If `closed`, the bins on the ends will be closed.  See [Hist](@ref).
+
+# Example 
+
+    o = fit!(HeatMap(-5:.1:5, -5:.1:5), eachrow(randn(10^5, 2)))
+
+    using Plots
+    plot(o)
+"""
 mutable struct HeatMap{EX, EY} <: OnlineStat{XY}
     xedges::EX 
     yedges::EY
@@ -308,12 +348,27 @@ xy(o::KHistBin) = o.loc, o.count
 
 
 """
-    KHist(b::Int)
+    KHist(k::Int)
 
-Estimate the probability density of a univariate distribution at `b` approximately 
+Estimate the probability density of a univariate distribution at `k` approximately 
 equally-spaced points.
     
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
+
+# Example 
+
+    o = fit!(KHist(25), randn(10^6))
+
+    # Approximate statistics
+    using Statistics
+    mean(o)
+    var(o)
+    std(o)
+    quantile(o)
+    median(o)
+
+    using Plots
+    plot(o)
 """
 struct KHist{T} <: HistogramStat{Number}
     bins::Vector{KHistBin{T}}
@@ -324,6 +379,7 @@ KHist(b::Int, T::Type = Float64) = KHist(KHistBin{T}[], b, Extrema(T))
 
 midpoints(o::KHist) = getfield.(o.bins, :loc)
 counts(o::KHist) = getfield.(o.bins, :count)
+edges(o::KHist) = vcat(minimum(o.ex), midpoints(getfield.(o.bins, :loc)), maximum(o.ex))
 
 nobs(o::KHist) = isempty(o.bins) ? 0 : sum(x -> x.count, o.bins)
 
@@ -365,7 +421,7 @@ function Base.push!(o::KHist, y::KHistBin)
     end
 end
 
-function Base.merge!(a::KHist, b::KHist)
+function _merge!(a::KHist, b::KHist)
     merge!(a.ex, b.ex)
     for bin in b.bins
         push!(a, bin)
@@ -413,138 +469,6 @@ end
 
 
 
-
-# #-----------------------------------------------------------------------# FixedBins2 
-# # left-closed only
-# mutable struct FixedBins2{E1, E2} <: HistAlgorithm{VectorOb}
-#     x::E1 
-#     y::E2 
-#     z::Matrix{Int}
-#     out::Int
-# end
-# function make_alg(e::AbstractVector, e2::AbstractVector; kw...) 
-#     FixedBins2(e, e2, zeros(Int, length(e2), length(e)), 0)
-# end
-# nobs(o::FixedBins2) = sum(o.z) + o.out
-
-# value(o::Hist{N, <:FixedBins2}) where {N} = (o.alg.x, o.alg.y, o.alg.z)
-
-# function _fit!(o::FixedBins2, xy)
-#     x, y = xy 
-#     if x > maximum(o.x) || x < minimum(o.x) || y > maximum(o.y) || y < minimum(o.y)
-#         o.out += 1
-#     else
-#         j = searchsortedfirst(o.x, x)
-#         i = searchsortedfirst(o.y, y)
-#         o.z[i-1, j-1] += 1
-#     end 
-# end
-
-# #-----------------------------------------------------------------------# FixedBins
-# mutable struct FixedBins{closed, E <: AbstractVector} <: HistAlgorithm{Number}
-#     edges::E
-#     counts::Vector{Int}
-#     out::Int
-
-#     function FixedBins{closed,E}(edges::E, counts::Vector{Int},
-#                                  out::Int) where {E<:AbstractVector,closed}
-#         closed in [:left, :right] || error("closed must be left or right")
-#         length(edges) == length(counts) + 1 ||
-#             error("Histogram edge vectors must be 1 longer than corresponding count vectors")
-#         issorted(edges) || error("Histogram edge vectors must be sorted in ascending order")
-#         new{closed,E}(edges, counts, out)
-#     end
-# end
-# Base.@pure FixedBins(edges::AbstractVector, counts::Vector{Int}, out::Int; closed::Symbol = :left) =
-#     FixedBins{closed,typeof(edges)}(edges, counts, out)
-
-# make_alg(e::AbstractVector; kw...) = FixedBins(e, zeros(Int, length(e) - 1), 0; kw...)
-# function Base.:(==)(o::FixedBins, o2::FixedBins)
-#     o.edges == o2.edges && o.counts == o2.counts && o.out == o2.out
-# end
-
-# midpoints(o::FixedBins) = midpoints(o.edges)
-# counts(o::FixedBins) = o.counts
-# nobs(o::FixedBins) = sum(o.counts) + o.out
-# function _fit!(o::FixedBins, y)
-#     idx = _binindex(o, y)
-#     if 1 ≤ idx < length(o.edges)
-#         @inbounds o.counts[idx] += 1
-#     else
-#         o.out += 1
-#     end
-# end
-
-# function _binindex(o::FixedBins{:left}, y)
-#     edges = o.edges
-#     a = first(edges)
-#     if y < a
-#         return 0
-#     elseif y == last(edges)
-#         # right-most bin is a closed interval [a, b]
-#         return length(edges) - 1
-#     else
-#         # other bins are left-closed intervals [a, b)
-#         if isa(edges, AbstractRange)
-#             return floor(Int, (y - a) / step(edges)) + 1
-#         else
-#             return searchsortedlast(edges, y)
-#         end
-#     end
-# end
-
-# function _binindex(o::FixedBins{:right}, y)
-#     edges = o.edges
-#     a = first(edges)
-#     if y < a
-#         return 0
-#     elseif y == first(edges)
-#         # left-most bin is a closed interval [a, b]
-#         return 1
-#     else
-#         # other bins are right-closed intervals (a, b]
-#         if isa(edges, AbstractRange)
-#             return ceil(Int, (y - a) / step(edges))
-#         else
-#             return searchsortedfirst(edges, y) - 1
-#         end
-#     end
-# end
-
-# function _merge!(o::FixedBins, o2::FixedBins) 
-#     if o.edges == o2.edges 
-#         for j in eachindex(o.counts)
-#             o.counts[j] += o2.counts[j]
-#         end
-#     else
-#         for (yi, wi) in zip(midpoints(o2), o2.counts)
-#             for k in 1:wi 
-#                 _fit!(o, yi)
-#             end
-#         end
-#     end
-# end
-
-# # No linear interpolation (in contrast to AdaptiveBins)
-# function pdf(o::FixedBins, y::Real)
-#     binidx = _binindex(o, y)
-#     c = o.counts
-#     if binidx < 1 || binidx > length(c)
-#         return 0.0
-#     else
-#         return c[binidx] / area(o)
-#     end
-# end
-
-# function area(o::FixedBins) 
-#     c = o.counts 
-#     e = o.edges
-#     if isa(e, AbstractRange)
-#         return step(e) * sum(c)
-#     else
-#         return sum((e[i+1] - e[i]) * c[i] for i in 1:length(c))
-#     end
-# end
 
 # #-----------------------------------------------------------------------# P2Bins 
 # mutable struct P2Bins <: HistAlgorithm{Number}
@@ -741,80 +665,3 @@ end
 # #         o.z[i, j] += 1
 # #     end 
 # # end
-
-
-# #-----------------------------------------------------------------------# Hist2 
-# # Idea: Any time an observation is outside of the bins, keep doubling the bin widths
-# # (and merging adjacent counts) until it fits.
-# """
-#     Hist2(nbins)
-
-# A faster adaptive histogram than `Hist(nbins)`, but can end up with many bin counts of 
-# zero on both sides of the distribution.
-
-# # Example 
-
-#     y = randn(10^7)
-#     fit!(OnlineStats.Hist2(100), y)
-# """
-# mutable struct Hist2 <: OnlineStat{Real}
-#     rng::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}}
-#     counts::Vector{Int}
-#     ex::Extrema{Float64}
-#     n::Int
-# end
-# Hist2(b::Int) = Hist2(0.0:0.0, zeros(Int, b), Extrema(), 0)
-# value(o::Hist2) = (o.rng, o.counts)
-
-# function _fit!(o::Hist2, y)
-#     o.n += 1
-#     fit!(o.ex, y)
-#     if nobs(o) < 2
-#     elseif nobs(o) == 2
-#         a, b = extrema(o.ex)
-#         o.rng = range(a, stop = b + eps(b), length = length(o.counts) + 1)
-#         o.counts[1] += 1
-#         o.counts[end] += 1
-#     else
-#         while y < minimum(o.rng)
-#             o.rng = extendleft(o.rng)
-#             collapseright!(o.counts) 
-#         end
-#         while y > maximum(o.rng)
-#             o.rng = extendright(o.rng)
-#             collapseleft!(o.counts)
-#         end
-#         o.counts[searchsortedfirst(o.rng, y) - 1] += 1
-#     end
-# end
-
-# width(rng) = rng[end] - rng[1]
-# extendleft(rng) = range(minimum(rng) - width(rng), stop=maximum(rng), length=length(rng))
-# extendright(rng) = range(minimum(rng), stop=maximum(rng) + width(rng), length=length(rng))
-
-# function collapseleft!(x)
-#     for i in eachindex(x)
-#         j = 2i - 1
-#         if j <= length(x)
-#             x[i] = x[j]
-#             if j < length(x) 
-#                 x[i] += x[j + 1]
-#             end
-#         else
-#             x[i] = 0
-#         end
-#     end
-# end
-# function collapseright!(x)
-#     for i in reverse(eachindex(x))
-#         j = 2i - length(x)
-#         if j >= 1
-#             x[i] = x[j]
-#             if j > 1
-#                 x[i] += x[j - 1]
-#             end
-#         else
-#             x[i] = 0
-#         end
-#     end
-# end

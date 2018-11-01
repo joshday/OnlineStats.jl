@@ -202,29 +202,27 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
 
 
 #---------------------------------------------------------------# [Indexed]Partition Hist
-@recipe f(o::IndexedPartition{T,O}) where {T, O<:Hist} = o.parts
-@recipe f(o::Partition{T,O}) where {T, O<:Hist} = o.parts
+@recipe f(o::IndexedPartition{T,O}) where {T, O<:HistogramStat} = o.parts
+@recipe f(o::Partition{T,O}) where {T, O<:HistogramStat} = o.parts
 
-@recipe function f(parts::Vector{Part{T, O}}) where {T, O<:Hist}
+@recipe function f(parts::Vector{Part{T, O}}) where {T, O<:HistogramStat}
     sort!(parts)
     x = []
     y = []
     fillz = Int[]
     for part in parts 
-        alg = part.stat.alg
-        _min, _max = extrema(part.stat)
-        edges = vcat(_min, midpoints(midpoints(part.stat)), _max)
-        counts = map(last, value(part.stat)[2])
-        for i in 1:length(counts)
-            if counts[i] > 0
+        edg = edges(part.stat)
+        cnts = counts(part.stat)
+        for i in eachindex(cnts)
+            if cnts[i] > 0
                 # rectangle
-                push!(x, part.a); push!(y, edges[i])   
-                push!(x, part.a); push!(y, edges[i + 1]) 
-                push!(x, part.b); push!(y, edges[i + 1]) 
-                push!(x, part.b); push!(y, edges[i])   
+                push!(x, part.a); push!(y, edg[i])   
+                push!(x, part.a); push!(y, edg[i + 1]) 
+                push!(x, part.b); push!(y, edg[i + 1]) 
+                push!(x, part.b); push!(y, edg[i])   
                 push!(x, NaN); push!(y, NaN);
                 # fill color
-                push!(fillz, counts[i])
+                push!(fillz, cnts[i])
             end
         end
     end
