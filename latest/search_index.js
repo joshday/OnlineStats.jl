@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nTracked history StatHistory\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms Hist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nDecision Trees FastTree\nRandom Forest FastForest\nNaive Bayes Classifier NBClassifier\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun\nBig Data Viz Partition, IndexedPartition\nCollections of Stats: \nApplied to same data stream Series, FTSeries\nApplied to different data streams Group\nCalculated stat by group GroupBy"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nTracked history StatHistory\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms/continuous density Hist and KHist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nDecision Trees FastTree\nRandom Forest FastForest\nNaive Bayes Classifier NBClassifier\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun\nBig Data Viz Partition, IndexedPartition\nCollections of Stats: \nApplied to same data stream Series, FTSeries\nApplied to different data streams Group\nCalculated stat by group GroupBy"
 },
 
 {
@@ -285,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Parallel Computation",
     "title": "ExactStat merges",
     "category": "section",
-    "text": "Many OnlineStats are capable of calculating the exact value as a corresponding offline estimator.  For these types, the order of fit!-ting and merge!-ing does not matter.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), Hist(50))\ns2 = Series(Mean(), Variance(), Hist(50))\ns3 = Series(Mean(), Variance(), Hist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
+    "text": "Many OnlineStats are capable of calculating the exact value as a corresponding offline estimator.  For these types, the order of fit!-ting and merge!-ing does not matter.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), KHist(50))\ns2 = Series(Mean(), Variance(), KHist(50))\ns3 = Series(Mean(), Variance(), KHist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
 },
 
 {
@@ -294,38 +294,6 @@ var documenterSearchIndex = {"docs": [
     "title": "Other Merges",
     "category": "section",
     "text": "For OnlineStats that rely on approximations, merging isn\'t always a well-defined operation.  OnlineStats will either make a sane choice for merging or print a warning that merging did not occur.  Please open an issue to discuss a stat you believe you should be merge-able."
-},
-
-{
-    "location": "datasurrogates.html#",
-    "page": "Data Surrogates",
-    "title": "Data Surrogates",
-    "category": "page",
-    "text": "import Pkg, Random\nPkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nRandom.seed!(123)\ngr()"
-},
-
-{
-    "location": "datasurrogates.html#Data-Surrogates-1",
-    "page": "Data Surrogates",
-    "title": "Data Surrogates",
-    "category": "section",
-    "text": "Some OnlineStats are especially useful for out-of-core computations.  After they\'ve been fit, they act as a data stand-in to get summaries, quantiles, regressions, etc, without the need to revisit the entire dataset again."
-},
-
-{
-    "location": "datasurrogates.html#Linear-Regressions-1",
-    "page": "Data Surrogates",
-    "title": "Linear Regressions",
-    "category": "section",
-    "text": "The LinRegBuilder type allows you to fit any linear regression model where y can be any variable and the x\'s can be any subset of variables.# make some data\nx = randn(10^6, 10)\ny = x * range(-1, stop=1, length=10) + randn(10^6)\n\no = fit!(LinRegBuilder(11), [x y])\n\n# adds intercept term by default as last coefficient\ncoef(o; y = 11, verbose = true)"
-},
-
-{
-    "location": "datasurrogates.html#Histograms-1",
-    "page": "Data Surrogates",
-    "title": "Histograms",
-    "category": "section",
-    "text": "The Hist type for online histograms uses a different algorithm based on whether the argument to the constructor is the number of bins or the bin edges.  Hist can be used  to calculate approximate summary statistics, without the need to revisit the actual data.o = Hist(20)        # adaptively find bins\no2 = Hist(0:.5:5)  # specify the bin edges\ns = Series(o, o2)\n\nusing Random, Statistics\nfit!(s, randexp(100_000))\n\nquantile(o, .5)\nquantile(o, [.2, .8])\nmean(o)\nvar(o)\nstd(o)\n\nusing Plots\nplot(s)\nsavefig(\"hist.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -405,7 +373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Visualizations",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )x = rand(1:1000, 10^5)\ny = x .+ 30randn(10^5)\n\no = fit!(IndexedPartition(Int, Hist(20)), zip(x,y))\n\nplot(o)\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )x = rand(1:1000, 10^5)\ny = x .+ 30randn(10^5)\n\no = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))\n\nplot(o)\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )"
 },
 
 {
@@ -633,11 +601,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "api.html#OnlineStats.HeatMap",
+    "page": "API",
+    "title": "OnlineStats.HeatMap",
+    "category": "type",
+    "text": "Heatmap(xedges, yedges; left = true, closed = true)\n\nCreate a two dimensional histogram with the bin partition created by xedges and yedges.   When fitting a new observation, the first value will be associated with X, the second with Y.\n\nIf left, the bins will be left-closed.\nIf closed, the bins on the ends will be closed.  See Hist.\n\nExample\n\no = fit!(HeatMap(-5:.1:5, -5:.1:5), eachrow(randn(10^5, 2)))\n\nusing Plots\nplot(o)\n\n\n\n\n\n"
+},
+
+{
     "location": "api.html#OnlineStats.Hist",
     "page": "API",
     "title": "OnlineStats.Hist",
     "category": "type",
-    "text": "Hist(nbins)\nHist(edges)\n\nCalculate a histogram over fixed edges or adaptive nbins.\n\nExample\n\nusing OnlineStats, Statistics\ny = randn(10^6)\n\no = fit!(Hist(20), y)\nquantile(o)\nmean(o)\nvar(o)\nstd(o)\nextrema(o)\nOnlineStats.pdf(o, 0.0)\nOnlineStats.cdf(o, 0.0)\n\n\n\n\n\n"
+    "text": "Hist(edges; left = true, closed = true)\n\nCreate a histogram with bin partition defined by edges.\n\nIf left, the bins will be left-closed.\nIf closed, the bin on the end will be closed.\nE.g. for a two bin histogram a b) b c) vs. a b) b c\n\nExample\n\no = fit!(Hist(-5:.1:5), randn(10^6))\n\n# approximate statistics \nusing Statistics\n\nmean(o)\nvar(o)\nstd(o)\nquantile(o)\nmedian(o)\nextrema(o)\n\n\n\n\n\n"
 },
 
 {
@@ -654,6 +630,14 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.IndexedPartition",
     "category": "type",
     "text": "IndexedPartition(T, stat, b=100)\n\nSummarize data with stat over a partition of size b where the data is indexed by a  variable of type T.\n\nExample\n\no = IndexedPartition(Float64, Hist(10))\nfit!(o, randn(10^4, 2))\n\nusing Plots \nplot(o)\n\n\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.KHist",
+    "page": "API",
+    "title": "OnlineStats.KHist",
+    "category": "type",
+    "text": "KHist(k::Int)\n\nEstimate the probability density of a univariate distribution at k approximately  equally-spaced points.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\nExample\n\no = fit!(KHist(25), randn(10^6))\n\n# Approximate statistics\nusing Statistics\nmean(o)\nvar(o)\nstd(o)\nquantile(o)\nmedian(o)\n\nusing Plots\nplot(o)\n\n\n\n\n\n"
 },
 
 {
@@ -902,22 +886,6 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.confint",
     "category": "function",
     "text": "confint(b::Bootstrap, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.AdaptiveBins",
-    "page": "API",
-    "title": "OnlineStats.AdaptiveBins",
-    "category": "type",
-    "text": "Calculate a histogram adaptively.\n\nRef: http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf\n\n\n\n\n\n"
-},
-
-{
-    "location": "api.html#OnlineStats.Hist2",
-    "page": "API",
-    "title": "OnlineStats.Hist2",
-    "category": "type",
-    "text": "Hist2(nbins)\n\nA faster adaptive histogram than Hist(nbins), but can end up with many bin counts of  zero on both sides of the distribution.\n\nExample\n\ny = randn(10^7)\nfit!(OnlineStats.Hist2(100), y)\n\n\n\n\n\n"
 },
 
 {
