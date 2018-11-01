@@ -117,13 +117,9 @@ end
     x, y = value(o)
     y2 = normed ? y ./ area(o) : y
     xlim --> extrema(o.ex)
-    @series begin
-        x, y2
-    end
-    @series begin 
-        seriestype --> :sticks 
-        x, y2
-    end
+    fillto --> 0
+    alpha --> .2
+    x, y2
 end
 
 #-----------------------------------------------------------------------# CountMap

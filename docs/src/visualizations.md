@@ -15,7 +15,7 @@ gr()
 ## Many Stats Can Be Plotted via Plot Recipes
 
 ```@example setup
-s = fit!(Series(Hist(25), Hist(-5:5)), randn(10^6))
+s = fit!(Series(KHist(25), Hist(-5:5)), randn(10^6))
 plot(s)
 savefig("plot_series.png") # hide
 ```
