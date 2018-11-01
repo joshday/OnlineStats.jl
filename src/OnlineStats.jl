@@ -62,5 +62,6 @@ include("stats/kahan.jl")
 include("viz/partition.jl")
 include("viz/mosaicplot.jl")
 include("viz/recipes.jl")
+include("viz/heatmap.jl")
 include("viz/plotbivariate.jl")
 end

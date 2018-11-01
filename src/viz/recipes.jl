@@ -126,13 +126,6 @@ end
     end
 end
 
-@recipe function f(o::HeatMap)
-    seriestype --> :heatmap 
-    z = Float64.(o.counts)
-    z[z .== 0] .= NaN
-    midpoints(o.xedges), midpoints(o.yedges), z
-end
-
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap, kys = keys(o); sortby = :keys)
     seriestype --> :bar 
