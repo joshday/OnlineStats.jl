@@ -5,16 +5,16 @@ Random.seed!(123)
 #-----------------------------------------------------------------------# readme plot
 @info "Plot 1"
 y = cumsum(randn(10^6)) + 100randn(10^6)
-o = Partition(Hist(10))
+o = Partition(KHist(10))
 fit!(o, y)
 p1 = plot(o)
 
 @info "Plot 2"
 p2 = plot(
-    plot(fit!(Hist(50), y[1:5_000])),
-    plot(fit!(Hist(50), y[1:200_000])),
-    plot(fit!(Hist(50), y[1:500_000])),
-    plot(fit!(Hist(50), y))
+    plot(fit!(KHist(50), y[1:5_000])),
+    plot(fit!(KHist(50), y[1:200_000])),
+    plot(fit!(KHist(50), y[1:500_000])),
+    plot(fit!(KHist(50), y))
 )
 
 @info "Plot 3"
@@ -115,6 +115,6 @@ p
 
 
 #-----------------------------------------------------------------------# Logo
-# o = fit!(Partition(Hist(8)), sin.(0:.001:2π) + .4randn(length(0:.001:2π)))
+# o = fit!(Partition(KHist(8)), sin.(0:.001:2π) + .4randn(length(0:.001:2π)))
 # p = plot(o, color = :viridis, grid=false, axis=false, legend=false, ms=4
 # png(p, "/Users/joshday/Desktop/logo.png")

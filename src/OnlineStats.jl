@@ -30,9 +30,9 @@ export
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
     FastNode, FastTree, FastForest, FTSeries, 
     Group, GroupBy,
-    Hist, HyperLogLog,
-    Ignored, IndexedPartition,
-    KMeans,
+    HeatMap, Hist, HyperLogLog,
+    IndexedPartition,
+    KHist, KMeans,
     Lag, LinReg, LinRegBuilder,
     Mean, ModelSchema, Moments, Mosaic, MovingTimeWindow, MovingWindow, 
     NBClassifier,
@@ -51,7 +51,7 @@ include("utils.jl")
 include("algorithms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")
-include("stats/hist.jl")
+include("stats/histograms.jl")
 include("stats/ml.jl")
 include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")

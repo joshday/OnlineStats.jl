@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------# General
 const Tup = Union{Tuple, NamedTuple}
-const XY = Union{AbstractVector, Tup} # Also Pair?
+const XY = Union{AbstractVector, Tup, Pair}
 const VectorOb = Union{AbstractVector, Tup}
 const TwoThings{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names, Tuple{T,S}}} where names
 
@@ -60,5 +60,21 @@ Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
 # convenience methods
 # deprecate?
 fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, eachrow(x))
-
+fit!(o::OnlineStat{XY}, x::AbstractMatrix) = fit!(o, eachrow(x))
 fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, eachrow(xy...))
+
+
+#-----------------------------------------------------------------------# text_histogram
+const ticks = ['▁','▂','▃','▄','▅','▆','▇']
+
+function text_histogram(x)
+    out = ""
+    if !isempty(x)
+        a, b = extrema(x)
+        for xi in x 
+            i = round(Int, 7 * (xi-a) / (b-a))
+            out *= i == 0 ? ' ' : ticks[i]
+        end
+    end
+    out
+end
