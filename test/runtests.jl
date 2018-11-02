@@ -1,6 +1,6 @@
 module OnlineStatsTests
+
 using OnlineStats, Test, Statistics, Random, LinearAlgebra, Dates
-# using Plots
 O = OnlineStats
 import StatsBase: countmap, fit, Histogram
 import DataStructures: OrderedDict, SortedDict

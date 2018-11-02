@@ -12,6 +12,7 @@ function smooth!(a, b, γ)
     end
 end
 
+# upper triangle
 function smooth_syr!(A::AbstractMatrix, x, γ::Number)
     for j in 1:size(A, 2), i in 1:j
         A[i, j] = smooth(A[i,j], x[i] * conj(x[j]), γ)

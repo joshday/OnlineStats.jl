@@ -281,12 +281,18 @@ function _fit!(o::CovMatrix{T}, x) where {T}
     γ = o.weight(o.n += 1)
     if isempty(o.A)
         p = length(x)
-        o.b = Vector{T}(undef, p)
-        o.A = Matrix{T}(undef, p, p)
-        o.value = Matrix{T}(undef, p, p)
+        o.b = zeros(T, p)
+        o.A = zeros(T, p, p)
+        o.value = zeros(T, p, p)
     end
     smooth!(o.b, x, γ)
     smooth_syr!(o.A, x, γ)
+    if any(isnan, o.b) 
+        @show o.b 
+        @show o.A 
+        @show x 
+        @show γ
+    end
 end
 nvars(o::CovMatrix) = size(o.A, 1)
 function value(o::CovMatrix; corrected::Bool = true)
