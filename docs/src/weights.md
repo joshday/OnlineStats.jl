@@ -1,4 +1,4 @@
-# Weight
+# Weights
 
 Many `OnlineStat`s are parameterized by a `Weight` that controls the influence of new observations.  If the `OnlineStat` is capable of calculating the same result as a corresponding offline estimator, it will have a keyword argument `weight`.  If the `OnlineStat` uses stochastic approximation, it will have a keyword argument `rate`.  
 
@@ -11,7 +11,7 @@ Consider how weights affect the influence of the next observation on an online m
 !!! note 
     The values produced by a `Weight` must follow two rules:
     1. ``\gamma_1 = 1`` (guarantees ``\theta^{(1)} = x_1``)
-    1. ``\gamma_t \in (0, 1), \quad \forall t > 1`` (guarantees ``\theta^{(t)}`` stays inside a convex space)
+    2. ``\gamma_t \in (0, 1), \quad \forall t > 1`` (guarantees ``\theta^{(t)}`` stays inside a convex space)
 
 ```@raw html
 <br>
@@ -19,6 +19,9 @@ Consider how weights affect the influence of the next observation on an online m
 ```
 
 ## Weight Types
+
+
+
 ```@docs
 EqualWeight
 ExponentialWeight

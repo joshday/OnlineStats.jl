@@ -287,12 +287,6 @@ function _fit!(o::CovMatrix{T}, x) where {T}
     end
     smooth!(o.b, x, γ)
     smooth_syr!(o.A, x, γ)
-    if any(isnan, o.b) 
-        @show o.b 
-        @show o.A 
-        @show x 
-        @show γ
-    end
 end
 nvars(o::CovMatrix) = size(o.A, 1)
 function value(o::CovMatrix; corrected::Bool = true)
