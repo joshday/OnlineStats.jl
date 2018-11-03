@@ -106,23 +106,23 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#",
-    "page": "Weight",
-    "title": "Weight",
+    "page": "Weights",
+    "title": "Weights",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "weights.html#Weight-1",
-    "page": "Weight",
-    "title": "Weight",
+    "location": "weights.html#Weights-1",
+    "page": "Weights",
+    "title": "Weights",
     "category": "section",
     "text": "Many OnlineStats are parameterized by a Weight that controls the influence of new observations.  If the OnlineStat is capable of calculating the same result as a corresponding offline estimator, it will have a keyword argument weight.  If the OnlineStat uses stochastic approximation, it will have a keyword argument rate.  Consider how weights affect the influence of the next observation on an online mean theta^(t), as many OnlineStats use updates of this form.  A larger weight  gamma_t puts higher influence on the new observation x_t:theta^(t) = (1-gamma_t)theta^(t-1) + gamma_t x_tnote: Note\nThe values produced by a Weight must follow two rules:gamma_1 = 1 (guarantees theta^(1) = x_1)\ngamma_t in (0 1) quad forall t  1 (guarantees theta^(t) stays inside a convex space)<br>\n<img src=\"https://user-images.githubusercontent.com/8075494/29486708-a52b9de6-84ba-11e7-86c5-debfc5a80cca.png\" height=450>"
 },
 
 {
     "location": "weights.html#OnlineStatsBase.EqualWeight",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.EqualWeight",
     "category": "type",
     "text": "EqualWeight()\n\nEqually weighted observations.  \n\nγ(t) = 1  t\n\n\n\n\n\n"
@@ -130,7 +130,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#OnlineStatsBase.ExponentialWeight",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.ExponentialWeight",
     "category": "type",
     "text": "ExponentialWeight(λ::Float64)\nExponentialWeight(lookback::Int)\n\nExponentially weighted observations.  The first weight is 1.0 and all else are  λ = 2 / (lookback + 1).\n\nγ(t) = λ\n\n\n\n\n\n"
@@ -138,7 +138,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#OnlineStatsBase.LearningRate",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.LearningRate",
     "category": "type",
     "text": "LearningRate(r = .6)\n\nSlowly decreasing weight.  Satisfies the standard stochastic approximation assumption   γ(t) =   γ(t)^2   if r  (5 1.\n\nγ(t) = inv(t ^ r)\n\n\n\n\n\n"
@@ -146,7 +146,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#OnlineStatsBase.HarmonicWeight",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.HarmonicWeight",
     "category": "type",
     "text": "HarmonicWeight(a = 10.0)\n\nWeight determined by harmonic series.  \n\nγ(t) = a  (a + t - 1)\n\n\n\n\n\n"
@@ -154,7 +154,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#OnlineStatsBase.McclainWeight",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.McclainWeight",
     "category": "type",
     "text": "McclainWeight(α = .1)\n\nWeight which decreases into a constant.\n\nγ(t) = γ(t-1)  (1 + γ(t-1) - α)\n\n\n\n\n\n"
@@ -162,7 +162,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#Weight-Types-1",
-    "page": "Weight",
+    "page": "Weights",
     "title": "Weight Types",
     "category": "section",
     "text": "EqualWeight\nExponentialWeight\nLearningRate\nHarmonicWeight\nMcclainWeight"
@@ -170,7 +170,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#OnlineStatsBase.Bounded",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.Bounded",
     "category": "type",
     "text": "Bounded(w::Weight, λ::Float64)\n\nBound the weight by a constant.\n\nγ(t) = max(γ(t) λ)\n\n\n\n\n\n"
@@ -178,7 +178,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#OnlineStatsBase.Scaled",
-    "page": "Weight",
+    "page": "Weights",
     "title": "OnlineStatsBase.Scaled",
     "category": "type",
     "text": "Scaled(w::Weight, λ::Float64)\n\nScale a weight by a constant.\n\nγ(t) = λ * γ(t)\n\n\n\n\n\n"
@@ -186,7 +186,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#Weight-wrappers-1",
-    "page": "Weight",
+    "page": "Weights",
     "title": "Weight wrappers",
     "category": "section",
     "text": "OnlineStatsBase.Bounded\nOnlineStatsBase.Scaled"
@@ -194,58 +194,10 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "weights.html#Custom-Weighting-1",
-    "page": "Weight",
+    "page": "Weights",
     "title": "Custom Weighting",
     "category": "section",
     "text": "The Weight can be any callable object that receives the number of observations as its argument.  For example:weight = inv will have the same result as weight = EqualWeight().\nweight = x -> x == 1 ? 1.0 : .01 will have the same result as weight = ExponentialWeight(.01)using OnlineStats # hide\ny = randn(100);\n\nfit!(Mean(weight = EqualWeight()), y)\nfit!(Mean(weight = inv), y)\n\nfit!(Mean(weight = ExponentialWeight(.01)), y)\nfit!(Mean(weight = x -> x == 1 ? 1.0 : .01), y)"
-},
-
-{
-    "location": "howfitworks.html#",
-    "page": "How fit! Works",
-    "title": "How fit! Works",
-    "category": "page",
-    "text": "using OnlineStats"
-},
-
-{
-    "location": "howfitworks.html#How-fit!-Works-1",
-    "page": "How fit! Works",
-    "title": "How fit! Works",
-    "category": "section",
-    "text": "Stats are subtypes of OnlineStat{T} where T is the type of a single observation.\nE.g. Mean <: OnlineStat{Number}\nWhen you try to fit!(o::OnlineStat{T}, data::T), o will be updated with the single observation data.\nWhen you try to fit!(o::OnlineStat{T}, data::S), OnlineStats will attempt to iterate through data and fit! each item."
-},
-
-{
-    "location": "howfitworks.html#Why-is-Fitting-Based-on-Iteration?-1",
-    "page": "How fit! Works",
-    "title": "Why is Fitting Based on Iteration?",
-    "category": "section",
-    "text": ""
-},
-
-{
-    "location": "howfitworks.html#Reason-1:-OnlineStats-doesn\'t-want-to-make-assumptions-on-the-shape-of-your-data-1",
-    "page": "How fit! Works",
-    "title": "Reason 1: OnlineStats doesn\'t want to make assumptions on the shape of your data",
-    "category": "section",
-    "text": "Consider CovMatrix, for which a single observation is an AbstractVector, Tuple, or NamedTuple. If I try to update it with a Matrix, it\'s ambiguous whether I want rows or columns of  the matrix to be treated as individual observations.  By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly  use the OnlineStatsBase.eachrow and OnlineStatsBase.eachcol functions, which efficiently iterate over  the rows or columns of the matrix, respectively.fit!(CovMatrix(), eachrow(randn(1000,2)))\n\nfit!(CovMatrix(), eachcol(randn(2,1000)))"
-},
-
-{
-    "location": "howfitworks.html#Reason-2:-OnlineStats-naturally-works-out-of-the-box-with-many-data-structures-1",
-    "page": "How fit! Works",
-    "title": "Reason 2: OnlineStats naturally works out-of-the-box with many data structures",
-    "category": "section",
-    "text": "Tabular data structures such as those in JuliaDB iterate over named tuples of rows, so things like this just work:using JuliaDB\n\nt = table(randn(100), randn(100))\n\nfit!(2Mean(), t)"
-},
-
-{
-    "location": "howfitworks.html#A-Common-Error-1",
-    "page": "How fit! Works",
-    "title": "A Common Error",
-    "category": "section",
-    "text": "Consider the following example:fit!(Mean(), \"asdf\")This causes an error because:\"asdf\" is not a Number, so OnlineStats attempts to iterate through it\nIterating through \"asdf\" begins with the character \'a\'"
 },
 
 {
@@ -390,6 +342,54 @@ var documenterSearchIndex = {"docs": [
     "title": "Demos",
     "category": "section",
     "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.  "
+},
+
+{
+    "location": "howfitworks.html#",
+    "page": "How fit! Works",
+    "title": "How fit! Works",
+    "category": "page",
+    "text": "using OnlineStats"
+},
+
+{
+    "location": "howfitworks.html#How-fit!-Works-1",
+    "page": "How fit! Works",
+    "title": "How fit! Works",
+    "category": "section",
+    "text": "Stats are subtypes of OnlineStat{T} where T is the type of a single observation.\nE.g. Mean <: OnlineStat{Number}\nWhen you try to fit!(o::OnlineStat{T}, data::T), o will be updated with the single observation data.\nWhen you try to fit!(o::OnlineStat{T}, data::S), OnlineStats will attempt to iterate through data and fit! each item."
+},
+
+{
+    "location": "howfitworks.html#Why-is-Fitting-Based-on-Iteration?-1",
+    "page": "How fit! Works",
+    "title": "Why is Fitting Based on Iteration?",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "howfitworks.html#Reason-1:-OnlineStats-doesn\'t-want-to-make-assumptions-on-the-shape-of-your-data-1",
+    "page": "How fit! Works",
+    "title": "Reason 1: OnlineStats doesn\'t want to make assumptions on the shape of your data",
+    "category": "section",
+    "text": "Consider CovMatrix, for which a single observation is an AbstractVector, Tuple, or NamedTuple. If I try to update it with a Matrix, it\'s ambiguous whether I want rows or columns of  the matrix to be treated as individual observations.  By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly  use the OnlineStatsBase.eachrow and OnlineStatsBase.eachcol functions, which efficiently iterate over  the rows or columns of the matrix, respectively.fit!(CovMatrix(), eachrow(randn(1000,2)))\n\nfit!(CovMatrix(), eachcol(randn(2,1000)))"
+},
+
+{
+    "location": "howfitworks.html#Reason-2:-OnlineStats-naturally-works-out-of-the-box-with-many-data-structures-1",
+    "page": "How fit! Works",
+    "title": "Reason 2: OnlineStats naturally works out-of-the-box with many data structures",
+    "category": "section",
+    "text": "Tabular data structures such as those in JuliaDB iterate over named tuples of rows, so things like this just work:using JuliaDB\n\nt = table(randn(100), randn(100))\n\nfit!(2Mean(), t)"
+},
+
+{
+    "location": "howfitworks.html#A-Common-Error-1",
+    "page": "How fit! Works",
+    "title": "A Common Error",
+    "category": "section",
+    "text": "Consider the following example:fit!(Mean(), \"asdf\")This causes an error because:\"asdf\" is not a Number, so OnlineStats attempts to iterate through it\nIterating through \"asdf\" begins with the character \'a\'"
 },
 
 {
