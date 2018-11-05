@@ -725,13 +725,13 @@ Track a univariate mean.
 
     @time fit!(Mean(), randn(10^6))
 """
-mutable struct Mean{W} <: OnlineStat{Number}
-    μ::Float64
+mutable struct Mean{T,W} <: OnlineStat{Number}
+    μ::T
     weight::W
     n::Int
 end
-Mean(;weight = EqualWeight()) = Mean(0.0, weight, 0)
-_fit!(o::Mean, x) = (o.μ = smooth(o.μ, x, o.weight(o.n += 1)))
+Mean(T::Type = Float64; weight = EqualWeight()) = Mean(zero(T), weight, 0)
+_fit!(o::Mean{T}, x) where {T} = (o.μ = smooth(o.μ, x, T(o.weight(o.n += 1))))
 function _merge!(o::Mean, o2::Mean)
     o.n += o2.n
     o.μ = smooth(o.μ, o2.μ, o2.n / o.n)

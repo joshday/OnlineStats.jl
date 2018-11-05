@@ -392,7 +392,10 @@ end
 end
 #-----------------------------------------------------------------------# Mean
 @testset "Mean" begin
+    @inferred Mean()
+    @inferred Mean(Complex{Float64})
     test_exact(Mean(), y, mean, mean)
+    test_exact(Mean(Complex{Float64}), y + y2*im, mean, mean)
     test_merge(Mean(), y, y2)
 end
 #-----------------------------------------------------------------------# ML
