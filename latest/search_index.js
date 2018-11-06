@@ -709,7 +709,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Mean",
     "category": "type",
-    "text": "Mean(; weight=EqualWeight())\n\nTrack a univariate mean.\n\nUpdate\n\nμ = (1 - γ) * μ + γ * x\n\nExample\n\n@time fit!(Mean(), randn(10^6))\n\n\n\n\n\n"
+    "text": "Mean(T = Float64; weight=EqualWeight())\n\nTrack a univariate mean, stored as type T.\n\nExample\n\n@time fit!(Mean(), randn(10^6))\n\n\n\n\n\n"
 },
 
 {
@@ -877,7 +877,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Variance",
     "category": "type",
-    "text": "Variance(; weight=EqualWeight())\n\nUnivariate variance.\n\nExample\n\no = fit!(Variance(), randn(10^6))\nmean(o)\nvar(o)\nstd(o)\n\n\n\n\n\n"
+    "text": "Variance(T = Float64; weight=EqualWeight())\n\nUnivariate variance, tracked as type T.\n\nExample\n\no = fit!(Variance(), randn(10^6))\nmean(o)\nvar(o)\nstd(o)\n\n\n\n\n\n"
 },
 
 {
