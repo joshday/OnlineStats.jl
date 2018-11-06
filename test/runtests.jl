@@ -1,8 +1,6 @@
-module OnlineStatsTests
-
 using OnlineStats, Test, Statistics, Random, LinearAlgebra, Dates
 O = OnlineStats
-import StatsBase: countmap, fit, Histogram
+import StatsBase: countmap, fit, Histogram, sample
 import DataStructures: OrderedDict, SortedDict
 
 const y = randn(1000)
@@ -49,6 +47,7 @@ function test_merge(o, y1, y2, compare = ≈; kw...)
     @test nobs(o) == nobs(o2) == nrows(y1) + nrows(y2)
 end
 
+# @test compare(fo(fit!(o,y)), fy(y))
 function test_exact(o, y, fo, fy::Function, compare = ≈; kw...)
     fit!(o, y)
     for (v1, v2) in zip(fo(o), fy(y))
@@ -58,6 +57,8 @@ function test_exact(o, y, fo, fy::Function, compare = ≈; kw...)
     end
     @test nobs(o) == nrows(y)
 end
+
+# @test compare(fo(fit!(o,y )), fy)
 function test_exact(o, y, fo, fy, compare = ≈; kw...)
     fit!(o, y)
     for (v1, v2) in zip(fo(o), fy)
@@ -73,6 +74,17 @@ nrows(m::AbstractMatrix) = size(m, 1)
 nrows(t::Tuple) = length(t[2])
 nrows(y::Base.Iterators.Zip2) = length(y)
 
+function testfit(o::OnlineStat, y, val, compare = ≈)
+    @test nobs(o) == nobs(o)
+    @test compare(value(fit!(o, y)), val)
+end
+
+function testmerge(o::OnlineStat, y, compare = ≈; n=10)
+    for i in 1:n 
+        a = sample(y, floor(Int, length(y)/2); replace=false)
+        b = sample(y, floor(Int, length(y)/2); replace=false)
+    end
+end
 
 #-----------------------------------------------------------------------# utils
 println("\n\n")
@@ -395,6 +407,7 @@ end
     @inferred Mean()
     @inferred Mean(Complex{Float64})
     test_exact(Mean(), y, mean, mean)
+    test_exact(Mean(BigFloat), big.(y), mean, mean, ≈, atol=1e-16)
     test_exact(Mean(Complex{Float64}), y + y2*im, mean, mean)
     test_merge(Mean(), y, y2)
 end
@@ -609,5 +622,3 @@ end
 end
 
 include("test_kahan.jl")
-
-end #module

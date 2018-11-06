@@ -15,9 +15,9 @@ end
 
 #-----------------------------------------------------------------------# Variance
 """
-    Variance(; weight=EqualWeight())
+    Variance(T = Float64; weight=EqualWeight())
 
-Univariate variance.
+Univariate variance, tracked as type `T`.
 
 # Example
 
@@ -26,19 +26,21 @@ Univariate variance.
     var(o)
     std(o)
 """
-mutable struct Variance{W} <: OnlineStat{Number}
-    σ2::Float64
-    μ::Float64
+mutable struct Variance{T, W} <: OnlineStat{Number}
+    σ2::T
+    μ::T
     weight::W
     n::Int
 end
-Variance(;weight = EqualWeight()) = Variance(0.0, 0.0, weight, 0)
+function Variance(T::Type{<:Number} = Float64; weight = EqualWeight()) 
+    Variance(zero(T), zero(T), weight, 0)
+end
 Base.copy(o::Variance) = Variance(o.σ2, o.μ, o.weight, o.n)
-function _fit!(o::Variance, x)
+function _fit!(o::Variance{T}, x) where {T}
     μ = o.μ
-    γ = o.weight(o.n += 1)
-    o.μ = smooth(o.μ, x, γ)
-    o.σ2 = smooth(o.σ2, (x - o.μ) * (x - μ), γ)
+    γ = T(o.weight(o.n += 1))
+    o.μ = smooth(o.μ, T(x), γ)
+    o.σ2 = smooth(o.σ2, (T(x) - o.μ) * (T(x) - μ), γ)
 end
 function _merge!(o::Variance, o2::Variance)
     γ = o2.n / (o.n += o2.n)
@@ -713,13 +715,9 @@ end
 
 #-----------------------------------------------------------------------# Mean
 """
-    Mean(; weight=EqualWeight())
+    Mean(T = Float64; weight=EqualWeight())
 
-Track a univariate mean.
-
-# Update
-
-``μ = (1 - γ) * μ + γ * x``
+Track a univariate mean, stored as type `T`.
 
 # Example
 
@@ -730,7 +728,7 @@ mutable struct Mean{T,W} <: OnlineStat{Number}
     weight::W
     n::Int
 end
-Mean(T::Type = Float64; weight = EqualWeight()) = Mean(zero(T), weight, 0)
+Mean(T::Type{<:Number} = Float64; weight = EqualWeight()) = Mean(zero(T), weight, 0)
 _fit!(o::Mean{T}, x) where {T} = (o.μ = smooth(o.μ, x, T(o.weight(o.n += 1))))
 function _merge!(o::Mean, o2::Mean)
     o.n += o2.n
