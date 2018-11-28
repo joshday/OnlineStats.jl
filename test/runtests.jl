@@ -72,7 +72,7 @@ end
 nrows(v::O.VectorOb) = length(v)
 nrows(m::AbstractMatrix) = size(m, 1)
 nrows(t::Tuple) = length(t[2])
-nrows(y::Base.Iterators.Zip2) = length(y)
+nrows(y::Base.Iterators.Zip2) = length(y)  # Fix for Julia 1.1
 
 function testfit(o::OnlineStat, y, val, compare = ≈)
     @test nobs(o) == nobs(o)
