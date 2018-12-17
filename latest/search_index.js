@@ -637,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.KMeans",
     "category": "type",
-    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nclusters = rand(Bool, 10^5)\n\nx = [clusters[i] > .5 ? randn() : 5 + randn() for i in 1:10^5, j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\n\n\n\n\n"
+    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nx = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\nsort!(o; rev=true)  # Order clusters by number of observations\n\n\n\n\n\n"
 },
 
 {
@@ -878,6 +878,14 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.confint",
     "category": "function",
     "text": "confint(b::Bootstrap, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Cluster",
+    "page": "API",
+    "title": "OnlineStats.Cluster",
+    "category": "type",
+    "text": "Cluster center and the number of observations\n\n\n\n\n\n"
 },
 
 {
