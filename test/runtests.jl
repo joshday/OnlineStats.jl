@@ -1,193 +1,179 @@
-using OnlineStats, Test, Statistics, Random, LinearAlgebra, Dates
-O = OnlineStats
-import StatsBase: countmap, fit, Histogram, sample
-import DataStructures: OrderedDict, SortedDict
-
-const y = randn(1000)
-const y2 = randn(1000)
-const x = randn(1000, 5)
-const x2 = randn(1000, 5)
-const z = Complex.(randn(10000, 5), randn(10000, 5))
-const z2 = Complex.(randn(10000, 5), randn(10000, 5))
-#-----------------------------------------------------------------------# Custom Printing
-@info("Custom Printing")
-for stat in [
-        BiasVec([1,2,3])
-        Bootstrap(Mean())
-        CallFun(Mean(), println)
-        FastNode(5)
-        FastTree(5)
-        FastForest(5)
-        FTSeries(Variance())
-        3Mean()
-        HyperLogLog(10)
-        LinRegBuilder(4)
-        NBClassifier(5, Float64)
-        ProbMap(Int)
-        P2Quantile(.5)
-        Series(Mean())
-        StatLearn(5)
-        ]
-    println("  > ", stat)
-end
-
-#-----------------------------------------------------------------------# test helpers
-
-function test_merge(o, y1, y2, compare = ≈; kw...)
-    o2 = copy(o)
-    fit!(o, y1)
-    fit!(o2, y2)
-    merge!(o, o2)
-    fit!(o2, y1)
-    for (v1, v2) in zip(value(o), value(o2))
-        result = compare(v1, v2; kw...)
-        result || @warn("Test Merge Failure: $v1 != $v2")
-        @test result
-    end
-    @test nobs(o) == nobs(o2) == nrows(y1) + nrows(y2)
-end
-
-# @test compare(fo(fit!(o,y)), fy(y))
-function test_exact(o, y, fo, fy::Function, compare = ≈; kw...)
-    fit!(o, y)
-    for (v1, v2) in zip(fo(o), fy(y))
-        result = compare(v1, v2; kw...)
-        result || @warn("Test Exact Failure: $v1 != $v2")
-        @test result
-    end
-    @test nobs(o) == nrows(y)
-end
-
-# @test compare(fo(fit!(o,y )), fy)
-function test_exact(o, y, fo, fy, compare = ≈; kw...)
-    fit!(o, y)
-    for (v1, v2) in zip(fo(o), fy)
-        result = compare(v1, v2; kw...)
-        result || @warn("Test Exact Failure: $v1 != $v2")
-        @test result
-    end
-    @test nobs(o) == nrows(y)
-end
-
-nrows(v::O.VectorOb) = length(v)
-nrows(m::AbstractMatrix) = size(m, 1)
-nrows(t::Tuple) = length(t[2])
-nrows(y::Base.Iterators.Zip2) = length(y)  # Fix for Julia 1.1
-
-function testfit(o::OnlineStat, y, val, compare = ≈)
-    @test nobs(o) == nobs(o)
-    @test compare(value(fit!(o, y)), val)
-end
-
-function testmerge(o::OnlineStat, y, compare = ≈; n=10)
-    for i in 1:n 
-        a = sample(y, floor(Int, length(y)/2); replace=false)
-        b = sample(y, floor(Int, length(y)/2); replace=false)
-    end
-end
+using OnlineStats, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
+using DataStructures: SortedDict
 
 #-----------------------------------------------------------------------# utils
-println("\n\n")
-@info("Testing Utils")
-@testset "utils" begin
-    @test O._dot((1,2,3), (4,5,6)) == sum([1,2,3] .* [4,5,6])
-    @test length(BiasVec((1,2,3))) == 4
-    @test size(BiasVec([1,2,3])) == (4,)
-    @test Base.IndexStyle(BiasVec{Float64, Vector{Float64}}) == IndexLinear()
+n = 1000
+x,  y,  z  = rand(Bool, n), randn(n), rand(1:10, n)
+x2, y2, z2 = rand(Bool, n), randn(n), rand(1:10, n)
+xs, ys, zs = vcat(x, x2), vcat(y, y2), vcat(z, z2)
+
+p = 5
+xmat,  ymat,  zmat  = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
+xmat2, ymat2, zmat2 = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
+
+# get the value of two stats: one created by fitting and one by merging
+function mergestats(o1::OnlineStat, y1, y2)
+    o2 = copy(o1)
+    fit!(o1, y1)
+    fit!(o2, y2)
+    merge!(o1, o2)
+    fit!(o2, y1)
+    @test nobs(o1) == nobs(o2) == length(y1) + length(y2)
+    o2, o2
 end
+mergevals(o1::OnlineStat, y1, y2) = map(value, mergestats(o1, y1, y2))
 
-
-println("\n\n")
-@info("Testing Stats")
+@info "Testing Stats..."
 #-----------------------------------------------------------------------# AutoCov
 @testset "AutoCov" begin
-    test_exact(AutoCov(10), y, autocov, autocov(y, 0:10))
-    test_exact(AutoCov(10), y, autocor, autocor(y, 0:10))
-    test_exact(AutoCov(10), y, nobs, length)
+    o = fit!(AutoCov(10), y)
+    @test autocov(o) ≈ autocov(y, 0:10)
+    @test autocor(o) ≈ autocor(y, 0:10)
+    @test nobs(o) == n
 end
 #-----------------------------------------------------------------------# Bootstrap
 @testset "Bootstrap" begin
     o = fit!(Bootstrap(Mean(), 100, [1]), y)
     @test all(value.(o.replicates) .== value(o.stat))
-    @test length(confint(o)) == 2
+    c = confint(o)
+    @test length(c) == 2
+    @test c[1] ≤ c[2]
 end
 #-----------------------------------------------------------------------# CallFun
 @testset "CallFun" begin
-    test_merge(CallFun(Mean(), x->nothing), y, y2)
-    test_exact(CallFun(Mean(), x->nothing), y, value, mean)
+    i = 0
+    o = fit!(CallFun(Mean(), x -> i+=1), y)
+    @test value(o) ≈ mean(y)
+    @test i == n
+    @test ≈(mergevals(CallFun(Mean(), x->nothing), y, y2)...)
 end
 #-----------------------------------------------------------------------# CountMap
 @testset "CountMap" begin
-    test_exact(CountMap(Int), rand(1:10, 100), nobs, length, ==)
-    test_exact(CountMap(Int), rand(1:10, 100), o->sort(value(o)), x->sort(countmap(x)), ==)
-    test_exact(CountMap(Int), [1,2,3,4], o->O.pdf(o,1), x->.25, ==)
-    test_merge(CountMap(SortedDict{Bool, Int}()), rand(Bool, 100), rand(Bool, 100), ==)
-    test_merge(CountMap(SortedDict{Bool, Int}()), trues(100), falses(100), ==)
-    test_merge(CountMap(SortedDict{Int, Int}()), rand(1:4, 100), rand(5:123, 50), ==)
-    test_merge(CountMap(SortedDict{Int, Int}()), rand(1:4, 100), rand(5:123, 50), ==)
-    test_merge(CountMap(SortedDict{String,Int}()), rand(["A","B"], 100), rand(["A","C"], 100), ==)
-    o = fit!(CountMap(Int), [1,2,3,4])
-    # @test all([1,2,3,4] .∈ keys(o.value))
-    @test probs(o) == fill(.25, 4)
-    @test probs(o, 7:9) == zeros(3)
+    a = fit!(CountMap(Bool), x)
+    @test sort(value(a)) == sort(countmap(x))
+    @test OnlineStats.pdf(a, true) == mean(x)
+    @test OnlineStats.pdf(a, false) == mean(!, x)
+    @test OnlineStats.pdf(a, 2) == 0.0
+
+    b = fit!(CountMap(Int), z)
+    @test sort(value(b)) == sort(countmap(z))
+    for i in 1:11
+        @test OnlineStats.pdf(b, i) ≈ sum(==(i), z) / n
+    end
+    @test all(x -> 0 < x < 1, probs(b))
+    @test probs(b, 11:13) == zeros(3)
+
+    c = fit!(CountMap(SortedDict{Bool, Int}()), x)
+    @test value(c) == sort(countmap(x))
+    @test probs(c) == [mean(!, x), mean(x)]
+
+    d = fit!(CountMap(SortedDict{Int,Int}()), z)
+    @test value(d) == sort(countmap(z))
+
+    @test ==(mergevals(CountMap(Bool), x, x2)...)
+    @test ==(mergevals(CountMap(SortedDict{Bool,Int}()), x, x2)...)
+    @test ==(mergevals(CountMap(Int), z, z2)...)
+    @test ==(mergevals(CountMap(SortedDict{Int,Int}()), z, z2)...)
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin
-    test_exact(CovMatrix(Float64, 5), x, var, x -> var(x, dims=1))
-    test_exact(CovMatrix(5), x, var, x -> var(x, dims=1))
-    test_exact(CovMatrix(), x, std, x -> std(x, dims=1))
-    test_exact(CovMatrix(5), x, mean, x -> mean(x, dims=1))
-    test_exact(CovMatrix(), x, cor, cor)
-    test_exact(CovMatrix(5), x, cov, cov)
-    test_exact(CovMatrix(), x, o->cov(o; corrected=false), cov(x, dims=1, corrected=false))
-    a = fit!(CovMatrix(), x)
-    b = fit!(CovMatrix(), x2)
-    c = merge(a, b)
-    if any(isnan, value(c))
-        @warn "Covariance value is NaN" a b c
-    end
-    test_merge(CovMatrix(), x, x2)
-    # Complex values
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, var, z -> var(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}), z, std, z -> std(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, mean, z -> mean(z, dims=1))
-    # test_exact(CovMatrix(Complex{Float64}), z, cor, cor)
-    # test_exact(CovMatrix(Complex{Float64}, 5), z, cov, cov)
-    # test_exact(CovMatrix(Complex{Float64}), z, o->cov(o; corrected=false), cov(z, dims=1, corrected=false))
-    # test_merge(CovMatrix(Complex{Float64}), z, z2)
-end
-#-----------------------------------------------------------------------# CStat
-@testset "CStat" begin
-    data = y + y2 * im
-    data2 = y2 + y * im
-    test_exact(CStat(Mean()), data, o->value(o)[1], mean(y))
-    test_exact(CStat(Mean()), data, o->value(o)[2], mean(y2))
-    test_exact(CStat(Mean()), data, nobs, length, ==)
-    test_merge(CStat(Mean()), y, y2)
-    test_merge(CStat(Mean()), data, data2)
+    o = fit!(CovMatrix(), ymat)
+    @test value(o) ≈ cov(ymat)
+    @test cov(o) ≈ cov(ymat)
+    @test cor(o) ≈ cor(ymat)
+    @test all(x -> ≈(x...), zip(var(o), var(ymat; dims=1)))
+    @test all(x -> ≈(x...), zip(std(o), std(ymat; dims=1)))
+    @test all(x -> ≈(x...), zip(mean(o), mean(ymat; dims=1)))
+
+    @test ≈(mergevals(CovMatrix(), eachrow(ymat), eachrow(ymat2))...)
+    @test ≈(mergevals(CovMatrix(), eachcol(ymat'), eachcol(ymat2'))...)
+    @test ≈(mergevals(CovMatrix(Complex{Float64}), eachrow(ymat * im), eachrow(ymat2))...)
+    @test ≈(mergevals(CovMatrix(Complex{Float64}), eachrow(ymat * im), eachrow(ymat2 * im))...)
 end
 #-----------------------------------------------------------------------# Diff
 @testset "Diff" begin
-    test_exact(Diff(), y, value, y -> y[end] - y[end-1])
+    @test value(fit!(Diff(), y)) == y[end] - y[end-1]
     o = fit!(Diff(Int), 1:10)
     @test diff(o) == 1
     @test last(o) == 10
 end
 #-----------------------------------------------------------------------# Extrema
 @testset "Extrema" begin
-    test_exact(Extrema(), y, extrema, extrema, ==)
-    test_exact(Extrema(), y, maximum, maximum, ==)
-    test_exact(Extrema(), y, minimum, minimum, ==)
-    test_exact(Extrema(Int), rand(Int, 100), minimum, minimum, ==)
-    test_merge(Extrema(), y, y2, ==)
+    o = fit!(Extrema(), y)
+    @test extrema(o) == extrema(y)
+    @test minimum(o) == minimum(y)
+    @test maximum(o) == maximum(y)
+
+    @test value(fit!(Extrema(Bool), x)) == extrema(x)
+    @test value(fit!(Extrema(Int), z)) == extrema(z)
+
+    @test ==(mergevals(Extrema(), y, y2)...)
+end
+#-----------------------------------------------------------------------# Fit[Dist]
+@testset "Fit[Dist]" begin
+    @testset "FitBeta" begin
+        @test value(FitBeta()) == (1.0, 1.0)
+        a, b = mergevals(FitBeta(), rand(100), rand(100))
+        @test a[1] ≈ b[1]
+        @test a[2] ≈ b[2]
+    end
+    @testset "FitCauchy" begin
+        @test value(FitCauchy()) == (0.0, 1.0)
+        a, b = mergevals(FitCauchy(), y, y2)
+        @test ≈(a[1], b[1]; atol=.5)
+        @test ≈(a[2], b[2]; atol=.5)
+    end
+    @testset "FitGamma" begin
+        @test value(FitGamma()) == (1.0, 1.0)
+        a, b = mergevals(FitGamma(), rand(100), rand(100))
+        @test a[1] ≈ b[1]
+        @test a[2] ≈ b[2]
+    end
+    @testset "FitLogNormal" begin
+        @test value(FitLogNormal()) == (0.0, 1.0)
+        a, b = mergevals(FitLogNormal(), exp.(y), exp.(y2))
+        @test a[1] ≈ b[1]
+        @test a[2] ≈ b[2]
+    end
+    @testset "FitNormal" begin
+        @test value(FitNormal()) == (0.0, 1.0)
+        a, b = mergestats(FitNormal(), y, y2)
+        @test value(a)[1] ≈ value(b)[1]
+        @test value(a)[2] ≈ value(b)[2]
+
+        @test mean(a) ≈ mean(ys)
+        @test var(a) ≈ var(ys)
+        @test std(a) ≈ std(ys)
+
+        # pdf and cdf
+        o = fit!(FitNormal(), [-1, 0, 1])
+        @test OnlineStats.pdf(o, 0.0) ≈ 0.3989422804014327
+        @test OnlineStats.pdf(o, -1.0) ≈ 0.24197072451914337
+        @test OnlineStats.cdf(o, 0.0) ≈ 0.5
+        @test ≈(OnlineStats.cdf(o, -1.0), 0.15865525393145702; atol=.001)
+    end
+    @testset "FitMultinomial" begin
+        o = FitMultinomial(5)
+        @test value(o)[2] == ones(5) / 5
+        data = [1 2 3 4 5; 1 2 3 4 5]
+        @test value(fit!(o, data))[2] == collect(2:2:10) ./ sum(data)
+
+        data1 = eachrow(rand(1:4, 10, 3))
+        data2 = eachrow(rand(2:7, 11, 3))
+        @test ==(mergestats(FitMultinomial(3), data1, data2)...)
+    end
+    @testset "FitMvNormal" begin
+        @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
+        a, b = mergevals(FitMvNormal(2), eachrow([y y2]), eachrow([y2 y]))
+        @test a[1] ≈ b[1]
+        @test a[2] ≈ b[2]
+    end
 end
 #-----------------------------------------------------------------------# FastNode
 @testset "FastNode" begin
-    data = (x,rand(1:3,1000))
-    data2 = (x,rand(1:3,1000))
-    Y = vcat(data, data2)
-    o = fit!(FastNode(5, 3), data)
+    data  = (ymat, rand(1:3,1000))
+    data2 = (ymat, rand(1:3,1000))
+    o  = fit!(FastNode(5, 3), data)
     o2 = fit!(FastNode(5, 3), data2)
     merge!(o, o2)
     fit!(o2, data)
@@ -196,23 +182,24 @@ end
         @test value(o.stats[k][j])[2] ≈ value(o2.stats[k][j])[2]
     end
     @test length(o[1]) == 3
+
     pvec = [mean(data[2] .== 1), mean(data[2] .== 2), mean(data[2] .== 3)]
-    test_exact(FastNode(5, 3), data, probs, pvec)
-    test_exact(FastNode(5, 3), data, nobs, 1000)
-    test_exact(FastNode(5, 3), data, O.nkeys, 3)
-    test_exact(FastNode(5, 3), data, O.nvars, 5)
+    o = fit!(FastNode(5, 3), data)
+    @test probs(o) == pvec
+    @test nobs(o) == 1000
+    @test OnlineStats.nkeys(o) == 3
+    @test OnlineStats.nvars(o) == 5
     @test classify(o) ∈ [1, 2, 3]
 end
 #-----------------------------------------------------------------------# FastTree
 @testset "FastTree" begin
-    X, Y = O.fakedata(FastNode, 10^4, 10)
+    X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
     o = fit!(FastTree(10; splitsize=100), (X,Y))
     @test classify(o, X[1,:]) ∈ [1, 2]
     @test all(0 .< classify(o, X) .< 3)
-    @test O.nkeys(o) == 2
-    @test O.nvars(o) == 10
+    @test OnlineStats.nkeys(o) == 2
+    @test OnlineStats.nvars(o) == 10
     @test mean(classify(o, X) .== Y) > .5
-    test_exact(FastTree(10), (X[1,:],Y[1]), length, 1)
 
     # Issue 116
     Random.seed!(218)
@@ -221,262 +208,247 @@ end
 end
 #-----------------------------------------------------------------------# FastForest
 @testset "FastForest" begin
-    X, Y = O.fakedata(FastNode, 10^4, 10)
+    X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
     o = fit!(FastForest(10; splitsize=500, λ = .7), (X, Y))
     @test classify(o, randn(10)) in 1:2
     @test mean(classify(o, X) .== Y) > .5
 end
-#-----------------------------------------------------------------------# Fit[Dist]
-@testset "Fit[Dist]" begin
-@testset "FitBeta" begin
-    test_merge(FitBeta(), rand(10), rand(10))
-    @test value(FitBeta()) == (1.0, 1.0)
-end
-@testset "FitCauchy" begin
-    test_exact(FitCauchy(), y, value, y->(0,1), atol = .5)
-    test_merge(FitCauchy(), y, y2, atol = .5)
-    @test value(FitCauchy()) == (0.0, 1.0)
-end
-@testset "FitGamma" begin
-    test_merge(FitGamma(), y, y2)
-    @test value(FitGamma()) == (1.0, 1.0)
-end
-@testset "FitLogNormal" begin
-    test_merge(FitLogNormal(), exp.(y), exp.(y2))
-    @test value(FitLogNormal()) == (0.0, 1.0)
-end
-@testset "FitNormal" begin
-    test_merge(FitNormal(), y, y2)
-    test_exact(FitNormal(), y, value, (mean(y), std(y)))
-    test_exact(FitNormal(), y, mean, mean(y))
-    test_exact(FitNormal(), y, var, var(y))
-    test_exact(FitNormal(), y, std, std(y))
-    @test value(FitNormal()) == (0.0, 1.0)
-    # pdf and cdf
-    o = fit!(FitNormal(), [-1, 0, 1])
-    @test O.pdf(o, 0.0) ≈ 0.3989422804014327
-    @test O.pdf(o, -1.0) ≈ 0.24197072451914337
-    @test O.cdf(o, 0.0) ≈ 0.5
-    @test ≈(O.cdf(o, -1.0), 0.15865525393145702; atol=.001)
-end
-@testset "FitMultinomial" begin
-    o = FitMultinomial(5)
-    @test value(o)[2] == ones(5) / 5
-    data = [1 2 3 4 5; 1 2 3 4 5]
-    test_exact(o, data, o->value(o)[2], collect(2:2:10) ./ sum(data))
-    test_merge(FitMultinomial(3), rand(1:4, 10, 3), rand(2:7, 11, 3))
-end
-@testset "FitMvNormal" begin
-    test_merge(FitMvNormal(2), [y y2], [y2 y])
-    @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
-end
-end
 #-----------------------------------------------------------------------# FTSeries
 @testset "FTSeries" begin
-    test_merge(FTSeries(Mean(), Variance(); transform = abs), y, y2)
-    test_exact(FTSeries(Mean(); transform=abs), y, o->value(o)[1], mean(abs, y))
-    data = [-1, 1, 2]
-    o = fit!(FTSeries(Mean(); filter = x->x>0), data)
-    @test o.nfiltered == 1
-    @test nobs(o) == 2
+    o = fit!(FTSeries(Mean(); transform=abs), y)
+    @test value(o)[1] ≈ mean(abs, y)
+
+    data = vcat(y, fill(missing, 20))   
+    o = fit!(FTSeries(Mean(); transform=abs, filter=!ismissing), data)
+    @test value(o)[1] ≈ mean(abs, y) 
+    @test o.nfiltered == 20
 end
 #-----------------------------------------------------------------------# Group
 @testset "Group" begin
-    o = Group(Mean(), Mean(), Mean(), Variance(), Variance())
-    @test o[1] == first(o) == Mean()
-    @test o[5] == last(o) == Variance()
-
-    test_exact(o, x, values, vcat(mean(x, dims=1)[1:3], var(x, dims=1)[4:5]))
-    test_exact(5Mean(), x, values, mean(x, dims=1))
-    test_exact(5Variance(), x, values, var(x, dims=1))
+    o = fit!(5Mean(), eachrow(ymat))
+    @test o[1] == first(o)
+    @test 5Mean() == 5Mean()
+    @test collect(map(value, value(o))) ≈ vec(mean(ymat, dims=1))
 
     o2 = Group(m1=Mean(), m2=Mean(), m3=Mean(), m4=Mean(), m5=Mean())
-    test_exact(copy(o2), x, values, mean(x, dims=1))
-    test_merge(o2, x, x2, (a,b) -> value(a) ≈ value(b))
+    fit!(o2, ymat)
+    @test collect(map(value, value(o2))) ≈ vec(mean(ymat, dims=1))
+    @test length(o2) == 5
 
-    test_merge(Group(Mean(),Variance(),Sum(),Moments(),Mean()), x, x2, (a,b) -> value(a) ≈ value(b))
-    test_merge(5Mean(), x, x2, (a,b) -> value(a) ≈ value(b))
-    test_merge(5Variance(), x, x2, (a,b) -> value(a) ≈ value(b))
-    @test 5Mean() == 5Mean()
-
-    g = fit!(5Mean(), x)
-    @test length(g) == 5
-    for (i, oi) in enumerate(g)
-        @test value(oi) ≈ mean(x[:, i])
+    a, b = mergevals(Group(Mean(),Variance(),Sum(),Moments(),Mean()), eachrow(ymat), eachrow(ymat2))
+    for (ai, bi) in zip(a, b)
+        @test value(ai) ≈ value(bi)
     end
 end
 #-----------------------------------------------------------------------# Group
 @testset "GroupBy" begin
-    o = GroupBy{Int}(Mean())
-    fit!(o, zip([1,1,2,2], 1:4))
-    @test value(value(o)[1]) ≈ 1.5
-    @test value(value(o)[2]) ≈ 3.5
+    d = value(fit!(GroupBy{Bool}(Mean()), zip(x,y)))
+    @test value(d[true]) ≈ mean(y[x])
+    @test value(d[false]) ≈ mean(y[map(!,x)])
+
+    a, b = mergevals(GroupBy{Int}(Mean()), zip(z,y), zip(z2, y2))
+    for (ai,bi) in zip(values(a), values(b))
+        @test value(ai) ≈ value(bi)
+    end
 end
 #-----------------------------------------------------------------------# HeatMap
 @testset "HeatMap" begin 
-    test_merge(HeatMap(-5:.1:5, -5:.1:5), x[:, 1:2], x2[:, 1:2])
+    data1 = eachrow(ymat[:, 1:2])
+    data2 = eachrow(ymat2[:, 1:2])
+    @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
 end
-
 #-----------------------------------------------------------------------# Hist
 @testset "Hist" begin
-    test_merge(Hist(-5:.1:5), y, y2)
-    @testset "Compare with StatsBase.Histogram" begin
+    @test ==(mergevals(Hist(-5:.1:5), y, y2)...)
+    @testset "Hist compared to StatsBase.Histogram" begin
         for edges in (-5:5, collect(-5:5), [-5, -3.5, 0, 1, 4, 5.5])
             for data in (y, -6:.75:6)
-                h1 = fit(Histogram, data, edges, closed = :left)
-                test_exact(Hist(edges, Number; closed=false), data, o -> o.counts, y -> h1.weights)
-                h2 = fit(Histogram, data, edges, closed = :right)
-                test_exact(Hist(edges, Number; left=false, closed=false), data, o -> o.counts, y -> h2.weights)
+                w  = fit(Histogram, data, edges, closed = :left).weights
+                w2 = fit(Histogram, data, edges, closed = :right).weights
+                @test fit!(Hist(edges, Number; closed=false),             data).counts == w
+                @test fit!(Hist(edges, Number; closed=false, left=false), data).counts == w2
             end
         end
     end 
-    test_exact(Hist(-5:.1:5), y, extrema, extrema, atol=.2)
-    test_exact(Hist(-5:.1:5), y, mean, mean, atol=.2)
-    test_exact(Hist(-5:.1:5), y, nobs, length)
-    test_exact(Hist(-5:.1:5), y, var, var, atol=.2)
-    test_merge(Hist(-5:.1:5), y, y2)
+    o = fit!(Hist(-5:.1:5), y)
+    for (v1, v2) in zip(extrema(o), extrema(y))
+        @test ≈(v1, v2; atol=.1)
+    end
+    @test ≈(mean(o), mean(y); atol=.1)
+    @test ≈(var(o), var(y); atol=.2)
+
     # merge unequal bins
     r1, r2 = -5:.2:5, -5:.1:5
     @test merge!(fit!(Hist(r1), y), fit!(Hist(r2), y2)) == fit!(Hist(r1), vcat(y, y2))
-    @test O.pdf(fit!(Hist(-5:.1:5), y), 0) > 0
-    @test O.pdf(fit!(Hist(-5:.1:5), y), 100) == 0
+    @test OnlineStats.pdf(fit!(Hist(-5:.1:5), y), 0) > 0
+    @test OnlineStats.pdf(fit!(Hist(-5:.1:5), y), 100) == 0
 end
 #-----------------------------------------------------------------------# KHist
 @testset "KHist" begin
-    test_exact(KHist(1000), y, mean, mean)
-    test_exact(KHist(1000), y, nobs, length)
-    test_exact(KHist(1000), y, var, var)
-    test_exact(KHist(1000), y, median, median)
-    test_exact(KHist(1000), y, quantile, quantile)
-    test_exact(KHist(1000), y, std, std)
-    test_exact(KHist(1000), y, extrema, extrema, ==)
-    test_merge(KHist(2000), y, y2)
-    test_merge(KHist(1), y, y2)
-    test_merge(KHist(2000, Float32), Float32.(y), Float32.(y2))
+    @test KHist(10) == KHist(10)
+
+    o = fit!(KHist(1000), y)
+    @test mean(o) ≈ mean(y)
+    @test var(o) ≈ var(y)
+    @test median(o) ≈ median(y)
+    @test quantile(o) ≈ quantile(y)
+    @test std(o) ≈ std(y)
+    @test extrema(o) == extrema(y)
+
+    ==(mergevals(KHist(2000), y, y2)...)
+    ==(mergevals(KHist(1), y, y2)...)
+    ==(mergevals(KHist(2000, Float32), Float32.(y), Float32.(y2))...)
 
     data = randn(10_000)
-
-    test_exact(KHist(100), data, o->O.pdf(o, -10), 0.0)
-    test_exact(KHist(100), data, o->O.pdf(o,0), 0.3989422804014327, atol=.2)
-    test_exact(KHist(100), data, o->O.pdf(o, 10), 0.0)
-
-    test_exact(KHist(100), data, o->O.cdf(o,-10), 0)
-    test_exact(KHist(100), data, o->O.cdf(o,0), .5, atol=.1)
-    test_exact(KHist(100), data, o->O.cdf(o,10), 1)
-
-    @test KHist(10) == KHist(10)
+    o = fit!(KHist(50), data)
+    @test OnlineStats.pdf(o, -10) == 0.0
+    @test ≈(OnlineStats.pdf(o, 0.0), 0.3989422804014327, atol=.2)
+    @test OnlineStats.pdf(o, 10) == 0.0
+    @test OnlineStats.cdf(o, -10) == 0.0
+    @test ≈(OnlineStats.cdf(o, 0.0), .5; atol=.1)
+    @test OnlineStats.cdf(o, 10) == 1.0
 end
-
-#-----------------------------------------------------------------------# HyperLogLog
-@testset "HyperLogLog" begin
-    test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
-    test_merge(HyperLogLog(4), y, y2)
-end
+# #-----------------------------------------------------------------------# HyperLogLog
+# @testset "HyperLogLog" begin
+#     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
+#     test_merge(HyperLogLog(4), y, y2)
+# end
 #-----------------------------------------------------------------------# IndexedPartition
 @testset "IndexedPartition" begin
     o = IndexedPartition(Float64, Mean())
-    fit!(o, [y y2])
+    fit!(o, zip(y, y2))
+end
+#-----------------------------------------------------------------------# KahanSum
+@testset "KahanSum" begin
+    @test value(fit!(KahanSum(), y)) ≈ sum(y)
+    @test value(fit!(KahanSum(Int), x)) == sum(x)
+    @test value(fit!(KahanSum(Int), z)) == sum(z)
+    @test ≈(mergevals(KahanSum(), y, y2)...)
+end
+#-----------------------------------------------------------------------# KahanMean
+@testset "KahanMean" begin
+    @test value(fit!(KahanMean(), y)) ≈ mean(y)
+    @test ≈(mergevals(KahanMean(), y, y2)...)
+end
+#-----------------------------------------------------------------------# KahanVariance
+@testset "KahanVariance" begin
+    o = fit!(KahanVariance(), y)
+    @test mean(o) ≈ mean(y)
+    @test var(o) ≈ var(y)
+    @test std(o) ≈ std(y)
+    @test ≈(mergevals(KahanVariance(), y, y2)...)
+
+    # Issue 116
+    @test std(KahanVariance()) == 1
+    @test std(fit!(KahanVariance(), 1)) == 1
+    @test std(fit!(KahanVariance(), [1, 2])) == sqrt(.5)
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin
-    o = fit!(KMeans(5,2), x)
+    o = fit!(KMeans(5,2), ymat)
 end
 #-----------------------------------------------------------------------# LinReg
 @testset "LinReg" begin
-    test_exact(LinReg(), (x,y), value, x\y)
-    test_merge(LinReg(), (x,y), (x2,y2))
-    # ridge
-    o = fit!(LinReg(), (x,y))
-    @test coef(o) ≈ x \ y
-    @test coef(o, .1) ≈ (x'x + 100 * I) \ x'y
-    λ = rand(5)
-    @test coef(o, λ) ≈ (x'x + 1000 * Diagonal(λ)) \ x'y
-    @test predict(o, x) == x * o.β
-    @test predict(o, x[1,:]) == dot(o.β, x[1, :])
+    ≈(mergevals(LinReg(), eachrow(ymat, y), eachrow(ymat2, y2))...)
+
+    o = fit!(LinReg(), (ymat, y))
+    @test coef(o) ≈ ymat \ y 
+    @test coef(o, .1) ≈ (ymat'ymat ./ n + .1I) \ ymat'y ./ n
+    @test coef(o, .1:.1:.5) ≈ (ymat'ymat ./ n + Diagonal(.1:.1:.5)) \ ymat'y ./ n
+    @test predict(o, ymat) == ymat * o.β
+    @test predict(o, ymat[1,:]) == dot(ymat[1,:], o.β)
 end
+#-----------------------------------------------------------------------# LinRegBuilder
 @testset "LinRegBuilder" begin
-    test_merge(LinRegBuilder(), [x y], [x2 y2])
-    test_exact(LinRegBuilder(), [x y], o->coef(o,y=6), [x ones(length(y))] \ y)
-    o = fit!(LinRegBuilder(), [y x])
-    @test coef(o, .1; bias=false) ≈ (x'x + 100 * I) \ x'y
-    λ = rand(5)
-    @test coef(o, λ; bias=false) ≈ (x'x + 1000 * Diagonal(λ)) \ x'y
+    @test ≈(mergevals(LinRegBuilder(), eachrow(ymat), eachrow(ymat2))...)
+
+    o = fit!(LinRegBuilder(), ymat)
+    for i in 1:5
+        data = ymat[:, setdiff(1:5, i)]
+        @test coef(o; y=i) ≈ [data ones(n)] \ ymat[:,i]
+        @test coef(o, .1; y=i, bias=false) ≈ (data'data ./ n + .1*I) \ data'ymat[:,i] ./ n
+    end
+
+    o2 = fit!(LinReg(), eachrow(ymat[:,[4,1]], ymat[:,3]))
+    @test coef(o, [.2,.4]; y=3, x = [4,1], bias=false) ≈ coef(o2, [.2, .4])
 end
 #-----------------------------------------------------------------------# Mean
 @testset "Mean" begin
-    @inferred Mean()
-    @inferred Mean(Complex{Float64})
-    test_exact(Mean(), y, mean, mean)
-    test_exact(Mean(BigFloat), big.(y), mean, mean, ≈, atol=1e-16)
-    test_exact(Mean(Complex{Float64}), y + y2*im, mean, mean)
-    test_merge(Mean(), y, y2)
+    o = fit!(Mean(), y)
+    @test value(o) ≈ mean(y)
+    @test mean(o) ≈ mean(y)
+    @test ≈(mergevals(Mean(), y, y2)...)
 end
 #-----------------------------------------------------------------------# ML
 @testset "ML" begin
-    o = OnlineStats.preprocess(eachrow(x))
+    o = OnlineStats.preprocess(eachrow(ymat))
     for i in 1:5
         @test o.group[i] isa OnlineStats.Numerical
     end
-    o = OnlineStats.preprocess(eachrow(rand(Bool, 100, 2)))
+    o = OnlineStats.preprocess(eachrow(xmat))
     for i in 1:2
         @test o.group[i] isa OnlineStats.Categorical
     end
-    o = OnlineStats.preprocess(eachrow(rand(1:5, 100, 5)), 3=>OnlineStats.Categorical(Int))
+    o = OnlineStats.preprocess(eachrow(zmat), 3 => OnlineStats.Categorical(Int))
     @test o.group[3] isa OnlineStats.Categorical
     @test o.group[1] isa OnlineStats.Numerical
 end
 #-----------------------------------------------------------------------# Moments
 @testset "Moments" begin
-    test_exact(Moments(), y, value, [mean(y), mean(y .^ 2), mean(y .^ 3), mean(y .^4) ])
-    test_exact(Moments(), y, skewness, skewness, atol = .1)
-    test_exact(Moments(), y, kurtosis, kurtosis, atol = .1)
-    test_exact(Moments(), y, mean, mean)
-    test_exact(Moments(), y, var, var)
-    test_exact(Moments(), y, std, std)
-    test_merge(Moments(), y, y2)
+    o = fit!(Moments(), y)
+    @test value(o) ≈ [mean(y), mean(y .^ 2), mean(y .^ 3), mean(y .^ 4)]
+    @test mean(o) ≈ mean(y)
+    @test var(o) ≈ var(y)
+    @test std(o) ≈ std(y)
+    @test skewness(o) ≈ skewness(y)
+    @test kurtosis(o) ≈ kurtosis(y)
+    for (v1,v2) in zip(mergevals(Moments(), y, y2)...)
+        @test v1 ≈ v2
+    end
 end
 #-----------------------------------------------------------------------# Mosaic
 @testset "Mosaic" begin
-    test_merge(Mosaic(Int,Int), rand(1:5, 100, 2), rand(1:5, 100, 2), ==)
+    @test ==(mergevals(Mosaic(Int,Int), zip(z, z2), zip(z2, z))...)
 end
 #-----------------------------------------------------------------------# MovingTimeWindow
 @testset "MovingTimeWindow" begin
     dates = Date(2010):Day(1):Date(2011)
     data = 1:length(dates)
-    o = MovingTimeWindow(Day(4); timetype=Date, valtype=Int)
-    test_exact(copy(o), zip(dates, data), value, Pair.(dates[end-4:end], data[end-4:end]), ==)
-    test_merge(o, zip(dates[1:2], data[1:2]), zip(dates[3:4], data[3:4]), ==)
+    o = fit!(MovingTimeWindow(Day(4); timetype=Date, valtype=Int), zip(dates,data))
+    @test value(o) == Pair.(dates[end-4:end], data[end-4:end])
+
+    d1 = zip(dates[1:2], data[1:2])
+    d2 = zip(dates[3:4], data[3:4])
+    @test ==(mergevals(MovingTimeWindow(Day(4); timetype=Date, valtype=Int), d1, d2)...)
 end
 #-----------------------------------------------------------------------# MovingWindow
 @testset "MovingWindow" begin
-    test_exact(MovingWindow(10,Int), 1:12, value, 3:12)
+    o = fit!(MovingWindow(10, Int), 1:12)
     for i in 1:10
-        test_exact(MovingWindow(10,Int), 1:12, o -> o[i], i + 2)
+        @test o[i] == (1:12)[i + 2]
     end
 end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin
-    X, Y = randn(1000, 5), rand(Bool, 1000)
-    X2, Y2 = randn(1000, 5), rand(Bool, 1000)
-    o = fit!(NBClassifier(5, Bool), (X,Y))
-    merge!(o, fit!(NBClassifier(5, Bool), (X2,Y2)))
+    o = fit!(NBClassifier(5, Bool), (ymat,x))
+    merge!(o, fit!(NBClassifier(5, Bool), (ymat2,x2)))
     @test nobs(o) == 2000
     @test length(probs(o)) == 2
-    @test sum(predict(o, x[1,:])) ≈ 1
-    @test classify(o, x[1, :]) || !classify(o, x[1, :])
+    @test sum(predict(o, ymat[1,:])) ≈ 1
+    @test classify(o, ymat[1, :]) || !classify(o, ymat[1, :])
     @test OnlineStats.nvars(o) == 5
     @test OnlineStats.nkeys(o) == 2
     @test length(o[2]) == 2
 end
 #-----------------------------------------------------------------------# OrderStats
 @testset "OrderStats" begin
-    test_merge(OrderStats(100), y, y2)
-    test_exact(OrderStats(1000), y, value, sort, ==)
-    test_exact(OrderStats(1000), y, quantile, quantile)
+    @test ≈(mergevals(OrderStats(100), y, y2)...)
+    o = fit!(OrderStats(n), y)
+    @test value(o) == sort(y)
+    @test quantile(o) == quantile(y)
 end
 #-----------------------------------------------------------------------# Partition
 @testset "Partition" begin
-    test_exact(Partition(Mean()), y, nobs, length)
     # merging
     o = fit!(Partition(Mean(), 1000), y)
     o2 = fit!(Partition(Mean(), 1000), y2)
@@ -490,7 +462,7 @@ end
 end
 #-----------------------------------------------------------------------# ProbMap
 @testset "ProbMap" begin
-    test_exact(ProbMap(Float64), y, o->sort(collect(keys(o.value))), sort(y))
+    @test sort(collect(keys(fit!(ProbMap(Float64), y).value))) == sort(y)
     # merge
     data, data2 = rand(1:4, 100), rand(1:4, 100)
     o = fit!(ProbMap(Int), data)
@@ -498,8 +470,8 @@ end
     merge!(o, o2)
     fit!(o2, data)
     @test sort(collect(keys(o.value))) == sort(collect(keys(o2.value)))
-    test_exact(ProbMap(Int), [1,1,2,2,3,3,4,4], probs, fill(.25, 4))
-    test_exact(ProbMap(Int), [1,1,2,2,3,3,4,4], o->probs(o, [1,2, 9]), [.5, .5, 0])
+    @test probs(fit!(ProbMap(Int), [1,1,2,2,3,3,4,4])) ≈ fill(.25, 4)
+    @test probs(fit!(ProbMap(Int), [1,1,2,2,3,3,4,4]), [1,2,9]) ≈ [.5, .5, 0]
 end
 #-----------------------------------------------------------------------# Quantile
 @testset "Quantile/P2Quantile" begin
@@ -512,41 +484,40 @@ end
             Quantile(τ; alg=OMAS()),
             Quantile(τ; alg=ADAGRAD())
             ]
-        test_exact(copy(o), data, value, quantile(data,τ), atol = .5)
-        test_merge(copy(o), data, data2, atol = .5)
+        @test ≈(value(fit!(copy(o), data)), quantile(data, τ), atol=.4)
+        @test ≈(mergevals(o, data, data2)...; atol=.4)
+
     end
     for τi in τ
-        test_exact(P2Quantile(τi), data, value, quantile(data, τi), atol = .2)
+        @test ≈(value(fit!(P2Quantile(τi),data)), quantile(data, τi), atol=.2)
     end
 end
 #-----------------------------------------------------------------------# ReservoirSample
 @testset "ReservoirSample" begin
-    test_exact(ReservoirSample(1000), y, value, identity, ==)
-    # merge
-    o1 = fit!(ReservoirSample(9), y)
-    o2 = fit!(ReservoirSample(9), y2)
-    merge!(o1, o2)
-    fit!(o2, y)
-    for yi in value(o1)
+    @test value(fit!(ReservoirSample(n), y)) == y
+    a, b = mergestats(ReservoirSample(9), y, y2)
+    for yi in value(a)
         @test (yi ∈ y) || (yi ∈ y2)
     end
 end
 #-----------------------------------------------------------------------# Series
 @testset "Series" begin
-    test_merge(Series(Mean(), Variance()), y, y2)
-    test_merge(Series(m=Mean(), v=Variance()), y, y2)
-    test_exact(Series(Mean(), Variance()), y, o->value(o)[1], mean(y))
-    test_exact(Series(m=Mean(), v=Variance()), y, o->value(o)[1], mean(y))
-    test_exact(Series(Mean(), Variance()), y, o->value(o)[2], var(y))
-    test_exact(Series(m=Mean(), v=Variance()), y, o->value(o)[2], var(y))
+    a, b = mergevals(Series(Mean(), Variance()), y, y2)
+    @test a[1] ≈ b[1]
+    @test a[2] ≈ b[2]
+
+    a, b = mergevals(Series(m=Mean(), v=Variance()), y, y2)
+    @test a.m ≈ b.m
+    @test a.v ≈ b.v
 end
 #-----------------------------------------------------------------------# StatHistory
 @testset "StatHistory" begin
     o = fit!(StatHistory(Mean(), 10), 1:20)
-    @test length(o.circbuff) == 10
+    @test length(value(o)) == 10
     for (i, m) in enumerate(reverse(o.circbuff))
         @test nobs(m) == 10 + i
     end
+    @test nobs(value(o)[1]) == 20
 end
 #-----------------------------------------------------------------------# StatLearn
 @testset "StatLearn" begin
@@ -568,7 +539,7 @@ end
             @test coef(o) == o.β
             @test predict(o, X) == X * o.β
             @test ≈(coef(o), β; atol=1.5)
-            @test O.objective(o, X, Y) ≈ value(o.loss, Y, predict(o, X), AggMode.Mean()) + value(o.penalty, o.β, o.λ)
+            @test OnlineStats.objective(o, X, Y) ≈ value(o.loss, Y, predict(o, X), AggMode.Mean()) + value(o.penalty, o.β, o.λ)
         end
         for L in [LogitMarginLoss(), DWDMarginLoss(1.0)]
             print(" | $L")
@@ -580,45 +551,40 @@ end
 end
 #-----------------------------------------------------------------------# Sum
 @testset "Sum" begin
-    test_exact(Sum(), y, sum, sum)
-    test_exact(Sum(Int), 1:100, sum, sum)
-    test_merge(Sum(), y, y2)
+    @test value(fit!(Sum(Int), x)) == sum(x)
+    @test value(fit!(Sum(), y)) ≈ sum(y)
+    @test value(fit!(Sum(Int), z)) == sum(z)
+
+    @test ==(mergevals(Sum(Int), x, x2)...)
+    @test ≈(mergevals(Sum(), y, y2)...)
+    @test ==(mergevals(Sum(Int), z, z2)...)
 end
 #-----------------------------------------------------------------------# Variance
 @testset "Variance" begin
-    test_exact(Variance(), y, mean, mean)
-    test_exact(Variance(), y, std, std)
-    test_exact(Variance(), y, var, var)
-    test_merge(Variance(), y, y2)
+    o = fit!(Variance(), y)
+    @test mean(o) ≈ mean(y)
+    @test var(o) ≈ var(y)
+    @test std(o) ≈ std(y)
 
+    @test ≈(mergevals(Variance(), x, x2)...)
+    @test ≈(mergevals(Variance(), y, y2)...)
+    @test ≈(mergevals(Variance(Float32), Float32.(y), Float32.(y2))...)
+    @test ≈(mergevals(Variance(), z, z2)...)
     # Issue 116
     @test std(Variance()) == 1
     @test std(fit!(Variance(), 1)) == 1
     @test std(fit!(Variance(), [1, 2])) == sqrt(.5)
 end
 
-#-----------------------------------------------------------------------# KahanSum
-@testset "KahanSum" begin
-    test_exact(KahanSum(), y, sum, sum)
-    test_exact(KahanSum(Int), 1:100, sum, sum)
-    test_merge(KahanSum(), y, y2)
-end
-#-----------------------------------------------------------------------# Mean
-@testset "KahanMean" begin
-    test_exact(KahanMean(), y, mean, mean)
-    test_merge(KahanMean(), y, y2)
-end
-#-----------------------------------------------------------------------# Variance
-@testset "KahanVariance" begin
-    test_exact(KahanVariance(), y, mean, mean)
-    test_exact(KahanVariance(), y, std, std)
-    test_exact(KahanVariance(), y, var, var)
-    test_merge(KahanVariance(), y, y2)
-
-    # Issue 116
-    @test std(KahanVariance()) == 1
-    @test std(fit!(KahanVariance(), 1)) == 1
-    @test std(fit!(KahanVariance(), [1, 2])) == sqrt(.5)
-end
 
 include("test_kahan.jl")
+
+#-----------------------------------------------------------------------# Show methods
+@testset "Show methods" begin
+    for stat in [BiasVec([1,2,3]), Bootstrap(Mean()), CallFun(Mean(), println), FastNode(5), 
+                 FastTree(5), FastForest(5), FTSeries(Variance()), Group(Mean(), Mean()), 
+                 HyperLogLog(10), LinRegBuilder(4), NBClassifier(5, Float64), ProbMap(Int),
+                 P2Quantile(.5), Series(Mean()), StatLearn(5)]
+        println("  > ", stat)
+    end
+end

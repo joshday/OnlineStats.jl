@@ -313,32 +313,6 @@ function Statistics.cor(o::CovMatrix; kw...)
     o.value
 end
 
-#-----------------------------------------------------------------------# CStat
-"""
-    CStat(stat)
-
-Track a univariate OnlineStat for complex numbers.  A copy of `stat` is made to
-separately track the real and imaginary parts.
-
-# Example
-
-    y = randn(100) + randn(100)im
-    fit!(CStat(Mean()), y)
-"""
-struct CStat{O <: OnlineStat{Number}} <: OnlineStat{Number}
-    re_stat::O
-    im_stat::O
-end
-CStat(o::OnlineStat{<:Number}) = CStat(o, copy(o))
-nobs(o::CStat) = nobs(o.re_stat)
-value(o::CStat) = value(o.re_stat), value(o.im_stat)
-_fit!(o::CStat, y::T) where {T<:Real} = (_fit!(o.re_stat, y); _fit!(o.im_stat, T(0)))
-_fit!(o::CStat, y::Complex) = (_fit!(o.re_stat, y.re); _fit!(o.im_stat, y.im))
-function _merge!(o::T, o2::T) where {T<:CStat}
-    _merge!(o.re_stat, o2.re_stat)
-    _merge!(o.im_stat, o2.im_stat)
-end
-
 #-----------------------------------------------------------------------# Diff
 """
     Diff(T::Type = Float64)
@@ -432,7 +406,7 @@ Create an FTSeries and specify the type `T` of the transformed values.
     o = FTSeries(DataValue, Mean(); transform=get, filter=!isna)
     fit!(o, y)
 """
-mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{N}
+mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{Union{N,Missing}}
     stats::OS
     filter::F
     transform::T
@@ -550,6 +524,11 @@ function Base.show(io::IO, o::GroupBy)
         print(io, "\n  $(char)── $k: $v")
     end
 end
+function _merge!(a::GroupBy{T,O}, b::GroupBy{T,O}) where {T,O}
+    a.init == b.init || error("Cannot merge GroupBy objects with different inits")
+    a.n += b.n
+    merge!((o1, o2) -> merge!(o1, o2), a.value, b.value)
+end
 
 #-----------------------------------------------------------------------# StatHistory
 """
@@ -562,11 +541,11 @@ Track a moving window (previous `b` copies) of `stat`.
     fit!(StatHistory(Mean(), 10), 1:20)
 """
 struct StatHistory{T, O<:OnlineStat{T}} <: OnlineStat{T}
-    stat::O
     circbuff::CircularBuffer{O}
+    stat::O
 end
 function StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}}
-    StatHistory{T,O}(stat, CircularBuffer{O}(b))
+    StatHistory{T,O}(CircularBuffer{O}(b), stat)
 end
 nobs(o::StatHistory) = nobs(o.stat)
 function _fit!(o::StatHistory, y)
@@ -767,15 +746,20 @@ function _fit!(o::Moments, y::Real)
     @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
 end
 Statistics.mean(o::Moments) = o.m[1]
-Statistics.var(o::Moments) = (o.m[2] - o.m[1] ^ 2) * unbias(o)
+function Statistics.var(o::Moments; corrected=true) 
+    out = (o.m[2] - o.m[1] ^ 2) 
+    corrected ? unbias(o) * out : out
+end
 function skewness(o::Moments)
     v = value(o)
     vr = o.m[2] - o.m[1]^2
     (v[3] - 3.0 * v[1] * vr - v[1] ^ 3) / vr ^ 1.5
 end
 function kurtosis(o::Moments)
-    v = value(o)
-    (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+    # v = value(o)
+    # (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
+    m1, m2, m3, m4 = value(o)
+    (m4 - 4.0 * m1 * m3 + 6.0 * m1^2 * m2 - 3.0 * m1 ^ 4) / var(o; corrected=false) ^ 2 - 3.0
 end
 function _merge!(o::Moments, o2::Moments)
     γ = o2.n / (o.n += o2.n)
@@ -1179,7 +1163,7 @@ function _fit!(o::ReservoirSample, y)
 end
 function _merge!(o::T, o2::T) where {T<:ReservoirSample}
     length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
-    p = o.n / (o.n + o2.n)
+    p = o.n / (o.n += o2.n)
     for j in eachindex(o.value)
         if rand() > p
             o.value[j] = o2.value[j]
@@ -1243,3 +1227,7 @@ _merge!(o::T, o2::T) where {T <: Sum} = (o.sum += o2.sum; o.n += o2.n; o)
 #     group::Group
 # end
 # nobs(o::Summarizer) = nobs(o.group)
+
+#-----------------------------------------------------------------------# CStat
+@deprecate CStat(::Mean) Mean(Complex{Float64})
+@deprecate CStat(::Variance) Variance(Complex{Float64})
