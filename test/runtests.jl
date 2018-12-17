@@ -11,14 +11,12 @@ p = 5
 xmat,  ymat,  zmat  = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
 xmat2, ymat2, zmat2 = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
 
-# a = fit! + merge!
-# b = fit! + fit!
+
 function mergestats(a::OnlineStat, y1, y2)
-    b = copy(a)
-    fit!(a, y1)
-    fit!(b, y2)
-    merge!(a, b)
-    fit!(b, y1)
+    fit!(a, y1)             # fit a on y1
+    b = fit!(copy(a), y2)   # fit b on y2
+    merge!(a, b)            # merge b into a
+    fit!(b, y1)             # fit b on y1
     @test nobs(a) == nobs(b) == length(y1) + length(y2)
     a, b
 end
