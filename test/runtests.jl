@@ -11,15 +11,16 @@ p = 5
 xmat,  ymat,  zmat  = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
 xmat2, ymat2, zmat2 = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
 
-# get the value of two stats: one created by fitting and one by merging
-function mergestats(o1::OnlineStat, y1, y2)
-    o2 = copy(o1)
-    fit!(o1, y1)
-    fit!(o2, y2)
-    merge!(o1, o2)
-    fit!(o2, y1)
-    @test nobs(o1) == nobs(o2) == length(y1) + length(y2)
-    o2, o2
+# a = fit! + merge!
+# b = fit! + fit!
+function mergestats(a::OnlineStat, y1, y2)
+    b = copy(a)
+    fit!(a, y1)
+    fit!(b, y2)
+    merge!(a, b)
+    fit!(b, y1)
+    @test nobs(a) == nobs(b) == length(y1) + length(y2)
+    a, b
 end
 mergevals(o1::OnlineStat, y1, y2) = map(value, mergestats(o1, y1, y2))
 
@@ -164,7 +165,8 @@ end
 
         data1 = eachrow(rand(1:4, 10, 3))
         data2 = eachrow(rand(2:7, 11, 3))
-        @test ==(mergestats(FitMultinomial(3), data1, data2)...)
+        a, b = mergevals(FitMultinomial(3), data1, data2)
+        @test ≈(a[2], b[2])
     end
     @testset "FitMvNormal" begin
         @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
@@ -251,7 +253,7 @@ end
     @test value(d[false]) ≈ mean(y[map(!,x)])
 
     a, b = mergevals(GroupBy{Int}(Mean()), zip(z,y), zip(z2, y2))
-    for (ai,bi) in zip(values(a), values(b))
+    for (ai,bi) in zip(values(sort(a)), values(sort(b)))
         @test value(ai) ≈ value(bi)
     end
 end
@@ -574,7 +576,7 @@ end
 
     @test ≈(mergevals(Variance(), x, x2)...)
     @test ≈(mergevals(Variance(), y, y2)...)
-    @test ≈(mergevals(Variance(Float32), Float32.(y), Float32.(y2))...)
+    @test ≈(mergevals(Variance(Float32), Float32.(y), Float32.(y2))...; atol=1e-6)
     @test ≈(mergevals(Variance(), z, z2)...)
     # Issue 116
     @test std(Variance()) == 1
