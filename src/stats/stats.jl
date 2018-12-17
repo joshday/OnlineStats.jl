@@ -653,6 +653,14 @@ function _merge!(o::HyperLogLog, o2::HyperLogLog)
 end
 
 #-----------------------------------------------------------------------# KMeans
+"Cluster center and the number of observations"
+mutable struct Cluster
+    value::Vector{Float64}
+    n::Int
+end
+Base.show(io::IO, o::Cluster) = print(io, "Cluster: nobs=$(o.n), value=$(o.value)")
+Base.isless(a::Cluster, b::Cluster) = isless(a.n, b.n)
+
 """
     KMeans(p, k; rate=LearningRate(.6))
 
@@ -660,35 +668,47 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
 
 # Example
 
-    clusters = rand(Bool, 10^5)
-
-    x = [clusters[i] > .5 ? randn() : 5 + randn() for i in 1:10^5, j in 1:2]
+    x = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]
 
     o = fit!(KMeans(2, 2), x)
+
+    sort!(o; rev=true)  # Order clusters by number of observations
 """
-mutable struct KMeans{W} <: OnlineStat{VectorOb}
-    value::Matrix{Float64}  # p × k
-    v::Vector{Float64}
+mutable struct KMeans{T, W} <: OnlineStat{VectorOb}
+    value::T
+    buffer::Vector{Float64}
     rate::W
     n::Int
 end
-KMeans(p::Integer, k::Integer; rate=LearningRate(.6)) = KMeans(zeros(p, k), zeros(k), rate, 0)
+function KMeans(p::Integer, k::Integer; rate=LearningRate()) 
+    KMeans(Tuple(Cluster(zeros(p), 0) for i in 1:k), zeros(k), rate, 0)
+end
+nobs(o::KMeans) = sum(x -> x.n, o.value)
+function Base.show(io::IO, o::KMeans)
+    print(io, "KMeans")
+    print_stat_tree(io, o.value)
+end
+function Base.sort!(o::KMeans; kw...)
+    o.value = Tuple(sort!(collect(o.value); kw...))
+    o
+end
 function _fit!(o::KMeans, x)
-    γ = o.rate(o.n += 1)
-    p, k = size(o.value)
-    if o.n <= k
-        o.value[:, o.n] = collect(x)
+    o.n += 1
+    if o.n ≤ length(o.value)
+        cluster = o.value[o.n]
+        cluster.value[:] = collect(x)
+        cluster.n += 1
     else
-        for j in 1:k
-            o.v[j] = 0.0
-            for i in 1:p
-                o.v[j] += abs2(x[i] - o.value[i, j])
+        fill!(o.buffer, 0.0)
+        for k in eachindex(o.buffer)
+            cluster = o.value[k]
+            for j in eachindex(x)
+                o.buffer[k] = norm(x[j] - cluster.value[j])
             end
         end
-        kstar = argmin(o.v)
-        for i in 1:p
-            o.value[i, kstar] = smooth(o.value[i, kstar], x[i], γ)
-        end
+        k_star = argmin(o.buffer)
+        cluster = o.value[k_star]
+        smooth!(cluster.value, x, o.rate(cluster.n += 1))
     end
 end
 
