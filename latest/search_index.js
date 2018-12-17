@@ -457,14 +457,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.CStat",
-    "page": "API",
-    "title": "OnlineStats.CStat",
-    "category": "type",
-    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nfit!(CStat(Mean()), y)\n\n\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.CallFun",
     "page": "API",
     "title": "OnlineStats.CallFun",
