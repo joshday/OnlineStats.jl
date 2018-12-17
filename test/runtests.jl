@@ -13,8 +13,9 @@ xmat2, ymat2, zmat2 = rand(Bool, n, p), randn(n, p), rand(1:10, n, p)
 
 
 function mergestats(a::OnlineStat, y1, y2)
+    b = copy(a)
     fit!(a, y1)             # fit a on y1
-    b = fit!(copy(a), y2)   # fit b on y2
+    fit!(b, y2)             # fit b on y2
     merge!(a, b)            # merge b into a
     fit!(b, y1)             # fit b on y1
     @test nobs(a) == nobs(b) == length(y1) + length(y2)
@@ -574,7 +575,7 @@ end
 
     @test ≈(mergevals(Variance(), x, x2)...)
     @test ≈(mergevals(Variance(), y, y2)...)
-    @test ≈(mergevals(Variance(Float32), Float32.(y), Float32.(y2))...; atol=1e-6)
+    @test ≈(mergevals(Variance(Float32), Float32.(y), Float32.(y2))...; atol=.001)
     @test ≈(mergevals(Variance(), z, z2)...)
     # Issue 116
     @test std(Variance()) == 1
