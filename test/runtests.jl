@@ -23,7 +23,11 @@ function mergestats(o1::OnlineStat, y1, y2)
 end
 mergevals(o1::OnlineStat, y1, y2) = map(value, mergestats(o1, y1, y2))
 
-@info "Testing Stats..."
+
+
+
+
+
 #-----------------------------------------------------------------------# AutoCov
 @testset "AutoCov" begin
     o = fit!(AutoCov(10), y)
@@ -346,6 +350,8 @@ end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin
     o = fit!(KMeans(5,2), ymat)
+    sort!(o, rev=true)
+    @test o.value[1].n ≥ o.value[2].n
 end
 #-----------------------------------------------------------------------# LinReg
 @testset "LinReg" begin
