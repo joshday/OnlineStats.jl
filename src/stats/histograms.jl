@@ -360,7 +360,7 @@ function value(o::KHist)
     (x=x, y=y)
 end
 
-_fit!(o::KHist, y) = push!(o, KHistBin(y, 1))
+_fit!(o::KHist{T}, y) where {T} = push!(o, KHistBin(T(y), 1))
 
 function Base.push!(o::KHist, y::KHistBin) 
     fit!(o.ex, y.loc)
@@ -401,7 +401,7 @@ function pdf(o::KHist, x::Number)
     elseif x ≥ maximum(o.ex)
         return 0.0 
     else 
-        i = searchsortedfirst(o.bins, KHistBin(x, 0))
+        i = searchsortedfirst(o.bins, KHistBin(x, 0)) - 1
         x1, y1 = xy(o.bins[i - 1])
         x2, y2 = xy(o.bins[i])
         return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
@@ -414,7 +414,7 @@ function cdf(o::KHist, x::Number)
     elseif x ≥ maximum(o.ex)
         return 1.0 
     else
-        i = searchsortedfirst(o.bins, KHistBin(x, 0))
+        i = searchsortedfirst(o.bins, KHistBin(x, 0)) - 1
         x1, y1 = o.bins[i - 1].loc, o.bins[i-1].count
         x2, y2 = o.bins[i].loc, o.bins[i].count
         w = x - x1
