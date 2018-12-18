@@ -396,29 +396,32 @@ end
 
 # based on linear interpolation
 function pdf(o::KHist, x::Number)
-    if x ≤ minimum(o.ex)
-        return 0.0 
-    elseif x ≥ maximum(o.ex)
-        return 0.0 
-    else 
-        i = searchsortedfirst(o.bins, KHistBin(x, 0)) - 1
+    a, b = extrema(o.ex)
+    if a < x < b
+        i = searchsortedfirst(o.bins, KHistBin(x, 0))
         x1, y1 = xy(o.bins[i - 1])
         x2, y2 = xy(o.bins[i])
         return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
+    else
+        x == a && return o.bins[1].count / area(o)
+        x == b && return o.bins[end].count / area(o)
+        return 0.0
     end
 end
 
 function cdf(o::KHist, x::Number)
-    if x ≤ minimum(o.ex)
-        return 0.0 
-    elseif x ≥ maximum(o.ex)
-        return 1.0 
+    a, b = extrema(o.ex)
+    if x < a 
+        return 0.0
+    elseif x == a 
+        return o.bins[1].count / area(o)
+    elseif x ≥ b
+        return 1.0
     else
-        i = searchsortedfirst(o.bins, KHistBin(x, 0)) - 1
-        x1, y1 = o.bins[i - 1].loc, o.bins[i-1].count
-        x2, y2 = o.bins[i].loc, o.bins[i].count
-        w = x - x1
+        i = searchsortedfirst(o.bins, KHistBin(x, 0))
+        x1, y1 = xy(o.bins[i - 1])
+        x2, y2 = xy(o.bins[i])
         h = smooth(y1, y2, (x2 - x) / (x2 - x1))
-        return (area(o, i-2) + w * h) / area(o)
+        return (area(o, i - 2) + (x - x1) * h) / area(o)
     end
 end
