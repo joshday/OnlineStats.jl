@@ -587,10 +587,13 @@ mutable struct HyperLogLog{p, T} <: OnlineStat{T}
     end
 end
 HyperLogLog(T::Type=Number) = HyperLogLog{16}(T)
+
 @deprecate HyperLogLog(p::Number, T::Type) HyperLogLog{p}(T::Type)
+
 function Base.show(io::IO, o::HyperLogLog{p,T}) where {p,T} 
     print(io, "HyperLogLog{$p, $T}: n=$(nobs(o)) | value=", value(o))
 end
+
 function _fit!(o::HyperLogLog, v)
     o.n += 1
     x = hash(v) % UInt32
@@ -598,6 +601,7 @@ function _fit!(o::HyperLogLog, v)
     w = (x & ~mask(o))
     o.M[i] = max(o.M[i], UInt32(leading_zeros(w) + 1))
 end
+
 function value(o::HyperLogLog)
     E = α(o) * _m(o) * _m(o) * inv(sum(x -> inv(2 ^ x), o.M))
     if E ≤ 5 * _m(o) / 2
@@ -609,6 +613,7 @@ function value(o::HyperLogLog)
         return -2 ^ 32 * log(1 - E / 2 ^ 32)
     end
 end
+
 function _merge!(o::HyperLogLog, o2::HyperLogLog)
     length(o.M) == length(o2.M) ||
         error("Merge failed. HyperLogLog objects have different number of registers.")
