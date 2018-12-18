@@ -613,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
     "category": "type",
-    "text": "HyperLogLog(T = Number)\nHyperLogLog{P}(T = Number)\n\nApproximate count of distinct elements of a data stream of type T, using 2 ^ P \"registers\".  P must be an integer between 4 and 16 (default).\n\nRef: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf\n\nExample\n\no = HyperLogLog()\nfit!(o, rand(1:100, 10^6))\n\n\n\n\n\n"
+    "text": "HyperLogLog(T = Number)\nHyperLogLog{P}(T = Number)\n\nApproximate count of distinct elements of a data stream of type T, using 2 ^ P \"registers\".  P must be an integer between 4 and 16 (default).\n\nRef: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf\n\nExample\n\no = HyperLogLog()\nfit!(o, rand(1:100, 10^6))\n\nusing Random\no2 = HyperLogLog(String)\nfit!(o2, [randstring(20) for i in 1:1000])\n\n\n\n\n\n"
 },
 
 {
