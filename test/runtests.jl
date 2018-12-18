@@ -313,11 +313,13 @@ end
     @test ≈(OnlineStats.cdf(o, 0.0), .5; atol=.1)
     @test OnlineStats.cdf(o, 10) == 1.0
 end
-# #-----------------------------------------------------------------------# HyperLogLog
-# @testset "HyperLogLog" begin
-#     test_exact(HyperLogLog(12), y, value, y->length(unique(y)), atol=50)
-#     test_merge(HyperLogLog(4), y, y2)
-# end
+#-----------------------------------------------------------------------# HyperLogLog
+@testset "HyperLogLog" begin
+    @test ≈(value(fit!(HyperLogLog(), y)), n; atol=20)
+    @test ==(mergevals(HyperLogLog(), x, x2)...)
+    @test ==(mergevals(HyperLogLog(), y, y2)...)
+    @test ==(mergevals(HyperLogLog(), z, z2)...)
+end
 #-----------------------------------------------------------------------# IndexedPartition
 @testset "IndexedPartition" begin
     o = IndexedPartition(Float64, Mean())
@@ -590,7 +592,7 @@ include("test_kahan.jl")
 @testset "Show methods" begin
     for stat in [BiasVec([1,2,3]), Bootstrap(Mean()), CallFun(Mean(), println), FastNode(5), 
                  FastTree(5), FastForest(5), FTSeries(Variance()), Group(Mean(), Mean()), 
-                 HyperLogLog(10), LinRegBuilder(4), NBClassifier(5, Float64), ProbMap(Int),
+                 HyperLogLog{10}(), LinRegBuilder(4), NBClassifier(5, Float64), ProbMap(Int),
                  P2Quantile(.5), Series(Mean()), StatLearn(5)]
         println("  > ", stat)
     end

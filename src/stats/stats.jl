@@ -558,99 +558,160 @@ function Base.show(io::IO, o::StatHistory)
 end
 
 #-----------------------------------------------------------------------# HyperLogLog
-# Mostly copy/pasted from StreamStats.jl
-"""
-    HyperLogLog(b, T::Type = Number)  # 4 ≤ b ≤ 16
+# https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf
 
-Approximate count of distinct elements.
+"""
+    HyperLogLog(T = Number)
+    HyperLogLog{P}(T = Number)
+
+Approximate count of distinct elements of a data stream of type `T`, using `2 ^ P`
+"registers".  `P` must be an integer between 4 and 16 (default).
+
+Ref: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf
 
 # Example
 
-    fit!(HyperLogLog(12), rand(1:10,10^5))
+    o = HyperLogLog()
+    fit!(o, rand(1:100, 10^6))
 """
-mutable struct HyperLogLog{T} <: OnlineStat{T}
-    m::UInt32
-    M::Vector{UInt32}
-    mask::UInt32
-    altmask::UInt32
+mutable struct HyperLogLog{p, T} <: OnlineStat{T}
+    M::Vector{Int}
     n::Int
-end
-function HyperLogLog(b::Integer, S::Type = Number)
-        !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
-        m = 0x00000001 << b
-        M = zeros(UInt32, m)
-        mask = 0x00000000
-        for i in 1:(b - 1)
-            mask |= 0x00000001
-            mask <<= 1
-        end
-        mask |= 0x00000001
-        altmask = ~mask
-        HyperLogLog{S}(m, M, mask, altmask, 0)
-    end
-function Base.show(io::IO, o::HyperLogLog{T}) where {T}
-    print(io, "HyperLogLog($(o.m) registers, input = $T, estimate = $(value(o)))")
-end
-
-hash32(d::Any) = hash(d) % UInt32
-maskadd32(x::UInt32, mask::UInt32, add::UInt32) = (x & mask) + add
-ρ(s::UInt32) = UInt32(leading_zeros(s)) + 0x00000001
-
-function α(m::UInt32)
-    if m == 0x00000010          # m = 16
-        return 0.673
-    elseif m == 0x00000020      #
-        return 0.697
-    elseif m == 0x00000040
-        return 0.709
-    else                        # if m >= UInt32(128)
-        return 0.7213 / (1 + 1.079 / m)
+    function HyperLogLog{p}(T::Type=Number) where {p}
+        4 ≤ p ≤ 16 || throw(ArgumentError("Number of registers must be in 4:16"))
+        new{p,T}(zeros(Int, 2^p), 0)
     end
 end
-
+HyperLogLog(T::Type=Number) = HyperLogLog{16}(T)
+@deprecate HyperLogLog(p::Number, T::Type) HyperLogLog{p}(T::Type)
+Base.show(io::IO, o::HyperLogLog{p,T}) where {p,T} = print(io, "HyperLogLog{$p, $T}: ", value(o))
 function _fit!(o::HyperLogLog, v)
     o.n += 1
-    x = hash32(v)
-    j = maskadd32(x, o.mask, 0x00000001)
-    w = x & o.altmask
-    o.M[j] = max(o.M[j], ρ(w))
-    o
+    x = hash(v) % UInt32
+    idx = (x & mask(o)) + 0x00000001
+    w = (x & ~mask(o))
+    o.M[idx] = max(o.M[idx], UInt32(leading_zeros(w) + 1))
 end
-
 function value(o::HyperLogLog)
-    S = 0.0
-    for j in eachindex(o.M)
-        S += 1 / (2 ^ o.M[j])
-    end
-    Z = 1 / S
-    E = α(o.m) * UInt(o.m) ^ 2 * Z
-    if E <= 5//2 * o.m
-        V = 0
-        for j in 1:o.m
-            V += Int(o.M[j] == 0x00000000)
-        end
-        if V != 0
-            E_star = o.m * log(o.m / V)
-        else
-            E_star = E
-        end
-    elseif E <= 1//30 * 2 ^ 32
-        E_star = E
+    E = α(o) * _m(o) * _m(o) * inv(sum(x -> inv(2 ^ x), o.M))
+    if E ≤ 5 * _m(o) / 2
+        V = sum(==(0), o.M)
+        return V == 0 ? E : _m(o) * log(_m(o) / V)
+    elseif E ≤ 2 ^ 32 / 30
+        return E
     else
-        E_star = -2 ^ 32 * log(1 - E / (2 ^ 32))
+        return -2 ^ 32 * log(1 - E / 2 ^ 32)
     end
-    return E_star
 end
-
 function _merge!(o::HyperLogLog, o2::HyperLogLog)
     length(o.M) == length(o2.M) ||
         error("Merge failed. HyperLogLog objects have different number of registers.")
     o.n += o2.n
     for j in eachindex(o.M)
-        o.M[j] = max(o.M[j], o2.M[j])
+        @inbounds o.M[j] = max(o.M[j], o2.M[j])
     end
     o
 end
+
+@generated _m(o::HyperLogLog{p}) where {p} = 2 ^ p
+
+@generated mask(o::HyperLogLog{p}) where {p} = UInt32(2 ^ p - 1)
+
+@generated α(o::HyperLogLog{4}) = 0.673
+@generated α(o::HyperLogLog{5}) = 0.697
+@generated α(o::HyperLogLog{6}) = 0.709
+@generated α(o::HyperLogLog{p}) where {p} = 0.7213 / (1 + 1.079 / 2 ^ p)
+
+
+# # Mostly copy/pasted from StreamStats.jl
+# """
+#     HyperLogLog(b, T::Type = Number)  # 4 ≤ b ≤ 16
+
+# Approximate count of distinct elements.
+
+# # Example
+
+#     fit!(HyperLogLog(12), rand(1:10,10^5))
+# """
+# mutable struct HyperLogLog{T} <: OnlineStat{T}
+#     m::UInt32
+#     M::Vector{UInt32}
+#     mask::UInt32
+#     altmask::UInt32
+#     n::Int
+# end
+# function HyperLogLog(b::Integer, S::Type = Number)
+#         !(4 ≤ b ≤ 16) && throw(ArgumentError("b must be an Integer between 4 and 16"))
+#         m = 0x00000001 << b
+#         M = zeros(UInt32, m)
+#         mask = 0x00000000
+#         for i in 1:(b - 1)
+#             mask |= 0x00000001
+#             mask <<= 1
+#         end
+#         mask |= 0x00000001
+#         altmask = ~mask
+#         HyperLogLog{S}(m, M, mask, altmask, 0)
+#     end
+# function Base.show(io::IO, o::HyperLogLog{T}) where {T}
+#     print(io, "HyperLogLog($(o.m) registers, input = $T, estimate = $(value(o)))")
+# end
+
+# function α(m::UInt32)
+#     if m == 0x00000010          # m = 16
+#         return 0.673
+#     elseif m == 0x00000020      #
+#         return 0.697
+#     elseif m == 0x00000040
+#         return 0.709
+#     else                        # if m >= UInt32(128)
+#         return 0.7213 / (1 + 1.079 / m)
+#     end
+# end
+
+# function _fit!(o::HyperLogLog, v)
+#     o.n += 1
+#     x = hash(v) % UInt32
+#     j = (x & o.mask) + 0x00000001 #maskadd32(x, o.mask, 0x00000001)
+#     w = x & o.altmask
+#     o.M[j] = max(o.M[j], UInt32(leading_zeros(w)) + 0x00000001)
+#     o
+# end
+
+# function value(o::HyperLogLog)
+#     S = 0.0
+#     for j in eachindex(o.M)
+#         S += 1 / (2 ^ o.M[j])
+#     end
+#     Z = 1 / S
+#     E = α(o.m) * UInt(o.m) ^ 2 * Z
+#     if E <= 5//2 * o.m
+#         V = 0
+#         for j in 1:o.m
+#             V += Int(o.M[j] == 0x00000000)
+#         end
+#         if V != 0
+#             E_star = o.m * log(o.m / V)
+#         else
+#             E_star = E
+#         end
+#     elseif E <= 1//30 * 2 ^ 32
+#         E_star = E
+#     else
+#         E_star = -2 ^ 32 * log(1 - E / (2 ^ 32))
+#     end
+#     return E_star
+# end
+
+# function _merge!(o::HyperLogLog, o2::HyperLogLog)
+#     length(o.M) == length(o2.M) ||
+#         error("Merge failed. HyperLogLog objects have different number of registers.")
+#     o.n += o2.n
+#     for j in eachindex(o.M)
+#         o.M[j] = max(o.M[j], o2.M[j])
+#     end
+#     o
+# end
 
 #-----------------------------------------------------------------------# KMeans
 "Cluster center and the number of observations"
