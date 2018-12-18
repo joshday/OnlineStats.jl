@@ -573,6 +573,10 @@ Ref: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.
 
     o = HyperLogLog()
     fit!(o, rand(1:100, 10^6))
+
+    using Random
+    o2 = HyperLogLog(String)
+    fit!(o2, [randstring(20) for i in 1:1000])
 """
 mutable struct HyperLogLog{p, T} <: OnlineStat{T}
     M::Vector{Int}
