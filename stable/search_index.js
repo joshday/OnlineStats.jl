@@ -457,14 +457,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.CStat",
-    "page": "API",
-    "title": "OnlineStats.CStat",
-    "category": "type",
-    "text": "CStat(stat)\n\nTrack a univariate OnlineStat for complex numbers.  A copy of stat is made to separately track the real and imaginary parts.\n\nExample\n\ny = randn(100) + randn(100)im\nfit!(CStat(Mean()), y)\n\n\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.CallFun",
     "page": "API",
     "title": "OnlineStats.CallFun",
@@ -621,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.HyperLogLog",
     "category": "type",
-    "text": "HyperLogLog(b, T::Type = Number)  # 4 ≤ b ≤ 16\n\nApproximate count of distinct elements.\n\nExample\n\nfit!(HyperLogLog(12), rand(1:10,10^5))\n\n\n\n\n\n"
+    "text": "HyperLogLog(T = Number)\nHyperLogLog{P}(T = Number)\n\nApproximate count of distinct elements of a data stream of type T, using 2 ^ P \"registers\".  P must be an integer between 4 and 16 (default).\n\nRef: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf\n\nExample\n\no = HyperLogLog()\nfit!(o, rand(1:100, 10^6))\n\nusing Random\no2 = HyperLogLog(String)\nfit!(o2, [randstring(20) for i in 1:1000])\n\n\n\n\n\n"
 },
 
 {
@@ -645,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.KMeans",
     "category": "type",
-    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nclusters = rand(Bool, 10^5)\n\nx = [clusters[i] > .5 ? randn() : 5 + randn() for i in 1:10^5, j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\n\n\n\n\n"
+    "text": "KMeans(p, k; rate=LearningRate(.6))\n\nApproximate K-Means clustering of k clusters and p variables.\n\nExample\n\nx = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]\n\no = fit!(KMeans(2, 2), x)\n\nsort!(o; rev=true)  # Order clusters by number of observations\n\n\n\n\n\n"
 },
 
 {
@@ -886,6 +878,14 @@ var documenterSearchIndex = {"docs": [
     "title": "StatsBase.confint",
     "category": "function",
     "text": "confint(b::Bootstrap, coverageprob = .95)\n\nReturn a confidence interval for a Bootstrap b.\n\n\n\n\n\n"
+},
+
+{
+    "location": "api.html#OnlineStats.Cluster",
+    "page": "API",
+    "title": "OnlineStats.Cluster",
+    "category": "type",
+    "text": "Cluster center and the number of observations\n\n\n\n\n\n"
 },
 
 {
