@@ -982,7 +982,7 @@ mutable struct P2Quantile <: OnlineStat{Number}
     nobs::Int
 end
 function P2Quantile(τ::Real = 0.5)
-    @assert 0 < τ < 1
+    0 < τ < 1 || error("specified quantile must be in (0, 1)")
     nprime = [1, 1 + 2τ, 1 + 4τ, 3 + 2τ, 5]
     P2Quantile(zeros(5), collect(1:5), nprime, τ, 0)
 end

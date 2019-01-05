@@ -148,8 +148,8 @@ mutable struct ADAMAX <: SGAlgorithm
     m::Vector{Float64}
     v::Vector{Float64}
     function ADAMAX(β1::Float64 = 0.9, β2::Float64 = .999)
-        @assert 0 < β1 < 1
-        @assert 0 < β2 < 1
+        0 < β1 < 1 || error("β1 must be in (0, 1)")
+        0 < β2 < 1 || error("β2 must be in (0, 1)")
         new(β1, β2, zeros(0), zeros(0))
     end
 end
@@ -181,8 +181,8 @@ end
 #     V::Vector{Float64}
 #     nups::Int
 #     function NADAM(β1::Float64 = 0.99, β2::Float64 = .999, p::Integer = 0)
-#         @assert 0 < β1 < 1
-#         @assert 0 < β2 < 1
+#         0 < β1 < 1 || error("β1 must be in (0, 1)")
+#         0 < β2 < 1 || error("β2 must be in (0, 1)")
 #         new(β1, β2, zeros(p), zeros(p), 0)
 #     end
 # end
