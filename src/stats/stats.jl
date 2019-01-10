@@ -361,12 +361,13 @@ Maximum and minimum.
     maximum(o)
     minimum(o)
 """
-mutable struct Extrema{T} <: OnlineStat{Number}
+mutable struct Extrema{T,S} <: OnlineStat{S}
     min::T
     max::T
     n::Int
 end
-Extrema(T::Type{<:Number} = Float64) = Extrema{T}(typemax.(T), typemin.(T), 0)
+Extrema(T::Type{<:Number} = Float64) = Extrema{T,Number}(typemax.(T), typemin.(T), 0)
+Extrema(T::Type) = Extrema{T,T}(typemax.(T), typemin.(T), 0)
 Extrema(initmin::T, initmax::T) where {T} = Extrema{T}(initmin, initmax, 0)
 function _fit!(o::Extrema, y)
     o.min = min(o.min, y)

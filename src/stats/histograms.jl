@@ -327,10 +327,10 @@ Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://ww
     using Plots
     plot(o)
 """
-struct KHist{T} <: HistogramStat{Number}
+struct KHist{T, E<:Extrema{T}} <: HistogramStat{Number}
     bins::Vector{KHistBin{T}}
     b::Int
-    ex::Extrema{T}
+    ex::E
 end
 KHist(b::Int, T::Type = Float64) = KHist(KHistBin{T}[], b, Extrema(T))
 

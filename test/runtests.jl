@@ -112,6 +112,10 @@ end
     @test value(fit!(Extrema(Int), z)) == extrema(z)
 
     @test ==(mergevals(Extrema(), y, y2)...)
+
+    o = fit!(Extrema(Date), Date(2010):Day(1):Date(2011))
+    @test minimum(o) == Date(2010)
+    @test maximum(o) == Date(2011)
 end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin
