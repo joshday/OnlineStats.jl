@@ -361,18 +361,25 @@ Maximum and minimum.
     maximum(o)
     minimum(o)
 """
+# T is type to store data, S is type of single observation.  
+# E.g. you may want to accept any Number even if you are storing values as Float64
 mutable struct Extrema{T,S} <: OnlineStat{S}
     min::T
     max::T
     n::Int
+    function Extrema(T::Type = Float64)
+        a, b, S = extrema_init(T)
+        new{T,S}(a, b, 0)
+    end
 end
-Extrema(T::Type{<:Number} = Float64) = Extrema{T,Number}(typemax.(T), typemin.(T), 0)
-Extrema(T::Type) = Extrema{T,T}(typemax.(T), typemin.(T), 0)
-Extrema(initmin::T, initmax::T) where {T} = Extrema{T}(initmin, initmax, 0)
+extrema_init(T::Type{<:Number}) = typemax(T), typemin(T), Number
+extrema_init(T::Type{String}) = "", "", String 
+extrema_init(T::Type{Date}) = typemax(Date), typemin(Date), Date
+extrema_init(T::Type) = rand(T), rand(T), T
 function _fit!(o::Extrema, y)
+    (o.n += 1) == 1 && (o.min = o.max = y)
     o.min = min(o.min, y)
     o.max = max(o.max, y)
-    o.n += 1
 end
 function _merge!(o::Extrema, o2::Extrema)
     o.min = min(o.min, o2.min)

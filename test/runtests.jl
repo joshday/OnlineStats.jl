@@ -116,6 +116,10 @@ end
     o = fit!(Extrema(Date), Date(2010):Day(1):Date(2011))
     @test minimum(o) == Date(2010)
     @test maximum(o) == Date(2011)
+
+    @test value(fit!(Extrema(Char), 'a':'z')) == ('a', 'z')
+    @test value(fit!(Extrema(Char), "abc")) == ('a', 'c')
+    @test value(fit!(Extrema(String), ["a", "b"])) == ("a", "b")
 end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin
