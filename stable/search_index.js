@@ -489,14 +489,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api.html#OnlineStats.Extrema",
-    "page": "API",
-    "title": "OnlineStats.Extrema",
-    "category": "type",
-    "text": "Extrema(T::Type = Float64)\n\nMaximum and minimum.\n\nExample\n\no = fit!(Extrema(), rand(10^5))\nextrema(o)\nmaximum(o)\nminimum(o)\n\n\n\n\n\n"
-},
-
-{
     "location": "api.html#OnlineStats.FTSeries",
     "page": "API",
     "title": "OnlineStats.FTSeries",
