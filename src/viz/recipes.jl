@@ -63,7 +63,7 @@ end
 end
 
 #-----------------------------------------------------------------------# GroupBy 
-@recipe function f(o::GroupBy{T, <:Hist}) where {T}
+@recipe function f(o::GroupBy{T, <:Union{KHist, Hist}}) where {T}
     sort!(o.value)
     link --> :all
     for (k, v) in pairs(o.value)
@@ -118,9 +118,9 @@ end
 @recipe function f(o::KHist; normed=true)
     x, y = value(o)
     y2 = normed ? y ./ area(o) : y
-    xlim --> extrema(o.ex)
+    # xlim --> extrema(o.ex)
     fillto --> 0
-    alpha --> .2
+    alpha --> .5
     x, y2
 end
 
