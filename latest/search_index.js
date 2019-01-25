@@ -581,7 +581,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.GroupBy",
     "category": "type",
-    "text": "GroupBy{T}(stat)\n\nUpdate stat for each group (of type T).\n\nExample\n\nx = rand(1:10, 10^5)\ny = x .+ randn(10^5)\nfit!(GroupBy{Int}(Extrema()), zip(x,y))\n\n\n\n\n\n"
+    "text": "GroupBy{T}(stat)\nGroupBy(T, stat)\n\nUpdate stat for each group (of type T).\n\nExample\n\nx = rand(1:10, 10^5)\ny = x .+ randn(10^5)\nfit!(GroupBy{Int}(Extrema()), zip(x,y))\n\n\n\n\n\n"
 },
 
 {
