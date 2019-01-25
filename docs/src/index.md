@@ -11,43 +11,39 @@ Pkg.add("OnlineStats")
 
 ## Basics
 
-- Every stat is `<: OnlineStat{T}`
-    -  `T` is the type of a single observation.
+### Every stat is `<: OnlineStat{T}`
 
-```@example index
+(where `T` is the type of a single observation)
+
+```@repl index
 using OnlineStats
-
 m = Mean()
-```
-
-```@example index
 supertype(typeof(m))
 ```
 
-- Stats can be updated.
-    - `fit!(stat::OnlineStat{T}, y::S)` will iterate through y if `T != S`.
+### Stats can be updated
 
-```@example index
-y = randn(100)
+`fit!(stat::OnlineStat{T}, y::S)` will iterate through y and `fit!` each element if `T != S`.
 
+```@repl index
+y = randn(100);
 fit!(m, y)
 ```
 
-- Stats can be merged.
+### Stats can be merged
 
-```@example index 
+```@repl index 
 y2 = randn(100);
-
 m2 = fit!(Mean(), y2)
-
 merge!(m, m2)
 ```
 
-- Stats have a value
+### Stats have a value
 
 ```@example index
 value(m)
 ```
+
 ## Collections of Stats
 
 ![](https://user-images.githubusercontent.com/8075494/40438658-3c4e8592-5e7e-11e8-97f1-76a749163de9.png)
@@ -61,7 +57,6 @@ A `Series` tracks stats that should be applied to the **same** data stream.
 
 ```@example collections
 y = rand(1000)
-
 s = Series(Mean(), Variance())
 fit!(s, y)
 ```
@@ -81,13 +76,11 @@ A `Group` tracks stats that should be applied to **different** data streams.
 
 ```@example collections 
 g = Group(Mean(), CountMap(Bool))
-
 itr = zip(randn(100), rand(Bool, 100))
-
 fit!(g, itr)
 ```
 
-## Resources
+## Additional Resources
 
 - [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
 - [JuliaDB Integration](http://juliadb.org/latest/onlinestats/)
