@@ -48,7 +48,7 @@ merge!(m, m2)
 ```@example index
 value(m)
 ```
-# Collections of Stats
+## Collections of Stats
 
 ![](https://user-images.githubusercontent.com/8075494/40438658-3c4e8592-5e7e-11e8-97f1-76a749163de9.png)
 
@@ -56,7 +56,7 @@ value(m)
 using OnlineStats
 ```
 
-## `Series`
+### `Series`
 A `Series` tracks stats that should be applied to the **same** data stream.
 
 ```@example collections
@@ -67,7 +67,7 @@ fit!(s, y)
 ```
 
 
-## `FTSeries`
+### `FTSeries`
 An `FTSeries` tracks stats that should be applied to the **same** data stream, but filters and transforms (hence `FT`) the input data before it is sent to its stats. 
 
 ```@example collections 
@@ -76,7 +76,7 @@ fit!(s, -y)
 ```
 
 
-## `Group`
+### `Group`
 A `Group` tracks stats that should be applied to **different** data streams.
 
 ```@example collections 
@@ -87,7 +87,7 @@ itr = zip(randn(100), rand(Bool, 100))
 fit!(g, itr)
 ```
 
-# Resources
+## Resources
 
 - [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
 - [JuliaDB Integration](http://juliadb.org/latest/onlinestats/)
