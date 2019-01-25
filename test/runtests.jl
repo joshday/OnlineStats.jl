@@ -255,6 +255,7 @@ end
 end
 #-----------------------------------------------------------------------# Group
 @testset "GroupBy" begin
+    @test GroupBy{Bool}(Mean()) == GroupBy(Bool, Mean())
     d = value(fit!(GroupBy{Bool}(Mean()), zip(x,y)))
     @test value(d[true]) ≈ mean(y[x])
     @test value(d[false]) ≈ mean(y[map(!,x)])

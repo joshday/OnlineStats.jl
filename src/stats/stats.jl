@@ -504,6 +504,7 @@ Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
 #-----------------------------------------------------------------------# GroupBy
 """
     GroupBy{T}(stat)
+    GroupBy(T, stat)
 
 Update `stat` for each group (of type `T`).
 
@@ -519,6 +520,7 @@ mutable struct GroupBy{T, O <: OnlineStat} <: OnlineStat{VectorOb}
     n::Int
 end
 GroupBy{T}(stat::O) where {T, O} = GroupBy{T,O}(OrderedDict{T, O}(), stat, 0)
+GroupBy(T::Type, stat::OnlineStat) = GroupBy{T}(stat)
 function _fit!(o::GroupBy, xy)
     o.n += 1
     x, y = xy
