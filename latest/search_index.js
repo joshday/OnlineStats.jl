@@ -29,7 +29,39 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Basics",
     "category": "section",
-    "text": "Every stat is <: OnlineStat{T}\nT is the type of a single observation.using OnlineStats\n\nm = Mean()supertype(typeof(m))Stats can be updated.\nfit!(stat::OnlineStat{T}, y::S) will iterate through y if T != S.y = randn(100)\n\nfit!(m, y)Stats can be merged.y2 = randn(100);\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)Stats have a valuevalue(m)"
+    "text": ""
+},
+
+{
+    "location": "index.html#Every-stat-is-:-OnlineStat{T}-1",
+    "page": "Home",
+    "title": "Every stat is <: OnlineStat{T}",
+    "category": "section",
+    "text": "(where T is the type of a single observation)using OnlineStats\nm = Mean()\nsupertype(typeof(m))"
+},
+
+{
+    "location": "index.html#Stats-can-be-updated-1",
+    "page": "Home",
+    "title": "Stats can be updated",
+    "category": "section",
+    "text": "fit!(stat::OnlineStat{T}, y::S) will iterate through y and fit! each element if T != S.y = randn(100);\nfit!(m, y)"
+},
+
+{
+    "location": "index.html#Stats-can-be-merged-1",
+    "page": "Home",
+    "title": "Stats can be merged",
+    "category": "section",
+    "text": "y2 = randn(100);\nm2 = fit!(Mean(), y2)\nmerge!(m, m2)"
+},
+
+{
+    "location": "index.html#Stats-have-a-value-1",
+    "page": "Home",
+    "title": "Stats have a value",
+    "category": "section",
+    "text": "value(m)"
 },
 
 {
@@ -45,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Series",
     "category": "section",
-    "text": "A Series tracks stats that should be applied to the same data stream.y = rand(1000)\n\ns = Series(Mean(), Variance())\nfit!(s, y)"
+    "text": "A Series tracks stats that should be applied to the same data stream.y = rand(1000)\ns = Series(Mean(), Variance())\nfit!(s, y)"
 },
 
 {
@@ -61,13 +93,13 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Group",
     "category": "section",
-    "text": "A Group tracks stats that should be applied to different data streams.g = Group(Mean(), CountMap(Bool))\n\nitr = zip(randn(100), rand(Bool, 100))\n\nfit!(g, itr)"
+    "text": "A Group tracks stats that should be applied to different data streams.g = Group(Mean(), CountMap(Bool))\nitr = zip(randn(100), rand(Bool, 100))\nfit!(g, itr)"
 },
 
 {
-    "location": "index.html#Resources-1",
+    "location": "index.html#Additional-Resources-1",
     "page": "Home",
-    "title": "Resources",
+    "title": "Additional Resources",
     "category": "section",
     "text": "OnlineStats Demos\nJuliaDB Integration"
 },
