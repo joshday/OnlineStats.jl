@@ -5,7 +5,7 @@ Two `OnlineStat`s can be merged together, which facilitates [Embarassingly paral
 !!! note
     In general, `fit!` is a cheaper operation than `merge!`.
 
-## ExactStat merges
+## Exact merges
 
 Many `OnlineStat`s are capable of calculating the exact value as a corresponding offline estimator.  For these types, the order of `fit!`-ting and `merge!`-ing does not matter.
 

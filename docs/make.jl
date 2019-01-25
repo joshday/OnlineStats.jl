@@ -9,12 +9,10 @@ makedocs(
     debug = true,
     pages = [
         "index.md",
-        "collectionstats.md",
         "weights.md",
         "stats_and_models.md",
         "parallel.md",
-        "visualizations.md",
-        "demos.md",
+        "plots.md",
         "howfitworks.md",
         "api.md",
     ]

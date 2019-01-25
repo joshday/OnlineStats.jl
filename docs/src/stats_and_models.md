@@ -52,4 +52,4 @@
 | **Collections of Stats:**          |                            |
 | Applied to same data stream        | [`Series`](@ref), [`FTSeries`](@ref) |
 | Applied to different data streams  | [`Group`](@ref)
-| Calculated stat by group           | [`GroupBy`](@ref)          |
+| Calculate stat by group            | [`GroupBy`](@ref)          |
