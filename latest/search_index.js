@@ -2,106 +2,74 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "index.html#",
-    "page": "Basics",
-    "title": "Basics",
+    "page": "Home",
+    "title": "Home",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "index.html#Basics-1",
-    "page": "Basics",
-    "title": "Basics",
+    "location": "index.html#Home-1",
+    "page": "Home",
+    "title": "Home",
     "category": "section",
     "text": "OnlineStats is a Julia package for statistical analysis with algorithms that run both online and in parallel.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all algorithms use O(1) memory."
 },
 
 {
     "location": "index.html#Installation-1",
-    "page": "Basics",
+    "page": "Home",
     "title": "Installation",
     "category": "section",
     "text": "import Pkg\nPkg.add(\"OnlineStats\")"
 },
 
 {
-    "location": "index.html#Basics-2",
-    "page": "Basics",
+    "location": "index.html#Basics-1",
+    "page": "Home",
     "title": "Basics",
     "category": "section",
-    "text": ""
+    "text": "Every stat is <: OnlineStat{T}\nT is the type of a single observation.using OnlineStats\n\nm = Mean()supertype(typeof(m))Stats can be updated.\nfit!(stat::OnlineStat{T}, y::S) will iterate through y if T != S.y = randn(100)\n\nfit!(m, y)Stats can be merged.y2 = randn(100);\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)Stats have a valuevalue(m)"
 },
 
 {
-    "location": "index.html#Every-Stat-is-:-OnlineStat-1",
-    "page": "Basics",
-    "title": "Every Stat is <: OnlineStat",
-    "category": "section",
-    "text": "using OnlineStats\n\nm = Mean()"
-},
-
-{
-    "location": "index.html#Stats-Can-Be-Updated-1",
-    "page": "Basics",
-    "title": "Stats Can Be Updated",
-    "category": "section",
-    "text": "y = randn(100);\n\nfit!(m, y)"
-},
-
-{
-    "location": "index.html#Stats-Can-Be-Merged-1",
-    "page": "Basics",
-    "title": "Stats Can Be Merged",
-    "category": "section",
-    "text": "y2 = randn(100);\n\nm2 = fit!(Mean(), y2)\n\nmerge!(m, m2)"
-},
-
-{
-    "location": "index.html#Stats-Have-a-Value-1",
-    "page": "Basics",
-    "title": "Stats Have a Value",
-    "category": "section",
-    "text": "value(m)"
-},
-
-{
-    "location": "collectionstats.html#",
-    "page": "Collections of Stats",
-    "title": "Collections of Stats",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "collectionstats.html#Collections-of-Stats-1",
-    "page": "Collections of Stats",
+    "location": "index.html#Collections-of-Stats-1",
+    "page": "Home",
     "title": "Collections of Stats",
     "category": "section",
     "text": "(Image: )using OnlineStats"
 },
 
 {
-    "location": "collectionstats.html#Series-1",
-    "page": "Collections of Stats",
+    "location": "index.html#Series-1",
+    "page": "Home",
     "title": "Series",
     "category": "section",
     "text": "A Series tracks stats that should be applied to the same data stream.y = rand(1000)\n\ns = Series(Mean(), Variance())\nfit!(s, y)"
 },
 
 {
-    "location": "collectionstats.html#FTSeries-1",
-    "page": "Collections of Stats",
+    "location": "index.html#FTSeries-1",
+    "page": "Home",
     "title": "FTSeries",
     "category": "section",
     "text": "An FTSeries tracks stats that should be applied to the same data stream, but filters and transforms (hence FT) the input data before it is sent to its stats. s = FTSeries(Mean(), Variance(); filter = x->true, transform = abs)\nfit!(s, -y)"
 },
 
 {
-    "location": "collectionstats.html#Group-1",
-    "page": "Collections of Stats",
+    "location": "index.html#Group-1",
+    "page": "Home",
     "title": "Group",
     "category": "section",
     "text": "A Group tracks stats that should be applied to different data streams.g = Group(Mean(), CountMap(Bool))\n\nitr = zip(randn(100), rand(Bool, 100))\n\nfit!(g, itr)"
+},
+
+{
+    "location": "index.html#Resources-1",
+    "page": "Home",
+    "title": "Resources",
+    "category": "section",
+    "text": "OnlineStats Demos\nJuliaDB Integration"
 },
 
 {
@@ -213,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Statistics and Models",
     "title": "Statistics and Models",
     "category": "section",
-    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nTracked history StatHistory\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms/continuous density Hist and KHist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nDecision Trees FastTree\nRandom Forest FastForest\nNaive Bayes Classifier NBClassifier\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun\nBig Data Viz Partition, IndexedPartition\nCollections of Stats: \nApplied to same data stream Series, FTSeries\nApplied to different data streams Group\nCalculated stat by group GroupBy"
+    "text": "Statistic/Model OnlineStat\nUnivariate Statistics: \nMean Mean\nVariance Variance\nQuantiles Quantile and P2Quantile\nMaximum/Minimum Extrema\nSkewness and kurtosis Moments\nSum Sum\nTime Series: \nDifference Diff\nLag Lag\nAutocorrelation/autocovariance AutoCov\nTracked history StatHistory\nMultivariate Analysis: \nCovariance/correlation matrix CovMatrix\nPrincipal components analysis CovMatrix\nK-means clustering (SGD) KMeans\nMultiple univariate statistics Group\nNonparametric Density Estimation: \nHistograms/continuous density Hist and KHist\nApproximate order statistics OrderStats\nCount for each unique value CountMap\nParametric Density Estimation: \nBeta FitBeta\nCauchy FitCauchy\nGamma FitGamma\nLogNormal FitLogNormal\nNormal FitNormal\nMultinomial FitMultinomial\nMvNormal FitMvNormal\nStatistical Learning: \nGLMs with regularization StatLearn\nLogistic regression StatLearn\nLinear SVMs StatLearn\nQuantile regression StatLearn\nAbsolute loss regression StatLearn\nDistance-weighted discrimination StatLearn\nHuber-loss regression StatLearn\nLinear (also ridge) regression LinReg, LinRegBuilder\nDecision Trees FastTree\nRandom Forest FastForest\nNaive Bayes Classifier NBClassifier\nOther: \nStatistical Bootstrap Bootstrap\nApprox. count of distinct elements HyperLogLog\nReservoir sampling ReservoirSample\nCallbacks CallFun\nBig Data Viz Partition, IndexedPartition\nCollections of Stats: \nApplied to same data stream Series, FTSeries\nApplied to different data streams Group\nCalculate stat by group GroupBy"
 },
 
 {
@@ -233,9 +201,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "parallel.html#ExactStat-merges-1",
+    "location": "parallel.html#Exact-merges-1",
     "page": "Parallel Computation",
-    "title": "ExactStat merges",
+    "title": "Exact merges",
     "category": "section",
     "text": "Many OnlineStats are capable of calculating the exact value as a corresponding offline estimator.  For these types, the order of fit!-ting and merge!-ing does not matter.y1 = randn(10_000)\ny2 = randn(10_000)\ny3 = randn(10_000)\n\ns1 = Series(Mean(), Variance(), KHist(50))\ns2 = Series(Mean(), Variance(), KHist(50))\ns3 = Series(Mean(), Variance(), KHist(50))\n\nfit!(s1, y1)\nfit!(s2, y2)\nfit!(s3, y3)\n\nmerge!(s1, s2)  # merge information from s2 into s1\nmerge!(s1, s3)  # merge information from s3 into s1<img width = 500 src = \"https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png\">"
 },
@@ -249,99 +217,83 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "visualizations.html#",
-    "page": "Visualizations",
-    "title": "Visualizations",
+    "location": "plots.html#",
+    "page": "Plots",
+    "title": "Plots",
     "category": "page",
     "text": "import Pkg, Random\nusing Dates\nPkg.add(\"GR\")\nPkg.add(\"Plots\")\nENV[\"GKSwstype\"] = \"100\"\nusing OnlineStats\nusing Plots\nRandom.seed!(1234)\ngr()"
 },
 
 {
-    "location": "visualizations.html#Visualizations-1",
-    "page": "Visualizations",
-    "title": "Visualizations",
+    "location": "plots.html#Plots-1",
+    "page": "Plots",
+    "title": "Plots",
     "category": "section",
     "text": ""
 },
 
 {
-    "location": "visualizations.html#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1",
-    "page": "Visualizations",
+    "location": "plots.html#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1",
+    "page": "Plots",
     "title": "Many Stats Can Be Plotted via Plot Recipes",
     "category": "section",
     "text": "s = fit!(Series(KHist(25), Hist(-5:5)), randn(10^6))\nplot(s)\nsavefig(\"plot_series.png\") # hide(Image: )"
 },
 
 {
-    "location": "visualizations.html#Naive-Bayes-Classifier-1",
-    "page": "Visualizations",
+    "location": "plots.html#Naive-Bayes-Classifier-1",
+    "page": "Plots",
     "title": "Naive Bayes Classifier",
     "category": "section",
     "text": "The NBClassifier type stores conditional histograms of the predictor variables, allowing you to plot approximate \"group by\" distributions:# make data\nx = randn(10^5, 5)\ny = x * [1,3,5,7,9] .> 0\n\no = NBClassifier(5, Bool)  # 5 predictors with Boolean categories\nfit!(o, (x, y))\nplot(o)\nsavefig(\"nbclassifier.png\"); nothing # hide(Image: )"
 },
 
 {
-    "location": "visualizations.html#Mosaic-Plots-1",
-    "page": "Visualizations",
+    "location": "plots.html#Mosaic-Plots-1",
+    "page": "Plots",
     "title": "Mosaic Plots",
     "category": "section",
     "text": "The Mosaic type allows you to plot the relationship between two categorical variables.   It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.x = rand([true, true, false], 10^5)\ny = map(xi -> xi ? rand(1:3) : rand(1:4), x)\no = fit!(Mosaic(Bool, Int), [x y])\nplot(o)\nsavefig(\"mosaic.png\"); nothing # hide(Image: )"
 },
 
 {
-    "location": "visualizations.html#Partitions-1",
-    "page": "Visualizations",
+    "location": "plots.html#Partitions-1",
+    "page": "Plots",
     "title": "Partitions",
     "category": "section",
     "text": "The Partition type summarizes sections of a data stream using any OnlineStat,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  "
 },
 
 {
-    "location": "visualizations.html#Continuous-Data-1",
-    "page": "Visualizations",
+    "location": "plots.html#Continuous-Data-1",
+    "page": "Plots",
     "title": "Continuous Data",
     "category": "section",
     "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(10))\n\nfit!(o, y)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_hist.png\"); nothing # hide(Image: )o = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(o, o2)\n\nfit!(s, y)\n\nplot(s, layout = 1, xlab = \"Nobs\")\nsavefig(\"partition_mean_ex.png\"); nothing # hide(Image: )"
 },
 
 {
-    "location": "visualizations.html#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1",
-    "page": "Visualizations",
+    "location": "plots.html#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1",
+    "page": "Plots",
     "title": "Plot a custom function of the OnlineStats (default is value)",
     "category": "section",
     "text": "Plot of mean +/- standard deviation:o = Partition(Variance())\n\nfit!(o, y)\n\nplot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = \"Nobs\")\nsavefig(\"partition_ci.png\"); nothing # hide  (Image: )"
 },
 
 {
-    "location": "visualizations.html#Categorical-Data-1",
-    "page": "Visualizations",
+    "location": "plots.html#Categorical-Data-1",
+    "page": "Plots",
     "title": "Categorical Data",
     "category": "section",
     "text": "y = rand([\"a\", \"a\", \"b\", \"c\"], 10^6)\n\no = Partition(CountMap(String), 75)\n\nfit!(o, y)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_countmap.png\"); nothing # hide(Image: )"
 },
 
 {
-    "location": "visualizations.html#Indexed-Partitions-1",
-    "page": "Visualizations",
+    "location": "plots.html#Indexed-Partitions-1",
+    "page": "Plots",
     "title": "Indexed Partitions",
     "category": "section",
     "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )x = rand(1:1000, 10^5)\ny = x .+ 30randn(10^5)\n\no = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))\n\nplot(o)\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )"
-},
-
-{
-    "location": "demos.html#",
-    "page": "Demos",
-    "title": "Demos",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "demos.html#Demos-1",
-    "page": "Demos",
-    "title": "Demos",
-    "category": "section",
-    "text": "A collection of jupyter notebooks are hosted at https://github.com/joshday/OnlineStatsDemos.  "
 },
 
 {
