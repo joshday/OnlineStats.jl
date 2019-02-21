@@ -84,3 +84,9 @@ fit!(g, itr)
 
 - [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
 - [JuliaDB Integration](http://juliadb.org/latest/onlinestats/)
+
+### Star us on GitHub!
+
+```@raw html
+<iframe src="https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+```

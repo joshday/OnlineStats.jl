@@ -20,7 +20,7 @@
 | K-means clustering (SGD)           | [`KMeans`](@ref)           |
 | Multiple univariate statistics     | [`Group`](@ref) |
 | **Nonparametric Density Estimation:**|                          |
-| Histograms/continuous density      | [`Hist`](@ref) and [`KHist`](ref) |
+| Histograms/continuous density      | [`Hist`](@ref) and [`KHist`](@ref) |
 | Approximate order statistics       | [`OrderStats`](@ref)       |
 | Count for each unique value        | [`CountMap`](@ref)         |
 | **Parametric Density Estimation:** |                            |

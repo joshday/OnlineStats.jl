@@ -24,9 +24,9 @@ the rows or columns of the matrix, respectively.
 
 
 ```@example howfitworks
-fit!(CovMatrix(), eachrow(randn(1000,2)))
+fit!(CovMatrix(), OnlineStats.eachrow(randn(1000,2)))
 
-fit!(CovMatrix(), eachcol(randn(2,1000)))
+fit!(CovMatrix(), OnlineStats.eachcol(randn(2,1000)))
 ```
 
 ### Reason 2: OnlineStats naturally works out-of-the-box with many data structures

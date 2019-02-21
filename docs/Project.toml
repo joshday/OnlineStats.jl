@@ -1,4 +1,6 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+GR = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
 OnlineStats = "a15396b6-48d5-5d58-9928-6d29437db91e"
 OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
