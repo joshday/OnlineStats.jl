@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Home",
     "category": "page",
-    "text": ""
+    "text": "<span style=\"text-shadow: none;\"><a class=\"github-button\" href=\"https://github.com/joshday/OnlineStats.jl\" data-icon=\"octicon-star\" data-size=\"large\" data-show-count=\"true\" aria-label=\"Star this on GitHub\">Star</a><script async defer src=\"https://buttons.github.io/buttons.js\"></script></span>"
 },
 
 {
