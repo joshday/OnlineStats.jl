@@ -90,7 +90,7 @@ end
     @test all(x -> ≈(x...), zip(mean(o), mean(ymat; dims=1)))
 
     @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
-    @test ≈(mergevals(CovMatrix(), eachcol(ymat'), eachcol(ymat2'))...)
+    @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachcol(ymat'), OnlineStatsBase.eachcol(ymat2'))...)
     @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2))...)
     @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2 * im))...)
 end

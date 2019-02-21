@@ -212,7 +212,7 @@ end
 function _fit!(o::FastForest, xy)
     x, y = xy
     o.n += 1
-    for (tree, subset) in zip(o.forest, eachcol(o.subsets))
+    for (tree, subset) in zip(o.forest, OnlineStatsBase.eachcol(o.subsets))
         rand() < o.λ && fit!(tree, (x[subset], y))
     end
 end
