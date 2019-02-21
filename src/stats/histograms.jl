@@ -397,14 +397,26 @@ end
 # based on linear interpolation
 function pdf(o::KHist, x::Number)
     a, b = extrema(o.ex)
-    if a < x < b
+    firstbin = o.bins[1]
+    lastbin = o.bins[end]
+
+    # a ≤ firstbin.loc ≤ lastbin.loc ≤ b
+    if firstbin.loc < x < lastbin.loc
         i = searchsortedfirst(o.bins, KHistBin(x, 0))
-        x1, y1 = xy(o.bins[max(i - 1, 1)])
-        x2, y2 = xy(o.bins[min(i, end)])
+        x1, y1 = xy(o.bins[i - 1])
+        x2, y2 = xy(o.bins[i])
         return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
+    elseif a < x ≤ firstbin.loc
+        x1, y1 = a, 1
+        x2, y2 = xy(firstbin)
+        return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
+    elseif lastbin.loc ≤ x < b 
+        x1, y1 = xy(lastbin)
+        x2, y2 = b, 1
+        return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
+    elseif x == a || x == b
+        return 1 / area(o)
     else
-        x == a && return o.bins[1].count / area(o)
-        x == b && return o.bins[end].count / area(o)
         return 0.0
     end
 end
