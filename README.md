@@ -25,7 +25,3 @@ o = Series(Mean(), Variance(), P2Quantile(), Extrema())
 
 fit!(o, randn(10^6))
 ```
-
-# Tutorials
-
-[https://github.com/joshday/OnlineStatsDemos](https://github.com/joshday/OnlineStatsDemos)
