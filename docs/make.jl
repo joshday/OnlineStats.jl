@@ -19,10 +19,5 @@ makedocs(
 )
 
 deploydocs(
-    repo   = "github.com/joshday/OnlineStats.jl.git",
-    target = "build",
-    osname = "linux",
-    julia  = "1.0",
-    deps   = nothing,
-    make   = nothing
+    repo   = "github.com/joshday/OnlineStats.jl.git"
 )

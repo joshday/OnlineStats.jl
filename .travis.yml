@@ -3,18 +3,24 @@ os:
   - linux
   - osx
 julia:
-  - 0.7
   - 1.0
+  - 1.1
   - nightly
 matrix:
   allow_failures:
     - julia: nightly
 notifications:
   email: true
-# script:
-#   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#   - julia --check-bounds=yes --depwarn=no -e 'Pkg.clone(pwd()); Pkg.build("OnlineStats"); Pkg.test("OnlineStats"; coverage=true)'
 after_success:
-  - julia -e 'import Pkg; ps=Pkg.PackageSpec(name="Documenter", version="0.19"); Pkg.add(ps); Pkg.pin(ps); Pkg.add("OnlineStatsBase")'
-  - julia -e 'import Pkg; cd(Pkg.dir("OnlineStats")); include(joinpath("docs", "make.jl"))'
   - julia -e 'import Pkg; cd(Pkg.dir("OnlineStats")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'import Pkg; Pkg.add("Documenter")'
+
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.0
+      os: linux
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip
