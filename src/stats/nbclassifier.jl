@@ -87,11 +87,11 @@ end
 
 predict(o::NBClassifier, x::VectorOb) = _predict(o, x)
 predict(o::NBClassifier, x) = [predict(o, xi) for xi in x]
-predict(o::NBClassifier, x::AbstractMatrix) = predict(o, eachrow(x))
+predict(o::NBClassifier, x::AbstractMatrix) = predict(o, OnlineStatsBase.eachrow(x))
 
 classify(o::NBClassifier, x::VectorOb) = _classify(o, x)
 classify(o::NBClassifier, x) = [classify(o, xi) for xi in x]
-classify(o::NBClassifier, x::AbstractMatrix) = classify(o, eachrow(x))
+classify(o::NBClassifier, x::AbstractMatrix) = classify(o, OnlineStatsBase.eachrow(x))
 
 # Tree stuff
 

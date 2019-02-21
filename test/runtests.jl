@@ -89,10 +89,10 @@ end
     @test all(x -> ≈(x...), zip(std(o), std(ymat; dims=1)))
     @test all(x -> ≈(x...), zip(mean(o), mean(ymat; dims=1)))
 
-    @test ≈(mergevals(CovMatrix(), eachrow(ymat), eachrow(ymat2))...)
+    @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
     @test ≈(mergevals(CovMatrix(), eachcol(ymat'), eachcol(ymat2'))...)
-    @test ≈(mergevals(CovMatrix(Complex{Float64}), eachrow(ymat * im), eachrow(ymat2))...)
-    @test ≈(mergevals(CovMatrix(Complex{Float64}), eachrow(ymat * im), eachrow(ymat2 * im))...)
+    @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2))...)
+    @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2 * im))...)
 end
 #-----------------------------------------------------------------------# Diff
 @testset "Diff" begin
@@ -170,14 +170,14 @@ end
         data = [1 2 3 4 5; 1 2 3 4 5]
         @test value(fit!(o, data))[2] == collect(2:2:10) ./ sum(data)
 
-        data1 = eachrow(rand(1:4, 10, 3))
-        data2 = eachrow(rand(2:7, 11, 3))
+        data1 = OnlineStatsBase.eachrow(rand(1:4, 10, 3))
+        data2 = OnlineStatsBase.eachrow(rand(2:7, 11, 3))
         a, b = mergevals(FitMultinomial(3), data1, data2)
         @test ≈(a[2], b[2])
     end
     @testset "FitMvNormal" begin
         @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
-        a, b = mergevals(FitMvNormal(2), eachrow([y y2]), eachrow([y2 y]))
+        a, b = mergevals(FitMvNormal(2), OnlineStatsBase.eachrow([y y2]), OnlineStatsBase.eachrow([y2 y]))
         @test a[1] ≈ b[1]
         @test a[2] ≈ b[2]
     end
@@ -238,7 +238,7 @@ end
 end
 #-----------------------------------------------------------------------# Group
 @testset "Group" begin
-    o = fit!(5Mean(), eachrow(ymat))
+    o = fit!(5Mean(), OnlineStatsBase.eachrow(ymat))
     @test o[1] == first(o)
     @test 5Mean() == 5Mean()
     @test collect(map(value, value(o))) ≈ vec(mean(ymat, dims=1))
@@ -248,7 +248,7 @@ end
     @test collect(map(value, value(o2))) ≈ vec(mean(ymat, dims=1))
     @test length(o2) == 5
 
-    a, b = mergevals(Group(Mean(),Variance(),Sum(),Moments(),Mean()), eachrow(ymat), eachrow(ymat2))
+    a, b = mergevals(Group(Mean(),Variance(),Sum(),Moments(),Mean()), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))
     for (ai, bi) in zip(a, b)
         @test value(ai) ≈ value(bi)
     end
@@ -267,8 +267,8 @@ end
 end
 #-----------------------------------------------------------------------# HeatMap
 @testset "HeatMap" begin 
-    data1 = eachrow(ymat[:, 1:2])
-    data2 = eachrow(ymat2[:, 1:2])
+    data1 = OnlineStatsBase.eachrow(ymat[:, 1:2])
+    data2 = OnlineStatsBase.eachrow(ymat2[:, 1:2])
     @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
 end
 #-----------------------------------------------------------------------# Hist
@@ -367,7 +367,7 @@ end
 end
 #-----------------------------------------------------------------------# LinReg
 @testset "LinReg" begin
-    ≈(mergevals(LinReg(), eachrow(ymat, y), eachrow(ymat2, y2))...)
+    ≈(mergevals(LinReg(), OnlineStatsBase.eachrow(ymat, y), OnlineStatsBase.eachrow(ymat2, y2))...)
 
     o = fit!(LinReg(), (ymat, y))
     @test coef(o) ≈ ymat \ y 
@@ -378,7 +378,7 @@ end
 end
 #-----------------------------------------------------------------------# LinRegBuilder
 @testset "LinRegBuilder" begin
-    @test ≈(mergevals(LinRegBuilder(), eachrow(ymat), eachrow(ymat2))...)
+    @test ≈(mergevals(LinRegBuilder(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
 
     o = fit!(LinRegBuilder(), ymat)
     for i in 1:5
@@ -387,7 +387,7 @@ end
         @test coef(o, .1; y=i, bias=false) ≈ (data'data ./ n + .1*I) \ data'ymat[:,i] ./ n
     end
 
-    o2 = fit!(LinReg(), eachrow(ymat[:,[4,1]], ymat[:,3]))
+    o2 = fit!(LinReg(), OnlineStatsBase.eachrow(ymat[:,[4,1]], ymat[:,3]))
     @test coef(o, [.2,.4]; y=3, x = [4,1], bias=false) ≈ coef(o2, [.2, .4])
 end
 #-----------------------------------------------------------------------# Mean
@@ -399,15 +399,15 @@ end
 end
 #-----------------------------------------------------------------------# ML
 @testset "ML" begin
-    o = OnlineStats.preprocess(eachrow(ymat))
+    o = OnlineStats.preprocess(OnlineStatsBase.eachrow(ymat))
     for i in 1:5
         @test o.group[i] isa OnlineStats.Numerical
     end
-    o = OnlineStats.preprocess(eachrow(xmat))
+    o = OnlineStats.preprocess(OnlineStatsBase.eachrow(xmat))
     for i in 1:2
         @test o.group[i] isa OnlineStats.Categorical
     end
-    o = OnlineStats.preprocess(eachrow(zmat), 3 => OnlineStats.Categorical(Int))
+    o = OnlineStats.preprocess(OnlineStatsBase.eachrow(zmat), 3 => OnlineStats.Categorical(Int))
     @test o.group[3] isa OnlineStats.Categorical
     @test o.group[1] isa OnlineStats.Numerical
 end

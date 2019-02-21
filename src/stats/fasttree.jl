@@ -159,7 +159,7 @@ end
 
 classify(o::FastTree, x::VectorOb) = classify(whichleaf(o, x))
 function classify(o::FastTree, x::AbstractMatrix) 
-    [classify(o, xi) for xi in eachrow(x)]
+    [classify(o, xi) for xi in OnlineStatsBase.eachrow(x)]
 end
 
 #-----------------------------------------------------------------------# FastForest 
@@ -228,5 +228,5 @@ end
 classify(o::FastForest, x::VectorOb) = _classify(o, x, zeros(Int, nkeys(o)))
 function classify(o::FastForest, x::AbstractMatrix) 
     buffer = zeros(Int, nkeys(o))
-    [_classify(o, xi, buffer) for xi in eachrow(x)]
+    [_classify(o, xi, buffer) for xi in OnlineStatsBase.eachrow(x)]
 end

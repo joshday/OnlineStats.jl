@@ -59,9 +59,9 @@ Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
 
 #-----------------------------------------------------------------------# fit!
 # convenience methods.  deprecate?
-fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, eachrow(x))
-fit!(o::OnlineStat{XY}, x::AbstractMatrix) = fit!(o, eachrow(x))
-fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, eachrow(xy...))
+fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, OnlineStatsBase.eachrow(x))
+fit!(o::OnlineStat{XY}, x::AbstractMatrix) = fit!(o, OnlineStatsBase.eachrow(x))
+fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, OnlineStatsBase.eachrow(xy...))
 
 
 #-----------------------------------------------------------------------# text_histogram
