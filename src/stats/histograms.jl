@@ -399,8 +399,8 @@ function pdf(o::KHist, x::Number)
     a, b = extrema(o.ex)
     if a < x < b
         i = searchsortedfirst(o.bins, KHistBin(x, 0))
-        x1, y1 = xy(o.bins[i - 1])
-        x2, y2 = xy(o.bins[i])
+        x1, y1 = xy(o.bins[max(i - 1, 1)])
+        x2, y2 = xy(o.bins[min(i, end)])
         return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
     else
         x == a && return o.bins[1].count / area(o)
