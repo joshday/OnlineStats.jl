@@ -27,7 +27,7 @@ supertype(typeof(m))
 
 ### Stats can be updated
 
-`fit!(stat::OnlineStat{T}, y::S)` will iterate through y and `fit!` each element if `T != S`.
+`fit!(stat::OnlineStat{T}, y::S)` will iterate through `y` and `fit!` each element if `T != S`.
 
 ```@repl index
 y = randn(100);
@@ -44,7 +44,7 @@ merge!(m, m2)
 
 ### Stats have a value
 
-```@example index
+```@repl index
 value(m)
 ```
 

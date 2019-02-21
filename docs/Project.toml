@@ -1,0 +1,4 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+OnlineStats = "a15396b6-48d5-5d58-9928-6d29437db91e"
+OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"

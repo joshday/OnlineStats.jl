@@ -13,7 +13,6 @@ notifications:
   email: true
 after_success:
   - julia -e 'import Pkg; cd(Pkg.dir("OnlineStats")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
-  - julia -e 'import Pkg; Pkg.add("Documenter")'
 
 jobs:
   include:
