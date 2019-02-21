@@ -105,6 +105,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "#Star-us-on-GitHub!-1",
+    "page": "Home",
+    "title": "Star us on GitHub!",
+    "category": "section",
+    "text": "<iframe src=\"https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>"
+},
+
+{
     "location": "weights/#",
     "page": "Weights",
     "title": "Weights",
@@ -357,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "How fit! Works",
     "title": "Reason 1: OnlineStats doesn\'t want to make assumptions on the shape of your data",
     "category": "section",
-    "text": "Consider CovMatrix, for which a single observation is an AbstractVector, Tuple, or NamedTuple. If I try to update it with a Matrix, it\'s ambiguous whether I want rows or columns of  the matrix to be treated as individual observations.  By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly  use the OnlineStatsBase.eachrow and OnlineStatsBase.eachcol functions, which efficiently iterate over  the rows or columns of the matrix, respectively.fit!(CovMatrix(), eachrow(randn(1000,2)))\n\nfit!(CovMatrix(), eachcol(randn(2,1000)))"
+    "text": "Consider CovMatrix, for which a single observation is an AbstractVector, Tuple, or NamedTuple. If I try to update it with a Matrix, it\'s ambiguous whether I want rows or columns of  the matrix to be treated as individual observations.  By default, OnlineStats will try observations-in-rows, but you can alternately/explicitly  use the OnlineStatsBase.eachrow and OnlineStatsBase.eachcol functions, which efficiently iterate over  the rows or columns of the matrix, respectively.fit!(CovMatrix(), OnlineStats.eachrow(randn(1000,2)))\n\nfit!(CovMatrix(), OnlineStats.eachcol(randn(2,1000)))"
 },
 
 {
