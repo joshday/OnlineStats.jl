@@ -5,7 +5,7 @@
 *.cov
 
 *.ipynb
-*.Manifest.toml
+*Manifest.toml
 
 test/experiment.jl
 
