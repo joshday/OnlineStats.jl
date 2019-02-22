@@ -1,3 +1,8 @@
+```@raw html
+<img src="https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif"
+    style = "display: block; margin-left: auto; margin-right: auto; width: 50%;">
+```
+
 # Home
 
 **OnlineStats** is a Julia package for statistical analysis with algorithms that run both **online** and **in parallel**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
