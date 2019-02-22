@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Home",
     "category": "page",
-    "text": "<img src=\"https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif\"\n    style = \"display: block; margin-left: auto; margin-right: auto; width: 50%;\">"
+    "text": ""
 },
 
 {
@@ -109,7 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Star us on GitHub!",
     "category": "section",
-    "text": "<iframe src=\"https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>"
+    "text": "<iframe src=\"https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>(Image: )"
 },
 
 {
@@ -681,14 +681,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/#OnlineStats.Mean",
-    "page": "API",
-    "title": "OnlineStats.Mean",
-    "category": "type",
-    "text": "Mean(T = Float64; weight=EqualWeight())\n\nTrack a univariate mean, stored as type T.\n\nExample\n\n@time fit!(Mean(), randn(10^6))\n\n\n\n\n\n"
-},
-
-{
     "location": "api/#OnlineStats.Moments",
     "page": "API",
     "title": "OnlineStats.Moments",
@@ -846,14 +838,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.Sum",
     "category": "type",
     "text": "Sum(T::Type = Float64)\n\nTrack the overall sum.\n\nExample\n\nfit!(Sum(Int), fill(1, 100))\n\n\n\n\n\n"
-},
-
-{
-    "location": "api/#OnlineStats.Variance",
-    "page": "API",
-    "title": "OnlineStats.Variance",
-    "category": "type",
-    "text": "Variance(T = Float64; weight=EqualWeight())\n\nUnivariate variance, tracked as type T.\n\nExample\n\no = fit!(Variance(), randn(10^6))\nmean(o)\nvar(o)\nstd(o)\n\n\n\n\n\n"
 },
 
 {
