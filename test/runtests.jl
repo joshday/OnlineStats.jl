@@ -390,13 +390,6 @@ end
     o2 = fit!(LinReg(), OnlineStatsBase.eachrow(ymat[:,[4,1]], ymat[:,3]))
     @test coef(o, [.2,.4]; y=3, x = [4,1], bias=false) ≈ coef(o2, [.2, .4])
 end
-#-----------------------------------------------------------------------# Mean
-@testset "Mean" begin
-    o = fit!(Mean(), y)
-    @test value(o) ≈ mean(y)
-    @test mean(o) ≈ mean(y)
-    @test ≈(mergevals(Mean(), y, y2)...)
-end
 #-----------------------------------------------------------------------# ML
 @testset "ML" begin
     o = OnlineStats.preprocess(OnlineStatsBase.eachrow(ymat))
@@ -577,23 +570,6 @@ end
     @test ≈(mergevals(Sum(), y, y2)...)
     @test ==(mergevals(Sum(Int), z, z2)...)
 end
-#-----------------------------------------------------------------------# Variance
-@testset "Variance" begin
-    o = fit!(Variance(), y)
-    @test mean(o) ≈ mean(y)
-    @test var(o) ≈ var(y)
-    @test std(o) ≈ std(y)
-
-    @test ≈(mergevals(Variance(), x, x2)...)
-    @test ≈(mergevals(Variance(), y, y2)...)
-    @test ≈(mergevals(Variance(Float32), Float32.(y), Float32.(y2))...; atol=.001)
-    @test ≈(mergevals(Variance(), z, z2)...)
-    # Issue 116
-    @test std(Variance()) == 1
-    @test std(fit!(Variance(), 1)) == 1
-    @test std(fit!(Variance(), [1, 2])) == sqrt(.5)
-end
-
 
 include("test_kahan.jl")
 

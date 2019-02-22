@@ -3,7 +3,7 @@ module OnlineStats
 using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
-import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, eachcol
+import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, Mean, Variance
 import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
     fweights, sample, coef, Histogram
