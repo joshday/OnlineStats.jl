@@ -426,7 +426,7 @@ end
     dates = Date(2010):Day(1):Date(2011)
     data = Int.(1:length(dates))
     o = fit!(MovingTimeWindow(Day(4); timetype=Date, valtype=Int), zip(dates, data))
-    @test value(o) == Pair.(dates[end-4:end], data[end-4:end])
+    @test value(o) == collect(Pair(a,b) for (a,b) in zip(dates[end-4:end], data[end-4:end]))
 
     d1 = zip(dates[1:2], data[1:2])
     d2 = zip(dates[3:4], data[3:4])
