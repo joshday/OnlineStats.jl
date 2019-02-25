@@ -1,3 +1,9 @@
+### Star us on GitHub!
+
+```@raw html
+<iframe src="https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+```
+
 # Home
 
 **OnlineStats** is a Julia package for statistical analysis with algorithms that run both **online** and **in parallel**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
@@ -84,11 +90,5 @@ fit!(g, itr)
 
 - [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
 - [JuliaDB Integration](http://juliadb.org/latest/onlinestats/)
-
-### Star us on GitHub!
-
-```@raw html
-<iframe src="https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
-```
 
 ![](https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif)
