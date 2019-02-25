@@ -208,6 +208,6 @@ function _merge!(o::KahanVariance{W1, T}, o2::KahanVariance{W2, T}) where {W1, W
     o
 end
 value(o::KahanVariance{W, T}) where {W, T} =
-    o.n > 1 ? o.σ2 * unbias(o) : T(1.0)
+    o.n > 1 ? o.σ2 * bessel(o) : T(1.0)
 Statistics.var(o::KahanVariance) = value(o)
 Statistics.mean(o::KahanVariance) = o.μ

@@ -253,7 +253,7 @@ end
 nvars(o::CovMatrix) = size(o.A, 1)
 function value(o::CovMatrix; corrected::Bool = true)
     o.value[:] = Matrix(Hermitian((o.A - o.b * o.b')))
-    corrected && rmul!(o.value, unbias(o))
+    corrected && rmul!(o.value, bessel(o))
     o.value
 end
 function _merge!(o::CovMatrix, o2::CovMatrix)
@@ -695,7 +695,7 @@ end
 Statistics.mean(o::Moments) = o.m[1]
 function Statistics.var(o::Moments; corrected=true) 
     out = (o.m[2] - o.m[1] ^ 2) 
-    corrected ? unbias(o) * out : out
+    corrected ? bessel(o) * out : out
 end
 function skewness(o::Moments)
     v = value(o)

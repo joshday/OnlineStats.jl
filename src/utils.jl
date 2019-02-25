@@ -4,21 +4,6 @@ const XY = Union{AbstractVector, Tup, Pair}
 const VectorOb = Union{AbstractVector, Tup}
 const TwoThings{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names, Tuple{T,S}}} where names
 
-smooth(a, b, γ) = a + γ * (b - a)
-
-function smooth!(a, b, γ)
-    for i in eachindex(a)
-        a[i] = smooth(a[i], b[i], γ)
-    end
-end
-
-# upper triangle
-function smooth_syr!(A::AbstractMatrix, x, γ::Number)
-    for j in 1:size(A, 2), i in 1:j
-        A[i, j] = smooth(A[i,j], x[i] * conj(x[j]), γ)
-    end
-end
-
 _dot(x::AbstractVector, y::AbstractVector) = dot(x, y)
 @generated function _dot(x::VectorOb, y::VectorOb)
     n = length(fieldnames(x))
@@ -28,8 +13,6 @@ _dot(x::AbstractVector, y::AbstractVector) = dot(x, y)
         out
     end
 end
-
-unbias(o) = nobs(o) / (nobs(o) - 1)
 
 const ϵ = 1e-7
 
