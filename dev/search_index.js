@@ -9,6 +9,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "#Star-us-on-GitHub!-1",
+    "page": "Home",
+    "title": "Star us on GitHub!",
+    "category": "section",
+    "text": "<iframe src=\"https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>"
+},
+
+{
     "location": "#Home-1",
     "page": "Home",
     "title": "Home",
@@ -101,15 +109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Additional Resources",
     "category": "section",
-    "text": "OnlineStats Demos\nJuliaDB Integration"
-},
-
-{
-    "location": "#Star-us-on-GitHub!-1",
-    "page": "Home",
-    "title": "Star us on GitHub!",
-    "category": "section",
-    "text": "<iframe src=\"https://ghbtns.com/github-btn.html?user=joshday&repo=OnlineStats.jl&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>(Image: )"
+    "text": "OnlineStats Demos\nJuliaDB Integration(Image: )"
 },
 
 {
