@@ -31,8 +31,6 @@ end
 
 unbias(o) = nobs(o) / (nobs(o) - 1)
 
-Statistics.std(o::OnlineStat; kw...) = sqrt.(var(o; kw...))
-
 const ϵ = 1e-7
 
 #-----------------------------------------------------------------------# BiasVec
