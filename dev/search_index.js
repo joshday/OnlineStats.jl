@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plots",
     "title": "Continuous Data",
     "category": "section",
-    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(Hist(10))\n\nfit!(o, y)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_hist.png\"); nothing # hide(Image: )o = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(o, o2)\n\nfit!(s, y)\n\nplot(s, layout = 1, xlab = \"Nobs\")\nsavefig(\"partition_mean_ex.png\"); nothing # hide(Image: )"
+    "text": "y = cumsum(randn(10^6)) + 100randn(10^6)\n\no = Partition(KHist(10))\n\nfit!(o, y)\n\nplot(o, xlab = \"Nobs\")\nsavefig(\"partition_hist.png\"); nothing # hide(Image: )o = Partition(Mean())\no2 = Partition(Extrema())\n\ns = Series(o, o2)\n\nfit!(s, y)\n\nplot(s, layout = 1, xlab = \"Nobs\")\nsavefig(\"partition_mean_ex.png\"); nothing # hide(Image: )"
 },
 
 {
@@ -333,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Plots",
     "title": "Indexed Partitions",
     "category": "section",
-    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, Hist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )x = rand(1:1000, 10^5)\ny = x .+ 30randn(10^5)\n\no = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))\n\nplot(o)\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )"
+    "text": "The Partition type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an IndexedPartition.  x = randn(10^5)\ny = x + randn(10^5)\n\no = fit!(IndexedPartition(Float64, KHist(10)), [x y])\n\nplot(o, ylab = \"Y\", xlab = \"X\")\nsavefig(\"indexpart2.png\"); nothing # hide(Image: )x = rand(\'a\':\'z\', 10^5)\ny = Float64.(x) + randn(10^5)\n\no = fit!(IndexedPartition(Char, Extrema()), [x y])\n\nplot(o, xlab = \"Category\")\nsavefig(\"indexpart3.png\"); nothing # hide(Image: )x = rand(10^5)\ny = rand(1:5, 10^5)\n\no = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))\n\nplot(o, xlab = \"X\", ylab = \"Y\")\nsavefig(\"indexpart4.png\"); nothing # hide(Image: )x = rand(1:1000, 10^5)\ny = x .+ 30randn(10^5)\n\no = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))\n\nplot(o)\nsavefig(\"indexpartequal.png\"); nothing # hide\n(Image: )"
 },
 
 {

@@ -11,13 +11,11 @@ y = map(xi -&gt; xi ? rand(1:3) : rand(1:4), x)
 o = fit!(Mosaic(Bool, Int), [x y])
 plot(o)</code></pre></div><p><img src="../mosaic.png" alt/></p><h2><a class="nav-anchor" id="Partitions-1" href="#Partitions-1">Partitions</a></h2><p>The <a href="../api/#OnlineStats.Partition"><code>Partition</code></a> type summarizes sections of a data stream using any <code>OnlineStat</code>,  and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.  </p><h4><a class="nav-anchor" id="Continuous-Data-1" href="#Continuous-Data-1">Continuous Data</a></h4><div><pre><code class="language-julia">y = cumsum(randn(10^6)) + 100randn(10^6)
 
-o = Partition(Hist(10))
+o = Partition(KHist(10))
 
 fit!(o, y)
 
-plot(o, xlab = &quot;Nobs&quot;)</code></pre><pre><code class="language-none">┌ Warning: `Hist(b::Int)` is deprecated, use `KHist(b::Int)` instead.
-│   caller = top-level scope at none:0
-└ @ Core none:0</code></pre></div><p><img src="../partition_hist.png" alt/></p><div><pre><code class="language-julia">o = Partition(Mean())
+plot(o, xlab = &quot;Nobs&quot;)</code></pre></div><p><img src="../partition_hist.png" alt/></p><div><pre><code class="language-julia">o = Partition(Mean())
 o2 = Partition(Extrema())
 
 s = Series(o, o2)
@@ -38,11 +36,9 @@ fit!(o, y)
 plot(o, xlab = &quot;Nobs&quot;)</code></pre></div><p><img src="../partition_countmap.png" alt/></p><h2><a class="nav-anchor" id="Indexed-Partitions-1" href="#Indexed-Partitions-1">Indexed Partitions</a></h2><p>The <code>Partition</code> type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an <code>IndexedPartition</code>.  </p><div><pre><code class="language-julia">x = randn(10^5)
 y = x + randn(10^5)
 
-o = fit!(IndexedPartition(Float64, Hist(10)), [x y])
+o = fit!(IndexedPartition(Float64, KHist(10)), [x y])
 
-plot(o, ylab = &quot;Y&quot;, xlab = &quot;X&quot;)</code></pre><pre><code class="language-none">┌ Warning: `Hist(b::Int)` is deprecated, use `KHist(b::Int)` instead.
-│   caller = top-level scope at none:0
-└ @ Core none:0</code></pre></div><p><img src="../indexpart2.png" alt/></p><div><pre><code class="language-julia">x = rand(&#39;a&#39;:&#39;z&#39;, 10^5)
+plot(o, ylab = &quot;Y&quot;, xlab = &quot;X&quot;)</code></pre></div><p><img src="../indexpart2.png" alt/></p><div><pre><code class="language-julia">x = rand(&#39;a&#39;:&#39;z&#39;, 10^5)
 y = Float64.(x) + randn(10^5)
 
 o = fit!(IndexedPartition(Char, Extrema()), [x y])
