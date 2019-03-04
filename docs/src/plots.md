@@ -64,7 +64,7 @@ rather than every single observation.
 ```@example setup
 y = cumsum(randn(10^6)) + 100randn(10^6)
 
-o = Partition(Hist(10))
+o = Partition(KHist(10))
 
 fit!(o, y)
 
@@ -128,7 +128,7 @@ to plot one variable against another, you can use an `IndexedPartition`.
 x = randn(10^5)
 y = x + randn(10^5)
 
-o = fit!(IndexedPartition(Float64, Hist(10)), [x y])
+o = fit!(IndexedPartition(Float64, KHist(10)), [x y])
 
 plot(o, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
