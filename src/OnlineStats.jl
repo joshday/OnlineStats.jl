@@ -1,4 +1,4 @@
-module OnlineStats 
+module OnlineStats
 
 using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
@@ -6,21 +6,21 @@ using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, Mean, Variance,
     smooth, smooth!, smooth_syr!, bessel
 import LearnBase: fit!, nobs, value, predict, transform, transform!
-import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints, 
+import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, Histogram
 import DataStructures: OrderedDict, CircularBuffer
 import SweepOperator
 
-export 
-# Statistics 
+export
+# Statistics
     mean, var, std, cov, cor,
-# functions 
+# functions
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
     classify, coef, transform, transform!, stats, series,
-# weights 
-    EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight, 
+# weights
+    EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
     McclainWeight, Bounded, Scaled,
-# algorithms 
+# algorithms
     ADAGRAD, ADAM, ADAMAX, ADADELTA, MSPI, OMAS, OMAP, RMSPROP, SGD,
 # stats
     AutoCov,
@@ -29,13 +29,13 @@ export
     Diff,
     Extrema,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
-    FastNode, FastTree, FastForest, FTSeries, 
+    FastNode, FastTree, FastForest, FTSeries,
     Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
     KHist, KMeans,
     Lag, LinReg, LinRegBuilder,
-    Mean, ModelSchema, Moments, Mosaic, MovingTimeWindow, MovingWindow, 
+    Mean, ModelSchema, Moments, Mosaic, MovingTimeWindow, MovingWindow,
     NBClassifier,
     OrderStats,
     Partition, PlotNN, ProbMap, P2Quantile,
@@ -44,7 +44,7 @@ export
     Series, StatLearn, StatHistory, Sum,
     Variance,
     KahanSum, KahanMean, KahanVariance,
-# other 
+# other
     OnlineStat, BiasVec
 
 input(o::OnlineStat{T}) where {T} = T

@@ -45,14 +45,17 @@ fit!(o::OnlineStat{XY}, x::AbstractMatrix) = fit!(o, OnlineStatsBase.eachrow(x))
 fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, OnlineStatsBase.eachrow(xy...))
 
 
-#-----------------------------------------------------------------------# text_histogram
+# #-----------------------------------------------------------------------# sparkline
 # const ticks = ['▁','▂','▃','▄','▅','▆','▇']
 
-# function text_histogram(x)
+# sparkline(x) = sparkline(stdout, x)
+# sparkline(io::IO, x) = print(io, sparkstring(x))
+
+# function sparkstring(x)
 #     out = ""
 #     if !isempty(x)
 #         a, b = extrema(x)
-#         for xi in x 
+#         for xi in x
 #             i = round(Int, 7 * (xi-a) / (b-a))
 #             out *= i == 0 ? ' ' : ticks[i]
 #         end

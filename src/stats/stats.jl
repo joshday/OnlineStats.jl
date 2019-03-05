@@ -321,7 +321,7 @@ Maximum and minimum.
     maximum(o)
     minimum(o)
 """
-# T is type to store data, S is type of single observation.  
+# T is type to store data, S is type of single observation.
 # E.g. you may want to accept any Number even if you are storing values as Float64
 mutable struct Extrema{T,S} <: OnlineStat{S}
     min::T
@@ -333,7 +333,7 @@ mutable struct Extrema{T,S} <: OnlineStat{S}
     end
 end
 extrema_init(T::Type{<:Number}) = typemax(T), typemin(T), Number
-extrema_init(T::Type{String}) = "", "", String 
+extrema_init(T::Type{String}) = "", "", String
 extrema_init(T::Type{Date}) = typemax(Date), typemin(Date), Date
 extrema_init(T::Type) = rand(T), rand(T), T
 function _fit!(o::Extrema, y)
@@ -422,7 +422,7 @@ observation `y`, `y[i]` is sent to `stats[i]`.
 # Examples
 
     x = randn(100, 2)
-    
+
     fit!(Group(Mean(), Mean()), x)
     fit!(Group(Mean(), Variance()), x)
 
@@ -560,7 +560,7 @@ HyperLogLog(T::Type=Number) = HyperLogLog{16}(T)
 
 @deprecate HyperLogLog(p::Number, T::Type) HyperLogLog{p}(T::Type)
 
-function Base.show(io::IO, o::HyperLogLog{p,T}) where {p,T} 
+function Base.show(io::IO, o::HyperLogLog{p,T}) where {p,T}
     print(io, "HyperLogLog{$p, $T}: n=$(nobs(o)) | value=", value(o))
 end
 
@@ -631,7 +631,7 @@ mutable struct KMeans{T, W} <: OnlineStat{VectorOb}
     rate::W
     n::Int
 end
-function KMeans(p::Integer, k::Integer; rate=LearningRate()) 
+function KMeans(p::Integer, k::Integer; rate=LearningRate())
     KMeans(Tuple(Cluster(zeros(p), 0) for i in 1:k), zeros(k), rate, 0)
 end
 nobs(o::KMeans) = sum(x -> x.n, o.value)
@@ -693,8 +693,8 @@ function _fit!(o::Moments, y::Real)
     @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
 end
 Statistics.mean(o::Moments) = o.m[1]
-function Statistics.var(o::Moments; corrected=true) 
-    out = (o.m[2] - o.m[1] ^ 2) 
+function Statistics.var(o::Moments; corrected=true)
+    out = (o.m[2] - o.m[1] ^ 2)
     corrected ? bessel(o) * out : out
 end
 function skewness(o::Moments)
@@ -1003,7 +1003,7 @@ end
     Quantile(q = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))
 
 Calculate quantiles via a stochastic approximation algorithm `OMAS`, `SGD`, `ADAGRAD`, or
-`MSPI`.  For better (although slower) approximations, see [`P2Quantile`](@ref) and 
+`MSPI`.  For better (although slower) approximations, see [`P2Quantile`](@ref) and
 [`Hist`](@ref).
 
 # Example
