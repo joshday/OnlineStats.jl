@@ -781,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "OnlineStats.Quantile",
     "category": "type",
-    "text": "Quantile(q = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or MSPI.  For better (although slower) approximations, see P2Quantile and  Hist.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n\n\n"
+    "text": "Quantile(q = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))\n\nCalculate quantiles via a stochastic approximation algorithm OMAS, SGD, ADAGRAD, or MSPI.  For better (although slower) approximations, see P2Quantile and Hist.\n\nExample\n\nfit!(Quantile(), randn(10^5))\n\n\n\n\n\n"
 },
 
 {
