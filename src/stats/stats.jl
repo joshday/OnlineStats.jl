@@ -382,7 +382,7 @@ mutable struct FTSeries{N, OS<:Tup, F, T} <: StatCollection{Union{N,Missing}}
 end
 function FTSeries(stats::OnlineStat...; filter=x->true, transform=identity)
     Ts = input.(stats)
-    FTSeries{promote_type(Ts...), typeof(stats), typeof(filter), typeof(transform)}(
+    FTSeries{Union{Ts...}, typeof(stats), typeof(filter), typeof(transform)}(
         stats, filter, transform, 0
     )
 end
@@ -1134,7 +1134,7 @@ Track a collection stats for one data stream.
 struct Series{IN, T} <: StatCollection{IN}
     stats::T
     function Series(stats::T) where T
-        IN = promote_type(map(input, values(stats))...)
+        IN = Union{map(input, stats)...}
         new{IN, T}(stats)
     end
 end
