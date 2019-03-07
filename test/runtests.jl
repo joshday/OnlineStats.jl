@@ -101,26 +101,6 @@ end
     @test diff(o) == 1
     @test last(o) == 10
 end
-#-----------------------------------------------------------------------# Extrema
-@testset "Extrema" begin
-    o = fit!(Extrema(), y)
-    @test extrema(o) == extrema(y)
-    @test minimum(o) == minimum(y)
-    @test maximum(o) == maximum(y)
-
-    @test value(fit!(Extrema(Bool), x)) == extrema(x)
-    @test value(fit!(Extrema(Int), z)) == extrema(z)
-
-    @test ==(mergevals(Extrema(), y, y2)...)
-
-    o = fit!(Extrema(Date), Date(2010):Day(1):Date(2011))
-    @test minimum(o) == Date(2010)
-    @test maximum(o) == Date(2011)
-
-    @test value(fit!(Extrema(Char), 'a':'z')) == ('a', 'z')
-    @test value(fit!(Extrema(Char), "abc")) == ('a', 'c')
-    @test value(fit!(Extrema(String), ["a", "b"])) == ("a", "b")
-end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin
     @testset "FitBeta" begin
@@ -226,16 +206,6 @@ end
     @test classify(o, randn(10)) in 1:2
     @test mean(classify(o, X) .== Y) > .5
 end
-#-----------------------------------------------------------------------# FTSeries
-@testset "FTSeries" begin
-    o = fit!(FTSeries(Mean(); transform=abs), y)
-    @test value(o)[1] ≈ mean(abs, y)
-
-    data = vcat(y, fill(missing, 20))   
-    o = fit!(FTSeries(Mean(); transform=abs, filter=!ismissing), data)
-    @test value(o)[1] ≈ mean(abs, y) 
-    @test o.nfiltered == 20
-end
 #-----------------------------------------------------------------------# Group
 @testset "Group" begin
     o = fit!(5Mean(), OnlineStatsBase.eachrow(ymat))
@@ -266,7 +236,7 @@ end
     end
 end
 #-----------------------------------------------------------------------# HeatMap
-@testset "HeatMap" begin 
+@testset "HeatMap" begin
     data1 = OnlineStatsBase.eachrow(ymat[:, 1:2])
     data2 = OnlineStatsBase.eachrow(ymat2[:, 1:2])
     @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
@@ -283,7 +253,7 @@ end
                 @test fit!(Hist(edges, Number; closed=false, left=false), data).counts == w2
             end
         end
-    end 
+    end
     o = fit!(Hist(-5:.1:5), y)
     for (v1, v2) in zip(extrema(o), extrema(y))
         @test ≈(v1, v2; atol=.1)
@@ -370,7 +340,7 @@ end
     ≈(mergevals(LinReg(), OnlineStatsBase.eachrow(ymat, y), OnlineStatsBase.eachrow(ymat2, y2))...)
 
     o = fit!(LinReg(), (ymat, y))
-    @test coef(o) ≈ ymat \ y 
+    @test coef(o) ≈ ymat \ y
     @test coef(o, .1) ≈ (ymat'ymat ./ n + .1I) \ ymat'y ./ n
     @test coef(o, .1:.1:.5) ≈ (ymat'ymat ./ n + Diagonal(.1:.1:.5)) \ ymat'y ./ n
     @test predict(o, ymat) == ymat * o.β
@@ -511,16 +481,6 @@ end
         @test (yi ∈ y) || (yi ∈ y2)
     end
 end
-#-----------------------------------------------------------------------# Series
-@testset "Series" begin
-    a, b = mergevals(Series(Mean(), Variance()), y, y2)
-    @test a[1] ≈ b[1]
-    @test a[2] ≈ b[2]
-
-    a, b = mergevals(Series(m=Mean(), v=Variance()), y, y2)
-    @test a.m ≈ b.m
-    @test a.v ≈ b.v
-end
 #-----------------------------------------------------------------------# StatHistory
 @testset "StatHistory" begin
     o = fit!(StatHistory(Mean(), 10), 1:20)
@@ -560,23 +520,14 @@ end
         println()
     end
 end
-#-----------------------------------------------------------------------# Sum
-@testset "Sum" begin
-    @test value(fit!(Sum(Int), x)) == sum(x)
-    @test value(fit!(Sum(), y)) ≈ sum(y)
-    @test value(fit!(Sum(Int), z)) == sum(z)
-
-    @test ==(mergevals(Sum(Int), x, x2)...)
-    @test ≈(mergevals(Sum(), y, y2)...)
-    @test ==(mergevals(Sum(Int), z, z2)...)
-end
+#-----------------------------------------------------------------------# Kahan
 
 include("test_kahan.jl")
 
 #-----------------------------------------------------------------------# Show methods
 @testset "Show methods" begin
-    for stat in [BiasVec([1,2,3]), Bootstrap(Mean()), CallFun(Mean(), println), FastNode(5), 
-                 FastTree(5), FastForest(5), FTSeries(Variance()), Group(Mean(), Mean()), 
+    for stat in [BiasVec([1,2,3]), Bootstrap(Mean()), CallFun(Mean(), println), FastNode(5),
+                 FastTree(5), FastForest(5), FTSeries(Variance()), Group(Mean(), Mean()),
                  HyperLogLog{10}(), LinRegBuilder(4), NBClassifier(5, Float64), ProbMap(Int),
                  P2Quantile(.5), Series(Mean()), StatLearn(5)]
         println("  > ", stat)

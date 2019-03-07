@@ -3,8 +3,8 @@ module OnlineStats
 using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
-import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, Mean, Variance,
-    smooth, smooth!, smooth_syr!, bessel
+import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, smooth, smooth!,
+    smooth_syr!, bessel, StatCollection, Mean, Variance, Series, FTSeries
 import LearnBase: fit!, nobs, value, predict, transform, transform!
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, Histogram
