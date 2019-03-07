@@ -481,14 +481,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/#OnlineStats.FTSeries",
-    "page": "API",
-    "title": "OnlineStats.FTSeries",
-    "category": "type",
-    "text": "FTSeries(stats...; filter=x->true, transform=identity)\n\nTrack multiple stats for one data stream that is filtered and transformed before being fitted.\n\nFTSeries(T, stats...; filter, transform)\n\nCreate an FTSeries and specify the type T of the transformed values.\n\nExample\n\no = FTSeries(Mean(), Variance(); transform=abs)\nfit!(o, -rand(1000))\n\n# Remove missing values represented as DataValues\nusing DataValues\ny = DataValueArray(randn(100), rand(Bool, 100))\no = FTSeries(DataValue, Mean(); transform=get, filter=!isna)\nfit!(o, y)\n\n\n\n\n\n"
-},
-
-{
     "location": "api/#OnlineStats.FastForest",
     "page": "API",
     "title": "OnlineStats.FastForest",
@@ -809,14 +801,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "api/#OnlineStats.Series",
-    "page": "API",
-    "title": "OnlineStats.Series",
-    "category": "type",
-    "text": "Series(stats)\nSeries(stats...)\nSeries(; stats...)\n\nTrack a collection stats for one data stream.\n\nExample\n\ns = Series(Mean(), Variance())\nfit!(s, randn(1000))\n\n\n\n\n\n"
-},
-
-{
     "location": "api/#OnlineStats.StatHistory",
     "page": "API",
     "title": "OnlineStats.StatHistory",
@@ -830,14 +814,6 @@ var documenterSearchIndex = {"docs": [
     "title": "OnlineStats.StatLearn",
     "category": "type",
     "text": "StatLearn(p, args...; rate=LearningRate())\n\nFit a model that is linear in the parameters.  \n\nThe (offline) objective function that StatLearn approximately minimizes is\n\n(1n) ᵢ f(yᵢ xᵢβ) + ⱼ λⱼ g(βⱼ)\n\nwhere fᵢ are loss functions of a single response and linear predictor, λⱼs are  nonnegative regularization parameters, and g is a penalty function. \n\nArguments\n\nloss = .5 * L2DistLoss()\npenalty = NoPenalty()\nalgorithm = SGD()\nrate = LearningRate(.6) (keyword arg)\n\nExample\n\nx = randn(1000, 5)\ny = x * range(-1, stop=1, length=5) + randn(1000)\n\no = fit!(StatLearn(5, MSPI()), (x, y))\ncoef(o)\n\n\n\n\n\n"
-},
-
-{
-    "location": "api/#OnlineStats.Sum",
-    "page": "API",
-    "title": "OnlineStats.Sum",
-    "category": "type",
-    "text": "Sum(T::Type = Float64)\n\nTrack the overall sum.\n\nExample\n\nfit!(Sum(Int), fill(1, 100))\n\n\n\n\n\n"
 },
 
 {
