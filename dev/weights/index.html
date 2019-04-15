@@ -5,13 +5,13 @@ ExponentialWeight(lookback::Int)</code></pre><p>Exponentially weighted observati
 julia&gt; y = randn(100);
 
 julia&gt; fit!(Mean(weight = EqualWeight()), y)
-Mean: n=100 | value=-0.108824
+Mean: n=100 | value=-0.017575
 
 julia&gt; fit!(Mean(weight = inv), y)
-Mean: n=100 | value=-0.108824
+Mean: n=100 | value=-0.017575
 
 julia&gt; fit!(Mean(weight = ExponentialWeight(.01)), y)
-Mean: n=100 | value=-0.225594
+Mean: n=100 | value=0.254398
 
 julia&gt; fit!(Mean(weight = x -&gt; x == 1 ? 1.0 : .01), y)
-Mean: n=100 | value=-0.225594</code></pre><footer><hr/><a class="previous" href="../"><span class="direction">Previous</span><span class="title">Home</span></a><a class="next" href="../stats_and_models/"><span class="direction">Next</span><span class="title">Statistics and Models</span></a></footer></article></body></html>
+Mean: n=100 | value=0.254398</code></pre><footer><hr/><a class="previous" href="../"><span class="direction">Previous</span><span class="title">Home</span></a><a class="next" href="../stats_and_models/"><span class="direction">Next</span><span class="title">Statistics and Models</span></a></footer></article></body></html>
