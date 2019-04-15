@@ -5,7 +5,7 @@ using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, smooth, smooth!,
     smooth_syr!, bessel, Extrema, StatCollection, Mean, Variance, Series, FTSeries
-import LearnBase: fit!, nobs, value, predict, transform, transform!
+import LearnBase: fit!, nobs, value, predict
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, Histogram
 import DataStructures: OrderedDict, CircularBuffer
@@ -16,7 +16,7 @@ export
     mean, var, std, cov, cor,
 # functions
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    classify, coef, transform, transform!, stats, series,
+    classify, coef, stats, series,
 # weights
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
     McclainWeight, Bounded, Scaled,
