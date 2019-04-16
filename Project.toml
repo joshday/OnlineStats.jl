@@ -1,0 +1,17 @@
+name = "OnlineStats"
+uuid = "a15396b6-48d5-5d58-9928-6d29437db91e"
+version = "0.24.0"
+
+[deps]
+LearnBase = "7f8f8fb0-2700-5f03-b4bd-41f8cfc144b6"
+LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
+OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"
+PenaltyFunctions = "06bb1623-fdd5-5ca2-a01c-88eae3ea319e"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
+
+[compat]
+julia = "1.0"
+OnlineStatsBase = "^0.11.0"
