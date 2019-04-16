@@ -3,8 +3,10 @@ module OnlineStats
 using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
 
-import OnlineStatsBase: OnlineStat, name, _fit!, _merge!, eachrow, smooth, smooth!, pdf,
-    probs, smooth_syr!, bessel, Extrema, StatCollection, Mean, Variance, Series, FTSeries
+import OnlineStatsBase: name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
+    smooth_syr!, eachcol, eachrow
+    # Extrema, FTSeries, GroupBy, Mean, Series, StatCollection, Variance
+
 import LearnBase: fit!, nobs, value, predict
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, Histogram
@@ -26,24 +28,21 @@ export
 # stats
     AutoCov,
     Bootstrap,
-    CallFun, Count, CountMap, CovMatrix, CStat,
+    CallFun, CovMatrix,
     Diff,
-    Extrema,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
-    FastNode, FastTree, FastForest, FTSeries,
-    Group, GroupBy,
+    FastNode, FastTree, FastForest,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
     KHist, KMeans,
     Lag, LinReg, LinRegBuilder,
-    Mean, ModelSchema, Moments, Mosaic, MovingTimeWindow, MovingWindow,
+    ModelSchema, Mosaic, MovingTimeWindow, MovingWindow,
     NBClassifier,
     OrderStats,
     Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    Series, StatLearn, StatHistory, StatLag, Sum,
-    Variance,
+    StatLearn, StatHistory, StatLag,
     KahanSum, KahanMean, KahanVariance,
 # other
     OnlineStat, BiasVec

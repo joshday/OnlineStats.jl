@@ -251,96 +251,6 @@ end
 Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
 
-#-----------------------------------------------------------------------# Group
-"""
-    Group(stats::OnlineStat...)
-    Group(; stats...)
-    Group(collection)
-
-Create a vector-input stat from several scalar-input stats.  For a new
-observation `y`, `y[i]` is sent to `stats[i]`.
-
-# Examples
-
-    x = randn(100, 2)
-
-    fit!(Group(Mean(), Mean()), x)
-    fit!(Group(Mean(), Variance()), x)
-
-    o = fit!(Group(m1 = Mean(), m2 = Mean()), x)
-    o.stats.m1
-    o.stats.m2
-"""
-struct Group{T} <: StatCollection{VectorOb}
-    stats::T
-end
-Group(o::OnlineStat...) = Group(o)
-Group(;o...) = Group(o.data)
-nobs(o::Group) = nobs(first(o.stats))
-Base.:(==)(a::Group, b::Group) = all(a.stats .== b.stats)
-
-Base.getindex(o::Group, i) = o.stats[i]
-Base.first(o::Group) = first(o.stats)
-Base.last(o::Group) = last(o.stats)
-Base.length(o::Group) = length(o.stats)
-Base.values(o::Group) = map(value, o.stats)
-
-Base.iterate(o::Group) = (o.stats[1], 2)
-Base.iterate(o::Group, i) = i > length(o) ? nothing : (o.stats[i], i + 1)
-
-@generated function _fit!(o::Group{T}, y) where {T}
-    N = fieldcount(T)
-    :(Base.Cartesian.@nexprs $N i -> @inbounds(_fit!(o.stats[i], y[i])))
-end
-function _fit!(o::Group{T}, y) where {T<:AbstractVector}
-    for (i,yi) in enumerate(y)
-        _fit!(o.stats[i], yi)
-    end
-end
-
-_merge!(o::Group, o2::Group) = map(merge!, o.stats, o2.stats)
-
-Base.:*(n::Integer, o::OnlineStat) = Group([copy(o) for i in 1:n]...)
-
-#-----------------------------------------------------------------------# GroupBy
-"""
-    GroupBy{T}(stat)
-    GroupBy(T, stat)
-
-Update `stat` for each group (of type `T`).
-
-# Example
-
-    x = rand(1:10, 10^5)
-    y = x .+ randn(10^5)
-    fit!(GroupBy{Int}(Extrema()), zip(x,y))
-"""
-mutable struct GroupBy{T, O <: OnlineStat} <: OnlineStat{VectorOb}
-    value::OrderedDict{T, O}
-    init::O
-    n::Int
-end
-GroupBy{T}(stat::O) where {T, O} = GroupBy{T,O}(OrderedDict{T, O}(), stat, 0)
-GroupBy(T::Type, stat::OnlineStat) = GroupBy{T}(stat)
-function _fit!(o::GroupBy, xy)
-    o.n += 1
-    x, y = xy
-    x in keys(o.value) ? fit!(o.value[x], y) : (o.value[x] = fit!(copy(o.init), y))
-end
-Base.getindex(o::GroupBy{T}, i::T) where {T} = o.value[i]
-function Base.show(io::IO, o::GroupBy)
-    print(io, name(o, false, true))
-    for (i, (k,v)) in enumerate(o.value)
-        char = i == length(o.value) ?  '└' : '├'
-        print(io, "\n  $(char)── $k: $v")
-    end
-end
-function _merge!(a::GroupBy{T,O}, b::GroupBy{T,O}) where {T,O}
-    a.init == b.init || error("Cannot merge GroupBy objects with different inits")
-    a.n += b.n
-    merge!((o1, o2) -> merge!(o1, o2), a.value, b.value)
-end
-
 #-----------------------------------------------------------------------# StatLag
 """
     StatLag(stat, b)
@@ -504,57 +414,6 @@ function _fit!(o::KMeans, x)
         cluster = o.value[k_star]
         smooth!(cluster.value, x, o.rate(cluster.n += 1))
     end
-end
-
-#-----------------------------------------------------------------------# Moments
-"""
-    Moments(; weight=EqualWeight())
-
-First four non-central moments.
-
-# Example
-
-    o = fit!(Moments(), randn(1000))
-    mean(o)
-    var(o)
-    std(o)
-    skewness(o)
-    kurtosis(o)
-"""
-mutable struct Moments{W} <: OnlineStat{Number}
-    m::Vector{Float64}
-    weight::W
-    n::Int
-end
-Moments(;weight = EqualWeight()) = Moments(zeros(4), weight, 0)
-function _fit!(o::Moments, y::Real)
-    γ = o.weight(o.n += 1)
-    y2 = y * y
-    @inbounds o.m[1] = smooth(o.m[1], y, γ)
-    @inbounds o.m[2] = smooth(o.m[2], y2, γ)
-    @inbounds o.m[3] = smooth(o.m[3], y * y2, γ)
-    @inbounds o.m[4] = smooth(o.m[4], y2 * y2, γ)
-end
-Statistics.mean(o::Moments) = o.m[1]
-function Statistics.var(o::Moments; corrected=true)
-    out = (o.m[2] - o.m[1] ^ 2)
-    corrected ? bessel(o) * out : out
-end
-function skewness(o::Moments)
-    v = value(o)
-    vr = o.m[2] - o.m[1]^2
-    (v[3] - 3.0 * v[1] * vr - v[1] ^ 3) / vr ^ 1.5
-end
-function kurtosis(o::Moments)
-    # v = value(o)
-    # (v[4] - 4.0 * v[1] * v[3] + 6.0 * v[1] ^ 2 * v[2] - 3.0 * v[1] ^ 4) / var(o) ^ 2 - 3.0
-    m1, m2, m3, m4 = value(o)
-    (m4 - 4.0 * m1 * m3 + 6.0 * m1^2 * m2 - 3.0 * m1 ^ 4) / var(o; corrected=false) ^ 2 - 3.0
-end
-function _merge!(o::Moments, o2::Moments)
-    γ = o2.n / (o.n += o2.n)
-    smooth!(o.m, o2.m, γ)
-    o
 end
 
 #-----------------------------------------------------------------------# MovingTimeWindow
@@ -966,7 +825,3 @@ end
 #     group::Group
 # end
 # nobs(o::Summarizer) = nobs(o.group)
-
-#-----------------------------------------------------------------------# CStat
-@deprecate CStat(::Mean) Mean(Complex{Float64})
-@deprecate CStat(::Variance) Variance(Complex{Float64})

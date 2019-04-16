@@ -46,7 +46,7 @@ end
 
 
 #-----------------------------------------------------------------------# StatCollection
-@recipe function f(s::StatCollection)
+@recipe function f(s::OnlineStatsBase.StatCollection)
     if :layout in keys(plotattributes)
         for stat in s.stats
             @series begin stat end

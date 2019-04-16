@@ -39,11 +39,9 @@ Base.getindex(v::BiasVec, i::Int) = i > length(v.x) ? v.bias : v.x[i]
 Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
 
 #-----------------------------------------------------------------------# fit!
-# convenience methods.  deprecate?
-fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) = fit!(o, OnlineStatsBase.eachrow(x))
-fit!(o::OnlineStat{XY}, x::AbstractMatrix) = fit!(o, OnlineStatsBase.eachrow(x))
-fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) = fit!(o, OnlineStatsBase.eachrow(xy...))
-
+@deprecate fit!(o::OnlineStat{VectorOb}, x::AbstractMatrix) fit!(o, eachrow(x))
+@deprecate fit!(o::OnlineStat{XY}, x::AbstractMatrix) fit!(o, eachrow(x))
+@deprecate fit!(o::OnlineStat{XY}, xy::Tuple{AbstractMatrix, AbstractVector}) fit!(o, zip(eachrow(xy[1]), xy[2]))
 
 # #-----------------------------------------------------------------------# sparkline
 # const ticks = ['▁','▂','▃','▄','▅','▆','▇']

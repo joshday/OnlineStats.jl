@@ -52,7 +52,7 @@ end
 end
 #-----------------------------------------------------------------------# CovMatrix
 @testset "CovMatrix" begin
-    o = fit!(CovMatrix(), ymat)
+    o = fit!(CovMatrix(), eachrow(ymat))
     @test value(o) ≈ cov(ymat)
     @test cov(o) ≈ cov(ymat)
     @test cor(o) ≈ cor(ymat)
@@ -119,7 +119,7 @@ end
         o = FitMultinomial(5)
         @test value(o)[2] == ones(5) / 5
         data = [1 2 3 4 5; 1 2 3 4 5]
-        @test value(fit!(o, data))[2] == collect(2:2:10) ./ sum(data)
+        @test value(fit!(o, eachrow(data)))[2] == collect(2:2:10) ./ sum(data)
 
         data1 = OnlineStatsBase.eachrow(rand(1:4, 10, 3))
         data2 = OnlineStatsBase.eachrow(rand(2:7, 11, 3))
@@ -135,8 +135,10 @@ end
 end
 #-----------------------------------------------------------------------# FastNode
 @testset "FastNode" begin
-    data  = (ymat, rand(1:3,1000))
-    data2 = (ymat, rand(1:3,1000))
+    X, Y = ymat, rand(1:3, 1000)
+    X2, Y2 = ymat, rand(1:3, 1000)
+    data  = zip(eachrow(X), Y)
+    data2 = zip(eachrow(X2), Y2)
     o  = fit!(FastNode(5, 3), data)
     o2 = fit!(FastNode(5, 3), data2)
     merge!(o, o2)
@@ -147,7 +149,7 @@ end
     end
     @test length(o[1]) == 3
 
-    pvec = [mean(data[2] .== 1), mean(data[2] .== 2), mean(data[2] .== 3)]
+    pvec = [mean(Y .== 1), mean(Y .== 2), mean(Y .== 3)]
     o = fit!(FastNode(5, 3), data)
     @test probs(o) == pvec
     @test nobs(o) == 1000
@@ -158,7 +160,7 @@ end
 #-----------------------------------------------------------------------# FastTree
 @testset "FastTree" begin
     X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
-    o = fit!(FastTree(10; splitsize=100), (X,Y))
+    o = fit!(FastTree(10; splitsize=100), zip(eachrow(X),Y))
     @test classify(o, X[1,:]) ∈ [1, 2]
     @test all(0 .< classify(o, X) .< 3)
     @test OnlineStats.nkeys(o) == 2
@@ -168,44 +170,16 @@ end
     # Issue 116
     Random.seed!(218)
     X,Y = OnlineStats.fakedata(FastNode, 10^4, 1)
-    fit!(FastTree(1, splitsize=100),(X,Y))
+    fit!(FastTree(1, splitsize=100), zip(eachrow(X),Y))
 end
 #-----------------------------------------------------------------------# FastForest
 @testset "FastForest" begin
     X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
-    o = fit!(FastForest(10; splitsize=500, λ = .7), (X, Y))
+    o = fit!(FastForest(10; splitsize=500, λ = .7), zip(eachrow(X), Y))
     @test classify(o, randn(10)) in 1:2
     @test mean(classify(o, X) .== Y) > .5
 end
-#-----------------------------------------------------------------------# Group
-@testset "Group" begin
-    o = fit!(5Mean(), OnlineStatsBase.eachrow(ymat))
-    @test o[1] == first(o)
-    @test 5Mean() == 5Mean()
-    @test collect(map(value, value(o))) ≈ vec(mean(ymat, dims=1))
 
-    o2 = Group(m1=Mean(), m2=Mean(), m3=Mean(), m4=Mean(), m5=Mean())
-    fit!(o2, ymat)
-    @test collect(map(value, value(o2))) ≈ vec(mean(ymat, dims=1))
-    @test length(o2) == 5
-
-    a, b = mergevals(Group(Mean(),Variance(),Sum(),Moments(),Mean()), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))
-    for (ai, bi) in zip(a, b)
-        @test value(ai) ≈ value(bi)
-    end
-end
-#-----------------------------------------------------------------------# Group
-@testset "GroupBy" begin
-    @test GroupBy{Bool}(Mean()) == GroupBy(Bool, Mean())
-    d = value(fit!(GroupBy{Bool}(Mean()), zip(x,y)))
-    @test value(d[true]) ≈ mean(y[x])
-    @test value(d[false]) ≈ mean(y[map(!,x)])
-
-    a, b = mergevals(GroupBy{Int}(Mean()), zip(z,y), zip(z2, y2))
-    for (ai,bi) in zip(values(sort(a)), values(sort(b)))
-        @test value(ai) ≈ value(bi)
-    end
-end
 #-----------------------------------------------------------------------# HeatMap
 @testset "HeatMap" begin
     data1 = OnlineStatsBase.eachrow(ymat[:, 1:2])
@@ -302,15 +276,15 @@ end
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin
-    o = fit!(KMeans(5,2), ymat)
+    o = fit!(KMeans(5,2), eachrow(ymat))
     sort!(o, rev=true)
     @test o.value[1].n ≥ o.value[2].n
 end
 #-----------------------------------------------------------------------# LinReg
 @testset "LinReg" begin
-    ≈(mergevals(LinReg(), OnlineStatsBase.eachrow(ymat, y), OnlineStatsBase.eachrow(ymat2, y2))...)
+    ≈(mergevals(LinReg(), zip(eachrow(ymat), y), zip(eachrow(ymat2), y2))...)
 
-    o = fit!(LinReg(), (ymat, y))
+    o = fit!(LinReg(), zip(eachrow(ymat), y))
     @test coef(o) ≈ ymat \ y
     @test coef(o, .1) ≈ (ymat'ymat ./ n + .1I) \ ymat'y ./ n
     @test coef(o, .1:.1:.5) ≈ (ymat'ymat ./ n + Diagonal(.1:.1:.5)) \ ymat'y ./ n
@@ -321,14 +295,14 @@ end
 @testset "LinRegBuilder" begin
     @test ≈(mergevals(LinRegBuilder(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
 
-    o = fit!(LinRegBuilder(), ymat)
+    o = fit!(LinRegBuilder(), eachrow(ymat))
     for i in 1:5
         data = ymat[:, setdiff(1:5, i)]
         @test coef(o; y=i) ≈ [data ones(n)] \ ymat[:,i]
         @test coef(o, .1; y=i, bias=false) ≈ (data'data ./ n + .1*I) \ data'ymat[:,i] ./ n
     end
 
-    o2 = fit!(LinReg(), OnlineStatsBase.eachrow(ymat[:,[4,1]], ymat[:,3]))
+    o2 = fit!(LinReg(), zip(eachrow(ymat[:,[4,1]]), ymat[:,3]))
     @test coef(o, [.2,.4]; y=3, x = [4,1], bias=false) ≈ coef(o2, [.2, .4])
 end
 #-----------------------------------------------------------------------# ML
@@ -345,19 +319,7 @@ end
     @test o.group[3] isa OnlineStats.Categorical
     @test o.group[1] isa OnlineStats.Numerical
 end
-#-----------------------------------------------------------------------# Moments
-@testset "Moments" begin
-    o = fit!(Moments(), y)
-    @test value(o) ≈ [mean(y), mean(y .^ 2), mean(y .^ 3), mean(y .^ 4)]
-    @test mean(o) ≈ mean(y)
-    @test var(o) ≈ var(y)
-    @test std(o) ≈ std(y)
-    @test skewness(o) ≈ skewness(y)
-    @test kurtosis(o) ≈ kurtosis(y)
-    for (v1,v2) in zip(mergevals(Moments(), y, y2)...)
-        @test v1 ≈ v2
-    end
-end
+
 #-----------------------------------------------------------------------# Mosaic
 @testset "Mosaic" begin
     @test ==(mergevals(Mosaic(Int,Int), zip(z, z2), zip(z2, z))...)
@@ -382,8 +344,8 @@ end
 end
 #-----------------------------------------------------------------------# NBClassifier
 @testset "NBClassifier" begin
-    o = fit!(NBClassifier(5, Bool), (ymat,x))
-    merge!(o, fit!(NBClassifier(5, Bool), (ymat2,x2)))
+    o = fit!(NBClassifier(5, Bool), zip(eachrow(ymat),x))
+    merge!(o, fit!(NBClassifier(5, Bool), zip(eachrow(ymat2), x2)))
     @test nobs(o) == 2000
     @test length(probs(o)) == 2
     @test sum(predict(o, ymat[1,:])) ≈ 1
@@ -473,7 +435,7 @@ end
         for L in [.5 * L2DistLoss()]
             print(" | $L")
             # sanity checks
-            o = fit!(StatLearn(5, A, L; rate=LearningRate(.7)), (X,Y))
+            o = fit!(StatLearn(5, A, L; rate=LearningRate(.7)), zip(eachrow(X),Y))
             @test o.loss isa typeof(L)
             @test o.alg isa typeof(A)
             any(isnan.(o.β)) && @info((L, A))
@@ -485,7 +447,7 @@ end
         end
         for L in [LogitMarginLoss(), DWDMarginLoss(1.0)]
             print(" | $L")
-            o = fit!(StatLearn(5, A, L), (X,Y2))
+            o = fit!(StatLearn(5, A, L), zip(eachrow(X),Y2))
             @test mean(Y2 .== classify(o, X)) > .5
         end
         println()
