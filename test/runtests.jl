@@ -275,7 +275,7 @@ end
     @test mean(o) ≈ mean(y)
     @test var(o) ≈ var(y)
     @test median(o) ≈ median(y)
-    @test quantile(o) ≈ quantile(y)
+    @test quantile(o) ≈ quantile(y, [0, .25, .5, .75, 1])
     @test std(o) ≈ std(y)
     @test extrema(o) == extrema(y)
 

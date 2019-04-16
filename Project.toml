@@ -3,15 +3,25 @@ uuid = "a15396b6-48d5-5d58-9928-6d29437db91e"
 version = "0.24.0"
 
 [deps]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 LearnBase = "7f8f8fb0-2700-5f03-b4bd-41f8cfc144b6"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"
 PenaltyFunctions = "06bb1623-fdd5-5ca2-a01c-88eae3ea319e"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
-julia = "1.0"
 OnlineStatsBase = "^0.11.0"
+julia = "1.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
