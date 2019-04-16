@@ -7,6 +7,9 @@ Store the last `b` values for a data stream of type `T`.  Values are stored as
 
 ``v(t), v(t-1), v(t-2), …, v(t-b+1)``
 
+so that `value(o::Lag)[1]` is the most recent observation and `value(o::Lag)[end]` is the
+`b`-th most recent observation.
+
 # Example
 
     o = fit!(Lag{Int}(10), 1:12)
@@ -14,16 +17,20 @@ Store the last `b` values for a data stream of type `T`.  Values are stored as
     o[end]
 """
 mutable struct Lag{T} <: OnlineStat{T}
-    circbuff::CircularBuffer{T}
+    value::Vector{T}
+    b::Int
     n::Int
-    Lag{T}(b::Integer) where {T} = new{T}(CircularBuffer{T}(b), 0)
 end
-Lag(b::Integer, T = Float64) = Lag{T}(b)
-value(o::Lag) = reverse(o.circbuff)
-_fit!(o::Lag, y) = (o.n += 1; push!(o.circbuff, y))
-Base.length(o::Lag) = length(o.circbuff)
-Base.getindex(o::Lag, i) = o.circbuff[end - i + 1]
+Lag(T::Type, b::Integer) = Lag(T[], b, 0)
+function _fit!(o::Lag, y)
+    o.n += 1
+    pushfirst!(o.value, y)
+    length(o.value) > o.b && pop!(o.value)
+end
+Base.length(o::Lag) = length(o.value)
+Base.getindex(o::Lag, i) = o.value[i]
 Base.lastindex(o::Lag) = length(o)
+
 
 """
     AutoCov(b, T = Float64; weight=EqualWeight())
@@ -48,7 +55,7 @@ struct AutoCov{T, W} <: OnlineStat{T}
 end
 function AutoCov(k::Integer, T = Float64; kw...)
     d = k + 1
-    AutoCov(zeros(d), zeros(d), zeros(d), Lag{T}(d), Lag{Float64}(d), Variance(;kw...))
+    AutoCov(zeros(d), zeros(d), zeros(d), Lag(T, d), Lag(Float64, d), Variance(;kw...))
 end
 nobs(o::AutoCov) = nobs(o.v)
 
@@ -148,48 +155,6 @@ value(o::CallFun) = value(o.stat)
 Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
 _fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
 _merge!(o::CallFun, o2::CallFun) = _merge!(o.stat, o2.stat)
-
-#-----------------------------------------------------------------------# CountMap
-"""
-    CountMap(T::Type)
-    CountMap(dict::AbstractDict{T, Int})
-
-Track a dictionary that maps unique values to its number of occurrences.  Similar to
-`StatsBase.countmap`.
-
-# Example
-
-    o = fit!(CountMap(Int), rand(1:10, 1000))
-    value(o)
-    probs(o)
-    OnlineStats.pdf(o, 1)
-    collect(keys(o))
-"""
-mutable struct CountMap{T, A <: AbstractDict{T, Int}} <: OnlineStat{T}
-    value::A  # OrderedDict by default
-    n::Int
-end
-CountMap{T}() where {T} = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T,Int}(), 0)
-CountMap(T::Type = Any) = CountMap{T, OrderedDict{T,Int}}(OrderedDict{T, Int}(), 0)
-CountMap(d::D) where {T,D<:AbstractDict{T, Int}} = CountMap{T, D}(d, 0)
-function _fit!(o::CountMap, x)
-    o.n += 1
-    o.value[x] = get!(o.value, x, 0) + 1
-end
-_merge!(o::CountMap, o2::CountMap) = (merge!(+, o.value, o2.value); o.n += o2.n)
-function probs(o::CountMap, kys = keys(o.value))
-    out = zeros(Int, length(kys))
-    valkeys = keys(o.value)
-    for (i, k) in enumerate(kys)
-        out[i] = k in valkeys ? o.value[k] : 0
-    end
-    sum(out) == 0 ? Float64.(out) : out ./ sum(out)
-end
-pdf(o::CountMap, y) = y in keys(o.value) ? o.value[y] / nobs(o) : 0.0
-Base.keys(o::CountMap) = keys(o.value)
-nkeys(o::CountMap) = length(o.value)
-Base.values(o::CountMap) = values(o.value)
-Base.getindex(o::CountMap, i) = o.value[i]
 
 #-----------------------------------------------------------------------# CovMatrix
 """
@@ -376,32 +341,34 @@ function _merge!(a::GroupBy{T,O}, b::GroupBy{T,O}) where {T,O}
     merge!((o1, o2) -> merge!(o1, o2), a.value, b.value)
 end
 
-#-----------------------------------------------------------------------# StatHistory
+#-----------------------------------------------------------------------# StatLag
 """
-    StatHistory(stat, b)
+    StatLag(stat, b)
 
 Track a moving window (previous `b` copies) of `stat`.
 
 # Example
 
-    fit!(StatHistory(Mean(), 10), 1:20)
+    fit!(StatLag(Mean(), 10), 1:20)
 """
-struct StatHistory{T, O<:OnlineStat{T}} <: OnlineStat{T}
-    circbuff::CircularBuffer{O}
+struct StatLag{T, O<:OnlineStat{T}} <: OnlineStat{T}
+    lag::Lag{O}
     stat::O
 end
-function StatHistory(stat::O, b::Integer) where {T,O<:OnlineStat{T}}
-    StatHistory{T,O}(CircularBuffer{O}(b), stat)
+function StatLag(stat::O, b::Integer) where {T, O<:OnlineStat{T}}
+    StatLag{T,O}(Lag(O,b), stat)
 end
-nobs(o::StatHistory) = nobs(o.stat)
-function _fit!(o::StatHistory, y)
+nobs(o::StatLag) = nobs(o.stat)
+function _fit!(o::StatLag, y)
     _fit!(o.stat, y)
-    pushfirst!(o.circbuff, copy(o.stat))
+    _fit!(o.lag, copy(o.stat))
 end
-function Base.show(io::IO, o::StatHistory)
+function Base.show(io::IO, o::StatLag)
     print(io, name(o, false, true))
-    print_stat_tree(io, o.circbuff)
+    OnlineStatsBase.print_stat_tree(io, o.lag.value)
 end
+
+Base.@deprecate_binding StatHistory StatLag
 
 #-----------------------------------------------------------------------# HyperLogLog
 # https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf

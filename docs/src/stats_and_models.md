@@ -13,7 +13,7 @@
 | Difference                         | [`Diff`](@ref)             |
 | Lag                                | [`Lag`](@ref)              |
 | Autocorrelation/autocovariance     | [`AutoCov`](@ref)          |
-| Tracked history                    | [`StatHistory`](@ref)      |
+| Tracked history                    | [`StatLag`](@ref)      |
 | **Multivariate Analysis:**         |                            |
 | Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
 | Principal components analysis      | [`CovMatrix`](@ref)        |

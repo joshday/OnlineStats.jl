@@ -50,25 +50,25 @@ end
     if :layout in keys(plotattributes)
         for stat in s.stats
             @series begin stat end
-        end 
+        end
     else  # hack to ensure series aren't sent to wrong subplots
         layout --> length(s.stats)
         for i in eachindex(s.stats)
-            @series begin 
-                subplot --> i 
+            @series begin
+                subplot --> i
                 s.stats[i]
             end
         end
     end
 end
 
-#-----------------------------------------------------------------------# GroupBy 
+#-----------------------------------------------------------------------# GroupBy
 @recipe function f(o::GroupBy{T, <:Union{KHist, Hist}}) where {T}
     sort!(o.value)
     link --> :all
     for (k, v) in pairs(o.value)
-        @series begin 
-            label --> k 
+        @series begin
+            label --> k
             v
         end
     end
@@ -79,14 +79,14 @@ end
     collect(keys(o.value)), value.(collect(values(o.value)))
 end
 
-#-----------------------------------------------------------------------# StatHistory 
-@recipe function f(o::StatHistory)
-    layout --> length(o.circbuff)
-    for i in 1:length(o.circbuff)
-        @series begin 
-            subplot --> i 
+#-----------------------------------------------------------------------# StatLag
+@recipe function f(o::StatLag)
+    layout --> length(o.value)
+    for i in 1:length(o.value)
+        @series begin
+            subplot --> i
             label --> "Current - $(i-1)"
-            o.circbuff[i]
+            o.value[i]
         end
     end
 end
@@ -126,7 +126,7 @@ end
 
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap, kys = keys(o); sortby = :keys)
-    seriestype --> :bar 
+    seriestype --> :bar
     kys = collect(kys)
     vls = [o.value[ky] for ky in kys]
     sortby in [:keys, :values] || @warn("sortby = :$sortby not recognized")
@@ -155,14 +155,14 @@ end
         label --> name(parts[1].stat, false, false)
         y2 = plotshape(y)
         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
-        if length(y[1]) == 2 
+        if length(y[1]) == 2
             # seriestype --> :step
             fillto --> y2[:, 1]
             alpha --> .4
             linewidth --> 0
             x2, y2[:, 2]
         else
-            x2, y2 
+            x2, y2
         end
     elseif y[1] isa AbstractDict  # CountMap
         kys = []
@@ -170,18 +170,18 @@ end
             ky ∉ kys && push!(kys, ky)
         end
         sort!(kys)
-        @series begin 
+        @series begin
             label --> reshape(kys, (1, length(kys)))
             ylim --> (0, 1)
             linewidth --> .5
             seriestype --> :bar
-            if parts[1].a isa Number 
+            if parts[1].a isa Number
                 bar_widths --> [p.b - p.a for p in parts]
             end
             y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
             x, y
         end
-    else 
+    else
         error("No plot recipe exists for this kind of partition")
     end
 end
@@ -201,23 +201,23 @@ plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachinde
     x = []
     y = []
     fillz = Int[]
-    for part in parts 
+    for part in parts
         edg = edges(part.stat)
         cnts = counts(part.stat)
         for i in eachindex(cnts)
             if cnts[i] > 0
                 # rectangle
-                push!(x, part.a); push!(y, edg[i])   
-                push!(x, part.a); push!(y, edg[i + 1]) 
-                push!(x, part.b); push!(y, edg[i + 1]) 
-                push!(x, part.b); push!(y, edg[i])   
+                push!(x, part.a); push!(y, edg[i])
+                push!(x, part.a); push!(y, edg[i + 1])
+                push!(x, part.b); push!(y, edg[i + 1])
+                push!(x, part.b); push!(y, edg[i])
                 push!(x, NaN); push!(y, NaN);
                 # fill color
                 push!(fillz, cnts[i])
             end
         end
     end
-    @series begin 
+    @series begin
         seriestype := :shape
         linewidth --> 0
         linealpha --> 0
@@ -229,22 +229,22 @@ end
 
 
 
-#-----------------------------------------------------------------------# NBClassifier 
+#-----------------------------------------------------------------------# NBClassifier
 @recipe function f(o::NBClassifier)
     kys = collect(keys(o))
     layout --> nvars(o) + 1
-    for j in 1:nvars(o) 
+    for j in 1:nvars(o)
         stats = o[j]
         for (i, s) in enumerate(stats)
-            @series begin 
+            @series begin
                 title --> "Var $j"
-                legend --> false 
-                subplot --> j 
+                legend --> false
+                subplot --> j
                 s
             end
         end
     end
-    @series begin 
+    @series begin
         subplot --> nvars(o) + 1
         label --> reshape(kys, 1, length(kys))
         framestyle := :none

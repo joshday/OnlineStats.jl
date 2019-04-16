@@ -23,8 +23,8 @@ LinReg(p=0;weight=EqualWeight()) = LinReg(zeros(p), zeros(1, 1), weight, 0)
 
 function _fit!(o::LinReg, xy)
     γ = o.weight(o.n += 1)
-    x, y = xy 
-    if o.n == 1 
+    x, y = xy
+    if o.n == 1
         p = length(x)
         o.β = zeros(p)
         o.A = zeros(p + 1, p + 1)
@@ -39,10 +39,10 @@ function _fit!(o::LinReg, xy)
     o.A[end] = smooth(o.A[end], y * y, γ)  # y'y
 end
 value(o::LinReg, args...) = coef(o, args...)
-function coef(o::LinReg) 
+function coef(o::LinReg)
     o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)]) \ o.A[1:(end-1), end]
 end
-function coef(o::LinReg, λ::Real) 
+function coef(o::LinReg, λ::Real)
     o.β[:] = Symmetric(o.A[1:(end-1), 1:(end-1)] + λ*I) \ o.A[1:(end-1), end]
 end
 function coef(o::LinReg, λ::AbstractVector{<:Real})
@@ -62,12 +62,12 @@ end
     LinRegBuilder(p)
 
 Create an object from which any variable can be regressed on any other set of variables,
-optionally with element-wise ridge regularization.  The main function to use with 
+optionally with element-wise ridge regularization.  The main function to use with
 `LinRegBuilder` is `coef`:
 
     coef(o::LinRegBuilder, λ = 0; y=1, x=[2,3,...], bias=true, verbose=false)
 
-Return the coefficients of a regressing column `y` on columns `x` with ridge (`L2Penalty`) 
+Return the coefficients of a regressing column `y` on columns `x` with ridge (`L2Penalty`)
 parameter `λ`.  An intercept (`bias`) term is added by default.
 
 # Examples
@@ -81,20 +81,20 @@ parameter `λ`.  An intercept (`bias`) term is added by default.
 """
 mutable struct LinRegBuilder{W} <: OnlineStat{VectorOb}
     A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
-    weight::W 
+    weight::W
     n::Int
 end
-function LinRegBuilder(p=0; weight = EqualWeight()) 
+function LinRegBuilder(p=0; weight = EqualWeight())
     LinRegBuilder(Matrix{Float64}(undef, p + 1, p + 1), weight, 0)
 end
-function Base.show(io::IO, o::LinRegBuilder) 
+function Base.show(io::IO, o::LinRegBuilder)
     print(io, "LinRegBuilder of $(nvars(o)) variables")
 end
 nvars(o::LinRegBuilder) = size(o.A, 1) - 1
 
-function _fit!(o::LinRegBuilder, x) 
-    o.n += 1 
-    if o.n == 1 
+function _fit!(o::LinRegBuilder, x)
+    o.n += 1
+    if o.n == 1
         o.A = zeros(length(x) + 1, length(x) + 1)
         o.A[end] = 1.0
     end
@@ -121,11 +121,11 @@ function coef(o::LinRegBuilder, λ=0.0; y=1, x=xs(o,y), bias=true, verbose=false
     push!(inds, y)
     S = Symmetric(o.A)[inds, inds]
     add_diag!(S, λ)
-    SweepOperator.sweep!(S, 1:(length(inds)-1))
+    sweep!(S, 1:(length(inds)-1))
     return S[1:(length(inds)-1), end]
 end
 
-function _merge!(o::LinRegBuilder, o2::LinRegBuilder) 
+function _merge!(o::LinRegBuilder, o2::LinRegBuilder)
     o.n += o2.n
     smooth!(o.A, o2.A, nobs(o2) / nobs(o))
 end

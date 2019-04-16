@@ -426,7 +426,7 @@ end
     @test ≈(mergevals(OrderStats(100), y, y2)...)
     o = fit!(OrderStats(n), y)
     @test value(o) == sort(y)
-    @test quantile(o) == quantile(y)
+    @test quantile(o, 0:.25:1) == quantile(y, 0:.25:1)
 end
 #-----------------------------------------------------------------------# Partition
 @testset "Partition" begin
@@ -481,11 +481,11 @@ end
         @test (yi ∈ y) || (yi ∈ y2)
     end
 end
-#-----------------------------------------------------------------------# StatHistory
-@testset "StatHistory" begin
-    o = fit!(StatHistory(Mean(), 10), 1:20)
-    @test length(value(o)) == 10
-    for (i, m) in enumerate(reverse(o.circbuff))
+#-----------------------------------------------------------------------# StatLag
+@testset "StatLag" begin
+    o = fit!(StatLag(Mean(), 10), 1:20)
+    @test length(o.lag.value) == 10
+    for (i, m) in enumerate(reverse(o.lag.value))
         @test nobs(m) == 10 + i
     end
     @test nobs(value(o)[1]) == 20
