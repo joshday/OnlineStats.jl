@@ -26,7 +26,7 @@ savefig("plot_series.png") # hide
 
 The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
 
-```@example setup 
+```@example setup
 # make data
 x = randn(10^5, 5)
 y = x * [1,3,5,7,9] .> 0
@@ -40,11 +40,11 @@ savefig("nbclassifier.png"); nothing # hide
 
 ## Mosaic Plots
 
-The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.  
+The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.
 It is typically more useful than a bar plot, as class probabilities are given by the horizontal
 widths.
 
-```@example setup 
+```@example setup
 x = rand([true, true, false], 10^5)
 y = map(xi -> xi ? rand(1:3) : rand(1:4), x)
 o = fit!(Mosaic(Bool, Int), [x y])
@@ -55,9 +55,9 @@ savefig("mosaic.png"); nothing # hide
 
 ## Partitions
 
-The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`, 
+The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`,
 and is therefore extremely useful in visualizing huge datasets, as summaries are plotted
-rather than every single observation.  
+rather than every single observation.
 
 #### Continuous Data
 
@@ -98,7 +98,7 @@ o = Partition(Variance())
 fit!(o, y)
 
 plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = "Nobs")
-savefig("partition_ci.png"); nothing # hide  
+savefig("partition_ci.png"); nothing # hide
 ```
 ![](partition_ci.png)
 
@@ -121,7 +121,7 @@ savefig("partition_countmap.png"); nothing # hide
 ## Indexed Partitions
 
 The `Partition` type can only track the number of observations in the x-axis.  If you wish
-to plot one variable against another, you can use an `IndexedPartition`.  
+to plot one variable against another, you can use an `IndexedPartition`.
 
 
 ```@example setup

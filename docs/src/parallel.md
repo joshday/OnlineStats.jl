@@ -1,13 +1,16 @@
 # Parallel Computation
 
-Two `OnlineStat`s can be merged together, which facilitates [Embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  Merging in **OnlineStats** is used by [**JuliaDB**](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics in parallel on large persistent datasets.
+`OnlineStat`s can be merged together to facilitate [Embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  For example, merging in **OnlineStats** is used under the hood by [**JuliaDB**](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics in parallel.
+
 
 !!! note
     In general, `fit!` is a cheaper operation than `merge!`.
 
-## Exact merges
+!!! warn
+    Not every `OnlineStat` can be merged.  In these cases, **OnlineStats** either uses an
+    approximation or provides a warning that no merging occurred.
 
-Many `OnlineStat`s are capable of calculating the exact value as a corresponding offline estimator.  For these types, the order of `fit!`-ting and `merge!`-ing does not matter.
+## Example
 
 ```julia
 y1 = randn(10_000)
@@ -29,7 +32,3 @@ merge!(s1, s3)  # merge information from s3 into s1
 ```@raw html
 <img width = 500 src = "https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png">
 ```
-
-## Other Merges
-
-For `OnlineStat`s that rely on approximations, merging isn't always a well-defined operation.  OnlineStats will either make a sane choice for merging or print a warning that merging did not occur.  Please open an [issue](https://github.com/joshday/OnlineStats.jl/issues) to discuss a stat you believe you should be merge-able.
