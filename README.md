@@ -1,4 +1,6 @@
-<img src="https://user-images.githubusercontent.com/8075494/39086572-80874e5a-4561-11e8-9a05-e52b21a3e580.png" width=755>
+<p align="center">
+  <img width="460" src="https://user-images.githubusercontent.com/8075494/57313750-3d890d80-70be-11e9-99c9-b3fe0de6ea81.png">
+</p>
 
 | Docs | Build | Test |
 |:----:|:-----:|:----:|
