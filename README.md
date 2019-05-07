@@ -2,38 +2,10 @@
   <img width="460" src="https://user-images.githubusercontent.com/8075494/57313750-3d890d80-70be-11e9-99c9-b3fe0de6ea81.png">
 </p>
 
-<table align="center">
-<tr>
-    <th>Docs</th>
-    <th>Build</th>
-    <th>Test</th>
-</tr>
-<tr>
-    <td>
-        <a href="https://joshday.github.io/OnlineStats.jl/stable">
-            <img src="https://img.shields.io/badge/docs-stable-blue.svg">
-        </a>
-        <br>
-        <a href="https://joshday.github.io/OnlineStats.jl/latest">
-            <img src="https://img.shields.io/badge/docs-latest-blue.svg">
-        </a>
-    </td>
-    <td>
-        <a href="https://travis-ci.org/joshday/OnlineStats.jl">
-            <img src="https://travis-ci.org/joshday/OnlineStats.jl.svg">
-        </a>
-        <br>
-        <a href="https://ci.appveyor.com/project/joshday/onlinestats-jl/branch/master">
-            <img src="https://ci.appveyor.com/api/projects/status/x2t1ey2sgbmow1a4/branch/master?svg=true">
-        </a>
-    </td>
-    <td>
-        <a href="https://codecov.io/gh/joshday/OnlineStats.jl">
-            <img src="https://codecov.io/gh/joshday/OnlineStats.jl/branch/master/graph/badge.svg">
-        </a>
-    </td>
-</tr>
-</table>
+
+| Docs | Build | Test |
+|:-----|:------|:-----|
+| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable) [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest) | [![Build Status](https://travis-ci.org/joshday/OnlineStats.jl.svg)](https://travis-ci.org/joshday/OnlineStats.jl) [![Build status](https://ci.appveyor.com/api/projects/status/x2t1ey2sgbmow1a4/branch/master?svg=true)](https://ci.appveyor.com/project/joshday/onlinestats-jl/branch/master) | [![codecov](https://codecov.io/gh/joshday/OnlineStats.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/OnlineStats.jl) |
 
 
 # Online algorithms for statistics
