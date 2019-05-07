@@ -2,7 +2,7 @@ using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
     format = Documenter.HTML(),
-    sitename = "OnlineStats.jl",
+    sitename = "OnlineStats Docs",
     authors = "Josh Day",
     clean = true,
     debug = true,
