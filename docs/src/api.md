@@ -4,5 +4,6 @@
 ```
 
 ```@autodocs
-Modules = [OnlineStats]
+Modules = [OnlineStats, OnlineStatsBase]
+Filter = T -> typeof(T) === DataType ? !(T <: Weight) : true
 ```

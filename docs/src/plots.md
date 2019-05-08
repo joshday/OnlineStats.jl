@@ -6,8 +6,10 @@ Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
 using OnlineStats
 using Plots
+using PlotThemes
 Random.seed!(1234)
 gr()
+theme(:juno)
 ```
 
 # Plots
@@ -32,7 +34,7 @@ x = randn(10^5, 5)
 y = x * [1,3,5,7,9] .> 0
 
 o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
-fit!(o, (x, y))
+fit!(o, zip(eachrow(x), y))
 plot(o)
 savefig("nbclassifier.png"); nothing # hide
 ```
@@ -47,7 +49,7 @@ widths.
 ```@example setup
 x = rand([true, true, false], 10^5)
 y = map(xi -> xi ? rand(1:3) : rand(1:4), x)
-o = fit!(Mosaic(Bool, Int), [x y])
+o = fit!(Mosaic(Bool, Int), eachrow([x y]))
 plot(o)
 savefig("mosaic.png"); nothing # hide
 ```
@@ -128,7 +130,7 @@ to plot one variable against another, you can use an `IndexedPartition`.
 x = randn(10^5)
 y = x + randn(10^5)
 
-o = fit!(IndexedPartition(Float64, KHist(10)), [x y])
+o = fit!(IndexedPartition(Float64, KHist(10)), eachrow([x y]))
 
 plot(o, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
@@ -139,7 +141,7 @@ savefig("indexpart2.png"); nothing # hide
 x = rand('a':'z', 10^5)
 y = Float64.(x) + randn(10^5)
 
-o = fit!(IndexedPartition(Char, Extrema()), [x y])
+o = fit!(IndexedPartition(Char, Extrema()), eachrow([x y]))
 
 plot(o, xlab = "Category")
 savefig("indexpart3.png"); nothing # hide

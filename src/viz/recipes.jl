@@ -1,10 +1,10 @@
 #-----------------------------------------------------------------------# Weight
 @recipe function f(wt::Weight; nobs=50)
-    xlab --> "Number of Observations"
-    ylab --> "Weight Value"
+    xlabel --> "Number of Observations"
+    ylabel --> "Weight Value"
     label --> name(wt)
     ylim --> (0, 1)
-    w --> 2
+    linewidth --> 2
     [wt(i) for i in 1:nobs]
 end
 

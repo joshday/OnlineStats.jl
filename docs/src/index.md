@@ -55,7 +55,9 @@ value(m)
 
 ## Collections of Stats
 
-![](https://user-images.githubusercontent.com/8075494/40438658-3c4e8592-5e7e-11e8-97f1-76a749163de9.png)
+```@raw html
+<img src="https://user-images.githubusercontent.com/8075494/57342826-bf088c00-710e-11e9-9ac0-f3c1e5aa7a7d.png" style="width:400px">
+```
 
 ```@setup collections
 using OnlineStats
@@ -93,5 +95,3 @@ fit!(g, itr)
 
 - [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
 - [JuliaDB Integration](http://juliadb.org/latest/onlinestats/)
-
-![](https://user-images.githubusercontent.com/8075494/32734476-260821d0-c860-11e7-8c91-49ba0b86397a.gif)

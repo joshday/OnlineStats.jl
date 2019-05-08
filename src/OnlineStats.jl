@@ -5,7 +5,6 @@ using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
     smooth_syr!, eachcol, eachrow
-    # Extrema, FTSeries, GroupBy, Mean, Series, StatCollection, Variance
 
 import LearnBase: fit!, nobs, value, predict
 import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,

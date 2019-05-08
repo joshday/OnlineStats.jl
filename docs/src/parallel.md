@@ -30,5 +30,5 @@ merge!(s1, s3)  # merge information from s3 into s1
 ```
 
 ```@raw html
-<img width = 500 src = "https://user-images.githubusercontent.com/8075494/32748459-519986e8-c88a-11e7-89b3-80dedf7f261b.png">
+<img src = "https://user-images.githubusercontent.com/8075494/57345083-95079780-7117-11e9-81bf-71b0469f04c7.png" style="width:400px">
 ```

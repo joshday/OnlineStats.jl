@@ -1,5 +1,5 @@
 ```@setup howfitworks
-using OnlineStats, LinearAlgebra
+using OnlineStats
 ```
 
 # How `fit!` Works
@@ -23,8 +23,8 @@ If I try to update it with a `Matrix`, it's ambiguous whether I want *rows* or *
 the matrix to be treated as individual observations.
 
 !!! note
-    Use [`eachrow`](@ref) and [`eachcol`](@ref) (after `using LinearAlgebra`) to choose what to iterate over.  For Julia
-    versions less than 1.1, use [`OnlineStats.eachrow`](@ref) and [`OnlineStats.eachcol`](@ref).
+    Use `eachrow` and `eachcol` (from `LinearAlgebra`) to choose what to iterate over.
+    For Julia versions less than 1.1, use `OnlineStats.eachrow` and `OnlineStats.eachcol`.
 
 
 ```@example howfitworks

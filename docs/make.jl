@@ -1,8 +1,9 @@
 using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
-    format = Documenter.HTML(),
+    format = Documenter.HTML(assets = ["assets/style.css"]),
     sitename = "OnlineStats Docs",
+    modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
     clean = true,
     debug = true,
