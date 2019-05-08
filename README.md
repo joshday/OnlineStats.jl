@@ -14,8 +14,6 @@ Online algorithms are well suited for streaming data or when data is too large t
 
 ![](https://user-images.githubusercontent.com/8075494/46229806-d55a9800-c334-11e8-8616-e4e27e58d66d.gif)
 
-
-
 # Quickstart
 
 ```julia

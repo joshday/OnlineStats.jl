@@ -1,0 +1,4 @@
+[deps]
+GR = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+PlotThemes = "ccf2f8ad-2431-5c83-bf29-c5338b663b6a"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
