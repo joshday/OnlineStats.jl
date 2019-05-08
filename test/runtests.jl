@@ -398,8 +398,8 @@ end
             Quantile(τ; alg=OMAS()),
             Quantile(τ; alg=ADAGRAD())
             ]
-        @test ≈(value(fit!(copy(o), data)), quantile(data, τ), atol=.4)
-        @test ≈(mergevals(o, data, data2)...; atol=.4)
+        @test ≈(value(fit!(copy(o), data)), quantile(data, τ), atol=.5)
+        @test ≈(mergevals(o, data, data2)...; atol=.5)
 
     end
     for τi in τ
