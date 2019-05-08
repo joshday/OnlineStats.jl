@@ -9,7 +9,7 @@
 Online algorithms are well suited for streaming data or when data is too large to hold in memory.  **OnlineStats** processes observations one by one and all **algorithms use O(1) memory**.
 
 <p align="center">
-  <img width="460" src="https://user-images.githubusercontent.com/8075494/46229806-d55a9800-c334-11e8-8616-e4e27e58d66d.gif">
+  <img width="550" src="https://user-images.githubusercontent.com/8075494/46229806-d55a9800-c334-11e8-8616-e4e27e58d66d.gif">
 </p>
 
 | Docs | Build | Test |
