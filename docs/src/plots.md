@@ -14,10 +14,13 @@ theme(:juno)
 
 # Plots
 
+!!! note
+    Each of the following examples are plotting **one million data points**.
+
 ## Many Stats Can Be Plotted via Plot Recipes
 
 ```@example setup
-s = fit!(Series(KHist(25), Hist(-5:5)), randn(10^6))
+s = fit!(Series(KHist(25), Hist(-5:.2:5)), randn(10^6))
 plot(s)
 savefig("plot_series.png") # hide
 ```
@@ -30,7 +33,7 @@ The [`NBClassifier`](@ref) type stores conditional histograms of the predictor v
 
 ```@example setup
 # make data
-x = randn(10^5, 5)
+x = randn(10^6, 5)
 y = x * [1,3,5,7,9] .> 0
 
 o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
@@ -47,7 +50,7 @@ It is typically more useful than a bar plot, as class probabilities are given by
 widths.
 
 ```@example setup
-x = rand([true, true, false], 10^5)
+x = rand([true, true, false], 10^6)
 y = map(xi -> xi ? rand(1:3) : rand(1:4), x)
 o = fit!(Mosaic(Bool, Int), eachrow([x y]))
 plot(o)
@@ -127,10 +130,10 @@ to plot one variable against another, you can use an `IndexedPartition`.
 
 
 ```@example setup
-x = randn(10^5)
-y = x + randn(10^5)
+x = randn(10^6)
+y = x + randn(10^6)
 
-o = fit!(IndexedPartition(Float64, KHist(10)), eachrow([x y]))
+o = fit!(IndexedPartition(Float64, KHist(40), 40), eachrow([x y]))
 
 plot(o, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
@@ -138,8 +141,8 @@ savefig("indexpart2.png"); nothing # hide
 ![](indexpart2.png)
 
 ```@example setup
-x = rand('a':'z', 10^5)
-y = Float64.(x) + randn(10^5)
+x = rand('a':'z', 10^6)
+y = 5sin.(Float64.(x)) + Float64.(x) + randn(10^6)
 
 o = fit!(IndexedPartition(Char, Extrema()), eachrow([x y]))
 
@@ -149,8 +152,8 @@ savefig("indexpart3.png"); nothing # hide
 ![](indexpart3.png)
 
 ```@example setup
-x = rand(10^5)
-y = rand(1:5, 10^5)
+x = rand(10^6)
+y = rand(1:5, 10^6)
 
 o = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))
 
@@ -160,8 +163,8 @@ savefig("indexpart4.png"); nothing # hide
 ![](indexpart4.png)
 
 ```@example setup
-x = rand(1:1000, 10^5)
-y = x .+ 30randn(10^5)
+x = rand(1:1000, 10^6)
+y = x .+ 30randn(10^6)
 
 o = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))
 
