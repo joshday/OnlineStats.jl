@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Online Algorithms for Statistics, Models, and Big Data Viz
+  <strong>Online Algorithms for Statistics, Models, and Big Data Viz</strong>
 </p>
 
 Online algorithms are well suited for streaming data or when data is too large to hold in memory.  **OnlineStats** processes observations one by one and all **algorithms use O(1) memory**.
