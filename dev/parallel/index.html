@@ -16,6 +16,6 @@ merge!(s1, s3)  # merge information from s3 into s1</code></pre><h3><a class="na
 addprocs(3)
 @everywhere using OnlineStats
 
-@distributed merge! for i in 1:3
+@distributed merge for i in 1:3
     s = fit!(Series(Mean(), Variance(), KHist(20)), randn(10_000))
 end</code></pre><img src = "https://user-images.githubusercontent.com/8075494/57345083-95079780-7117-11e9-81bf-71b0469f04c7.png" style="width:400px"><footer><hr/><a class="previous" href="../stats_and_models/"><span class="direction">Previous</span><span class="title">Statistics and Models</span></a><a class="next" href="../plots/"><span class="direction">Next</span><span class="title">Plots</span></a></footer></article></body></html>
