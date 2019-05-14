@@ -38,7 +38,7 @@ using Distributed
 addprocs(3)
 @everywhere using OnlineStats
 
-@distributed merge! for i in 1:3
+@distributed merge for i in 1:3
     s = fit!(Series(Mean(), Variance(), KHist(20)), randn(10_000))
 end
 ```

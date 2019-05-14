@@ -1,6 +1,6 @@
 name = "OnlineStats"
 uuid = "a15396b6-48d5-5d58-9928-6d29437db91e"
-version = "0.26.0"
+version = "0.26.1"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
