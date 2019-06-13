@@ -36,6 +36,8 @@ function midpoint(o::Part)
     end
 end
 
+midpoint(o::Part{<:TimeType}) = o.a + fld(o.b - o.a, 2)
+
 width(o::Part) = o.b - o.a
 
 isfull(o::Part{Int}) = (nobs(o) == o.b - o.a + 1)
