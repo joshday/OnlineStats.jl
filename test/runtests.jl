@@ -231,7 +231,7 @@ end
     data = randn(10_000)
     o = fit!(KHist(50), data)
     @test OnlineStats.pdf(o, -10) == 0.0
-    @test ≈(OnlineStats.pdf(o, 0.0), 0.3989422804014327, atol=.2)
+    @test ≈(OnlineStats.pdf(o, 0.0), 0.3989422804014327, atol=.5)
     @test OnlineStats.pdf(o, 10) == 0.0
     @test OnlineStats.cdf(o, -10) == 0.0
     @test ≈(OnlineStats.cdf(o, 0.0), .5; atol=.1)
