@@ -47,7 +47,6 @@
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
-| Callbacks                          | [`CallFun`](@ref)          |
 | Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref) |
 | **Collections of Stats:**          |                            |
 | Applied to same data stream        | [`Series`](@ref), [`FTSeries`](@ref) |
