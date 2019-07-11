@@ -5,14 +5,14 @@ ExponentialWeight(lookback::Int)</code></pre><p>Exponentially weighted observati
 julia&gt; y = randn(100);
 
 julia&gt; fit!(Mean(weight = EqualWeight()), y)
-Mean: n=100 | value=-0.015688
+Mean: n=100 | value=-0.2135
 
 julia&gt; fit!(Mean(weight = inv), y)
-Mean: n=100 | value=-0.015688
+Mean: n=100 | value=-0.2135
 
 julia&gt; fit!(Mean(weight = ExponentialWeight(.01)), y)
-Mean: n=100 | value=-0.239714
+Mean: n=100 | value=0.580584
 
 julia&gt; fit!(Mean(weight = x -&gt; x == 1 ? 1.0 : .01), y)
-Mean: n=100 | value=-0.239714</code></pre><h2><a class="nav-anchor" id="Example-of-Weight-Effects-using-Data-with-[Concept-Drift](https://en.wikipedia.org/wiki/Concept_drift)-1" href="#Example-of-Weight-Effects-using-Data-with-[Concept-Drift](https://en.wikipedia.org/wiki/Concept_drift)-1">Example of Weight Effects using Data with <a href="https://en.wikipedia.org/wiki/Concept_drift">Concept Drift</a></a></h2><br>
+Mean: n=100 | value=0.580584</code></pre><h2><a class="nav-anchor" id="Example-of-Weight-Effects-using-Data-with-[Concept-Drift](https://en.wikipedia.org/wiki/Concept_drift)-1" href="#Example-of-Weight-Effects-using-Data-with-[Concept-Drift](https://en.wikipedia.org/wiki/Concept_drift)-1">Example of Weight Effects using Data with <a href="https://en.wikipedia.org/wiki/Concept_drift">Concept Drift</a></a></h2><br>
 <img src="https://user-images.githubusercontent.com/8075494/57347308-d4d27d00-711f-11e9-8fbe-fc4523b96b48.gif" style="width:400"><footer><hr/><a class="previous" href="../"><span class="direction">Previous</span><span class="title">Home</span></a><a class="next" href="../stats_and_models/"><span class="direction">Next</span><span class="title">Statistics and Models</span></a></footer></article></body></html>
