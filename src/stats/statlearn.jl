@@ -1,23 +1,23 @@
 """
     StatLearn(p, args...; rate=LearningRate())
 
-Fit a model that is linear in the parameters.  
+Fit a model that is linear in the parameters.
 
 The (offline) objective function that StatLearn approximately minimizes is
 
 ``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
 
-where ``fᵢ`` are loss functions of a single response and linear predictor, ``λⱼ``s are 
-nonnegative regularization parameters, and ``g`` is a penalty function. 
+where ``fᵢ`` are loss functions of a single response and linear predictor, ``λⱼ``s are
+nonnegative regularization parameters, and ``g`` is a penalty function.
 
-# Arguments 
+# Arguments
 
 - `loss = .5 * L2DistLoss()`
 - `penalty = NoPenalty()`
 - `algorithm = SGD()`
 - `rate = LearningRate(.6)` (keyword arg)
 
-# Example 
+# Example
 
     x = randn(1000, 5)
     y = x * range(-1, stop=1, length=5) + randn(1000)
@@ -29,15 +29,15 @@ mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: OnlineStat{XY}
     β::Vector{Float64}
     λ::Vector{Float64}
     gx::Vector{Float64}
-    loss::L 
-    penalty::P 
+    loss::L
+    penalty::P
     alg::A
-    rate::W 
+    rate::W
     n::Int
 end
 function StatLearn(p::Int, args...; rate=LearningRate())
-    λ, loss, pen, alg = zeros(p), .5*L2DistLoss(), NoPenalty(), SGD()
-    for a in args 
+    λ, loss, pen, alg = zeros(p), .5*L2DistLoss(), PenaltyFunctions.NoPenalty(), SGD()
+    for a in args
         a isa AbstractVector && (λ = a)
         a isa Float64        && (λ = fill(a, 1))
         a isa Loss           && (loss = a)
@@ -60,20 +60,20 @@ end
 coef(o::StatLearn) = value(o)
 
 function gradient!(o::StatLearn, x, y)
-    d_dη = deriv(o.loss, y, predict(o, x))
+    d_dη = LearnBase.deriv(o.loss, y, predict(o, x))
     for j in eachindex(o.gx)
         o.gx[j] = x[j] * d_dη
     end
 end
 function _fit!(o::StatLearn{<:SGAlgorithm}, xy)
-    x, y = xy 
+    x, y = xy
     o.n += 1
     gradient!(o, x, y)
     update!(o.alg, o.gx)
     updateβ!(o, o.rate(o.n))
 end
 function _merge!(o::StatLearn, o2::StatLearn)
-    o.n += o2.n 
+    o.n += o2.n
     γ = nobs(o2) / nobs(o)
     smooth!(o.β, o2.β, γ)
     merge!(o.alg, o2.alg, γ)
@@ -127,7 +127,7 @@ end
 #     for j in eachindex(o.β)
 #         U.θ[j] = o.β[j] - U.α * U.v[j]
 #     end
-#     ŷ = _dot(x, U.θ) 
+#     ŷ = _dot(x, U.θ)
 #     for j in eachindex(o.β)
 #         U.v[j] = U.α * U.v[j] + deriv(o.loss, y, ŷ) * x[j]
 #         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
@@ -160,15 +160,15 @@ lconst(o::StatLearn, x, y) = lconst(o.loss, x, y)
 
 lconst(o::Loss, x, y) = error("No defined Lipschitz constant for $o")
 lconst(o::L2Scaled{N}, x, y) where {N} = 2N * _dot(x, x)
-lconst(o::L2DistLoss, x, y) = 2 * _dot(x, x)
-lconst(o::LogitMarginLoss, x, y) = .25 * _dot(x, x)
-lconst(o::DWDMarginLoss, x, y) = (o.q + 1)^2 / o.q * _dot(x, x)
+lconst(o::LossFunctions.L2DistLoss, x, y) = 2 * _dot(x, x)
+lconst(o::LossFunctions.LogitMarginLoss, x, y) = .25 * _dot(x, x)
+lconst(o::LossFunctions.DWDMarginLoss, x, y) = (o.q + 1)^2 / o.q * _dot(x, x)
 
 #-----------------------------------------------------------------------# OMAS
 # L stored in o.alg.a[1]
 function _fit!(o::StatLearn{OMAS}, xy)
     γ = o.rate(o.n += 1)
-    x, y = xy 
+    x, y = xy
     b = o.alg.b
     gradient!(o, x, y)
     ht = lconst(o.loss, x, y)

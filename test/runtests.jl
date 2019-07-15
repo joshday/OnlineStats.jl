@@ -1,4 +1,5 @@
 using OnlineStats, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
+using LossFunctions, PenaltyFunctions
 
 #-----------------------------------------------------------------------# utils
 n = 1000

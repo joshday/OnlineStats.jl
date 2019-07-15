@@ -1,19 +1,19 @@
-#-----------------------------------------------------------------------# common 
+#-----------------------------------------------------------------------# common
 abstract type HistogramStat{T} <: OnlineStat{T} end
 
 # Index of `edges` that `y` belongs in, depending on if bins are `left` closed and if
 # the bin on the end is `closed` instead of half-open.
 function binindex(edges::AbstractVector, y, left::Bool, closed::Bool)
     a, b = extrema(edges)
-    if y < a 
+    if y < a
         0
-    elseif y > b 
+    elseif y > b
         length(edges)
     elseif y == a && (left || closed)
         1
     elseif y == b && (!left || closed)
         length(edges) - 1
-    elseif left 
+    elseif left
         if isa(edges, AbstractRange)
             floor(Int, (y - a) / step(edges)) + 1
         else
@@ -34,19 +34,19 @@ Statistics.mean(o::HistogramStat) = mean(midpoints(o), fweights(counts(o)))
 Statistics.var(o::HistogramStat) = var(midpoints(o), fweights(counts(o)); corrected=true)
 Statistics.std(o::HistogramStat) = sqrt(var(o))
 Statistics.median(o::HistogramStat) = quantile(o, .5)
-function Base.extrema(o::HistogramStat) 
+function Base.extrema(o::HistogramStat)
     x, y = midpoints(o), counts(o)
     x[findfirst(x -> x > 0, y)], x[findlast(x -> x > 0, y)]
 end
-function Statistics.quantile(o::HistogramStat, p = [0, .25, .5, .75, 1]) 
+function Statistics.quantile(o::HistogramStat, p = [0, .25, .5, .75, 1])
     x, y = midpoints(o), counts(o)
-    inds = findall(x -> x != 0, y) 
+    inds = findall(x -> x != 0, y)
     quantile(x[inds], fweights(y[inds]), p)
 end
 
 
 
-#-----------------------------------------------------------------------# Hist 
+#-----------------------------------------------------------------------# Hist
 """
     Hist(edges; left = true, closed = true)
 
@@ -56,11 +56,11 @@ Create a histogram with bin partition defined by `edges`.
 - If `closed`, the bin on the end will be closed.
     - E.g. for a two bin histogram ``[a, b), [b, c)`` vs. ``[a, b), [b, c]``
 
-# Example 
+# Example
 
     o = fit!(Hist(-5:.1:5), randn(10^6))
-    
-    # approximate statistics 
+
+    # approximate statistics
     using Statistics
 
     mean(o)
@@ -71,13 +71,13 @@ Create a histogram with bin partition defined by `edges`.
     extrema(o)
 """
 struct Hist{T, R} <: HistogramStat{T}
-    edges::R 
-    counts::Vector{Int} 
+    edges::R
+    counts::Vector{Int}
     out::Vector{Int}
     left::Bool
     closed::Bool
 
-    function Hist(edges::R, T::Type = eltype(edges); left::Bool=true, closed::Bool = true) where {R<:AbstractVector}           
+    function Hist(edges::R, T::Type = eltype(edges); left::Bool=true, closed::Bool = true) where {R<:AbstractVector}
         new{T,R}(edges, zeros(Int, length(edges) - 1), [0,0], left, closed)
     end
 end
@@ -88,8 +88,8 @@ midpoints(o::Hist) = midpoints(o.edges)
 counts(o::Hist) = o.counts
 edges(o::Hist) = o.edges
 
-function area(o::Hist) 
-    c = o.counts 
+function area(o::Hist)
+    c = o.counts
     e = o.edges
     if isa(e, AbstractRange)
         return step(e) * sum(c)
@@ -116,15 +116,15 @@ function _fit!(o::Hist, y)
     end
 end
 
-function _merge!(o::Hist, o2::Hist) 
-    if o.edges == o2.edges 
+function _merge!(o::Hist, o2::Hist)
+    if o.edges == o2.edges
         for j in eachindex(o.counts)
             o.counts[j] += o2.counts[j]
         end
     else
-        @warn("Histogram edges do not align.  Merging is approximate.")
+        @warn("Histogram edges are not aligned.  Merging is approximate.")
         for (yi, wi) in zip(midpoints(o2.edges), o2.counts)
-            for k in 1:wi 
+            for k in 1:wi
                 _fit!(o, yi)
             end
         end
@@ -145,7 +145,7 @@ mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
         new{T, R}(init, zeros(Int, length(init) - 1), left, 0)
     end
 end
-function ExpandingHist(b::Int; left::Bool=true) 
+function ExpandingHist(b::Int; left::Bool=true)
     ExpandingHist(range(0, stop = 0, length = b + 1), Number; left=left)
 end
 
@@ -153,7 +153,7 @@ midpoints(o::ExpandingHist) = midpoints(o.edges)
 counts(o::ExpandingHist) = o.counts
 edges(o::ExpandingHist) = o.edges
 
-function Base.in(y, o::ExpandingHist) 
+function Base.in(y, o::ExpandingHist)
     a, b = extrema(o.edges)
     o.left ? (a ≤ y < b) : (a < y ≤ b)
 end
@@ -188,12 +188,12 @@ end
 
 # function adapt!(o::Hist, y)
 #     y in o && return nothing
-    
+
 #     a, b = extrema(o.edges)
 #     w = b - a
 
 #     # number of widths to extend to the left
-#     vl = (a - y) / w 
+#     vl = (a - y) / w
 #     n_widths_l = if vl < 0
 #         0
 #     elseif o.left || o.closed
@@ -204,10 +204,10 @@ end
 #     end
 
 #     # number of widths to extend to the right
-#     vr = (y - b) / w 
+#     vr = (y - b) / w
 #     n_widths_r = if vr < 0
 #         0
-#     elseif !o.left || o.closed 
+#     elseif !o.left || o.closed
 #         ceil(Int, (y - b) / w)
 #     else
 #         v = (y - b) / w
@@ -218,7 +218,7 @@ end
 #         o.edges = extendleft(o.edges)
 #         collapseright!(o.counts)
 #     end
-#     for i in 1:n_widths_r 
+#     for i in 1:n_widths_r
 #         o.edges = extendright(o.edges)
 #         collapseleft!(o.counts)
 #     end
@@ -227,7 +227,7 @@ end
 
 # function Base.in(y, o::Hist)
 #     a, b = extrema(o.edges)
-#     if o.left 
+#     if o.left
 #         return o.closed ? (a ≤ y ≤ b) : (a ≤ y < b)
 #     else
 #         return o.closed ? (a ≤ y ≤ b) : (a < y ≤ b)
@@ -239,7 +239,7 @@ end
 #         j = 2i - 1
 #         if j <= length(x)
 #             x[i] = x[j]
-#             if j < length(x) 
+#             if j < length(x)
 #                 x[i] += x[j + 1]
 #             end
 #         else
@@ -291,12 +291,12 @@ end
 
 #-----------------------------------------------------------------------# KHist
 struct KHistBin{T}
-    loc::T 
+    loc::T
     count::Int
 end
 Base.isless(a::KHistBin, b::KHistBin) = isless(a.loc, b.loc)
 function Base.merge(a::KHistBin, b::KHistBin)
-    n = a.count + b.count 
+    n = a.count + b.count
     KHistBin(smooth(a.loc, b.loc, b.count / n), n)
 end
 xy(o::KHistBin) = o.loc, o.count
@@ -307,12 +307,12 @@ xy(o::KHistBin) = o.loc, o.count
 """
     KHist(k::Int)
 
-Estimate the probability density of a univariate distribution at `k` approximately 
+Estimate the probability density of a univariate distribution at `k` approximately
 equally-spaced points.
-    
+
 Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 
-# Example 
+# Example
 
     o = fit!(KHist(25), randn(10^6))
 
@@ -344,7 +344,7 @@ xy(o::KHist) = getfield.(o.bins, :loc), getfield.(o.bins, :count)
 
 Base.extrema(o::KHist) = extrema(o.ex)
 
-function value(o::KHist) 
+function value(o::KHist)
     x, y = xy(o)
     a, b = extrema(o.ex)
     if !isempty(x)
@@ -362,14 +362,14 @@ end
 
 _fit!(o::KHist{T}, y) where {T} = push!(o, KHistBin(T(y), 1))
 
-function Base.push!(o::KHist, y::KHistBin) 
+function Base.push!(o::KHist, y::KHistBin)
     fit!(o.ex, y.loc)
     insert!(o.bins, searchsortedfirst(o.bins, y), y)
-    if length(o.bins) > o.b 
+    if length(o.bins) > o.b
         mindiff, i = Inf, 0
         for k in Base.OneTo(length(o.bins) - 1)
             diff = o.bins[k + 1].loc - o.bins[k].loc
-            if diff < mindiff 
+            if diff < mindiff
                 mindiff, i = diff, k
             end
         end
@@ -410,7 +410,7 @@ function pdf(o::KHist, x::Number)
         x1, y1 = a, 1
         x2, y2 = xy(firstbin)
         return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
-    elseif lastbin.loc ≤ x < b 
+    elseif lastbin.loc ≤ x < b
         x1, y1 = xy(lastbin)
         x2, y2 = b, 1
         return smooth(y1, y2, (x - x1) / (x2 - x1)) / area(o)
@@ -423,9 +423,9 @@ end
 
 function cdf(o::KHist, x::Number)
     a, b = extrema(o.ex)
-    if x < a 
+    if x < a
         return 0.0
-    elseif x == a 
+    elseif x == a
         return o.bins[1].count / area(o)
     elseif x ≥ b
         return 1.0

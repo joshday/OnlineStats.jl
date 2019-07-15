@@ -1,7 +1,7 @@
 module OnlineStats
 
 using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
-@reexport using OnlineStatsBase, LossFunctions, PenaltyFunctions, LearnBase
+@reexport using OnlineStatsBase
 
 import OnlineStatsBase: name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
     smooth_syr!, eachcol, eachrow
@@ -12,6 +12,9 @@ import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoi
 
 using OrderedCollections: OrderedDict
 using SweepOperator: sweep!
+using LossFunctions: LossFunctions, Loss, L2DistLoss, AggMode
+using PenaltyFunctions: PenaltyFunctions, Penalty
+using LearnBase: LearnBase, deriv, prox
 
 export
 # Statistics
