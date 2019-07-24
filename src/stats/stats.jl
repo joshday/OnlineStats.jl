@@ -390,7 +390,7 @@ end
 nobs(o::KMeans) = sum(x -> x.n, o.value)
 function Base.show(io::IO, o::KMeans)
     print(io, "KMeans")
-    print_stat_tree(io, o.value)
+    OnlineStatsBase.print_stat_tree(io, o.value)
 end
 function Base.sort!(o::KMeans; kw...)
     o.value = Tuple(sort!(collect(o.value); kw...))
