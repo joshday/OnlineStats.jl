@@ -80,7 +80,7 @@ function _merge!(o::StatLearn, o2::StatLearn)
     smooth!(o.λ, o2.λ, γ)
 end
 
-predict(o::StatLearn, x::VectorOb) = _dot(x, o.β)
+predict(o::StatLearn, x::VectorOb) = dot(x, o.β)
 predict(o::StatLearn, x::AbstractMatrix) = x * o.β
 classify(o::StatLearn, x) = sign.(predict(o, x))
 
@@ -127,7 +127,7 @@ end
 #     for j in eachindex(o.β)
 #         U.θ[j] = o.β[j] - U.α * U.v[j]
 #     end
-#     ŷ = _dot(x, U.θ)
+#     ŷ = dot(x, U.θ)
 #     for j in eachindex(o.β)
 #         U.v[j] = U.α * U.v[j] + deriv(o.loss, y, ŷ) * x[j]
 #         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
@@ -159,10 +159,10 @@ const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
 lconst(o::StatLearn, x, y) = lconst(o.loss, x, y)
 
 lconst(o::Loss, x, y) = error("No defined Lipschitz constant for $o")
-lconst(o::L2Scaled{N}, x, y) where {N} = 2N * _dot(x, x)
-lconst(o::LossFunctions.L2DistLoss, x, y) = 2 * _dot(x, x)
-lconst(o::LossFunctions.LogitMarginLoss, x, y) = .25 * _dot(x, x)
-lconst(o::LossFunctions.DWDMarginLoss, x, y) = (o.q + 1)^2 / o.q * _dot(x, x)
+lconst(o::L2Scaled{N}, x, y) where {N} = 2N * dot(x, x)
+lconst(o::LossFunctions.L2DistLoss, x, y) = 2 * dot(x, x)
+lconst(o::LossFunctions.LogitMarginLoss, x, y) = .25 * dot(x, x)
+lconst(o::LossFunctions.DWDMarginLoss, x, y) = (o.q + 1)^2 / o.q * dot(x, x)
 
 #-----------------------------------------------------------------------# OMAS
 # L stored in o.alg.a[1]
