@@ -156,67 +156,6 @@ Base.show(io::IO, o::CallFun) = print(io, "CallFun: $(o.stat) |> $(o.f)")
 _fit!(o::CallFun, arg)  = (_fit!(o.stat, arg); o.f(o.stat))
 _merge!(o::CallFun, o2::CallFun) = _merge!(o.stat, o2.stat)
 
-#-----------------------------------------------------------------------# CovMatrix
-"""
-    CovMatrix(p=0; weight=EqualWeight())
-    CovMatrix(::Type{T}, p=0; weight=EqualWeight())
-
-Calculate a covariance/correlation matrix of `p` variables.  If the number of variables is
-unknown, leave the default `p=0`.
-
-# Example
-
-    o = fit!(CovMatrix(), randn(100, 4))
-    cor(o)
-    cov(o)
-    mean(o)
-    var(o)
-"""
-mutable struct CovMatrix{T,W} <: OnlineStat{VectorOb} where T<:Number
-    value::Matrix{T}
-    A::Matrix{T}  # x'x/n
-    b::Vector{T}  # 1'x/n
-    weight::W
-    n::Int
-end
-function CovMatrix(::Type{T}, p::Int=0; weight = EqualWeight()) where T<:Number
-    CovMatrix(zeros(T,p,p), zeros(T,p,p), zeros(T,p), weight, 0)
-end
-CovMatrix(p::Int=0; weight = EqualWeight()) = CovMatrix(zeros(p,p), zeros(p,p), zeros(p), weight, 0)
-function _fit!(o::CovMatrix{T}, x) where {T}
-    γ = o.weight(o.n += 1)
-    if isempty(o.A)
-        p = length(x)
-        o.b = zeros(T, p)
-        o.A = zeros(T, p, p)
-        o.value = zeros(T, p, p)
-    end
-    smooth!(o.b, x, γ)
-    smooth_syr!(o.A, x, γ)
-end
-nvars(o::CovMatrix) = size(o.A, 1)
-function value(o::CovMatrix; corrected::Bool = true)
-    o.value[:] = Matrix(Hermitian((o.A - o.b * o.b')))
-    corrected && rmul!(o.value, bessel(o))
-    o.value
-end
-function _merge!(o::CovMatrix, o2::CovMatrix)
-    γ = o2.n / (o.n += o2.n)
-    smooth!(o.A, o2.A, γ)
-    smooth!(o.b, o2.b, γ)
-    o
-end
-Statistics.cov(o::CovMatrix; corrected::Bool = true) = value(o; corrected=corrected)
-Statistics.mean(o::CovMatrix) = o.b
-Statistics.var(o::CovMatrix; kw...) = diag(value(o; kw...))
-function Statistics.cor(o::CovMatrix; kw...)
-    value(o; kw...)
-    v = 1.0 ./ sqrt.(diag(o.value))
-    rmul!(o.value, Diagonal(v))
-    lmul!(Diagonal(v), o.value)
-    o.value
-end
-
 #-----------------------------------------------------------------------# Diff
 """
     Diff(T::Type = Float64)
