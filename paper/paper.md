@@ -1,6 +1,7 @@
 ---
-title: 'OnlineStats: A Framework for Large-Scale Statistics'
+title: 'OnlineStats: A Julia package for statistics on data streams'
 tags:
+  - Julia
   - statistics
   - big data
   - online algorithms
@@ -10,14 +11,14 @@ authors:
     orcid: 0000-0002-7490-6986
     affiliation: 1
   - name: Hua Zhou
-    orcid: ?
+    orcid: XXXX-XXXX-XXXX-XXXX
     affiliation: 2
 affiliations:
-  - name: Julia Computing
+  - name: Loon Analytics
     index: 1
   - name: UCLA
     index: 2
-date: 16 June 2018
+date: 02 September 2019
 bibliography: paper.bib
 ---
 
