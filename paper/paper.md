@@ -26,7 +26,7 @@ bibliography: paper.bib
 
 The growing prevalence of big and streaming data require a new generation of tools to handle the challenges posed by this new paradigm.  Data often has infinite size in the sense that new observations are continually arriving hourly/weekly/yearly, etc.  Existing offline tools can only operate in finite batches and require re-loading possibly large datasets for seemingly simple tasks such as incorporating a few more observations into an analysis.
 
-``OnlineStats`` is a Julia [@Julia] package that offers a high-performance framework for online algorithms.  It is easily extendable and also facilitates the use of embarassingly parallel computations.
+``OnlineStats`` is a Julia [@Julia] package that offers a high-performance framework for online algorithms.  It includes a large catalog of algorithms as well as an easily extendable interface.  The paradigm behind ``OnlineStats`` also facilitates embarassingly parallel computations.
 
 # Interface
 
