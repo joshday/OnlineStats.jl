@@ -26,11 +26,12 @@ bibliography: paper.bib
 
 The growing prevalence of big and streaming data require a new generation of tools to handle the challenges posed by this new paradigm.  Data often has infinite size in the sense that new observations are continually arriving hourly/weekly/yearly, etc.  Existing offline tools can only operate in finite batches and require re-loading possibly large datasets for seemingly simple tasks such as incorporating a few more observations into an analysis.
 
-``OnlineStats`` is a Julia [@Julia] package that offers a high-performance framework for online algorithms.  It includes a large catalog of algorithms as well as an easily extendable interface.  The paradigm behind ``OnlineStats`` also facilitates embarassingly parallel computations.
+``OnlineStats`` is a Julia [@Julia] package for high-performance online algorithms. The ``OnlineStats`` framework is easily extendable, includes a large catalog of algorithms, provides primitives for parallel computing, and offers a weighting mechanism that lets new observations have a higher relative influence over the value of the statistic/model/visualization.
+
 
 # Interface
 
-Each algorithm is associated with its own type (e.g. `Mean`, `Variance`, etc.).  A new statistic/model/visualization requires just a few methods to fit into the ``OnlineStats`` framework.
+Each algorithm is associated with its own type (e.g. `Mean`, `Variance`, etc.).  To live within the ``OnlineStats`` framework, a new type needs a few required method definitions.  The ``OnlineStatsBase`` package provides the essential methods that make up the ``OnlineStats`` interface.
 
 ## Updating
 
@@ -38,7 +39,7 @@ Each algorithm is associated with its own type (e.g. `Mean`, `Variance`, etc.). 
 OnlineStatsBase._fit!(stat, y)
 ```
 
-The `_fit!` method determines how the statistic is updated with a single observation `y`.  Each OnlineStat is a concrete subtype of `OnlineStat{T}`, where `T` is the type of a single observation.  The `fit!(stat::OnlineStat{T}, y::T)` method simply calls `_fit!`.  When `fit!(stat::OnlineStat{T}, y::S)` is called (where `S` is not a subtype of `T`),  `y` is iterated through and `fit!` is called on each item.
+The `_fit!` method determines how the statistic `stat` is updated with a single observation `y`.  Each OnlineStat is a concrete subtype of `OnlineStat{T}`, where `T` is the type of a single observation.  The `fit!(stat::OnlineStat{T}, y::T)` method simply calls `_fit!`.  When `fit!(stat::OnlineStat{T}, y::S)` is called (where `S` is not a subtype of `T`),  `y` is iterated through and `fit!` is called on each item.
 
 ### Update Weights
 
@@ -76,17 +77,17 @@ The `value` function returns the value of the estimator (optionally determined b
 OnlineStatsBase.nobs(stat)
 ```
 
-The `nobs` function returns the number of observations that the statistic has seen.  By default this returns the `n` field from the type (`stat.n`).
+The `nobs` function returns the number of observations that the statistic has seen.  By default this returns the `n` field from the algorithm's type (`stat.n`).
 
-# Mean Example
+# Example
 
-The ``Mean`` type provides an understandable full example of how to implement a new algorithm.  The update formula, as previously stated, is:
+The ``Mean`` type provides an easy-to-understand full example of how to implement a new algorithm.  The update formula, as previously stated, is:
 
 $$
 \mu^{(t)} = [1 - w(t)] \mu^{(t-1)} + w(t) y_t.
 $$
 
-The merge formula for two means, $\mu_1^{(t)}$ and $\mu_2^{(s)}$, is
+The merge formula for two means, $\mu_1^{(t)}$ and $\mu_2^{(s)}$, generalizes the above equation to:
 
 $$
 \mu_{merged}^{(t + s)} = [1 - s/(t+s)] \mu_1^{(t)} + [s/(t+s)] \mu_2^{(s)}.
