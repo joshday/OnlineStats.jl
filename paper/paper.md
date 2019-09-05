@@ -26,7 +26,7 @@ bibliography: paper.bib
 
 The growing prevalence of big and streaming data requires a new generation of tools.  Data often has infinite size in the sense that new observations are continually arriving daily, hourly, etc.  In recent years, several new technologies such as Kafka [@Kafka] and Spark Streaming [@SparkStreaming] have been introduced for processing streaming data.  Statistical tools for data streams, however, are under-developed and offer only basic functionality.  The majority of statistical software can only operate on finite batches and require re-loading possibly large datasets for seemingly simple tasks such as incorporating a few more observations into an analysis.
 
-``OnlineStats`` is a Julia [@Julia] package for high-performance online algorithms. The ``OnlineStats`` framework is easily extendable, includes a large catalog of algorithms, provides primitives for parallel computing, and offers a weighting mechanism that allows new observations have a higher relative influence over the value of the statistic/model/visualization.
+``OnlineStats`` is a Julia [@Julia] package for high-performance online algorithms. The ``OnlineStats`` framework is easily extensible, includes a large catalog of algorithms, provides primitives for parallel computing, and offers a weighting mechanism that allows new observations have a higher relative influence over the value of the statistic/model/visualization.
 
 # Interface
 
