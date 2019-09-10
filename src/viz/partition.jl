@@ -117,7 +117,7 @@ variable of type `T`.
 
 # Example 
 
-    o = IndexedPartition(Float64, Hist(10))
+    o = IndexedPartition(Float64, KHist(10))
     fit!(o, randn(10^4, 2))
 
     using Plots 
