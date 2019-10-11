@@ -22,7 +22,7 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
     x = randn(1000, 5)
     y = x * range(-1, stop=1, length=5) + randn(1000)
 
-    o = fit!(StatLearn(5, MSPI()), (x, y))
+    o = fit!(StatLearn(5, MSPI()), zip(eachrow(x), y))
     coef(o)
 """
 mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: OnlineStat{XY}

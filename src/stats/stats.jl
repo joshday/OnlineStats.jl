@@ -313,7 +313,7 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
 
     x = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]
 
-    o = fit!(KMeans(2, 2), x)
+    o = fit!(KMeans(2, 2), eachrow(x))
 
     sort!(o; rev=true)  # Order clusters by number of observations
 """

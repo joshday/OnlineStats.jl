@@ -185,7 +185,7 @@ Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
 # Example 
 
     y = randn(100, 2)
-    o = fit!(FitMvNormal(2), y)
+    o = fit!(FitMvNormal(2), eachrow(y))
 """
 struct FitMvNormal <: OnlineStat{VectorOb}
     cov::CovMatrix{Float64}

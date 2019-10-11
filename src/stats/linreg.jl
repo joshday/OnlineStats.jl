@@ -8,7 +8,7 @@ Linear regression, optionally with element-wise ridge regularization.
 
     x = randn(100, 5)
     y = x * (1:5) + randn(100)
-    o = fit!(LinReg(), (x,y))
+    o = fit!(LinReg(), zip(eachrow(x),y))
     coef(o)
     coef(o, .1)
     coef(o, [0,0,0,0,Inf])
@@ -73,7 +73,7 @@ parameter `λ`.  An intercept (`bias`) term is added by default.
 # Examples
 
     x = randn(1000, 10)
-    o = fit!(LinRegBuilder(), x)
+    o = fit!(LinRegBuilder(), eachrow(x))
 
     coef(o; y=3, verbose=true)
 
