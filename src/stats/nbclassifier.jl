@@ -9,7 +9,7 @@ class `K`, predictor variables are summarized by the `stat`.
 
     x, y = randn(10^4, 10), rand(Bool, 10^4)
 
-    o = fit!(NBClassifier(10, Bool), (x,y))
+    o = fit!(NBClassifier(10, Bool), zip(eachrow(x),y))
     collect(keys(o))
     probs(o)
 

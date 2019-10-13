@@ -116,7 +116,7 @@ Each variable is summarized by `stat`, which can be `FitNormal()` or `Hist(nbins
     x = randn(10^5, 10)
     y = rand([1,2], 10^5)
 
-    o = fit!(FastTree(10), (x,y))
+    o = fit!(FastTree(10), zip(eachrow(x),y))
 
     xi = randn(10)
     classify(o, xi)
@@ -183,7 +183,7 @@ Calculate a random forest where each variable is summarized by `stat`.
 
     x, y = randn(10^5, 10), rand(1:2, 10^5)
 
-    o = fit!(FastForest(10), (x,y))
+    o = fit!(FastForest(10), zip(eachrow(x),y))
 
     classify(o, x[1,:])
 """
