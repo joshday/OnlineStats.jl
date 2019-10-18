@@ -7,21 +7,25 @@ function binindex(edges::AbstractVector, y, left::Bool, closed::Bool)
     a, b = extrema(edges)
     if y < a
         0
+    elseif y == a
+        1
     elseif y > b
         length(edges)
+    elseif y == b
+        length(edges) - 1
     elseif y == a && (left || closed)
         1
     elseif y == b && (!left || closed)
         length(edges) - 1
     elseif left
         if isa(edges, AbstractRange)
-            floor(Int, (y - a) / step(edges)) + 1
+            floor(Int, prevfloat((y - a) / step(edges))) + 1
         else
             searchsortedlast(edges, y)
         end
     else
         if isa(edges, AbstractRange)
-            ceil(Int, (y - a) / step(edges))
+            ceil(Int, nextfloat((y - a) / step(edges)))
         else
             searchsortedfirst(edges, y) - 1
         end
@@ -166,127 +170,36 @@ function _fit!(o::ExpandingHist, y)
         o.edges = range(y, stop=y, length=length(o.edges))
     elseif nobs(o) == 2
         a, b = extrema(o.edges)
-        ey = eps(float(y))
-        o.edges = range(min(a,y) - ey, stop=max(b, y) + ey, length=length(o.edges))
+        w = max(abs(y - a), abs(y - b))
+        o.edges = range(min(a,y) - w, stop=max(b, y) + w, length=length(o.edges))
     end
 
     expand!(o, y)
-    o.counts[binindex(o.edges, y, o.left, false)] += 1
+    o.counts[binindex(o.edges, y, o.left, true)] += 1
 end
 
 function expand!(o::ExpandingHist, y)
     a, b = extrema(o.edges)
-    if y > b  # find C such that y <= a + 2^C * (b - a)
-        C = ceil(Int, log2((y - a) / (b - a)))
-        o.edges = range(a, stop = a + 2^C * (b - a), length = length(o.edges))
-    elseif y < a  # find C such that y >= b - 2^C * (b - a)
-        C = ceil(Int, log2((b - y) / (b - a)))
-        o.edges = range(b - 2^C * (b - a), stop = b, length = length(o.edges))
+    w = b - a
+    nbins = length(o.counts)
+
+    if y > b  # find K such that y <= a + 2^K * w
+        C = 2 ^ ceil(Int, log2((y - a) / w))
+        o.edges = range(a, stop = a + C*w, length=nbins + 1)
+        for i in eachindex(o.counts)
+            rng = ((i-1) * C + 1):min(i * C, nbins)
+            o.counts[i] = sum(view(o.counts, rng))
+        end
+    elseif y < a # find K such that y >= b - 2^K * w
+        C = 2 ^ ceil(Int, log2((b - y) / w))
+        o.edges = range(b - C*w, stop=b, length=nbins + 1)
+        # (n-3c+1):(n-2c), (n-2c+1):(n-c), (n - c + 1):n
+        for i in eachindex(o.counts)
+            rng = max(1, nbins - i * C + 1):(nbins - (i-1) * C)
+            o.counts[nbins - i + 1] = sum(view(o.counts, rng))
+        end
     end
 end
-
-
-# function adapt!(o::Hist, y)
-#     y in o && return nothing
-
-#     a, b = extrema(o.edges)
-#     w = b - a
-
-#     # number of widths to extend to the left
-#     vl = (a - y) / w
-#     n_widths_l = if vl < 0
-#         0
-#     elseif o.left || o.closed
-#         ceil(Int, (a - y) / w)
-#     else
-#         v = (a - y) / w
-#         ceil(Int, v) + isinteger(v)
-#     end
-
-#     # number of widths to extend to the right
-#     vr = (y - b) / w
-#     n_widths_r = if vr < 0
-#         0
-#     elseif !o.left || o.closed
-#         ceil(Int, (y - b) / w)
-#     else
-#         v = (y - b) / w
-#         ceil(Int, v) + isinteger(v)
-#     end
-
-#     for i in 1:n_widths_l
-#         o.edges = extendleft(o.edges)
-#         collapseright!(o.counts)
-#     end
-#     for i in 1:n_widths_r
-#         o.edges = extendright(o.edges)
-#         collapseleft!(o.counts)
-#     end
-#     nothing
-# end
-
-# function Base.in(y, o::Hist)
-#     a, b = extrema(o.edges)
-#     if o.left
-#         return o.closed ? (a ≤ y ≤ b) : (a ≤ y < b)
-#     else
-#         return o.closed ? (a ≤ y ≤ b) : (a < y ≤ b)
-#     end
-# end
-
-# function collapseleft!(x)
-#     for i in eachindex(x)
-#         j = 2i - 1
-#         if j <= length(x)
-#             x[i] = x[j]
-#             if j < length(x)
-#                 x[i] += x[j + 1]
-#             end
-#         else
-#             x[i] = 0
-#         end
-#     end
-# end
-# function collapseright!(x)
-#     for i in reverse(eachindex(x))
-#         j = 2i - length(x)
-#         if j >= 1
-#             x[i] = x[j]
-#             if j > 1
-#                 x[i] += x[j - 1]
-#             end
-#         else
-#             x[i] = 0
-#         end
-#     end
-# end
-
-# function extendleft(rng::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})
-#     a, b = extrema(rng)
-#     range(2a - b, stop = b, length = length(rng))
-# end
-# function extendright(rng::StepRangeLen{Float64,Base.TwicePrecision{Float64},Base.TwicePrecision{Float64}})
-#     a, b = extrema(rng)
-#     range(a, stop = 2b - a, length = length(rng))
-# end
-
-
-# function extendleft(rng::StepRange)
-#     a, b = extrema(rng)
-#     (2a - b):step(rng):b
-# end
-# function extendright(rng::StepRange)
-#     a, b = extrema(rng)
-#     a:step(rng):(2b - a)
-# end
-
-# extendleft(rng) = error("Histogram cannot adapt with bin edges of type ", typeof(rng))
-# extendright(rng) = extendleft(rng)
-
-
-
-
-
 
 
 #-----------------------------------------------------------------------# KHist
