@@ -28,165 +28,165 @@ mergevals(o1::OnlineStat, y1, y2) = map(value, mergestats(o1, y1, y2))
 
 
 
-#-----------------------------------------------------------------------# AutoCov
-@testset "AutoCov" begin
-    o = fit!(AutoCov(10), y)
-    @test autocov(o) ≈ autocov(y, 0:10)
-    @test autocor(o) ≈ autocor(y, 0:10)
-    @test nobs(o) == n
-end
-#-----------------------------------------------------------------------# Bootstrap
-@testset "Bootstrap" begin
-    o = fit!(Bootstrap(Mean(), 100, [1]), y)
-    @test all(value.(o.replicates) .== value(o.stat))
-    c = confint(o)
-    @test length(c) == 2
-    @test c[1] ≤ c[2]
-end
-#-----------------------------------------------------------------------# CallFun
-@testset "CallFun" begin
-    i = 0
-    o = fit!(CallFun(Mean(), x -> i+=1), y)
-    @test value(o) ≈ mean(y)
-    @test i == n
-    @test ≈(mergevals(CallFun(Mean(), x->nothing), y, y2)...)
-end
-#-----------------------------------------------------------------------# CovMatrix
-@testset "CovMatrix" begin
-    o = fit!(CovMatrix(), eachrow(ymat))
-    @test value(o) ≈ cov(ymat)
-    @test cov(o) ≈ cov(ymat)
-    @test cor(o) ≈ cor(ymat)
-    @test all(x -> ≈(x...), zip(var(o), var(ymat; dims=1)))
-    @test all(x -> ≈(x...), zip(std(o), std(ymat; dims=1)))
-    @test all(x -> ≈(x...), zip(mean(o), mean(ymat; dims=1)))
+# #-----------------------------------------------------------------------# AutoCov
+# @testset "AutoCov" begin
+#     o = fit!(AutoCov(10), y)
+#     @test autocov(o) ≈ autocov(y, 0:10)
+#     @test autocor(o) ≈ autocor(y, 0:10)
+#     @test nobs(o) == n
+# end
+# #-----------------------------------------------------------------------# Bootstrap
+# @testset "Bootstrap" begin
+#     o = fit!(Bootstrap(Mean(), 100, [1]), y)
+#     @test all(value.(o.replicates) .== value(o.stat))
+#     c = confint(o)
+#     @test length(c) == 2
+#     @test c[1] ≤ c[2]
+# end
+# #-----------------------------------------------------------------------# CallFun
+# @testset "CallFun" begin
+#     i = 0
+#     o = fit!(CallFun(Mean(), x -> i+=1), y)
+#     @test value(o) ≈ mean(y)
+#     @test i == n
+#     @test ≈(mergevals(CallFun(Mean(), x->nothing), y, y2)...)
+# end
+# #-----------------------------------------------------------------------# CovMatrix
+# @testset "CovMatrix" begin
+#     o = fit!(CovMatrix(), eachrow(ymat))
+#     @test value(o) ≈ cov(ymat)
+#     @test cov(o) ≈ cov(ymat)
+#     @test cor(o) ≈ cor(ymat)
+#     @test all(x -> ≈(x...), zip(var(o), var(ymat; dims=1)))
+#     @test all(x -> ≈(x...), zip(std(o), std(ymat; dims=1)))
+#     @test all(x -> ≈(x...), zip(mean(o), mean(ymat; dims=1)))
 
-    @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
-    @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachcol(ymat'), OnlineStatsBase.eachcol(ymat2'))...)
-    @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2))...)
-    @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2 * im))...)
-end
-#-----------------------------------------------------------------------# Diff
-@testset "Diff" begin
-    @test value(fit!(Diff(), y)) == y[end] - y[end-1]
-    o = fit!(Diff(Int), 1:10)
-    @test diff(o) == 1
-    @test last(o) == 10
-end
-#-----------------------------------------------------------------------# Fit[Dist]
-@testset "Fit[Dist]" begin
-    @testset "FitBeta" begin
-        @test value(FitBeta()) == (1.0, 1.0)
-        a, b = mergevals(FitBeta(), rand(100), rand(100))
-        @test a[1] ≈ b[1]
-        @test a[2] ≈ b[2]
-    end
-    @testset "FitCauchy" begin
-        @test value(FitCauchy()) == (0.0, 1.0)
-        a, b = mergevals(FitCauchy(), y, y2)
-        @test ≈(a[1], b[1]; atol=.5)
-        @test ≈(a[2], b[2]; atol=.5)
-    end
-    @testset "FitGamma" begin
-        @test value(FitGamma()) == (1.0, 1.0)
-        a, b = mergevals(FitGamma(), rand(100), rand(100))
-        @test a[1] ≈ b[1]
-        @test a[2] ≈ b[2]
-    end
-    @testset "FitLogNormal" begin
-        @test value(FitLogNormal()) == (0.0, 1.0)
-        a, b = mergevals(FitLogNormal(), exp.(y), exp.(y2))
-        @test a[1] ≈ b[1]
-        @test a[2] ≈ b[2]
-    end
-    @testset "FitNormal" begin
-        @test value(FitNormal()) == (0.0, 1.0)
-        a, b = mergestats(FitNormal(), y, y2)
-        @test value(a)[1] ≈ value(b)[1]
-        @test value(a)[2] ≈ value(b)[2]
+#     @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
+#     @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachcol(ymat'), OnlineStatsBase.eachcol(ymat2'))...)
+#     @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2))...)
+#     @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2 * im))...)
+# end
+# #-----------------------------------------------------------------------# Diff
+# @testset "Diff" begin
+#     @test value(fit!(Diff(), y)) == y[end] - y[end-1]
+#     o = fit!(Diff(Int), 1:10)
+#     @test diff(o) == 1
+#     @test last(o) == 10
+# end
+# #-----------------------------------------------------------------------# Fit[Dist]
+# @testset "Fit[Dist]" begin
+#     @testset "FitBeta" begin
+#         @test value(FitBeta()) == (1.0, 1.0)
+#         a, b = mergevals(FitBeta(), rand(100), rand(100))
+#         @test a[1] ≈ b[1]
+#         @test a[2] ≈ b[2]
+#     end
+#     @testset "FitCauchy" begin
+#         @test value(FitCauchy()) == (0.0, 1.0)
+#         a, b = mergevals(FitCauchy(), y, y2)
+#         @test ≈(a[1], b[1]; atol=.5)
+#         @test ≈(a[2], b[2]; atol=.5)
+#     end
+#     @testset "FitGamma" begin
+#         @test value(FitGamma()) == (1.0, 1.0)
+#         a, b = mergevals(FitGamma(), rand(100), rand(100))
+#         @test a[1] ≈ b[1]
+#         @test a[2] ≈ b[2]
+#     end
+#     @testset "FitLogNormal" begin
+#         @test value(FitLogNormal()) == (0.0, 1.0)
+#         a, b = mergevals(FitLogNormal(), exp.(y), exp.(y2))
+#         @test a[1] ≈ b[1]
+#         @test a[2] ≈ b[2]
+#     end
+#     @testset "FitNormal" begin
+#         @test value(FitNormal()) == (0.0, 1.0)
+#         a, b = mergestats(FitNormal(), y, y2)
+#         @test value(a)[1] ≈ value(b)[1]
+#         @test value(a)[2] ≈ value(b)[2]
 
-        @test mean(a) ≈ mean(ys)
-        @test var(a) ≈ var(ys)
-        @test std(a) ≈ std(ys)
+#         @test mean(a) ≈ mean(ys)
+#         @test var(a) ≈ var(ys)
+#         @test std(a) ≈ std(ys)
 
-        # pdf and cdf
-        o = fit!(FitNormal(), [-1, 0, 1])
-        @test OnlineStats.pdf(o, 0.0) ≈ 0.3989422804014327
-        @test OnlineStats.pdf(o, -1.0) ≈ 0.24197072451914337
-        @test OnlineStats.cdf(o, 0.0) ≈ 0.5
-        @test ≈(OnlineStats.cdf(o, -1.0), 0.15865525393145702; atol=.001)
-    end
-    @testset "FitMultinomial" begin
-        o = FitMultinomial(5)
-        @test value(o)[2] == ones(5) / 5
-        data = [1 2 3 4 5; 1 2 3 4 5]
-        @test value(fit!(o, eachrow(data)))[2] == collect(2:2:10) ./ sum(data)
+#         # pdf and cdf
+#         o = fit!(FitNormal(), [-1, 0, 1])
+#         @test OnlineStats.pdf(o, 0.0) ≈ 0.3989422804014327
+#         @test OnlineStats.pdf(o, -1.0) ≈ 0.24197072451914337
+#         @test OnlineStats.cdf(o, 0.0) ≈ 0.5
+#         @test ≈(OnlineStats.cdf(o, -1.0), 0.15865525393145702; atol=.001)
+#     end
+#     @testset "FitMultinomial" begin
+#         o = FitMultinomial(5)
+#         @test value(o)[2] == ones(5) / 5
+#         data = [1 2 3 4 5; 1 2 3 4 5]
+#         @test value(fit!(o, eachrow(data)))[2] == collect(2:2:10) ./ sum(data)
 
-        data1 = OnlineStatsBase.eachrow(rand(1:4, 10, 3))
-        data2 = OnlineStatsBase.eachrow(rand(2:7, 11, 3))
-        a, b = mergevals(FitMultinomial(3), data1, data2)
-        @test ≈(a[2], b[2])
-    end
-    @testset "FitMvNormal" begin
-        @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
-        a, b = mergevals(FitMvNormal(2), OnlineStatsBase.eachrow([y y2]), OnlineStatsBase.eachrow([y2 y]))
-        @test a[1] ≈ b[1]
-        @test a[2] ≈ b[2]
-    end
-end
-#-----------------------------------------------------------------------# FastNode
-@testset "FastNode" begin
-    X, Y = ymat, rand(1:3, 1000)
-    X2, Y2 = ymat, rand(1:3, 1000)
-    data  = zip(eachrow(X), Y)
-    data2 = zip(eachrow(X2), Y2)
-    o  = fit!(FastNode(5, 3), data)
-    o2 = fit!(FastNode(5, 3), data2)
-    merge!(o, o2)
-    fit!(o2, data)
-    for k in 1:3, j in 1:5
-        @test value(o.stats[k][j])[1] ≈ value(o2.stats[k][j])[1]
-        @test value(o.stats[k][j])[2] ≈ value(o2.stats[k][j])[2]
-    end
-    @test length(o[1]) == 3
+#         data1 = OnlineStatsBase.eachrow(rand(1:4, 10, 3))
+#         data2 = OnlineStatsBase.eachrow(rand(2:7, 11, 3))
+#         a, b = mergevals(FitMultinomial(3), data1, data2)
+#         @test ≈(a[2], b[2])
+#     end
+#     @testset "FitMvNormal" begin
+#         @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
+#         a, b = mergevals(FitMvNormal(2), OnlineStatsBase.eachrow([y y2]), OnlineStatsBase.eachrow([y2 y]))
+#         @test a[1] ≈ b[1]
+#         @test a[2] ≈ b[2]
+#     end
+# end
+# #-----------------------------------------------------------------------# FastNode
+# @testset "FastNode" begin
+#     X, Y = ymat, rand(1:3, 1000)
+#     X2, Y2 = ymat, rand(1:3, 1000)
+#     data  = zip(eachrow(X), Y)
+#     data2 = zip(eachrow(X2), Y2)
+#     o  = fit!(FastNode(5, 3), data)
+#     o2 = fit!(FastNode(5, 3), data2)
+#     merge!(o, o2)
+#     fit!(o2, data)
+#     for k in 1:3, j in 1:5
+#         @test value(o.stats[k][j])[1] ≈ value(o2.stats[k][j])[1]
+#         @test value(o.stats[k][j])[2] ≈ value(o2.stats[k][j])[2]
+#     end
+#     @test length(o[1]) == 3
 
-    pvec = [mean(Y .== 1), mean(Y .== 2), mean(Y .== 3)]
-    o = fit!(FastNode(5, 3), data)
-    @test probs(o) == pvec
-    @test nobs(o) == 1000
-    @test OnlineStats.nkeys(o) == 3
-    @test OnlineStats.nvars(o) == 5
-    @test classify(o) ∈ [1, 2, 3]
-end
-#-----------------------------------------------------------------------# FastTree
-@testset "FastTree" begin
-    X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
-    o = fit!(FastTree(10; splitsize=100), zip(eachrow(X),Y))
-    @test classify(o, X[1,:]) ∈ [1, 2]
-    @test all(0 .< classify(o, X) .< 3)
-    @test OnlineStats.nkeys(o) == 2
-    @test OnlineStats.nvars(o) == 10
-    @test mean(classify(o, X) .== Y) > .5
+#     pvec = [mean(Y .== 1), mean(Y .== 2), mean(Y .== 3)]
+#     o = fit!(FastNode(5, 3), data)
+#     @test probs(o) == pvec
+#     @test nobs(o) == 1000
+#     @test OnlineStats.nkeys(o) == 3
+#     @test OnlineStats.nvars(o) == 5
+#     @test classify(o) ∈ [1, 2, 3]
+# end
+# #-----------------------------------------------------------------------# FastTree
+# @testset "FastTree" begin
+#     X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
+#     o = fit!(FastTree(10; splitsize=100), zip(eachrow(X),Y))
+#     @test classify(o, X[1,:]) ∈ [1, 2]
+#     @test all(0 .< classify(o, X) .< 3)
+#     @test OnlineStats.nkeys(o) == 2
+#     @test OnlineStats.nvars(o) == 10
+#     @test mean(classify(o, X) .== Y) > .5
 
-    # Issue 116
-    Random.seed!(218)
-    X,Y = OnlineStats.fakedata(FastNode, 10^4, 1)
-    fit!(FastTree(1, splitsize=100), zip(eachrow(X),Y))
-end
-#-----------------------------------------------------------------------# FastForest
-@testset "FastForest" begin
-    X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
-    o = fit!(FastForest(10; splitsize=500, λ = .7), zip(eachrow(X), Y))
-    @test classify(o, randn(10)) in 1:2
-    @test mean(classify(o, X) .== Y) > .5
-end
+#     # Issue 116
+#     Random.seed!(218)
+#     X,Y = OnlineStats.fakedata(FastNode, 10^4, 1)
+#     fit!(FastTree(1, splitsize=100), zip(eachrow(X),Y))
+# end
+# #-----------------------------------------------------------------------# FastForest
+# @testset "FastForest" begin
+#     X, Y = OnlineStats.fakedata(FastNode, 10^4, 10)
+#     o = fit!(FastForest(10; splitsize=500, λ = .7), zip(eachrow(X), Y))
+#     @test classify(o, randn(10)) in 1:2
+#     @test mean(classify(o, X) .== Y) > .5
+# end
 
-#-----------------------------------------------------------------------# HeatMap
-@testset "HeatMap" begin
-    data1 = OnlineStatsBase.eachrow(ymat[:, 1:2])
-    data2 = OnlineStatsBase.eachrow(ymat2[:, 1:2])
-    @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
-end
+# #-----------------------------------------------------------------------# HeatMap
+# @testset "HeatMap" begin
+#     data1 = OnlineStatsBase.eachrow(ymat[:, 1:2])
+#     data2 = OnlineStatsBase.eachrow(ymat2[:, 1:2])
+#     @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
+# end
 #-----------------------------------------------------------------------# Hist
 @testset "Hist" begin
     @test ==(mergevals(Hist(-5:.1:5), y, y2)...)
@@ -195,7 +195,7 @@ end
             for data in (y, -6:.75:6)
                 w  = fit(Histogram, data, edges, closed = :left).weights
                 w2 = fit(Histogram, data, edges, closed = :right).weights
-                @test fit!(Hist(edges, Number; closed=false),             data).counts == w
+                @test fit!(Hist(edges, Number; closed=false, left=true),  data).counts == w
                 @test fit!(Hist(edges, Number; closed=false, left=false), data).counts == w2
             end
         end

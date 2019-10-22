@@ -5,29 +5,21 @@ abstract type HistogramStat{T} <: OnlineStat{T} end
 # the bin on the end is `closed` instead of half-open.
 function binindex(edges::AbstractVector, y, left::Bool, closed::Bool)
     a, b = extrema(edges)
-    if y < a
-        0
-    elseif y == a
-        1
-    elseif y > b
-        length(edges)
-    elseif y == b
-        length(edges) - 1
-    elseif y == a && (left || closed)
-        1
-    elseif y == b && (!left || closed)
-        length(edges) - 1
-    elseif left
+    y < a && return 0
+    y > b && return length(edges)
+    closed && y == a && return 1
+    closed && y == b && return length(edges) - 1
+    if left
         if isa(edges, AbstractRange)
-            floor(Int, prevfloat((y - a) / step(edges))) + 1
+            return floor(Int, (y - a) / step(edges)) + 1
         else
-            searchsortedlast(edges, y)
+            return searchsortedlast(edges, y)
         end
     else
         if isa(edges, AbstractRange)
-            ceil(Int, nextfloat((y - a) / step(edges)))
+            return ceil(Int, (y - a) / step(edges))
         else
-            searchsortedfirst(edges, y) - 1
+            return searchsortedfirst(edges, y) - 1
         end
     end
 end

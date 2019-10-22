@@ -317,7 +317,7 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
 
     sort!(o; rev=true)  # Order clusters by number of observations
 """
-mutable struct KMeans{T, W} <: OnlineStat{VectorOb}
+mutable struct KMeans{T <: NTuple{N, Cluster} where N, W} <: OnlineStat{VectorOb}
     value::T
     buffer::Vector{Float64}
     rate::W
@@ -345,9 +345,7 @@ function _fit!(o::KMeans, x)
         fill!(o.buffer, 0.0)
         for k in eachindex(o.buffer)
             cluster = o.value[k]
-            for j in eachindex(x)
-                o.buffer[k] = norm(x[j] - cluster.value[j])
-            end
+            o.buffer[k] = norm(x .- cluster.value)
         end
         k_star = argmin(o.buffer)
         cluster = o.value[k_star]
