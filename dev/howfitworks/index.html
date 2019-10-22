@@ -3,7 +3,7 @@
 
 fit!(CovMatrix(), eachrow(x))
 
-fit!(CovMatrix(), eachcol(x&#39;))</code></pre><pre><code class="language-none">CovMatrix: n=1000 | value=[0.98484 0.0243709; 0.0243709 1.04163]</code></pre><h3><a class="nav-anchor" id="Reason-2:-OnlineStats-works-out-of-the-box-with-many-data-structures-1" href="#Reason-2:-OnlineStats-works-out-of-the-box-with-many-data-structures-1">Reason 2: OnlineStats works out-of-the-box with many data structures</a></h3><p>Tabular data structures such as those in <a href="https://github.com/JuliaComputing/JuliaDB.jl">JuliaDB</a> iterate over named tuples of rows, so things like this just work:</p><pre><code class="language-julia">using JuliaDB
+fit!(CovMatrix(), eachcol(x&#39;))</code></pre><pre><code class="language-none">CovMatrix: n=1000 | value=[1.05455 0.0167681; 0.0167681 1.01153]</code></pre><h3><a class="nav-anchor" id="Reason-2:-OnlineStats-works-out-of-the-box-with-many-data-structures-1" href="#Reason-2:-OnlineStats-works-out-of-the-box-with-many-data-structures-1">Reason 2: OnlineStats works out-of-the-box with many data structures</a></h3><p>Tabular data structures such as those in <a href="https://github.com/JuliaComputing/JuliaDB.jl">JuliaDB</a> iterate over named tuples of rows, so things like this just work:</p><pre><code class="language-julia">using JuliaDB
 
 t = table(randn(100), randn(100))
 

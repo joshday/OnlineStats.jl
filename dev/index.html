@@ -14,22 +14,22 @@ julia&gt; supertype(typeof(m))
 OnlineStat{Number}</code></pre><h3><a class="nav-anchor" id="Stats-can-be-updated-1" href="#Stats-can-be-updated-1">Stats can be updated</a></h3><p><code>fit!(stat::OnlineStat{T}, y::S)</code> will iterate through <code>y</code> and <code>fit!</code> each element if <code>T != S</code>.</p><pre><code class="language-julia-repl">julia&gt; y = randn(100);
 
 julia&gt; fit!(m, y)
-Mean: n=100 | value=0.0874959</code></pre><h3><a class="nav-anchor" id="Stats-can-be-merged-1" href="#Stats-can-be-merged-1">Stats can be merged</a></h3><pre><code class="language-julia-repl">julia&gt; y2 = randn(100);
+Mean: n=100 | value=0.119094</code></pre><h3><a class="nav-anchor" id="Stats-can-be-merged-1" href="#Stats-can-be-merged-1">Stats can be merged</a></h3><pre><code class="language-julia-repl">julia&gt; y2 = randn(100);
 
 julia&gt; m2 = fit!(Mean(), y2)
-Mean: n=100 | value=0.127671
+Mean: n=100 | value=0.0728624
 
 julia&gt; merge!(m, m2)
-Mean: n=200 | value=0.107584</code></pre><h3><a class="nav-anchor" id="Stats-have-a-value-1" href="#Stats-have-a-value-1">Stats have a value</a></h3><pre><code class="language-julia-repl">julia&gt; value(m)
-0.10758361937465946</code></pre><h2><a class="nav-anchor" id="Collections-of-Stats-1" href="#Collections-of-Stats-1">Collections of Stats</a></h2><img src="https://user-images.githubusercontent.com/8075494/57342826-bf088c00-710e-11e9-9ac0-f3c1e5aa7a7d.png" style="width:400px"><div></div><h3><a class="nav-anchor" id="Series-1" href="#Series-1"><code>Series</code></a></h3><p>A <code>Series</code> tracks stats that should be applied to the <strong>same</strong> data stream.</p><pre><code class="language-julia">y = rand(1000)
+Mean: n=200 | value=0.0959782</code></pre><h3><a class="nav-anchor" id="Stats-have-a-value-1" href="#Stats-have-a-value-1">Stats have a value</a></h3><pre><code class="language-julia-repl">julia&gt; value(m)
+0.0959782441182235</code></pre><h2><a class="nav-anchor" id="Collections-of-Stats-1" href="#Collections-of-Stats-1">Collections of Stats</a></h2><img src="https://user-images.githubusercontent.com/8075494/57342826-bf088c00-710e-11e9-9ac0-f3c1e5aa7a7d.png" style="width:400px"><div></div><h3><a class="nav-anchor" id="Series-1" href="#Series-1"><code>Series</code></a></h3><p>A <code>Series</code> tracks stats that should be applied to the <strong>same</strong> data stream.</p><pre><code class="language-julia">y = rand(1000)
 s = Series(Mean(), Variance())
 fit!(s, y)</code></pre><pre><code class="language-none">Series
-  ├── Mean: n=1000 | value=0.493638
-  └── Variance: n=1000 | value=0.0819703</code></pre><h3><a class="nav-anchor" id="FTSeries-1" href="#FTSeries-1"><code>FTSeries</code></a></h3><p>An <code>FTSeries</code> tracks stats that should be applied to the <strong>same</strong> data stream, but filters and transforms (hence <code>FT</code>) the input data before it is sent to its stats.</p><pre><code class="language-julia">s = FTSeries(Mean(), Variance(); filter = x-&gt;true, transform = abs)
+  ├── Mean: n=1000 | value=0.502089
+  └── Variance: n=1000 | value=0.086859</code></pre><h3><a class="nav-anchor" id="FTSeries-1" href="#FTSeries-1"><code>FTSeries</code></a></h3><p>An <code>FTSeries</code> tracks stats that should be applied to the <strong>same</strong> data stream, but filters and transforms (hence <code>FT</code>) the input data before it is sent to its stats.</p><pre><code class="language-julia">s = FTSeries(Mean(), Variance(); filter = x-&gt;true, transform = abs)
 fit!(s, -y)</code></pre><pre><code class="language-none">FTSeries
-  ├── Mean: n=1000 | value=0.493638
-  └── Variance: n=1000 | value=0.0819703</code></pre><h3><a class="nav-anchor" id="Group-1" href="#Group-1"><code>Group</code></a></h3><p>A <code>Group</code> tracks stats that should be applied to <strong>different</strong> data streams.</p><pre><code class="language-julia">g = Group(Mean(), CountMap(Bool))
+  ├── Mean: n=1000 | value=0.502089
+  └── Variance: n=1000 | value=0.086859</code></pre><h3><a class="nav-anchor" id="Group-1" href="#Group-1"><code>Group</code></a></h3><p>A <code>Group</code> tracks stats that should be applied to <strong>different</strong> data streams.</p><pre><code class="language-julia">g = Group(Mean(), CountMap(Bool))
 itr = zip(randn(100), rand(Bool, 100))
 fit!(g, itr)</code></pre><pre><code class="language-none">Group
-  ├── Mean: n=100 | value=0.100958
-  └── CountMap: n=100 | value=OrderedCollections.OrderedDict(true=&gt;63,false=&gt;37)</code></pre><h2><a class="nav-anchor" id="Additional-Resources-1" href="#Additional-Resources-1">Additional Resources</a></h2><ul><li><a href="https://github.com/joshday/OnlineStatsDemos">OnlineStats Demos</a></li><li><a href="http://juliadb.org/latest/onlinestats/">JuliaDB Integration</a></li></ul><footer><hr/><a class="next" href="weights/"><span class="direction">Next</span><span class="title">Weights</span></a></footer></article></body></html>
+  ├── Mean: n=100 | value=0.10148
+  └── CountMap: n=100 | value=OrderedCollections.OrderedDict(false=&gt;56,true=&gt;44)</code></pre><h2><a class="nav-anchor" id="Additional-Resources-1" href="#Additional-Resources-1">Additional Resources</a></h2><ul><li><a href="https://github.com/joshday/OnlineStatsDemos">OnlineStats Demos</a></li><li><a href="http://juliadb.org/latest/onlinestats/">JuliaDB Integration</a></li></ul><footer><hr/><a class="next" href="weights/"><span class="direction">Next</span><span class="title">Weights</span></a></footer></article></body></html>
