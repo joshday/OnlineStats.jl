@@ -38,7 +38,8 @@ fit!(o, randn(10^6))
 
 ## Contributing
 
-When contributing to OnlineStats, trivial PRs like documentation typos are very welcome!  For nontrivial changes, please first discuss the change you wish to make via issue/email/slack with @joshday.
+- Trivial PRs such as fixing typos are very welcome!  
+- For nontrivial changes, you'll probably want to first discuss the changes via issue/email/slack with [`@joshday`](https://github.com/joshday).
 
 ## Authors
 
@@ -49,4 +50,4 @@ See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/co
 
 ## License
 
-OnlineStats is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT - see the [LICENSE](LICENSE) file.
