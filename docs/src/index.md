@@ -27,7 +27,7 @@ Pkg.add("OnlineStats")
 ```@repl index
 using OnlineStats
 m = Mean()
-supertype(typeof(m))
+supertype(Mean)
 ```
 
 ### Stats can be updated
