@@ -3,3 +3,7 @@ img {
     margin: auto;
     display: block;
 }
+
+code {
+    color: #444;
+}
