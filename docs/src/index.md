@@ -1,7 +1,8 @@
 ```@raw html
-<div style="width:100%; height:150px;border-width:4px;border-style:solid;
-        border-color:#2269D1;border-radius:10px;text-align:center;">
-    <h1>Star us on GitHub!</h1>
+<div style="width:100%; height:150px;border-width:1px;border-style:solid;padding-top:25px;
+        border-color:#000;border-radius:10px;text-align:center;background-color:#209cee;
+        color:#FFF">
+    <h3 style="color:white">Star us on GitHub!</h3>
     <a class="github-button" href="https://github.com/joshday/OnlineStats.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star joshday/OnlineStats.jl on GitHub" style="margin:auto">Star</a>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </div>
@@ -64,7 +65,7 @@ using OnlineStats
 ```
 
 ### `Series`
-A `Series` tracks stats that should be applied to the **same** data stream.
+A [`Series`](@ref) tracks stats that should be applied to the **same** data stream.
 
 ```@example collections
 y = rand(1000)
@@ -74,7 +75,8 @@ fit!(s, y)
 
 
 ### `FTSeries`
-An `FTSeries` tracks stats that should be applied to the **same** data stream, but filters and transforms (hence `FT`) the input data before it is sent to its stats.
+
+An [`FTSeries`](@ref) tracks stats that should be applied to the **same** data stream, but filters and transforms (hence `FT`) the input data before it is sent to its stats.
 
 ```@example collections
 s = FTSeries(Mean(), Variance(); filter = x->true, transform = abs)
@@ -83,7 +85,8 @@ fit!(s, -y)
 
 
 ### `Group`
-A `Group` tracks stats that should be applied to **different** data streams.
+
+A [`Group`](@ref) tracks stats that should be applied to **different** data streams.
 
 ```@example collections
 g = Group(Mean(), CountMap(Bool))
