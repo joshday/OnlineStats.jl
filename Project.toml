@@ -19,6 +19,7 @@ SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
 OnlineStatsBase = "1.0"
+StatsBase = "0.32"
 julia = "1.0"
 
 [extras]
