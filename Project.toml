@@ -18,8 +18,10 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
+LossFunctions = "0.5"
 OnlineStatsBase = "1.0"
 PenaltyFunctions = "0.1"
+OrderedCollections = "1.1"
 julia = "1.0"
 
 [extras]
