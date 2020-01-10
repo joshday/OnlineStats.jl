@@ -97,4 +97,3 @@ fit!(g, itr)
 ## Additional Resources
 
 - [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
-- [JuliaDB Integration](http://juliadb.org/latest/onlinestats/)
