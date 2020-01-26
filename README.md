@@ -28,6 +28,8 @@ using OnlineStats
 
 o = Series(Mean(), Variance(), P2Quantile(), Extrema())
 
+fit!(o, 1.0)
+
 fit!(o, randn(10^6))
 ```
 

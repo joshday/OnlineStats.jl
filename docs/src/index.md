@@ -33,7 +33,8 @@ supertype(Mean)
 
 ### Stats can be updated
 
-`fit!(stat::OnlineStat{T}, y::S)` will iterate through `y` and `fit!` each element if `T != S`.
+!!! note
+    `fit!` can be used to update the stat with a single observation or multiple observations: `fit!(stat::OnlineStat{T}, y::S)` will iterate through `y` and `fit!` each element if `T != S`.
 
 ```@repl index
 y = randn(100);
