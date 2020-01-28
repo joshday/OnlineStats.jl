@@ -7,3 +7,7 @@ img {
 code {
     color: #444 !important;
 }
+
+.content a code {
+    color: #2e63b8 !important;
+}
