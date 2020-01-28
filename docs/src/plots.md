@@ -15,7 +15,7 @@ theme(:juno)
 # Plots
 
 !!! note
-    Each of the following examples are plotting **one million data points**.
+    Each of the following examples are plotting one million data points, a typically difficult task.
 
 ## Many Stats Can Be Plotted via Plot Recipes
 
