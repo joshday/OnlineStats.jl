@@ -53,3 +53,13 @@ See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/co
 ## License
 
 MIT - see the [LICENSE](LICENSE) file.
+
+## Packages Using OnlineStats/[OnlineStatsBase](https://github.com/joshday/OnlineStatsBase.jl)
+
+- [ESDL](https://github.com/esa-esdl/ESDL.jl)
+- [IndexedTables](https://github.com/JuliaComputing/IndexedTables.jl)
+- [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl)
+- [Pathogen](https://github.com/jangevaare/Pathogen.jl)
+- [Recombinase](https://github.com/piever/Recombinase.jl)
+- [Transducers](https://github.com/tkf/Transducers.jl)
+- [WeightedOnlineStats](https://github.com/gdkrmr/WeightedOnlineStats.jl)
