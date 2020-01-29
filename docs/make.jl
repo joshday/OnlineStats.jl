@@ -1,7 +1,10 @@
 using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
-    format = Documenter.HTML(assets = ["assets/style.css"], sidebar_sitename=false),
+    format = Documenter.HTML(
+        assets = ["assets/style.css", "assets/favicon.ico"], 
+        sidebar_sitename=false
+    ),
     sitename = "OnlineStats Docs",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
