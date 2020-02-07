@@ -161,9 +161,9 @@ function _fit!(o::ExpandingHist, y)
     if nobs(o) == 1
         o.edges = range(y, stop=y, length=length(o.edges))
     elseif nobs(o) == 2
-        a, b = extrema(o.edges)
-        w = max(abs(y - a), abs(y - b))
-        o.edges = range(min(a,y) - w, stop=max(b, y) + w, length=length(o.edges))
+        a = first(o.edges)
+        w = abs(y - a)
+        o.edges = range(min(a,y) - 2w, stop=max(a, y) + 2w, length=length(o.edges))
     end
 
     expand!(o, y)
