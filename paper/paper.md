@@ -96,7 +96,7 @@ Converting these formulas into ``Julia`` code, we get the following implementati
 
 ```julia
 mutable struct Mean{T,W} <: OnlineStat{Number}
-    μ::T
+    m::T
     weight::W
     n::Int
 end
@@ -108,12 +108,12 @@ end
 function _fit!(o::Mean{T}, x) where {T}
     o.n += 1
     w = T(o.weight(o.n))
-    o.μ += w * (x - o.μ)
+    o.m += w * (x - o.m)
 end
 
 function _merge!(o::Mean, o2::Mean)
     o.n += o2.n
-    o.μ += (o2.n / o.n) * (o2.μ - o.μ)
+    o.m += (o2.n / o.n) * (o2.m - o.m)
 end
 ```
 
