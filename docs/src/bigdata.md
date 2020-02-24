@@ -13,6 +13,9 @@ through the rows of a (possibly larger-than-memory) CSV file.
 
 ### Example
 
+Here is a toy example (Iris dataset) of how to iterate through the rows of a CSV file one-by-one
+and calculate histograms grouped by another variable.
+
 ```@example bigdata
 using OnlineStats, CSV, Plots
 
