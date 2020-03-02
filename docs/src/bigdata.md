@@ -40,7 +40,6 @@ savefig("versicolor.png") # hide
 ```
 
 ![](versicolor.png)
-```
 
 
 ## Distributed Parallelism
