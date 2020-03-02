@@ -28,8 +28,10 @@ o = GroupBy(String, Group([Hist(0:.2:8) for _ in 1:4]...))
 
 vars = [:sepal_length, :sepal_width, :petal_length, :petal_width]
 
+x = zeros(4)  # create buffer for storing rows
+
 for row in rows
-    x = map(x -> parse(Float64, getproperty(row, x)), vars)
+    map!(x -> parse(Float64, getproperty(row, x)), x, vars)
     fit!(o, (row.variety, x))
 end
 
