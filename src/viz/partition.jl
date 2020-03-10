@@ -8,7 +8,7 @@ nobs(o::AbstractPartition) = isempty(o.parts) ? 0 : sum(nobs, o.parts)
 
 `stat` summarizes a Y variable over an X variable's range `a` to `b`.
 """
-mutable struct Part{T, O <: OnlineStat} <: OnlineStat{VectorOb} 
+mutable struct Part{T, O <: OnlineStat} <: OnlineStat{XY} 
     stat::O 
     a::T
     b::T 

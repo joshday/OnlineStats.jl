@@ -237,6 +237,9 @@ end
     @test OnlineStats.cdf(o, -10) == 0.0
     @test ≈(OnlineStats.cdf(o, 0.0), .5; atol=.1)
     @test OnlineStats.cdf(o, 10) == 1.0
+    # Issue 182
+    @test OnlineStats.cdf(o, maximum(data)) == 1.0
+    @test OnlineStats.cdf(o, minimum(data)) == o.bins[1].count / 10_000
 end
 #-----------------------------------------------------------------------# HyperLogLog
 @testset "HyperLogLog" begin

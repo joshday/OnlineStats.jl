@@ -331,7 +331,7 @@ function cdf(o::KHist, x::Number)
     if x < a
         return 0.0
     elseif x == a
-        return o.bins[1].count / area(o)
+        return o.bins[1].count / nobs(o)
     elseif x ≥ b
         return 1.0
     else
