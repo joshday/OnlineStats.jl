@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Plots · OnlineStats Docs</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/style.css" rel="stylesheet" type="text/css"/><link href="../assets/favicon.ico" rel="icon" type="image/x-icon"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="OnlineStats Docs logo"/></a><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../weights/">Weights</a></li><li><a class="tocitem" href="../stats_and_models/">Statistics and Models</a></li><li><a class="tocitem" href="../bigdata/">Big Data</a></li><li class="is-active"><a class="tocitem" href>Plots</a><ul class="internal"><li><a class="tocitem" href="#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1"><span>Many Stats Can Be Plotted via Plot Recipes</span></a></li><li><a class="tocitem" href="#Naive-Bayes-Classifier-1"><span>Naive Bayes Classifier</span></a></li><li><a class="tocitem" href="#Mosaic-Plots-1"><span>Mosaic Plots</span></a></li><li><a class="tocitem" href="#Partitions-1"><span>Partitions</span></a></li><li><a class="tocitem" href="#Indexed-Partitions-1"><span>Indexed Partitions</span></a></li></ul></li><li><a class="tocitem" href="../howfitworks/">How <code>fit!</code> Works</a></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Plots</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Plots</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/joshday/OnlineStats.jl/blob/master/docs/src/plots.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Plots-1"><a class="docs-heading-anchor" href="#Plots-1">Plots</a><a class="docs-heading-anchor-permalink" href="#Plots-1" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Each of the following examples are plotting one million data points, a typically difficult task.</p></div></div><h2 id="Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1"><a class="docs-heading-anchor" href="#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1">Many Stats Can Be Plotted via Plot Recipes</a><a class="docs-heading-anchor-permalink" href="#Many-Stats-Can-Be-Plotted-via-Plot-Recipes-1" title="Permalink"></a></h2><pre><code class="language-julia">s = fit!(Series(KHist(25), Hist(-5:.2:5)), randn(10^6))
+plot(s)</code></pre><p><img src="../plot_series.png" alt/></p><h2 id="Naive-Bayes-Classifier-1"><a class="docs-heading-anchor" href="#Naive-Bayes-Classifier-1">Naive Bayes Classifier</a><a class="docs-heading-anchor-permalink" href="#Naive-Bayes-Classifier-1" title="Permalink"></a></h2><p>The <a href="../api/#OnlineStats.NBClassifier"><code>NBClassifier</code></a> type stores conditional histograms of the predictor variables, allowing you to plot approximate &quot;group by&quot; distributions:</p><pre><code class="language-julia"># make data
+x = randn(10^6, 5)
+y = x * [1,3,5,7,9] .&gt; 0
+
+o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
+fit!(o, zip(eachrow(x), y))
+plot(o)</code></pre><p><img src="../nbclassifier.png" alt/></p><h2 id="Mosaic-Plots-1"><a class="docs-heading-anchor" href="#Mosaic-Plots-1">Mosaic Plots</a><a class="docs-heading-anchor-permalink" href="#Mosaic-Plots-1" title="Permalink"></a></h2><p>The <a href="../api/#OnlineStats.Mosaic"><code>Mosaic</code></a> type allows you to plot the relationship between two categorical variables. It is typically more useful than a bar plot, as class probabilities are given by the horizontal widths.</p><pre><code class="language-">x = rand([true, true, false], 10^6)
+y = map(xi -&gt; xi ? rand(1:3) : rand(1:4), x)
+o = fit!(Mosaic(Bool, Int), eachrow([x y]))
+plot(o)
+savefig(&quot;mosaic.png&quot;); nothing # hide</code></pre><p><img src="../mosaic.png" alt/></p><h2 id="Partitions-1"><a class="docs-heading-anchor" href="#Partitions-1">Partitions</a><a class="docs-heading-anchor-permalink" href="#Partitions-1" title="Permalink"></a></h2><p>The <a href="../api/#OnlineStats.Partition"><code>Partition</code></a> type summarizes sections of a data stream using any <code>OnlineStat</code>, and is therefore extremely useful in visualizing huge datasets, as summaries are plotted rather than every single observation.</p><h4 id="Continuous-Data-1"><a class="docs-heading-anchor" href="#Continuous-Data-1">Continuous Data</a><a class="docs-heading-anchor-permalink" href="#Continuous-Data-1" title="Permalink"></a></h4><pre><code class="language-julia">y = cumsum(randn(10^6)) + 100randn(10^6)
+
+o = Partition(KHist(10))
+
+fit!(o, y)
+
+plot(o, xlab = &quot;Nobs&quot;)</code></pre><p><img src="../partition_hist.png" alt/></p><pre><code class="language-julia">o = Partition(Mean())
+o2 = Partition(Extrema())
+
+s = Series(o, o2)
+
+fit!(s, y)
+
+plot(s, layout = 1, xlab = &quot;Nobs&quot;)</code></pre><p><img src="../partition_mean_ex.png" alt/></p><h4 id="Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1"><a class="docs-heading-anchor" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1">Plot a custom function of the <code>OnlineStat</code>s (default is <code>value</code>)</a><a class="docs-heading-anchor-permalink" href="#Plot-a-custom-function-of-the-OnlineStats-(default-is-value)-1" title="Permalink"></a></h4><p>Plot of mean +/- standard deviation:</p><pre><code class="language-julia">o = Partition(Variance())
+
+fit!(o, y)
+
+plot(o, x -&gt; [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = &quot;Nobs&quot;)</code></pre><p><img src="../partition_ci.png" alt/></p><h4 id="Categorical-Data-1"><a class="docs-heading-anchor" href="#Categorical-Data-1">Categorical Data</a><a class="docs-heading-anchor-permalink" href="#Categorical-Data-1" title="Permalink"></a></h4><pre><code class="language-julia">y = rand([&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;], 10^6)
+
+o = Partition(CountMap(String), 75)
+
+fit!(o, y)
+
+plot(o, xlab = &quot;Nobs&quot;)</code></pre><p><img src="../partition_countmap.png" alt/></p><h2 id="Indexed-Partitions-1"><a class="docs-heading-anchor" href="#Indexed-Partitions-1">Indexed Partitions</a><a class="docs-heading-anchor-permalink" href="#Indexed-Partitions-1" title="Permalink"></a></h2><p>The <code>Partition</code> type can only track the number of observations in the x-axis.  If you wish to plot one variable against another, you can use an <code>IndexedPartition</code>.</p><pre><code class="language-julia">x = randn(10^6)
+y = x + randn(10^6)
+
+o = fit!(IndexedPartition(Float64, KHist(40), 40), eachrow([x y]))
+
+plot(o, ylab = &quot;Y&quot;, xlab = &quot;X&quot;)</code></pre><p><img src="../indexpart2.png" alt/></p><pre><code class="language-julia">x = rand(&#39;a&#39;:&#39;z&#39;, 10^6)
+y = 5sin.(Float64.(x)) + Float64.(x) + randn(10^6)
+
+o = fit!(IndexedPartition(Char, Extrema()), eachrow([x y]))
+
+plot(o, xlab = &quot;Category&quot;)</code></pre><p><img src="../indexpart3.png" alt/></p><pre><code class="language-julia">x = rand(10^6)
+y = rand(1:5, 10^6)
+
+o = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))
+
+plot(o, xlab = &quot;X&quot;, ylab = &quot;Y&quot;)</code></pre><p><img src="../indexpart4.png" alt/></p><pre><code class="language-julia">x = rand(1:1000, 10^6)
+y = x .+ 30randn(10^6)
+
+o = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))
+
+plot(o)</code></pre><p><img src="../indexpartequal.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../bigdata/">« Big Data</a><a class="docs-footer-nextpage" href="../howfitworks/">How <code>fit!</code> Works »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 10 March 2020 15:24">Tuesday 10 March 2020</span>. Using Julia version 1.3.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
