@@ -3,12 +3,11 @@ module OnlineStats
 using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase
 
-import OnlineStatsBase: name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, eachcol, eachrow, nvars
+import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
+    smooth_syr!, eachcol, eachrow, nvars, Weight
 
-import LearnBase: fit!, nobs, value, predict
-import StatsBase: autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
-    fweights, sample, coef, Histogram
+import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
+    fweights, sample, coef, predict, Histogram
 
 using OrderedCollections: OrderedDict
 using SweepOperator: sweep!

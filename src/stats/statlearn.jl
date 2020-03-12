@@ -85,7 +85,7 @@ predict(o::StatLearn, x::AbstractMatrix) = x * o.β
 classify(o::StatLearn, x) = sign.(predict(o, x))
 
 function objective(o::StatLearn, x::AbstractMatrix, y::VectorOb)
-    value(o.loss, y, predict(o, x), AggMode.Mean()) + value(o.penalty, o.β, o.λ)
+    LearnBase.value(o.loss, y, predict(o, x), AggMode.Mean()) + LearnBase.value(o.penalty, o.β, o.λ)
 end
 
 #-----------------------------------------------------------------------# updateβ!
