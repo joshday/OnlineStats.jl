@@ -45,7 +45,7 @@ Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of
     autocov(o)
     autocor(o)
 """
-struct AutoCov{T, W} <: OnlineStat{T}
+struct AutoCov{T, W} <: OnlineStat{Number}
     cross::Vector{Float64}
     m1::Vector{Float64}
     m2::Vector{Float64}

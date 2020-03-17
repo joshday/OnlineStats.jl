@@ -4,7 +4,7 @@ using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
 @reexport using OnlineStatsBase
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, eachcol, eachrow, nvars, Weight
+    smooth_syr!, eachcol, eachrow, nvars, Weight, Centroid, ClosedInterval
 
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram

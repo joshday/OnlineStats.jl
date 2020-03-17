@@ -20,7 +20,7 @@ SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 [compat]
 LearnBase = "0.2"
 LossFunctions = "0.5"
-OnlineStatsBase = "~1.1"
+OnlineStatsBase = "1.2"
 OrderedCollections = "1.1"
 PenaltyFunctions = "0.1"
 RecipesBase = "0.7, 0.8"

@@ -137,95 +137,163 @@ end
     x, y
 end
 
-#-----------------------------------------------------------------------# Partition
-@recipe f(o::AbstractPartition, fun=value) = o.parts, fun
 
-@recipe function f(parts::Vector{Part{T, O}}, fun) where {T, O}
-    sort!(parts)
-    y = map(part -> fun(part.stat), parts)
-    x = midpoint.(parts)
-    # if parts[1].a isa Number
-    #     xlim --> (parts[1].a, parts[end].b)
-    # end
-    if y[1] isa Number
-        seriestype --> :step
-        label --> name(parts[1].stat, false, false)
-        x, y
-    elseif y[1] isa VectorOb
-        label --> name(parts[1].stat, false, false)
-        y2 = plotshape(y)
-        x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
-        if length(y[1]) == 2
-            # seriestype --> :step
-            fillto --> y2[:, 1]
-            alpha --> .4
-            linewidth --> 0
-            x2, y2[:, 2]
-        else
-            x2, y2
-        end
-    elseif y[1] isa AbstractDict  # CountMap
-        kys = []
-        for item in y, ky in keys(item)
-            ky ∉ kys && push!(kys, ky)
-        end
-        sort!(kys)
-        @series begin
-            label --> reshape(kys, (1, length(kys)))
-            ylim --> (0, 1)
-            linewidth --> .5
-            seriestype --> :bar
-            if parts[1].a isa Number
-                bar_widths --> [p.b - p.a for p in parts]
-            end
-            y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
-            x, y
-        end
-    else
-        error("No plot recipe exists for this kind of partition")
-    end
+#-----------------------------------------------------------------------------# Vector{<:Part}
+_x(p::Part{<:ClosedInterval}) = [p.domain.first, p.domain.last, NaN]
+_y(val) = [val, val, NaN]
+_label(v::Vector{<:Part}) = OnlineStatsBase.name(first(v).stat, false, false)
+
+# Fallback (Mean, Variance, and scalar-valued stat)
+@recipe function f(val::Vector{<:Part})
+    label --> _label(val)
+    vcat(_x.(val)...), vcat(map(x -> _y(value(x.stat)), val)...)
 end
 
-plotshape(v::Vector) = v
-plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
+# CountMap
+@recipe function f(parts::Vector{<:Part{<:Any, <:CountMap}}; prob=true)
+    keyset = sort!(collect(mapreduce(x -> Set(keys(value(x.stat))), union, parts)))
+    seriestype --> :bar
+    bar_widths --> [p.domain.last - p.domain.first for p in parts]
+    x = [middle(p.domain.first, p.domain.last) for p in parts]
+    ys = hcat([[value(p.stat)[k] for p in parts] for k in keyset]...)
+    @info typeof(ys)
+    for (i, k) in enumerate(reverse(keyset))
+        y = sum(ys[:, i:end], dims=2)
+        if prob 
+            y = y ./ sum(ys, dims=2)
+        end
+        @series begin 
+            label --> string(k)
+            x,  y
+        end
+    end
+end 
 
+# Extrema
+@recipe function f(val::Vector{<:Part{<:Any, <:Extrema}}) 
+    label --> _label(val)
+    alpha --> .3
+    fillrange --> vcat(map(x -> _y(x.stat.min), val)...)
+    vcat(_x.(val)...), vcat(map(x -> _y(x.stat.max), val)...)
+end
 
-
-
-#---------------------------------------------------------------# [Indexed]Partition Hist
-@recipe f(o::IndexedPartition{T,O}) where {T, O<:HistogramStat} = o.parts
-@recipe f(o::Partition{T,O}) where {T, O<:HistogramStat} = o.parts
-
-@recipe function f(parts::Vector{Part{T, O}}) where {T, O<:HistogramStat}
+# KHist and Hist
+@recipe function f(parts::Vector{<:Part{<:Any, <:HistogramStat}}; prob=true)
     sort!(parts)
     x = []
     y = []
-    fillz = Int[]
+    fillz = Float64[]
     for part in parts
         edg = edges(part.stat)
         cnts = counts(part.stat)
+        n = nobs(part.stat)
         for i in eachindex(cnts)
             if cnts[i] > 0
                 # rectangle
-                push!(x, part.a); push!(y, edg[i])
-                push!(x, part.a); push!(y, edg[i + 1])
-                push!(x, part.b); push!(y, edg[i + 1])
-                push!(x, part.b); push!(y, edg[i])
+                push!(x, part.domain.first); push!(y, edg[i])
+                push!(x, part.domain.first); push!(y, edg[i + 1])
+                push!(x, part.domain.last); push!(y, edg[i + 1])
+                push!(x, part.domain.last); push!(y, edg[i])
                 push!(x, NaN); push!(y, NaN);
                 # fill color
-                push!(fillz, cnts[i])
+                push!(fillz, prob ? cnts[i] / n : cnts[i])
             end
         end
     end
     @series begin
+        lt = prob ? "Probabilities" : "Counts"
         seriestype := :shape
         linewidth --> 0
         linealpha --> 0
-        legend --> false
+        label --> ""
+        legendtitle --> lt
         fillz := fillz
         x, y
     end
 end
+
+# Series
+@recipe function f(val::Vector{T}) where {O, T<:Part{<:Any, <:Series}}
+    for i in eachindex(first(val).stat.stats) 
+        @series begin 
+            map(x -> Part(x.stat.stats[i], x.domain), val)
+        end
+    end
+end
+
+#-----------------------------------------------------------------------------# Partition 
+@recipe function f(o::Partition{T,O}) where {O, T}
+    xlabel --> "Nobs"
+    ylabel --> "Value"
+    o.parts
+end
+
+# @recipe function f(o::IndexedPartition{T,O}) where {O, T}
+#     xlabel --> "Nobs"
+#     ylabel --> "Value"
+#     o.parts
+# end
+
+
+# #-----------------------------------------------------------------------# Partition
+# @recipe f(o::AbstractPartition, fun=value) = o.parts, fun
+
+# @recipe function f(parts::Vector{Part{T, O}}, fun) where {T, O}
+#     sort!(parts)
+#     y = map(part -> fun(part.stat), parts)
+#     x = midpoint.(parts)
+#     # if parts[1].a isa Number
+#     #     xlim --> (parts[1].a, parts[end].b)
+#     # end
+#     if y[1] isa Number
+#         seriestype --> :step
+#         label --> name(parts[1].stat, false, false)
+#         x, y
+#     elseif y[1] isa VectorOb
+#         label --> name(parts[1].stat, false, false)
+#         y2 = plotshape(y)
+#         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
+#         if length(y[1]) == 2
+#             # seriestype --> :step
+#             fillto --> y2[:, 1]
+#             alpha --> .4
+#             linewidth --> 0
+#             x2, y2[:, 2]
+#         else
+#             x2, y2
+#         end
+#     elseif y[1] isa AbstractDict  # CountMap
+#         kys = []
+#         for item in y, ky in keys(item)
+#             ky ∉ kys && push!(kys, ky)
+#         end
+#         sort!(kys)
+#         @series begin
+#             label --> reshape(kys, (1, length(kys)))
+#             ylim --> (0, 1)
+#             linewidth --> .5
+#             seriestype --> :bar
+#             if parts[1].a isa Number
+#                 bar_widths --> [p.b - p.a for p in parts]
+#             end
+#             y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
+#             x, y
+#         end
+#     else
+#         error("No plot recipe exists for this kind of partition")
+#     end
+# end
+
+# plotshape(v::Vector) = v
+# plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
+
+
+
+
+# #---------------------------------------------------------------# [Indexed]Partition Hist
+# @recipe f(o::IndexedPartition{T,O}) where {T, O<:HistogramStat} = o.parts
+# @recipe f(o::Partition{T,O}) where {T, O<:HistogramStat} = o.parts
+
 
 
 

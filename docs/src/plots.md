@@ -12,7 +12,7 @@ gr()
 theme(:juno)
 ```
 
-# Plots
+# Data Viz
 
 !!! note
     Each of the following examples are plotting one million data points, a typically difficult task.
