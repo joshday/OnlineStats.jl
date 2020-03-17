@@ -181,32 +181,32 @@ function indexed_merge_next!(parts::Vector{<:Part}, method)
     end
 end
 
-# function _merge!(o::IndexedPartition, o2::IndexedPartition)
-#     # If there's any overlap, merge
-#     for p2 in o2.parts 
-#         pushpart = true
-#         for p in o.parts 
-#             if (p2.a ∈ p) || (p2.b ∈ p)
-#                 pushpart = false
-#                 merge!(p, p2) 
-#                 break               
-#             end
-#         end
-#         pushpart && push!(o.parts, p2)
-#     end
-#     # merge parts that overlap 
-#     for i in reverse(2:length(o.parts))
-#         p1, p2 = o.parts[i-1], o.parts[i]
-#         if p1.a > p2.b
-#             # info("hey I deleted something at $i")
-#             merge!(p1, p2)
-#             deleteat!(o.parts, i)
-#         end
-#     end
-#     # merge until there's b left
-#     sort!(o.parts)
-#     while length(o.parts) > o.b 
-#         merge_nearest!(o.parts)
-#     end
-#     o
-# end
+function _merge!(o::IndexedPartition, o2::IndexedPartition)
+    # If there's any overlap, merge
+    for p2 in o2.parts 
+        pushpart = true
+        for p in o.parts 
+            if (p2.domain.first ∈ p) || (p2.domain.last ∈ p)
+                pushpart = false
+                merge!(p, p2) 
+                break               
+            end
+        end
+        pushpart && push!(o.parts, p2)
+    end
+    # merge parts that overlap 
+    for i in reverse(2:length(o.parts))
+        p1, p2 = o.parts[i-1], o.parts[i]
+        if p1.domain.first > p2.domain.last
+            # info("hey I deleted something at $i")
+            merge!(p1, p2)
+            deleteat!(o.parts, i)
+        end
+    end
+    # merge until there's b left
+    sort!(o.parts)
+    while length(o.parts) > o.b 
+        indexed_merge_next!(o.parts, o.method)
+    end
+    o
+end

@@ -255,6 +255,10 @@ end
 @testset "IndexedPartition" begin
     o = IndexedPartition(Float64, Mean())
     fit!(o, zip(y, y2))
+    o2 = IndexedPartition(Float64, Mean())
+    fit!(o, zip(y, y2))
+    merge!(o, o2)
+    @test nobs(o) == 2n
 end
 #-----------------------------------------------------------------------# KahanSum
 @testset "KahanSum" begin
