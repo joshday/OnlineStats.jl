@@ -67,33 +67,33 @@ Split a data stream into `nparts` where each part is summarized by `stat`.
     using Plots
     plot(o)
 """
-struct Partition{T, O <: OnlineStat{T}, P <: Part{ClosedInterval{Int}, O}} <: OnlineStat{T}
+mutable struct Partition{T, O <: OnlineStat{T}, P <: Part{ClosedInterval{Int}, O}} <: OnlineStat{T}
     parts::Vector{P}
     b::Int
     init::O
     method::Symbol
+    n::Int
 end
 function Partition(o::O, b::Int=100; method=:equal) where {O <: OnlineStat}
-    Partition(Part{ClosedInterval{Int}, O}[], b, o, method)
+    Partition(Part{ClosedInterval{Int}, O}[], b, o, method, 0)
 end
-nobs(o::Partition) = length(o.parts) > 0 ? sum(nobs, o.parts) : 0
 
 function _fit!(o::Partition, y)
     isempty(o.parts) && push!(o.parts, Part(copy(o.init), ClosedInterval(1, 1)))
     lastpart = last(o.parts)
-    n = nobs(o)
-    if (n + 1) ∈ lastpart 
-        _fit!(lastpart, (n + 1) => y)
+    n = o.n += 1
+    if n ∈ lastpart 
+        _fit!(lastpart, n => y)
     else
         stat = fit!(copy(o.init), y)
-        push!(o.parts, Part(stat, ClosedInterval(n + 1, n + nobs(lastpart))))
+        push!(o.parts, Part(stat, ClosedInterval(n, n + nobs(lastpart) - 1)))
     end
     length(o.parts) > o.b && isfull(last(o.parts)) && merge_next!(o.parts, o.method)
 end
 
-Base.merge!(a::ClosedInterval, b::ClosedInterval, c,d) = merge!(a, b)
+Base.merge!(a::ClosedInterval, b::ClosedInterval, c, d) = merge!(a, b)
 
-isfull(p::Part{<:ClosedInterval}) = nobs(p) == p.domain.last - p.domain.first + 1
+# isfull(p::Part{<:ClosedInterval}) = nobs(p) == p.domain.last - p.domain.first + 1
 
 function merge_next!(parts::Vector{<:Part}, method)
     if method === :equal
@@ -141,29 +141,31 @@ variable of type `T`.
     using Plots 
     plot(o)
 """
-struct IndexedPartition{IN, O<:OnlineStat{IN}, T} <: AbstractPartition{VectorOb}
-    parts::Vector{Part{T, O}}
+struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Part{ClosedInterval{Int}, O}} <: OnlineStat{TwoThings}
+    parts::Vector{P}
     b::Int
     init::O
     method::Symbol
 end
-# function IndexedPartition(T::Type, o::O, b::Int=100) where {IN, O<:OnlineStat{IN}}
-#     IndexedPartition{IN, O, T}(Part{T, O}[], b, o)
-# end
-# function _fit!(o::IndexedPartition{I,O,T}, xy) where {I,O,T}
-#     x, y = xy
-#     isempty(o.parts) && push!(o.parts, Part(copy(o.init), T(x), T(x)))
-#     addpart = true
-#     for p in o.parts 
-#         if x in p 
-#             addpart = false 
-#             _fit!(p, xy)
-#             break
-#         end
-#     end
-#     addpart && push!(o.parts, Part(fit!(copy(o.init), y), x, x))
-#     length(o.parts) > o.b && merge_nearest!(sort!(o.parts))
-# end
+function IndexedPartition(I::Type, o::O, b::Int=100; method=:nearest) where {T, O<:OnlineStat{T}}
+    IndexedPartition(Part{ClosedInterval{T}, O}[], b, o, method)
+end
+nobs(o::IndexedPartition) = length(o.parts) > 0 ? sum(nobs, o.parts) : 0
+
+function _fit!(o::IndexedPartition{I,O,T}, xy) where {I,O,T}
+    x, y = xy
+    isempty(o.parts) && push!(o.parts, Part(copy(o.init), ClosedInterval(T(x), T(x))))
+    addpart = true
+    for p in o.parts 
+        if x in p 
+            addpart = false 
+            _fit!(p, xy)
+            break
+        end
+    end
+    addpart && push!(o.parts, Part(fit!(copy(o.init), y), ClosedInterval(x, x)))
+    length(o.parts) > o.b && merge_nearest!(sort!(o.parts))
+end
 
 # function merge_nearest!(parts::Vector{<:Part})
 #     diff = get_diff(parts[1], parts[2])
