@@ -378,7 +378,7 @@ end
     @test nobs(o) == nobs(o2)
     @test all(nobs.(o.parts) .== nobs.(o2.parts))
     for i in 1:5
-        @test value(o.parts[i]) ≈ value(o2.parts[500 + i])
+        @test value(o.parts[i].stat) ≈ value(o2.parts[500 + i].stat)
     end
 end
 #-----------------------------------------------------------------------# ProbMap

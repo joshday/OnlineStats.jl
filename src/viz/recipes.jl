@@ -139,7 +139,10 @@ end
 
 
 #-----------------------------------------------------------------------------# Vector{<:Part}
-_x(p::Part{<:ClosedInterval}) = [p.domain.first, p.domain.last, NaN]
+function _x(p::Part{<:ClosedInterval}) 
+    a, b = p.domain.first, p.domain.last
+    [a, b, NaN]
+end
 _y(val) = [val, val, NaN]
 _label(v::Vector{<:Part}) = OnlineStatsBase.name(first(v).stat, false, false)
 
@@ -228,74 +231,11 @@ end
     o.parts
 end
 
-# @recipe function f(o::IndexedPartition{T,O}) where {O, T}
-#     xlabel --> "Nobs"
-#     ylabel --> "Value"
-#     o.parts
-# end
-
-
-# #-----------------------------------------------------------------------# Partition
-# @recipe f(o::AbstractPartition, fun=value) = o.parts, fun
-
-# @recipe function f(parts::Vector{Part{T, O}}, fun) where {T, O}
-#     sort!(parts)
-#     y = map(part -> fun(part.stat), parts)
-#     x = midpoint.(parts)
-#     # if parts[1].a isa Number
-#     #     xlim --> (parts[1].a, parts[end].b)
-#     # end
-#     if y[1] isa Number
-#         seriestype --> :step
-#         label --> name(parts[1].stat, false, false)
-#         x, y
-#     elseif y[1] isa VectorOb
-#         label --> name(parts[1].stat, false, false)
-#         y2 = plotshape(y)
-#         x2 = eltype(x) == Char ? string.(x) : x  # Plots can't handle Char
-#         if length(y[1]) == 2
-#             # seriestype --> :step
-#             fillto --> y2[:, 1]
-#             alpha --> .4
-#             linewidth --> 0
-#             x2, y2[:, 2]
-#         else
-#             x2, y2
-#         end
-#     elseif y[1] isa AbstractDict  # CountMap
-#         kys = []
-#         for item in y, ky in keys(item)
-#             ky ∉ kys && push!(kys, ky)
-#         end
-#         sort!(kys)
-#         @series begin
-#             label --> reshape(kys, (1, length(kys)))
-#             ylim --> (0, 1)
-#             linewidth --> .5
-#             seriestype --> :bar
-#             if parts[1].a isa Number
-#                 bar_widths --> [p.b - p.a for p in parts]
-#             end
-#             y = plotshape(map(x -> reverse(cumsum(probs(x.stat, reverse(kys)))), parts))
-#             x, y
-#         end
-#     else
-#         error("No plot recipe exists for this kind of partition")
-#     end
-# end
-
-# plotshape(v::Vector) = v
-# plotshape(v::Vector{<:VectorOb}) = [v[i][j] for i in eachindex(v), j in eachindex(v[1])]
-
-
-
-
-# #---------------------------------------------------------------# [Indexed]Partition Hist
-# @recipe f(o::IndexedPartition{T,O}) where {T, O<:HistogramStat} = o.parts
-# @recipe f(o::Partition{T,O}) where {T, O<:HistogramStat} = o.parts
-
-
-
+@recipe function f(o::IndexedPartition{T,O}; connect=false) where {O, T}
+    xlabel --> "Index"
+    ylabel --> "Value"
+    o.parts
+end
 
 #-----------------------------------------------------------------------# NBClassifier
 @recipe function f(o::NBClassifier)

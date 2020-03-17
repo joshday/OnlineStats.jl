@@ -91,20 +91,17 @@ function _fit!(o::Partition, y)
     length(o.parts) > o.b && isfull(last(o.parts)) && merge_next!(o.parts, o.method)
 end
 
-Base.merge!(a::ClosedInterval, b::ClosedInterval, c, d) = merge!(a, b)
-
-# isfull(p::Part{<:ClosedInterval}) = nobs(p) == p.domain.last - p.domain.first + 1
+isfull(p::Part{<:ClosedInterval}) = nobs(p) == p.domain.last - p.domain.first + 1
 
 function merge_next!(parts::Vector{<:Part}, method)
     if method === :equal
         n = nobs(first(parts))
-        ind = 1 
-        for (i, p) in enumerate(parts)
-            nobs(p) < n && (ind = i; break;)
+        i = 1
+        for (j, p) in enumerate(parts)
+            nobs(p) < n && (i = j; break;)
         end
-        ind -= ind == length(parts)
-        merge!(parts[ind], parts[ind+1])
-        deleteat!(parts, ind + 1)
+        merge!(parts[i], parts[i + 1])
+        deleteat!(parts, i + 1)
     elseif method === :oldest_first
         ind = 1
         error("TODO")
@@ -116,13 +113,14 @@ end
 # Assumes `a` goes before `b`
 function _merge!(a::Partition, b::Partition)
     n = nobs(a)
+    a.n += b.n
     for p in b.parts
         push!(a.parts, Part(copy(p.stat), ClosedInterval(p.domain.first + n, p.domain.last + n)))
     end
-    while length(a.parts) > o.b
-        merge_next!(a.parts)
+    while length(a.parts) > a.b
+        merge_next!(a.parts, a.method)
     end
-    o
+    a
 end
 
 
@@ -141,51 +139,50 @@ variable of type `T`.
     using Plots 
     plot(o)
 """
-struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Part{ClosedInterval{Int}, O}} <: OnlineStat{TwoThings}
+mutable struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Part{ClosedInterval{I}, O}} <: OnlineStat{TwoThings}
     parts::Vector{P}
     b::Int
     init::O
     method::Symbol
+    n::Int
 end
-function IndexedPartition(I::Type, o::O, b::Int=100; method=:nearest) where {T, O<:OnlineStat{T}}
-    IndexedPartition(Part{ClosedInterval{T}, O}[], b, o, method)
+function IndexedPartition(I::Type, o::O, b::Int=100; method=:weighted_nearest) where {T, O<:OnlineStat{T}}
+    IndexedPartition(Part{ClosedInterval{I}, O}[], b, o, method, 0)
 end
-nobs(o::IndexedPartition) = length(o.parts) > 0 ? sum(nobs, o.parts) : 0
 
-function _fit!(o::IndexedPartition{I,O,T}, xy) where {I,O,T}
+function _fit!(o::IndexedPartition{I,T,O}, xy) where {I,T,O}
     x, y = xy
+    n = o.n += 1
     isempty(o.parts) && push!(o.parts, Part(copy(o.init), ClosedInterval(T(x), T(x))))
-    addpart = true
-    for p in o.parts 
-        if x in p 
-            addpart = false 
-            _fit!(p, xy)
-            break
-        end
+    i = findfirst(p -> x in p, o.parts)
+    if isnothing(i) 
+        push!(o.parts, Part(fit!(copy(o.init), y), ClosedInterval(x, x)))
+    else 
+        _fit!(o.parts[i], xy)
     end
-    addpart && push!(o.parts, Part(fit!(copy(o.init), y), ClosedInterval(x, x)))
-    length(o.parts) > o.b && merge_nearest!(sort!(o.parts))
+    length(o.parts) > o.b && indexed_merge_next!(sort!(o.parts), o.method)
 end
 
-# function merge_nearest!(parts::Vector{<:Part})
-#     diff = get_diff(parts[1], parts[2])
-#     ind = 1
-#     for i in 2:(length(parts) - 1)
-#         newdiff = get_diff(parts[i], parts[i+1])
-#         if newdiff < diff 
-#             diff = newdiff 
-#             ind = i 
-#         end
-#     end
-#     merge!(parts[ind], parts[ind + 1])
-#     deleteat!(parts, ind + 1)
-# end
+function indexed_merge_next!(parts::Vector{<:Part}, method)
+    if method === :weighted_nearest
+        diff = Inf
+        ind = 1
+        for (i, (a,b)) in enumerate(neighbors(parts))
+            newdiff = (b.domain.first - a.domain.last) * middle(nobs(a), nobs(b))
+            if newdiff < diff 
+                diff = newdiff
+                ind=i
+            end
+        end
+        merge!(parts[ind], parts[ind + 1])
+        deleteat!(parts, ind + 1)
+    else
+        error("method not recognized")
+    end
+end
 
-
-# get_diff(a::Part{T}, b::Part{T}) where {T<:Dates.TimeType} = 
-#     (Dates.value(b.a) - Dates.value(a.b)) * (nobs(a) + nobs(b)) / 2
-
-# get_diff(a::Part{T}, b::Part{T}) where {T<:Number} = (b.a - a.b) * (nobs(a) + nobs(b)) / 2
+# remove after next OnlineStatsBase release
+Base.merge!(a::ClosedInterval, b::ClosedInterval) = merge!(a, b, nothing, nothing)
 
 # function _merge!(o::IndexedPartition, o2::IndexedPartition)
 #     # If there's any overlap, merge
