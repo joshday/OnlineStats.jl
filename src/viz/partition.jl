@@ -181,9 +181,6 @@ function indexed_merge_next!(parts::Vector{<:Part}, method)
     end
 end
 
-# remove after next OnlineStatsBase release
-Base.merge!(a::ClosedInterval, b::ClosedInterval) = merge!(a, b, nothing, nothing)
-
 # function _merge!(o::IndexedPartition, o2::IndexedPartition)
 #     # If there's any overlap, merge
 #     for p2 in o2.parts 
