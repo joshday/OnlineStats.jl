@@ -50,9 +50,16 @@ It is typically more useful than a bar plot, as class probabilities are given by
 widths.
 
 ```@example setup
-x = rand([true, true, false], 10^6)
-y = map(xi -> xi ? rand(1:3) : rand(1:4), x)
-o = fit!(Mosaic(Bool, Int), eachrow([x y]))
+using RDatasets 
+t = dataset("datasets", "Titanic")
+
+o = Mosaic(String, String)
+for (age, surv, n) in zip(t.Age, t.Survived, t.Freq)
+    for i in 1:n
+        fit!(o, (age, surv))
+    end
+end
+
 plot(o)
 savefig("mosaic.png"); nothing # hide
 ```
