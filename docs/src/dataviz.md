@@ -60,7 +60,7 @@ for (age, surv, n) in zip(t.Age, t.Survived, t.Freq)
     end
 end
 
-plot(o)
+plot(o, legendtitle="Survived", xlabel="Age")
 savefig("mosaic.png"); nothing # hide
 ```
 ![](mosaic.png)

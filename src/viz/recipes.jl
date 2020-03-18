@@ -227,6 +227,7 @@ end
 @recipe function f(o::Partition{T,O}) where {O, T}
     xlabel --> "Nobs"
     ylabel --> "Value"
+    ylim -> (0, o.parts[end].domain.last)
     o.parts
 end
 

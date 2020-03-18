@@ -52,8 +52,6 @@ end
     xlim --> (0, 1)
     label --> permutedims(string.(collect(keys(b))))
     xticks --> (midpoints(x), string.(collect(keys(a))))
-    xlabel --> "X"
-    legendtitle --> "Y"
     linewidth --> 0.5
 
     y = reverse(cumsum([d[(av,bv)] / a[av] for av in keys(a), bv in keys(b)], dims=2), dims=2)

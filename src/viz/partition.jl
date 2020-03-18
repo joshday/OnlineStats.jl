@@ -153,7 +153,7 @@ end
 function _fit!(o::IndexedPartition{I,T,O}, xy) where {I,T,O}
     x, y = xy
     n = o.n += 1
-    isempty(o.parts) && push!(o.parts, Part(copy(o.init), ClosedInterval(T(x), T(x))))
+    isempty(o.parts) && push!(o.parts, Part(copy(o.init), ClosedInterval(I(x), I(x))))
     i = findfirst(p -> x in p, o.parts)
     if isnothing(i) 
         push!(o.parts, Part(fit!(copy(o.init), y), ClosedInterval(x, x)))
@@ -165,7 +165,7 @@ end
 
 function indexed_merge_next!(parts::Vector{<:Part}, method)
     if method === :weighted_nearest
-        diff = Inf
+        diff = parts[2].domain.first - parts[1].domain.last
         ind = 1
         for (i, (a,b)) in enumerate(neighbors(parts))
             newdiff = (b.domain.first - a.domain.last) * middle(nobs(a), nobs(b))
