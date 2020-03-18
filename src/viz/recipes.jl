@@ -159,7 +159,6 @@ end
     bar_widths --> [p.domain.last - p.domain.first for p in parts]
     x = [middle(p.domain.first, p.domain.last) for p in parts]
     ys = hcat([[value(p.stat)[k] for p in parts] for k in keyset]...)
-    @info typeof(ys)
     for (i, k) in enumerate(reverse(keyset))
         y = sum(ys[:, i:end], dims=2)
         if prob 

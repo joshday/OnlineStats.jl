@@ -1,11 +1,3 @@
-# struct MosaicPlot{T, S} <: OnlineStat{VectorOb}
-#     stat::GroupBy{T,CountMap{S,OrderedDict{S,Int}}}
-# end
-# MosaicPlot(T, S) = MosaicPlot(GroupBy{T}(CountMap(S)))
-# nobs(o::MosaicPlot) = nobs(o.stat)
-# _fit!(o::MosaicPlot, xy) = _fit!(o.stat, xy)
-
-
 """
     Mosaic(T::Type, S::Type)
 
@@ -19,47 +11,48 @@ Data structure for generating a mosaic plot, a comparison between two categorica
     o = fit!(Mosaic(Bool, Int), zip(x, y))
     plot(o)
 """
-mutable struct Mosaic{T, C<:CountMap} <: OnlineStat{VectorOb}
-    value::OrderedDict{T, C}
-    n::Int
+struct Mosaic{T <: CountMap} <: OnlineStat{TwoThings}
+    cm::T
 end
-Mosaic(T::Type, S::Type) = Mosaic(OrderedDict{T, CountMap{S, OrderedDict{S,Int}}}(), 0)
-Base.show(io::IO, o::Mosaic{T,S}) where {T, S} = print(io, "Mosaic: $T × $S")
-function _fit!(o::Mosaic{T, C}, xy) where {T, S, C<:CountMap{S, OrderedDict{S,Int}}}
-    o.n += 1
-    if haskey(o.value, first(xy))
-        _fit!(o.value[first(xy)], last(xy))
-    else 
-        stat = CountMap(S)
-        _fit!(stat, last(xy))
-        o.value[first(xy)] = stat
+Mosaic(T::Type, S::Type) = Mosaic(CountMap{Tuple{T,S}}())
+value(o::Mosaic) = value(o.cm)
+nobs(o::Mosaic) = nobs(o.cm)
+_fit!(o::Mosaic, xy) = fit!(o.cm, Tuple(xy))
+_merge!(a::Mosaic, b::Mosaic) = merge!(a.cm, b.cm)
+
+function add_zero_counts!(o::Mosaic)
+    v = value(o)
+    akeys = [k[1] for k in keys(v)]
+    bkeys = [k[2] for k in keys(v)]
+    for ai in akeys, bi in bkeys 
+        get!(v, (ai, bi), 0)
     end
+    sort!(v)
+    o
 end
-value(o::Mosaic) = sort!(o.value)
-Base.keys(o::Mosaic) = sort!(collect(keys(o.value)))
-subkeys(o::Mosaic) = sort!(mapreduce(x->collect(keys(x)), union, values(o.value)))
-_merge!(o::Mosaic, o2::Mosaic) = (o.n += o2.n; merge!(merge!, o.value, o2.value))
 
+function split_countmaps(o::Mosaic)
+    v = value(o)
+    akeys, bkeys = unique(first.(keys(v))), unique(last.(keys(v)))
+    a = OrderedDict(k => sum(last, filter(x -> x[1][1] == k, v)) for k in akeys) 
+    b = OrderedDict(k => sum(last, filter(x -> x[1][2] == k, v)) for k in bkeys)
+    sort!(a), sort!(b)
+end
 
-@recipe function f(o::Mosaic{T,S}) where {T,S}
-    kys = sort!(collect(keys(o.value)))
+@recipe function f(o::Mosaic)
     n = nobs(o)
-    xwidths = [nobs(o.value[ky]) / n for ky in kys]
-    xedges = vcat(0.0, cumsum(xwidths))
+    a, b = split_countmaps(o)
+    d = value(add_zero_counts!(o))
 
-    subkys = subkeys(o)
-    y = zeros(length(subkys), length(kys))
-    for (j, ky) in enumerate(kys) 
-        y[:, j] = probs(o.value[ky], subkys)
-        y[:, j] = 1.0 .- vcat(0.0, cumsum(y[1:(end-1), j]))
-    end
+    x = vcat(0.0, cumsum([av / n for av in values(a)]))
 
-    seriestype := :bar
-    bar_widths := xwidths
-    labels := subkys
-    xticks := (midpoints(xedges), kys)
-    xlim := (0, 1)
-    ylim := (0, 1)
+    seriestype := :bar 
+    bar_widths := diff(x)
+    ylim --> (0,1)
+    xlim --> (0, 1)
+    label --> permutedims(string.(collect(keys(b))))
+    xticks --> (midpoints(x), string.(collect(keys(a))))
 
-    xedges, y'
+    y = reverse(cumsum([d[(av,bv)] / a[av] for av in keys(a), bv in keys(b)], dims=2), dims=2)
+    midpoints(x), y
 end
