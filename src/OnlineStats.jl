@@ -65,4 +65,5 @@ include("viz/recipes.jl")
 include("viz/heatmap.jl")
 include("viz/plotbivariate.jl")
 include("viz/khist.jl")
+include("viz/hexlattice.jl")
 end
