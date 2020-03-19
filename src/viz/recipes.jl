@@ -172,11 +172,11 @@ end
 end 
 
 # Extrema
-@recipe function f(val::Vector{<:Part{<:Any, <:Extrema}}) 
-    label --> _label(val)
+@recipe function f(parts::Vector{<:Part{<:Any, <:Extrema}}) 
+    label --> _label(parts)
     alpha --> .3
-    fillrange --> vcat(map(x -> _y(x.stat.min), val)...)
-    vcat(_x.(val)...), vcat(map(x -> _y(x.stat.max), val)...)
+    fillrange --> vcat(map(x -> _y(x.stat.min), parts)...)
+    vcat(_x.(parts)...), vcat(map(x -> _y(x.stat.max), parts)...)
 end
 
 # KHist and Hist
