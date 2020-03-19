@@ -165,17 +165,10 @@ end
 
 function indexed_merge_next!(parts::Vector{<:Part}, method)
     if method === :weighted_nearest
-        diff = parts[2].domain.first - parts[1].domain.last
-        ind = 1
-        for (i, (a,b)) in enumerate(neighbors(parts))
-            newdiff = (b.domain.first - a.domain.last) * middle(nobs(a), nobs(b))
-            if newdiff < diff 
-                diff = newdiff
-                ind=i
-            end
-        end
-        merge!(parts[ind], parts[ind + 1])
-        deleteat!(parts, ind + 1)
+        diffs = [diff(a, b) * middle(nobs(a), nobs(b)) for (a,b) in neighbors(parts)]
+        _, i = findmin(diffs)
+        merge!(parts[i], parts[i + 1])
+        deleteat!(parts, i + 1)
     else
         error("method not recognized")
     end

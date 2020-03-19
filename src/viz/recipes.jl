@@ -141,7 +141,7 @@ end
 #-----------------------------------------------------------------------------# Vector{<:Part}
 function _x(p::Part{<:ClosedInterval}) 
     a, b = p.domain.first, p.domain.last
-    [a, b, NaN]
+    [a, b, b]  # third point won't be plotted since _y(val)[3] is NaN
 end
 _y(val) = [val, val, NaN]
 _label(v::Vector{<:Part}) = OnlineStatsBase.name(first(v).stat, false, false)
