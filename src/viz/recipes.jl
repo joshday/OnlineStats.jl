@@ -157,6 +157,7 @@ end
     keyset = sort!(collect(mapreduce(x -> Set(keys(value(x.stat))), union, parts)))
     seriestype --> :bar
     bar_widths --> [p.domain.last - p.domain.first for p in parts]
+    linewidth --> 0
     x = [middle(p.domain.first, p.domain.last) for p in parts]
     ys = hcat([[value(p.stat)[k] for p in parts] for k in keyset]...)
     for (i, k) in enumerate(reverse(keyset))
