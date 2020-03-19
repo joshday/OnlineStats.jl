@@ -52,21 +52,6 @@ savefig("partition_mean_ex.png"); nothing # hide
 ![](partition_mean_ex.png)
 
 
-#### Plot a custom function of the `OnlineStat`s (default is `value`)
-
-Plot of mean +/- standard deviation:
-
-```@example setup
-o = Partition(Variance())
-
-fit!(o, y)
-
-plot(o, x -> [mean(x) - std(x), mean(x), mean(x) + std(x)], xlab = "Nobs")
-savefig("partition_ci.png"); nothing # hide
-```
-![](partition_ci.png)
-
-
 #### Categorical Data
 
 ```@example setup
@@ -92,7 +77,7 @@ to plot one variable against another, you can use an `IndexedPartition`.
 x = randn(10^6)
 y = x + randn(10^6)
 
-o = fit!(IndexedPartition(Float64, KHist(40), 40), eachrow([x y]))
+o = fit!(IndexedPartition(Float64, KHist(40), 40), zip(x, y))
 
 plot(o, ylab = "Y", xlab = "X")
 savefig("indexpart2.png"); nothing # hide
@@ -103,7 +88,7 @@ savefig("indexpart2.png"); nothing # hide
 x = rand('a':'z', 10^6)
 y = 5sin.(Float64.(x)) + Float64.(x) + randn(10^6)
 
-o = fit!(IndexedPartition(Char, Extrema()), eachrow([x y]))
+o = fit!(IndexedPartition(Char, Extrema()), zip(x, y))
 
 plot(o, xlab = "Category")
 savefig("indexpart3.png"); nothing # hide
