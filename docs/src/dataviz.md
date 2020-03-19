@@ -15,55 +15,7 @@ theme(:bright)
 # Data Viz
 
 !!! note
-    Each of the following examples are plotting one million data points, a typically difficult task.
-
-## Many Stats Can Be Plotted via Plot Recipes
-
-```@example setup
-s = fit!(Series(KHist(25), Hist(-5:.2:5)), randn(10^6))
-plot(s)
-savefig("plot_series.png") # hide
-```
-
-![](plot_series.png)
-
-## Naive Bayes Classifier
-
-The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
-
-```@example setup
-# make data
-x = randn(10^6, 5)
-y = x * [1,3,5,7,9] .> 0
-
-o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
-fit!(o, zip(eachrow(x), y))
-plot(o)
-savefig("nbclassifier.png"); nothing # hide
-```
-![](nbclassifier.png)
-
-## Mosaic Plots
-
-The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.
-It is typically more useful than a bar plot, as class probabilities are given by the horizontal
-widths.
-
-```@example setup
-using RDatasets 
-t = dataset("datasets", "Titanic")
-
-o = Mosaic(String, String)
-for (age, surv, n) in zip(t.Age, t.Survived, t.Freq)
-    for i in 1:n
-        fit!(o, (age, surv))
-    end
-end
-
-plot(o, legendtitle="Survived", xlabel="Age")
-savefig("mosaic.png"); nothing # hide
-```
-![](mosaic.png)
+    Each of the following examples are plotting one million data points.
 
 ## Partitions
 
@@ -182,6 +134,16 @@ savefig("indexpartequal.png"); nothing # hide
 ![](indexpartequal.png)
 
 
+## Histograms
+
+```@example setup
+s = fit!(Series(KHist(25), Hist(-5:.2:5)), randn(10^6))
+plot(s)
+savefig("plot_series.png") # hide
+```
+
+![](plot_series.png)
+
 ## Approximate CDF
 
 ```@example setup 
@@ -189,3 +151,42 @@ o = fit!(OrderStats(1000), randn(10^6))
 
 plot(o)
 ```
+
+## Mosaic Plots
+
+The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.
+It is typically more useful than a bar plot, as class probabilities are given by the horizontal
+widths.
+
+```@example setup
+using RDatasets 
+t = dataset("datasets", "Titanic")
+
+o = Mosaic(String, String)
+for (age, surv, n) in zip(t.Age, t.Survived, t.Freq)
+    for i in 1:n
+        fit!(o, (age, surv))
+    end
+end
+
+plot(o, legendtitle="Survived", xlabel="Age")
+savefig("mosaic.png"); nothing # hide
+```
+![](mosaic.png)
+
+
+## Naive Bayes Classifier
+
+The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
+
+```@example setup
+# make data
+x = randn(10^6, 5)
+y = x * [1,3,5,7,9] .> 0
+
+o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
+fit!(o, zip(eachrow(x), y))
+plot(o)
+savefig("nbclassifier.png"); nothing # hide
+```
+![](nbclassifier.png)
