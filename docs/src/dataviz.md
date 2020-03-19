@@ -180,3 +180,12 @@ savefig("indexpartequal.png"); nothing # hide
 
 ```
 ![](indexpartequal.png)
+
+
+## Approximate CDF
+
+```@example setup 
+o = fit!(OrderStats(1000), randn(10^6))
+
+plot(o)
+```

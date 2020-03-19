@@ -165,7 +165,7 @@ end
 
 function indexed_merge_next!(parts::Vector{<:Part}, method)
     if method === :weighted_nearest
-        diffs = [diff(a, b) * middle(nobs(a), nobs(b)) for (a,b) in neighbors(parts)]
+        diffs = [diff(a, b) * middle(nobs(a), nobs(b)) for (a, b) in neighbors(parts)]
         _, i = findmin(diffs)
         merge!(parts[i], parts[i + 1])
         deleteat!(parts, i + 1)

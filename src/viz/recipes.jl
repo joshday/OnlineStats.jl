@@ -19,6 +19,17 @@ end
     zeros(0)
 end
 
+#-----------------------------------------------------------------------------# OrderStats
+@recipe function f(o::OrderStats)
+    label --> "Approximate CDF via OrderStats"
+    xlabel --> "x"
+    ylabel --> "P(X < x)"
+    a, b = value(o.ex)
+    v = vcat(a, value(o), b)
+    k = length(v)
+    v, [1:k] ./ k
+end
+
 #-----------------------------------------------------------------------# residual plot
 @recipe function f(o::OnlineStat{VectorOb}, x::AbstractMatrix, y::AbstractVector)
     ylab --> "Residual"

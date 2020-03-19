@@ -458,27 +458,29 @@ mutable struct OrderStats{T, W} <: OnlineStat{Number}
     value::Vector{T}
     buffer::Vector{T}
     weight::W
-    n::Int
+    ex::Extrema{T}
 end
 function OrderStats(p::Integer, T::Type = Float64; weight=EqualWeight())
-    OrderStats(zeros(T, p), zeros(T, p), weight, 0)
+    OrderStats(zeros(T, p), zeros(T, p), weight, Extrema(T))
 end
+nobs(o::OrderStats) = nobs(o.ex)
 function _fit!(o::OrderStats, y)
+    n = nobs(o)
     p = length(o.value)
     buffer = o.buffer
-    i = (o.n % p) + 1
-    o.n += 1
+    i = (nobs(o) % p) + 1
+    _fit!(o.ex, y)
     buffer[i] = y
     if i == p
         sort!(buffer)
-        smooth!(o.value, buffer, o.weight(o.n / p))
+        smooth!(o.value, buffer, o.weight(nobs(o) / p))
     end
 end
-function _merge!(o::OrderStats, o2::OrderStats)
-    length(o.value) == length(o2.value) ||
-        error("Merge failed.  OrderStats track different batch sizes")
-    o.n += o2.n
-    smooth!(o.value, o2.value, o2.n / o.n)
+function _merge!(a::OrderStats, b::OrderStats)
+    length(a.value) == length(b.value) ||
+        @warn "OrderStats track different batch sizes.  No merging occurred."
+    merge!(a.ex, b.ex)
+    smooth!(a.value, b.value, nobs(b) / nobs(a))
 end
 Statistics.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
