@@ -187,7 +187,7 @@ end
 end 
 _middle(a,b) = middle(a,b)
 function _middle(a::Date, b::Date) 
-    m = Millisecond(a.instant.periods + b.instant.periods) / 2
+    m = (Millisecond(a.instant.periods) + Millisecond(b.instant.periods)) / 2
     DateTime(Dates.UTInstant(m))
 end
 
