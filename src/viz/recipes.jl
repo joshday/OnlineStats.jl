@@ -166,10 +166,13 @@ end
 # CountMap
 @recipe function f(parts::Vector{<:Part{<:Any, <:CountMap}}; prob=true)
     keyset = sort!(collect(mapreduce(x -> Set(keys(value(x.stat))), union, parts)))
+    for k in keyset, p in parts 
+        get!(p.stat.value, k, 0)
+    end
     seriestype --> :bar
     bar_widths --> [p.domain.last - p.domain.first for p in parts]
     linewidth --> 0
-    x = [middle(p.domain.first, p.domain.last) for p in parts]
+    x = [_middle(p.domain.first, p.domain.last) for p in parts]
     ys = hcat([[value(p.stat)[k] for p in parts] for k in keyset]...)
     for (i, k) in enumerate(reverse(keyset))
         y = sum(ys[:, i:end], dims=2)
@@ -182,6 +185,11 @@ end
         end
     end
 end 
+_middle(a,b) = middle(a,b)
+function _middle(a::Date, b::Date) 
+    m = Millisecond(a.instant.periods + b.instant.periods) / 2
+    DateTime(Dates.UTInstant(m))
+end
 
 # Extrema
 @recipe function f(parts::Vector{<:Part{<:Any, <:Extrema}}) 

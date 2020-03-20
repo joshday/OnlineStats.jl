@@ -1,7 +1,8 @@
 #-----------------------------------------------------------------------# AutoCov and Lag
 # Lag
 """
-    Lag{T}(b::Integer)
+    Lag{T}(b::Int)
+    Lag(T, b)
 
 Store the last `b` values for a data stream of type `T`.  Values are stored as
 
@@ -12,7 +13,7 @@ so that `value(o::Lag)[1]` is the most recent observation and `value(o::Lag)[end
 
 # Example
 
-    o = fit!(Lag{Int}(10), 1:12)
+    o = fit!(Lag(Int, 10), 1:12)
     o[1]
     o[end]
 """
@@ -21,7 +22,8 @@ mutable struct Lag{T} <: OnlineStat{T}
     b::Int
     n::Int
 end
-Lag(T::Type, b::Integer) = Lag(T[], b, 0)
+Lag(T::Type, b::Int) = Lag(T[], b, 0)
+Lag{T}(b::Int) where {T} = Lag(T, b)
 function _fit!(o::Lag, y)
     o.n += 1
     pushfirst!(o.value, y)
