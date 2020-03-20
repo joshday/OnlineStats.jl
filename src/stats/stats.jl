@@ -453,6 +453,9 @@ Average order statistics with batches of size `b`.
 
     o = fit!(OrderStats(100), randn(10^5))
     quantile(o, [.25, .5, .75])
+
+    f = ecdf(o)
+    f(0)
 """
 mutable struct OrderStats{T, W} <: OnlineStat{Number}
     value::Vector{T}
@@ -484,6 +487,11 @@ function _merge!(a::OrderStats, b::OrderStats)
 end
 Statistics.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
+function ecdf(o)
+    a, b = extrema(o.ex)
+    ecdf(vcat(a, value(o), b))
+end
+cdf(o, x) = ecdf(o)(x)
 # # tree/nbc help:
 # function pdf(o::OrderStats, x)
 #     if x ≤ first(o.value)

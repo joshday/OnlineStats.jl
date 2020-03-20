@@ -36,6 +36,7 @@
 | Histograms/continuous density      | [`Hist`](@ref) and [`KHist`](@ref) |
 | Approximate order statistics       | [`OrderStats`](@ref)       |
 | Count for each unique value        | [`CountMap`](@ref)         |
+| Approximate CDF                    | [`OrderStats`](@ref)
 
 ## Parametric Density Estimation
 
