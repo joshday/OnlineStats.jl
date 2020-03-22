@@ -25,7 +25,7 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
     o = fit!(StatLearn(5, MSPI()), zip(eachrow(x), y))
     coef(o)
 """
-mutable struct StatLearn{A<:Algorithm, L<:Loss, P<:Penalty, W} <: OnlineStat{XY}
+mutable struct StatLearn{A<:Algorithm, L, P, W} <: OnlineStat{XY}
     β::Vector{Float64}
     λ::Vector{Float64}
     gx::Vector{Float64}

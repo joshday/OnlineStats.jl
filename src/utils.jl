@@ -1,8 +1,8 @@
 #-----------------------------------------------------------------------# General
 const Tup = Union{Tuple, NamedTuple}
-const XY = Union{AbstractVector, Tup, Pair}
 const VectorOb = Union{AbstractVector, Tup}
 const TwoThings{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names, Tuple{T,S}}} where names
+const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names, Tuple{T,S}}} where {names, T<:AbstractVector, S}
 
 const ϵ = 1e-7
 

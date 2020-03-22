@@ -164,14 +164,11 @@ _label(v::Vector{<:Part}) = OnlineStatsBase.name(first(v).stat, false, false)
 end
 
 # CountMap
-@recipe function f(parts::Vector{<:Part{<:Any, <:CountMap}}; prob=true)
+@recipe function f(parts::Vector{<:Part{<:Any, <:CountMap}}; prob=true, use_part_width=true)
     keyset = sort!(collect(mapreduce(x -> Set(keys(value(x.stat))), union, parts)))
     for k in keyset, p in parts 
         get!(p.stat.value, k, 0)
     end
-    seriestype --> :bar
-    bar_widths --> [p.domain.last - p.domain.first for p in parts]
-    linewidth --> 0
     x = [_middle(p.domain.first, p.domain.last) for p in parts]
     ys = hcat([[value(p.stat)[k] for p in parts] for k in keyset]...)
     for (i, k) in enumerate(reverse(keyset))
@@ -180,6 +177,11 @@ end
             y = y ./ sum(ys, dims=2)
         end
         @series begin 
+            seriestype --> :bar
+            if use_part_width
+                bar_widths --> [p.domain.last - p.domain.first for p in parts]
+            end
+            linewidth --> 0
             label --> string(k)
             x,  y
         end

@@ -9,12 +9,12 @@ When fitting a new observation, the first value will be associated with X, the s
 
 # Example
 
-    o = fit!(HeatMap(-5:.1:5, -5:.1:5), eachrow(randn(10^5, 2)))
+    o = fit!(HeatMap(-5:.1:5, -5:.1:5), zip(randn(10^6), randn(10^6)))
 
     using Plots
     plot(o)
 """
-mutable struct HeatMap{EX, EY} <: OnlineStat{XY}
+mutable struct HeatMap{EX, EY} <: OnlineStat{TwoThings}
     xedges::EX
     yedges::EY
     counts::Matrix{Int}

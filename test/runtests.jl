@@ -186,8 +186,8 @@ end
 
 #-----------------------------------------------------------------------# HeatMap
 @testset "HeatMap" begin
-    data1 = OnlineStatsBase.eachrow(ymat[:, 1:2])
-    data2 = OnlineStatsBase.eachrow(ymat2[:, 1:2])
+    data1 = zip(ymat[:,1], ymat[:,2])
+    data2 = zip(ymat2[:,1], ymat2[:,2])
     @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
 end
 #-----------------------------------------------------------------------# Hist

@@ -768,9 +768,3 @@ function _merge!(o::T, o2::T) where {T<:ReservoirSample}
         end
     end
 end
-
-# #-----------------------------------------------------------------------# Summarizer
-# mutable struct Summarizer{T} <: OnlineStat{T}
-#     group::Group
-# end
-# nobs(o::Summarizer) = nobs(o.group)

@@ -175,3 +175,17 @@ plot(o)
 savefig("nbclassifier.png"); nothing # hide
 ```
 ![](nbclassifier.png)
+
+## HeatMap
+
+```@example setup
+o = HeatMap(-5:.1:5, -5:.1:5)
+
+x, y = randn(10^6), randn(10^6)
+
+fit!(o, zip(x, y))
+
+plot(o)
+savefig("heatmap.png"); nothing # hide
+```
+![](heatmap.ong)
