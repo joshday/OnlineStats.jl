@@ -1,3 +1,4 @@
+#-----------------------------------------------------------------------------# StatLearn
 """
     StatLearn(p, args...; rate=LearningRate())
 
@@ -91,31 +92,31 @@ end
 #-----------------------------------------------------------------------# updateβ!
 function updateβ!(o::StatLearn{SGD}, γ)
     for j in eachindex(o.β)
-        o.β[j] = prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λ[j])
+        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{T}, γ) where {T<:Union{ADAGRAD, RMSPROP}}
     for j in eachindex(o.β)
         s = γ / sqrt(o.alg.h[j] + ϵ)
-        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
+        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{ADAM}, γ)
     for j in eachindex(o.β)
         s = γ / sqrt(o.alg.v[j] + ϵ)
-        o.β[j] = prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
+        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{ADAMAX}, γ)
     for j in eachindex(o.β)
         s = γ / ((1 - o.alg.β1^nobs(o)) * o.alg.v[j])
-        o.β[j] = prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
+        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{ADADELTA}, γ)
     for j in eachindex(o.β)
         s = o.alg.δ[j]
-        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
+        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
     end
 end
 
@@ -175,7 +176,7 @@ function _fit!(o::StatLearn{OMAS}, xy)
     L = (o.alg.a[1] = smooth(o.alg.a[1], ht, γ))
     for j in eachindex(o.β)
         b[j] = smooth(b[j], ht * o.β[j] - o.gx[j], γ)
-        o.β[j] = prox(o.penalty, b[j] / L, o.λ[j] / L)
+        o.β[j] = LearnBase.prox(o.penalty, b[j] / L, o.λ[j] / L)
     end
 end
 #-----------------------------------------------------------------------# OMAP
@@ -195,6 +196,6 @@ function _fit!(o::StatLearn{MSPI}, xy)
     gradient!(o, x, y)
     γ2 = γ / (1 + γ * lconst(o, x, y))
     for j in eachindex(o.β)
-        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ2 * o.gx[j], γ2 * o.λ[j])
+        @inbounds o.β[j] = LearnBase.prox(o.penalty, o.β[j] - γ2 * o.gx[j], γ2 * o.λ[j])
     end
 end

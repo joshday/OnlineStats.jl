@@ -188,4 +188,4 @@ fit!(o, zip(x, y))
 plot(o)
 savefig("heatmap.png"); nothing # hide
 ```
-![](heatmap.ong)
+![](heatmap.png)

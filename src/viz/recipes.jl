@@ -276,7 +276,7 @@ end
     end
     @series begin
         subplot --> nvars(o) + 1
-        label --> reshape(kys, 1, length(kys))
+        label --> string.(reshape(kys, 1, length(kys)))
         framestyle := :none
         zeros(0, length(kys))
     end
