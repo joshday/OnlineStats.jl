@@ -1,3 +1,7 @@
+#-----------------------------------------------------------------------------# utils
+prox(args...) = LearnBase.prox(args...)
+prox(::typeof(zero), θ, s) = θ
+
 #-----------------------------------------------------------------------------# StatLearn
 """
     StatLearn(p, args...; rate=LearningRate())
@@ -92,31 +96,31 @@ end
 #-----------------------------------------------------------------------# updateβ!
 function updateβ!(o::StatLearn{SGD}, γ)
     for j in eachindex(o.β)
-        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λ[j])
+        o.β[j] = prox(o.penalty, o.β[j] - γ * o.gx[j], γ * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{T}, γ) where {T<:Union{ADAGRAD, RMSPROP}}
     for j in eachindex(o.β)
         s = γ / sqrt(o.alg.h[j] + ϵ)
-        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{ADAM}, γ)
     for j in eachindex(o.β)
         s = γ / sqrt(o.alg.v[j] + ϵ)
-        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{ADAMAX}, γ)
     for j in eachindex(o.β)
         s = γ / ((1 - o.alg.β1^nobs(o)) * o.alg.v[j])
-        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.alg.m[j], s * o.λ[j])
     end
 end
 function updateβ!(o::StatLearn{ADADELTA}, γ)
     for j in eachindex(o.β)
         s = o.alg.δ[j]
-        o.β[j] = LearnBase.prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
+        o.β[j] = prox(o.penalty, o.β[j] - s * o.gx[j], s * o.λ[j])
     end
 end
 

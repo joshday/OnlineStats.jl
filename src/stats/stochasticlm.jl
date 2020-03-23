@@ -20,6 +20,11 @@ module Losses
     end
 end
 
+#-----------------------------------------------------------------------------# penalties
+module Penalties
+    
+end
+
 #-----------------------------------------------------------------------------# StochasticLM
 struct StochasticLM{L, SA <: StochasticApproximation} <: OnlineStat{XY}
     alg::SA

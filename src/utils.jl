@@ -34,7 +34,7 @@ Base.getindex(v::BiasVec, i::Int) = i > length(v.x) ? v.bias : v.x[i]
 Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
 
 
-#-----------------------------------------------------------------------------# other 
+#-----------------------------------------------------------------------------# iterators 
 neighbors(x) = ((x[i], x[i+1]) for i in eachindex(x)[1:end-1])
 
 # #-----------------------------------------------------------------------# sparkline
