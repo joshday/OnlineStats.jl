@@ -92,6 +92,8 @@ function transform(o::CCIPCA, u::AbstractArray{Float64})
     @assert indim(o) == length(u)
     (u .- o.center)' * o.U
 end
+# We can also call the CCIPCA object itself to transform:
+(o::CCIPCA)(u::AbstractArray{Float64}) = transform(o, u)
 """
     reconstruct(o::CCIPCA, uproj::AbstractArray{Float64})
 

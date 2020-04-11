@@ -105,7 +105,7 @@ function setup_ccipca_randomly(indimrange = 4:100, maxn = 200;
     return o, us
 end
 
-@testset "fit!+transform+reconstruct == fittransform!+reconstruct" begin
+@testset "fit!+transform == fittransform! and callable (random testing)" begin
     function test_f!tr_equals_ft!r(o1, o2, u)
         fit!(o1, u)
         uproj1 = OnlineStats.transform(o1, u)
@@ -115,6 +115,10 @@ end
 
         @test uproj1 == uproj2
         @test urec1 == urec2
+
+        # calling the ccipca object is same as transform
+        uproj1b = o1(u)
+        @test uproj1b == uproj1 
     end
 
     # Random testing with different indims and outdims
