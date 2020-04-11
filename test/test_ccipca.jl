@@ -10,7 +10,7 @@
     @test OnlineStats.eigenvalue(o, 1) == 0.0
     @test OnlineStats.eigenvalue(o, 2) == 0.0
 
-    # first vectors added goes straight into the projection matrix:
+    # first vector added goes straight into the projection matrix:
     u1 = rand(4)
     fit!(o, u1)
     @test o[1] == u1/norm(u1)
@@ -19,16 +19,16 @@
     # We can get eigen-values individually or in array:
     @test length(OnlineStats.eigenvalues(o)) == 2
     @test OnlineStats.eigenvalues(o)[1] == OnlineStats.eigenvalue(o, 1)
-    @test OnlineStats.eigenvalues(o)[2] == OnlineStats.eigenvalue(o,     2)
+    @test OnlineStats.eigenvalues(o)[2] == OnlineStats.eigenvalue(o, 2)
 
     # errors if asking for eigen-values or vectors outside of outdim range:
-    @test_throws AssertionError OnlineStats.eigenvalue(o, 3)
-    @test_throws AssertionError OnlineStats.eigenvalue(o, 0)
-    @test_throws AssertionError OnlineStats.eigenvalue(o,   -1)
+    @test_throws AssertionError OnlineStats.eigenvalue(o,  3)
+    @test_throws AssertionError OnlineStats.eigenvalue(o,  0)
+    @test_throws AssertionError OnlineStats.eigenvalue(o, -1)
 
     # errors if trying to fit vector of wrong length:
     @test_throws AssertionError fit!(o, rand(3))
-    @test_throws AssertionError fit!(o, rand(   5  ) )
+    @test_throws AssertionError fit!(o, rand(5))
 end # @testset "CCIPCA basic tests" begin
 
 @testset "fit!+transform+reconstruct == fittransform!+reconstruct" begin
