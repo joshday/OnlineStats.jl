@@ -22,6 +22,15 @@ for Dimensionality Reduction to project high-dimensional vectors into a
 low-dimensional (typically 2D or 3D) space. This algorithm has shown very 
 good properties in comparative studies; it is both fast and give a good 
 approximation to (batch) PCA.
+
+# Example
+
+    o = CCIPCA(10, 2)     # Project 10-dimensional vectors into 2D
+    fit!(o, rand(10))
+    fit!(o, rand(10))
+    OnlineStats.transform(o, rand(10))
+    sort!(o)              # Sort from high to low eigenvalues
+    o[1]                  # Get primary (1st) eigenvector
 """
 mutable struct CCIPCA <: OnlineStat{Vector{Float64}}
     U::Matrix{Float64}      # Eigenvectors, one row per indim, one column per outdim
@@ -48,7 +57,8 @@ function _fit!(o::CCIPCA, x::Vector{Float64})
     @assert length(x) == indim(o)
     n = o.n + 1
     # update center with new observation:
-    o.center = (o.n * o.center .+ x)/n
+    #o.center = (o.n * o.center .+ x)/n
+    o.center += (x .- o.center)/n
     # center the new observation, unless this is the first observation:
     xi = (o.n > 0) ? (x .- o.center) : deepcopy(x)
     # Now recalc eigen-values and -vectors given the new observation:
@@ -66,24 +76,77 @@ function _fit!(o::CCIPCA, x::Vector{Float64})
     end
     o.n = n
 end
+"""
+    transform(o::CCIPCA, u::AbstractArray{Float64})
+
+Transform (i.e. project) the vector `u` into the PCA space 
+represented by `o`.
+"""
 function transform(o::CCIPCA, u::AbstractArray{Float64})
     @assert indim(o) == length(u)
     (u .- o.center)' * o.U
 end
+"""
+    reconstruct(o::CCIPCA, uproj::AbstractArray{Float64})
+
+Reconstruct the (projected) vector `uproj` back to the original
+space from which `o` has been fitted.
+"""
 function reconstruct(o::CCIPCA, uproj::AbstractArray{Float64})
     @assert outdim(o) == length(uproj)
     o.center .+ (o.U * uproj')
 end
-function fittransform!(o::CCIPCA, u::Vector)
+"""
+    fittransform!(o::CCIPCA, u::Vector{Float64})
+
+First `fit!` and then `transform` the vector `u` into the PCA
+space represented by `o`.
+"""
+function fittransform!(o::CCIPCA, u::Vector{Float64})
     _fit!(o, u)
     transform(o, u)
 end
+"""
+    eigenvalue(o::CCIPCA, i::Int)
+
+Get the `i`th eigenvalue of `o`.
+"""
 function eigenvalue(o::CCIPCA, i::Int)
     @assert 1 <= i <= outdim(o) "This CCIPCA has $(outdim(o)) eigenvalues, cannot return eigenvalue $(i)!"
     o.lambda[i]
 end
+"""
+    eigenvector(o::CCIPCA, i::Int)
+
+Get the `i`th eigenvector of `o`.
+"""
 function eigenvector(o::CCIPCA, i::Int)
     @assert 1 <= i <= outdim(o) "This CCIPCA has $(outdim(o)) eigenvectors, cannot return eigenvector $(i)!"
     o.U[:, i]
 end
-eigenvalues(o::CCIPCA) = o.lambda
+eigenvalues(o::CCIPCA) = Float64[eigenvalue(o, i) for i in 1:outdim(o)]
+"""
+    variation(o::CCIPCA)
+
+Get the variation (explained) in the direction of each eigenvector.
+Returns a vector of zeros if no vectors have yet been fitted.
+"""
+function variation(o::CCIPCA)
+    if o.n == 0
+        return zeros(Float64, outdim(o))
+    else
+        return o.lambda ./ sum(o.lambda)
+    end
+end
+"""
+    sort!(o::CCIPCA)
+
+Sort eigenvalues and their eigenvectors of `o` so highest ones come first.
+Useful before visualising since it ensures most variation is on the
+first (X) axis.
+"""
+function Base.sort!(o::CCIPCA)
+    perm = sortperm(o.lambda, rev=true)
+    o.lambda = o.lambda[perm]
+    o.U = o.U[:, perm]
+end

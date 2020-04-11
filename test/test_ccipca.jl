@@ -10,6 +10,9 @@
     @test OnlineStats.eigenvalue(o, 1) == 0.0
     @test OnlineStats.eigenvalue(o, 2) == 0.0
 
+    # variation is also a vector of zeros before we fit any values:
+    @test OnlineStats.variation(o) == zeros(Float64, 2)
+
     # first vector added goes straight into the projection matrix:
     u1 = rand(4)
     fit!(o, u1)
@@ -30,33 +33,6 @@
     @test_throws AssertionError fit!(o, rand(3))
     @test_throws AssertionError fit!(o, rand(5))
 end # @testset "CCIPCA basic tests" begin
-
-@testset "fit!+transform+reconstruct == fittransform!+reconstruct" begin
-
-    function test_f!tr_equals_ft!r(o1, o2, u)
-        fit!(o1, u)
-        uproj1 = OnlineStats.transform(o1, u)
-        urec1  = OnlineStats.reconstruct(o1, uproj1)
-        uproj2 = OnlineStats.fittransform!(o2, u)
-        urec2 = OnlineStats.reconstruct(o2, uproj2)
-
-        @test uproj1 == uproj2
-        @test urec1 == urec2
-    end
-
-    # Random testing with different indims and outdims
-    for _ in 1:10
-        indim = rand(4:100)
-        outdim = rand(1:(indim-1))
-        o1 = CCIPCA(indim, outdim)
-        o2 = CCIPCA(indim, outdim)
-
-        for _ in 1:rand(1:10)
-            u = rand(0.01:0.01:42.42) * rand(indim)
-            test_f!tr_equals_ft!r(o1, o2, u)
-        end
-    end
-end
 
 @testset "Differential test #1 with onlinePCA R package" begin
     # Differential testing with onlinePCA package in R:
@@ -112,3 +88,69 @@ end
     #   r1$vectors[4,2] # => -0.721400948
     @test isapprox(ev2[4], -0.721400948; atol = 1e-6)
 end # @testset "Differential test with onlinePCA R package" begin
+
+function setup_ccipca_randomly(indimrange = 4:100, maxn = 200; 
+    scalerange = 0.01:0.001:42.42, fit = true)
+    indim = rand(indimrange)
+    outdim = rand(1:min(5, indim-1))
+    o = CCIPCA(indim, outdim)
+    us = Vector{Float64}[]
+    for _ in 1:rand(1:maxn)
+        u = rand(scalerange, indim)
+        push!(us, u)
+        if fit
+            fit!(o, u)
+        end
+    end
+    return o, us
+end
+
+@testset "fit!+transform+reconstruct == fittransform!+reconstruct" begin
+    function test_f!tr_equals_ft!r(o1, o2, u)
+        fit!(o1, u)
+        uproj1 = OnlineStats.transform(o1, u)
+        urec1  = OnlineStats.reconstruct(o1, uproj1)
+        uproj2 = OnlineStats.fittransform!(o2, u)
+        urec2 = OnlineStats.reconstruct(o2, uproj2)
+
+        @test uproj1 == uproj2
+        @test urec1 == urec2
+    end
+
+    # Random testing with different indims and outdims
+    for _ in 1:10
+        o1, us = setup_ccipca_randomly(4:100, 30; fit = false)
+        o2 = CCIPCA(OnlineStats.indim(o1), OnlineStats.outdim(o1))
+        for u in us
+            test_f!tr_equals_ft!r(o1, o2, u)
+        end
+    end
+end
+
+@testset "sort! and variation (random testing)" begin
+    for _ in 1:10
+        o, us = setup_ccipca_randomly(4:42, 25)
+        lambdapre = deepcopy(o.lambda)
+        Upre = deepcopy(o.U)
+        sort!(o)
+
+        # Ensure eigen-values and -vectors are correctly sorted:
+        for i in 1:(OnlineStats.outdim(o)-1)
+            evi = OnlineStats.eigenvalue(o, i)
+            # earlier eigenvalues are larger than equal later ones
+            @test evi >= OnlineStats.eigenvalue(o, i+1)
+            # current eigenvector is same as where current eigenvalue was previously
+            idx = findfirst(ev -> ev == evi, lambdapre)
+            @test OnlineStats.eigenvector(o, i) == Upre[:, idx]
+        end
+
+        # Ensure variation is also sorted and has valid ranges
+        v = OnlineStats.variation(o)
+        @test length(v) == OnlineStats.outdim(o)
+        @test isapprox(sum(v), 1.0; atol=1e-4)
+        for i in 1:(OnlineStats.outdim(o)-1)
+            @test v[i] >= v[i+1]
+            @test 0.0 <= v[i] <= 1.0
+        end
+    end
+end
