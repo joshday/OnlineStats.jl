@@ -464,6 +464,10 @@ end
         println()
     end
 end
+#-----------------------------------------------------------------------# CCIPCA
+@testset "CCIPCA" begin
+    include("test_ccipca.jl")
+end
 #-----------------------------------------------------------------------# Kahan
 
 include("test_kahan.jl")

@@ -46,6 +46,7 @@ export
     ReservoirSample,
     SGDStat, StatLearn, StatHistory, StatLag,
     KahanSum, KahanMean, KahanVariance,
+    CCIPCA,
 # other
     OnlineStat, BiasVec
 
@@ -63,6 +64,7 @@ include("stats/linreg.jl")
 include("stats/statlearn.jl")
 include("stats/stochasticlm.jl")
 include("stats/kahan.jl")
+include("stats/pca.jl")
 
 include("viz/partition.jl")
 include("viz/mosaicplot.jl")
