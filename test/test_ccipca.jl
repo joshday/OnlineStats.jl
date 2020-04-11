@@ -3,7 +3,8 @@
     @test OnlineStats.outdim(o) == 2
     @test OnlineStats.indim(o)  == 4
     @test size(o)               == (4, 2)
-
+    @test length(o) == lastindex(o) == 2
+    
     # eigen-vectors and eigen-values are 0 before we fit any values:
     @test o[1] == zeros(Float64, 4)
     @test o[2] == zeros(Float64, 4)
