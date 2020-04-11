@@ -12,10 +12,10 @@
     CCIPCA(indim::Int, outdim::Int; l::Int)
 
 Online PCA with the CCIPCA (Candid Covariance-free Incremental PCA) algorithm,
-where indim is the length of incoming vectors, outdim is the number of dimension 
-to project to, , and l is the level of amnesia. Give values of l in the range
-2-4 if you want old vectors to be gradually less important, i.e. latest vectors 
-added get more weight.
+where indim is the length of incoming vectors, outdim is the number of 
+dimension to project to, and l is the level of amnesia. Give values of l in 
+the range 2-4 if you want old vectors to be gradually less important, i.e. 
+latest vectors added get more weight.
 
 This is a very fast, simple, and online approximation of PCA. It can be used
 for Dimensionality Reduction to project high-dimensional vectors into a 
