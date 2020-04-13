@@ -64,7 +64,7 @@ function _fit!(o::CCIPCA, x::Vector{Float64})
     n = o.n + 1
     # update center with new observation:
     #o.center = (o.n * o.center .+ x)/n
-    o.center += (x .- o.center)/n
+    o.center += (x .- o.center) ./ n
     # center the new observation, unless this is the first observation:
     xi = (o.n > 0) ? (x .- o.center) : deepcopy(x)
     # Now recalc eigen-values and -vectors given the new observation:
