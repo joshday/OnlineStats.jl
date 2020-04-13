@@ -145,12 +145,20 @@ end
 """
     eigenvalue(o::CCIPCA, i::Int)
 
-Get the `i`th eigenvalue of `o`.
+Get the `i`th eigenvalue of `o`. Also called principal variance
+for PCA.
 """
 function eigenvalue(o::CCIPCA, i::Int)
     @assert 1 <= i <= outdim(o) "This CCIPCA has $(outdim(o)) eigenvalues, cannot return eigenvalue $(i)!"
     o.lambda[i]
 end
+"""
+    eigenvalue(o::CCIPCA, i::Int)
+
+Get the `i`th eigenvalue of `o`. Also called principal variance
+for PCA.
+"""
+principalvar(o::CCIPCA, i::Int) = eigenvalue(o, i)
 """
     eigenvector(o::CCIPCA, i::Int)
 
@@ -161,13 +169,16 @@ function eigenvector(o::CCIPCA, i::Int)
     o.U[:, i]
 end
 eigenvalues(o::CCIPCA) = Float64[eigenvalue(o, i) for i in 1:outdim(o)]
+principalvars(o::CCIPCA) = eigenvalues(o)
 """
-    variation(o::CCIPCA)
+    relativevariances(o::CCIPCA)
 
-Get the variation (explained) in the direction of each eigenvector.
-Returns a vector of zeros if no vectors have yet been fitted.
+Get the relative variance (explained) in the direction of each 
+eigenvector. Returns a vector of zeros if no vectors have yet been fitted.
+Note that this does not inclue the residual variance that is not captured
+in the eigenvectors.
 """
-function variation(o::CCIPCA)
+function relativevariances(o::CCIPCA)
     if o.n == 0
         return zeros(Float64, outdim(o))
     else

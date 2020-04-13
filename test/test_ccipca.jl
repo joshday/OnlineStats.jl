@@ -11,8 +11,8 @@
     @test OnlineStats.eigenvalue(o, 1) == 0.0
     @test OnlineStats.eigenvalue(o, 2) == 0.0
 
-    # variation is also a vector of zeros before we fit any values:
-    @test OnlineStats.variation(o) == zeros(Float64, 2)
+    # relativevariances is also a vector of zeros before we fit any values:
+    @test OnlineStats.relativevariances(o) == zeros(Float64, 2)
 
     # first vector added goes straight into the projection matrix:
     u1 = rand(4)
@@ -150,7 +150,7 @@ end
     end
 end
 
-@testset "sort! and variation (random testing)" begin
+@testset "sort! and relativevariances (random testing)" begin
     for _ in 1:10
         o, us = setup_ccipca_randomly(4:42, 25)
         lambdapre = deepcopy(o.lambda)
@@ -167,8 +167,8 @@ end
             @test OnlineStats.eigenvector(o, i) == Upre[:, idx]
         end
 
-        # Ensure variation is also sorted and has valid ranges
-        v = OnlineStats.variation(o)
+        # Ensure relativevariances is also sorted and has valid ranges
+        v = OnlineStats.relativevariances(o)
         @test length(v) == OnlineStats.outdim(o)
         @test isapprox(sum(v), 1.0; atol=1e-4)
         for i in 1:(OnlineStats.outdim(o)-1)
