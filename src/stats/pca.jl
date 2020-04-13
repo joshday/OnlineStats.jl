@@ -38,12 +38,15 @@ approximation to (batch) PCA.
     o[1]                             # Get primary (1st) eigenvector
     OnlineStats.variation(o)         # Get the variation (explained) "by" each eigenvector
 """
-mutable struct CCIPCA <: OnlineStat{Vector{Float64}}
+mutable struct CCIPCA <: OnlineStat{AbstractVector{<:Real}}
     U::Matrix{Float64}      # Eigenvectors, one row per indim, one column per outdim
     lambda::Vector{Float64} # Eigenvalues, one per outdim
     center::Vector{Float64} # Center/mean, one per indim
     l::Int
     n::Int
+    # temp vars, saved here for slight speed bump:
+    xi::Vector{Float64}
+    v::Vector{Float64}
 end
 function CCIPCA(indim::Int, outdim::Int; l::Int=0)
     @assert outdim < indim
@@ -51,7 +54,9 @@ function CCIPCA(indim::Int, outdim::Int; l::Int=0)
     center = zeros(Float64, indim)
     lambda = zeros(Float64, outdim)
     U      = zeros(Float64, indim, outdim)
-    CCIPCA(U, lambda, center, l, 0)
+    xi     = zeros(Float64, indim)
+    v      = zeros(Float64, indim)
+    CCIPCA(U, lambda, center, l, 0, xi, v)
 end
 Base.length(o::CCIPCA) = outdim(o) # Number of eigen-vectors
 Base.getindex(o::CCIPCA, i) = o.U[:, i]
@@ -66,19 +71,19 @@ function _fit!(o::CCIPCA, x::Vector{Float64})
     #o.center = (o.n * o.center .+ x)/n
     o.center += (x .- o.center) ./ n
     # center the new observation, unless this is the first observation:
-    xi = (o.n > 0) ? (x .- o.center) : deepcopy(x)
+    o.xi = (o.n > 0) ? (x .- o.center) : deepcopy(x)
     # Now recalc eigen-values and -vectors given the new observation:
     f = (1.0+o.l)/n
     @inbounds for i in 1:outdim(o)
         if i == n
-            o.lambda[i] = norm(xi)
-            o.U[:, i] = xi / o.lambda[i]
+            o.lambda[i] = norm(o.xi)
+            o.U[:, i] = o.xi / o.lambda[i]
             break
         end
-        v = (1-f) * o.lambda[i] * o.U[:, i] + f * dot(o.U[:, i], xi) * xi
-        o.lambda[i] = norm(v)
-        o.U[:, i] = v/o.lambda[i]
-        xi = xi .- (dot(o.U[:, i], xi) * o.U[:, i])
+        o.v = (1-f) * o.lambda[i] * o.U[:, i] + f * dot(o.U[:, i], o.xi) * o.xi
+        o.lambda[i] = norm(o.v)
+        o.U[:, i] = o.v/o.lambda[i]
+        o.xi = o.xi .- (dot(o.U[:, i], o.xi) * o.U[:, i])
     end
     o.n = n
 end

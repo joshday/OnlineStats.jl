@@ -7,7 +7,7 @@ import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth,
     smooth_syr!, eachcol, eachrow, nvars, Weight, Centroid, ClosedInterval
 
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
-    fweights, sample, coef, predict, Histogram, ecdf
+    fweights, sample, coef, predict, Histogram, ecdf, transform
 
 using OrderedCollections: OrderedDict
 using SweepOperator: sweep!
@@ -46,7 +46,7 @@ export
     ReservoirSample,
     SGDStat, StatLearn, StatHistory, StatLag,
     KahanSum, KahanMean, KahanVariance,
-    CCIPCA,
+    CCIPCA, transform,
 # other
     OnlineStat, BiasVec
 
