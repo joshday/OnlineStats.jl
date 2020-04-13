@@ -9,7 +9,7 @@
 # High Dimension: Which Algorithm to Choose?", Int. Statistical Review, 2018-
 
 """
-    CCIPCA(indim::Int, outdim::Int; l::Int)
+    CCIPCA(outdim::Int, indim; l::Int)
 
 Online PCA with the CCIPCA (Candid Covariance-free Incremental PCA) algorithm,
 where indim is the length of incoming vectors, outdim is the number of 
@@ -17,7 +17,10 @@ dimension to project to, and l is the level of amnesia. Give values of l in
 the range 2-4 if you want old vectors to be gradually less important, i.e. 
 latest vectors added get more weight.
 
-This is a very fast, simple, and online approximation of PCA. It can be used
+If no indim is specified it will be set later, on first call to fit. After
+that it is fixed and cannot change.
+
+The CCIPCA is a very fast, simple, and online approximation of PCA. It can be used
 for Dimensionality Reduction to project high-dimensional vectors into a 
 low-dimensional (typically 2D or 3D) space. This algorithm has shown very 
 good properties in comparative studies; it is both fast and give a good 
@@ -25,7 +28,7 @@ approximation to (batch) PCA.
 
 # Example
 
-    o = CCIPCA(10, 2)                # Project 10-dimensional vectors into 2D
+    o = CCIPCA(2, 10)                # Project 10-dimensional vectors into 2D
     u1 = rand(10)
     fit!(o, u1)                      # Fit to u1
     u2 = rand(10)
@@ -39,24 +42,35 @@ approximation to (batch) PCA.
     OnlineStats.variation(o)         # Get the variation (explained) "by" each eigenvector
 """
 mutable struct CCIPCA <: OnlineStat{AbstractVector{<:Real}}
-    U::Matrix{Float64}      # Eigenvectors, one row per indim, one column per outdim
     lambda::Vector{Float64} # Eigenvalues, one per outdim
+    U::Matrix{Float64}      # Eigenvectors, one row per indim, one column per outdim
     center::Vector{Float64} # Center/mean, one per indim
+    xi::Vector{Float64}     # temp var used in calc, saved here for speed
+    v::Vector{Float64}      # temp var used in calc, saved here for speed
     l::Int
     n::Int
-    # temp vars, saved here for slight speed bump:
-    xi::Vector{Float64}
-    v::Vector{Float64}
+    indimdet::Bool          # True iff indim has been determined (if not it is set on first fit)
 end
-function CCIPCA(indim::Int, outdim::Int; l::Int=0)
-    @assert outdim < indim
+function CCIPCA(outdim::Int, indim::Union{Nothing,Int} = nothing; l::Int=0)
+    if isnothing(indim)
+        indim = 1 # Dummy value, since we will update on first _fit
+        indimdet = false
+    elseif indim > 0
+        @assert outdim < indim "indim ($indim) must be larger than outdim ($outdim)"
+        indimdet = true
+    else
+        error("indim cannot take a value below 1, was set to $indim")
+    end
     @assert l >= 0
-    center = zeros(Float64, indim)
+    CCIPCA(setup_internal_vars(outdim, indim)..., l, 0, indimdet)
+end
+function setup_internal_vars(outdim::Int, indim::Int)
     lambda = zeros(Float64, outdim)
     U      = zeros(Float64, indim, outdim)
+    center = zeros(Float64, indim)
     xi     = zeros(Float64, indim)
     v      = zeros(Float64, indim)
-    CCIPCA(U, lambda, center, l, 0, xi, v)
+    return (lambda, U, center, xi, v)
 end
 Base.length(o::CCIPCA) = outdim(o) # Number of eigen-vectors
 Base.getindex(o::CCIPCA, i) = o.U[:, i]
@@ -65,7 +79,16 @@ Base.size(o::CCIPCA) = (indim(o), outdim(o))
 @inline outdim(o::CCIPCA) = length(o.lambda)
 @inline indim(o::CCIPCA) = length(o.center)
 function _fit!(o::CCIPCA, x::Vector{Float64})
-    @assert length(x) == indim(o)
+    if o.indimdet == false
+        # Now indim is known so we set up accordingly
+        idim = length(x)
+        o.indimdet = true
+        odim = size(o.U, 2)
+        @assert odim < idim "indim ($idim) must be larger than outdim ($odim)"
+        o.lambda, o.U, o.center, o.xi, o.v = setup_internal_vars(odim, idim)
+    else
+        @assert length(x) == OnlineStats.indim(o)
+    end
     n = o.n + 1
     # update center with new observation:
     #o.center = (o.n * o.center .+ x)/n

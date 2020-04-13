@@ -1,5 +1,5 @@
 @testset "CCIPCA basic tests" begin
-    o = CCIPCA(4, 2)
+    o = CCIPCA(2, 4)
     @test OnlineStats.outdim(o) == 2
     @test OnlineStats.indim(o)  == 4
     @test size(o)               == (4, 2)
@@ -35,12 +35,30 @@
     @test_throws AssertionError fit!(o, rand(5))
 end # @testset "CCIPCA basic tests" begin
 
+@testset "CCIPCA with no indim to constructor" begin
+    o = CCIPCA(3)
+    @test OnlineStats.outdim(o) == 3
+    @test OnlineStats.indim(o)  == 1
+    @test size(o)               == (1, 3)
+    @test length(o) == lastindex(o) == 3
+
+    # It will now be set on first fit instead
+    fit!(o, rand(5))
+    @test OnlineStats.outdim(o) == 3
+    @test OnlineStats.indim(o)  == 5
+    @test size(o)               == (5, 3)
+
+    # But, obviously, we cannot change the indim again
+    @test_throws AssertionError fit!(o, rand(6))
+    @test_throws AssertionError fit!(o, rand(4))
+end
+
 @testset "Differential test #1 with onlinePCA R package" begin
     # Differential testing with onlinePCA package in R:
     #   lambda <- c(0.0, 0.0)
     #   U <- matrix(rep.int(0, 2*4), nrow = 4, ncol = 2)
     #   library(onlinePCA)
-    o = CCIPCA(4, 2)
+    o = CCIPCA(2, 4)
 
     #   u1 <- c(1.0, 2.0, 3.0, 4.0)
     u1 = [1.0, 2.0, 3.0, 4.0]
@@ -94,7 +112,7 @@ function setup_ccipca_randomly(indimrange = 4:100, maxn = 200;
     scalerange = 0.01:0.001:42.42, fit = true)
     indim = rand(indimrange)
     outdim = rand(1:min(5, indim-1))
-    o = CCIPCA(indim, outdim)
+    o = CCIPCA(outdim, indim)
     us = Vector{Float64}[]
     for _ in 1:rand(1:maxn)
         u = rand(scalerange, indim)
@@ -125,7 +143,7 @@ end
     # Random testing with different indims and outdims
     for _ in 1:10
         o1, us = setup_ccipca_randomly(4:100, 30; fit = false)
-        o2 = CCIPCA(OnlineStats.indim(o1), OnlineStats.outdim(o1))
+        o2 = CCIPCA(OnlineStats.outdim(o1), OnlineStats.indim(o1))
         for u in us
             test_f!tr_equals_ft!r(o1, o2, u)
         end
