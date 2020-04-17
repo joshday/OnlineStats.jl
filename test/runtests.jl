@@ -1,5 +1,5 @@
 using OnlineStats, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
-using LossFunctions, PenaltyFunctions
+using LearnBase, LossFunctions, PenaltyFunctions
 
 value = OnlineStats.value
 val = LearnBase.value
