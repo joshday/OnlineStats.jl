@@ -20,7 +20,7 @@ export
     mean, var, std, cov, cor,
 # functions
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    classify, coef, stats, series,
+    classify, coef, ecdf,
 # weights
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
     McclainWeight, Bounded, Scaled,

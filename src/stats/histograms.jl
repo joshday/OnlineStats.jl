@@ -332,7 +332,7 @@ function ecdf(o::KHist)
         pushfirst!(data, KHistBin(o.ex.min, o.ex.nmin))
     end
     if data[end].loc != o.ex.max 
-        pushfirst!(data, KHistBin(o.ex.max, o.ex.nmax))
+        push!(data, KHistBin(o.ex.max, o.ex.nmax))
     end
     ecdf(map(x -> x.loc, data), weights=fweights(map(x -> x.count, data)))
 end
