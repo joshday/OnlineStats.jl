@@ -326,19 +326,15 @@ function pdf(o::KHist, x::Number)
     end
 end
 
-function cdf(o::KHist, x::Number)
-    a, b = extrema(o.ex)
-    if x < a
-        return 0.0
-    elseif x == a
-        return o.bins[1].count / nobs(o)
-    elseif x ≥ b
-        return 1.0
-    else
-        i = searchsortedfirst(o.bins, KHistBin(x, 0))
-        x1, y1 = xy(o.bins[i - 1])
-        x2, y2 = xy(o.bins[i])
-        h = smooth(y1, y2, (x2 - x) / (x2 - x1))
-        return (area(o, i - 2) + (x - x1) * h) / area(o)
+function ecdf(o::KHist) 
+    data = copy(o.bins)
+    if data[1].loc != o.ex.min 
+        pushfirst!(data, KHistBin(o.ex.min, o.ex.nmin))
     end
+    if data[end].loc != o.ex.max 
+        pushfirst!(data, KHistBin(o.ex.max, o.ex.nmax))
+    end
+    ecdf(map(x -> x.loc, data), weights=fweights(map(x -> x.count, data)))
 end
+
+@deprecate cdf(o::KHist, x) ecdf(o)(x)

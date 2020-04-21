@@ -489,7 +489,7 @@ function _merge!(a::OrderStats, b::OrderStats)
 end
 Statistics.quantile(o::OrderStats, arg...) = quantile(value(o), arg...)
 
-function ecdf(o)
+function ecdf(o::OrderStats)
     a, b = extrema(o.ex)
     ecdf(vcat(a, value(o), b))
 end
