@@ -1,5 +1,6 @@
 """
     Heatmap(xedges, yedges; left = true, closed = true)
+    Heatmap(itr; left = true, closed = true)
 
 Create a two dimensional histogram with the bin partition created by `xedges` and `yedges`.
 When fitting a new observation, the first value will be associated with X, the second with Y.
@@ -9,10 +10,15 @@ When fitting a new observation, the first value will be associated with X, the s
 
 # Example
 
-    o = fit!(HeatMap(-5:.1:5, -5:.1:5), zip(randn(10^6), randn(10^6)))
-
     using Plots
+
+    xy = zip(randn(10^6), randn(10^6))
+    o = fit!(HeatMap(-5:.1:5, -5:.1:5), xy)
     plot(o)
+
+    xy = zip(1 .+ randn(10^6) ./ 10, randn(10^6))
+    o = HeatMap(xy)
+    plot(o, aspect_ratio=:equal)
 """
 mutable struct HeatMap{EX, EY} <: OnlineStat{TwoThings}
     xedges::EX
@@ -25,6 +31,11 @@ mutable struct HeatMap{EX, EY} <: OnlineStat{TwoThings}
     function HeatMap(x::T, y::S; left::Bool=true, closed::Bool=true) where {T<:AbstractVector,S<:AbstractVector}
         new{T,S}(x,y, zeros(Int, length(x)-1, length(y)-1), 0, left, closed)
     end
+end
+function HeatMap(itr, bins::Integer=200; kw...)
+    xa, xb = extrema(first, itr)
+    ya, yb = extrema(last, itr)
+    fit!(HeatMap(range(xa, xb, length=bins), range(ya, yb, length=bins); kw...), itr)
 end
 nobs(o::HeatMap) = sum(o.counts) + o.out
 value(o::HeatMap) = (x=o.xedges, y=o.yedges, z=o.counts)
