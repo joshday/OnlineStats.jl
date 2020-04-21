@@ -26,7 +26,7 @@ PenaltyFunctions = "0.1, 0.2"
 RecipesBase = "0.7, 0.8, 1.0"
 Reexport = "0.2"
 StatsBase = "0.32, 0.33"
-SweepOperator = "0.3"
+SweepOperator = "0.2, 0.3"
 julia = "1.1"
 
 [extras]
