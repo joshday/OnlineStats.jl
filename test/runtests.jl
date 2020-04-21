@@ -242,7 +242,7 @@ end
     @test OnlineStats.cdf(o, 10) == 1.0
     # Issue 182
     @test OnlineStats.cdf(o, maximum(data)) == 1.0
-    @test OnlineStats.cdf(o, minimum(data)) ≈ o.ex.nmin / 10_000
+    @test OnlineStats.cdf(o, minimum(data)) == o.ex.nmin / 10_000
 end
 #-----------------------------------------------------------------------# HyperLogLog
 @testset "HyperLogLog" begin
