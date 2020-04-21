@@ -159,6 +159,30 @@ savefig("mosaic.png"); nothing # hide
 ```
 ![](mosaic.png)
 
+## HeatMap
+
+```@example setup
+o = HeatMap(-5:.1:5, -5:.1:5)
+
+x, y = randn(10^6), randn(10^6)
+
+fit!(o, zip(x, y))
+
+plot(o)
+savefig("heatmap.png"); nothing # hide
+```
+![](heatmap.png)
+
+
+```@example setup
+x, y = randn(10^6), randn(10^6)
+
+o = HeatMap(zip(x, y))
+
+plot(o, aspect_ratio=:equal)
+savefig("heatmap2.png"); nothing # hide
+```
+![](heatmap2.png)
 
 ## Naive Bayes Classifier
 
@@ -176,16 +200,3 @@ savefig("nbclassifier.png"); nothing # hide
 ```
 ![](nbclassifier.png)
 
-## HeatMap
-
-```@example setup
-o = HeatMap(-5:.1:5, -5:.1:5)
-
-x, y = randn(10^6), randn(10^6)
-
-fit!(o, zip(x, y))
-
-plot(o)
-savefig("heatmap.png"); nothing # hide
-```
-![](heatmap.png)
