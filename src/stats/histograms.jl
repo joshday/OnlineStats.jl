@@ -73,7 +73,7 @@ struct Hist{T, R} <: HistogramStat{T}
     left::Bool
     closed::Bool
 
-    function Hist(edges::R, T::Type = eltype(edges); left::Bool=true, closed::Bool = true) where {R<:AbstractVector}
+    function Hist(edges::R, T::Type = eltype(edges); left::Bool=true, closed::Bool=true) where {R<:AbstractVector}
         new{T,R}(edges, zeros(Int, length(edges) - 1), [0,0], left, closed)
     end
 end
@@ -205,8 +205,6 @@ function Base.merge(a::KHistBin, b::KHistBin)
     KHistBin(smooth(a.loc, b.loc, b.count / n), n)
 end
 xy(o::KHistBin) = o.loc, o.count
-
-@deprecate Hist(b::Int) KHist(b::Int)
 
 
 """

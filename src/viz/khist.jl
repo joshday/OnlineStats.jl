@@ -6,31 +6,29 @@ end
 function KHist2(k::Int, typ::Type{T} = Float64) where {T<:Number}
     KHist2(Part{Centroid{T}, Counter{T}}[], k)
 end
+KHist2(k::Int, itr) = fit!(KHist2(k, eltype(itr)), itr)
 
 nobs(o::KHist2) = length(o.parts) < 1 ? 0 : sum(nobs, o.parts)
 
+function Base.push!(o::KHist{T}, p::Part{Centroid{T}, Counter{T}}) where {T}
+    parts = o.parts 
+    insert!(parts, searchsortedfirst(parts, p), p)
+    if length(parts) > o.k 
+        mindiff, i = Inf, 0 
+        for (j, (a,b)) in enumerate(neighbors(parts))
+            diff = Float64(diff(a, b))
+            if diff < mindiff 
+                mindiff = diff 
+                i = j
+            end
+        end
+        parts[i] = merge(parts[i], parts[i+1])
+        deleteat!(parts, i+1)
+    end
+    o
+end
 
-# xy(o::KHist) = center.(o.bins), nobs.(o.bins)
-
-# function Base.push!(o::KHist, p::Bin{<:Centroid})
-#     bins = o.bins
-#     insert!(bins, searchsortedfirst(bins, p), p)
-#     if length(bins) > o.k
-#         mindiff, i = Inf, 0
-#         for j in Base.OneTo(length(bins) - 1)
-#             diff = Float64(center(bins[j + 1]) - center(bins[j]))
-#             if diff < mindiff
-#                 mindiff = diff
-#                 i = j
-#             end
-#         end
-#         bins[i] = merge(bins[i], bins[i + 1])
-#         deleteat!(bins, i + 1)
-#     end
-#     o
-# end
-
-# _fit!(o::KHist{T}, y) where {T} = push!(o, Bin(Centroid{T}(y), 1))
+_fit!(o::KHist2{T}, y) where {T} = push!(o.parts, Part(fit!(Counter(T), y), Centroid(y)))
 
 # function value(o::KHist) 
 #     x, y = xy(o)

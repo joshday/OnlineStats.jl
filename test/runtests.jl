@@ -1,4 +1,4 @@
-using OnlineStats, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
+using OnlineStats, OnlineStatsBase, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
 using LearnBase, LossFunctions, PenaltyFunctions
 
 value = OnlineStats.value
@@ -53,21 +53,6 @@ end
     @test value(o) ≈ mean(y)
     @test i == n
     @test ≈(mergevals(CallFun(Mean(), x->nothing), y, y2)...)
-end
-#-----------------------------------------------------------------------# CovMatrix
-@testset "CovMatrix" begin
-    o = fit!(CovMatrix(), eachrow(ymat))
-    @test value(o) ≈ cov(ymat)
-    @test cov(o) ≈ cov(ymat)
-    @test cor(o) ≈ cor(ymat)
-    @test all(x -> ≈(x...), zip(var(o), var(ymat; dims=1)))
-    @test all(x -> ≈(x...), zip(std(o), std(ymat; dims=1)))
-    @test all(x -> ≈(x...), zip(mean(o), mean(ymat; dims=1)))
-
-    @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
-    @test ≈(mergevals(CovMatrix(), OnlineStatsBase.eachcol(ymat'), OnlineStatsBase.eachcol(ymat2'))...)
-    @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2))...)
-    @test ≈(mergevals(CovMatrix(Complex{Float64}), OnlineStatsBase.eachrow(ymat * im), OnlineStatsBase.eachrow(ymat2 * im))...)
 end
 #-----------------------------------------------------------------------# Diff
 @testset "Diff" begin
@@ -316,21 +301,6 @@ end
     o2 = fit!(LinReg(), zip(eachrow(ymat[:,[4,1]]), ymat[:,3]))
     @test coef(o, [.2,.4]; y=3, x = [4,1], bias=false) ≈ coef(o2, [.2, .4])
 end
-#-----------------------------------------------------------------------# ML
-@testset "ML" begin
-    o = OnlineStats.preprocess(OnlineStatsBase.eachrow(ymat))
-    for i in 1:5
-        @test o.group[i] isa OnlineStats.Numerical
-    end
-    o = OnlineStats.preprocess(OnlineStatsBase.eachrow(xmat))
-    for i in 1:2
-        @test o.group[i] isa OnlineStats.Categorical
-    end
-    o = OnlineStats.preprocess(OnlineStatsBase.eachrow(zmat), 3 => OnlineStats.Categorical(Int))
-    @test o.group[3] isa OnlineStats.Categorical
-    @test o.group[1] isa OnlineStats.Numerical
-end
-
 #-----------------------------------------------------------------------# Mosaic
 @testset "Mosaic" begin
     @test ==(mergevals(Mosaic(Int,Int), zip(z, z2), zip(z2, z))...)

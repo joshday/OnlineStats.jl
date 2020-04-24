@@ -1,10 +1,11 @@
 module OnlineStats
 
-using RecipesBase, Reexport, Statistics, LinearAlgebra, Dates
-@reexport using OnlineStatsBase
+using RecipesBase, Statistics, LinearAlgebra, Dates
+
+using OnlineStatsBase
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, eachcol, eachrow, nvars, Weight, Centroid, ClosedInterval
+    smooth_syr!, nvars, Weight, Centroid, ClosedInterval
 
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform
@@ -17,10 +18,10 @@ using LearnBase: LearnBase, deriv
 
 export
 # Statistics
-    mean, var, std, cov, cor,
+    mean, var, std, cov, cor, 
 # functions
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    classify, coef, ecdf,
+    classify, coef, ecdf, transform,
 # weights
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
     McclainWeight, Bounded, Scaled,
@@ -29,24 +30,24 @@ export
 # stats
     AutoCov,
     Bootstrap,
-    CallFun, CovMatrix,
+    CallFun, Counter, CountMap, CountMissing, CovMatrix, CCIPCA,
     Diff,
+    Extrema,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
-    FastNode, FastTree, FastForest,
-    GradientCore,
+    FastNode, FastTree, FastForest, FTSeries,
+    GradientCore, Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
-    KHist, KMeans,
+    KHist, KMeans, KahanSum, KahanMean, KahanVariance,
     Lag, LinReg, LinRegBuilder,
-    ModelSchema, Mosaic, MovingTimeWindow, MovingWindow,
+    Mean, Moments, ModelSchema, Mosaic, MovingTimeWindow, MovingWindow,
     NBClassifier,
     OrderStats,
-    Partition, PlotNN, ProbMap, P2Quantile,
+    Part, Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    SGDStat, StatLearn, StatHistory, StatLag,
-    KahanSum, KahanMean, KahanVariance,
-    CCIPCA, transform,
+    Series, SGDStat, StatLearn, StatHistory, StatLag, Sum,
+    Variance,
 # other
     OnlineStat, BiasVec
 
@@ -56,7 +57,6 @@ include("algorithms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")
 include("stats/histograms.jl")
-include("stats/ml.jl")
 include("stats/nbclassifier.jl")
 include("stats/fasttree.jl")
 include("stats/linreg.jl")

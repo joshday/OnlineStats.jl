@@ -493,7 +493,8 @@ function ecdf(o::OrderStats)
     a, b = extrema(o.ex)
     ecdf(vcat(a, value(o), b))
 end
-cdf(o, x) = ecdf(o)(x)
+@deprecate cdf(o, x) ecdf(o)(x)
+
 # # tree/nbc help:
 # function pdf(o::OrderStats, x)
 #     if x ≤ first(o.value)

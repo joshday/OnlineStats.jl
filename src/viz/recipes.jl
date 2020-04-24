@@ -1,11 +1,13 @@
 #-----------------------------------------------------------------------# Weight
 @recipe function f(wt::Weight; nobs=50)
-    xlabel --> "Number of Observations"
-    ylabel --> "Weight Value"
+    xlabel --> "n"
+    ylabel --> "w(n)"
     label --> name(wt)
-    ylim --> (0, 1)
+    xlim --> (0, nobs + 1)
+    ylim --> (0, 1.02)
     linewidth --> 2
-    [wt(i) for i in 1:nobs]
+    seriestype --> :scatter
+    wt.(1:nobs)
 end
 
 #-----------------------------------------------------------------------# Fallback
@@ -23,7 +25,7 @@ end
 @recipe function f(o::OrderStats)
     label --> "Approximate CDF via OrderStats"
     xlabel --> "x"
-    ylabel --> "P(X < x)"
+    ylabel --> "P(X ≤ x)"
     a, b = value(o.ex)
     v = vcat(a, value(o), b)
     k = length(v)
@@ -47,12 +49,6 @@ end
     xlab --> "j"
     seriestype --> :scatter
     coef(o)
-end
-
-@recipe function f(o::Series, x::AbstractMatrix, y::AbstractVector)
-    for stat in o.stats
-        @series begin stat end
-    end
 end
 
 
@@ -195,6 +191,7 @@ end
 
 # Extrema
 @recipe function f(parts::Vector{<:Part{<:Any, <:Extrema}}) 
+    sort!(parts)
     label --> _label(parts)
     alpha --> .3
     fillrange --> vcat(map(x -> _y(x.stat.min), parts)...)

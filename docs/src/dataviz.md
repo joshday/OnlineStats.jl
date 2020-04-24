@@ -79,21 +79,11 @@ y = x + randn(10^6)
 
 o = fit!(IndexedPartition(Float64, KHist(40), 40), zip(x, y))
 
-plot(o, ylab = "Y", xlab = "X")
+plot(o, prob=false)
 savefig("indexpart2.png"); nothing # hide
 ```
 ![](indexpart2.png)
 
-```@example setup
-x = rand('a':'z', 10^6)
-y = 5sin.(Float64.(x)) + Float64.(x) + randn(10^6)
-
-o = fit!(IndexedPartition(Char, Extrema()), zip(x, y))
-
-plot(o, xlab = "Category")
-savefig("indexpart3.png"); nothing # hide
-```
-![](indexpart3.png)
 
 ```@example setup
 x = rand(10^6)
