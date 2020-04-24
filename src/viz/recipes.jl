@@ -122,14 +122,6 @@ end
     Histogram(e[vcat(inds, inds[end] + 1)], c[inds], closed)
 end
 
-@recipe function f(o::KHist; normed=true)
-    x, y = value(o)
-    y2 = normed ? y ./ area(o) : y
-    # xlim --> extrema(o.ex)
-    fillto --> 0
-    alpha --> .5
-    x, y2
-end
 
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap, kys = keys(o); sortby = :keys)

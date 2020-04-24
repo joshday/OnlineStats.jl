@@ -2,8 +2,6 @@ module OnlineStats
 
 using RecipesBase, Statistics, LinearAlgebra, Dates
 
-using OnlineStatsBase
-
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
     smooth_syr!, nvars, Weight, Centroid, ClosedInterval
 
@@ -15,6 +13,7 @@ using SweepOperator: sweep!
 using LossFunctions: LossFunctions, Loss, L2DistLoss, AggMode
 using PenaltyFunctions: PenaltyFunctions, Penalty
 using LearnBase: LearnBase, deriv
+using OnlineStatsBase
 
 export
 # Statistics
@@ -64,11 +63,11 @@ include("stats/statlearn.jl")
 include("stats/kahan.jl")
 include("stats/pca.jl")
 
+include("viz/khist.jl")
 include("viz/partition.jl")
 include("viz/mosaicplot.jl")
 include("viz/recipes.jl")
 include("viz/heatmap.jl")
 include("viz/plotbivariate.jl")
-include("viz/khist.jl")
 include("viz/hexlattice.jl")
 end

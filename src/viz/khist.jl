@@ -1,76 +1,88 @@
-#-----------------------------------------------------------------------------# KHist
-struct KHist2{T, P <: Part{Centroid{T}, Counter{T}}} <: OnlineStat{T}
-    parts::Vector{P}
+"""
+    KHist(k::Int)
+
+Estimate the probability density of a univariate distribution at `k` approximately
+equally-spaced points.  
+
+Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
+
+A difference from the above reference is that the minimum and maximum values are not allowed to merge into another bin.
+
+# Example
+
+    o = fit!(KHist(25), randn(10^6))
+
+    # Approximate statistics
+    using Statistics
+    mean(o)
+    var(o)
+    std(o)
+    quantile(o)
+    median(o)
+
+    using Plots
+    plot(o)
+"""
+struct KHist{T} <: OnlineStat{T}
+    bins::Vector{Pair{T, Int}}  # loc => count
     k::Int
+    function KHist(bins::Vector{Pair{T, Int}}, k::Int) where {T}
+        k > 2 || error("KHist requires >2 bins")
+        new{T}(bins, k)
+    end
 end
-function KHist2(k::Int, typ::Type{T} = Float64) where {T<:Number}
-    KHist2(Part{Centroid{T}, Counter{T}}[], k)
-end
-KHist2(k::Int, itr) = fit!(KHist2(k, eltype(itr)), itr)
+KHist(k::Int, typ::Type{T} = Float64) where {T<:Number} = KHist(Pair{T, Int}[], k)
+KHist(k::Int, itr) = fit!(KHist(k, eltype(itr)), itr)
 
-nobs(o::KHist2) = length(o.parts) < 1 ? 0 : sum(nobs, o.parts)
+nobs(o::KHist) = length(o.bins) < 1 ? 0 : sum(last, o.bins)
 
-function Base.push!(o::KHist{T}, p::Part{Centroid{T}, Counter{T}}) where {T}
-    parts = o.parts 
-    insert!(parts, searchsortedfirst(parts, p), p)
-    if length(parts) > o.k 
-        mindiff, i = Inf, 0 
-        for (j, (a,b)) in enumerate(neighbors(parts))
-            diff = Float64(diff(a, b))
-            if diff < mindiff 
-                mindiff = diff 
+xy(o::KHist) = first.(o.bins), last.(o.bins)
+
+function Base.push!(o::KHist{T}, p::Pair{T,Int}) where {T}
+    bins = o.bins 
+    insert!(bins, searchsortedfirst(bins, p), p)
+    if length(bins) > o.k 
+        mindiff = Inf
+        i = 0 
+        for (j, (a,b)) in enumerate(neighbors(bins))
+            d = first(b) - first(a)
+            if d < mindiff && 1 < j < (length(bins) - 1)
+                mindiff = d 
                 i = j
             end
         end
-        parts[i] = merge(parts[i], parts[i+1])
-        deleteat!(parts, i+1)
+        a = bins[i] 
+        b = bins[i + 1]
+        n = last(a) + last(b)
+        bins[i] = smooth(first(a), first(b), last(b) / n) => n
+        deleteat!(bins, i + 1)
     end
     o
 end
 
-_fit!(o::KHist2{T}, y) where {T} = push!(o.parts, Part(fit!(Counter(T), y), Centroid(y)))
+_fit!(o::KHist{T}, y) where {T} = push!(o, y => 1)
 
-# function value(o::KHist) 
-#     x, y = xy(o)
-#     (centers=x, counts=y)
-# end
+value(o::KHist) = (centers=first.(o.bins), counts=last.(o.bins))
 
-# function _merge!(a::KHist, b::KHist)
-#     for bin in b.bins
-#         push!(a, bin)
-#     end
-# end
+_merge!(a::KHist, b::KHist) = foreach(x -> push!(a, x), b.bins)
 
-# midpoints(o::KHist) = map(center, o.bins)
+ecdf(o::KHist) = ecdf(first.(o.bins); weights=fweights(last.(o.bins)))
+@deprecate cdf(o::KHist, x) ecdf(o)(x)
 
-# # Area of the histogram up to `val` (with linear interpolation)
-# function area(o::KHist, val = Inf)
-#     x, y = value(o)
-#     lastindex = searchsortedlast(x, val)
-#     result =  0.0
-#     if lastindex > 1
-#         result += sum((x[i] - x[i-1]) * (y[i] + y[i-1]) for i in 2:lastindex)
-#     end
-#     if x[1] < val < x[end]
-#         x1, x2 = x[lastindex:(lastindex + 1)]
-#         y1, y2 = y[lastindex:(lastindex + 1)]
-#         Δ = val - x1
-#         interpolated_y = smooth(y1, y2, Δ / (x2 - x1))
-#         result += Δ * (interpolated_y + y2)
-#     end
-#     return 0.5 * result
-# end
-
-# # Number of obs that are less than or equal to val (approximate, via linear interpolation)
-# function nle(o::KHist{T}, val = Inf) where {T}
-#     x, y = value(o)
-#     i = searchsortedlast(x, val)
-#     yi = i < 1 ? 0.0 : y[i]
-#     xi = i < 1 ? zero(T) : x[i]
-#     i < 1 ? 0.0 : sum(y[1:i]) + smooth(yi, y[i+1], (val - xi) / (x[i+1] - xi))
-# end
-
-# cdf(o::KHist, x) = nle(o, x) / nobs(o)
+# based on linear interpolation
+function pdf(o::KHist, x::Number)
+    a, b = extrema(o)
+    if x < a || x > b
+        return 0.0 
+    elseif x == a 
+        return last(o.bins[1]) / area(o)
+    else
+        i = searchsortedfirst(o.bins, x => 0)
+        x1, y1 = o.bins[i-1]
+        x2, y2 = o.bins[i]
+        return smooth(y1, y2, (x-x1) / (x2 - x1)) / area(o)
+    end
+end
 
 # function pdf(o::KHist, val)
 #     x, y = value(o)
@@ -80,26 +92,32 @@ _fit!(o::KHist2{T}, y) where {T} = push!(o.parts, Part(fit!(Counter(T), y), Cent
 #     x2, y2 = x[i+1], y[i+1]
 #     smooth(y1, y2, (val - x1) / (x2 - x1)) / area(o)
 # end
+function area(o::KHist)
+    x, y = value(o)
+    0.5 * sum((x[i] - x[i-1]) * (y[i] + y[i-1]) for i in 2:length(x))
+end
 
+# statistics
+Base.extrema(o::KHist) = first(o.bins[1]), first(o.bins[end])
+function Statistics.mean(o::KHist) 
+    x, y = xy(o)
+    mean(x, fweights(y))
+end
+function Statistics.var(o::KHist) 
+    x, y = xy(o)
+    var(x, fweights(y); corrected=true)
+end
+function Statistics.quantile(o::KHist, q=[0, .25, .5, .75, 1]) 
+    x, y = xy(o)
+    quantile(x, fweights(y), q)
+end
+Statistics.median(o::KHist) = quantile(o, .5)
 
-# #-----------------------------------------------------------------------------# Base/Statistics
-# Base.extrema(o::KHist) = minimum(o), maximum(o)
-# Base.minimum(o::KHist) = o.bins[1].domain.center
-# Base.maximum(o::KHist) = o.bins[end].domain.center
-
-# function Statistics.mean(o::KHist) 
-#     x, y = value(o)
-#     mean(x, fweights(y))
-# end
-
-# function Statistics.var(o::KHist) 
-#     x, y = value(o)
-#     var(x, fweights(y); corrected=true)
-# end
-
-# function Statistics.quantile(o::KHist, p = [0, .25, .5, .75, 1])
-#     x, y = value(o)
-#     quantile(x, fweights(y), p)
-# end
-
-# Statistics.median(o::KHist) = quantile(o, .5)
+#-----------------------------------------------------------------------------# plot 
+@recipe function f(o::KHist; normed=true)
+    x, y = xy(o)
+    y2 = normed ? y ./ area(o) : y
+    fillto --> 0
+    alpha --> .5
+    x, y2
+end
