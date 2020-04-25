@@ -82,8 +82,9 @@ variable of type `T`.
 
 # Example 
 
+    x, y = randn(10^5), randn(10^6)
     o = IndexedPartition(Float64, Hist(10))
-    fit!(o, eachrow(randn(10^4, 2)))
+    fit!(o, zip(x, y))
 
     using Plots 
     plot(o)

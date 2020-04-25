@@ -1,8 +1,7 @@
 #-----------------------------------------------------------------------# AutoCov and Lag
 # Lag
 """
-    Lag{T}(b::Int)
-    Lag(T, b)
+    Lag(T, b::Int)
 
 Store the last `b` values for a data stream of type `T`.  Values are stored as
 
