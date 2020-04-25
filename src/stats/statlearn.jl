@@ -1,7 +1,3 @@
-#-----------------------------------------------------------------------------# utils
-prox(args...) = LearnBase.prox(args...)
-prox(::typeof(zero), θ, s) = θ
-
 #-----------------------------------------------------------------------------# StatLearn
 """
     StatLearn(p, args...; rate=LearningRate())
@@ -158,7 +154,7 @@ end
 
 
 #------------------------------------------------------------------# Majorization-based
-const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
+const L2Scaled{N} = LossFunctions.ScaledLoss{L2DistLoss, N}
 
 # lipschitz_constant (L): f(θ) ≤ f(θₜ) + ∇f(θₜ)'(θ - θₜ) + (L / 2) ||θ - θₜ||^2
 lconst(o::StatLearn, x, y) = lconst(o.loss, x, y)

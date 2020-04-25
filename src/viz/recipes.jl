@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------# Weight
 @recipe function f(wt::Weight; nobs=50)
-    xlabel --> "n"
-    ylabel --> "w(n)"
+    xguide --> "n"
+    yguide --> "w(n)"
     label --> name(wt)
     xlim --> (0, nobs + 1)
     ylim --> (0, 1.02)
@@ -24,8 +24,8 @@ end
 #-----------------------------------------------------------------------------# OrderStats
 @recipe function f(o::OrderStats)
     label --> "Approximate CDF via OrderStats"
-    xlabel --> "x"
-    ylabel --> "P(X ≤ x)"
+    xguide --> "x"
+    yguide --> "P(X ≤ x)"
     a, b = value(o.ex)
     v = vcat(a, value(o), b)
     k = length(v)
@@ -100,8 +100,8 @@ end
 
 #-----------------------------------------------------------------------# AutoCov
 @recipe function f(o::AutoCov)
-    xlabel --> "Lag"
-    ylabel --> "Autocorrelation"
+    xguide --> "Lag"
+    yguide --> "Autocorrelation"
     ylim --> (0, 1)
     seriestype --> :scatter
     autocor(o)
@@ -114,11 +114,11 @@ end
 end
 
 #-----------------------------------------------------------------------# Histograms
-@recipe function f(o::HistogramStat; normed=true)
+@recipe function f(o::HistogramStat; normalize=true)
     e, c = edges(o), counts(o)
     inds = findfirst(x -> x > 0, c):findlast(x -> x > 0, c)
     closed = o.left ? :left : :right
-    normed --> normed
+    normalize --> normalize
     Histogram(e[vcat(inds, inds[end] + 1)], c[inds], closed)
 end
 
@@ -220,7 +220,7 @@ end
         linealpha --> 0
         label --> ""
         legendtitle --> lt
-        fillz := fillz
+        fill_z := fillz
         x, y
     end
 end
@@ -236,15 +236,15 @@ end
 
 #-----------------------------------------------------------------------------# Partition 
 @recipe function f(o::Partition{T,O}) where {O, T}
-    xlabel --> "Nobs"
-    ylabel --> "Value"
+    xguide --> "Nobs"
+    yguide --> "Value"
     ylim -> (0, o.parts[end].domain.last)
     o.parts
 end
 
 @recipe function f(o::IndexedPartition{T,O}; connect=false) where {O, T}
-    xlabel --> "Index"
-    ylabel --> "Value"
+    xguide --> "Index"
+    yguide --> "Value"
     o.parts
 end
 

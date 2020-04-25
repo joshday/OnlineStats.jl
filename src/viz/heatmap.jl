@@ -65,8 +65,8 @@ end
 
 @recipe function f(o::HeatMap)
     seriestype --> :heatmap
-    xlabel --> string(o.xedges)
-    ylabel --> string(o.yedges)
+    xguide --> string(o.xedges)
+    yguide --> string(o.yedges)
     z = Float64.(o.counts)
     z[z .== 0] .= NaN
     o.xedges, o.yedges, z'

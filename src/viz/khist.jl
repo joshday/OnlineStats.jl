@@ -23,7 +23,7 @@ A difference from the above reference is that the minimum and maximum values are
     using Plots
     plot(o)
 """
-struct KHist{T} <: OnlineStat{T}
+struct KHist{T} <: HistogramStat{T}
     bins::Vector{Pair{T, Int}}  # loc => count
     k::Int
     function KHist(bins::Vector{Pair{T, Int}}, k::Int) where {T}
@@ -37,6 +37,8 @@ KHist(k::Int, itr) = fit!(KHist(k, eltype(itr)), itr)
 nobs(o::KHist) = length(o.bins) < 1 ? 0 : sum(last, o.bins)
 
 xy(o::KHist) = first.(o.bins), last.(o.bins)
+edges(o::KHist) = vcat(first(o.bins[1]), midpoints(first.(o.bins)), first(o.bins[end]))
+counts(o::KHist) = last.(o.bins)
 
 function Base.push!(o::KHist{T}, p::Pair{T,Int}) where {T}
     bins = o.bins 
@@ -66,6 +68,7 @@ value(o::KHist) = (centers=first.(o.bins), counts=last.(o.bins))
 
 _merge!(a::KHist, b::KHist) = foreach(x -> push!(a, x), b.bins)
 
+#-----------------------------------------------------------------------------# pdf/cdf
 ecdf(o::KHist) = ecdf(first.(o.bins); weights=fweights(last.(o.bins)))
 @deprecate cdf(o::KHist, x) ecdf(o)(x)
 
@@ -84,20 +87,12 @@ function pdf(o::KHist, x::Number)
     end
 end
 
-# function pdf(o::KHist, val)
-#     x, y = value(o)
-#     i = searchsortedlast(x, val)
-#     x1, y1 = x[i], y[i]
-#     val == y1 && return y[i] / area(o)
-#     x2, y2 = x[i+1], y[i+1]
-#     smooth(y1, y2, (val - x1) / (x2 - x1)) / area(o)
-# end
 function area(o::KHist)
     x, y = value(o)
     0.5 * sum((x[i] - x[i-1]) * (y[i] + y[i-1]) for i in 2:length(x))
 end
 
-# statistics
+#-----------------------------------------------------------------------------# statistics
 Base.extrema(o::KHist) = first(o.bins[1]), first(o.bins[end])
 function Statistics.mean(o::KHist) 
     x, y = xy(o)
