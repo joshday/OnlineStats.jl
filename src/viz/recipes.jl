@@ -136,7 +136,6 @@ end
     x, y
 end
 
-
 #-----------------------------------------------------------------------------# Vector{<:Part}
 function _x(p::Part{<:ClosedInterval}) 
     a, b = p.domain.first, p.domain.last

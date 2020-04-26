@@ -3,7 +3,7 @@ module OnlineStats
 using RecipesBase, Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, nvars, Weight, Centroid, ClosedInterval
+    smooth_syr!, nvars, Weight, ClosedInterval
 
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform
@@ -12,7 +12,7 @@ using OrderedCollections: OrderedDict
 using SweepOperator: sweep!
 using LossFunctions: LossFunctions, Loss, L2DistLoss, AggMode
 using PenaltyFunctions: PenaltyFunctions, Penalty
-using LearnBase: LearnBase, deriv
+using LearnBase: LearnBase, deriv, prox
 using OnlineStatsBase
 
 export
