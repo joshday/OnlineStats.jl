@@ -33,7 +33,7 @@ o = Partition(KHist(10))
 
 fit!(o, y)
 
-plot(o, xlab = "Nobs")
+plot(o)
 savefig("partition_hist.png"); nothing # hide
 ```
 ![](partition_hist.png)
