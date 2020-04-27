@@ -1,7 +1,5 @@
 using Documenter, OnlineStats, OnlineStatsBase
 
-ENV["GKS_ENCODING"]="utf8"
-
 makedocs(
     format = Documenter.HTML(
         assets = ["assets/style.css", "assets/favicon.ico"], 

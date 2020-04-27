@@ -3,6 +3,7 @@ using Pkg
 Pkg.add("GR")
 Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
+ENV["GKS_ENCODING"]="utf8"
 ```
 
 # Big Data
