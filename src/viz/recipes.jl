@@ -15,8 +15,8 @@ end
     legend --> false
     axis --> false
     grid --> false
-    ylim --> (0, 1)
-    xlim --> (0, 1)
+    ylims --> (0, 1)
+    xlims --> (0, 1)
     annotations --> [(.5, .75, name(o) * ":"), (.5, .4, string(value(o)))]
     zeros(0)
 end
@@ -152,6 +152,7 @@ end
     linewidth   --> _linewidth(parts)
     fill_z      --> _fill_z(parts)
     ylims       --> _ylims(parts)
+    xlims       --> (first(parts)[1][1], last(parts)[1][2])
     yguide      --> _yguide(parts)
 
     group = _group(parts)

@@ -39,14 +39,11 @@ savefig("partition_hist.png"); nothing # hide
 
 
 ```@example setup
-o = Partition(Mean())
-o2 = Partition(Extrema())
+o = Partition(Series(Mean(), Extrema()))
 
-s = Series(o, o2)
+fit!(o, y)
 
-fit!(s, y)
-
-plot(s, layout = 1, xlab = "Nobs")
+plot(o)
 savefig("partition_mean_ex.png"); nothing # hide
 ```
 ![](partition_mean_ex.png)
@@ -79,7 +76,7 @@ y = x + randn(10^6)
 
 o = fit!(IndexedPartition(Float64, KHist(40), 40), zip(x, y))
 
-plot(o, prob=false)
+plot(o)
 savefig("indexpart2.png"); nothing # hide
 ```
 ![](indexpart2.png)

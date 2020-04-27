@@ -48,8 +48,8 @@ end
 
     seriestype := :bar 
     bar_widths := diff(x)
-    ylim --> (0,1)
-    xlim --> (0, 1)
+    ylims --> (0,1)
+    xlims --> (0, 1)
     label --> permutedims(string.(collect(keys(b))))
     xticks --> (midpoints(x), string.(collect(keys(a))))
     linewidth --> 0.5
