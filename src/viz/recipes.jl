@@ -3,8 +3,8 @@
     xguide --> "n"
     yguide --> "w(n)"
     label --> name(wt)
-    xlim --> (0, nobs + 1)
-    ylim --> (0, 1.02)
+    xlims --> (0, nobs + 1)
+    ylims --> (0, 1.02)
     linewidth --> 2
     seriestype --> :scatter
     wt.(1:nobs)
@@ -136,116 +136,150 @@ end
     x, y
 end
 
-#-----------------------------------------------------------------------------# Vector{<:Part}
-function _x(p::Part{<:ClosedInterval}) 
-    a, b = p.domain.first, p.domain.last
-    [a, b, b]  # third point won't be plotted since _y(val)[3] is NaN
-end
-_y(val) = [val, val, NaN]
-_label(v::Vector{<:Part}) = OnlineStatsBase.name(first(v).stat, false, false)
-
-# Fallback (Mean, Variance, and scalar-valued stat)
-@recipe function f(val::Vector{<:Part})
-    label --> _label(val)
-    vcat(_x.(val)...), vcat(map(x -> _y(value(x.stat)), val)...)
-end
-
-# CountMap
-@recipe function f(parts::Vector{<:Part{<:Any, <:CountMap}}; prob=true, use_part_width=true)
-    keyset = sort!(collect(mapreduce(x -> Set(keys(value(x.stat))), union, parts)))
-    for k in keyset, p in parts 
-        get!(p.stat.value, k, 0)
-    end
-    x = [_middle(p.domain.first, p.domain.last) for p in parts]
-    ys = hcat([[value(p.stat)[k] for p in parts] for k in keyset]...)
-    for (i, k) in enumerate(reverse(keyset))
-        y = sum(ys[:, i:end], dims=2)
-        if prob 
-            y = y ./ sum(ys, dims=2)
-        end
-        @series begin 
-            seriestype --> :bar
-            if use_part_width
-                bar_widths --> [p.domain.last - p.domain.first for p in parts]
-            end
-            linewidth --> 0
-            label --> string(k)
-            x,  y
-        end
-    end
-end 
-_middle(a,b) = middle(a,b)
-function _middle(a::Date, b::Date) 
-    m = (Millisecond(a.instant.periods) + Millisecond(b.instant.periods)) / 2
-    DateTime(Dates.UTInstant(m))
-end
-
-# Extrema
-@recipe function f(parts::Vector{<:Part{<:Any, <:Extrema}}) 
-    sort!(parts)
-    label --> _label(parts)
-    alpha --> .3
-    fillrange --> vcat(map(x -> _y(x.stat.min), parts)...)
-    vcat(_x.(parts)...), vcat(map(x -> _y(x.stat.max), parts)...)
-end
-
-# KHist and Hist
-@recipe function f(parts::Vector{<:Part{<:Any, <:HistogramStat}}; prob=true)
-    sort!(parts)
-    x = []
-    y = []
-    fillz = Float64[]
-    for part in parts
-        edg = edges(part.stat)
-        cnts = counts(part.stat)
-        n = nobs(part.stat)
-        for i in eachindex(cnts)
-            if cnts[i] > 0
-                # rectangle
-                push!(x, part.domain.first); push!(y, edg[i])
-                push!(x, part.domain.first); push!(y, edg[i + 1])
-                push!(x, part.domain.last); push!(y, edg[i + 1])
-                push!(x, part.domain.last); push!(y, edg[i])
-                push!(x, NaN); push!(y, NaN);
-                # fill color
-                push!(fillz, prob ? cnts[i] / n : cnts[i])
-            end
-        end
-    end
-    @series begin
-        lt = prob ? "Probabilities" : "Counts"
-        seriestype := :shape
-        linewidth --> 0
-        linealpha --> 0
-        label --> ""
-        legendtitle --> lt
-        fill_z := fillz
-        x, y
-    end
-end
-
-# Series
-@recipe function f(val::Vector{T}) where {O, T<:Part{<:Any, <:Series}}
-    for i in eachindex(first(val).stat.stats) 
-        @series begin 
-            map(x -> Part(x.stat.stats[i], x.domain), val)
-        end
-    end
-end
-
-#-----------------------------------------------------------------------------# Partition 
-@recipe function f(o::Partition{T,O}) where {O, T}
+#-----------------------------------------------------------------------------# Partition
+@recipe function f(o::Partition) 
     xguide --> "Nobs"
-    yguide --> "Value"
-    ylim -> (0, o.parts[end].domain.last)
+    o.parts
+end
+@recipe function f(o::IndexedPartition) 
+    xguide --> "Index"
     o.parts
 end
 
-@recipe function f(o::IndexedPartition{T,O}; connect=false) where {O, T}
-    xguide --> "Index"
-    yguide --> "Value"
-    o.parts
+@recipe function f(parts::T) where T <: AbstractVector{<:Pair{<:Any, <:OnlineStat}}
+    seriestype  --> _seriestype(parts)
+    seriesalpha --> _alpha(parts)
+    linewidth   --> _linewidth(parts)
+    fill_z      --> _fill_z(parts)
+    ylims       --> _ylims(parts)
+    yguide      --> _yguide(parts)
+
+    group = _group(parts)
+    x, y = xy(parts)
+
+    if isnothing(group)
+        label --> _label(parts)
+        return x, y 
+    else 
+        for k in unique(group)
+            @series begin 
+                label --> _label(parts) * ": $k"
+                x[group .== k], y[group .== k]
+            end
+        end
+    end
 end
+
+@recipe function f(parts::AbstractVector{<:Pair{<:Any, <:Union{Series, Group}}})
+    nstats = length(parts[1][2].stats)
+    for i in 1:nstats 
+        @series begin 
+            map(x -> x[1] => x[2].stats[i], parts)
+        end
+    end
+end
+
+function xy(parts::AbstractVector{<:Pair{<:Any, <:OnlineStat}}) 
+    data = xy.(parts)
+    x, y = vcat(first.(data)...), vcat(last.(data)...)
+end
+
+_yguide(::Any) = ""
+_yguide(::AbstractArray{<:Pair{<:Any, <:CountMap}}) = "Probability"
+
+_seriestype(::Any) = :line
+_seriestype(::AbstractVector{<:Pair{<:Any, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
+
+_alpha(parts) = 1
+_alpha(::AbstractVector{<:Pair{<:Any, <:Extrema}}) = .5
+
+_linewidth(parts) = 1
+_linewidth(::AbstractVector{<:Pair{<:Any, <:Union{Extrema, HistogramStat}}}) = 0
+
+_label(parts) = name(parts[1][2], false, false)
+_label(::AbstractVector{<:Pair{<:Any, <:Moments}}) = ["m1" "m2" "m3" "m4"]
+_label(::AbstractVector{<:Pair{<:Any, <:HistogramStat}}) = ""
+
+_fill_z(parts) = nothing 
+function _fill_z(parts::AbstractVector{<:Pair{<:Any, <:HistogramStat}}) 
+    z = vcat(map(x -> counts(x[2]), parts)...)
+    z[z .> 0]
+end
+
+_ylims(parts) = (-Inf, Inf)
+_ylims(parts::AbstractVector{<:Pair{<:Any, <:Union{CountMap, ProbMap}}}) = (0, Inf)
+
+_group(parts) = nothing
+function _group(parts::AbstractVector{<:Pair{<:Any, <:Union{CountMap, ProbMap}}})
+    out = map(x -> collect(keys(sort!(value(x[2])))), parts)
+    out = map(x -> repeat(x,inner=5), out)
+    string.(vcat(out...))
+end
+
+function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance}})
+    (a,b), o = part 
+    [a, b, NaN], [value(o), value(o), NaN]
+end
+function xy(part::Pair{<:TwoThings, <:Extrema})
+    (a,b), o = part 
+    low, high = extrema(o)
+    [a, a, b, b, NaN], [low, high, high, low, NaN]
+end
+function xy(part::Pair{<:TwoThings, <:Moments})
+    (a,b), o = part 
+    hcat([[a, b, NaN] for _ in 1:4]...), hcat([[v,v,NaN] for v in value(o)]...)
+end
+function xy(part::Pair{<:TwoThings, <:HistogramStat})
+    (a,b), o = part 
+    x, y = Float64[], Float64[]
+    edg = edges(o)
+    cnts = counts(o)
+    for i in eachindex(cnts)
+        if cnts[i] > 0
+            append!(x, [a, a, b, b, NaN])
+            append!(y, [edg[i], edg[i+1], edg[i+1], edg[i], NaN])
+        end
+    end
+    x, y
+end
+
+function xy(part::Pair{<:TwoThings, <:CountMap})
+    (a,b), o = part 
+    x = Float64[]
+    y = Float64[]
+    count = 0
+    for (k,v) in sort!(o.value)
+        append!(x, [a, a, b, b, NaN])
+        append!(y, [count, count + v, count + v, count, NaN] ./ nobs(o))
+        count += v
+    end
+    x, y
+end
+
+
+
+# # Series
+# @recipe function f(val::Vector{T}) where {O, T<:Part{<:Any, <:Series}}
+#     for i in eachindex(first(val).stat.stats) 
+#         @series begin 
+#             map(x -> Part(x.stat.stats[i], x.domain), val)
+#         end
+#     end
+# end
+
+# #-----------------------------------------------------------------------------# Partition 
+# @recipe function f(o::Partition{T,O}) where {O, T}
+#     xguide --> "Nobs"
+#     yguide --> "Value"
+#     ylim -> (0, o.parts[end].domain.last)
+#     o.parts
+# end
+
+# @recipe function f(o::IndexedPartition{T,O}; connect=false) where {O, T}
+#     xguide --> "Index"
+#     yguide --> "Value"
+#     o.parts
+# end
 
 #-----------------------------------------------------------------------# NBClassifier
 @recipe function f(o::NBClassifier)

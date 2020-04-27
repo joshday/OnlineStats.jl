@@ -3,7 +3,7 @@ module OnlineStats
 using RecipesBase, Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, nvars, Weight, ClosedInterval
+    smooth_syr!, nvars, Weight
 
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform

@@ -547,7 +547,7 @@ function _fit!(o::ProbMap, y)
 end
 function _merge!(o::ProbMap, o2::ProbMap)
     o.n += o2.n
-    merge!((a, b)->smooth(a, b, o2.n / o.n), o.value, o2.value)
+    merge!((a, b) -> smooth(a, b, o2.n / o.n), o.value, o2.value)
     o
 end
 function probs(o::ProbMap, levels = keys(o.value))
