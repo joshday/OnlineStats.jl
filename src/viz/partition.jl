@@ -46,7 +46,7 @@ function _merge!(a::Partition, b::Partition)
     n = nobs(a)
     a.n += b.n
     for p in b.parts
-        push!(a.parts, (p[1][1] + n, p[1][2] + n) => p.stat)
+        push!(a.parts, (p[1][1] + n, p[1][2] + n) => copy(p[2]))
     end
     while length(a.parts) > a.b
         merge_next!(a.parts)

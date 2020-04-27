@@ -357,9 +357,9 @@ end
     merge!(o, o2)
     fit!(o2, y)
     @test nobs(o) == nobs(o2)
-    @test all(nobs.(o.parts) .== nobs.(o2.parts))
+    @test all(nobs.(last.(o.parts)) .== nobs.(last.(o2.parts)))
     for i in 1:5
-        @test value(o.parts[i].stat) ≈ value(o2.parts[500 + i].stat)
+        @test value(o.parts[i][2]) ≈ value(o2.parts[500 + i][2])
     end
 end
 #-----------------------------------------------------------------------# ProbMap
