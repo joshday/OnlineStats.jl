@@ -59,7 +59,7 @@ o = Partition(CountMap(String), 75)
 
 fit!(o, y)
 
-plot(o, xlab = "Nobs")
+plot(o)
 savefig("partition_countmap.png"); nothing # hide
 ```
 ![](partition_countmap.png)
