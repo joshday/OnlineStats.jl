@@ -24,6 +24,7 @@ end
 #-----------------------------------------------------------------------------# OrderStats
 @recipe function f(o::OrderStats)
     label --> "Approximate CDF via OrderStats"
+    legend --> :topleft
     xguide --> "x"
     yguide --> "P(X ≤ x)"
     a, b = value(o.ex)
@@ -150,6 +151,7 @@ end
     seriestype  --> _seriestype(parts)
     seriesalpha --> _alpha(parts)
     linewidth   --> _linewidth(parts)
+    linealpha   --> _linealpha(parts)
     fill_z      --> _fill_z(parts)
     ylims       --> _ylims(parts)
     xlims       --> (first(parts)[1][1], last(parts)[1][2])
@@ -190,6 +192,9 @@ _yguide(::AbstractArray{<:Pair{<:Any, <:CountMap}}) = "Probability"
 
 _seriestype(::Any) = :line
 _seriestype(::AbstractVector{<:Pair{<:Any, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
+
+_linealpha(parts) = 1
+_linealpha(::AbstractVector{<:Pair{<:Any, <:Union{Extrema,HistogramStat}}}) = 0
 
 _alpha(parts) = 1
 _alpha(::AbstractVector{<:Pair{<:Any, <:Extrema}}) = .5

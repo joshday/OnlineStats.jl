@@ -150,9 +150,9 @@ savefig("mosaic.png"); nothing # hide
 ## HeatMap
 
 ```@example setup
-o = HeatMap(-5:.1:5, -5:.1:5)
+o = HeatMap(-5:.1:5, -0:.1:10)
 
-x, y = randn(10^6), randn(10^6)
+x, y = randn(10^6), 5 .+ randn(10^6)
 
 fit!(o, zip(x, y))
 

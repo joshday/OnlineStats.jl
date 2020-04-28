@@ -112,7 +112,7 @@ Statistics.median(o::KHist) = quantile(o, .5)
 @recipe function f(o::KHist; normed=true)
     x, y = xy(o)
     y2 = normed ? y ./ area(o) : y
-    fillto --> 0
-    alpha --> .5
+    fillrange --> 0
+    seriesalpha --> .5
     x, y2
 end
