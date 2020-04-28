@@ -154,7 +154,7 @@ end
     linealpha   --> _linealpha(parts)
     fill_z      --> _fill_z(parts)
     ylims       --> _ylims(parts)
-    xlims       --> (first(parts)[1][1], last(parts)[1][2])
+    xlims       --> _xlims(parts)
     yguide      --> _yguide(parts)
 
     group = _group(parts)
@@ -191,37 +191,42 @@ _yguide(::Any) = ""
 _yguide(::AbstractArray{<:Pair{<:Any, <:CountMap}}) = "Probability"
 
 _seriestype(::Any) = :line
-_seriestype(::AbstractVector{<:Pair{<:Any, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
+_seriestype(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
 
 _linealpha(parts) = 1
-_linealpha(::AbstractVector{<:Pair{<:Any, <:Union{Extrema,HistogramStat}}}) = 0
+_linealpha(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema,HistogramStat}}}) = 0
 
 _alpha(parts) = 1
 _alpha(::AbstractVector{<:Pair{<:Any, <:Extrema}}) = .5
 
 _linewidth(parts) = 1
-_linewidth(::AbstractVector{<:Pair{<:Any, <:Union{Extrema, HistogramStat}}}) = 0
+_linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Mean, Variance}}}) = 2
+_linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat}}}) = 0
 
 _label(parts) = name(parts[1][2], false, false)
-_label(::AbstractVector{<:Pair{<:Any, <:Moments}}) = ["m1" "m2" "m3" "m4"]
-_label(::AbstractVector{<:Pair{<:Any, <:HistogramStat}}) = ""
+_label(::AbstractVector{<:Pair{<:TwoThings, <:Moments}}) = ["m1" "m2" "m3" "m4"]
+_label(::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}}) = ""
 
 _fill_z(parts) = nothing 
-function _fill_z(parts::AbstractVector{<:Pair{<:Any, <:HistogramStat}}) 
+function _fill_z(parts::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}}) 
     z = vcat(map(x -> counts(x[2]), parts)...)
     z[z .> 0]
 end
 
 _ylims(parts) = (-Inf, Inf)
-_ylims(parts::AbstractVector{<:Pair{<:Any, <:Union{CountMap, ProbMap}}}) = (0, Inf)
+_ylims(parts::AbstractVector{<:Pair{<:TwoThings, <:Union{CountMap, ProbMap}}}) = (0, Inf)
+
+_xlims(parts) = (-Inf, Inf)
+_xlims(parts::AbstractVector{<:Pair{<:TwoThings{<:Number, <:Number}, <:Any}}) = parts[1][1][1], parts[end][1][2]
 
 _group(parts) = nothing
-function _group(parts::AbstractVector{<:Pair{<:Any, <:Union{CountMap, ProbMap}}})
+function _group(parts::AbstractVector{<:Pair{<:TwoThings, <:Union{CountMap, ProbMap}}})
     out = map(x -> collect(keys(sort!(value(x[2])))), parts)
     out = map(x -> repeat(x,inner=5), out)
     string.(vcat(out...))
 end
 
+#-----------------------------------------------------------------------------# xy (for Partitions)
 function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance}})
     (a,b), o = part 
     [a, b, NaN], [value(o), value(o), NaN]
@@ -261,31 +266,6 @@ function xy(part::Pair{<:TwoThings, <:CountMap})
     end
     x, y
 end
-
-
-
-# # Series
-# @recipe function f(val::Vector{T}) where {O, T<:Part{<:Any, <:Series}}
-#     for i in eachindex(first(val).stat.stats) 
-#         @series begin 
-#             map(x -> Part(x.stat.stats[i], x.domain), val)
-#         end
-#     end
-# end
-
-# #-----------------------------------------------------------------------------# Partition 
-# @recipe function f(o::Partition{T,O}) where {O, T}
-#     xguide --> "Nobs"
-#     yguide --> "Value"
-#     ylim -> (0, o.parts[end].domain.last)
-#     o.parts
-# end
-
-# @recipe function f(o::IndexedPartition{T,O}; connect=false) where {O, T}
-#     xguide --> "Index"
-#     yguide --> "Value"
-#     o.parts
-# end
 
 #-----------------------------------------------------------------------# NBClassifier
 @recipe function f(o::NBClassifier)
