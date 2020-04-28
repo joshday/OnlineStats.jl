@@ -47,7 +47,7 @@ end
     x = vcat(0.0, cumsum([av / n for av in values(a)]))
 
     seriestype := :bar 
-    bar_widths := diff(x)
+    bar_width := diff(x)
     ylims --> (0,1)
     xlims --> (0, 1)
     label --> permutedims(string.(collect(keys(b))))

@@ -190,18 +190,18 @@ end
 _yguide(::Any) = ""
 _yguide(::AbstractArray{<:Pair{<:Any, <:CountMap}}) = "Probability"
 
-_seriestype(::Any) = :line
+_seriestype(::Any) = :path
 _seriestype(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
 
 _linealpha(parts) = 1
-_linealpha(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema,HistogramStat}}}) = 0
+_linealpha(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema,HistogramStat,CountMap}}}) = 0
 
 _alpha(parts) = 1
 _alpha(::AbstractVector{<:Pair{<:Any, <:Extrema}}) = .5
 
 _linewidth(parts) = 1
 _linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Mean, Variance}}}) = 2
-_linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat}}}) = 0
+_linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema,HistogramStat,CountMap}}}) = 0
 
 _label(parts) = name(parts[1][2], false, false)
 _label(::AbstractVector{<:Pair{<:TwoThings, <:Moments}}) = ["m1" "m2" "m3" "m4"]
