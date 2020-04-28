@@ -133,14 +133,11 @@ widths.
 
 ```@example setup
 using RDatasets 
-t = dataset("datasets", "Titanic")
+t = dataset("ggplot2", "diamonds")
 
-o = Mosaic(String, String)
-for (age, surv, n) in zip(t.Age, t.Survived, t.Freq)
-    for i in 1:n
-        fit!(o, (age, surv))
-    end
-end
+o = Mosaic(eltype(t.Cut), eltype(t.Color))
+
+fit!(o, zip(t.Cut, t.Color))
 
 plot(o, legendtitle="Survived", xlabel="Age")
 savefig("mosaic.png"); nothing # hide
@@ -165,7 +162,7 @@ savefig("heatmap.png"); nothing # hide
 ```@example setup
 x, y = randn(10^6), randn(10^6)
 
-o = HeatMap(zip(x, y))
+o = HeatMap(zip(x, y), 200)  # use 200 bins in both dimensions
 
 plot(o, aspect_ratio=:equal)
 savefig("heatmap2.png"); nothing # hide
