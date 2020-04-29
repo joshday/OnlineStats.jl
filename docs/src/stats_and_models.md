@@ -33,7 +33,7 @@
 
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
-| Histograms/continuous density      | [`Hist`](@ref) and [`KHist`](@ref) |
+| Histograms/continuous density      | [`Hist`](@ref), [`KHist`](@ref), and [`ExpandingHist`](@ref) |
 | Approximate order statistics       | [`OrderStats`](@ref)       |
 | Count for each unique value        | [`CountMap`](@ref)         |
 | Approximate CDF                    | [`OrderStats`](@ref)

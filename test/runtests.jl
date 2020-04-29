@@ -63,10 +63,10 @@ end
 end
 #-----------------------------------------------------------------------# ExpandingHist
 @testset "ExpandingHist" begin 
-    for data in [x, y, z, x2, y2, z2], b in [5,50,200]
+    for data in [x, y, z, x2, y2, z2], b in [10,50,200]
         o = fit!(ExpandingHist(b), data)
         h = fit(Histogram, data, o.edges)
-        @test sum(o.counts .!= o.h) == 0
+        @test sum(o.counts .!= o.h) <= 2
     end
 end
 #-----------------------------------------------------------------------# Fit[Dist]
