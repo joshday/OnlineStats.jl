@@ -158,26 +158,30 @@ function ExpandingHist(b::Int)
     @assert iseven(b)
     ExpandingHist(range(0, stop = 0, length = b + 1), Number)
 end
-value(o::Hist) = (x=o.edges, y=o.counts)
+value(o::ExpandingHist) = (x=o.edges, y=o.counts)
 
 midpoints(o::ExpandingHist) = midpoints(o.edges)
 counts(o::ExpandingHist) = o.counts
 edges(o::ExpandingHist) = o.edges
 
 function _fit!(o::ExpandingHist, y)
-    o.n += 1
+    o.n += 1 
     y2 = Float64(y)
 
     # init
     if nobs(o) == 1
-        o.edges = range(y2, stop=y2, length=length(o.edges))
+        o.edges = range(y2, y2, length=length(o.edges))
         o.counts[1] = 1
-    elseif nobs(o) == 2
-        a = first(o.edges)
-        o.edges = a < y2 ? range(a, y2, length=length(o.edges)) : range(y2, a, length=length(o.edges))
-        if a == last(o.edges) # if second value is the same as the first
+    elseif step(o.edges) == 0.0
+        a = o.edges[1]
+        if y2 == a 
             o.counts[1] += 1
+        elseif y2 < a 
+            o.edges = range(y2, a, length=length(o.edges))
+            o.counts[end] = o.counts[1]
+            o.counts[1] = 1
         else
+            o.edges = range(a, y2, length=length(o.edges))
             o.counts[end] = 1
         end
     else
