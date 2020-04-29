@@ -16,7 +16,7 @@ theme(:bright)
 # Data Viz
 
 !!! note
-    Each of the following examples are plotting one million data points.
+    Each example plots one million data points.
 
 ## Partitions
 
