@@ -16,7 +16,8 @@ theme(:bright)
 # Data Viz
 
 !!! note
-    Each example plots one million data points.
+    Each of the following examples plots one million data points, but can scale to infinitely many 
+    observations, since only a summary (`OnlineStat`) of the data is plotted.
 
 ## Partitions
 
@@ -139,7 +140,7 @@ o = Mosaic(eltype(t.Cut), eltype(t.Color))
 
 fit!(o, zip(t.Cut, t.Color))
 
-plot(o, legendtitle="Survived", xlabel="Age")
+plot(o, legendtitle="Color", xlabel="Cut")
 savefig("mosaic.png"); nothing # hide
 ```
 ![](mosaic.png)

@@ -10,7 +10,7 @@
 
 # Home
 
-**OnlineStats** is a Julia package for statistical analysis with algorithms that run both **online** and **in parallel**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
+**OnlineStats** is a Julia package for statistical analysis with algorithms that run both [**online**](https://en.wikipedia.org/wiki/Online_algorithm) and **in parallel**.  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
 
 ## Installation
 
@@ -34,7 +34,11 @@ supertype(Mean)
 ### Stats can be updated
 
 !!! note
-    `fit!` can be used to update the stat with a single observation or multiple observations: `fit!(stat::OnlineStat{T}, y::S)` will iterate through `y` and `fit!` each element if `T != S`.
+    `fit!` can be used to update the stat with a single observation or multiple observations: 
+    ```
+    fit!(stat::OnlineStat{T}, y::S)
+    ``` 
+    will iterate through `y` and `fit!` each element if `T != S`.
 
 ```@repl index
 y = randn(100);

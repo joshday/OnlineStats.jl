@@ -25,7 +25,7 @@
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
-| Principal components analysis      | [`CovMatrix`](@ref)        |
+| Principal components analysis      | [`CovMatrix`](@ref), [`CCIPCA`](@ref)        |
 | K-means clustering (SGD)           | [`KMeans`](@ref)           |
 | Multiple univariate statistics     | [`Group`](@ref) |
 
@@ -70,6 +70,7 @@
 
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
+| Handling Missing DAta              | [`FTSeries`](@ref), [`CountMissing`](@ref)
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Reservoir sampling                 | [`ReservoirSample`](@ref)  |
