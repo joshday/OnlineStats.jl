@@ -31,7 +31,7 @@ export
     Bootstrap,
     CallFun, Counter, CountMap, CountMissing, CovMatrix, CCIPCA,
     Diff,
-    Extrema,
+    Extrema, ExpandingHist,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
     FastNode, FastTree, FastForest, FTSeries,
     GradientCore, Group, GroupBy,

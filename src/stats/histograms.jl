@@ -142,6 +142,7 @@ mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
     end
 end
 function ExpandingHist(b::Int; left::Bool=true)
+    @assert iseven(b)
     ExpandingHist(range(0, stop = 0, length = b + 1), Number; left=left)
 end
 
@@ -160,35 +161,41 @@ function _fit!(o::ExpandingHist, y)
     # init
     if nobs(o) == 1
         o.edges = range(y, stop=y, length=length(o.edges))
+        o.counts[1] = 1
     elseif nobs(o) == 2
         a = first(o.edges)
-        w = abs(y - a)
-        o.edges = range(min(a,y) - 2w, stop=max(a, y) + 2w, length=length(o.edges))
+        o.edges = a < y ? range(a, y, length=length(o.edges)) : range(y, a, length=length(o.edges))
+        o.counts[end] = 1
+    else
+        expand!(o, y)
+        i = binindex(o.edges, y, o.left, true)
+        o.counts[i] += 1
     end
-
-    expand!(o, y)
-    o.counts[binindex(o.edges, y, o.left, true)] += 1
 end
 
 function expand!(o::ExpandingHist, y)
     a, b = extrema(o.edges)
     w = b - a
-    nbins = length(o.counts)
-
+    halfnbin = round(Int, length(o.counts) / 2)
     if y > b  # find K such that y <= a + 2^K * w
-        C = 2 ^ ceil(Int, log2((y - a) / w))
-        o.edges = range(a, stop = a + C*w, length=nbins + 1)
-        for i in eachindex(o.counts)
-            rng = ((i-1) * C + 1):min(i * C, nbins)
-            o.counts[i] = sum(view(o.counts, rng))
+        K = ceil(Int, log2((y - a) / w))
+        C = 2 ^ K
+        old_edges = copy(o.edges)
+        o.edges = range(a, stop = a + C*w, length=length(o.edges))
+        for _ in 1:min(K, halfnbin)
+            for i in eachindex(o.counts)
+                o.counts[i] = i ≤ halfnbin ? sum(o.counts[(2i-1):(2i)]) : 0
+            end
         end
     elseif y < a # find K such that y >= b - 2^K * w
-        C = 2 ^ ceil(Int, log2((b - y) / w))
-        o.edges = range(b - C*w, stop=b, length=nbins + 1)
-        # (n-3c+1):(n-2c), (n-2c+1):(n-c), (n - c + 1):n
-        for i in eachindex(o.counts)
-            rng = max(1, nbins - i * C + 1):(nbins - (i-1) * C)
-            o.counts[nbins - i + 1] = sum(view(o.counts, rng))
+        K = ceil(Int, log2((b - y) / w))
+        C = 2 ^ K
+        o.edges = range(b - C*w, stop = b, length=length(o.edges))
+        for _ in 1:min(K, halfnbin)
+            n = length(o.counts)
+            for i in 0:(length(o.counts) - 1)
+                o.counts[end-i] = i+1 ≤ halfnbin ? sum(o.counts[end-2i-1:end-2i]) : 0
+            end
         end
     end
 end

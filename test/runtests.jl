@@ -61,6 +61,14 @@ end
     @test diff(o) == 1
     @test last(o) == 10
 end
+#-----------------------------------------------------------------------# ExpandingHist
+@testset "ExpandingHist" begin 
+    for data in [x, y, z, x2, y2, z2], b in [5,50,200]
+        o = fit!(ExpandingHist(b), data)
+        h = fit(Histogram, data, o.edges)
+        @test sum(o.counts .!= o.h) == 0
+    end
+end
 #-----------------------------------------------------------------------# Fit[Dist]
 @testset "Fit[Dist]" begin
     @testset "FitBeta" begin
