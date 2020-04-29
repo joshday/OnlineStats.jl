@@ -175,7 +175,7 @@ function _fit!(o::ExpandingHist, y)
     elseif nobs(o) == 2
         a = first(o.edges)
         o.edges = a < y2 ? range(a, y2, length=length(o.edges)) : range(y2, a, length=length(o.edges))
-        if a == last(o.edges) 
+        if a == last(o.edges) # if second value is the same as the first
             o.counts[1] += 1
         else
             o.counts[end] = 1
