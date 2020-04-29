@@ -231,25 +231,25 @@ end
 #-----------------------------------------------------------------------------# xy (for Partitions)
 function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance}})
     (a,b), o = part 
-    [a, b, NaN], [value(o), value(o), NaN]
+    [a, b, b], [value(o), value(o), NaN]
 end
 function xy(part::Pair{<:TwoThings, <:Extrema})
     (a,b), o = part 
     low, high = extrema(o)
-    [a, a, b, b, NaN], [low, high, high, low, NaN]
+    [a, a, b, b, b], [low, high, high, low, NaN]
 end
 function xy(part::Pair{<:TwoThings, <:Moments})
     (a,b), o = part 
-    hcat([[a, b, NaN] for _ in 1:4]...), hcat([[v,v,NaN] for v in value(o)]...)
+    hcat([[a, b, b] for _ in 1:4]...), hcat([[v,v,NaN] for v in value(o)]...)
 end
 function xy(part::Pair{<:TwoThings, <:HistogramStat})
     (a,b), o = part 
-    x, y = Float64[], Float64[]
+    x, y = [], Float64[]
     edg = edges(o)
     cnts = counts(o)
     for i in eachindex(cnts)
         if cnts[i] > 0
-            append!(x, [a, a, b, b, NaN])
+            append!(x, [a, a, b, b, b])
             append!(y, [edg[i], edg[i+1], edg[i+1], edg[i], NaN])
         end
     end
@@ -258,11 +258,11 @@ end
 
 function xy(part::Pair{<:TwoThings, <:CountMap})
     (a,b), o = part 
-    x = Float64[]
+    x = []
     y = Float64[]
     count = 0
     for (k,v) in sort!(o.value)
-        append!(x, [a, a, b, b, NaN])
+        append!(x, [a, a, b, b, b])
         append!(y, [count, count + v, count + v, count, NaN] ./ nobs(o))
         count += v
     end

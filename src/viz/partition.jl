@@ -98,7 +98,7 @@ end
 function indexed_merge_next!(parts, method)
     if method === :weighted_nearest
         diffs = map(neighbors(parts)) do (a, b)
-            (b[1][1] - a[1][2]) * middle(nobs(a[2]), nobs(b[2]))
+            (b[1][1] - a[1][2]) * round(Int, middle(nobs(a[2]), nobs(b[2])))
         end
         _, i = findmin(diffs)
         parts[i] = (parts[i][1][1], parts[i+1][1][2]) => merge!(parts[i][2], parts[i + 1][2])
