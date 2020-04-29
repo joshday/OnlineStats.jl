@@ -66,7 +66,7 @@ end
     for data in (y, y2), b in [10, 50, 200]
         o = fit!(ExpandingHist(b), data)
         h = fit(Histogram, data, o.edges)
-        @test sum(o.counts .!= h.weights) ≤ 2
+        @test sum(o.counts .!= h.weights) ≤ 4
     end
 end
 #-----------------------------------------------------------------------# Fit[Dist]

@@ -85,11 +85,10 @@ savefig("indexpart2.png"); nothing # hide
 
 
 ```@example setup
-using Dates
-x = rand(Date(2019):Day(1):Date(2020), 10^6)
-y = rand(1:3, 10^6)
+x = rand(10^6)
+y = rand(1:5, 10^6)
 
-o = fit!(IndexedPartition(Date, CountMap(Int)), zip(x,y))
+o = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))
 
 plot(o, xlab = "X", ylab = "Y")
 savefig("indexpart4.png"); nothing # hide
@@ -97,10 +96,12 @@ savefig("indexpart4.png"); nothing # hide
 ![](indexpart4.png)
 
 ```@example setup
-x = rand(1:1000, 10^6)
-y = x .+ 30randn(10^6)
+using Dates
 
-o = fit!(IndexedPartition(Int, KHist(20)), zip(x,y))
+x = rand(Date(2019):Day(1):Date(2020), 10^6)
+y = Dates.value.(x) .+ 30randn(10^6)
+
+o = fit!(IndexedPartition(Date, KHist(20)), zip(x,y))
 
 plot(o)
 savefig("indexpartequal.png"); nothing # hide
