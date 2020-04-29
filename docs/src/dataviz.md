@@ -111,7 +111,7 @@ savefig("indexpartequal.png"); nothing # hide
 ## Histograms
 
 ```@example setup
-s = fit!(Series(KHist(25), Hist(-5:.2:5)), randn(10^6))
+s = fit!(Series(KHist(25), Hist(-5:.2:5), ExpandingHist(100)), randn(10^6))
 plot(s)
 savefig("plot_series.png") # hide
 ```

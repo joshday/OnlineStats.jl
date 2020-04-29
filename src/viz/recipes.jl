@@ -118,10 +118,12 @@ end
 @recipe function f(o::HistogramStat; normalize=true)
     e, c = edges(o), counts(o)
     inds = findfirst(x -> x > 0, c):findlast(x -> x > 0, c)
-    closed = o.left ? :left : :right
     normalize --> normalize
-    Histogram(e[vcat(inds, inds[end] + 1)], c[inds], closed)
+    Histogram(e[vcat(inds, inds[end] + 1)], c[inds], _closed(o))
 end
+
+_closed(o::Hist) = o.left ? :left : :right 
+_closed(o) = :left
 
 
 #-----------------------------------------------------------------------# CountMap

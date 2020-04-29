@@ -132,28 +132,37 @@ end
 #-----------------------------------------------------------------------# ExpandingHist
 const ExpandableRange = Union{StepRange, StepRangeLen, LinRange}
 
+"""
+    ExpandingHist(nbins)
+
+An adaptive histogram where the bin edges keep doubling in size in order to contain every observation.
+`nbins` must be an even number.  Bins are left-closed and the rightmost bin is closed, e.g.
+
+- `[a, b)`, `[b, c)`, `[c, d]`
+
+# Example 
+    o = fit!(ExpandingHist(200), randn(10^6))
+
+    using Plots
+    plot(o)
+"""
 mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
     edges::R
     counts::Vector{Int}
-    left::Bool
     n::Int
-    function ExpandingHist(init::R, T::Type=Number; left::Bool = true) where {R <: ExpandableRange}
-        new{T, R}(init, zeros(Int, length(init) - 1), left, 0)
+    function ExpandingHist(init::R, T::Type=Number) where {R <: ExpandableRange}
+        new{T, R}(init, zeros(Int, length(init) - 1), 0)
     end
 end
-function ExpandingHist(b::Int; left::Bool=true)
+function ExpandingHist(b::Int)
     @assert iseven(b)
-    ExpandingHist(range(0, stop = 0, length = b + 1), Number; left=left)
+    ExpandingHist(range(0, stop = 0, length = b + 1), Number)
 end
+value(o::Hist) = (x=o.edges, y=o.counts)
 
 midpoints(o::ExpandingHist) = midpoints(o.edges)
 counts(o::ExpandingHist) = o.counts
 edges(o::ExpandingHist) = o.edges
-
-function Base.in(y, o::ExpandingHist)
-    a, b = extrema(o.edges)
-    o.left ? (a ≤ y < b) : (a < y ≤ b)
-end
 
 function _fit!(o::ExpandingHist, y)
     o.n += 1
@@ -168,7 +177,7 @@ function _fit!(o::ExpandingHist, y)
         o.counts[end] = 1
     else
         expand!(o, y)
-        i = binindex(o.edges, y, o.left, true)
+        i = binindex(o.edges, y, true, true)
         o.counts[i] += 1
     end
 end
