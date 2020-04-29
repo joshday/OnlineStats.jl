@@ -166,18 +166,23 @@ edges(o::ExpandingHist) = o.edges
 
 function _fit!(o::ExpandingHist, y)
     o.n += 1
+    y2 = Float64(y)
 
     # init
     if nobs(o) == 1
-        o.edges = range(y, stop=y, length=length(o.edges))
+        o.edges = range(y2, stop=y2, length=length(o.edges))
         o.counts[1] = 1
     elseif nobs(o) == 2
         a = first(o.edges)
-        o.edges = a < y ? range(a, y, length=length(o.edges)) : range(y, a, length=length(o.edges))
-        o.counts[end] = 1
+        o.edges = a < y2 ? range(a, y2, length=length(o.edges)) : range(y2, a, length=length(o.edges))
+        if a == last(o.edges) 
+            o.counts[1] += 1
+        else
+            o.counts[end] = 1
+        end
     else
-        expand!(o, y)
-        i = binindex(o.edges, y, true, true)
+        expand!(o, y2)
+        i = binindex(o.edges, y2, true, true)
         o.counts[i] += 1
     end
 end
@@ -185,6 +190,7 @@ end
 function expand!(o::ExpandingHist, y)
     a, b = extrema(o.edges)
     w = b - a
+    w = w == 0.0 ? y - a : w
     halfnbin = round(Int, length(o.counts) / 2)
     if y > b  # find K such that y <= a + 2^K * w
         K = ceil(Int, log2((y - a) / w))
