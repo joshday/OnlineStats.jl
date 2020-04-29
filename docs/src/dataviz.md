@@ -112,7 +112,7 @@ savefig("indexpartequal.png"); nothing # hide
 
 ```@example setup
 s = fit!(Series(KHist(25), Hist(-5:.2:5), ExpandingHist(100)), randn(10^6))
-plot(s)
+plot(s, link = :x)
 savefig("plot_series.png") # hide
 ```
 
