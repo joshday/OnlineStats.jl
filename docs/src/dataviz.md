@@ -168,16 +168,6 @@ savefig("heatmap2.png"); nothing # hide
 ![](heatmap2.png)
 
 
-```@example setup
-x, y = randn(10^6), randn(10^6)
-
-o = HeatMap(zip(x, y), 200)  # use 200 bins in both dimensions
-
-plot(o, aspect_ratio=:equal)
-savefig("heatmap2.png"); nothing # hide
-```
-![](heatmap2.png)
-
 ## Naive Bayes Classifier
 
 The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:

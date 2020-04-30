@@ -1,7 +1,3 @@
-# This file contains implementations to plot bivariate relationships:
-#   - PlotNN: Numerical × Numerical
-
-
 #-----------------------------------------------------------------------# Bin2D
 mutable struct Bin2D
     x::Float64
@@ -18,7 +14,7 @@ nobs(o::Bin2D) = o.z
 
 #-----------------------------------------------------------------------# Hist2D
 """
-    PlotNN(b=300)
+    KHist2D(b=300)
 
 Approximate scatterplot of `b` centers.  This implementation is too slow to be useful.
 
@@ -26,18 +22,21 @@ Approximate scatterplot of `b` centers.  This implementation is too slow to be u
 
     x = randn(10^4)
     y = x + randn(10^4)
-    plot(fit!(PlotNN(), zip(x, y)))
+    plot(fit!(KHist2D(), zip(x, y)))
 """
-struct PlotNN <: OnlineStat{VectorOb}
+struct KHist2D <: OnlineStat{TwoThings{<:Number, <:Number}}
     value::Vector{Bin2D}
     b::Int
 end
-PlotNN(b::Int=300) = PlotNN(Bin2D[], b)
+KHist2D(b::Int=300) = KHist2D(Bin2D[], b)
 
-nobs(o::PlotNN) = length(o.value) > 0 ? sum(nobs, o.value) : 0
+
+Base.@deprecate_binding PlotNN KHist2D
+
+nobs(o::KHist2D) = length(o.value) > 0 ? sum(nobs, o.value) : 0
 
 # Works, but much room to optimize
-function _fit!(o::PlotNN, xy)
+function _fit!(o::KHist2D, xy)
     newbin = Bin2D(xy..., 1)
     push!(o.value, newbin)
     if length(o.value) > o.b 
@@ -59,7 +58,7 @@ function _fit!(o::PlotNN, xy)
     end
 end
 
-@recipe function f(o::PlotNN; maxsize=10, minsize=1)
+@recipe function f(o::KHist2D; maxsize=10, minsize=1)
     x = [v.x for v in o.value]
     y = [v.y for v in o.value]
     z = [v.z for v in o.value]
@@ -67,6 +66,6 @@ end
     markersize --> z / maximum(nobs, o.value) .* maxsize .+ minsize
     markerstrokewidth --> 0
     seriestype --> :scatter 
-    color --> :viridis
+    seriescolor --> :viridis
     x, y
 end

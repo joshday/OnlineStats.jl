@@ -37,7 +37,7 @@ export
     GradientCore, Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
-    KHist, KMeans, KahanSum, KahanMean, KahanVariance, KIndexedPartition,
+    KHist, KHist2D, KMeans, KahanSum, KahanMean, KahanVariance, KIndexedPartition,
     Lag, LinReg, LinRegBuilder,
     Mean, Moments, ModelSchema, Mosaic, MovingTimeWindow, MovingWindow,
     NBClassifier,
@@ -64,10 +64,10 @@ include("stats/kahan.jl")
 include("stats/pca.jl")
 
 include("viz/khist.jl")
+include("viz/khist2d.jl")
 include("viz/partition.jl")
 include("viz/mosaicplot.jl")
 include("viz/recipes.jl")
 include("viz/heatmap.jl")
-include("viz/plotbivariate.jl")
 include("viz/hexlattice.jl")
 end
