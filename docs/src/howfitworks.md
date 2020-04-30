@@ -6,11 +6,11 @@ using OnlineStats
 
 ## Core Principles
 
-1. Stats are subtypes of `OnlineStat{T}` where `T` is the type of a single observation.
+- Stats are subtypes of `OnlineStat{T}` where `T` is the type of a single observation.
     - E.g. `Mean <: OnlineStat{Number}`
-2. `fit!(o::OnlineStat{T}, data::T)`
+- `fit!(o::OnlineStat{T}, data::T)`
     - Update `o` with the single observation `data`.
-3. `fit!(o::OnlineStat{T}, data::S)`
+- `fit!(o::OnlineStat{T}, data::S)`
     - Iterate through `data` and `fit!` each item.
 
 

@@ -34,7 +34,7 @@ supertype(Mean)
 ### Stats can be updated
 
 !!! note
-    `fit!` can be used to update the stat with a single observation or multiple observations: 
+    `fit!` can be used to update the stat with a **single observation** or **multiple observations**: 
     ```
     fit!(stat::OnlineStat{T}, y::S)
     ``` 

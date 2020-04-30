@@ -166,27 +166,26 @@ edges(o::ExpandingHist) = o.edges
 
 function _fit!(o::ExpandingHist, y)
     o.n += 1 
-    y2 = Float64(y)
 
     # init
-    if nobs(o) == 1
-        o.edges = range(y2, y2, length=length(o.edges))
+    @inbounds if nobs(o) == 1
+        o.edges = range(y, y, length=length(o.edges))
         o.counts[1] = 1
     elseif step(o.edges) == 0.0
         a = o.edges[1]
-        if y2 == a 
+        if y == a 
             o.counts[1] += 1
-        elseif y2 < a 
-            o.edges = range(y2, a, length=length(o.edges))
+        elseif y < a 
+            o.edges = range(y, a, length=length(o.edges))
             o.counts[end] = o.counts[1]
             o.counts[1] = 1
         else
-            o.edges = range(a, y2, length=length(o.edges))
+            o.edges = range(a, y, length=length(o.edges))
             o.counts[end] = 1
         end
     else
-        expand!(o, y2)
-        i = binindex(o.edges, y2, true, true)
+        expand!(o, y)
+        i = binindex(o.edges, y, true, true)
         o.counts[i] += 1
     end
 end
@@ -196,14 +195,13 @@ function expand!(o::ExpandingHist, y)
     w = b - a
     w = w == 0.0 ? y - a : w
     halfnbin = round(Int, length(o.counts) / 2)
-    if y > b  # find K such that y <= a + 2^K * w
+    @inbounds if y > b  # find K such that y <= a + 2^K * w
         K = ceil(Int, log2((y - a) / w))
         C = 2 ^ K
-        old_edges = copy(o.edges)
         o.edges = range(a, stop = a + C*w, length=length(o.edges))
         for _ in 1:min(K, halfnbin)
             for i in eachindex(o.counts)
-                o.counts[i] = i ≤ halfnbin ? sum(o.counts[(2i-1):(2i)]) : 0
+                o.counts[i] = i ≤ halfnbin ? sum(view(o.counts, (2i-1):(2i))) : 0
             end
         end
     elseif y < a # find K such that y >= b - 2^K * w
@@ -213,7 +211,8 @@ function expand!(o::ExpandingHist, y)
         for _ in 1:min(K, halfnbin)
             n = length(o.counts)
             for i in 0:(length(o.counts) - 1)
-                o.counts[end-i] = i+1 ≤ halfnbin ? sum(o.counts[end-2i-1:end-2i]) : 0
+                rng = (n-2i-1):(n-2i)
+                o.counts[end-i] = i+1 ≤ halfnbin ? sum(view(o.counts, rng)) : 0
             end
         end
     end
