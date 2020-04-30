@@ -161,6 +161,12 @@ savefig("heatmap.png"); nothing # hide
 ```
 ![](heatmap.png)
 
+```@example setup 
+plot(o, marginals=false)
+savefig("heatmap2.png"); nothing # hide
+```
+![](heatmap2.png)
+
 
 ```@example setup
 x, y = randn(10^6), randn(10^6)

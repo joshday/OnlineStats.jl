@@ -63,11 +63,43 @@ function _merge!(a::HeatMap, b::HeatMap)
     end
 end
 
-@recipe function f(o::HeatMap)
-    seriestype --> :heatmap
-    xguide --> string(o.xedges)
-    yguide --> string(o.yedges)
+@recipe function f(o::HeatMap; marginals=true)
+    link --> :x
     z = Float64.(o.counts)
     z[z .== 0] .= NaN
-    o.xedges, o.yedges, z'
+    @series begin
+        s = marginals ? 3 : 1
+        subplot --> s
+        seriestype --> :heatmap
+        legend --> false
+        o.xedges, o.yedges, z'
+    end
+    if marginals 
+        layout --> (2, 2)
+        @series begin
+            subplot --> 2 
+            seriestype --> :heatmap 
+            gride --> false 
+            axis --> false 
+            framestyle --> :none
+            o.xedges, o.yedges, z'
+        end
+        @series begin 
+            subplot --> 1
+            label --> ""
+            linewidth --> 0
+            line_alpha --> 0
+            seriestype --> :bar
+            o.xedges, vec(sum(o.counts, dims=1))
+        end
+        @series begin 
+            subplot --> 4
+            label --> ""
+            linewidth --> 0
+            line_alpha --> 0
+            orientation --> :h
+            seriestype --> :bar
+            o.yedges, vec(sum(o.counts, dims=2))
+        end
+    end
 end
