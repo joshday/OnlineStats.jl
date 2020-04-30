@@ -162,7 +162,7 @@ savefig("heatmap.png"); nothing # hide
 ![](heatmap.png)
 
 ```@example setup 
-plot(o, marginals=false)
+plot(o, marginals=false, legend=true)
 savefig("heatmap2.png"); nothing # hide
 ```
 ![](heatmap2.png)
