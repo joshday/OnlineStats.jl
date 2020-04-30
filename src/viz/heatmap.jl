@@ -18,7 +18,8 @@ When fitting a new observation, the first value will be associated with X, the s
 
     xy = zip(1 .+ randn(10^6) ./ 10, randn(10^6))
     o = HeatMap(xy)
-    plot(o, aspect_ratio=:equal)
+    plot(o, marginals=false)
+    plot(o)
 """
 mutable struct HeatMap{EX, EY} <: OnlineStat{TwoThings}
     xedges::EX
