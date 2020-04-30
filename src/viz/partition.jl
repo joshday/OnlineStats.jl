@@ -1,3 +1,13 @@
+#-----------------------------------------------------------------------------# common 
+function mergestats(partition)
+    parts = partition.parts
+    o = copy(parts[1][2])
+    for p in parts[2:end]
+        merge!(o, p[2])
+    end
+    o
+end
+
 #-----------------------------------------------------------------------# Partition 
 """
     Partition(stat, nparts=100)
@@ -71,15 +81,15 @@ variable of type `T`.
     using Plots 
     plot(o)
 """
-mutable struct IndexedPartition{I, O <: OnlineStat, P <: Pair{<:Tuple, O}} <: OnlineStat{TwoThings}
+mutable struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Pair{<:Tuple, O}} <: OnlineStat{TwoThings{I,T}}
     parts::Vector{P}
     b::Int
     init::O
     method::Symbol
     n::Int
 end
-function IndexedPartition(I::Type, o::O, b::Int=100; method=:weighted_nearest) where {O<:OnlineStat}
-    IndexedPartition{I,O,Pair{Tuple{I,I}, O}}(Pair{Tuple{I,I}, O}[], b, o, method, 0)
+function IndexedPartition(I::Type, o::O, b::Int=100; method=:weighted_nearest) where {T, O<:OnlineStat{T}}
+    IndexedPartition{I,T, O,Pair{Tuple{I,I}, O}}(Pair{Tuple{I,I}, O}[], b, o, method, 0)
 end
 
 function _fit!(o::IndexedPartition{I}, xy) where {I}
@@ -137,3 +147,40 @@ end
 #     end
 #     o
 # end
+
+
+#-----------------------------------------------------------------------------# KIndexedPartition
+mutable struct KIndexedPartition{I,T,O<:OnlineStat{T},F} <: OnlineStat{TwoThings{I,T}}
+    parts::Vector{Pair{I,O}}
+    k::Int 
+    init::F
+    n::Int
+end
+function KIndexedPartition(I::Type, init::Base.Callable, k::Int=100)
+    o = init()
+    T, O = OnlineStatsBase.input(o), typeof(o)
+    KIndexedPartition{I,T,O,typeof(init)}(Pair{I,O}[], k, init, 0)
+end
+
+function _fit!(o::KIndexedPartition, xy)
+    x, y = xy 
+    parts = o.parts
+    newpart = x => fit!(o.init(), y)
+    insert!(parts, searchsortedfirst(parts, newpart; by=first), newpart)
+    if length(parts) > o.k 
+        mindiff = Inf
+        i = 0 
+        for (j, (a,b)) in enumerate(neighbors(parts))
+            d = first(b) - first(a)
+            if d < mindiff && 1 < j < (length(parts) - 1)
+                mindiff = d 
+                i = j
+            end
+        end
+        a = parts[i] 
+        b = parts[i + 1]
+        n = nobs(last(a)) + nobs(last(b))
+        parts[i] = smooth(first(a), first(b), nobs(last(b)) / n) => merge!(a[2], b[2])
+        deleteat!(parts, i + 1)
+    end
+end

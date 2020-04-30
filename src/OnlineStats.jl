@@ -37,7 +37,7 @@ export
     GradientCore, Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
-    KHist, KMeans, KahanSum, KahanMean, KahanVariance,
+    KHist, KMeans, KahanSum, KahanMean, KahanVariance, KIndexedPartition,
     Lag, LinReg, LinRegBuilder,
     Mean, Moments, ModelSchema, Mosaic, MovingTimeWindow, MovingWindow,
     NBClassifier,

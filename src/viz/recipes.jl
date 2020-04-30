@@ -140,13 +140,40 @@ _closed(o) = :left
 end
 
 #-----------------------------------------------------------------------------# Partition
-@recipe function f(o::Partition) 
-    xguide --> "Nobs"
-    o.parts
-end
-@recipe function f(o::IndexedPartition) 
-    xguide --> "Index"
-    o.parts
+_xguide(o::Partition) = "Nobs"
+_xguide(o::Union{IndexedPartition, KIndexedPartition}) = "Index"
+
+__middle(x) = x 
+__middle(x::Tuple) = middle(x...)
+
+@recipe function f(o::Union{Partition, IndexedPartition, KIndexedPartition}; type=1) 
+    if type === 1
+        @series begin
+            t = o isa Partition ? "" : "Joint Distribution"
+            title --> t
+            xguide --> _xguide(o)
+            o.parts
+        end
+    elseif type === 2
+        @series begin 
+            title --> "Stat Over Entire Index"
+            seriestype --> :bar 
+            orientation --> :h
+            mergestats(o)
+        end
+    elseif type === 3
+        @series begin 
+            l = o isa Partition ? "Nobs / Part" : "Index Distribution"
+            label --> "Index Distribution"
+            seriestype := :bar
+            linewidth --> 0
+            line_alpha --> 0
+            data = [__middle(loc) => nobs(o) for (loc,o) in o.parts]
+            first.(data), last.(data)
+        end
+    else
+        error("type must be 1, 2, or 3.")
+    end
 end
 
 @recipe function f(parts::T) where T <: AbstractVector{<:Pair{<:Any, <:OnlineStat}}
@@ -154,10 +181,13 @@ end
     seriesalpha --> _alpha(parts)
     linewidth   --> _linewidth(parts)
     linealpha   --> _linealpha(parts)
+    line_z      --> _line_z(parts)
     fill_z      --> _fill_z(parts)
     ylims       --> _ylims(parts)
     xlims       --> _xlims(parts)
     yguide      --> _yguide(parts)
+
+    hover --> string.(nobs.(last.(parts))), :quiet
 
     group = _group(parts)
     x, y = xy(parts)
@@ -194,9 +224,13 @@ _yguide(::AbstractArray{<:Pair{<:Any, <:CountMap}}) = "Probability"
 
 _seriestype(::Any) = :path
 _seriestype(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
+_seriestype(::AbstractVector{<:Pair{<:Number, <:Mean}}) = :scatter
 
 _linealpha(parts) = 1
 _linealpha(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema,HistogramStat,CountMap}}}) = 0
+
+_line_z(parts) = nothing 
+_line_z(parts::AbstractVector{<:Pair{<:Number, <:HistogramStat}}) = repeat(vcat(counts.(last.(parts))...), inner=3)
 
 _alpha(parts) = 1
 _alpha(::AbstractVector{<:Pair{<:Any, <:Extrema}}) = .5
@@ -204,10 +238,12 @@ _alpha(::AbstractVector{<:Pair{<:Any, <:Extrema}}) = .5
 _linewidth(parts) = 1
 _linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Mean, Variance}}}) = 2
 _linewidth(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema,HistogramStat,CountMap}}}) = 0
+_linewidth(::AbstractVector{<:Pair{<:Number, <:Extrema}}) = 2
+_linewidth(::AbstractVector{<:Pair{<:Number, <:Union{HistogramStat,CountMap}}}) = 4
 
 _label(parts) = name(parts[1][2], false, false)
 _label(::AbstractVector{<:Pair{<:TwoThings, <:Moments}}) = ["m1" "m2" "m3" "m4"]
-_label(::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}}) = ""
+_label(::AbstractVector{<:Pair{<:Any, <:HistogramStat}}) = ""
 
 _fill_z(parts) = nothing 
 function _fill_z(parts::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}}) 
@@ -227,21 +263,38 @@ function _group(parts::AbstractVector{<:Pair{<:TwoThings, <:Union{CountMap, Prob
     out = map(x -> repeat(x,inner=5), out)
     string.(vcat(out...))
 end
+function _group(parts::AbstractVector{<:Pair{<:Number, <:CountMap}}) 
+    out = map(x -> collect(keys(sort!(value(x[2])))), parts)
+    string.(repeat(vcat(out...), inner=3))
+end
 
-#-----------------------------------------------------------------------------# xy (for Partitions)
+#-----------------------------------------------------------------------------# xy Mean
 function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance}})
     (a,b), o = part 
     [a, b, b], [value(o), value(o), NaN]
 end
+xy(part::Pair{<:Number, <:Mean}) = part[1], value(part[2])
+#-----------------------------------------------------------------------------# xy Extrema
 function xy(part::Pair{<:TwoThings, <:Extrema})
     (a,b), o = part 
     low, high = extrema(o)
     [a, a, b, b, b], [low, high, high, low, NaN]
 end
+function xy(part::Pair{<:Number, <:Extrema})
+    loc, o = part 
+    low, high = extrema(o)
+    [loc, loc, loc], [low, high, NaN]
+end
+#-----------------------------------------------------------------------------# xy Moments
 function xy(part::Pair{<:TwoThings, <:Moments})
     (a,b), o = part 
     hcat([[a, b, b] for _ in 1:4]...), hcat([[v,v,NaN] for v in value(o)]...)
 end
+function xy(part::Pair{<:Number, <:Moments})
+    loc, o = part 
+    [loc loc loc loc], hcat(value(o)...)
+end
+#-----------------------------------------------------------------------------# xy HistogramStat
 function xy(part::Pair{<:TwoThings, <:HistogramStat})
     (a,b), o = part 
     x, y = [], Float64[]
@@ -255,15 +308,41 @@ function xy(part::Pair{<:TwoThings, <:HistogramStat})
     end
     x, y
 end
+function xy(part::Pair{<:Number, <:HistogramStat})
+    loc, o = part 
+    x, y = [], Float64[]
+    edg = edges(o)
+    cnts = counts(o)
+    for i in eachindex(cnts)
+        if cnts[i] > 0 
+            append!(x, [loc, loc, loc])
+            append!(y, [edg[i], edg[i+1], NaN])
+        end
+    end
+    x, y
+end
 
+
+#-----------------------------------------------------------------------------# xy CountMap
 function xy(part::Pair{<:TwoThings, <:CountMap})
     (a,b), o = part 
-    x = []
-    y = Float64[]
+    x, y = [], Float64[]
     count = 0
     for (k,v) in sort!(o.value)
         append!(x, [a, a, b, b, b])
         append!(y, [count, count + v, count + v, count, NaN] ./ nobs(o))
+        count += v
+    end
+    x, y
+end
+function xy(part::Pair{<:Number, <:CountMap})
+    loc, o = part 
+    sort!(o)
+    x, y = [], Float64[]
+    count = 0 
+    for (k,v) in sort!(o.value)
+        append!(x, [loc, loc, loc])
+        append!(y, [count, count + v, NaN] ./ nobs(o))
         count += v
     end
     x, y

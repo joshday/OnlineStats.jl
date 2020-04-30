@@ -19,12 +19,11 @@ using OnlineStats
 ### Reason 1: OnlineStats doesn't make assumptions on the shape of your data
 
 Consider `CovMatrix`, for which a single observation is an `AbstractVector`, `Tuple`, or `NamedTuple`.
-If I try to update it with a `Matrix`, it's ambiguous whether I want *rows* or *columns* of
+If I try to [`fit!`](@ref) it with a `Matrix`, it's ambiguous whether I want *rows* or *columns* of
 the matrix to be treated as individual observations.
 
 !!! note
-    Use `eachrow` and `eachcol` (from `LinearAlgebra`) to choose what to iterate over.
-    For Julia versions less than 1.1, use `OnlineStats.eachrow` and `OnlineStats.eachcol`.
+    See **`eachrow`** and **`eachcol`** (after typing `using LinearAlgebra`).
 
 
 ```@example howfitworks
