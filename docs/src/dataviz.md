@@ -109,6 +109,24 @@ savefig("indexpartequal.png"); nothing # hide
 ```
 ![](indexpartequal.png)
 
+## K-Indexed Partitions
+
+A [`KIndexedPartition`](@ref) is simlar to an [`IndexedPartition`](@ref), but uses a different method
+of binning the x variable (centroids vs. intervals), similar to that of [`KHist`](@ref).
+
+For the sake of performance (and sparing the details), you must provide a **function** that creates
+the OnlineStat you wish to calculate for the y variable.
+
+```@example setup 
+x = randn(10^6)
+y = x + randn(10^6)
+
+o = fit!(KIndexedPartition(Float64, () -> KHist(20)), zip(x, y))
+
+plot(o)
+savefig("kindexedpartition.png"); nothing # hide
+```
+![](kindexpartition.png)
 
 ## Histograms
 
