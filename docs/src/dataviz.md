@@ -10,7 +10,7 @@ using Plots
 using PlotThemes
 Random.seed!(1234)
 gr()
-theme(:bright)
+theme(:juno)
 ```
 
 # Data Viz

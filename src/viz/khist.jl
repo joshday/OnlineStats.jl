@@ -48,7 +48,7 @@ function Base.push!(o::KHist{T}, p::Pair{T,Int}) where {T}
         i = 0 
         for (j, (a,b)) in enumerate(neighbors(bins))
             d = first(b) - first(a)
-            if d < mindiff && 1 < j < (length(bins) - 1)
+            if d < mindiff
                 mindiff = d 
                 i = j
             end

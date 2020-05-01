@@ -80,6 +80,7 @@ end
         @series begin
             subplot --> 2 
             seriestype --> :heatmap 
+            legendposition --> :left
             gride --> false 
             axis --> false 
             framestyle --> :none
