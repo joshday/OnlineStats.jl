@@ -124,9 +124,9 @@ y = x + randn(10^6)
 o = fit!(KIndexedPartition(Float64, () -> KHist(20)), zip(x, y))
 
 plot(o)
-savefig("kindexedpartition.png"); nothing # hide
+savefig("k_indexed_partition.png"); nothing # hide
 ```
-![](kindexpartition.png)
+![](k_indexed_partition.png)
 
 ## Histograms
 
