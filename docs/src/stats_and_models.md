@@ -74,7 +74,7 @@
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Random sample                      | [`ReservoirSample`](@ref)  |
-| Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref) |
+| Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref), [`KIndexedPartition`](@ref) |
 
 ## Collection of Stats
 
