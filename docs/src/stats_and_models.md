@@ -70,7 +70,7 @@
 
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
-| Handling Missing DAta              | [`FTSeries`](@ref), [`CountMissing`](@ref)
+| Handling Missing Data              | [`FTSeries`](@ref), [`CountMissing`](@ref)
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Random sample                      | [`ReservoirSample`](@ref)  |
