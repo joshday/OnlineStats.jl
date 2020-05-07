@@ -12,11 +12,11 @@ makedocs(
     debug = true,
     pages = [
         "index.md",
-        "weights.md",
         "stats_and_models.md",
         "bigdata.md",
         "dataviz.md",
         "howfitworks.md",
+        "weights.md",
         "api.md",
     ]
 )
