@@ -3,13 +3,12 @@ module OnlineStats
 using RecipesBase, Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, nvars, Weight
+    smooth_syr!, nvars, Weight, eachrow, eachcol
 
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform
 
 using OrderedCollections: OrderedDict
-using SweepOperator: sweep!
 using LossFunctions: LossFunctions, Loss, L2DistLoss, AggMode
 using PenaltyFunctions: PenaltyFunctions, Penalty
 using LearnBase: LearnBase, deriv, prox
@@ -20,7 +19,7 @@ export
     mean, var, std, cov, cor, 
 # functions
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
-    classify, coef, ecdf, transform,
+    classify, coef, ecdf, transform, eachrow, eachcol,
 # weights
     EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
     McclainWeight, Bounded, Scaled,

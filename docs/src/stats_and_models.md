@@ -73,7 +73,7 @@
 | Handling Missing DAta              | [`FTSeries`](@ref), [`CountMissing`](@ref)
 | Statistical Bootstrap              | [`Bootstrap`](@ref)        |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
-| Reservoir sampling                 | [`ReservoirSample`](@ref)  |
+| Random sample                      | [`ReservoirSample`](@ref)  |
 | Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref) |
 
 ## Collection of Stats

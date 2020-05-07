@@ -121,8 +121,8 @@ function coef(o::LinRegBuilder, λ=0.0; y=1, x=xs(o,y), bias=true, verbose=false
     push!(inds, y)
     S = Symmetric(o.A)[inds, inds]
     add_diag!(S, λ)
-    sweep!(S, 1:(length(inds)-1))
-    return S[1:(length(inds)-1), end]
+    p = length(inds) - 1
+    return S[1:p, 1:p] \ S[1:p, end]
 end
 
 function _merge!(o::LinRegBuilder, o2::LinRegBuilder)
