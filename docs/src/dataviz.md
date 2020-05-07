@@ -114,7 +114,7 @@ savefig("indexpartequal.png"); nothing # hide
 A [`KIndexedPartition`](@ref) is simlar to an [`IndexedPartition`](@ref), but uses a different method
 of binning the x variable (centroids vs. intervals), similar to that of [`KHist`](@ref).
 
-For the sake of performance (and sparing the details), you must provide a **function** that creates
+For the sake of performance, you must provide a **function** that creates
 the OnlineStat you wish to calculate for the y variable.
 
 ```@example setup 
