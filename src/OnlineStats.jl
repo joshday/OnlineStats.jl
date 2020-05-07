@@ -14,6 +14,10 @@ using PenaltyFunctions: PenaltyFunctions, Penalty
 using LearnBase: LearnBase, deriv, prox
 using OnlineStatsBase
 
+@static if VERSION < v"1.1.0"
+    isnothing(x) = x === nothing
+end
+
 export
 # Statistics
     mean, var, std, cov, cor, 

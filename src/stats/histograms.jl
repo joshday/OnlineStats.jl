@@ -145,6 +145,34 @@ An adaptive histogram where the bin edges keep doubling in size in order to cont
 
     using Plots
     plot(o)
+
+# Details 
+
+How `ExpandingHist` works is best understood through example.  Suppose we start with a histogram 
+of edges/counts as follows:
+
+```
+|1|2|5|3|2|
+```
+
+- Now we observe a data point that is not contained in the bin edges:
+
+```
+|1|2|5|3|2|       *
+```
+
+- In order to contain the point, the range of the edges doubles in the direction of the new 
+  data point and adjacent bins merge their counts:
+
+```
+|1|2|5|3|2|       *
+ \\ / \\ / \\ /      ↓
+  ↓   ↓   ↓       ↓ 
+| 3 | 8 | 2 | 0 | 1 | 
+```
+
+- Note that multiple iterations of bin-doubling may occur until the new point is contained by the 
+  bin edges. 
 """
 mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
     edges::R
@@ -156,7 +184,7 @@ mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
 end
 function ExpandingHist(b::Int)
     @assert iseven(b)
-    ExpandingHist(range(0, stop = 0, length = b + 1), Number)
+    ExpandingHist(range(0, stop=0, length = b + 1), Number)
 end
 value(o::ExpandingHist) = (x=o.edges, y=o.counts)
 

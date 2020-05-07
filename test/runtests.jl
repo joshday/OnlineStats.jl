@@ -67,6 +67,7 @@ end
         o = fit!(ExpandingHist(b), data)
         h = fit(Histogram, data, o.edges)
         @test sum(o.counts .!= h.weights) ≤ 4
+        @test sum(value(o).y) == length(data)
     end
 end
 #-----------------------------------------------------------------------# Fit[Dist]
