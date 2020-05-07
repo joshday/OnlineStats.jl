@@ -169,18 +169,18 @@ function _fit!(o::ExpandingHist, y)
 
     # init
     @inbounds if nobs(o) == 1
-        o.edges = range(y, y, length=length(o.edges))
+        o.edges = range(y, stop=y, length=length(o.edges))
         o.counts[1] = 1
     elseif step(o.edges) == 0.0
         a = o.edges[1]
         if y == a 
             o.counts[1] += 1
         elseif y < a 
-            o.edges = range(y, a, length=length(o.edges))
+            o.edges = range(y, stop=a, length=length(o.edges))
             o.counts[end] = o.counts[1]
             o.counts[1] = 1
         else
-            o.edges = range(a, y, length=length(o.edges))
+            o.edges = range(a, stop=y, length=length(o.edges))
             o.counts[end] = 1
         end
     else

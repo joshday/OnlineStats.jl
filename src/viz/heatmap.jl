@@ -36,7 +36,7 @@ end
 function HeatMap(itr, bins::Integer=200; kw...)
     xa, xb = extrema(first, itr)
     ya, yb = extrema(last, itr)
-    fit!(HeatMap(range(xa, xb, length=bins), range(ya, yb, length=bins); kw...), itr)
+    fit!(HeatMap(range(xa, stop=xb, length=bins), range(ya, stop=yb, length=bins); kw...), itr)
 end
 nobs(o::HeatMap) = sum(o.counts) + o.out
 value(o::HeatMap) = (x=o.xedges, y=o.yedges, z=o.counts)
