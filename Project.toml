@@ -17,7 +17,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
-LearnBase = "0.2, 0.3"
+LearnBase = "0.2, 0.3, 0.4"
 LossFunctions = "0.5, 0.6"
 OnlineStatsBase = "1.4"
 OrderedCollections = "1.1"
