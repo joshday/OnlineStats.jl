@@ -188,6 +188,8 @@ function ExpandingHist(b::Int)
 end
 value(o::ExpandingHist) = (x=o.edges, y=o.counts)
 
+Base.show(io::IO, o::ExpandingHist) = print(io, "ExpandingHist | n = $(nobs(o)) | nbins = $(length(o.counts))")
+
 midpoints(o::ExpandingHist) = midpoints(o.edges)
 counts(o::ExpandingHist) = o.counts
 edges(o::ExpandingHist) = o.edges
