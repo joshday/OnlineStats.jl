@@ -1,3 +1,12 @@
+# This file is from a previous version of OnlineStats (< 1.5.0).  It is no longer included because:
+#
+#   1. I don't think it's super useful
+#       a. For linear regression, you should use LinReg or LinRegBuilder
+#       b. For everything else, sampling your big data probably gives you more accurate results.  
+#           - Stochastic approximation is hard/noisy/unpredictable and you should avoid it if you can.
+#
+#   2. It added 3 dependencies (LearnBase, LossFunctions, PenaltyFunctions)
+
 #-----------------------------------------------------------------------------# StatLearn
 """
     StatLearn(p, args...; rate=LearningRate())
