@@ -54,13 +54,6 @@
 
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
-| GLMs with regularization           | [`StatLearn`](@ref)        |
-| Logistic regression                | [`StatLearn`](@ref)        |
-| Linear SVMs                        | [`StatLearn`](@ref)        |
-| Quantile regression                | [`StatLearn`](@ref)        |
-| Absolute loss regression           | [`StatLearn`](@ref)        |
-| Distance-weighted discrimination   | [`StatLearn`](@ref)        |
-| Huber-loss regression              | [`StatLearn`](@ref)        |
 | Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
 | Decision Trees                     | [`FastTree`](@ref)         |
 | Random Forest                      | [`FastForest`](@ref)       |

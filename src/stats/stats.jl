@@ -650,85 +650,18 @@ end
 # end
 
 #-----------------------------------------------------------------------# Quantile
-"""
-    Quantile(q = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))
-
-Calculate quantiles via a stochastic approximation algorithm `OMAS`, `SGD`, `ADAGRAD`, or
-`MSPI`.  For better (although slower) approximations, see [`P2Quantile`](@ref) and
-[`Hist`](@ref).
-
-# Example
-
-    fit!(Quantile(), randn(10^5))
-"""
-mutable struct Quantile{T <: Algorithm, W} <: OnlineStat{Number}
-    value::Vector{Float64}
-    τ::Vector{Float64}
-    rate::W
-    n::Int
-    alg::T
+struct Quantile{T<:ExpandingHist} <: OnlineStat{Number}
+    q::Vector{Float64}
+    eh::T
 end
-function Quantile(τ::AbstractVector = [.25, .5, .75]; alg=OMAS(), rate=LearningRate(.6))
-    init!(alg, length(τ))
-    Quantile(zeros(length(τ)), sort!(collect(τ)), rate, 0, alg)
+function Quantile(q=[0,.25,.5,.75,1], b::Int=500, alg=nothing, rate=nothing)
+    !isnothing(alg) && @warn("`alg` keyword is deprecated and ignored by the new quantile algorithm")
+    !isnothing(rate) && @warn("`rate` keyword is deprecated and ignored by the new quantile algorithm")
+    Quantile(Vector{Float64}(q), ExpandingHist(b))
 end
-function _fit!(o::Quantile, y)
-    γ = o.rate(o.n += 1)
-    len = length(o.value)
-    if o.n > len
-        qfit!(o, y, γ)
-    else
-        o.value[o.n] = y
-        o.n == len && sort!(o.value)
-    end
-end
-function _merge!(o::Quantile, o2::Quantile)
-    o.τ == o2.τ || error("Merge failed. Quantile objects track different quantiles.")
-    o.n += o2.n
-    γ = nobs(o2) / nobs(o)
-    merge!(o.alg, o2.alg, γ)
-    smooth!(o.value, o2.value, γ)
-end
-
-function qfit!(o::Quantile{SGD}, y, γ)
-    for j in eachindex(o.value)
-        o.value[j] -= γ * Float64((o.value[j] > y) - o.τ[j])
-    end
-end
-function qfit!(o::Quantile{ADAGRAD}, y, γ)
-    for j in eachindex(o.value)
-        g = Float64((o.value[j] > y) - o.τ[j])
-        o.alg.h[j] = smooth(o.alg.h[j], g * g, 1 / nobs(o))
-        o.value[j] -= γ * g / sqrt(o.alg.h[j] + ϵ)
-    end
-end
-function qfit!(o::Quantile{MSPI}, y, γ)
-    for i in eachindex(o.τ)
-        w = inv(abs(y - o.value[i]) + ϵ)
-        halfyw = .5 * y * w
-        b = o.τ[i] - .5 + halfyw
-        o.value[i] = (o.value[i] + γ * b) / (1 + .5 * γ * w)
-    end
-end
-function qfit!(o::Quantile{OMAS}, y, γ)
-    s, t = o.alg.a, o.alg.b
-    @inbounds for j in eachindex(o.τ)
-        w = inv(abs(y - o.value[j]) + ϵ)
-        s[j] = smooth(s[j], w * y, γ)
-        t[j] = smooth(t[j], w, γ)
-        o.value[j] = (s[j] + (2.0 * o.τ[j] - 1.0)) / t[j]
-    end
-end
-
-# # OMAP...why is this bad?
-# q_init(u::OMAP, p) = u
-# function qfit!(o::Quantile{<:OMAP}, y, γ)
-#     for j in eachindex(o.τ)
-#         w = abs(y - o.value[j]) + ϵ
-#         θ = y + w * (2o.τ[j] - 1)
-#         o.value[j] = smooth(o.value[j], θ, γ)
-#     end
-# end
+_fit!(o::Quantile, x) = fit!(o.eh, x)
+value(o::Quantile) = quantile(o.eh, o.q)
+nobs(o::Quantile) = nobs(o.eh)
 
 #-----------------------------------------------------------------------# ReservoirSample
 """

@@ -1,8 +1,4 @@
 using OnlineStats, OnlineStatsBase, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
-using LearnBase, LossFunctions, PenaltyFunctions
-
-value = OnlineStats.value
-val = LearnBase.value
 
 #-----------------------------------------------------------------------# utils
 n = 1000
@@ -80,9 +76,6 @@ end
     end
     @testset "FitCauchy" begin
         @test value(FitCauchy()) == (0.0, 1.0)
-        a, b = mergevals(FitCauchy(), y, y2)
-        @test ≈(a[1], b[1]; atol=.5)
-        @test ≈(a[2], b[2]; atol=.5)
     end
     @testset "FitGamma" begin
         @test value(FitGamma()) == (1.0, 1.0)
@@ -389,16 +382,9 @@ end
     data = randn(10_000)
     data2 = randn(10_000)
     τ = .1:.1:.9
-    for o in [
-            Quantile(τ; alg=SGD()),
-            Quantile(τ; alg=MSPI()),
-            Quantile(τ; alg=OMAS()),
-            Quantile(τ; alg=ADAGRAD())
-            ]
-        @test ≈(value(fit!(copy(o), data)), quantile(data, τ), atol=.5)
-        @test ≈(mergevals(o, data, data2)...; atol=.5)
+    o = Quantile(τ, 1000)
+    @test ≈(value(fit!(copy(o), data)), quantile(data, τ), atol=.1)
 
-    end
     for τi in τ
         @test ≈(value(fit!(P2Quantile(τi),data)), quantile(data, τi), atol=.2)
     end
@@ -421,35 +407,35 @@ end
     @test nobs(value(o)[1]) == 20
 end
 #-----------------------------------------------------------------------# StatLearn
-@testset "StatLearn" begin
-    X = randn(10_000, 5)
-    β = collect(-1:.5:1)
-    Y = X * β + randn(10_000)
-    Y2 = 2.0 .* [rand()< 1 /(1 + exp(-η)) for η in X*β] .- 1.0
-    for A in [SGD(),ADAGRAD(),ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
-        print("  > $A")
-        print(": ")
-        for L in [.5 * L2DistLoss()]
-            print(" | $L")
-            # sanity checks
-            o = fit!(StatLearn(5, A, L; rate=LearningRate(.7)), zip(eachrow(X),Y))
-            @test o.loss isa typeof(L)
-            @test o.alg isa typeof(A)
-            any(isnan.(o.β)) && @info((L, A))
-            merge!(o, copy(o))
-            @test coef(o) == o.β
-            @test predict(o, X) == X * o.β
-            @test ≈(coef(o), β; atol=1.5)
-            @test OnlineStats.objective(o, X, Y) ≈ val(o.loss, Y, predict(o, X), AggMode.Mean()) + val(o.penalty, o.β, o.λ)
-        end
-        for L in [LogitMarginLoss(), DWDMarginLoss(1.0)]
-            print(" | $L")
-            o = fit!(StatLearn(5, A, L), zip(eachrow(X),Y2))
-            @test mean(Y2 .== classify(o, X)) > .5
-        end
-        println()
-    end
-end
+# @testset "StatLearn" begin
+#     X = randn(10_000, 5)
+#     β = collect(-1:.5:1)
+#     Y = X * β + randn(10_000)
+#     Y2 = 2.0 .* [rand()< 1 /(1 + exp(-η)) for η in X*β] .- 1.0
+#     for A in [SGD(),ADAGRAD(),ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
+#         print("  > $A")
+#         print(": ")
+#         for L in [.5 * L2DistLoss()]
+#             print(" | $L")
+#             # sanity checks
+#             o = fit!(StatLearn(5, A, L; rate=LearningRate(.7)), zip(eachrow(X),Y))
+#             @test o.loss isa typeof(L)
+#             @test o.alg isa typeof(A)
+#             any(isnan.(o.β)) && @info((L, A))
+#             merge!(o, copy(o))
+#             @test coef(o) == o.β
+#             @test predict(o, X) == X * o.β
+#             @test ≈(coef(o), β; atol=1.5)
+#             @test OnlineStats.objective(o, X, Y) ≈ val(o.loss, Y, predict(o, X), AggMode.Mean()) + val(o.penalty, o.β, o.λ)
+#         end
+#         for L in [LogitMarginLoss(), DWDMarginLoss(1.0)]
+#             print(" | $L")
+#             o = fit!(StatLearn(5, A, L), zip(eachrow(X),Y2))
+#             @test mean(Y2 .== classify(o, X)) > .5
+#         end
+#         println()
+#     end
+# end
 #-----------------------------------------------------------------------# CCIPCA
 @testset "CCIPCA" begin
     include("test_ccipca.jl")
@@ -463,7 +449,7 @@ include("test_kahan.jl")
     for stat in [BiasVec([1,2,3]), Bootstrap(Mean()), CallFun(Mean(), println), FastNode(5),
                  FastTree(5), FastForest(5), FTSeries(Variance()), Group(Mean(), Mean()),
                  HyperLogLog{10}(), LinRegBuilder(4), NBClassifier(5, Float64), ProbMap(Int),
-                 P2Quantile(.5), Series(Mean()), StatLearn(5)]
+                 P2Quantile(.5), Series(Mean())]
         println("  > ", stat)
     end
 end

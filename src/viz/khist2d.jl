@@ -16,7 +16,8 @@ nobs(o::Bin2D) = o.z
 """
     KHist2D(b=300)
 
-Approximate scatterplot of `b` centers.  This implementation is too slow to be useful.
+Approximate scatterplot of `b` centers.  This implementation is slow!  See [`IndexedPartition`](@ref)
+and [`KIndexedPartition`](@ref) instead.
 
 # Example
 

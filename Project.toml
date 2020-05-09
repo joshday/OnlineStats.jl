@@ -1,15 +1,12 @@
 name = "OnlineStats"
 uuid = "a15396b6-48d5-5d58-9928-6d29437db91e"
-version = "1.4.1"
+version = "1.5.0"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-LearnBase = "7f8f8fb0-2700-5f03-b4bd-41f8cfc144b6"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-PenaltyFunctions = "06bb1623-fdd5-5ca2-a01c-88eae3ea319e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
@@ -17,11 +14,8 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
-LearnBase = "0.2, 0.3, 0.4.1"
-LossFunctions = "0.5, 0.6"
 OnlineStatsBase = "1.4"
 OrderedCollections = "1.1"
-PenaltyFunctions = "0.1, 0.2"
 RecipesBase = "0.7, 0.8, 1.0"
 StatsBase = "0.32, 0.33"
 SweepOperator = "0.2, 0.3"

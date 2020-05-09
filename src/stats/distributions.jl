@@ -28,10 +28,11 @@ _merge!(o::FitBeta, o2::FitBeta) = _merge!(o.var, o2.var)
 
 #---------------------------------------------------------------------------------# Cauchy
 """
-    FitCauchy(; alg, rate)
+    FitCauchy(b=500)
 
 Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
-quantiles, so that `alg` will be passed to [`Quantile`](@ref).
+approximated quantiles.  See [`Quantile`](@ref) and [`ExpandingHist`](@ref) for details on how the 
+distribution is estimated.
 
 # Example 
     o = fit!(FitCauchy(), randn(1000))
@@ -39,12 +40,13 @@ quantiles, so that `alg` will be passed to [`Quantile`](@ref).
 mutable struct FitCauchy{T} <: OnlineStat{Number}
     q::Quantile{T}
 end
-FitCauchy(alg = OMAS(), kw...) = FitCauchy(Quantile([.25, .5, .75]; alg=alg, kw...))
+FitCauchy(b = 500) = FitCauchy(Quantile([.25, .5, .75], b))
 nobs(o::FitCauchy) = nobs(o.q)
 _fit!(o::FitCauchy, y) = _fit!(o.q, y)
 function value(o::FitCauchy)
     if nobs(o) > 1
-        return o.q.value[2], 0.5 * (o.q.value[3] - o.q.value[1])
+        a, b, c = value(o.q)
+        return b, 0.5 * (c - a)
     else
         return 0.0, 1.0
     end
