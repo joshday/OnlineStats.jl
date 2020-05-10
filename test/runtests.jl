@@ -418,6 +418,10 @@ end
         for L in [OnlineStats.l2regloss]
             print(" | $L")
             # sanity checks
+            for P in [OnlineStats.ElasticNet(.5), abs, abs2, zero]
+                fit!(StatLearn(A, L, .1; rate=LearningRate(.7), penalty=P), zip(eachrow(X),Y))
+                print("✓")
+            end
             o = fit!(StatLearn(A, L; rate=LearningRate(.7)), zip(eachrow(X),Y))
             @test o.loss isa typeof(L)
             @test o.alg isa typeof(A)

@@ -8,6 +8,9 @@ deriv(::typeof(l1regloss), y, yhat) = sign(yhat - y)
 logisticloss(y, yhat) = log1p(exp(-y * yhat))
 deriv(::typeof(logisticloss), y, yhat) = -y / (1 + exp(y * yhat))
 
+l1hingeloss(y, yhat) = max(1 - y*yhat, zero(yhat))
+deriv(::typeof(l1hingeloss), y, yhat) = (u = y*yhat; u ≥ 1 ? zero(y) : -y)
+
 struct DWDLoss{T<:Number}
     q::T 
 end
@@ -21,9 +24,13 @@ function (o::DWDLoss)(y, yhat)
     end
 end
 function deriv(loss::DWDLoss, y, yhat)
-    agreement = y * yhat
+    u = y * yhat
     q = loss.q
-    agreement ≤ q / (q + 1) ? -1 : -( q / (q + 1)) ^ (q + 1) / agreement ^ (q + 1)
+    if u ≤ q / (q + 1)
+        -y
+    else
+       - y * ( q / (q + 1)) ^ (q + 1) / u ^ (q + 1)
+    end
 end
 
 #-----------------------------------------------------------------------------# Penalties 
@@ -31,6 +38,14 @@ prox(::typeof(zero), x, s) = x
 prox(::typeof(abs2), x, s) = x / (1 + s)
 prox(::typeof(abs), x, s) = sign(x) * max(0, abs(x) - s)
 
+struct ElasticNet{T}
+    α::T
+end
+(p::ElasticNet)(x) = smooth(abs2(x), abs(x), p.α)
+function prox(p::ElasticNet, x, s)
+    αs = p.α * s
+    prox(abs, x, αs) / (1 + s - αs)
+end
 
 #-----------------------------------------------------------------------------# StatLearn
 """
@@ -45,13 +60,34 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
 
 # Arguments
 
-- `loss = OnlineStats.l2regloss` (options are `l2regloss, l1regloss, logisticloss, DWDLoss(q)`)
-- `algorithm = SGD()` (options are `subtypes(OnlineStats.SGAlgorithm)`)
+- `loss = OnlineStats.l2regloss`: The loss function to be (approximately) minimized.
+    - Regression Losses:
+        - `l2regloss`: Squared error loss
+        - `l1regloss`: Absolute error loss
+    - Classification (y ∈ {-1, 1}) Losses:
+        - `logisticloss`: Logistic regression
+        - `l1hingeloss`: Loss function used in Support Vector Machines.
+        - `DWDLoss(q)`: Generalized Distance Weighted Discrimination (smoothed `l1hingeloss`)
+- `algorithm = SGD()`: The stochastic approximation method to be used.
+    - Algorithms based on Stochastic gradient:
+        - `SGD()`: Stochastic Gradient Descent
+        - `ADAGRAD()`: AdaGrad (adaptive version of SGD)
+        - `RMSPROP()`: RMSProp (adaptive version of SGD)
+    - Algorithms based on Majorization-Minimization Principle:
+        - `MSPI()`: Majorized Stochastic Proximal Iteration
+        - `OMAS()`: Online MM via Averaged Surrogate
+        - `OMAP()`: Online MM via Averaged Parameter
+- `λ = 0.0`: The hyperparameter(s) used for the penalty function
+    - User can provide elementwise penalty hyperparameters (`Vector{Float64}`) or single hyperparameter (`Float64`).
 
 ## Keyword Arguments
 
-- `penalty = zero` (options are `zero`, `abs` (LASSO), or `abs2` (Ridge))
-- `rate = LearningRate(.6)` (keyword arg)
+- `penalty = zero`
+    - `zero`: no penalty
+    - `abs`: (LASSO) parameters penalized by their absolute value
+    - `abs2`: (Ridge) parameters penalized by their squared value
+    - `ElasticNet(α)`: α * (abs penalty) + (1-α) * (abs2 penalty)
+- `rate = LearningRate(.6)`
 
 # Example
 
@@ -59,6 +95,9 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
     y = x * range(-1, stop=1, length=5) + randn(1000)
 
     o = fit!(StatLearn(MSPI()), zip(eachrow(x), y))
+    coef(o)
+
+    o = fit!(StatLearn(OnlineStats.l1regloss, ADAGRAD()), zip(eachrow(x), y))
     coef(o)
 """
 mutable struct StatLearn{A<:Algorithm, L, P, W} <: OnlineStat{XY}
