@@ -407,35 +407,34 @@ end
     @test nobs(value(o)[1]) == 20
 end
 #-----------------------------------------------------------------------# StatLearn
-# @testset "StatLearn" begin
-#     X = randn(10_000, 5)
-#     β = collect(-1:.5:1)
-#     Y = X * β + randn(10_000)
-#     Y2 = 2.0 .* [rand()< 1 /(1 + exp(-η)) for η in X*β] .- 1.0
-#     for A in [SGD(),ADAGRAD(),ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
-#         print("  > $A")
-#         print(": ")
-#         for L in [.5 * L2DistLoss()]
-#             print(" | $L")
-#             # sanity checks
-#             o = fit!(StatLearn(5, A, L; rate=LearningRate(.7)), zip(eachrow(X),Y))
-#             @test o.loss isa typeof(L)
-#             @test o.alg isa typeof(A)
-#             any(isnan.(o.β)) && @info((L, A))
-#             merge!(o, copy(o))
-#             @test coef(o) == o.β
-#             @test predict(o, X) == X * o.β
-#             @test ≈(coef(o), β; atol=1.5)
-#             @test OnlineStats.objective(o, X, Y) ≈ val(o.loss, Y, predict(o, X), AggMode.Mean()) + val(o.penalty, o.β, o.λ)
-#         end
-#         for L in [LogitMarginLoss(), DWDMarginLoss(1.0)]
-#             print(" | $L")
-#             o = fit!(StatLearn(5, A, L), zip(eachrow(X),Y2))
-#             @test mean(Y2 .== classify(o, X)) > .5
-#         end
-#         println()
-#     end
-# end
+@testset "StatLearn" begin
+    X = randn(10_000, 5)
+    β = collect(-1:.5:1)
+    Y = X * β + randn(10_000)
+    Y2 = 2.0 .* [rand()< 1 /(1 + exp(-η)) for η in X*β] .- 1.0
+    for A in [SGD(),ADAGRAD(),ADAM(),ADAMAX(),ADADELTA(),RMSPROP(),OMAS(),OMAP(),MSPI()]
+        print("  > $A")
+        print(": ")
+        for L in [OnlineStats.l2regloss]
+            print(" | $L")
+            # sanity checks
+            o = fit!(StatLearn(A, L; rate=LearningRate(.7)), zip(eachrow(X),Y))
+            @test o.loss isa typeof(L)
+            @test o.alg isa typeof(A)
+            any(isnan.(o.β)) && @info((L, A))
+            merge!(o, copy(o))
+            @test coef(o) == o.β
+            @test predict(o, X) == X * o.β
+            @test ≈(coef(o), β; atol=1.5)
+        end
+        for L in [OnlineStats.logisticloss, OnlineStats.DWDLoss(1.0)]
+            print(" | $L")
+            o = fit!(StatLearn(A, L), zip(eachrow(X),Y2))
+            @test mean(Y2 .== classify(o, X)) > .5
+        end
+        println()
+    end
+end
 #-----------------------------------------------------------------------# CCIPCA
 @testset "CCIPCA" begin
     include("test_ccipca.jl")

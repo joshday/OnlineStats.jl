@@ -5,7 +5,7 @@ using Statistics, LinearAlgebra, Dates
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
     smooth_syr!, nvars, Weight, eachrow, eachcol
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
-    fweights, sample, coef, predict, Histogram, ecdf, transform
+    fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
 
 using OrderedCollections: OrderedDict
 
@@ -45,7 +45,7 @@ export
     Part, Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    Series, SGDStat, StatHistory, StatLag, Sum,
+    Series, SGDStat, StatHistory, StatLag, StatLearn, Sum,
     Variance,
 # other
     OnlineStat, BiasVec
@@ -83,6 +83,8 @@ Base.getindex(v::BiasVec, i::Int) = i > length(v.x) ? v.bias : v.x[i]
 Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
 
 #-----------------------------------------------------------------------------# stats
+include("algorithms.jl")
+
 include("stats/histograms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")
@@ -91,6 +93,7 @@ include("stats/fasttree.jl")
 include("stats/linreg.jl")
 include("stats/kahan.jl")
 include("stats/pca.jl")
+include("stats/statlearn.jl")
 #-----------------------------------------------------------------------------# viz
 include("viz/khist.jl")
 include("viz/khist2d.jl")

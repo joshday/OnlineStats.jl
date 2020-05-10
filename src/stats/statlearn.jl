@@ -1,19 +1,42 @@
-# This file is from a previous version of OnlineStats (< 1.5.0).  It is no longer included because:
-#
-#   1. I don't think it's super useful
-#       a. For linear regression, you should use LinReg or LinRegBuilder
-#       b. For everything else, sampling your big data probably gives you more accurate results.  
-#           - Stochastic approximation is hard/noisy/unpredictable and you should avoid it if you can.
-#
-#   2. It added 3 dependencies (LearnBase, LossFunctions, PenaltyFunctions)
+#-----------------------------------------------------------------------------# Losses 
+l2regloss(y, yhat) = .5 * abs2(y - yhat) 
+deriv(::typeof(l2regloss), y, yhat) = yhat - y
+
+l1regloss(y, yhat) = abs(y - yhat)
+deriv(::typeof(l1regloss), y, yhat) = sign(yhat - y)
+
+logisticloss(y, yhat) = log1p(exp(-y * yhat))
+deriv(::typeof(logisticloss), y, yhat) = -y / (1 + exp(y * yhat))
+
+struct DWDLoss{T<:Number}
+    q::T 
+end
+function (o::DWDLoss)(y, yhat)
+    agreement = y * yhat 
+    q = loss.q
+    if agreement ≤ q / (q + 1)
+        1 - agreement
+    else
+        (q ^ q / (q + 1) ^ (q + 1)) / agreement ^ q
+    end
+end
+function deriv(loss::DWDLoss, y, yhat)
+    agreement = y * yhat
+    q = loss.q
+    agreement ≤ q / (q + 1) ? -1 : -( q / (q + 1)) ^ (q + 1) / agreement ^ (q + 1)
+end
+
+#-----------------------------------------------------------------------------# Penalties 
+prox(::typeof(zero), x, s) = x 
+prox(::typeof(abs2), x, s) = x / (1 + s)
+prox(::typeof(abs), x, s) = sign(x) * max(0, abs(x) - s)
+
 
 #-----------------------------------------------------------------------------# StatLearn
 """
-    StatLearn(p, args...; rate=LearningRate())
+    StatLearn(args...; rate=LearningRate())
 
-Fit a model that is linear in the parameters.
-
-The (offline) objective function that StatLearn approximately minimizes is
+Fit a model that is linear in the parameters.  The (offline) objective function that StatLearn approximately minimizes is
 
 ``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
 
@@ -22,9 +45,12 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
 
 # Arguments
 
-- `loss = .5 * L2DistLoss()`
-- `penalty = NoPenalty()`
-- `algorithm = SGD()`
+- `loss = OnlineStats.l2regloss` (options are `l2regloss, l1regloss, logisticloss, DWDLoss(q)`)
+- `algorithm = SGD()` (options are `subtypes(OnlineStats.SGAlgorithm)`)
+
+## Keyword Arguments
+
+- `penalty = zero` (options are `zero`, `abs` (LASSO), or `abs2` (Ridge))
 - `rate = LearningRate(.6)` (keyword arg)
 
 # Example
@@ -32,7 +58,7 @@ nonnegative regularization parameters, and ``g`` is a penalty function.
     x = randn(1000, 5)
     y = x * range(-1, stop=1, length=5) + randn(1000)
 
-    o = fit!(StatLearn(5, MSPI()), zip(eachrow(x), y))
+    o = fit!(StatLearn(MSPI()), zip(eachrow(x), y))
     coef(o)
 """
 mutable struct StatLearn{A<:Algorithm, L, P, W} <: OnlineStat{XY}
@@ -45,23 +71,26 @@ mutable struct StatLearn{A<:Algorithm, L, P, W} <: OnlineStat{XY}
     rate::W
     n::Int
 end
-function StatLearn(p::Int, args...; rate=LearningRate())
-    λ, loss, pen, alg = zeros(p), .5*L2DistLoss(), PenaltyFunctions.NoPenalty(), SGD()
+function StatLearn(args...; penalty=zero, rate=LearningRate())
+    p = 0
+    λ = zeros(1)
+    loss = l2regloss 
+    alg = SGD()
     for a in args
         a isa AbstractVector && (λ = a)
         a isa Float64        && (λ = fill(a, 1))
-        a isa Loss           && (loss = a)
-        a isa Penalty        && (pen = a)
         a isa Algorithm      && (alg = a)
+        a isa Integer        && (p = a)
+        a isa Base.Callable  && (loss = a)
     end
     init!(alg, p)
-    StatLearn(zeros(p), λ, zeros(p), loss, pen, alg, rate, 0)
+    StatLearn(zeros(p), λ, zeros(p), loss, penalty, alg, rate, 0)
 end
 
 function Base.show(io::IO, o::StatLearn)
     print(io, "StatLearn: ")
     print(io, name(o.alg, false, false))
-    print(io, " | mean(λ)=", mean(o.λ))
+    o.penalty != zero && print(io, " | mean(λ)=", mean(o.λ))
     print(io, " | ", o.loss)
     print(io, " | ", o.penalty)
     print(io, " | nobs=", nobs(o))
@@ -70,18 +99,27 @@ end
 coef(o::StatLearn) = value(o)
 
 function gradient!(o::StatLearn, x, y)
-    d_dη = LearnBase.deriv(o.loss, y, predict(o, x))
+    d_dη = deriv(o.loss, y, predict(o, x))
     for j in eachindex(o.gx)
         o.gx[j] = x[j] * d_dη
     end
 end
 function _fit!(o::StatLearn{<:SGAlgorithm}, xy)
     x, y = xy
-    o.n += 1
+    (o.n += 1) == 1  && init!(o, length(x))
     gradient!(o, x, y)
     update!(o.alg, o.gx)
     updateβ!(o, o.rate(o.n))
 end
+function init!(o::StatLearn, p)
+    o.β = zeros(p)
+    o.gx = zeros(p)
+    init!(o.alg, p)
+    if length(o.λ) == 1 
+        o.λ = fill(o.λ[1], p)
+    end
+end
+
 function _merge!(o::StatLearn, o2::StatLearn)
     o.n += o2.n
     γ = nobs(o2) / nobs(o)
@@ -95,7 +133,7 @@ predict(o::StatLearn, x::AbstractMatrix) = x * o.β
 classify(o::StatLearn, x) = sign.(predict(o, x))
 
 function objective(o::StatLearn, x::AbstractMatrix, y::VectorOb)
-    LearnBase.value(o.loss, y, predict(o, x), AggMode.Mean()) + LearnBase.value(o.penalty, o.β, o.λ)
+    mean(o.loss.(y, predict(o,x))) + sum(o.λ .* o.penalty.(o.β))
 end
 
 #-----------------------------------------------------------------------# updateβ!
@@ -129,82 +167,50 @@ function updateβ!(o::StatLearn{ADADELTA}, γ)
     end
 end
 
-
-# #-----------------------------------------------------------------------# NSGD
-# function fit!(o::StatLearn{NSGD}, t::Tuple{VectorOb, Real}, γ::Float64)
-#     U = o.updater
-#     x, y = t
-#     for j in eachindex(o.β)
-#         U.θ[j] = o.β[j] - U.α * U.v[j]
-#     end
-#     ŷ = dot(x, U.θ)
-#     for j in eachindex(o.β)
-#         U.v[j] = U.α * U.v[j] + deriv(o.loss, y, ŷ) * x[j]
-#         @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ * U.v[j], γ * o.λfactor[j])
-#     end
-# end
-# #-----------------------------------------------------------------------# NADAM
-# function update!(o::StatLearn{NADAM}, γ)
-#     U = o.updater
-#     β1 = U.β1
-#     β2 = U.β2
-#     U.nups += 1
-#     @inbounds for j in eachindex(o.β)
-#         gx = o.gx[j] + deriv(o.penalty, o.β[j], o.λfactor[j])
-#         U.M[j] = smooth(gx, U.M[j], U.β1)
-#         U.V[j] = smooth(gx ^ 2, U.V[j], U.β2)
-#         mt = U.M[j] / (1 - U.β1 ^ U.nups)
-#         vt = U.V[j] / (1 - U.β2 ^ U.nups)
-#         Δ = γ / (sqrt(vt + ϵ)) * (U.β1 * mt + (1 - U.β1) / (1 - U.β1^U.nups) * gx)
-#         o.β[j] -= Δ
-#     end
-# end
-
-
-
 #------------------------------------------------------------------# Majorization-based
-const L2Scaled{N} = LossFunctions.ScaledDistanceLoss{L2DistLoss, N}
+# lipschitz_constant (L): f(θ) ≤ f(x) + ∇f(x)'(θ - x) + (L / 2) ||θ - x||^2
+lconst(loss, x, y) = error("Unkown Lipschitz constant for loss $loss")
 
-# lipschitz_constant (L): f(θ) ≤ f(θₜ) + ∇f(θₜ)'(θ - θₜ) + (L / 2) ||θ - θₜ||^2
-lconst(o::StatLearn, x, y) = lconst(o.loss, x, y)
+lconst(o::typeof(l2regloss), x, y) = dot(x, x)
 
-lconst(o::Loss, x, y) = error("No defined Lipschitz constant for $o")
-lconst(o::L2Scaled{N}, x, y) where {N} = 2N * dot(x, x)
-lconst(o::LossFunctions.L2DistLoss, x, y) = 2 * dot(x, x)
-lconst(o::LossFunctions.LogitMarginLoss, x, y) = .25 * dot(x, x)
-lconst(o::LossFunctions.DWDMarginLoss, x, y) = (o.q + 1)^2 / o.q * dot(x, x)
+lconst(o::typeof(logisticloss), x, y) = .25 * dot(x, x)
+
+lconst(o::DWDLoss, x, y) = (o.q + 1)^2 / o.q * dot(x, x)
 
 #-----------------------------------------------------------------------# OMAS
 # L stored in o.alg.a[1]
 function _fit!(o::StatLearn{OMAS}, xy)
-    γ = o.rate(o.n += 1)
     x, y = xy
+    (o.n += 1) == 1  && init!(o, length(x))
+    γ = o.rate(o.n)
     b = o.alg.b
     gradient!(o, x, y)
     ht = lconst(o.loss, x, y)
     L = (o.alg.a[1] = smooth(o.alg.a[1], ht, γ))
     for j in eachindex(o.β)
         b[j] = smooth(b[j], ht * o.β[j] - o.gx[j], γ)
-        o.β[j] = LearnBase.prox(o.penalty, b[j] / L, o.λ[j] / L)
+        o.β[j] = prox(o.penalty, b[j] / L, o.λ[j] / L)
     end
 end
 #-----------------------------------------------------------------------# OMAP
 function _fit!(o::StatLearn{OMAP}, xy)
-    γ = o.rate(o.n += 1)
     x, y = xy
+    (o.n += 1) == 1 && init!(o, length(x))
+    γ = o.rate(o.n)
     gradient!(o, x, y)
-    h_inv = inv(lconst(o, x, y))
+    h_inv = inv(lconst(o.loss, x, y))
     for j in eachindex(o.β)
         o.β[j] -= γ * h_inv * o.gx[j]
     end
 end
 #-----------------------------------------------------------------------# MSPI
 function _fit!(o::StatLearn{MSPI}, xy)
-    γ = o.rate(o.n += 1)
     x, y = xy
+    (o.n += 1) == 1  && init!(o, length(x))
+    γ = o.rate(o.n)
     gradient!(o, x, y)
-    γ2 = γ / (1 + γ * lconst(o, x, y))
+    γ2 = γ / (1 + γ * lconst(o.loss, x, y))
     for j in eachindex(o.β)
-        @inbounds o.β[j] = LearnBase.prox(o.penalty, o.β[j] - γ2 * o.gx[j], γ2 * o.λ[j])
+        @inbounds o.β[j] = prox(o.penalty, o.β[j] - γ2 * o.gx[j], γ2 * o.λ[j])
     end
 end
