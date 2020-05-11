@@ -36,7 +36,7 @@ end
 #-----------------------------------------------------------------------------# Penalties 
 prox(::typeof(zero), x, s) = x 
 prox(::typeof(abs2), x, s) = x / (1 + s)
-prox(::typeof(abs), x, s) = sign(x) * max(0, abs(x) - s)
+prox(::typeof(abs), x::T, s::Number) where {T} = sign(x) * max(T(0), abs(x) - s)
 
 struct ElasticNet{T}
     α::T
@@ -49,13 +49,13 @@ end
 
 #-----------------------------------------------------------------------------# StatLearn
 """
-    StatLearn(args...; rate=LearningRate())
+    StatLearn(args...; penalty=zero, rate=LearningRate())
 
 Fit a model that is linear in the parameters.  The (offline) objective function that StatLearn approximately minimizes is
 
 ``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
 
-where ``fᵢ`` are loss functions of a single response and linear predictor, ``λⱼ``s are
+where ``fᵢ`` are loss functions of a response variable and linear predictor, ``λⱼ``s are
 nonnegative regularization parameters, and ``g`` is a penalty function.
 
 # Arguments

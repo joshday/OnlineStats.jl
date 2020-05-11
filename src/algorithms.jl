@@ -50,7 +50,7 @@ mutable struct ADAGRAD <: SGAlgorithm
     n::Int
     ADAGRAD() = new(zeros(0), 0)
 end
-init!(o::ADAGRAD, p) = (o.h = zeros(p))
+init!(o::ADAGRAD, p) = (o.h = ones(p))
 Base.merge!(o::ADAGRAD, o2::ADAGRAD, γ) = (smooth!(o.h, o2.h, γ); o)
 function update!(o::ADAGRAD, gx)
     o.n += 1

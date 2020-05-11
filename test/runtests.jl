@@ -231,12 +231,13 @@ end
     @test OnlineStats.pdf(o, -10) == 0.0
     @test ≈(OnlineStats.pdf(o, 0.0), 0.3989422804014327, atol=.5)
     @test OnlineStats.pdf(o, 10) == 0.0
-    @test OnlineStats.cdf(o, -10) == 0.0
-    @test ≈(OnlineStats.cdf(o, 0.0), .5; atol=.1)
-    @test OnlineStats.cdf(o, 10) == 1.0
+    f = ecdf(o)
+    @test f(-10) == 0.0
+    @test ≈(f(0.0), .5; atol=.1)
+    @test f(10) == 1.0
     # Issue 182
-    @test OnlineStats.cdf(o, maximum(data)) == 1.0
-    @test OnlineStats.cdf(o, minimum(data)) == 1 / 10_000
+    @test f(maximum(data)) == 1.0
+    @test f(minimum(data)) == 1 / 10_000
 end
 #-----------------------------------------------------------------------# HyperLogLog
 @testset "HyperLogLog" begin
