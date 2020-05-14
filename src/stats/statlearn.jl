@@ -85,8 +85,8 @@ Use `StatLearn` with caution, as stochastic approximation algorithms are inheren
 
 ## Keyword Arguments
 
-- `penalty = zero`
-    - `zero`: no penalty
+- `penalty`: The regularization function used.
+    - `zero`: no penalty (default)
     - `abs`: (LASSO) parameters penalized by their absolute value
     - `abs2`: (Ridge) parameters penalized by their squared value
     - `ElasticNet(α)`: α * (abs penalty) + (1-α) * (abs2 penalty)
@@ -119,11 +119,38 @@ function StatLearn(args...; penalty=zero, rate=LearningRate())
     loss = l2regloss 
     alg = SGD()
     for a in args
-        a isa AbstractVector && (λ = a)
-        a isa Float64        && (λ = fill(a, 1))
-        a isa Algorithm      && (alg = a)
-        a isa Integer        && (p = a)
-        a isa Base.Callable  && (loss = a)
+        if a isa AbstractVector 
+            λ = a
+        elseif a isa Float64 
+            λ = fill(a, 1)
+        elseif a isa Algorithm 
+            alg = a
+        elseif a isa Integer 
+            p = a
+        elseif hasmethod(a, (Number, Number)) && hasmethod(deriv, (typeof(a), Number, Number))
+            loss = a
+        else
+            @warn """
+            Arguments of type $(typeof(a)) are not recognized by StatLearn.  You may be seeing this as 
+            a result of OnlineStats removing LearnBase, LossFunctions, and PenaltyFunctions as 
+            dependencies.  See the `StatLearn` docstring for details.  
+            
+            - Previous behavior for PenaltyFunctions can be restored e.g. 
+
+            ```
+            OnlineStats.prox(p::Penalty, x, s) = PenaltyFunctions.prox(p, x, s)
+            StatLearn(penalty = L1Penalty())
+            ```
+
+            - Previous behavior for LossFunctions can be restored e.g.:
+
+            ```
+            f(y, yhat) = LossFunctions.value(L2DistLoss(), y, yhat)
+            OnlineStats.deriv(::typeof(f), y, yhat) = LossFunctions.deriv(L2DistLoss(), y, yhat)
+            StatLearn(f)
+            ```
+            """
+        end
     end
     init!(alg, p)
     StatLearn(zeros(p), λ, zeros(p), loss, penalty, alg, rate, 0)
