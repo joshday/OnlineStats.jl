@@ -16,7 +16,7 @@ struct DWDLoss{T<:Number}
 end
 function (o::DWDLoss)(y, yhat)
     agreement = y * yhat 
-    q = loss.q
+    q = o.q
     if agreement ≤ q / (q + 1)
         1 - agreement
     else
@@ -51,12 +51,15 @@ end
 """
     StatLearn(args...; penalty=zero, rate=LearningRate())
 
-Fit a model that is linear in the parameters.  The (offline) objective function that StatLearn approximately minimizes is
+Fit a model (via stochastic approximation) that is linear in the parameters.  The (offline) 
+objective function that StatLearn approximately minimizes is
 
 ``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
 
 where ``fᵢ`` are loss functions of a response variable and linear predictor, ``λⱼ``s are
 nonnegative regularization parameters, and ``g`` is a penalty function.
+
+Use `StatLearn` with caution, as stochastic approximation algorithms are inherently noisy.
 
 # Arguments
 
