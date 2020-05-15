@@ -223,7 +223,7 @@ _yguide(::Any) = ""
 _yguide(::AbstractArray{<:Pair{<:Any, <:CountMap}}) = "Probability"
 
 _seriestype(::Any) = :path
-_seriestype(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat, CountMap, ProbMap}}}) = :shape
+_seriestype(::AbstractVector{<:Pair{<:TwoThings, <:Union{Extrema, HistogramStat, CountMap, ProbMap, Counter}}}) = :shape
 _seriestype(::AbstractVector{<:Pair{<:Number, <:Mean}}) = :scatter
 
 _linealpha(parts) = 1
@@ -244,6 +244,7 @@ _linewidth(::AbstractVector{<:Pair{<:Number, <:Union{HistogramStat,CountMap}}}) 
 _label(parts) = name(parts[1][2], false, false)
 _label(::AbstractVector{<:Pair{<:TwoThings, <:Moments}}) = ["m1" "m2" "m3" "m4"]
 _label(::AbstractVector{<:Pair{<:Any, <:HistogramStat}}) = ""
+_label(::AbstractVector{<:Pair{<:Any, <:Counter{T}}}) where {T} = "Count of $T"
 
 _fill_z(parts) = nothing 
 function _fill_z(parts::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}}) 
@@ -252,7 +253,7 @@ function _fill_z(parts::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}})
 end
 
 _ylims(parts) = (-Inf, Inf)
-_ylims(parts::AbstractVector{<:Pair{<:TwoThings, <:Union{CountMap, ProbMap}}}) = (0, Inf)
+_ylims(parts::AbstractVector{<:Pair{<:TwoThings, <:Union{CountMap, ProbMap, Counter}}}) = (0, Inf)
 
 _xlims(parts) = (-Inf, Inf)
 _xlims(parts::AbstractVector{<:Pair{<:TwoThings{<:Number, <:Number}, <:Any}}) = parts[1][1][1], parts[end][1][2]
@@ -268,12 +269,18 @@ function _group(parts::AbstractVector{<:Pair{<:Number, <:CountMap}})
     string.(repeat(vcat(out...), inner=3))
 end
 
-#-----------------------------------------------------------------------------# xy Mean/Variance/Counter
+#-----------------------------------------------------------------------------# xy Mean and Variance
 function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance, Counter}})
     (a,b), o = part 
     [a, b, b], [value(o), value(o), NaN]
 end
-xy(part::Pair{<:Number, <:Union{Mean, Variance, Counter}}) = part[1], value(part[2])
+xy(part::Pair{<:Number, <:Union{Mean, Variance}}) = part[1], value(part[2])
+#-----------------------------------------------------------------------------# xy Counter 
+function xy(part::Pair{<:TwoThings, <:Counter})
+    (a,b), o = part
+    [a, a, b, b, b], [0, value(o), value(o), 0, NaN]
+end
+xy(part::Pair{<:Number, <:Counter}) = part[1], value(part[2])
 #-----------------------------------------------------------------------------# xy Extrema
 function xy(part::Pair{<:TwoThings, <:Extrema})
     (a,b), o = part 
