@@ -650,17 +650,34 @@ end
 # end
 
 #-----------------------------------------------------------------------# Quantile
+"""
+    Quantile(q::Vector{Float64} = [0, .25, .5, .75, 1]; b=500)
+
+Calculate (approximate) quantiles from a data stream.  Internally uses [`ExpandingHist`](@ref) to 
+estimate the distribution, for which `b` is the number of histogram bins.  Setting `b` to a larger
+number will decrease speed, but increase accuracy.
+
+# Example
+
+    q = [.25, .5, .75]
+    x = randn(10^6)
+
+    o = fit!(Quantile(q, b=1000), randn(10^6))
+    value(o)
+
+    quantile(x, q)
+"""
 struct Quantile{T<:ExpandingHist} <: OnlineStat{Number}
     q::Vector{Float64}
     eh::T
 end
-function Quantile(q=[0,.25,.5,.75,1], b::Int=500, alg=nothing, rate=nothing)
+function Quantile(q=[0,.25,.5,.75,1]; b::Int=500, alg=nothing, rate=nothing)
     !isnothing(alg) && @warn("`alg` keyword is deprecated and ignored by the new quantile algorithm")
     !isnothing(rate) && @warn("`rate` keyword is deprecated and ignored by the new quantile algorithm")
     Quantile(Vector{Float64}(q), ExpandingHist(b))
 end
 _fit!(o::Quantile, x) = fit!(o.eh, x)
-value(o::Quantile) = quantile(o.eh, o.q)
+value(o::Quantile) = nobs(o) > 0 ? quantile(o.eh, o.q) : zeros(length(o.q))
 nobs(o::Quantile) = nobs(o.eh)
 
 #-----------------------------------------------------------------------# ReservoirSample

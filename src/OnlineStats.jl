@@ -7,6 +7,8 @@ import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth,
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
 
+import AbstractTrees: AbstractTrees
+
 using OrderedCollections: OrderedDict
 
 using OnlineStatsBase, RecipesBase

@@ -1,4 +1,48 @@
-#-----------------------------------------------------------------------# NBClassifier
+# #-----------------------------------------------------------------------# NBClassifier
+# mutable struct NBClassifier{T, G<:Group, F} <: OnlineStat{XY}
+#     d::OrderedDict{T, G}
+#     init::F
+#     n::Int
+# end
+# function NBClassifier(T::Type, xtypes)
+#     init = () -> Group(nbclassifier_stat.(xtypes)...)
+#     NBClassifier(OrderedDict{T, typeof(init())}(), init, 0)
+# end
+
+# nbclassifier_stat(x) = nbclassifier_stat(typeof(x))
+# nbclassifier_stat(::Type{<:Number}) = ExpandingHist(100)
+# nbclassifier_stat(::Type{T}) where {T} = CountMap{T}()
+
+# AbstractTrees.printnode(io::IO, ::NBClassifier{T}) where {T} = print(io, "NBClassifier | $T")
+# AbstractTrees.children(o::NBClassifier) = collect(o.d)
+# Base.show(io::IO, o::NBClassifier) = AbstractTrees.print_tree(io, o)
+
+# function _fit!(o::NBClassifier, xy)
+#     x, y = xy 
+#     if haskey(o.d, y)
+#         _fit!(o.d[y], x)
+#     else 
+#         o.d[y] = fit!(o.init(), x)
+#     end
+# end
+
+# _merge!(a::NBClassifier, b::NBClassifier) = merge!(merge!, a.d, b.d)
+
+# function _predict(o::NBClassifier, x, p = zeros(nkeys(o)), n = nobs(o))
+#     for (k, gk) in enumerate(values(o))
+#         # P(Ck)
+#         p[k] = log(nobs(gk) / n + ϵ) 
+#         # P(xj | Ck)
+#         for j in 1:length(x)
+#             p[k] += log(pdf(gk[j], x[j]) + ϵ)
+#         end
+#         p[k] = exp(p[k])
+#     end
+#     sp = sum(p)
+#     sp == 0.0 ? p : rmul!(p, inv(sp))
+# end
+
+
 """
     NBClassifier(p::Int, T::Type; stat = Hist(15))
 
