@@ -268,12 +268,12 @@ function _group(parts::AbstractVector{<:Pair{<:Number, <:CountMap}})
     string.(repeat(vcat(out...), inner=3))
 end
 
-#-----------------------------------------------------------------------------# xy Mean
-function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance}})
+#-----------------------------------------------------------------------------# xy Mean/Variance/Counter
+function xy(part::Pair{<:TwoThings, <:Union{Mean, Variance, Counter}})
     (a,b), o = part 
     [a, b, b], [value(o), value(o), NaN]
 end
-xy(part::Pair{<:Number, <:Mean}) = part[1], value(part[2])
+xy(part::Pair{<:Number, <:Union{Mean, Variance, Counter}}) = part[1], value(part[2])
 #-----------------------------------------------------------------------------# xy Extrema
 function xy(part::Pair{<:TwoThings, <:Extrema})
     (a,b), o = part 
