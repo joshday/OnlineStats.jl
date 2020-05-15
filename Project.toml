@@ -3,6 +3,7 @@ uuid = "a15396b6-48d5-5d58-9928-6d29437db91e"
 version = "1.5.2"
 
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"
@@ -14,6 +15,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
+AbstractTrees = "0.3"
 OnlineStatsBase = "1.4"
 OrderedCollections = "1.1"
 RecipesBase = "0.7, 0.8, 1.0"
