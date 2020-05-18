@@ -408,7 +408,7 @@ end
     MovingWindow(b, T)
     MovingWindow(T, b)
 
-Track a moving window of `b` items of type `T`.
+Track a moving window of `b` items of type `T`.  Also known as a circular buffer.
 
 # Example
 
