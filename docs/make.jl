@@ -3,7 +3,8 @@ using Documenter, OnlineStats, OnlineStatsBase
 makedocs(
     format = Documenter.HTML(
         assets = ["assets/style.css", "assets/favicon.ico"], 
-        sidebar_sitename=false
+        sidebar_sitename=false,
+        analytics="UA-72795550-5"
     ),
     sitename = "OnlineStats Docs",
     modules = [OnlineStats, OnlineStatsBase],
