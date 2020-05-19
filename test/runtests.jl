@@ -471,7 +471,7 @@ if haskey(ENV, "TRENDSPOT_API_KEY")
             "id": "OnlineStats Test Time",
             "value": $(Dates.value(now() - start_time)),
             "apiKey": "$(ENV["TRENDSPOT_API_KEY"])",
-            "tags": ["Julia", "Testing", "$(Sys.MACHINE)"]
+            "tags": ["Julia", "Testing", "$(Sys.MACHINE)", "v$VERSION"]
         }
         """
     ]))
