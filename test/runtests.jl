@@ -462,14 +462,17 @@ end
 
 #-----------------------------------------------------------------------------# Log time 
 if haskey(ENV, "TRENDSPOT_API_KEY")
-    run(`
-        curl -X POST https://trendspot.io/api/v1/trend \
-        -H "Content-Type: application/json" \
-        -d '{
+    run(Cmd([
+        "curl", "-X", "POST", "https://trendspot.io/api/v1/trend",
+        "-H", "Content-Type: application/json",
+        "-d", 
+        """
+        {
             "id": "OnlineStats Test Time",
             "value": $(Dates.value(now() - start_time)),
             "apiKey": "$(ENV["TRENDSPOT_API_KEY"])",
-            "tags": ["Julia", "Testing", $(Sys.MACHINE)]
-        }'
-    `)
+            "tags": ["Julia", "Testing", "$(Sys.MACHINE)"]
+        }
+        """
+    ]))
 end
