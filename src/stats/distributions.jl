@@ -40,7 +40,7 @@ distribution is estimated.
 mutable struct FitCauchy{T} <: OnlineStat{Number}
     q::Quantile{T}
 end
-FitCauchy(b = 500) = FitCauchy(Quantile([.25, .5, .75], b))
+FitCauchy(b = 500) = FitCauchy(Quantile([.25, .5, .75], b=b))
 nobs(o::FitCauchy) = nobs(o.q)
 _fit!(o::FitCauchy, y) = _fit!(o.q, y)
 function value(o::FitCauchy)
