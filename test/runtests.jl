@@ -1,5 +1,7 @@
 using OnlineStats, OnlineStatsBase, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
 
+start_time = now()
+
 #-----------------------------------------------------------------------# utils
 n = 1000
 x,  y,  z  = rand(Bool, n), randn(n), rand(1:10, n)
@@ -383,7 +385,7 @@ end
     data = randn(10_000)
     data2 = randn(10_000)
     τ = .1:.1:.9
-    o = Quantile(τ, 1000)
+    o = Quantile(τ, b=1000)
     @test ≈(value(fit!(copy(o), data)), quantile(data, τ), atol=.1)
 
     for τi in τ
@@ -456,4 +458,18 @@ include("test_kahan.jl")
                  P2Quantile(.5), Series(Mean())]
         println("  > ", stat)
     end
+end
+
+#-----------------------------------------------------------------------------# Log time 
+if haskey(ENV, "TRENDSPOT_API_KEY")
+    run(`
+        curl -X POST https://trendspot.io/api/v1/trend \
+        -H "Content-Type: application/json" \
+        -d '{
+            "id": "OnlineStats Test Time",
+            "value": $(Dates.value(now() - start_time)),
+            "apiKey": "$(ENV["TRENDSPOT_API_KEY"])",
+            "tags": ["Julia", "Testing"]
+        }'
+    `)
 end
