@@ -61,5 +61,6 @@ MIT - see the [LICENSE](LICENSE) file.
 - [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl)
 - [Pathogen](https://github.com/jangevaare/Pathogen.jl)
 - [Recombinase](https://github.com/piever/Recombinase.jl)
-- [Transducers](https://github.com/tkf/Transducers.jl)
+- [ThreadsX](https://github.com/tkf/ThreadsX.jl)
+- [Transducers](https://github.com/JuliaFolds/Transducers.jl)
 - [WeightedOnlineStats](https://github.com/gdkrmr/WeightedOnlineStats.jl)
