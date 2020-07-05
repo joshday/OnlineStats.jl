@@ -376,15 +376,15 @@ are kept track of.
     o = MovingTimeWindow(Day(4); timetype=Date, valtype=Float64)
     fit!(o, zip(dts, y))
 """
-mutable struct MovingTimeWindow{T<:TimeType, S, D<:DatePeriod} <: OnlineStat{TwoThings{T,S}}
+mutable struct MovingTimeWindow{T<:TimeType, S, D<:Period} <: OnlineStat{TwoThings{T,S}}
     values::Vector{Pair{T,S}}
     window::D
     n::Int
 end
-function MovingTimeWindow{T,S}(window::DatePeriod) where {T<:TimeType, S}
+function MovingTimeWindow{T,S}(window::Period) where {T<:TimeType, S}
     MovingTimeWindow(Pair{T,S}[], window, 0)
 end
-function MovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)
+function MovingTimeWindow(window::Period; valtype=Float64, timetype=Date)
     MovingTimeWindow{timetype, valtype}(window)
 end
 value(o::MovingTimeWindow) = sort!(o.values)
