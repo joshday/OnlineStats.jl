@@ -356,14 +356,14 @@ end
 
 #-----------------------------------------------------------------------# MovingTimeWindow
 """
-    MovingTimeWindow{T<:TimeType, S}(window::DatePeriod)
-    MovingTimeWindow(window::DatePeriod; valtype=Float64, timetype=Date)
+    MovingTimeWindow{T<:TimeType, S}(window::Dates.Period)
+    MovingTimeWindow(window::Dates.Period; valtype=Float64, timetype=Date)
 
 Fit a moving window of data based on time stamps.  Each observation must be a `Tuple`,
 `NamedTuple`, or `Pair` where the first item is `<: Dates.TimeType`.  Only observations
-with time stamps in the range
+with a `timestamp` in the range
 
-``most_recent_datetime - window <= time_stamp <= most_recent_datetime``
+``now() - window <= timestamp <= now()``
 
 are kept track of.
 
