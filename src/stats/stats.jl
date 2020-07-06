@@ -360,12 +360,14 @@ end
     MovingTimeWindow(window::Dates.Period; valtype=Float64, timetype=Date)
 
 Fit a moving window of data based on time stamps.  Each observation must be a `Tuple`,
-`NamedTuple`, or `Pair` where the first item is `<: Dates.TimeType`.  Only observations
-with a `timestamp` in the range
+`NamedTuple`, or `Pair` where the first item is `<: Dates.TimeType`.  Observations
+with a `timestamp` NOT in the range
 
-``now() - window <= timestamp <= now()``
+```
+now() - window ≤ timestamp ≤ now()
+```
 
-are kept track of.
+are discarded on every `fit!`.
 
 # Example
 
