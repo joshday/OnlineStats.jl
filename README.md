@@ -56,6 +56,8 @@ MIT - see the [LICENSE](LICENSE) file.
 
 ## Packages Using OnlineStats/[OnlineStatsBase](https://github.com/joshday/OnlineStatsBase.jl)
 
+[![deps](https://juliahub.com/docs/OnlineStats/deps.svg)](https://juliahub.com/ui/Packages/OnlineStats/G3mU6?t=2)
+
 - [ESDL](https://github.com/esa-esdl/ESDL.jl)
 - [IndexedTables](https://github.com/JuliaComputing/IndexedTables.jl)
 - [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl)
