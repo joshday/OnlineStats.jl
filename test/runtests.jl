@@ -454,7 +454,7 @@ include("test_kahan.jl")
 @testset "Show methods" begin
     for stat in [BiasVec([1,2,3]), Bootstrap(Mean()), CallFun(Mean(), println), FastNode(5),
                  FastTree(5), FastForest(5), FTSeries(Variance()), Group(Mean(), Mean()),
-                 HyperLogLog{10}(), LinRegBuilder(4), NBClassifier(5, Float64), ProbMap(Int),
+                 HyperLogLog{10}(), LinRegBuilder(4), KMeans(4), NBClassifier(5, Float64), ProbMap(Int),
                  P2Quantile(.5), Series(Mean())]
         println("  > ", stat)
     end
