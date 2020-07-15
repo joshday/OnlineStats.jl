@@ -298,12 +298,15 @@ end
 
 #-----------------------------------------------------------------------# KMeans
 "Cluster center and the number of observations"
-mutable struct Cluster
-    value::Vector{Float64}
+mutable struct Cluster{T<:Number}
+    value::Vector{T}
     n::Int
+    Cluster(T, p::Integer = 0) = new{T}(zeros(T, p), 0)
 end
 Base.show(io::IO, o::Cluster) = print(io, "Cluster: nobs=$(o.n), value=$(o.value)")
 Base.isless(a::Cluster, b::Cluster) = isless(a.n, b.n)
+nobs(o::Cluster) = o.n
+value(o::Cluster) = o.value
 
 """
     KMeans(p, k; rate=LearningRate(.6))
@@ -314,36 +317,40 @@ Approximate K-Means clustering of `k` clusters and `p` variables.
 
     x = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]
 
-    o = fit!(KMeans(2, 2), eachrow(x))
+    o = fit!(KMeans(2, 2), eachrow(x)) 
 
     sort!(o; rev=true)  # Order clusters by number of observations
 """
-mutable struct KMeans{T <: NTuple{N, Cluster} where N, W} <: OnlineStat{VectorOb}
-    value::T
-    buffer::Vector{Float64}
+mutable struct KMeans{T, C <: NTuple{N, Cluster{T}} where N, W} <: OnlineStat{VectorOb}
+    value::C
+    buffer::Vector{T}
     rate::W
     n::Int
 end
-function KMeans(p::Integer, k::Integer; rate=LearningRate())
-    KMeans(Tuple(Cluster(zeros(p), 0) for i in 1:k), zeros(k), rate, 0)
+@deprecate KMeans(p::Integer, k::Integer) KMeans(k)
+KMeans(T::Type{<:Number}, k::Integer; kw...) = KMeans(k, T; kw...)
+function KMeans(k::Integer, T::Type{<:Number} = Float64; rate=LearningRate())
+    KMeans(Tuple(Cluster(T) for i in 1:k), zeros(T, k), rate, 0)
 end
-nobs(o::KMeans) = sum(x -> x.n, o.value)
-function Base.show(io::IO, o::KMeans)
-    print(io, "KMeans")
-    OnlineStatsBase.print_stat_tree(io, o.value)
-end
+Base.show(io::IO, o::KMeans) = AbstractTrees.print_tree(io, o)
+AbstractTrees.printnode(io::IO, o::KMeans) = print(io, "KMeans($(length(o.value))) | n=$(nobs(o))")
+AbstractTrees.children(o::KMeans) = value(o)
 function Base.sort!(o::KMeans; kw...)
     o.value = Tuple(sort!(collect(o.value); kw...))
     o
 end
-function _fit!(o::KMeans, x)
+function _fit!(o::KMeans{T}, x) where {T}
     o.n += 1
+    if o.n == 1
+        p = length(x)
+        o.value = Tuple(Cluster(T, p) for _ in o.value)
+    end
     if o.n ≤ length(o.value)
         cluster = o.value[o.n]
         cluster.value[:] = collect(x)
         cluster.n += 1
     else
-        fill!(o.buffer, 0.0)
+        # fill!(o.buffer, 0.0)
         for k in eachindex(o.buffer)
             cluster = o.value[k]
             o.buffer[k] = norm(x .- cluster.value)

@@ -460,7 +460,7 @@ include("test_kahan.jl")
     end
 end
 
-#-----------------------------------------------------------------------------# Log time 
+#-----------------------------------------------------------------------------# Log to TrendSpot 
 if haskey(ENV, "TRENDSPOT_API_KEY")
     run(Cmd([
         "curl", "-X", "POST", "https://trendspot.io/api/v1/trend",
@@ -471,7 +471,7 @@ if haskey(ENV, "TRENDSPOT_API_KEY")
             "id": "OnlineStats Test Time",
             "value": $(Dates.value(now() - start_time)),
             "apiKey": "$(ENV["TRENDSPOT_API_KEY"])",
-            "tags": ["Julia", "Testing", "$(Sys.MACHINE)", "v$VERSION"]
+            "tags": {"machine": "$(Sys.MACHINE)", "version": "$VERSION"}
         }
         """
     ]))
