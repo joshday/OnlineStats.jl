@@ -309,9 +309,9 @@ nobs(o::Cluster) = o.n
 value(o::Cluster) = o.value
 
 """
-    KMeans(p, k; rate=LearningRate(.6))
+    KMeans(k; rate=LearningRate(.6))
 
-Approximate K-Means clustering of `k` clusters and `p` variables.
+Approximate K-Means clustering of `k` clusters.
 
 # Example
 
