@@ -52,7 +52,7 @@ See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/co
 
 ## License
 
-MIT - see the [LICENSE](LICENSE) file.
+[MIT](LICENSE)
 
 ## Packages Using OnlineStats/[OnlineStatsBase](https://github.com/joshday/OnlineStatsBase.jl)
 
