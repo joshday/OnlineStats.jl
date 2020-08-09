@@ -257,12 +257,13 @@ function Base.show(io::IO, o::HyperLogLog{p,T}) where {p,T}
     print(io, "HyperLogLog{$p, $T}: n=$(nobs(o)) | value=", value(o))
 end
 
-function _fit!(o::HyperLogLog, v)
+function _fit!(o::HyperLogLog{p}, v) where {p}
     o.n += 1
     x = hash(v) % UInt32
     i = (x & mask(o)) + UInt32(1)
     w = (x & ~mask(o))
-    o.M[i] = max(o.M[i], UInt32(leading_zeros(w) + 1))
+    nzeros = min(leading_zeros(w), 32 - p)
+    o.M[i] = max(o.M[i], UInt32(nzeros + 1))
 end
 
 function value(o::HyperLogLog)
