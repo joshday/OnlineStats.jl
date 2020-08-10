@@ -221,7 +221,7 @@ end
 Base.@deprecate_binding StatHistory StatLag
 
 #-----------------------------------------------------------------------# HyperLogLog
-# https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf
+# https://arxiv.org/pdf/1702.01284.pdf
 
 """
     HyperLogLog(T = Number)
@@ -230,7 +230,9 @@ Base.@deprecate_binding StatHistory StatLag
 Approximate count of distinct elements of a data stream of type `T`, using `2 ^ P`
 "registers".  `P` must be an integer between 4 and 16 (default).
 
-Ref: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.pdf
+By default it returns the improved HyperLogLog cardinality estimator as defined by [^1].
+
+The original HyperLogLog estimator [^2] can be retrieved with the option `original_estimator=true`.
 
 # Example
 
@@ -240,6 +242,23 @@ Ref: https://storage.googleapis.com/pub-tools-public-publication-data/pdf/40671.
     using Random
     o2 = HyperLogLog(String)
     fit!(o2, [randstring(20) for i in 1:1000])
+
+    # by default the improved estimator is returned:
+    value(o)
+    # the original HyperLogLog estimator can be retrieved via:
+    value(o; original_estimator=true)
+
+# References
+
+[^1] Improved estimator:
+Otmar Ertl.
+New cardinality estimation algorithms for HyperLogLog sketches.
+<https://arxiv.org/abs/1702.01284>
+
+[^2] Original estimator:
+P. Flajolet, Éric Fusy, O. Gandouet, and F. Meunier.
+Hyperloglog: The analysis of a near-optimal cardinality estimation algorithm.
+*In Analysis of Algorithms (AOFA)*, pages 127–146, 2007.
 """
 mutable struct HyperLogLog{p, T} <: OnlineStat{T}
     M::Vector{Int}
@@ -266,7 +285,12 @@ function _fit!(o::HyperLogLog{p}, v) where {p}
     o.M[i] = max(o.M[i], UInt32(nzeros + 1))
 end
 
-function value(o::HyperLogLog)
+function value(o::HyperLogLog; original_estimator=false)
+    original_estimator && return _original_estimator(o)
+    _improved_estimator(o)
+end
+
+function _original_estimator(o::HyperLogLog)
     E = α(o) * _m(o) * _m(o) * inv(sum(x -> inv(2 ^ x), o.M))
     if E ≤ 5 * _m(o) / 2
         V = sum(==(0), o.M)
@@ -278,6 +302,17 @@ function value(o::HyperLogLog)
     end
 end
 
+function _improved_estimator(o::HyperLogLog)
+    m = _m(o)
+    C = _multiplicities(o)
+    z = τ(1 - C[end] / m)
+    for C_k = C[end-1:-1:2]
+        z = (z + C_k) / 2
+    end
+    z += m * σ(C[1] / m)
+    return m^2 / z / (2log(2))
+end
+
 function _merge!(o::HyperLogLog, o2::HyperLogLog)
     length(o.M) == length(o2.M) ||
         error("Merge failed. HyperLogLog objects have different number of registers.")
@@ -286,6 +321,39 @@ function _merge!(o::HyperLogLog, o2::HyperLogLog)
         @inbounds o.M[j] = max(o.M[j], o2.M[j])
     end
     o
+end
+
+function _multiplicities(o::HyperLogLog{p}) where p
+    q = 32 - p
+    C = zeros(Int, q + 2)
+    for k = o.M
+        C[k+1] += 1
+    end
+    return C
+end
+
+function σ(x::Float64)
+    x == 1 && return Inf
+    y, z = 1, x
+    while true
+        x = x^2
+        z′ = z
+        z = z + x*y
+        z′ == z && return z
+        y *= 2
+    end
+end
+
+function τ(x::Float64)
+    (x == 0 || x == 1) && return 0
+    y, z = 1, 1 - x
+    while true
+        x = √x
+        z′ = z
+        y = 0.5y
+        z = z - y*(1 - x)^2
+        z′ == z && return z/3
+    end
 end
 
 @generated _m(o::HyperLogLog{p}) where {p} = 2 ^ p
