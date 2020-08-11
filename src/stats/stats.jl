@@ -310,7 +310,7 @@ function _improved_estimator(o::HyperLogLog)
         z = (z + C_k) / 2
     end
     z += m * σ(C[1] / m)
-    return m^2 / z / (2log(2))
+    return m^2.0 / z / (2log(2))
 end
 
 function _merge!(o::HyperLogLog, o2::HyperLogLog)
