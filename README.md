@@ -57,13 +57,6 @@ See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/co
 
 ## Packages Using OnlineStats/[OnlineStatsBase](https://github.com/joshday/OnlineStatsBase.jl)
 
-[![deps](https://juliahub.com/docs/OnlineStats/deps.svg)](https://juliahub.com/ui/Packages/OnlineStats/G3mU6?t=2)
+See JuliaHub:
 
-- [ESDL](https://github.com/esa-esdl/ESDL.jl)
-- [IndexedTables](https://github.com/JuliaComputing/IndexedTables.jl)
-- [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl)
-- [Pathogen](https://github.com/jangevaare/Pathogen.jl)
-- [Recombinase](https://github.com/piever/Recombinase.jl)
-- [ThreadsX](https://github.com/tkf/ThreadsX.jl)
-- [Transducers](https://github.com/JuliaFolds/Transducers.jl)
-- [WeightedOnlineStats](https://github.com/gdkrmr/WeightedOnlineStats.jl)
+[![deps](https://juliahub.com/docs/OnlineStats/deps.svg)](https://juliahub.com/ui/Packages/OnlineStats/G3mU6?t=2)
