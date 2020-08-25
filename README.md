@@ -47,6 +47,7 @@ fit!(o, randn(10^6))
 
 - Primary Author: [**Josh Day (@joshday)**](https://github.com/joshday)
 - Significant early contributions from [**Tom Breloff (@tbreloff)**](https://github.com/tbreloff)
+- Many algorithms developed under mentorship of [**Hua Zhou (@Hua-Zhou)**](https://github.com/Hua-Zhou)
 
 See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/contributors) to OnlineStats.
 
