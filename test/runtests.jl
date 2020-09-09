@@ -284,7 +284,7 @@ end
 end
 #-----------------------------------------------------------------------# KMeans
 @testset "KMeans" begin
-    o = fit!(KMeans(5,2), eachrow(ymat))
+    o = fit!(KMeans(2), eachrow(ymat))
     sort!(o, rev=true)
     @test o.value[1].n ≥ o.value[2].n
 end

@@ -44,11 +44,11 @@ function Base.push!(o::KHist{T}, p::Pair{T,Int}) where {T}
     bins = o.bins 
     insert!(bins, searchsortedfirst(bins, p), p)
     if length(bins) > o.k 
-        mindiff = typemax(T)
+        mindiff = Inf
         i = 0 
         for (j, (a,b)) in enumerate(neighbors(bins))
             d = first(b) - first(a)
-            if d < mindiff
+            if d < mindiff && 1 < j < (length(bins) - 1)
                 mindiff = d 
                 i = j
             end
