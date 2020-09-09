@@ -4,7 +4,7 @@
 Estimate the probability density of a univariate distribution at `k` approximately
 equally-spaced points.  
 
-Ref: [http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](http://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
+Ref: [https://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](https://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
 
 A difference from the above reference is that the minimum and maximum values are not allowed to merge into another bin.
 
@@ -44,11 +44,11 @@ function Base.push!(o::KHist{T}, p::Pair{T,Int}) where {T}
     bins = o.bins 
     insert!(bins, searchsortedfirst(bins, p), p)
     if length(bins) > o.k 
-        mindiff = Inf
+        mindiff = typemax(T)
         i = 0 
         for (j, (a,b)) in enumerate(neighbors(bins))
             d = first(b) - first(a)
-            if d < mindiff && 1 < j < (length(bins) - 1)
+            if d < mindiff
                 mindiff = d 
                 i = j
             end

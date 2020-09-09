@@ -1,6 +1,6 @@
 name = "OnlineStats"
 uuid = "a15396b6-48d5-5d58-9928-6d29437db91e"
-version = "1.5.3"
+version = "1.5.4"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
@@ -18,7 +18,7 @@ SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 AbstractTrees = "0.3"
 OnlineStatsBase = "1.4"
 OrderedCollections = "1.1"
-RecipesBase = "0.7, 0.8, 1.0"
+RecipesBase = "0.7, 0.8, 1.0, 1.1"
 StatsBase = "0.32, 0.33"
 SweepOperator = "0.2, 0.3"
 julia = "1.0"
