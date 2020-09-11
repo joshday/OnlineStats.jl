@@ -214,8 +214,10 @@ function _fit!(o::StatLag, y)
     _fit!(o.lag, copy(o.stat))
 end
 function Base.show(io::IO, o::StatLag)
-    print(io, name(o, false, true))
-    OnlineStatsBase.print_stat_tree(io, o.lag.value)
+    print(io, name(o, false, false), ": ")
+    print(io, "n=", nobs(o))
+    print(io, " | stat values = ")
+    show(IOContext(io, :compact => true), value.(value(o.lag)))
 end
 
 Base.@deprecate_binding StatHistory StatLag
