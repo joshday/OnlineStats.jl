@@ -13,9 +13,15 @@ Consider how weights affect the influence of the next observation on an online m
     1. ``\gamma_1 = 1`` (guarantees ``\theta^{(1)} = x_1``)
     2. ``\gamma_t \in (0, 1), \quad \forall t > 1`` (guarantees ``\theta^{(t)}`` stays inside a convex space)
 
-```@raw html
-<br>
-<img src="https://user-images.githubusercontent.com/8075494/57347301-cc7a4200-711f-11e9-86e5-385e4f77f069.png" style="width:400">
+
+```@eval
+using OnlineStats, Plots
+ws = subtypes(OnlineStats.Weight)
+p = plot(ws[1](), st=:line, c=1, primary=[true false], lw=3)
+for i in 2:length(ws)
+    plot!(p, ws[i](), st=:line, c=i, primary=[true false], lw=3, linestyle=:auto)
+end
+p
 ```
 
 ## Weight Types

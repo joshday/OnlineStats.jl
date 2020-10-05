@@ -7,7 +7,7 @@
     ylims --> (0, 1.02)
     linewidth --> 2
     seriestype --> :scatter
-    wt.(1:nobs)
+    wt.(collect(1:nobs))
 end
 
 #-----------------------------------------------------------------------# Fallback
