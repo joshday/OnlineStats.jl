@@ -35,8 +35,8 @@ end
 
 #-----------------------------------------------------------------------# residual plot
 @recipe function f(o::OnlineStat{VectorOb}, x::AbstractMatrix, y::AbstractVector)
-    ylab --> "Residual"
-    xlab --> "Observation Index"
+    yguide --> "Residual"
+    xguide --> "Observation Index"
     legend --> false
     @series begin
         linetype --> :scatter
@@ -46,8 +46,8 @@ end
 end
 
 @recipe function f(o::OnlineStat{XY})
-    ylab --> "beta_j"
-    xlab --> "j"
+    yguide --> "beta_j"
+    xguide --> "j"
     seriestype --> :scatter
     coef(o)
 end
