@@ -29,11 +29,7 @@ o = GroupBy(String, Hist(4:0.25:8))
 fit!(o, itr)
 
 plot(o, layout=(3,1))
-
-savefig("versicolor.png") # hide
 ```
-
-![](versicolor.png)
 
 
 ## Distributed Parallelism

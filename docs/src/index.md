@@ -10,18 +10,15 @@
 
 # Welcome!
 
-**OnlineStats** does statistics and data visualization for big/streaming data via [**online algorithms**](https://en.wikipedia.org/wiki/Online_algorithm).  Each algorithm **processes data one observation at a time** and **all algorithms use O(1) memory**.
+**OnlineStats** does statistics and data visualization for big/streaming data via [**online algorithms**](https://en.wikipedia.org/wiki/Online_algorithm).  Each algorithm:
 
-## Getting Started
+1. processes data one observation at a time.
+2. uses O(1) memory.
 
-```
-import Pkg
-Pkg.add("OnlineStats")
-```
 
 ## Basics
 
-### Every stat is `<: OnlineStat{T}`
+### 1) Every stat is `<: OnlineStat{T}`
 
 (where `T` is the type of a single observation)
 
@@ -31,7 +28,7 @@ m = Mean()
 supertype(Mean)
 ```
 
-### Stats can be updated
+### 2) Stats can be updated
 
 !!! note
     `fit!` can be used to update the stat with a **single observation** or **multiple observations**: 
@@ -45,7 +42,7 @@ y = randn(100);
 fit!(m, y)
 ```
 
-### Stats can be merged
+### 3) Stats can be merged
 
 ```@repl index
 y2 = randn(100);
@@ -53,51 +50,12 @@ m2 = fit!(Mean(), y2)
 merge!(m, m2)
 ```
 
-### Stats have a value
+### 4) Stats have a value
 
 ```@repl index
 value(m)
 ```
 
-## Collections of Stats
-
-```@raw html
-<img src="https://user-images.githubusercontent.com/8075494/57342826-bf088c00-710e-11e9-9ac0-f3c1e5aa7a7d.png" style="width:400px">
-```
-
-```@setup collections
-using OnlineStats
-```
-
-### `Series`
-A [`Series`](@ref) tracks stats that should be applied to the **same** data stream.
-
-```@example collections
-y = rand(1000)
-s = Series(Mean(), Variance())
-fit!(s, y)
-```
-
-
-### `FTSeries`
-
-An [`FTSeries`](@ref) tracks stats that should be applied to the **same** data stream, but filters and transforms (hence `FT`) the input data before it is sent to its stats.
-
-```@example collections
-s = FTSeries(Mean(), Variance(); filter = x->true, transform = abs)
-fit!(s, -y)
-```
-
-
-### `Group`
-
-A [`Group`](@ref) tracks stats that should be applied to **different** data streams.
-
-```@example collections
-g = Group(Mean(), CountMap(Bool))
-itr = zip(randn(100), rand(Bool, 100))
-fit!(g, itr)
-```
 
 ## Additional Resources
 
