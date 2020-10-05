@@ -1,7 +1,4 @@
 ```@setup bigdata
-using Pkg
-Pkg.add("GR")
-Pkg.add("Plots")
 ENV["GKSwstype"] = "100"
 ENV["GKS_ENCODING"]="utf8"
 ```
@@ -23,20 +20,16 @@ using OnlineStats, CSV, Plots
 
 url = "https://gist.githubusercontent.com/joshday/df7bdaa1d58b398592e7656395de6335/raw/5a1c83f498f8ca7e25ff2372340e44b3389be9b1/iris.csv"
 
-rows = CSV.Rows(download(url); allowmissing=:none)
+rows = CSV.Rows(download(url); reusebuffer = true)
 
-o = GroupBy(String, Group([Hist(0:.2:8) for _ in 1:4]...))
+itr = (row.variety => parse(Float64, row.sepal_length) for row in rows)
 
-vars = [:sepal_length, :sepal_width, :petal_length, :petal_width]
+o = GroupBy(String, Hist(4:0.25:8))
 
-x = zeros(4)  # create buffer for storing rows
+fit!(o, itr)
 
-for row in rows
-    map!(x -> parse(Float64, getproperty(row, x)), x, vars)
-    fit!(o, (row.variety, x))
-end
+plot(o, layout=(3,1))
 
-plot(o["Versicolor"], label=permutedims(vars), xlim=(0,8))
 savefig("versicolor.png") # hide
 ```
 
@@ -63,16 +56,16 @@ y1 = randn(10_000)
 y2 = randn(10_000)
 y3 = randn(10_000)
 
-s1 = Series(Mean(), Variance(), KHist(20))
-s2 = Series(Mean(), Variance(), KHist(20))
+a = Series(Mean(), Variance(), KHist(20))
+b = Series(Mean(), Variance(), KHist(20))
 s3 = Series(Mean(), Variance(), KHist(20))
 
-fit!(s1, y1)
-fit!(s2, y2)
-fit!(s3, y3)
+fit!(a, y1)
+fit!(b, y2)
+fit!(c, y3)
 
-merge!(s1, s2)  # merge information from s2 into s1
-merge!(s1, s3)  # merge information from s3 into s1
+merge!(a, b)  # merge `b` into `a`
+merge!(a, c)  # merge `c` into `a`
 ```
 
 #### In Parallel

@@ -71,12 +71,12 @@ end
 end
 
 #-----------------------------------------------------------------------# GroupBy
-@recipe function f(o::GroupBy{T, <:Union{KHist, Hist}}) where {T}
+@recipe function f(o::GroupBy{<:Any, <:Any, <:Union{KHist, ExpandingHist, Hist}})
     sort!(o.value)
     link --> :all
     for (k, v) in pairs(o.value)
         @series begin
-            label --> k
+            label --> string(k)
             v
         end
     end
