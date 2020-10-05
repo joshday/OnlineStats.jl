@@ -125,6 +125,9 @@ function _merge!(o::Hist, o2::Hist)
             end
         end
     end
+    for j in eachindex(o.out)
+        o.out[j] += o2.out[j]
+    end
 end
 
 
