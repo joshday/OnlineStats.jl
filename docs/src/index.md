@@ -1,18 +1,18 @@
 ```@raw html
 <div style="width:100%; height:150px;border-width:1px;border-style:solid;padding-top:25px;
-        border-color:#000;border-radius:10px;text-align:center;background-color:#209cee;
-        color:#FFF">
+        border-color:#000;border-radius:10px;text-align:center;background-color:#B3D8FF;
+        color:#F000">
     <h3 style="color:white">Star us on GitHub!</h3>
     <a class="github-button" href="https://github.com/joshday/OnlineStats.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star joshday/OnlineStats.jl on GitHub" style="margin:auto">Star</a>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 </div>
 ```
 
-# Home
+# Welcome!
 
-**OnlineStats** is a Julia package for statistical analysis using (parallelizable) [**online algorithms**](https://en.wikipedia.org/wiki/Online_algorithm).  Online algorithms are well suited for streaming data or when data is too large to hold in memory.  Observations are processed one at a time and all **algorithms use O(1) memory**.
+**OnlineStats** does statistics and data visualization for big/streaming data via [**online algorithms**](https://en.wikipedia.org/wiki/Online_algorithm).  Each algorithm **processes data one observation at a time** and **all algorithms use O(1) memory**.
 
-## Installation
+## Getting Started
 
 ```
 import Pkg
