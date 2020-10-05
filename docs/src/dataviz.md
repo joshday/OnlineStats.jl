@@ -1,13 +1,10 @@
 ```@setup setup
 import Random
 using Dates
-ENV["GKSwstype"] = "100"
-ENV["GKS_ENCODING"]="utf8"
 using OnlineStats
 using Plots
 using PlotThemes
 Random.seed!(1234)
-theme(:juno)
 ```
 
 # Data Viz

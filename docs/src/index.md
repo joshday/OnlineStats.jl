@@ -55,8 +55,3 @@ merge!(m, m2)
 ```@repl index
 value(m)
 ```
-
-
-## Additional Resources
-
-- [OnlineStats Demos](https://github.com/joshday/OnlineStatsDemos)
