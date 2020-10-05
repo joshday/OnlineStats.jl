@@ -16,6 +16,7 @@ makedocs(
         "stats_and_models.md",
         "bigdata.md",
         "dataviz.md",
+        "collections.md",
         "howfitworks.md",
         "weights.md",
         "api.md",
