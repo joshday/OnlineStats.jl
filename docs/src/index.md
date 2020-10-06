@@ -49,5 +49,5 @@ merge!(m, m2)
 ```
 
 !!! warn
-    Some `OnlineStat` are not analytically mergeable.  In these cases, you will see a warning that 
+    Some `OnlineStat`s are not analytically mergeable.  In these cases, you will see a warning that 
     either no merging occurred or that the merge is approximate.

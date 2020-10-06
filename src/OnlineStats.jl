@@ -29,6 +29,7 @@ export
 # algorithms
     ADAGRAD, ADAM, ADAMAX, ADADELTA, MSPI, OMAS, OMAP, RMSPROP, SGD,
 # stats
+    Ash,
     AutoCov,
     Bootstrap,
     CallFun, Counter, CountMap, CountMissing, CovMatrix, CCIPCA,
@@ -36,7 +37,7 @@ export
     Extrema, ExpandingHist,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
     FastNode, FastTree, FastForest, FTSeries,
-    GradientCore, Group, GroupBy,
+    Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
     KHist, KHist2D, KMeans, KahanSum, KahanMean, KahanVariance, KIndexedPartition,
@@ -104,4 +105,5 @@ include("viz/mosaicplot.jl")
 include("viz/recipes.jl")
 include("viz/heatmap.jl")
 include("viz/hexlattice.jl")
+include("viz/ash.jl")
 end

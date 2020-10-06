@@ -38,6 +38,7 @@ nobs(o::KHist) = length(o.bins) < 1 ? 0 : sum(last, o.bins)
 
 xy(o::KHist) = first.(o.bins), last.(o.bins)
 edges(o::KHist) = vcat(first(o.bins[1]), midpoints(first.(o.bins)), first(o.bins[end]))
+midpoints(o::KHist) = first.(o.bins)
 counts(o::KHist) = last.(o.bins)
 
 function Base.push!(o::KHist{T}, p::Pair{T,Int}) where {T}
@@ -87,10 +88,8 @@ function pdf(o::KHist, x::Number)
     end
 end
 
-function area(o::KHist)
-    x, y = value(o)
-    0.5 * sum((x[i] - x[i-1]) * (y[i] + y[i-1]) for i in 2:length(x))
-end
+area(o::KHist) = area(value(o)...)
+area(x, y) = 0.5 * sum((x[i] - x[i-1]) * (y[i] + y[i-1]) for i in 2:length(x))
 
 #-----------------------------------------------------------------------------# statistics
 Base.extrema(o::KHist) = first(o.bins[1]), first(o.bins[end])

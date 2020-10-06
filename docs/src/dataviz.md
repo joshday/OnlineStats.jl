@@ -3,7 +3,6 @@ import Random
 using Dates
 using OnlineStats
 using Plots
-plotly()
 Random.seed!(1234)
 ```
 
@@ -113,6 +112,16 @@ plot(o)
 ```@example setup
 s = fit!(Series(KHist(25), Hist(-5:.2:5), ExpandingHist(100)), randn(10^6))
 plot(s, link = :x, label = ["KHist" "Hist" "ExpandingHist"])
+```
+
+## Average Shifted Histograms (ASH)
+
+- ASH is a semi-parametric density estimation method that is similar to Kernel Density Estimation, 
+  but uses a fine partition histogram instead of individual observations to perform the smoothing.
+
+```@example setup
+o = fit!(Ash(ExpandingHist(1000)), randn(10^6))
+plot(o)
 ```
 
 ## Approximate CDF
