@@ -3,7 +3,7 @@ import Random
 using Dates
 using OnlineStats
 using Plots
-using PlotThemes
+plotly()
 Random.seed!(1234)
 ```
 
