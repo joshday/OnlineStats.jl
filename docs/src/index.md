@@ -18,9 +18,9 @@
 
 ## Basics
 
-### 1) Every stat is `<: OnlineStat{T}`
+### 1) Creating
 
-(where `T` is the type of a single observation)
+- Stats are subtypes of `OnlineStat{T}` where `T` is the type of a single observation.
 
 ```@repl index
 using OnlineStats
@@ -28,21 +28,19 @@ m = Mean()
 supertype(Mean)
 ```
 
-### 2) Stats can be updated
+### 2) Updating
 
-!!! note
-    `fit!` can be used to update the stat with a **single observation** or **multiple observations**: 
-    ```
-    fit!(stat::OnlineStat{T}, y::S)
-    ``` 
-    will iterate through `y` and `fit!` each element if `T != S`.
+- Stats can be updated with single or multiple observations e.g. `fit!(m, 1))` and `fit!(m, [1,2,3])`.
 
 ```@repl index
 y = randn(100);
 fit!(m, y)
+value(m)
 ```
 
-### 3) Stats can be merged
+### 3) Merging
+
+- Stats can be merged.
 
 ```@repl index
 y2 = randn(100);
@@ -50,8 +48,6 @@ m2 = fit!(Mean(), y2)
 merge!(m, m2)
 ```
 
-### 4) Stats have a value
-
-```@repl index
-value(m)
-```
+!!! warn
+    Some `OnlineStat` are not analytically mergeable.  In these cases, you will see a warning that 
+    either no merging occurred or that the merge is approximate.
