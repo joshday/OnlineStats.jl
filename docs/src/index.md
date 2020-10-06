@@ -30,7 +30,7 @@ supertype(Mean)
 
 ### 2) Updating
 
-- Stats can be updated with single or multiple observations e.g. `fit!(m, 1))` and `fit!(m, [1,2,3])`.
+- Stats can be updated with single or multiple observations e.g. `fit!(m, 1)` and `fit!(m, [1,2,3])`.
 
 ```@repl index
 y = randn(100);
