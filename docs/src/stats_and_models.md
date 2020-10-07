@@ -2,7 +2,7 @@
 
 ## Univariate Statistics
 
-| Statistic/Model                    | OnlineStat                 |
+| Statistic                          | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Mean                               | [`Mean`](@ref)             |
 | Variance                           | [`Variance`](@ref)         |
@@ -11,9 +11,19 @@
 | Skewness and kurtosis              | [`Moments`](@ref)          |
 | Sum                                | [`Sum`](@ref)              |
 
+## Data Visualization (See [Data Viz](@ref))
+
+- Note that many `OnlineStat`s also have Plot recipes.
+
+| Plot                               | OnlineStat                 |
+|:-----------------------------------|:---------------------------|
+| Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref), [`KIndexedPartition`](@ref) |
+| Mosaic Plot                        | [`Mosaic`](@ref)           |
+| HeatMap                            | [`HeatMap`](@ref)           |
+
 ## Time Series
 
-| Statistic/Model                    | OnlineStat                 |
+| Statistic                          | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Difference                         | [`Diff`](@ref)             |
 | Lag                                | [`Lag`](@ref)              |
@@ -26,7 +36,7 @@
 |:-----------------------------------|:---------------------------|
 | Covariance/correlation matrix      | [`CovMatrix`](@ref)        |
 | Principal components analysis      | [`CovMatrix`](@ref), [`CCIPCA`](@ref)        |
-| K-means clustering (SGD)           | [`KMeans`](@ref)           |
+| K-means clustering                 | [`KMeans`](@ref)           |
 | Multiple univariate statistics     | [`Group`](@ref) |
 
 ## Nonparametric Density Estimation
@@ -34,13 +44,14 @@
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Histograms/continuous density      | [`Hist`](@ref), [`KHist`](@ref), and [`ExpandingHist`](@ref) |
+| ASH KDE                            | [`Ash`](@ref)              |
 | Approximate order statistics       | [`OrderStats`](@ref)       |
 | Count for each unique value        | [`CountMap`](@ref)         |
 | Approximate CDF                    | [`OrderStats`](@ref)
 
 ## Parametric Density Estimation
 
-| Statistic/Model                    | OnlineStat                 |
+| Distribution                       | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Beta                               | [`FitBeta`](@ref)          |
 | Cauchy                             | [`FitCauchy`](@ref)        |
@@ -52,7 +63,7 @@
 
 ## Statistical Learning
 
-| Statistic/Model                    | OnlineStat                 |
+| Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Linear (also ridge) regression     | [`LinReg`](@ref), [`LinRegBuilder`](@ref) |
 | Decision Trees                     | [`FastTree`](@ref)         |
@@ -68,12 +79,11 @@
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)      |
 | Random sample                      | [`ReservoirSample`](@ref)  |
 | Moving Window                      | [`MovingWindow`](@ref), [`MovingTimeWindow`](@ref) |
-| Big Data Viz                       | [`Partition`](@ref), [`IndexedPartition`](@ref), [`KIndexedPartition`](@ref) |
 
 ## Collection of Stats
 
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
-| Apply stats to same data stream    | [`Series`](@ref), [`FTSeries`](@ref) |
-| Apply stats to different data streams  | [`Group`](@ref)
-| Calculate stat by group            | [`GroupBy`](@ref)          |
+| Univariate data stream             | [`Series`](@ref), [`FTSeries`](@ref) |
+| Multivariate data streams          | [`Group`](@ref)
+| Group by categorical variable      | [`GroupBy`](@ref)          |
