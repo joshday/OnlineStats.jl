@@ -31,10 +31,15 @@ fit!(o, itr)
 plot(o, layout=(3,1))
 ```
 
+## Multithreading
+
+The [ThreadsX](https://github.com/tkf/ThreadsX.jl) package offers multithreaded implementations of many functions in Base and supports OnlineStats via `ThreadsX.reduce(::OnlineStat, data)`.
+
+- See ["A quick introduction to data parallelism in Julia"](https://juliafolds.github.io/data-parallelism/tutorials/quick-introduction/) by ThreadsX author Takafumi Arakaki (`@tkf`) for more details.
 
 ## Distributed Parallelism
 
-`OnlineStat`s can be merged together to facilitate [Embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.  For example, merging in **OnlineStats** is used under the hood by [**JuliaDB**](https://github.com/JuliaComputing/JuliaDB.jl) to run analytics in parallel.
+`OnlineStat`s can be merged together to facilitate [Embarassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) computations.
 
 !!! note
     In general, `fit!` is a cheaper operation than `merge!`.
