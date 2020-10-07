@@ -31,7 +31,7 @@ fit!(o, itr)
 plot(o, layout=(3,1))
 ```
 
-## Multithreading
+## Threaded Parallelism
 
 The [ThreadsX](https://github.com/tkf/ThreadsX.jl) package offers multithreaded implementations of many functions in Base and supports OnlineStats via `ThreadsX.reduce(::OnlineStat, data)`.
 
