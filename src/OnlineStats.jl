@@ -91,12 +91,16 @@ include("algorithms.jl")
 include("stats/histograms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")
-include("stats/nbclassifier.jl")
-include("stats/fasttree.jl")
-include("stats/linreg.jl")
 include("stats/kahan.jl")
 include("stats/pca.jl")
-include("stats/statlearn.jl")
+
+#-----------------------------------------------------------------------------# ML
+include("ml/linreg.jl")
+include("ml/nbclassifier.jl")
+include("ml/fasttree.jl")
+include("ml/statlearn.jl")
+include("ml/trees.jl")
+
 #-----------------------------------------------------------------------------# viz
 include("viz/khist.jl")
 include("viz/khist2d.jl")
