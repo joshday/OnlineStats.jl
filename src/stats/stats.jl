@@ -784,7 +784,7 @@ function _fit!(o::ReservoirSample, y)
         o.value[o.n] = y
     else
         j = rand(1:o.n)
-        if j < length(o.value)
+        if j <= length(o.value)
             o.value[j] = y
         end
     end
