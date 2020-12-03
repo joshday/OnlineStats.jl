@@ -3,7 +3,7 @@ module OnlineStats
 using Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, nvars, Weight, eachrow, eachcol
+    smooth_syr!, nvars, Weight, eachrow, eachcol, TwoThings
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
 
@@ -56,7 +56,6 @@ export
 #-----------------------------------------------------------------------------# utils 
 const Tup = Union{Tuple, NamedTuple}
 const VectorOb = Union{AbstractVector, Tup}
-const TwoThings{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names, Tuple{T,S}}} where names
 const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names,Tuple{T,S}}} where {names,T<:AbstractVector{<:Number},S<:Number}
 
 const ϵ = 1e-7  # avoid dividing by 0 in some cases
