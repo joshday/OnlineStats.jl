@@ -14,7 +14,7 @@ macro bind(def, element)
 end
 
 # ╔═╡ 3edd0654-8b09-11eb-3687-836299a6af9b
-using OnlineStats, Plots, CSV, Dates
+using OnlineStats, Plots, CSV, Dates, PlutoUI
 
 # ╔═╡ 0404234e-8b09-11eb-12f3-d5bd255db0ba
 md"![](https://user-images.githubusercontent.com/8075494/111925031-87462b80-8a7d-11eb-98e2-eae044b13a3f.png)"
@@ -36,20 +36,20 @@ rows = CSV.Rows(file, reusebuffer=true)
 
 # ╔═╡ 139bc94e-8b0e-11eb-1e52-f92dd6285603
 begin
-	o = GroupBy(String, ExpandingHist(50))
+	o = GroupBy(String, Hist(0.0:100))
 	
 	itr = (row.passenger_count => parse(Float64, row.fare_amount) for row in rows)
 	
 	t = @elapsed fit!(o, itr)
 	
 	md"Seconds Elapsed: $(round(t, digits=2))"
-end;
+end
 
 # ╔═╡ 62c09e5c-8b0f-11eb-2bc6-3d6963b471c4
 @bind val Select(collect(keys(o.value)))
 
 # ╔═╡ 30833604-8b12-11eb-3227-cf3ae84d1395
-plot(o.value[val])
+plot(o.value[val], title=val)
 
 # ╔═╡ Cell order:
 # ╟─0404234e-8b09-11eb-12f3-d5bd255db0ba

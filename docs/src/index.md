@@ -8,7 +8,7 @@
 </div>
 ```
 
-# Welcome!
+# ⚡ Welcome! ⚡
 
 **OnlineStats** does statistics and data visualization for big/streaming data via [**online algorithms**](https://en.wikipedia.org/wiki/Online_algorithm).  Each algorithm:
 
