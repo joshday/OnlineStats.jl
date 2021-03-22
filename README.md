@@ -7,7 +7,7 @@
 </p>
 
 - ➕ Update statistics one observation at a time.
-- 🎉 All algorithms use O(1) memory.
+- ✅ All algorithms use O(1) memory.
 - 📈 Perfect for streaming and big data.
 
 <p align="center">
