@@ -79,12 +79,12 @@ end
         layout --> (2, 2)
         @series begin
             subplot --> 2 
-            seriestype --> :heatmap 
-            legendposition --> :left
-            gride --> false 
+            grid --> false 
             axis --> false 
+            label --> ""
+            title --> "Nobs: $(nobs(o))"
             framestyle --> :none
-            o.xedges, o.yedges, z'
+            Float64[]
         end
         @series begin 
             subplot --> 1
@@ -92,7 +92,7 @@ end
             linewidth --> 0
             line_alpha --> 0
             seriestype --> :bar
-            o.xedges, vec(sum(o.counts, dims=1))
+            o.xedges, vec(sum(o.counts, dims=2))
         end
         @series begin 
             subplot --> 4
@@ -101,7 +101,7 @@ end
             line_alpha --> 0
             orientation --> :h
             seriestype --> :bar
-            o.yedges, vec(sum(o.counts, dims=2))
+            o.yedges, vec(sum(o.counts, dims=1))
         end
     end
 end
