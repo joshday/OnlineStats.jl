@@ -249,7 +249,7 @@ _label(::AbstractVector{<:Pair{<:Any, <:Counter{T}}}) where {T} = "Count of $T"
 _fill_z(parts) = nothing 
 function _fill_z(parts::AbstractVector{<:Pair{<:TwoThings, <:HistogramStat}}) 
     z = vcat(map(x -> counts(x[2]), parts)...)
-    z[z .> 0]
+    permutedims(z[z .> 0])
 end
 
 _ylims(parts) = (-Inf, Inf)
@@ -304,13 +304,13 @@ end
 #-----------------------------------------------------------------------------# xy HistogramStat
 function xy(part::Pair{<:TwoThings, <:HistogramStat})
     (a,b), o = part 
-    x, y = [], Float64[]
+    x, y = [], []
     edg = edges(o)
     cnts = counts(o)
     for i in eachindex(cnts)
         if cnts[i] > 0
-            append!(x, [a, a, b, b, b])
-            append!(y, [edg[i], edg[i+1], edg[i+1], edg[i], NaN])
+            push!(x, [a, a, b, b])
+            push!(y, [edg[i], edg[i+1], edg[i+1], edg[i]])
         end
     end
     x, y
