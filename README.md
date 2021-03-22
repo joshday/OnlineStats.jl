@@ -52,3 +52,7 @@ fit!(o, randn(10^6))
 - Many algorithms developed under mentorship of [**Hua Zhou (@Hua-Zhou)**](https://github.com/Hua-Zhou)
 
 See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/contributors) to OnlineStats.
+
+<a href="https://github.com/joshday/onlinestats.jl/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=joshday/onlinestats.jl" />
+</a>
