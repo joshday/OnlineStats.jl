@@ -6,8 +6,9 @@
   <strong>Online Algorithms for Statistics, Models, and Big Data Viz</strong>
 </p>
 
-- ➕ Update statistics one observation at a time.
-- ✅ All algorithms use O(1) memory.
+- ⚡ High-performance single-pass algorithms for statistics and data viz.
+- ➕ Updated one observation at a time.
+- ✅ Algorithms use O(1) memory.
 - 📈 Perfect for streaming and big data.
 
 <p align="center">

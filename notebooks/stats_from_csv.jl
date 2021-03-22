@@ -42,6 +42,8 @@ begin
 	
 	t = @elapsed fit!(o, itr)
 	
+	sort!(o)
+	
 	md"Seconds Elapsed: $(round(t, digits=2))"
 end
 
