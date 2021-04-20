@@ -29,11 +29,17 @@ Pkg.add("OnlineStats")
 
 using OnlineStats
 
+# Create several statistics
 o = Series(Mean(), Variance(), Extrema())
 
+# Update with single data point
 fit!(o, 1.0)
 
+# Iterate through and update with lots of data
 fit!(o, randn(10^6))
+
+# Get the values of the statistics
+value(o)  # (value(mean), value(variance), value(extrema))
 ```
 
 ## 📖 Documentation
