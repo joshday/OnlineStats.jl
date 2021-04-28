@@ -103,7 +103,7 @@ end
 @recipe function f(o::AutoCov)
     xguide --> "Lag"
     yguide --> "Autocorrelation"
-    ylim --> (0, 1)
+    ylims --> (0, 1)
     seriestype --> :scatter
     autocor(o)
 end
