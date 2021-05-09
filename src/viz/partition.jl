@@ -10,9 +10,10 @@ end
 
 #-----------------------------------------------------------------------# Partition 
 """
-    Partition(stat, nparts=100)
+    Partition(stat)
+    Partition(stat, nparts)
 
-Split a data stream into `nparts` where each part is summarized by `stat`.  
+Split a data stream into `nparts` (default 100) where each part is summarized by `stat`.  
 
 # Example 
 
