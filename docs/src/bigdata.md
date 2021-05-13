@@ -59,7 +59,7 @@ y3 = randn(10_000)
 
 a = Series(Mean(), Variance(), KHist(20))
 b = Series(Mean(), Variance(), KHist(20))
-s3 = Series(Mean(), Variance(), KHist(20))
+c = Series(Mean(), Variance(), KHist(20))
 
 fit!(a, y1)
 fit!(b, y2)
