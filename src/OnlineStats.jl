@@ -47,7 +47,7 @@ export
     OrderStats,
     Part, Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
-    ReservoirSample,
+    ReservoirSample, LogSumExp,
     Series, SGDStat, StatHistory, StatLag, StatLearn, Sum,
     Variance,
 # other

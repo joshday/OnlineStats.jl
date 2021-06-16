@@ -798,3 +798,52 @@ function _merge!(o::T, o2::T) where {T<:ReservoirSample}
         end
     end
 end
+
+#-----------------------------------------------------------------------# LogSumExp
+
+"""
+    LogSumExp(T::Type = Float64)
+
+For positive numbers that can be very small (or very large), it's common to
+store each `log(x)` instead of each `x` itself, to avoid underflow (or
+overflow). `LogSumExp` takes values in this representation and adds them,
+returning the result in the same representation.
+
+Ref: [https://www.nowozin.net/sebastian/blog/streaming-log-sum-exp-computation.html](https://www.nowozin.net/sebastian/blog/streaming-log-sum-exp-computation.html)
+
+# Example
+
+    x = randn(1000)
+
+    fit!(LogSumExp(), x)
+
+    log(sum(exp.(x))) # should be very close
+"""
+mutable struct LogSumExp{T<:Number} <: OnlineStat{Number}
+    r::T
+    α::T
+    n::Int
+end
+
+function LogSumExp(T::Type = Float64)
+    LogSumExp{T}(zero(T), T(-Inf), 0)
+end
+
+function _fit!(o::LogSumExp{T}, x) where {T}
+    o.n += 1
+    if x <= o.α
+        o.r += exp(x - o.α)
+    else
+        o.r *= exp(o.α - x)
+        o.r += one(T)
+        o.α = x
+    end
+end
+
+function _merge!(o1::LogSumExp, o2::LogSumExp)
+    o1.n += o2.n - 1
+    fit!(o1, value(o2))
+end
+
+value(o::LogSumExp) = log(o.r) + o.α
+nobs(o::LogSumExp) = o.n

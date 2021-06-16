@@ -400,6 +400,13 @@ end
         @test (yi ∈ y) || (yi ∈ y2)
     end
 end
+#-----------------------------------------------------------------------# LogSumExp
+@testset "LogSumExp" begin
+    @test value(LogSumExp()) == -Inf
+    a, b = mergestats(LogSumExp(), y, y2)
+    @test value(a) ≈ value(b)
+    @test value(a) ≈ log(sum(exp.(y)) + sum(exp.(y2)))
+end
 #-----------------------------------------------------------------------# StatLag
 @testset "StatLag" begin
     o = fit!(StatLag(Mean(), 10), 1:20)
