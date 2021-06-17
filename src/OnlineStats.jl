@@ -41,7 +41,7 @@ export
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,
     KHist, KHist2D, KMeans, KahanSum, KahanMean, KahanVariance, KIndexedPartition,
-    Lag, LinReg, LinRegBuilder,
+    Lag, LinReg, LinRegBuilder, LogSumExp,
     Mean, Moments, ModelSchema, Mosaic, MovingTimeWindow, MovingWindow,
     NBClassifier,
     OrderStats,
