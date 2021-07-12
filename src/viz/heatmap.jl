@@ -33,10 +33,13 @@ mutable struct HeatMap{EX, EY} <: OnlineStat{TwoThings}
         new{T,S}(x,y, zeros(Int, length(x)-1, length(y)-1), 0, left, closed)
     end
 end
+
+_heatmap_range(x, bins) = range(extrema(x)..., length=bins)
+
 function HeatMap(itr, bins::Integer=200; kw...)
-    xa, xb = extrema(first, itr)
-    ya, yb = extrema(last, itr)
-    fit!(HeatMap(range(xa, stop=xb, length=bins), range(ya, stop=yb, length=bins); kw...), itr)
+    xrng = _heatmap_range(first.(itr))
+    yrng = _heatmap_range(last.(itr))
+    fit!(HeatMap(xrng, yrng; kw...), itr)
 end
 nobs(o::HeatMap) = sum(o.counts) + o.out
 value(o::HeatMap) = (x=o.xedges, y=o.yedges, z=o.counts)
