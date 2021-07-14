@@ -1,5 +1,6 @@
 *.png
 *.gif
+*.DS_Store
 
 # coveralls files
 *.cov
