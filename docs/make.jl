@@ -6,7 +6,8 @@ makedocs(
             asset("assets/style.css", islocal=true), 
             asset("assets/favicon.ico", islocal=true), 
             asset("https://fonts.googleapis.com/css2?family=Roboto&display=swap", class=:css)
-        ], 
+        ]
+    ),
     sitename = "OnlineStats Docs",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
@@ -24,6 +25,4 @@ makedocs(
     ]
 )
 
-deploydocs(
-    repo   = "github.com/joshday/OnlineStats.jl.git"
-)
+deploydocs(repo = "github.com/joshday/OnlineStats.jl.git")
