@@ -2,10 +2,11 @@ using Documenter, OnlineStats, OnlineStatsBase
 
 makedocs(
     format = Documenter.HTML(
-        assets = ["assets/style.css", "assets/favicon.ico"], 
-        sidebar_sitename=false,
-        analytics="UA-72795550-5"
-    ),
+        assets = [
+            asset("assets/style.css", islocal=true), 
+            asset("assets/favicon.ico", islocal=true), 
+            asset("https://fonts.googleapis.com/css2?family=Roboto&display=swap", class=:css)
+        ], 
     sitename = "OnlineStats Docs",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
