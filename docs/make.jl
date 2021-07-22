@@ -5,10 +5,9 @@ makedocs(
         assets = [
             asset("assets/style.css", islocal=true), 
             asset("assets/favicon.ico", islocal=true), 
-            asset("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap", class=:css)
         ]
     ),
-    sitename = "",
+    sitename = "OnlineStats Docs",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
     clean = true,
