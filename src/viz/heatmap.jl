@@ -37,8 +37,8 @@ end
 _heatmap_range(x, bins) = range(extrema(x)..., length=bins)
 
 function HeatMap(itr, bins::Integer=200; kw...)
-    xrng = _heatmap_range(first.(itr))
-    yrng = _heatmap_range(last.(itr))
+    xrng = _heatmap_range(first.(itr), bins)
+    yrng = _heatmap_range(last.(itr), bins)
     fit!(HeatMap(xrng, yrng; kw...), itr)
 end
 nobs(o::HeatMap) = sum(o.counts) + o.out

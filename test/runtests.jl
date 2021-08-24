@@ -178,6 +178,7 @@ end
     data1 = zip(ymat[:,1], ymat[:,2])
     data2 = zip(ymat2[:,1], ymat2[:,2])
     @test ==(mergevals(HeatMap(-5:.1:5, -5:.1:5), data1, data2)...)
+    @test nobs(HeatMap(data1)) == length(data1)
 end
 #-----------------------------------------------------------------------# Hist
 @testset "Hist" begin
