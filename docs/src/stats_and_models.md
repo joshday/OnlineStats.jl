@@ -85,5 +85,30 @@
 | Statistic/Model                    | OnlineStat                 |
 |:-----------------------------------|:---------------------------|
 | Univariate data stream             | [`Series`](@ref), [`FTSeries`](@ref) |
-| Multivariate data streams          | [`Group`](@ref)
+| Multivariate data streams          | [`Group`](@ref)            |
 | Group by categorical variable      | [`GroupBy`](@ref)          |
+
+## Machine Learning
+
+| Statistic/Model                    | OnlineStat                 |
+|:-----------------------------------|:---------------------------|
+| Linear SGD                         | [`StatLearn`](@ref)        |
+
+### Regression and Classification Losses
+
+| Loss                               | Function                   |
+|:-----------------------------------|:---------------------------|
+| ``L_{2}`` Loss (squared error)     | [`l2regloss`](@ref)        |
+| ``L_{1}`` Loss (absolute error)    | [`l1regloss`](@ref)        |
+| Logistic Loss                      | [`logisticloss`](@ref)     |
+| ``L_{1}`` Hinge Loss               | [`l1hingeloss`](@ref)      |
+| Generalized distance weighted discrimination | [`DWDLoss`](@ref)|
+
+### Optimization Algorithms
+
+| Algorithm                               | Constructor           |
+|:----------------------------------------|:----------------------|
+| Stochastic Gradient Descent             | [`SGD`](@ref)         |
+| Majorization Minimization (averaged surrogate) | [`OMAS`](@ref) |
+| Majorization Minimization (averaged parameter) | [`OMAP`](@ref) |
+
