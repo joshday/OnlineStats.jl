@@ -122,18 +122,18 @@ ENV["GKS_ENCODING"]="utf8"
 
 The `StatLearn` (short for statistical learning) OnlineStat uses stochastic approximation methods to estimate models that take the form:
 
-``\\frac{1}{n} \\sum_i f(y_i, x_i'\\beta) + \\sum_j \\lambda_j g(\\beta_j),``
+``\frac{1}{n} \sum_i f(y_i, x_i'\beta) + \sum_j \lambda_j g(\beta_j),``
 
 where 
 
 - ``f`` is a **loss function** of a response variable and linear preditor.
-- ``\\lambda_j``'s are nonnegative regularization parameters.
+- ``\lambda_j``'s are nonnegative regularization parameters.
 - ``g`` is a **penalty function**.
 
 For example, [LASSO Regression](https://en.wikipedia.org/wiki/Lasso_(statistics)) fits this form with:
 
-- ``f(y_i, x_i'\\beta) = \\frac{1}{2}(y_i - x_i'\beta) ^ 2``
-- ``g(\\beta_j) = \\|\\beta_j\\|``
+- ``f(y_i, x_i'\beta) = \frac{1}{2}(y_i - x_i'\beta) ^ 2``
+- ``g(\beta_j) = \|\beta_j\|``
 
 OnlineStats implements interchangeable loss and penalty functions to use for both regression and classification problems.  See the `StatLearn` docstring below for details.
 
