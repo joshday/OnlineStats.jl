@@ -15,7 +15,7 @@ Consider how weights affect the influence of the next observation on an online m
 
 
 ```@eval
-using OnlineStats, Plots
+using OnlineStats, Plots, InteractiveUtils
 ws = subtypes(OnlineStats.Weight)
 p = plot(ws[1](), st=:line, c=1, primary=[true false], lw=3)
 for i in 2:length(ws)
