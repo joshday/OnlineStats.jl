@@ -108,20 +108,6 @@ o = fit!(KIndexedPartition(Float64, () -> KHist(20)), zip(x, y))
 plot(o)
 ```
 
-## Traces
-
-A [`Trace`](@ref) will take snapshots of an OnlineStat as it is fitted, allowing you view how the value changed as observations were added.  This can be useful for identifying [concept drift](https://en.wikipedia.org/wiki/Concept_drift) or finding optimal hyperparameters for stochastic approximation methods like [`StatLearn`](@ref).
-
-```@example setup
-y = range(1, 20, length=10^6) .* randn(10^6)
-
-o = Trace(Extrema())
-
-fit!(o, y)
-
-plot(o)
-```
-
 ## Histograms
 
 ```@example setup
@@ -181,6 +167,20 @@ plot(o)
 plot(o, marginals=false, legend=true)
 ```
 
+
+## Traces
+
+A [`Trace`](@ref) will take snapshots of an OnlineStat as it is fitted, allowing you view how the value changed as observations were added.  This can be useful for identifying [concept drift](https://en.wikipedia.org/wiki/Concept_drift) or finding optimal hyperparameters for stochastic approximation methods like [`StatLearn`](@ref).
+
+```@example setup
+y = range(1, 20, length=10^6) .* randn(10^6)
+
+o = Trace(Extrema())
+
+fit!(o, y)
+
+plot(o)
+```
 
 
 ## Naive Bayes Classifier
