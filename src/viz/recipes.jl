@@ -125,7 +125,6 @@ end
 _closed(o::Hist) = o.left ? :left : :right 
 _closed(o) = :left
 
-
 #-----------------------------------------------------------------------# CountMap
 @recipe function f(o::CountMap, kys = keys(o); sortby = :keys)
     seriestype --> :bar
