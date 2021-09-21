@@ -20,6 +20,7 @@ makedocs(
         "collections.md",
         "howfitworks.md",
         "weights.md",
+        "ml.md",
         "api.md",
     ]
 )

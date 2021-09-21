@@ -12,6 +12,7 @@ import AbstractTrees: AbstractTrees
 using OrderedCollections: OrderedDict
 
 using OnlineStatsBase, RecipesBase
+using OnlineStatsBase: neighbors
 
 @static if VERSION < v"1.1.0"
     isnothing(x) = x === nothing
@@ -49,6 +50,7 @@ export
     Quantile,
     ReservoirSample,
     Series, SGDStat, StatHistory, StatLag, StatLearn, Sum,
+    Trace,
     Variance,
 # other
     OnlineStat, BiasVec
@@ -59,8 +61,6 @@ const VectorOb = Union{AbstractVector, Tup}
 const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names,Tuple{T,S}}} where {names,T<:AbstractVector{<:Number},S<:Number}
 
 const ϵ = 1e-7  # avoid dividing by 0 in some cases
-
-neighbors(x) = ((x[i], x[i+1]) for i in eachindex(x)[1:end-1])
 
 #-----------------------------------------------------------------------# BiasVec
 """
@@ -96,6 +96,7 @@ include("stats/linreg.jl")
 include("stats/kahan.jl")
 include("stats/pca.jl")
 include("stats/statlearn.jl")
+include("stats/trace.jl")
 #-----------------------------------------------------------------------------# viz
 include("viz/khist.jl")
 include("viz/khist2d.jl")

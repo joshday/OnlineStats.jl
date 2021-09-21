@@ -139,6 +139,24 @@ _closed(o) = :left
     x, y
 end
 
+#-----------------------------------------------------------------------------# Trace 
+@recipe function f(o::Trace, f = value)
+    parts = last.(first.(o.parts)) .=> last.(o.parts)
+    label       --> "$f($(OnlineStatsBase.name(parts[end][2],false,false)))"
+    xguide      --> "Nobs"
+    seriestype  --> _seriestype(parts)
+    seriesalpha --> _alpha(parts)
+    linewidth   --> _linewidth(parts)
+    linealpha   --> _linealpha(parts)
+    line_z      --> _line_z(parts)
+    fill_z      --> _fill_z(parts)
+    ylims       --> _ylims(parts)
+    xlims       --> _xlims(parts)
+    yguide      --> _yguide(parts)
+    hover       --> map(x -> "Nobs: $(first(x))", parts), :quiet
+    xy(parts)
+end
+
 #-----------------------------------------------------------------------------# Partition
 _xguide(o::Partition) = "Nobs"
 _xguide(o::Union{IndexedPartition, KIndexedPartition}) = "Index"
@@ -186,8 +204,7 @@ end
     ylims       --> _ylims(parts)
     xlims       --> _xlims(parts)
     yguide      --> _yguide(parts)
-
-    hover --> string.(nobs.(last.(parts))), :quiet
+    hover       --> map(x -> "Nobs: $(first(x))", parts), :quiet
 
     group = _group(parts)
     x, y = xy(parts)
