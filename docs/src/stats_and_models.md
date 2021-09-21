@@ -99,22 +99,22 @@ ENV["GKS_ENCODING"]="utf8"
 
 ### Regression and Classification Losses
 
-| Loss                                         | Function               |
-|:---------------------------------------------|:-----------------------|
-| ``L_{2}`` Loss (squared error)               | [`l2regloss`](@ref)    |
-| ``L_{1}`` Loss (absolute error)              | [`l1regloss`](@ref)    |
-| Logistic Loss                                | [`logisticloss`](@ref) |
-| ``L_{1}`` Hinge Loss                         | [`l1hingeloss`](@ref)  |
-| Generalized distance weighted discrimination | [`DWDLoss`](@ref)      |
+| Loss                                         | Function                           |
+|:---------------------------------------------|:-----------------------------------|
+| ``L_{2}`` Loss (squared error)               | [`OnlineStats.l2regloss`](@ref)    |
+| ``L_{1}`` Loss (absolute error)              | [`OnlineStats.l1regloss`](@ref)    |
+| Logistic Loss                                | [`OnlineStats.logisticloss`](@ref) |
+| ``L_{1}`` Hinge Loss                         | [`OnlineStats.l1hingeloss`](@ref)  |
+| Generalized distance weighted discrimination | [`OnlineStats.DWDLoss`](@ref)      |
 
 ### Penalty/regularization functions 
 
-| Penalty                    | Function             |
-|:---------------------------|:---------------------|
-| None                       | `zero`               |
-| LASSO (``L_{1}`` penalty)  | `abs`                |
-| Ridge  (``L_{2}`` penalty) | `abs2`               |
-| Elastic Net                | [`ElasticNet`](@ref) |        
+| Penalty                    | Function                         |
+|:---------------------------|:---------------------------------|
+| None                       | `zero`                           |
+| LASSO (``L_{1}`` penalty)  | `abs`                            |
+| Ridge  (``L_{2}`` penalty) | `abs2`                           |
+| Elastic Net                | [`OnlineStats.ElasticNet`](@ref) |      
 
 ### Optimization Algorithms
 
