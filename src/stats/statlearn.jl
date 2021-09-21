@@ -1,16 +1,49 @@
 #-----------------------------------------------------------------------------# Losses 
+"""
+    l2regloss(y, xβ)
+
+Loss function between continuous response `y` and linear predictor `xβ` based on the ``L_2`` norm:
+
+``.5 * (y - xβ) ^ 2``
+"""
 l2regloss(y, yhat) = .5 * abs2(y - yhat) 
 deriv(::typeof(l2regloss), y, yhat) = yhat - y
 
+"""
+    l1regloss(y, xβ)
+
+Loss function between continuous response `y` and linear predictor `xβ` based on the ``L_1`` norm:
+
+``|y - xβ|``
+"""
 l1regloss(y, yhat) = abs(y - yhat)
 deriv(::typeof(l1regloss), y, yhat) = sign(yhat - y)
 
+"""
+    logisticloss(y, xβ)
+
+Loss function between boolean response `y ∈ {-1, 1}` and linear predictor `xβ` for logistic regression:
+
+``log(1 + exp(-y * xβ))``
+"""
 logisticloss(y, yhat) = log1p(exp(-y * yhat))
 deriv(::typeof(logisticloss), y, yhat) = -y / (1 + exp(y * yhat))
 
+"""
+    l1hingeloss(y, xβ)
+
+Loss function between boolean response `y ∈ {-1, 1}` and linear predictor `xβ` for support vector machines:
+
+``max(1 - y * xβ, 0)``
+"""
 l1hingeloss(y, yhat) = max(1 - y*yhat, zero(yhat))
 deriv(::typeof(l1hingeloss), y, yhat) = (u = y*yhat; u ≥ 1 ? zero(y) : -y)
 
+"""
+    DWDLoss(q)(y, xβ)
+
+Distance-weighted discrimination loss function (smoothed `l1hingeloss`) with smoothing parameter `q`.  Loss is calculated between a boolean response `y ∈ {-1, 1}` and linear predictor `xβ`.
+"""
 struct DWDLoss{T<:Number}
     q::T 
 end
@@ -38,6 +71,14 @@ prox(::typeof(zero), x, s) = x
 prox(::typeof(abs2), x, s) = x / (1 + s)
 prox(::typeof(abs), x::T, s::Number) where {T} = sign(x) * max(T(0), abs(x) - s)
 
+
+"""
+    ElasticNet(α)
+
+Weighted average of Ridge (`abs`) and LASSO (`abs2`) penalty functions.
+
+``(1 - α) * Ridge + α * LASSO``
+"""
 struct ElasticNet{T}
     α::T
 end
