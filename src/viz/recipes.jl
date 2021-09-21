@@ -318,9 +318,13 @@ function xy(part::Pair{<:Number, <:Moments})
     loc, o = part 
     [loc loc loc loc], hcat(value(o)...)
 end
+
 #-----------------------------------------------------------------------------# xy HistogramStat
 function xy(part::Pair{<:TwoThings, <:HistogramStat})
     (a,b), o = part 
+    if typeof(a) <: Union{DateTime, Date}
+        a, b = Dates.value(a), Dates.value(b)
+    end
     x, y = [], []
     edg = edges(o)
     cnts = counts(o)

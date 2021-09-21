@@ -49,7 +49,7 @@ export
     Part, Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    Series, SGDStat, StatHistory, StatLag, StatLearn, Sum,
+    Series, SGDStat, StatLag, StatLearn, Sum,
     Trace,
     Variance,
 # other

@@ -78,6 +78,7 @@ o = fit!(IndexedPartition(Float64, CountMap(Int)), zip(x,y))
 plot(o, xlab = "X", ylab = "Y")
 ```
 
+Due to a limitation with Plots.jl, `Date` and `DateTime` will sometimes be converted to their `Dates.value` when plotted.  To get human-readable tick labels, you can use the `xformatter` keyword argument to `plot`.
 
 ```@example setup
 using Dates
@@ -87,7 +88,7 @@ y = Dates.value.(x) .+ 30randn(10^6)
 
 o = fit!(IndexedPartition(Date, KHist(20)), zip(x,y))
 
-plot(o)
+plot(o, xformatter = x -> string(Date(Dates.UTInstant(Day(x)))))
 ```
 
 ## K-Indexed Partitions
@@ -103,6 +104,20 @@ x = randn(10^6)
 y = x + randn(10^6)
 
 o = fit!(KIndexedPartition(Float64, () -> KHist(20)), zip(x, y))
+
+plot(o)
+```
+
+## Traces
+
+A [`Trace`](@ref) will take snapshots of an OnlineStat as it is fitted, allowing you view how the value changed as observations were added.  This can be useful for identifying [concept drift](https://en.wikipedia.org/wiki/Concept_drift) or finding optimal hyperparameters for stochastic approximation methods like [`StatLearn`](@ref).
+
+```@example setup
+y = range(1, 20, length=10^6) .* randn(10^6)
+
+o = Trace(Extrema())
+
+fit!(o, y)
 
 plot(o)
 ```
@@ -181,4 +196,3 @@ o = NBClassifier(5, Bool)  # 5 predictors with Boolean categories
 fit!(o, zip(eachrow(x), y))
 plot(o)
 ```
-

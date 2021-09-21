@@ -4,7 +4,7 @@
 Store `b` snapshots of an OnlineStat.
 """
 mutable struct Trace{T, O <: OnlineStat{T}} <: OnlineStat{T}
-    parts::Vector{Pair{Tuple{Int,Int}, O}} # (a,b) => stat
+    parts::Vector{Pair{Tuple{Int,Int}, O}}
     b::Int
     n::Int
 end

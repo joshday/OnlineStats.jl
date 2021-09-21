@@ -220,7 +220,6 @@ function Base.show(io::IO, o::StatLag)
     show(IOContext(io, :compact => true), value.(value(o.lag)))
 end
 
-Base.@deprecate_binding StatHistory StatLag
 
 #-----------------------------------------------------------------------# HyperLogLog
 # https://arxiv.org/pdf/1702.01284.pdf
