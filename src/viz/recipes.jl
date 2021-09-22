@@ -380,8 +380,8 @@ end
     end
 end
 
-# #-----------------------------------------------------------------------------# Trace 
-# @recipe function f(o::Trace)
-#     parts = last.(first.(o.parts)) .=> last.(o.parts)
-#     parts
-# end
+#-----------------------------------------------------------------------------# Trace 
+@recipe function f(o::Trace)
+    parts = last.(first.(o.parts)) .=> last.(o.parts)
+    parts
+end
