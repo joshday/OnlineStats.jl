@@ -1,4 +1,4 @@
-using Documenter, OnlineStats, OnlineStatsBase
+using Documenter, OnlineStats, OnlineStatsBase, InteractiveUtils
 
 makedocs(
     format = Documenter.HTML(
@@ -12,11 +12,12 @@ makedocs(
     authors = "Josh Day",
     clean = true,
     debug = true,
+    doctest = false,
     pages = [
         "index.md",
         "stats_and_models.md",
         "bigdata.md",
-        # "dataviz.md",
+        "dataviz.md",
         "collections.md",
         "howfitworks.md",
         "weights.md",

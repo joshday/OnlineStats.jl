@@ -14,9 +14,9 @@ Consider how weights affect the influence of the next observation on an online m
     2. ``\gamma_t \in (0, 1), \quad \forall t > 1`` (guarantees ``\theta^{(t)}`` stays inside a convex space)
 
 
-```@eval
-using OnlineStats, Plots, InteractiveUtils
-ws = subtypes(OnlineStats.Weight)
+```@example
+using Plots, OnlineStats, OnlineStatsBase
+ws = [EqualWeight, ExponentialWeight, HarmonicWeight, LearningRate, LearningRate2, McclainWeight]
 p = plot(ws[1](), st=:line, c=1, primary=[true false], lw=3)
 for i in 2:length(ws)
     plot!(p, ws[i](), st=:line, c=i, primary=[true false], lw=3, linestyle=:auto)

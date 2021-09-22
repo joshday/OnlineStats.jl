@@ -13,6 +13,7 @@ using OrderedCollections: OrderedDict
 
 using OnlineStatsBase, RecipesBase
 using OnlineStatsBase: neighbors
+import OnlineStatsBase: name
 
 @static if VERSION < v"1.1.0"
     isnothing(x) = x === nothing

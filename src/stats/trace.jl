@@ -10,7 +10,7 @@ mutable struct Trace{T, O <: OnlineStat{T}} <: OnlineStat{T}
 end
 Trace(o::OnlineStat, b::Int=100) = Trace([(1,1) => o], b, 0)
 
-OnlineStatsBase.name(o::Trace, args...) = "Trace($(OnlineStatsBase.name(o.parts[end][2], args...)))"
+name(o::Trace, args...) = "Trace($(name(o.parts[end][2], args...)))"
 value(o::Trace) = value(o.parts[end][2])
 
 function _fit!(o::Trace, y)
