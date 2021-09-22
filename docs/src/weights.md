@@ -15,13 +15,14 @@ Consider how weights affect the influence of the next observation on an online m
 
 
 ```@example
-using Plots, OnlineStats, OnlineStatsBase
-ws = [EqualWeight, ExponentialWeight, HarmonicWeight, LearningRate, LearningRate2, McclainWeight]
-p = plot(ws[1](), st=:line, c=1, primary=[true false], lw=3)
-for i in 2:length(ws)
-    plot!(p, ws[i](), st=:line, c=i, primary=[true false], lw=3, linestyle=:auto)
-end
-p
+using Plots, OnlineStats, OnlineStatsBase, InteractiveUtils # hide
+gr(size=(816,400), margin=6Plots.mm)
+ws = subtypes(OnlineStatsBase.Weight) # hide
+p = plot(ws[1](), st=:line, c=1, primary=[true false], lw=3, title="Built-in Weights") # hide
+for i in 2:length(ws) # hide
+    plot!(p, ws[i](), st=:line, c=i, primary=[true false], lw=3, linestyle=:auto) # hide
+end # hide
+p # hide
 ```
 
 ## Weight Types
