@@ -1,13 +1,9 @@
-img {
+img, svg {
     border-radius: 4px;
-    margin: auto;
+    margin-left: 6px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    /* margin-bottom: 8px;
     display: block;
+    width: 100%; */
 }
-
-/* code {
-    color: #444 !important;
-} */
-
-/* .content a code {
-    color: #2e63b8 !important;
-} */
