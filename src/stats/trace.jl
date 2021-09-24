@@ -1,7 +1,21 @@
 """
     Trace(stat, b=500, f=value)
 
-Store `b` snapshots of an OnlineStat.
+Wrapper around an OnlineStat that stores `b` "snapshots" (a fixed copy of the OnlineStat).  The snapshots 
+are taken at approximately equally-spaced intervals between 0 and the current `nobs`.  The main use 
+case is visualizing state changes as observations are added.
+
+# Example 
+
+    using OnlineStats, Plots
+
+    o = Trace(Mean(), 10)
+
+    fit!(o, 1:100)
+
+    OnlineStats.snapshots(o)
+
+    plot(o)
 """
 mutable struct Trace{T, O <: OnlineStat{T}} <: OnlineStat{T}
     parts::Vector{Pair{Tuple{Int,Int}, O}}
@@ -12,6 +26,8 @@ Trace(o::OnlineStat, b::Int=100) = Trace([(1,1) => o], b, 0)
 
 name(o::Trace, args...) = "Trace($(name(o.parts[end][2], args...)))"
 value(o::Trace) = value(o.parts[end][2])
+
+snapshots(o::Trace) = last.(o.parts)
 
 function _fit!(o::Trace, y)
     n = o.n += 1

@@ -13,7 +13,7 @@ where
 For example, [LASSO Regression](https://en.wikipedia.org/wiki/Lasso_(statistics)) fits this form with:
 
 - ``f(y_i, x_i'\beta) = \frac{1}{2}(y_i - x_i'\beta) ^ 2``
-- ``g(\beta_j) = \|\beta_j\|``
+- ``g(\beta_j) = |\beta_j|``
 
 OnlineStats implements interchangeable loss and penalty functions to use for both regression and classification problems.  See the [`StatLearn`](@ref) docstring for details.
 

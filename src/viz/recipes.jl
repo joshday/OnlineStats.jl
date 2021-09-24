@@ -385,6 +385,7 @@ end
 
 #-----------------------------------------------------------------------------# Trace 
 @recipe function f(o::Trace)
+    xguide --> "Nobs"
     parts = last.(first.(o.parts)) .=> last.(o.parts)
     parts
 end
