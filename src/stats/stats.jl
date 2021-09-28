@@ -770,12 +770,15 @@ the probability of an observation being in the sample is `1 / n`.
 
     fit!(ReservoirSample(100, Int), 1:1000)
 """
-mutable struct ReservoirSample{T<:Number} <: OnlineStat{Number}
+mutable struct ReservoirSample{T} <: OnlineStat{T}
     value::Vector{T}
     n::Int
 end
 function ReservoirSample(k::Int, T::Type = Float64)
     ReservoirSample(zeros(T, k), 0)
+end
+function ReservoirSample(k::Int, T::Type{<:AbstractString})
+    ReservoirSample(fill(T(""), k), 0)
 end
 function _fit!(o::ReservoirSample, y)
     o.n += 1
