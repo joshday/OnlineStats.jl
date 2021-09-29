@@ -7,7 +7,7 @@ gr(size=(816,400), margin=6Plots.mm)
 Random.seed!(1234)
 ```
 
-# Data Viz
+# Data Vizualization
 
 !!! note
     Each of the following examples plots one million data points, but can scale to infinitely many 

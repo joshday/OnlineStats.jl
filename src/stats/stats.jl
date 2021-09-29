@@ -271,8 +271,6 @@ mutable struct HyperLogLog{p, T} <: OnlineStat{T}
 end
 HyperLogLog(T::Type=Number) = HyperLogLog{16}(T)
 
-@deprecate HyperLogLog(p::Number, T::Type) HyperLogLog{p}(T::Type)
-
 function Base.show(io::IO, o::HyperLogLog{p,T}) where {p,T}
     print(io, "HyperLogLog{$p, $T}: n=$(nobs(o)) | value=", value(o))
 end
@@ -397,7 +395,6 @@ mutable struct KMeans{T, C <: NTuple{N, Cluster{T}} where N, W} <: OnlineStat{Ve
     rate::W
     n::Int
 end
-@deprecate KMeans(p::Integer, k::Integer) KMeans(k)
 KMeans(T::Type{<:Number}, k::Integer; kw...) = KMeans(k, T; kw...)
 function KMeans(k::Integer, T::Type{<:Number} = Float64; rate=LearningRate())
     KMeans(Tuple(Cluster(T) for i in 1:k), zeros(T, k), rate, 0)
@@ -571,7 +568,6 @@ function ecdf(o::OrderStats)
     a, b = extrema(o.ex)
     ecdf(vcat(a, value(o), b))
 end
-@deprecate cdf(o, x) ecdf(o)(x)
 
 # # tree/nbc help:
 # function pdf(o::OrderStats, x)
@@ -774,12 +770,8 @@ mutable struct ReservoirSample{T} <: OnlineStat{T}
     value::Vector{T}
     n::Int
 end
-function ReservoirSample(k::Int, T::Type = Float64)
-    ReservoirSample(zeros(T, k), 0)
-end
-function ReservoirSample(k::Int, T::Type{<:AbstractString})
-    ReservoirSample(fill(T(""), k), 0)
-end
+ReservoirSample(k::Int, T::Type = Float64) = ReservoirSample(Vector{T}(undef, k), 0)
+value(o::ReservoirSample) = nobs(o) < length(o.value) ? o.value[1:nobs(o)] : o.value
 function _fit!(o::ReservoirSample, y)
     o.n += 1
     if o.n <= length(o.value)

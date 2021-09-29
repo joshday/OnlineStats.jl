@@ -16,7 +16,7 @@ Consider how weights affect the influence of the next observation on an online m
 
 ```@example
 using Plots, OnlineStats, OnlineStatsBase, InteractiveUtils # hide
-gr(size=(816,400), margin=6Plots.mm)
+gr(size=(816,400), margin=6Plots.mm) # hide
 ws = subtypes(OnlineStatsBase.Weight) # hide
 p = plot(ws[1](), st=:line, c=1, primary=[true false], lw=3, title="Built-in Weights") # hide
 for i in 2:length(ws) # hide

@@ -400,6 +400,10 @@ end
     for yi in value(a)
         @test (yi ∈ y) || (yi ∈ y2)
     end
+    o = fit!(ReservoirSample(20, Char), rand('a':'z', 1000))
+    for yi in value(o)
+        @test yi in 'a':'z'
+    end
 end
 #-----------------------------------------------------------------------# LogSumExp
 @testset "LogSumExp" begin
