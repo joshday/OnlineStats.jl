@@ -4,8 +4,8 @@
 s = Series(Mean(), Variance())
 
 fit!(s, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Series
-├─ Mean: n=1000 | value=0.504841
-└─ Variance: n=1000 | value=0.0854155
+├─ Mean: n=1000 | value=0.500564
+└─ Variance: n=1000 | value=0.0843937
 </code></pre><h3 id="FTSeries"><a class="docs-heading-anchor" href="#FTSeries"><code>FTSeries</code></a><a id="FTSeries-1"></a><a class="docs-heading-anchor-permalink" href="#FTSeries" title="Permalink"></a></h3><p>An <a href="../api/#OnlineStatsBase.FTSeries"><code>FTSeries</code></a> tracks stats that should be applied to the <strong>same</strong> data stream, but filters and transforms (hence <code>FT</code>) the input data before it is sent to its stats.  This is useful for things like removing <code>missing</code> values.</p><pre><code class="language-julia hljs">T = Union{Missing,Number}
 
 s = FTSeries(T, Mean(), Variance(); filter = !ismissing, transform = abs)
@@ -18,6 +18,6 @@ fit!(s, [-1, missing])</code></pre><pre class="documenter-example-output"><code 
 itr = zip(randn(100), rand(Bool, 100))
 
 fit!(g, itr)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Group
-├─ Mean: n=100 | value=-0.134392
-└─ CountMap: n=100 | value=OrderedCollections.OrderedDict{Bool, Int64}(0=&gt;59, 1=&gt;41)
-</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../dataviz/">« Data Vizualization</a><a class="docs-footer-nextpage" href="../howfitworks/">How <code>fit!</code> Works »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.7 on <span class="colophon-date" title="Wednesday 29 September 2021 10:37">Wednesday 29 September 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+├─ Mean: n=100 | value=0.00800462
+└─ CountMap: n=100 | value=OrderedCollections.OrderedDict{Bool, Int64}(0=&gt;51, 1=&gt;49)
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../dataviz/">« Data Vizualization</a><a class="docs-footer-nextpage" href="../howfitworks/">How <code>fit!</code> Works »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.7 on <span class="colophon-date" title="Wednesday 29 September 2021 10:44">Wednesday 29 September 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
