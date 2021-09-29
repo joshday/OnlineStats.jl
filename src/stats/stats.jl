@@ -771,7 +771,7 @@ mutable struct ReservoirSample{T} <: OnlineStat{T}
     k::Int
     n::Int
 end
-ReservoirSample(k::Int, T::Type = Float64) = ReservoirSample(T[], k, 0)
+ReservoirSample(k::Int, T::Type = Float64) = ReservoirSample(sizehint!(T[], k), k, 0)
 function _fit!(o::ReservoirSample, y)
     if (o.n += 1) ≤ o.k 
         push!(o.value, y)
