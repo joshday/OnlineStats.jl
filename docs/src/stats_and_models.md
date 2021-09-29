@@ -16,9 +16,10 @@ ENV["GKS_ENCODING"]="utf8"
 | Skewness and kurtosis | [`Moments`](@ref)                           |
 | Sum                   | [`Sum`](@ref)                               |
 
-## Data Visualization (See [Data Viz](@ref))
+## Plotting (See [Data Visualization](@ref))
 
-- Note that many `OnlineStat`s also have Plot recipes.
+!!! info
+    Many `OnlineStat`s have Plot recipes beyond what is listed here.
 
 | Plot         | OnlineStat                                                                   |
 |:-------------|:-----------------------------------------------------------------------------|
@@ -28,12 +29,12 @@ ENV["GKS_ENCODING"]="utf8"
 
 ## Time Series
 
-| Statistic                      | OnlineStat        |
-|:-------------------------------|:------------------|
-| Difference                     | [`Diff`](@ref)    |
-| Lag                            | [`Lag`](@ref)     |
-| Autocorrelation/autocovariance | [`AutoCov`](@ref) |
-| Tracked history                | [`StatLag`](@ref) |
+| Statistic                      | OnlineStat                         |
+|:-------------------------------|:-----------------------------------|
+| Difference                     | [`Diff`](@ref)                     |
+| Lag                            | [`Lag`](@ref)                      |
+| Autocorrelation/autocovariance | [`AutoCov`](@ref)                  |
+| Tracked history                | [`Trace`](@ref), [`StatLag`](@ref) |
 
 ## Multivariate Analysis
 
@@ -78,13 +79,13 @@ ENV["GKS_ENCODING"]="utf8"
 
 ## Other
 
-| Statistic/Model                    | OnlineStat                                         |
-|:-----------------------------------|:---------------------------------------------------|
-| Handling Missing Data              | [`FTSeries`](@ref), [`CountMissing`](@ref)         |
-| Statistical Bootstrap              | [`Bootstrap`](@ref)                                |
-| Approx. count of distinct elements | [`HyperLogLog`](@ref)                              |
-| Random sample                      | [`ReservoirSample`](@ref)                          |
-| Moving Window                      | [`MovingWindow`](@ref), [`MovingTimeWindow`](@ref) |
+| Statistic/Model                    | OnlineStat                                                        |
+|:-----------------------------------|:------------------------------------------------------------------|
+| Handling Missing Data              | [`FTSeries`](@ref), [`CountMissing`](@ref), [`SkipMissing`](@ref) |
+| Statistical Bootstrap              | [`Bootstrap`](@ref)                                               |
+| Approx. count of distinct elements | [`HyperLogLog`](@ref)                                             |
+| Random sample                      | [`ReservoirSample`](@ref)                                         |
+| Moving Window                      | [`MovingWindow`](@ref), [`MovingTimeWindow`](@ref)                |
 
 ## Collection of Stats
 
@@ -95,7 +96,7 @@ ENV["GKS_ENCODING"]="utf8"
 | Group by categorical variable | [`GroupBy`](@ref)                    |
 
 
-## [`StatLearn`](@ref) 
+## Stochastic Approximation with [`StatLearn`](@ref) 
 
 ### Regression and Classification Losses
 
