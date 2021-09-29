@@ -63,6 +63,14 @@ const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names,Tuple{T,S}}} where
 
 const ϵ = 1e-7  # avoid dividing by 0 in some cases
 
+function searchsortednearest(a, x)
+    idx = searchsortedfirst(a, x)
+    idx == 1 && return idx
+    idx > length(a) && return length(a)
+    a[idx] == x && return idx 
+    return abs(a[idx] - x) < abs(a[idx - 1] - x) ? idx : idx - 1
+end
+
 #-----------------------------------------------------------------------# BiasVec
 """
     BiasVec(x)

@@ -768,23 +768,22 @@ the probability of an observation being in the sample is `1 / n`.
 """
 mutable struct ReservoirSample{T} <: OnlineStat{T}
     value::Vector{T}
+    k::Int
     n::Int
 end
-ReservoirSample(k::Int, T::Type = Float64) = ReservoirSample(Vector{T}(undef, k), 0)
-value(o::ReservoirSample) = nobs(o) < length(o.value) ? o.value[1:nobs(o)] : o.value
+ReservoirSample(k::Int, T::Type = Float64) = ReservoirSample(T[], k, 0)
 function _fit!(o::ReservoirSample, y)
-    o.n += 1
-    if o.n <= length(o.value)
-        o.value[o.n] = y
+    if (o.n += 1) ≤ o.k 
+        push!(o.value, y)
     else
         j = rand(1:o.n)
-        if j <= length(o.value)
+        if j ≤ length(o.value)
             o.value[j] = y
         end
     end
 end
 function _merge!(o::T, o2::T) where {T<:ReservoirSample}
-    length(o.value) == length(o2.value) || error("Can't merge different-sized samples.")
+    length(o.value) == length(o2.value) || error("Can't merge different-sized ReservoirSamples.")
     p = o.n / (o.n += o2.n)
     for j in eachindex(o.value)
         if rand() > p
