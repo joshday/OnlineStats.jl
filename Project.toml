@@ -12,7 +12,6 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-SweepOperator = "7522ee7d-7047-56d0-94d9-4bc626e7058d"
 
 [compat]
 AbstractTrees = "0.3"
@@ -20,7 +19,6 @@ OnlineStatsBase = "1.4"
 OrderedCollections = "1.1"
 RecipesBase = "0.7, 0.8, 1.0, 1.1"
 StatsBase = "0.32, 0.33"
-SweepOperator = "0.2, 0.3"
 julia = "1.0"
 
 [extras]
