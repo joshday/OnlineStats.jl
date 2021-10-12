@@ -15,7 +15,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 AbstractTrees = "0.3"
-OnlineStatsBase = "1.4"
+OnlineStatsBase = "1.4.7"
 OrderedCollections = "1.1"
 RecipesBase = "0.7, 0.8, 1.0, 1.1"
 StatsBase = "0.32, 0.33"
