@@ -187,6 +187,12 @@ end
     yguide      --> _yguide(parts)
     hover       --> map(x -> "Nobs: $(first(x))", parts), :quiet
 
+    # if parts[1][1] isa Tuple 
+    #     parts = map(parts) do part 
+    #         ==(part[1]...) ? part[1][1] => part[2] : part
+    #     end
+    # end
+
     group = _group(parts)
     x, y = xy(parts)
 

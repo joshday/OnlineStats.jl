@@ -1,14 +1,4 @@
-#-----------------------------------------------------------------------------# common 
-function mergestats(partition)
-    parts = partition.parts
-    o = copy(parts[1][2])
-    for p in parts[2:end]
-        merge!(o, p[2])
-    end
-    o
-end
-
-#-----------------------------------------------------------------------# Partition 
+\#-----------------------------------------------------------------------# Partition 
 """
     Partition(stat)
     Partition(stat, nparts)
@@ -23,22 +13,30 @@ Split a data stream into `nparts` (default 100) where each part is summarized by
     using Plots
     plot(o)
 """
-mutable struct Partition{T, O <: OnlineStat{T}} <: OnlineStat{T}
+mutable struct Partition{T, I, O <: OnlineStat{T}} <: OnlineStat{T}
     parts::Vector{Pair{Tuple{Int,Int}, O}} # (a,b) => stat
     b::Int
-    init::O
+    init::I
     n::Int
 end
-Partition(o::OnlineStat, b::Int=100) = Partition([(1,1) => copy(o)], b, o, 0)
+Partition(init::Function, b::Int=100) = Partition([(1,1) => init()], b, init, 0)
+Partition(o::OnlineStat, b::Int=100) = Partition(() -> copy(o), b)
+
+OnlineStatsBase.additional_info(o::Partition) = (;b = o.b)
+value(o::Partition) = (o.parts[1][1][1], o.parts[end][1][2]) => value(reduce(merge!, last.(o.parts), init=o.init()))
 
 function _fit!(o::Partition, y)
-    n = o.n += 1
+    n = (o.n += 1)
     parts = o.parts
-    (a, b), stat = parts[end]
-    a ≤ n ≤ b ?
-        _fit!(stat, y) :
-        push!(parts, (n, n + nobs(stat) - 1) => fit!(copy(o.init), y))
-    length(parts) > o.b && nobs(parts[end][2]) == (b - a + 1) && merge_next!(parts)
+    lastpart = parts[end]
+    (a, b), stat = lastpart
+    if a ≤ n ≤ b 
+        _fit!(stat, y)
+    else
+        lastpart = (n, n + nobs(stat) - 1) => fit!(o.init(), y)
+        push!(parts, lastpart)
+    end
+    length(parts) > o.b && nobs(lastpart[2]) == (b - a + 1) && merge_next!(parts)
 end
 
 function merge_next!(parts)
@@ -47,8 +45,9 @@ function merge_next!(parts)
     for (j, p) in enumerate(parts)
         nobs(p[2]) < n && (i = j; break;)
     end
-    a, b = parts[i], parts[i+1]
-    parts[i] = (min(a[1][1], b[1][1]), max(a[1][2], b[1][2])) => merge!(a[2], b[2])
+    # a, b = parts[i], parts[i+1]
+    ((a1, b1), stat1), ((a2,b2), stat2) = parts[i], parts[i+1]
+    parts[i] = (min(a1, a2), max(b1, b2)) => merge!(stat1, stat2)
     deleteat!(parts, i + 1)
 end
 
@@ -86,12 +85,14 @@ mutable struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Pair{<:Tuple, O}}
     parts::Vector{P}
     b::Int
     init::O
-    method::Symbol
     n::Int
 end
-function IndexedPartition(I::Type, o::O, b::Int=100; method=:weighted_nearest) where {T, O<:OnlineStat{T}}
-    IndexedPartition{I,T, O,Pair{Tuple{I,I}, O}}(Pair{Tuple{I,I}, O}[], b, o, method, 0)
+function IndexedPartition(I::Type, o::O, b::Int=100) where {T, O<:OnlineStat{T}}
+    IndexedPartition{I,T, O,Pair{Tuple{I,I}, O}}(Pair{Tuple{I,I}, O}[], b, o, 0)
 end
+value(o::IndexedPartition) = nobs(o) == 0 ?
+    nothing => value(copy(o.init)) :
+    (o.parts[1][1][1], o.parts[end][1][2]) => value(reduce(merge!, last.(o.parts), init=copy(o.init)))
 
 function _fit!(o::IndexedPartition{I}, xy) where {I}
     x, y = xy
@@ -103,52 +104,25 @@ function _fit!(o::IndexedPartition{I}, xy) where {I}
     else 
         _fit!(o.parts[i][2], y)
     end
-    length(o.parts) > o.b && indexed_merge_next!(sort!(o.parts, by = x -> x[1][1]), o.method)
+    length(o.parts) > o.b && indexed_merge_next!(sort!(o.parts, by = x -> x[1][1]))
 end
 
-function indexed_merge_next!(parts, method)
-    if method === :weighted_nearest
-        diffs = map(neighbors(parts)) do (a, b)
-            (b[1][1] - a[1][2]) * round(Int, middle(nobs(a[2]), nobs(b[2])))
-        end
-        _, i = findmin(diffs)
-        parts[i] = (parts[i][1][1], parts[i+1][1][2]) => merge!(parts[i][2], parts[i + 1][2])
-        deleteat!(parts, i + 1)
-    else
-        error("method not recognized")
+function indexed_merge_next!(parts)
+    diffs = map(neighbors(parts)) do (a, b)
+        (b[1][1] - a[1][2]) * round(Int, middle(nobs(a[2]), nobs(b[2])))
+    end
+    _, i = findmin(diffs)
+    parts[i] = (parts[i][1][1], parts[i+1][1][2]) => merge!(parts[i][2], parts[i + 1][2])
+    deleteat!(parts, i + 1)
+end
+
+function _merge!(p1::IndexedPartition, p2::IndexedPartition)
+    sort!(append!(p1.parts, p2.parts), by = x -> x[1][1])
+    p1.n += p2.n
+    while length(p1.parts) > p1.b
+        indexed_merge_next!(p1.parts)
     end
 end
-
-# function _merge!(o::IndexedPartition, o2::IndexedPartition)
-#     # If there's any overlap, merge
-#     for p2 in o2.parts 
-#         pushpart = true
-#         for p in o.parts 
-#             if (p[1][1] ≤ p2[1][1] ≤ p[1][2]) || (p[1][1] ≤ p2[1][2] ≤ p[1][2])
-#                 pushpart = false
-#                 merge!(p, p2) 
-#                 break               
-#             end
-#         end
-#         pushpart && push!(o.parts, p2)
-#     end
-#     # merge parts that overlap 
-#     for i in reverse(2:length(o.parts))
-#         p1, p2 = o.parts[i-1], o.parts[i]
-#         if p1.domain.first > p2.domain.last
-#             # info("hey I deleted something at $i")
-#             merge!(p1, p2)
-#             deleteat!(o.parts, i)
-#         end
-#     end
-#     # merge until there's b left
-#     sort!(o.parts)
-#     while length(o.parts) > o.b 
-#         indexed_merge_next!(o.parts, o.method)
-#     end
-#     o
-# end
-
 
 #-----------------------------------------------------------------------------# KIndexedPartition
 """
@@ -179,26 +153,38 @@ function KIndexedPartition(I::Type, init::Base.Callable, k::Int=100)
     T, O = OnlineStatsBase.input(o), typeof(o)
     KIndexedPartition{I,T,O,typeof(init)}(Pair{I,O}[], k, init, 0)
 end
+value(o::KIndexedPartition) = 
+    (o.parts[1][1][1], o.parts[end][1][2]) => value(reduce(merge!, last.(o.parts), init=o.init()))
+
 
 function _fit!(o::KIndexedPartition, xy)
     x, y = xy 
     parts = o.parts
     newpart = x => fit!(o.init(), y)
     insert!(parts, searchsortedfirst(parts, newpart; by=first), newpart)
-    if length(parts) > o.k 
-        mindiff = Inf
-        i = 0 
-        for (j, (a,b)) in enumerate(neighbors(parts))
-            d = first(b) - first(a)
-            if d < mindiff && 1 < j < (length(parts) - 1)
-                mindiff = d 
-                i = j
-            end
+    length(parts) > o.k && kindexed_merge_next!(parts)
+end
+
+function kindexed_merge_next!(parts)
+    mindiff = Inf
+    i = 0 
+    for (j, (a,b)) in enumerate(neighbors(parts))
+        d = first(b) - first(a)
+        if d < mindiff && 1 < j < (length(parts) - 1)
+            mindiff = d 
+            i = j
         end
-        a = parts[i] 
-        b = parts[i + 1]
-        n = nobs(last(a)) + nobs(last(b))
-        parts[i] = smooth(first(a), first(b), nobs(last(b)) / n) => merge!(a[2], b[2])
-        deleteat!(parts, i + 1)
+    end
+    a = parts[i] 
+    b = parts[i + 1]
+    n = nobs(last(a)) + nobs(last(b))
+    parts[i] = smooth(first(a), first(b), nobs(last(b)) / n) => merge!(a[2], b[2])
+    deleteat!(parts, i + 1)
+end
+
+function _merge!(a::KIndexedPartition, b::KIndexedPartition)
+    sort!(append!(a.parts, b.parts), by=first)
+    while length(a.parts) > a.k 
+        kindexed_merge_next!(a.parts)
     end
 end

@@ -416,10 +416,10 @@ end
 @testset "StatLag" begin
     o = fit!(StatLag(Mean(), 10), 1:20)
     @test length(o.lag.value) == 10
-    for (i, m) in enumerate(reverse(o.lag.value))
+    for (i, m) in enumerate(o.lag.value)
         @test nobs(m) == 10 + i
     end
-    @test nobs(value(o)[1]) == 20
+    @test nobs(o) == 20
 end
 #-----------------------------------------------------------------------# StatLearn
 @testset "StatLearn" begin

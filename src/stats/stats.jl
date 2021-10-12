@@ -21,7 +21,10 @@ mutable struct Lag{T} <: OnlineStat{T}
     b::Int
     n::Int
 end
-Lag(T::Type, b::Int) = Lag(T[], b, 0)
+function Lag(T::Type, b::Int)
+    Base.depwarn("`Lag(T, b)` is deprecated.  Use `CircBuff(T,b,rev=true)` instead.", :Lag, force=true)
+    Lag(T[], b, 0)
+end
 Lag{T}(b::Int) where {T} = Lag(T, b)
 function _fit!(o::Lag, y)
     o.n += 1
@@ -50,13 +53,13 @@ struct AutoCov{T, W} <: OnlineStat{Number}
     cross::Vector{Float64}
     m1::Vector{Float64}
     m2::Vector{Float64}
-    lag::Lag{T}         # y_{t-1}, y_{t-2}, ...
-    wlag::Lag{Float64}  # γ_{t-1}, γ_{t-2}, ...
+    lag::CircBuff{T}         # y_{t-1}, y_{t-2}, ...
+    wlag::CircBuff{Float64}  # γ_{t-1}, γ_{t-2}, ...
     v::Variance{W}
 end
 function AutoCov(k::Integer, T = Float64; kw...)
     d = k + 1
-    AutoCov(zeros(d), zeros(d), zeros(d), Lag(T, d), Lag(Float64, d), Variance(;kw...))
+    AutoCov(zeros(d), zeros(d), zeros(d), CircBuff(T,d;rev=true), CircBuff(Float64,d;rev=true), Variance(;kw...))
 end
 nobs(o::AutoCov) = nobs(o.v)
 
@@ -201,14 +204,13 @@ Track a moving window (previous `b` copies) of `stat`.
 
     fit!(StatLag(Mean(), 10), 1:20)
 """
-struct StatLag{T, O<:OnlineStat{T}} <: OnlineStat{T}
-    lag::Lag{O}
+struct StatLag{T, O<:OnlineStat{T}} <: OnlineStatsBase.StatWrapper{T}
+    lag::CircBuff{O}
     stat::O
 end
 function StatLag(stat::O, b::Integer) where {T, O<:OnlineStat{T}}
-    StatLag{T,O}(Lag(O,b), stat)
+    StatLag{T,O}(CircBuff(O,b), stat)
 end
-nobs(o::StatLag) = nobs(o.stat)
 function _fit!(o::StatLag, y)
     _fit!(o.stat, y)
     _fit!(o.lag, copy(o.stat))
@@ -216,7 +218,7 @@ end
 function Base.show(io::IO, o::StatLag)
     print(io, name(o, false, false), ": ")
     print(io, "n=", nobs(o))
-    print(io, " | stat values = ")
+    print(io, " | stat_values_old_to_new= ")
     show(IOContext(io, :compact => true), value.(value(o.lag)))
 end
 
