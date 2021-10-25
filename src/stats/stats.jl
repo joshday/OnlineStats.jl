@@ -536,11 +536,11 @@ Average order statistics with batches of size `b`.
     f = ecdf(o)
     f(0)
 """
-mutable struct OrderStats{T, W} <: OnlineStat{Number}
+mutable struct OrderStats{T, W, E<:Extrema} <: OnlineStat{Number}
     value::Vector{T}
     buffer::Vector{T}
     weight::W
-    ex::Extrema{T}
+    ex::E
 end
 function OrderStats(p::Integer, T::Type = Float64; weight=EqualWeight())
     OrderStats(zeros(T, p), zeros(T, p), weight, Extrema(T))
