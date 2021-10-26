@@ -17,7 +17,7 @@
 
 | Docs | Build | Test | Citation | Dependents |
 |:-----|:------|:-----|----------|------------|
-| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable) [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest) | [![Build Status](https://github.com/joshday/OnlineStats.jl/actions?query=workflow%3ACI+branch%3Amaster)](https://github.com/joshday/OnlineStats.jl/actions?query=workflow%3ACI+branch%3Amaster) | [![codecov](https://codecov.io/gh/joshday/OnlineStats.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/OnlineStats.jl) | [![DOI](https://joss.theoj.org/papers/10.21105/joss.01816/status.svg)](https://doi.org/10.21105/joss.01816) | [![deps](https://juliahub.com/docs/OnlineStats/deps.svg)](https://juliahub.com/ui/Packages/OnlineStats/G3mU6?t=2) |
+| [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable) [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest) | ![CI workflow](https://github.com/joshday/OnlineStats.jl/actions/workflows/CI.yml/badge.svg) | [![codecov](https://codecov.io/gh/joshday/OnlineStats.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/OnlineStats.jl) | [![DOI](https://joss.theoj.org/papers/10.21105/joss.01816/status.svg)](https://doi.org/10.21105/joss.01816) | [![deps](https://juliahub.com/docs/OnlineStats/deps.svg)](https://juliahub.com/ui/Packages/OnlineStats/G3mU6?t=2) |
 
 
 ## 🚀 Quickstart
