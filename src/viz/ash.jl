@@ -22,8 +22,8 @@ mutable struct Ash{H, T} <: OnlineStat{Number}
     kernel::Function
 end
 
-_default_m(h) = ceil(Int, length(edges(h)) / 100)
-_default_m(h::KHist) = ceil(Int, h.k / 100)
+_default_m(h) = ceil(Int, .05 * length(edges(h)))
+_default_m(h::KHist) = ceil(Int, .05 * h.k)
 
 _default_density(h) = zeros(length(counts(h)))
 _default_density(h::KHist) = zeros(h.k)

@@ -47,13 +47,13 @@ ENV["GKS_ENCODING"]="utf8"
 
 ## Nonparametric Density Estimation
 
-| Statistic/Model               | OnlineStat                                                   |
-|:------------------------------|:-------------------------------------------------------------|
-| Histograms/continuous density | [`Hist`](@ref), [`KHist`](@ref), and [`ExpandingHist`](@ref) |
-| ASH density (similar to KDE)  | [`Ash`](@ref)                                                |
-| Approximate order statistics  | [`OrderStats`](@ref)                                         |
-| Count for each unique value   | [`CountMap`](@ref)                                           |
-| Approximate CDF               | [`OrderStats`](@ref)                                         |
+| Statistic/Model                              | OnlineStat                                                   |
+|:---------------------------------------------|:-------------------------------------------------------------|
+| Histograms/continuous density                | [`Hist`](@ref), [`KHist`](@ref), and [`ExpandingHist`](@ref) |
+| ASH density (semiparametric, similar to KDE) | [`Ash`](@ref)                                                |
+| Approximate order statistics                 | [`OrderStats`](@ref)                                         |
+| Count for each unique value                  | [`CountMap`](@ref)                                           |
+| Approximate CDF                              | [`OrderStats`](@ref)                                         |
 
 ## Parametric Density Estimation
 
@@ -79,13 +79,13 @@ ENV["GKS_ENCODING"]="utf8"
 
 ## Other
 
-| Statistic/Model                    | OnlineStat                                                        |
-|:-----------------------------------|:------------------------------------------------------------------|
-| Handling Missing Data              | [`FTSeries`](@ref), [`CountMissing`](@ref), [`SkipMissing`](@ref) |
-| Statistical Bootstrap              | [`Bootstrap`](@ref)                                               |
-| Approx. count of distinct elements | [`HyperLogLog`](@ref)                                             |
-| Random sample                      | [`ReservoirSample`](@ref)                                         |
-| Moving Window                      | [`MovingWindow`](@ref), [`MovingTimeWindow`](@ref)                |
+| Statistic/Model                    | OnlineStat                                                               |
+|:-----------------------------------|:-------------------------------------------------------------------------|
+| Handling Missing Data              | [`FilterTransform`](@ref), [`CountMissing`](@ref), [`SkipMissing`](@ref) |
+| Statistical Bootstrap              | [`Bootstrap`](@ref)                                                      |
+| Approx. count of distinct elements | [`HyperLogLog`](@ref)                                                    |
+| Random sample                      | [`ReservoirSample`](@ref)                                                |
+| Moving Window                      | [`MovingWindow`](@ref), [`MovingTimeWindow`](@ref)                       |
 
 ## Collection of Stats
 
