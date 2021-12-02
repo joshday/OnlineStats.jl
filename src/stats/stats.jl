@@ -732,7 +732,7 @@ end
 
 Calculate (approximate) quantiles from a data stream.  Internally uses [`ExpandingHist`](@ref) to 
 estimate the distribution, for which `b` is the number of histogram bins.  Setting `b` to a larger
-number will decrease speed, but increase accuracy.
+number will increase accuracy at the cost of speed.
 
 # Example
 
@@ -754,7 +754,7 @@ function Quantile(q=[0,.25,.5,.75,1]; b::Int=500, alg=nothing, rate=nothing)
     Quantile(Vector{Float64}(q), ExpandingHist(b))
 end
 _fit!(o::Quantile, x) = fit!(o.eh, x)
-value(o::Quantile) = nobs(o) > 0 ? quantile(o.eh, o.q) : zeros(length(o.q))
+value(o::Quantile, q=o.q) = nobs(o) > 0 ? quantile(o.eh, q) : zeros(length(q))
 nobs(o::Quantile) = nobs(o.eh)
 
 #-----------------------------------------------------------------------# ReservoirSample
