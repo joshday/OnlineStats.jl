@@ -39,6 +39,7 @@ export
     Extrema, ExpandingHist,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
     FastNode, FastTree, FastForest, FTSeries,
+    GeometricMean,
     Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
     IndexedPartition,

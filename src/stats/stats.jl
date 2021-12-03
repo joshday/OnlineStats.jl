@@ -194,6 +194,25 @@ end
 Base.last(o::Diff) = o.lastval
 Base.diff(o::Diff) = o.diff
 
+#-----------------------------------------------------------------------------# GeometricMean
+"""
+    GeometricMean(T = Float64)
+
+Calculate the geometric mean of a data stream, stored as type `T`.
+
+# Example 
+
+    o = fit!(GeometricMean(), 1:100)
+"""
+struct GeometricMean{T<:Mean} <: OnlineStat{Number}
+    m::T
+end
+GeometricMean(T::Type{<:Number} = Float64) = GeometricMean(Mean(T))
+nobs(o::GeometricMean) = nobs(o.m)
+value(o::GeometricMean) = nobs(o) > 0 ? exp(value(o.m)) : zero(typeof(value(o.m)))
+_fit!(o::GeometricMean, y) = fit!(o.m, log(y))
+_merge!(a::GeometricMean, b::GeometricMean) = merge!(a.m, b.m)
+
 #-----------------------------------------------------------------------# StatLag
 """
     StatLag(stat, b)

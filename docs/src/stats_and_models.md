@@ -15,6 +15,7 @@ ENV["GKS_ENCODING"]="utf8"
 | Maximum/Minimum       | [`Extrema`](@ref)                           |
 | Skewness and kurtosis | [`Moments`](@ref)                           |
 | Sum                   | [`Sum`](@ref)                               |
+| Geometric Mean        | [`GeometricMean`](@ref)                     |
 
 ## Plotting (See [Data Visualization](@ref))
 

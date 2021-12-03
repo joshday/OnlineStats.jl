@@ -172,7 +172,12 @@ end
     @test classify(o, randn(10)) in 1:2
     @test mean(classify(o, X) .== Y) > .5
 end
-
+#-----------------------------------------------------------------------------# GeometricMean
+@testset "GeometricMean" begin 
+    o = fit!(GeometricMean(), z)
+    @test value(o) ≈ geomean(z)
+    @test ≈(mergevals(GeometricMean(), z, z2)...)
+end
 #-----------------------------------------------------------------------# HeatMap
 @testset "HeatMap" begin
     data1 = zip(ymat[:,1], ymat[:,2])
