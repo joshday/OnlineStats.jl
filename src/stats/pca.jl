@@ -39,7 +39,7 @@ approximation to (batch) PCA.
     OnlineStats.fittransform!(o, u4) # Fit u4 and then project u4 into the space
     sort!(o)                         # Sort from high to low eigenvalues
     o[1]                             # Get primary (1st) eigenvector
-    OnlineStats.variation(o)         # Get the variation (explained) "by" each eigenvector
+    OnlineStats.relativevariances(o)         # Get the variation (explained) "by" each eigenvector
 """
 mutable struct CCIPCA <: OnlineStat{AbstractVector{<:Real}}
     lambda::Vector{Float64} # Eigenvalues, one per outdim
