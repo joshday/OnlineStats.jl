@@ -97,6 +97,7 @@ Base.IndexStyle(::Type{<:BiasVec}) = IndexLinear()
 #-----------------------------------------------------------------------------# stats
 include("algorithms.jl")
 
+include("stats/probabilistic.jl")
 include("stats/histograms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")

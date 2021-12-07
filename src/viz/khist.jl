@@ -109,6 +109,7 @@ Statistics.median(o::KHist) = quantile(o, .5)
 
 #-----------------------------------------------------------------------------# plot 
 @recipe function f(o::KHist; normalize=true)
+    seriestype --> :sticks
     x, y = xy(o)
     y2 = normalize ? y ./ area(o) : y
     fillrange --> 0
