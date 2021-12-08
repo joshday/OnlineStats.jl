@@ -52,6 +52,12 @@ end
     @test i == n
     @test ≈(mergevals(CallFun(Mean(), x->nothing), y, y2)...)
 end
+#-----------------------------------------------------------------------# CountMinSketch
+@testset "CountMinSketch" begin 
+    a, b = mergestats(CountMinSketch(), z, z2)
+    @test value(a, 1) == value(b, 1)
+    @test value(a, 1) == sum(z .== 1) + sum(z2 .== 1)
+end
 #-----------------------------------------------------------------------# Diff
 @testset "Diff" begin
     @test value(fit!(Diff(), y)) == y[end] - y[end-1]

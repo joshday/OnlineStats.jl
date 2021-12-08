@@ -34,7 +34,7 @@ export
     Ash,
     AutoCov,
     Bootstrap,
-    CallFun, Counter, CountMap, CountMissing, CovMatrix, CCIPCA,
+    CallFun, Counter, CountMap, CountMinSketch, CountMissing, CovMatrix, CCIPCA,
     Diff,
     Extrema, ExpandingHist,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,

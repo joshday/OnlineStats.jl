@@ -85,6 +85,7 @@ ENV["GKS_ENCODING"]="utf8"
 | Handling Missing Data              | [`FilterTransform`](@ref), [`CountMissing`](@ref), [`SkipMissing`](@ref) |
 | Statistical Bootstrap              | [`Bootstrap`](@ref)                                                      |
 | Approx. count of distinct elements | [`HyperLogLog`](@ref)                                                    |
+| Approx. count of occurrences       | [`CountMinSketch`](@ref)                                                 |
 | Random sample                      | [`ReservoirSample`](@ref)                                                |
 | Moving Window                      | [`MovingWindow`](@ref), [`MovingTimeWindow`](@ref)                       |
 

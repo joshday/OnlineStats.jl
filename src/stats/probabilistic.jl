@@ -1,30 +1,38 @@
 #-----------------------------------------------------------------------------# CountMinSketch
 # https://florian.github.io/count-min-sketch/
 """
-    CountMinSketch(nhash=20)
+    CountMinSketch
 """
-mutable struct CountMinSketch{T, I, H} <: OnlineStat{T} 
-    sketch::Matrix{I}
+mutable struct CountMinSketch{T, IntType} <: OnlineStat{T} 
+    sketch::Matrix{IntType}
     n::Int
-    function CountMinSketch(T::Type, nhash::Integer=20; storagetype = Int, hashtype=UInt8)
-        new{T, storagetype, hashtype}(zeros(storagetype, typemax(hashtype), nhash), 0)
+    function CountMinSketch(T::Type = Number; nhash::Integer=50, hashlength=1000, storagetype=Int)
+        @assert storagetype <: Integer
+        new{T, storagetype}(zeros(storagetype, hashlength, nhash), 0)
     end
 end
-CountMinSketch(nhash::Integer=20, T::Type=Number; kw...) = CountMinSketch(T, nhash; kw...)
 
-# value(::CountMinSketch) = nothing
+value(::CountMinSketch) = nothing
 value(::CountMinSketch{T}, val::S) where {T,S} = error("CountMinSketch is tracking $T but value of $S was requested.")
 
-_index(value, j, hashtype) = (hash(value, UInt(j)) % hashtype) + 1
+_index(x, j, limit) = hash(x, UInt(j)) % limit + 1
 
-value(o::CountMinSketch{T,I,H}, val::T) where {T,I,H} = minimum(o.sketch[_index(val, j, H), j] for j in 1:size(o.sketch, 2))
+function value(o::CountMinSketch{T,I}, val::T) where {T,I} 
+    n, p = size(o.sketch)
+    minimum(o.sketch[_index(val, j, n), j] for j in 1:p)
+end
 
-function _fit!(o::CountMinSketch{T,I,H}, y) where {T,I,H}
+function _fit!(o::CountMinSketch{T,I}, y) where {T,I}
     o.n += 1
     r, c = size(o.sketch)
     for j in 1:c 
-        o.sketch[_index(y, j, H), j] += 1
+        o.sketch[_index(y, j, r), j] += 1
     end
+end
+
+function _merge!(a::CountMinSketch, b::CountMinSketch)
+    a.n += b.n 
+    a.sketch .+= b.sketch
 end
 
 #-----------------------------------------------------------------------# HyperLogLog
