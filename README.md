@@ -19,6 +19,7 @@
 |:-----|:------|:-----|----------|------------|
 | [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable) [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest) | [![Build status](https://github.com/joshday/OnlineStats.jl/workflows/CI/badge.svg)](https://github.com/joshday/OnlineStats.jl/actions?query=workflow%3ACI+branch%3Amaster) | [![codecov](https://codecov.io/gh/joshday/OnlineStats.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/OnlineStats.jl) | [![DOI](https://joss.theoj.org/papers/10.21105/joss.01816/status.svg)](https://doi.org/10.21105/joss.01816) | [![deps](https://juliahub.com/docs/OnlineStats/deps.svg)](https://juliahub.com/ui/Packages/OnlineStats/G3mU6?t=2) |
 
+<br>
 
 ## 🚀 Quickstart
 
@@ -41,16 +42,21 @@ fit!(o, randn(10^6))
 # Get the values of the statistics
 value(o)  # (value(mean), value(variance), value(extrema))
 ```
+<br>
 
 ## 📖 Documentation
 
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest)
 
+<br>
+
 ## ✨ Contributing
 
-- Trivial PRs such as fixing typos are very welcome!  
+- Trivial PRs such as fixing typos are very welcome!
 - For nontrivial changes, you'll probably want to first discuss the changes via issue/email/slack with [`@joshday`](https://github.com/joshday).
+
+<br>
 
 ## ✏️ Authors
 
