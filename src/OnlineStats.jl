@@ -52,7 +52,7 @@ export
     Quantile,
     ReservoirSample,
     Series, SGDStat, StatLag, StatLearn, Sum,
-    Trace,
+    TopK, Trace,
     Variance,
 # other
     OnlineStat, BiasVec

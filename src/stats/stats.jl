@@ -669,6 +669,87 @@ function _merge!(o::T, o2::T) where {T<:ReservoirSample}
     end
 end
 
+#-----------------------------------------------------------------------# TopK
+
+"""
+    TopK(k::Int, T::Type = Float64; rev = false)
+
+Keep a sorted list of the largest `k` observations. 
+Or with `rev = true`, the smallest `k` instead.
+
+# Example
+
+    fit!(TopK(5), [2pi; 0:9])
+    fit!(TopK(5; rev=true), [pi; 1:10])
+"""
+mutable struct TopK{T<:Number} <: OnlineStat{T}
+    value::Vector{T}
+    rev::Bool
+    n::Int
+end
+function TopK(k::Int, ::Type{T} = Float64; rev::Bool = false) where {T}
+    init = rev ? typemax(T) : typemin(T)
+    TopK{T}(fill(init, k), rev, 0)
+end
+
+function _fit!(o::TopK, y)
+    value = o.value
+    if o.rev
+        if y < value[1]
+            value[1] = y
+            sort!(value; rev = true)
+        end
+    else
+        if y > value[1]
+            value[1] = y
+            sort!(value; rev = false)
+        end
+    end
+    o.n += 1
+end
+
+#=
+
+# https://discourse.julialang.org/t/maintaining-a-fixed-size-top-n-values-list/78868/15
+
+julia> N = 1000; x = randn(10_000_000);  # as in the post
+
+julia> @btime min_values1($N, $x, $v11);
+  10.269 ms (0 allocations: 0 bytes)
+
+julia> @btime min_values4($N, $x, $v44);
+  10.914 ms (0 allocations: 0 bytes)
+
+julia> @btime min_values6($N, $x, $v66);
+  10.246 ms (0 allocations: 0 bytes)
+
+julia> @btime fit!($(TopK(N; rev=true)), $x);
+  33.640 ms (0 allocations: 0 bytes)
+  15.436 ms (0 allocations: 0 bytes)  # without o.n += 1
+
+
+julia> N = 10; x = randn(100);  # much smaller
+
+julia> @btime min_values1($N, $x, $v11);
+  123.842 ns (0 allocations: 0 bytes)
+
+julia> @btime fit!($(TopK(N; rev=true)), $x);
+  334.270 ns (0 allocations: 0 bytes)
+  172.642 ns (0 allocations: 0 bytes)  # without o.n += 1
+
+
+=#
+
+Base.length(o::TopK) = length(o.value)
+Base.getindex(o::TopK, i) = o.value[i]
+Base.lastindex(o::TopK) = length(o)
+
+function _merge!(o::TopK, o2::TopK)
+    o.n += o2.n
+    o.rev == o2.rev || throw(ArgumentError("Can't merge two TopK unless they agree on rev"))
+    o.value = sort!(vcat(o.value, o2.value); rev = o.rev)[end-length(o)+1:end]
+end
+
 #-----------------------------------------------------------------------# LogSumExp
 
 """

@@ -416,6 +416,21 @@ end
         @test yi in 'a':'z'
     end
 end
+#-----------------------------------------------------------------------# TopK
+@testset "TopK" begin
+    @test value(TopK(1)) == [-Inf]
+    @test value(fit!(TopK(2, Int), shuffle(1:10))) == [9, 10]
+    @test nobs(fit!(TopK(2, Int), shuffle(1:10))) == 10
+    a, b = mergestats(TopK(10), y, y2)
+    @test value(a) == value(b)
+
+    @test value(TopK(1; rev=true)) == [Inf]
+    @test value(fit!(TopK(2, Int, rev=true), shuffle(1:10))) == [2, 1]
+    a, b = mergestats(TopK(20; rev=true), y, y2)
+    @test value(a) == value(b)
+
+    @test_throws ArgumentError merge(fit!(TopK(2, Int), 1:10), fit!(TopK(2, Int; rev=true), 1:10))
+end
 #-----------------------------------------------------------------------# LogSumExp
 @testset "LogSumExp" begin
     @test value(LogSumExp()) == -Inf
