@@ -53,8 +53,8 @@ value(o)  # (value(mean), value(variance), value(extrema))
 
 ## ✨ Contributing
 
-- Trivial PRs such as fixing typos are very welcome!
-- For nontrivial changes, you'll probably want to first discuss the changes via issue/email/slack with [`@joshday`](https://github.com/joshday).
+- Pull requests are very welcome!
+- For major changes, you'll probably want to first discuss the changes via issue/email/slack with [`@joshday`](https://github.com/joshday).
 
 <br>
 
