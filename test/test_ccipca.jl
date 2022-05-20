@@ -4,7 +4,7 @@
     @test OnlineStats.indim(o)  == 4
     @test size(o)               == (4, 2)
     @test length(o) == lastindex(o) == 2
-    
+
     # eigen-vectors and eigen-values are 0 before we fit any values:
     @test o[1] == zeros(Float64, 4)
     @test o[2] == zeros(Float64, 4)
@@ -108,7 +108,7 @@ end
     @test isapprox(ev2[4], -0.721400948; atol = 1e-6)
 end # @testset "Differential test with onlinePCA R package" begin
 
-function setup_ccipca_randomly(indimrange = 4:100, maxn = 200; 
+function setup_ccipca_randomly(indimrange = 4:100, maxn = 200;
     scalerange = 0.01:0.001:42.42, fit = true)
     indim = rand(indimrange)
     outdim = rand(1:min(5, indim-1))
@@ -137,7 +137,7 @@ end
 
         # calling the ccipca object is same as transform
         uproj1b = o1(u)
-        @test uproj1b == uproj1 
+        @test uproj1b == uproj1
     end
 
     # Random testing with different indims and outdims

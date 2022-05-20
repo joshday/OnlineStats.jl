@@ -18,10 +18,10 @@
 # Base.show(io::IO, o::NBClassifier) = AbstractTrees.print_tree(io, o)
 
 # function _fit!(o::NBClassifier, xy)
-#     x, y = xy 
+#     x, y = xy
 #     if haskey(o.d, y)
 #         _fit!(o.d[y], x)
-#     else 
+#     else
 #         o.d[y] = fit!(o.init(), x)
 #     end
 # end
@@ -31,7 +31,7 @@
 # function _predict(o::NBClassifier, x, p = zeros(nkeys(o)), n = nobs(o))
 #     for (k, gk) in enumerate(values(o))
 #         # P(Ck)
-#         p[k] = log(nobs(gk) / n + ϵ) 
+#         p[k] = log(nobs(gk) / n + ϵ)
 #         # P(xj | Ck)
 #         for j in 1:length(x)
 #             p[k] += log(pdf(gk[j], x[j]) + ϵ)
@@ -49,7 +49,7 @@
 Calculate a naive bayes classifier for classes of type `T` and `p` predictors.  For each
 class `K`, predictor variables are summarized by the `stat`.
 
-# Example 
+# Example
 
     x, y = randn(10^4, 10), rand(Bool, 10^4)
 
@@ -65,13 +65,13 @@ mutable struct NBClassifier{T, G<:Group} <: OnlineStat{XY}
     d::OrderedDict{T, G}
     init::G
     # For trees
-    id::Int 
-    j::Int 
+    id::Int
+    j::Int
     at::Union{Number, String, Symbol, Char}
     ig::Float64
     children::Vector{Int}
 end
-function NBClassifier{T}(g::G; id=1) where {T,G} 
+function NBClassifier{T}(g::G; id=1) where {T,G}
     NBClassifier{T,G}(OrderedDict{T,G}(), g, id, 0, -Inf, -Inf, Int[])
 end
 function NBClassifier(g::G, T::Type; id=1) where {G<:Group}
@@ -87,10 +87,10 @@ function Base.show(io::IO, o::NBClassifier)
     end
 end
 function _fit!(o::NBClassifier, xy)
-    x, y = xy 
+    x, y = xy
     if haskey(o.d, y)
         _fit!(o.d[y], x)
-    else 
+    else
         stat = copy(o.init)
         _fit!(stat, x)
         o.d[y] = stat
@@ -109,7 +109,7 @@ probs(o::NBClassifier) = isempty(o.d) ? zeros(0) : map(nobs, values(o)) ./ nobs(
 function _predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
     for (k, gk) in enumerate(values(o))
         # P(Ck)
-        p[k] = log(nobs(gk) / n + ϵ) 
+        p[k] = log(nobs(gk) / n + ϵ)
         # P(xj | Ck)
         for j in 1:length(x)
             p[k] += log(pdf(gk[j], x[j]) + ϵ)
@@ -119,13 +119,13 @@ function _predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)
     sp = sum(p)
     sp == 0.0 ? p : rmul!(p, inv(sp))
 end
-function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)) 
+function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
     _, k = findmax(_predict(o, x, p, n))
     index_to_key(o, k)
 end
 function index_to_key(d, i)
     for (k, ky) in enumerate(keys(d))
-        k == i && return ky 
+        k == i && return ky
     end
 end
 
@@ -173,7 +173,7 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 #             if ig > split.ig
 #                 split.j = j
 #                 split.at = loc
-#                 split.ig = ig 
+#                 split.ig = ig
 #                 split.nleft .= nleft
 #             end
 #         end
@@ -189,14 +189,14 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 #     o, split, left, right
 # end
 
-# #-----------------------------------------------------------------------# NBClassifier 
+# #-----------------------------------------------------------------------# NBClassifier
 # """
 #     NBClassifier(group::Group, labeltype::Type)
 
-# Create a naive bayes classifier, using the stats in `group` to approximate the 
+# Create a naive bayes classifier, using the stats in `group` to approximate the
 # distributions of each predictor variable conditioned on label.
 
-# - For continuous variables, use [`Hist(nbin)`](@ref). 
+# - For continuous variables, use [`Hist(nbin)`](@ref).
 # - For categorical variables, use [`CountMap(T)`](@ref).
 
 # # Example
@@ -214,9 +214,9 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # end
 # NBClassifier(T::Type, g::G) where {G<:Group} = NBClassifier(OrderedDict{T,G}(), g)
 # NBClassifier(g::Group, T::Type) = NBClassifier(T, g)
-# function NBClassifier(labels::Vector{T}, g::G) where {T, G<:Group} 
+# function NBClassifier(labels::Vector{T}, g::G) where {T, G<:Group}
 #     NBClassifier(OrderedDict{T, G}(lab=>copy(g) for lab in labels), g)
-# end 
+# end
 # NBClassifier(p::Int, T::Type, b=20) = NBClassifier(T, p * Hist(b))
 
 
@@ -240,16 +240,16 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # # d is an object that iterates keys in known order
 # function index_to_key(d, i)
 #     for (k, ky) in enumerate(keys(d))
-#         k == i && return ky 
+#         k == i && return ky
 #     end
 # end
 
 # function fit!(o::NBClassifier, xy, γ)
-#     x, y = xy 
+#     x, y = xy
 #     if haskey(o, y)
 #         g = o.d[y]
 #         fit!(g, x, 1 / (nobs(g) + 1))
-#     else 
+#     else
 #         o.d[y] = fit!(copy(o.init), x, 1.0)
 #     end
 # end
@@ -258,7 +258,7 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # function _predict(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
 #     for (k, gk) in enumerate(values(o))
 #         # P(Ck)
-#         p[k] = log(nobs(gk) / n + ϵ) 
+#         p[k] = log(nobs(gk) / n + ϵ)
 #         # P(xj | Ck)
 #         for j in 1:length(x)
 #             p[k] += log(pdf(gk[j], x[j]) + ϵ)
@@ -268,7 +268,7 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 #     sp = sum(p)
 #     sp == 0.0 ? p : p ./= sum(p)
 # end
-# function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o)) 
+# function _classify(o::NBClassifier, x::VectorOb, p = zeros(nkeys(o)), n = nobs(o))
 #     _, k = findmax(_predict(o, x, p, n))
 #     index_to_key(o, k)
 # end
@@ -279,7 +279,7 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 #     index_to_key(o, k)
 # end
 # for f in [:(_predict), :(_classify)]
-#     @eval begin 
+#     @eval begin
 #         function $f(o::NBClassifier, x::AbstractMatrix, ::Rows = Rows())
 #             n = nobs(o)
 #             p = zeros(nkeys(o))
@@ -314,7 +314,7 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 #             if ig > split.ig
 #                 split.j = j
 #                 split.at = loc
-#                 split.ig = ig 
+#                 split.ig = ig
 #                 split.nleft .= nleft
 #             end
 #         end
@@ -334,12 +334,12 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # n_sent_left(o::CountMap, label) = o[label]
 
 # #-----------------------------------------------------------------------# NBSplit
-# # Continuous:  x[j] < at 
+# # Continuous:  x[j] < at
 # # Categorical: x[j] == at
 # mutable struct NBSplit{}
-#     j::Int 
+#     j::Int
 #     at::Any
-#     ig::Float64 
+#     ig::Float64
 #     nleft::Vector{Int}
 # end
 # NBSplit(n=0) = NBSplit(0, -Inf, -Inf, zeros(Int, n))
@@ -349,12 +349,12 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # #-----------------------------------------------------------------------# NBNode
 # mutable struct NBNode{T <: NBClassifier} <: ExactStat{(1, 0)}
 #     nbc::T
-#     id::Int 
-#     parent::Int 
+#     id::Int
+#     parent::Int
 #     children::Vector{Int}
 #     split::NBSplit
 # end
-# function NBNode(o::NBClassifier; id = 1, parent = 0, children = Int[], split = NBSplit()) 
+# function NBNode(o::NBClassifier; id = 1, parent = 0, children = Int[], split = NBSplit())
 #     NBNode(o, id, parent, children, split)
 # end
 # function Base.show(io::IO, o::NBNode)
@@ -364,15 +364,15 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 #     end
 # end
 
-# #-----------------------------------------------------------------------# NBTree 
+# #-----------------------------------------------------------------------# NBTree
 # """
 #     NBTree(o::NBClassifier; maxsize=5000, splitsize=1000)
 
-# Create a decision tree where each node is a naive bayes classifier.  A node will split 
-# when it reaches `splitsize` observations and no more splits will occur once `maxsize` 
+# Create a decision tree where each node is a naive bayes classifier.  A node will split
+# when it reaches `splitsize` observations and no more splits will occur once `maxsize`
 # nodes are in the tree.
 
-# # Example 
+# # Example
 
 #     x = randn(10^5, 10)
 #     y = rand(Bool, 10^5)
@@ -394,10 +394,10 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # end
 
 # function fit!(o::NBTree, xy, γ)
-#     x, y = xy 
+#     x, y = xy
 #     i, node = whichleaf(o, x)
 #     fit!(node.nbc, xy, γ)
-#     if length(o.tree) < o.maxsize && nobs(node.nbc) >= o.splitsize 
+#     if length(o.tree) < o.maxsize && nobs(node.nbc) >= o.splitsize
 #         nbc, spl, left_nbc, right_nbc = split(node.nbc)
 #         # if spl.ig > o.cp
 #             node.split = spl
@@ -412,7 +412,7 @@ entropy(o::NBClassifier) = entropy(probs(o), 2)
 # end
 
 # function whichleaf(o::NBTree, x::VectorOb)
-#     i = 1 
+#     i = 1
 #     node = o.tree[i]
 #     while length(node.children) > 0
 #         i = node.children[whichchild(node.split, x)]

@@ -143,15 +143,15 @@ An adaptive histogram where the bin edges keep doubling in size in order to cont
 
 - `[a, b)`, `[b, c)`, `[c, d]`
 
-# Example 
+# Example
     o = fit!(ExpandingHist(200), randn(10^6))
 
     using Plots
     plot(o)
 
-# Details 
+# Details
 
-How `ExpandingHist` works is best understood through example.  Suppose we start with a histogram 
+How `ExpandingHist` works is best understood through example.  Suppose we start with a histogram
 of edges/counts as follows:
 
 ```
@@ -164,18 +164,18 @@ of edges/counts as follows:
 |1|2|5|3|2|       *
 ```
 
-- In order to contain the point, the range of the edges doubles in the direction of the new 
+- In order to contain the point, the range of the edges doubles in the direction of the new
   data point and adjacent bins merge their counts:
 
 ```
 |1|2|5|3|2|       *
  \\ / \\ / \\ /      ↓
-  ↓   ↓   ↓       ↓ 
-| 3 | 8 | 2 | 0 | 1 | 
+  ↓   ↓   ↓       ↓
+| 3 | 8 | 2 | 0 | 1 |
 ```
 
-- Note that multiple iterations of bin-doubling may occur until the new point is contained by the 
-  bin edges. 
+- Note that multiple iterations of bin-doubling may occur until the new point is contained by the
+  bin edges.
 """
 mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
     edges::R
@@ -199,7 +199,7 @@ edges(o::ExpandingHist) = o.edges
 
 function _fit!(o::ExpandingHist, y)
     isfinite(y) || error("ExpandingHist requires finite values.  Found $y.")
-    o.n += 1 
+    o.n += 1
 
     # init
     @inbounds if nobs(o) == 1
@@ -207,9 +207,9 @@ function _fit!(o::ExpandingHist, y)
         o.counts[1] = 1
     elseif step(o.edges) == 0.0
         a = o.edges[1]
-        if y == a 
+        if y == a
             o.counts[1] += 1
-        elseif y < a 
+        elseif y < a
             o.edges = range(y, stop=a, length=length(o.edges))
             o.counts[end] = o.counts[1]
             o.counts[1] = 1

@@ -53,7 +53,7 @@ end
     @test ≈(mergevals(CallFun(Mean(), x->nothing), y, y2)...)
 end
 #-----------------------------------------------------------------------# CountMinSketch
-@testset "CountMinSketch" begin 
+@testset "CountMinSketch" begin
     a, b = mergestats(CountMinSketch(), z, z2)
     @test value(a, 1) == value(b, 1)
     @test value(a, 1) == sum(z .== 1) + sum(z2 .== 1)
@@ -66,7 +66,7 @@ end
     @test last(o) == 10
 end
 #-----------------------------------------------------------------------# ExpandingHist
-@testset "ExpandingHist" begin 
+@testset "ExpandingHist" begin
     for data in (y, y2), b in [10, 50, 200]
         o = fit!(ExpandingHist(b), data)
         h = fit(Histogram, data, o.edges)
@@ -179,7 +179,7 @@ end
     @test mean(classify(o, X) .== Y) > .5
 end
 #-----------------------------------------------------------------------------# GeometricMean
-@testset "GeometricMean" begin 
+@testset "GeometricMean" begin
     o = fit!(GeometricMean(), z)
     @test value(o) ≈ geomean(z)
     @test ≈(mergevals(GeometricMean(), z, z2)...)
@@ -232,7 +232,7 @@ end
     @test_throws Exception KHist(1)
 
     for (a, b) in [
-            mergevals(KHist(2000), y, y2), 
+            mergevals(KHist(2000), y, y2),
             mergevals(KHist(3), y, y2),
             mergevals(KHist(2000, Float32), Float32.(y), Float32.(y2))
             ]
@@ -483,12 +483,12 @@ include("test_kahan.jl")
     end
 end
 
-#-----------------------------------------------------------------------------# Log to TrendSpot 
+#-----------------------------------------------------------------------------# Log to TrendSpot
 if haskey(ENV, "TRENDSPOT_API_KEY")
     run(Cmd([
         "curl", "-X", "POST", "https://trendspot.io/api/v1/trend",
         "-H", "Content-Type: application/json",
-        "-d", 
+        "-d",
         """
         {
             "id": "OnlineStats Test Time",

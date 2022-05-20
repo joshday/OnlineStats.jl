@@ -200,7 +200,7 @@ Base.diff(o::Diff) = o.diff
 
 Calculate the geometric mean of a data stream, stored as type `T`.
 
-# Example 
+# Example
 
     o = fit!(GeometricMean(), 1:100)
 """
@@ -262,7 +262,7 @@ Approximate K-Means clustering of `k` clusters.
 
     x = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]
 
-    o = fit!(KMeans(2, 2), eachrow(x)) 
+    o = fit!(KMeans(2, 2), eachrow(x))
 
     sort!(o; rev=true)  # Order clusters by number of observations
 """
@@ -605,7 +605,7 @@ end
 """
     Quantile(q::Vector{Float64} = [0, .25, .5, .75, 1]; b=500)
 
-Calculate (approximate) quantiles from a data stream.  Internally uses [`ExpandingHist`](@ref) to 
+Calculate (approximate) quantiles from a data stream.  Internally uses [`ExpandingHist`](@ref) to
 estimate the distribution, for which `b` is the number of histogram bins.  Setting `b` to a larger
 number will increase accuracy at the cost of speed.
 
@@ -650,7 +650,7 @@ mutable struct ReservoirSample{T} <: OnlineStat{T}
 end
 ReservoirSample(k::Int, T::Type = Float64) = ReservoirSample(sizehint!(T[], k), k, 0)
 function _fit!(o::ReservoirSample, y)
-    if (o.n += 1) ≤ o.k 
+    if (o.n += 1) ≤ o.k
         push!(o.value, y)
     else
         j = rand(1:o.n)

@@ -1,6 +1,6 @@
-# #-----------------------------------------------------------------------------# XPixel 
+# #-----------------------------------------------------------------------------# XPixel
 # """
-# A pixel split into four values.  Adjacent pixels can be joined in multiple ways to create 
+# A pixel split into four values.  Adjacent pixels can be joined in multiple ways to create
 # different shapes.
 
 # ```
@@ -18,22 +18,22 @@
 # ```
 # """
 # mutable struct XPixel{T, S}
-#     x::S 
+#     x::S
 #     y::S
-#     h::S 
+#     h::S
 #     w::S
 
 #     top::T
-#     right::T 
-#     bottom::T 
+#     right::T
+#     bottom::T
 #     left::T
 # end
 # Base.sum(x::XPixel) = x.top + x.right + x.bottom + x.left
 
 # #-----------------------------------------------------------------------------# HexGrid
 # struct HexGrid{EX, EY}
-#     xedges::EX 
+#     xedges::EX
 #     yedges::EY
 #     counts::Matrix{XPixel}
-#     out::Int 
+#     out::Int
 # end

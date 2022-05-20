@@ -2,7 +2,7 @@
     Ash(h::Union{KHist, Hist, ExpandingHist})
     Ash(h::Union{KHist, Hist, ExpandingHist}, m::Int, kernel::Function)
 
-Create an Average Shifted Histogram using `h` as the base histogram with smoothing parameter `m` 
+Create an Average Shifted Histogram using `h` as the base histogram with smoothing parameter `m`
 and kernel function `kernel`.  Built-in kernels are available in the `OnlineStats.Kernels` module.
 
 # Example
@@ -42,15 +42,15 @@ value(o::Ash, kernel::Function, m::Int = o.m) = value(o, m, kernel)
 
 function value(o::Ash, m::Int = o.m, kernel::Function = o.kernel)
     if nobs(o) > 0
-        o.m = m 
+        o.m = m
         o.kernel = kernel
         y = o.density
-        y .= 0.0 
+        y .= 0.0
         counts = OnlineStats.counts(o.hist)
         b = length(counts)
         mids = midpoints(o.hist)
         for k in eachindex(mids)
-            if counts[k] > 0 
+            if counts[k] > 0
                 for i in max(1, k - m + 1):min(b, k + m - 1)
                     y[i] += counts[k] * kernel((i - k) / m)
                 end
@@ -79,7 +79,7 @@ histdensity(o::Ash{<:KHist}) = counts(o.hist) ./ area(o.hist)
 
 @recipe function f(o::Ash, m::Int = o.m, kernel::Function = o.kernel; hist=true)
     if hist
-        @series begin 
+        @series begin
             normalize --> true
             seriesalpha --> .4
             seriestype --> :sticks
@@ -87,7 +87,7 @@ histdensity(o::Ash{<:KHist}) = counts(o.hist) ./ area(o.hist)
             midpoints(o.hist), histdensity(o)
         end
     end
-    @series begin 
+    @series begin
         x, y = value(o, m, kernel)
         label --> "Ash(m=$(m), kernel=$(o.kernel))"
         xlims --> extrema(x)

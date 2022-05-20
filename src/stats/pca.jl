@@ -1,29 +1,29 @@
 # Implements Candid Covariance-Free Incremental PCA algorithm of Weng et al:
-# Weng, Juyang, Yilu Zhang, and Wey-Shiuan Hwang. "Candid covariance-free 
-# incremental principal component analysis." IEEE Transactions on Pattern 
+# Weng, Juyang, Yilu Zhang, and Wey-Shiuan Hwang. "Candid covariance-free
+# incremental principal component analysis." IEEE Transactions on Pattern
 # Analysis and Machine Intelligence 25.8 (2003): 1034-1040.
 #
 # A comparison of online PCA algorithms in 2018 showed it to be a good
 # trade-off in that it is fast and has low reconstruction error:
-# H. Cardot and D. Degras, "Online Principal Component Analysis in 
+# H. Cardot and D. Degras, "Online Principal Component Analysis in
 # High Dimension: Which Algorithm to Choose?", Int. Statistical Review, 2018-
 
 """
     CCIPCA(outdim::Int, indim; l::Int)
 
 Online PCA with the CCIPCA (Candid Covariance-free Incremental PCA) algorithm,
-where indim is the length of incoming vectors, outdim is the number of 
-dimension to project to, and l is the level of amnesia. Give values of l in 
-the range 2-4 if you want old vectors to be gradually less important, i.e. 
+where indim is the length of incoming vectors, outdim is the number of
+dimension to project to, and l is the level of amnesia. Give values of l in
+the range 2-4 if you want old vectors to be gradually less important, i.e.
 latest vectors added get more weight.
 
 If no indim is specified it will be set later, on first call to fit. After
 that it is fixed and cannot change.
 
 The CCIPCA is a very fast, simple, and online approximation of PCA. It can be used
-for Dimensionality Reduction to project high-dimensional vectors into a 
-low-dimensional (typically 2D or 3D) space. This algorithm has shown very 
-good properties in comparative studies; it is both fast and give a good 
+for Dimensionality Reduction to project high-dimensional vectors into a
+low-dimensional (typically 2D or 3D) space. This algorithm has shown very
+good properties in comparative studies; it is both fast and give a good
 approximation to (batch) PCA.
 
 # Example
@@ -113,7 +113,7 @@ end
 """
     transform(o::CCIPCA, u::AbstractArray{Float64})
 
-Transform (i.e. project) the vector `u` into the PCA space 
+Transform (i.e. project) the vector `u` into the PCA space
 represented by `o`.
 """
 function transform(o::CCIPCA, u::AbstractArray{Float64})
@@ -173,7 +173,7 @@ principalvars(o::CCIPCA) = eigenvalues(o)
 """
     relativevariances(o::CCIPCA)
 
-Get the relative variance (explained) in the direction of each 
+Get the relative variance (explained) in the direction of each
 eigenvector. Returns a vector of zeros if no vectors have yet been fitted.
 Note that this does not inclue the residual variance that is not captured
 in the eigenvectors.

@@ -78,18 +78,18 @@ end
         legend --> false
         o.xedges, o.yedges, z'
     end
-    if marginals 
+    if marginals
         layout --> (2, 2)
         @series begin
-            subplot --> 2 
-            grid --> false 
-            axis --> false 
+            subplot --> 2
+            grid --> false
+            axis --> false
             label --> ""
             title --> "Nobs: $(nobs(o))"
             framestyle --> :none
             Float64[]
         end
-        @series begin 
+        @series begin
             subplot --> 1
             label --> ""
             linewidth --> 0
@@ -97,7 +97,7 @@ end
             seriestype --> :bar
             o.xedges, vec(sum(o.counts, dims=2))
         end
-        @series begin 
+        @series begin
             subplot --> 4
             label --> ""
             linewidth --> 0

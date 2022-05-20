@@ -31,25 +31,22 @@ struct KHist2D <: OnlineStat{TwoThings{<:Number, <:Number}}
 end
 KHist2D(b::Int=300) = KHist2D(Bin2D[], b)
 
-
-Base.@deprecate_binding PlotNN KHist2D
-
 nobs(o::KHist2D) = length(o.value) > 0 ? sum(nobs, o.value) : 0
 
 # Works, but much room to optimize
 function _fit!(o::KHist2D, xy)
     newbin = Bin2D(xy..., 1)
     push!(o.value, newbin)
-    if length(o.value) > o.b 
-        i, j = 1, 2 
+    if length(o.value) > o.b
+        i, j = 1, 2
         mindist = Inf
-        for _i in 1:o.b 
+        for _i in 1:o.b
             v1 = o.value[_i]
             for _j in (_i + 1):o.b
                 dist = distance(v1, o.value[_j])
-                if dist < mindist 
-                    mindist = dist 
-                    i = _i 
+                if dist < mindist
+                    mindist = dist
+                    i = _i
                     j = _j
                 end
             end
@@ -66,7 +63,7 @@ end
     marker_z --> z
     markersize --> z / maximum(nobs, o.value) .* maxsize .+ minsize
     markerstrokewidth --> 0
-    seriestype --> :scatter 
+    seriestype --> :scatter
     seriescolor --> :viridis
     x, y
 end

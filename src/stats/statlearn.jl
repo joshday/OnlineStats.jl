@@ -1,4 +1,4 @@
-#-----------------------------------------------------------------------------# Losses 
+#-----------------------------------------------------------------------------# Losses
 """
     l2regloss(y, xβ)
 
@@ -6,7 +6,7 @@ Loss function between continuous response `y` and linear predictor `xβ` based o
 
 ``.5 * (y - xβ) ^ 2``
 """
-l2regloss(y, yhat) = .5 * abs2(y - yhat) 
+l2regloss(y, yhat) = .5 * abs2(y - yhat)
 deriv(::typeof(l2regloss), y, yhat) = yhat - y
 
 """
@@ -45,10 +45,10 @@ deriv(::typeof(l1hingeloss), y, yhat) = (u = y*yhat; u ≥ 1 ? zero(y) : -y)
 Distance-weighted discrimination loss function (smoothed `l1hingeloss`) with smoothing parameter `q`.  Loss is calculated between a boolean response `y ∈ {-1, 1}` and linear predictor `xβ`.
 """
 struct DWDLoss{T<:Number}
-    q::T 
+    q::T
 end
 function (o::DWDLoss)(y, yhat)
-    agreement = y * yhat 
+    agreement = y * yhat
     q = o.q
     if agreement ≤ q / (q + 1)
         1 - agreement
@@ -66,8 +66,8 @@ function deriv(loss::DWDLoss, y, yhat)
     end
 end
 
-#-----------------------------------------------------------------------------# Penalties 
-prox(::typeof(zero), x, s) = x 
+#-----------------------------------------------------------------------------# Penalties
+prox(::typeof(zero), x, s) = x
 prox(::typeof(abs2), x, s) = x / (1 + s)
 prox(::typeof(abs), x::T, s::Number) where {T} = sign(x) * max(T(0), abs(x) - s)
 
@@ -92,7 +92,7 @@ end
 """
     StatLearn(args...; penalty=zero, rate=LearningRate())
 
-Fit a model (via stochastic approximation) that is linear in the parameters.  The (offline) 
+Fit a model (via stochastic approximation) that is linear in the parameters.  The (offline)
 objective function that StatLearn approximately minimizes is
 
 ``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
@@ -157,22 +157,22 @@ end
 function StatLearn(args...; penalty=zero, rate=LearningRate())
     p = 0
     λ = zeros(1)
-    loss = l2regloss 
+    loss = l2regloss
     alg = MSPI()
     for a in args
-        if a isa AbstractVector 
+        if a isa AbstractVector
             λ = a
-        elseif a isa Float64 
+        elseif a isa Float64
             λ = fill(a, 1)
-        elseif a isa Algorithm 
+        elseif a isa Algorithm
             alg = a
-        elseif a isa Integer 
+        elseif a isa Integer
             p = a
         elseif hasmethod(a, (Number, Number)) && hasmethod(deriv, (typeof(a), Number, Number))
             loss = a
         else
             @warn """
-            Arguments of type $(typeof(a)) are not recognized by StatLearn.  See the `StatLearn` docs for details.  
+            Arguments of type $(typeof(a)) are not recognized by StatLearn.  See the `StatLearn` docs for details.
             """
         end
     end
@@ -208,7 +208,7 @@ function init!(o::StatLearn, p)
     o.β = zeros(p)
     o.gx = zeros(p)
     init!(o.alg, p)
-    if length(o.λ) == 1 
+    if length(o.λ) == 1
         o.λ = fill(o.λ[1], p)
     end
 end

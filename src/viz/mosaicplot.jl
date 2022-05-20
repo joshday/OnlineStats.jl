@@ -5,7 +5,7 @@ Data structure for generating a mosaic plot, a comparison between two categorica
 
 # Example
 
-    using OnlineStats, Plots 
+    using OnlineStats, Plots
     x = [rand() > .8 for i in 1:10^5]
     y = rand([1,2,2,3,3,3], 10^5)
     o = fit!(Mosaic(Bool, Int), zip(x, y))
@@ -24,7 +24,7 @@ function add_zero_counts!(o::Mosaic)
     v = value(o)
     akeys = [k[1] for k in keys(v)]
     bkeys = [k[2] for k in keys(v)]
-    for ai in akeys, bi in bkeys 
+    for ai in akeys, bi in bkeys
         get!(v, (ai, bi), 0)
     end
     sort!(v)
@@ -34,7 +34,7 @@ end
 function split_countmaps(o::Mosaic)
     v = value(o)
     akeys, bkeys = unique(first.(keys(v))), unique(last.(keys(v)))
-    a = OrderedDict(k => sum(last, filter(x -> x[1][1] == k, v)) for k in akeys) 
+    a = OrderedDict(k => sum(last, filter(x -> x[1][1] == k, v)) for k in akeys)
     b = OrderedDict(k => sum(last, filter(x -> x[1][2] == k, v)) for k in bkeys)
     sort!(a), sort!(b)
 end
@@ -46,7 +46,7 @@ end
 
     x = vcat(0.0, cumsum([av / n for av in values(a)]))
 
-    seriestype := :bar 
+    seriestype := :bar
     bar_width := diff(x)
     ylims --> (0,1)
     xlims --> (0, 1)

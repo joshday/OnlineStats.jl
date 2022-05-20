@@ -4,7 +4,7 @@
 
 Online parameter estimate of a Beta distribution (Method of Moments).
 
-# Example 
+# Example
     o = fit!(FitBeta(), rand(1000))
 """
 struct FitBeta{V<:Variance} <: OnlineStat{Number}
@@ -31,10 +31,10 @@ _merge!(o::FitBeta, o2::FitBeta) = _merge!(o.var, o2.var)
     FitCauchy(b=500)
 
 Approximate parameter estimation of a Cauchy distribution.  Estimates are based on
-approximated quantiles.  See [`Quantile`](@ref) and [`ExpandingHist`](@ref) for details on how the 
+approximated quantiles.  See [`Quantile`](@ref) and [`ExpandingHist`](@ref) for details on how the
 distribution is estimated.
 
-# Example 
+# Example
     o = fit!(FitCauchy(), randn(1000))
 """
 mutable struct FitCauchy{T} <: OnlineStat{Number}
@@ -59,7 +59,7 @@ _merge!(o::FitCauchy, o2::FitCauchy) = _merge!(o.q, o2.q)
 
 Online parameter estimate of a Gamma distribution (Method of Moments).
 
-# Example 
+# Example
     using Random
     o = fit!(FitGamma(), randexp(10^5))
 """
@@ -87,7 +87,7 @@ _merge!(o::FitGamma, o2::FitGamma) = _merge!(o.v, o2.v)
 
 Online parameter estimate of a LogNormal distribution (MLE).
 
-# Example 
+# Example
     o = fit!(FitLogNormal(), exp.(randn(10^5)))
 """
 struct FitLogNormal <: OnlineStat{Number}
@@ -111,7 +111,7 @@ _merge!(o::FitLogNormal, o2::FitLogNormal) = _merge!(o.v, o2.v)
 
 Calculate the parameters of a normal distribution via maximum likelihood.
 
-# Example 
+# Example
     o = fit!(FitNormal(), randn(1000))
 """
 struct FitNormal{V <: Variance} <: OnlineStat{Number}
@@ -131,11 +131,11 @@ _merge!(o::FitNormal, o2::FitNormal) = _merge!(o.v, o2.v)
 Statistics.mean(o::FitNormal) = mean(o.v)
 Statistics.var(o::FitNormal) = var(o.v)
 
-function pdf(o::FitNormal, x::Number) 
+function pdf(o::FitNormal, x::Number)
     σ = std(o)
     1 / (sqrt(2π) * σ) * exp(-(x - mean(o))^2 / 2σ^2)
 end
-function cdf(o::FitNormal, x::Number) 
+function cdf(o::FitNormal, x::Number)
     .5 * (1.0 + erf_approx((x - mean(o)) / (std(o) * √2)))
 end
 # https://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions
@@ -159,7 +159,7 @@ Online parameter estimate of a Multinomial distribution.  The sum of counts does
 to be consistent across observations.  Therefore, the `n` parameter of the Multinomial
 distribution is returned as 1.
 
-# Example 
+# Example
     x = [1 2 3; 4 8 12]
     fit!(FitMultinomial(3), x)
 """
@@ -184,7 +184,7 @@ _merge!(o::FitMultinomial, o2::FitMultinomial) = _merge!(o.grp, o2.grp)
 
 Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
 
-# Example 
+# Example
 
     y = randn(100, 2)
     o = fit!(FitMvNormal(2), eachrow(y))

@@ -1,11 +1,11 @@
-\#-----------------------------------------------------------------------# Partition 
+\#-----------------------------------------------------------------------# Partition
 """
     Partition(stat)
     Partition(stat, nparts)
 
-Split a data stream into `nparts` (default 100) where each part is summarized by `stat`.  
+Split a data stream into `nparts` (default 100) where each part is summarized by `stat`.
 
-# Example 
+# Example
 
     o = Partition(Extrema())
     fit!(o, cumsum(randn(10^5)))
@@ -30,7 +30,7 @@ function _fit!(o::Partition, y)
     parts = o.parts
     lastpart = parts[end]
     (a, b), stat = lastpart
-    if a ≤ n ≤ b 
+    if a ≤ n ≤ b
         _fit!(stat, y)
     else
         lastpart = (n, n + nobs(stat) - 1) => fit!(o.init(), y)
@@ -69,16 +69,16 @@ end
 """
     IndexedPartition(T, stat, b=100)
 
-Summarize data with `stat` over a partition of size `b` where the data is indexed by a 
+Summarize data with `stat` over a partition of size `b` where the data is indexed by a
 variable of type `T`.
 
-# Example 
+# Example
 
     x, y = randn(10^5), randn(10^6)
     o = IndexedPartition(Float64, KHist(10))
     fit!(o, zip(x, y))
 
-    using Plots 
+    using Plots
     plot(o)
 """
 mutable struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Pair{<:Tuple, O}} <: OnlineStat{TwoThings{I,T}}
@@ -99,9 +99,9 @@ function _fit!(o::IndexedPartition{I}, xy) where {I}
     n = o.n += 1
     isempty(o.parts) && push!(o.parts, (I(x), I(x)) => copy(o.init))
     i = findfirst(p -> p[1][1] ≤ x ≤ p[1][2], o.parts)
-    if isnothing(i) 
+    if isnothing(i)
         push!(o.parts, (I(x), I(x)) => fit!(copy(o.init), y))
-    else 
+    else
         _fit!(o.parts[i][2], y)
     end
     length(o.parts) > o.b && indexed_merge_next!(sort!(o.parts, by = x -> x[1][1]))
@@ -129,12 +129,12 @@ end
     KIndexedPartition(T, stat_init, k=100)
 
 Similar to [`IndexedPartition`](@ref), but indexes the first variable by centroids (like [`KHist`](@ref))
-rather than intervals.  
+rather than intervals.
 
 - Note: `stat_init` must be a function e.g. `() -> Mean()`
 
 # Example
-    using Plots 
+    using Plots
 
     o = KIndexedPartition(Float64, () -> KHist(10))
 
@@ -144,7 +144,7 @@ rather than intervals.
 """
 mutable struct KIndexedPartition{I,T,O<:OnlineStat{T},F} <: OnlineStat{TwoThings{I,T}}
     parts::Vector{Pair{I,O}}
-    k::Int 
+    k::Int
     init::F
     n::Int
 end
@@ -153,12 +153,12 @@ function KIndexedPartition(I::Type, init::Base.Callable, k::Int=100)
     T, O = OnlineStatsBase.input(o), typeof(o)
     KIndexedPartition{I,T,O,typeof(init)}(Pair{I,O}[], k, init, 0)
 end
-value(o::KIndexedPartition) = 
+value(o::KIndexedPartition) =
     (o.parts[1][1][1], o.parts[end][1][2]) => value(reduce(merge!, last.(o.parts), init=o.init()))
 
 
 function _fit!(o::KIndexedPartition, xy)
-    x, y = xy 
+    x, y = xy
     parts = o.parts
     newpart = x => fit!(o.init(), y)
     insert!(parts, searchsortedfirst(parts, newpart; by=first), newpart)
@@ -167,15 +167,15 @@ end
 
 function kindexed_merge_next!(parts)
     mindiff = Inf
-    i = 0 
+    i = 0
     for (j, (a,b)) in enumerate(neighbors(parts))
         d = first(b) - first(a)
         if d < mindiff && 1 < j < (length(parts) - 1)
-            mindiff = d 
+            mindiff = d
             i = j
         end
     end
-    a = parts[i] 
+    a = parts[i]
     b = parts[i + 1]
     n = nobs(last(a)) + nobs(last(b))
     parts[i] = smooth(first(a), first(b), nobs(last(b)) / n) => merge!(a[2], b[2])
@@ -184,7 +184,7 @@ end
 
 function _merge!(a::KIndexedPartition, b::KIndexedPartition)
     sort!(append!(a.parts, b.parts), by=first)
-    while length(a.parts) > a.k 
+    while length(a.parts) > a.k
         kindexed_merge_next!(a.parts)
     end
 end

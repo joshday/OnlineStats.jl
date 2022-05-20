@@ -15,13 +15,9 @@ using OnlineStatsBase, RecipesBase
 using OnlineStatsBase: neighbors
 import OnlineStatsBase: name
 
-@static if VERSION < v"1.1.0"
-    isnothing(x) = x === nothing
-end
-
 export
 # Statistics
-    mean, var, std, cov, cor, 
+    mean, var, std, cov, cor,
 # functions
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
     classify, coef, ecdf, eachrow, eachcol,
@@ -57,7 +53,7 @@ export
 # other
     OnlineStat, BiasVec
 
-#-----------------------------------------------------------------------------# utils 
+#-----------------------------------------------------------------------------# utils
 const Tup = Union{Tuple, NamedTuple}
 const VectorOb = Union{AbstractVector, Tup}
 const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names,Tuple{T,S}}} where {names,T<:AbstractVector{<:Number},S<:Number}
@@ -68,7 +64,7 @@ function searchsortednearest(a, x)
     idx = searchsortedfirst(a, x)
     idx == 1 && return idx
     idx > length(a) && return length(a)
-    a[idx] == x && return idx 
+    a[idx] == x && return idx
     return abs(a[idx] - x) < abs(a[idx - 1] - x) ? idx : idx - 1
 end
 

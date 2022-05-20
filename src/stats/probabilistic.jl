@@ -3,13 +3,13 @@
 """
     CountMinSketch(T = Number; nhash=50, hashlength=1000, storagetype=Int)
 
-Create a Count-Min Sketch with `nhash` hash functions of width `hashlength`.  Counts in the sketch 
-will be stored as `storagetype`.  
+Create a Count-Min Sketch with `nhash` hash functions of width `hashlength`.  Counts in the sketch
+will be stored as `storagetype`.
 
 This lets you calculate an upper bound on the number of occurrences of some value `x` in a data stream via
 `value(count_min_sketch, x)`.  For details and error bounds, please see the references section.
 
-# Example 
+# Example
 
     o = CountMinSketch()
 
@@ -21,12 +21,12 @@ This lets you calculate an upper bound on the number of occurrences of some valu
 
     sum(y .== 1)
 
-# References 
+# References
 
 - https://florian.github.io/count-min-sketch/
 
 """
-mutable struct CountMinSketch{T, IntType} <: OnlineStat{T} 
+mutable struct CountMinSketch{T, IntType} <: OnlineStat{T}
     sketch::Matrix{IntType}
     n::Int
     function CountMinSketch(T::Type = Number; nhash::Integer=50, hashlength=1000, storagetype=Int)
@@ -40,7 +40,7 @@ value(::CountMinSketch{T}, val::S) where {T,S} = error("CountMinSketch is tracki
 
 _index(x, j, limit) = hash(x, UInt(j)) % limit + 1
 
-function value(o::CountMinSketch{T,I}, val::T) where {T,I} 
+function value(o::CountMinSketch{T,I}, val::T) where {T,I}
     n, p = size(o.sketch)
     minimum(o.sketch[_index(val, j, n), j] for j in 1:p)
 end
@@ -48,13 +48,13 @@ end
 function _fit!(o::CountMinSketch{T,I}, y) where {T,I}
     o.n += 1
     r, c = size(o.sketch)
-    for j in 1:c 
+    for j in 1:c
         o.sketch[_index(y, j, r), j] += 1
     end
 end
 
 function _merge!(a::CountMinSketch, b::CountMinSketch)
-    a.n += b.n 
+    a.n += b.n
     a.sketch .+= b.sketch
 end
 
