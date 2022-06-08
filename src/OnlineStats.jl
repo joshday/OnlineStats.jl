@@ -6,6 +6,9 @@ import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth,
     smooth_syr!, nvars, Weight, eachrow, eachcol, TwoThings
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
+import StatsFuns: logsumexp
+import Distributions: MixtureModel, TDist
+import SpecialFunctions: loggamma
 
 import AbstractTrees: AbstractTrees
 
@@ -50,6 +53,7 @@ export
     Series, SGDStat, StatLag, StatLearn, Sum,
     Trace,
     Variance,
+    DPMM,
 # other
     OnlineStat, BiasVec
 
@@ -104,6 +108,7 @@ include("stats/kahan.jl")
 include("stats/pca.jl")
 include("stats/statlearn.jl")
 include("stats/trace.jl")
+include("stats/dpmm.jl")
 #-----------------------------------------------------------------------------# viz
 include("viz/khist.jl")
 include("viz/khist2d.jl")
@@ -114,3 +119,4 @@ include("viz/heatmap.jl")
 include("viz/hexlattice.jl")
 include("viz/ash.jl")
 end
+
