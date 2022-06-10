@@ -6,7 +6,7 @@
 # Only univariate mixtures are currently supported.
 
 """
-    DDPM(comp_mu::Real,
+    DPMM(comp_mu::Real,
          comp_lambda::Real,
          comp_alpha::Real,
          comp_beta::Real,
@@ -18,7 +18,7 @@
 Online univariate dirichlet process Gaussian mixture model algorithm.
 The model is described as
     
-    G ~ DP(dirchlet_alpha, normal-gamma)
+    G ~ DP(dirchlet_alpha, Normal-Gamma)
     (μₖ, τₖ) ~ G
     x ~ N(μ, 1/sqrt(τ))
 
@@ -36,7 +36,16 @@ birth threshold `comp_birth_thres` (higher means less frequen births) and
 existing components are pruned depending on the death threshold `comp_death_thres`.
 
 # Example
-
+    n    = 1024
+    μ    = 0.0
+    λ    = 1e-3
+    α    = 1.1
+    β    = 1e-2
+    α_dp = 1.0
+    o    = DPMM(μ, λ, α, β, α_dp; comp_birth_thres=0.5,
+                comp_death_thres=1e-2, n_comp_max=10) 
+    p = MixtureModel([ Normal(-2.0, 0.5), Normal(3.0, 1.0) ], [0.7, 0.3])
+    o = fit!(o, rand(p, 1000))
 """
 mutable struct DPMM{T <: Real} <: OnlineStat{T}
     n::Int        # Number of observations
@@ -53,7 +62,6 @@ mutable struct DPMM{T <: Real} <: OnlineStat{T}
     η₂::Vector{T} # Natural parameter 2
     η₃::Vector{T} # Natural parameter 3
     η₄::Vector{T} # Natural parameter 4
-    ∑ρ::Vector{T} # Mixture component running likelihood
     function DPMM(comp_mu::T,
                   comp_lambda::T,
                   comp_alpha::T,
@@ -76,12 +84,13 @@ mutable struct DPMM{T <: Real} <: OnlineStat{T}
         η₂_prior = -β₀ - λ₀.*μ₀.^2/2
         η₃_prior = α₀ - 1/2
         η₄_prior = λ₀/-2
-        new{T}(0, n_comp_max, dirichlet_alpha, comp_birth_thres, comp_death_thres,
+        new{T}(0, n_comp_max, dirichlet_alpha,
+               comp_birth_thres, comp_death_thres,
                η₁_prior, η₂_prior, η₃_prior, η₄_prior,
-               Float64[], Float64[], Float64[], Float64[], Float64[], Float64[])
+               Float64[], Float64[], Float64[], Float64[], Float64[])
     end
 end
-Base.length(o::CCIPCA) = length(w) # Number of mixture components
+Base.length(o::DPMM) = length(w) # Number of mixture components
 function _fit!(o::DPMM{T}, x::T) where {T <: Real}
     A(η₁, η₂, η₃, η₄) = begin
         loggamma(η₃ + 1/2) - log(-2*η₄)/2 - (η₃ + 1/2)*log(-η₂ + η₁^2/(4*η₄))
@@ -120,7 +129,6 @@ function _fit!(o::DPMM{T}, x::T) where {T <: Real}
         o.η₂ = vcat(o.η₂, o.η₂_prior)
         o.η₃ = vcat(o.η₃, o.η₃_prior)
         o.η₄ = vcat(o.η₄, o.η₄_prior)
-        o.∑ρ = vcat(o.∑ρ, 0.0)
     end
 
     # Update variational parameters
@@ -129,23 +137,18 @@ function _fit!(o::DPMM{T}, x::T) where {T <: Real}
     o.η₂ += ρ*T₂
     o.η₃ += ρ*T₃
     o.η₄ += ρ*T₄
-    o.∑ρ += ρ
 
     # Prune component with small contribution
-    w_prune  = o.∑ρ / sum(o.∑ρ)
-    idx_keep = w_prune .> o.ϵ_death
-
+    idx_keep = o.w .> o.ϵ_death
     o.w  = o.w[idx_keep]
     o.η₁ = o.η₁[idx_keep]
     o.η₂ = o.η₂[idx_keep]
     o.η₃ = o.η₃[idx_keep]
     o.η₄ = o.η₄[idx_keep]
-    o.∑ρ = o.∑ρ[idx_keep]
-
-    o.n = n
+    o.n  = n
 end
 """
-    marginalmixture(o::CCIPCA)
+    value(o::DPMM)
 
 Realize the mixture model where each component is the marginal predictive
 distribution obtained as
@@ -153,10 +156,9 @@ distribution obtained as
     q(x; mₖ, lₖ, aₖ, bₖ)
         = ∫ N(x; μₖ, sqrt(1/τₖ)) q(μₖ | τₖ; mₖ, lₖ) q(τₖ; aₖ, bₖ) dμₖ dτₖ
         = ∫ N(x; mₖ, sqrt(1/τₖ + 1/(lₖ*τₖ))) G(τₖ; aₖ, bₖ) dμₖ dτₖ
-        = TDist( 2*aₖ, mₖ, sqrt(bₖ/aₖ*(lₖ+1)/lₖ) )  dμₖ dτₖ
-
+        = TDist( 2*aₖ, mₖ, sqrt(bₖ/aₖ*(lₖ+1)/lₖ) )
 """
-function marginalmixture(o::DPMM)
+function value(o::DPMM)
     K = length(o.w)
 
     η₁, η₂, η₃, η₄ = if K == 0
@@ -170,11 +172,10 @@ function marginalmixture(o::DPMM)
     a = η₃ .+ 1/2
     b = -η₂ + (η₁.^2 ./ (4*η₄))
 
-    μ_marg = m
-    ν_marg = 2*a
-    σ_marg = sqrt.(b./a.*((l .+ 1)./l))
-    w_norm = o.w / sum(o.w)
-    qₖ     = TDist.(ν_marg) .* σ_marg .+ μ_marg
-    MixtureModel(qₖ, w_norm)
+    μ = m
+    ν = 2*a
+    σ = sqrt.(b./a.*((l .+ 1)./l))
+    w = o.w / sum(o.w)
+    w, ν, μ, σ
 end
 
