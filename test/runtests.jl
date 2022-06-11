@@ -469,6 +469,10 @@ end
 @testset "CCIPCA" begin
     include("test_ccipca.jl")
 end
+#-----------------------------------------------------------------------# CCIPCA
+@testset "DPMM" begin
+    include("test_dpmm.jl")
+end
 #-----------------------------------------------------------------------# Kahan
 
 include("test_kahan.jl")
