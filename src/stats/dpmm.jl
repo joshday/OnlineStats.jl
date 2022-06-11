@@ -47,7 +47,7 @@ existing components are pruned depending on the death threshold `comp_death_thre
     p = MixtureModel([ Normal(-2.0, 0.5), Normal(3.0, 1.0) ], [0.7, 0.3])
     o = fit!(o, rand(p, 1000))
 """
-mutable struct DPMM{T <: Real} <: OnlineStat{T}
+mutable struct DPMM{T <: Real} <: OnlineStat{Number}
     n::Int        # Number of observations
     K_max::Int
     α_dp::T       # Dirichlet prior hyperparameter
@@ -67,8 +67,8 @@ mutable struct DPMM{T <: Real} <: OnlineStat{T}
                   comp_alpha::T,
                   comp_beta::T,
                   dirichlet_alpha::T;
-                  comp_birth_thres=1e-2,
-                  comp_death_thres=1e-2,
+                  comp_birth_thres=T(1e-2),
+                  comp_death_thres=T(1e-2),
                   n_comp_max=10) where {T <: Real}
         @assert comp_lambda     > 0 "Component mean hyperparameter λ must be positive"
         @assert comp_alpha      > 0 "Component scale hyperparameter α must be positive"
@@ -90,8 +90,8 @@ mutable struct DPMM{T <: Real} <: OnlineStat{T}
                Float64[], Float64[], Float64[], Float64[], Float64[])
     end
 end
-Base.length(o::DPMM) = length(w) # Number of mixture components
-function _fit!(o::DPMM{T}, x::T) where {T <: Real}
+Base.length(o::DPMM) = length(o.w) # Number of mixture components
+function _fit!(o::DPMM, x::Real)
     A(η₁, η₂, η₃, η₄) = begin
         loggamma(η₃ + 1/2) - log(-2*η₄)/2 - (η₃ + 1/2)*log(-η₂ + η₁^2/(4*η₄))
     end
