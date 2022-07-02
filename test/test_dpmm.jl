@@ -70,6 +70,58 @@ end
     end
 end
 
+@testset "DPMM update hyperparameters" begin
+    μ       = 0.0
+    λ       = 1e-5
+    α       = 2.0
+    β       = 1e-4
+    α_dp    = 1.0
+    ϵ_death = 1e-2
+    ϵ_birth = 1e-1
+    K_max   = 5
+    o       = DPMM(μ, λ, α, β, α_dp; comp_birth_thres=ϵ_birth,
+                   comp_death_thres=ϵ_death, n_comp_max=K_max)   
+
+    μ_up       = μ*π
+    λ_up       = λ*π
+    α_up       = α*π
+    β_up       = β*π
+    α_dp_up    = α*π
+
+    o = OnlineStats.sethyperparams!(o, μ_up, λ_up, α_up, β_up, α_dp_up)
+    
+    μ_up_test, λ_up_test, α_up_test, β_up_test = OnlineStats.transformnatural⁻¹(
+        o.η₁_prior, o.η₂_prior, o.η₃_prior, o.η₄_prior)
+
+    @test μ_up   == μ_up_test
+    @test λ_up   == λ_up_test
+    @test α_up   == α_up_test
+    @test β_up   == β_up_test
+    @test o.α_dp == α_dp_up
+    @test o.ϵ_birth == ϵ_birth
+    @test o.ϵ_death == ϵ_death
+
+    ϵ_death_up = ϵ_death*π
+    ϵ_birth_up = ϵ_birth*π
+    K_max_up   = K_max*2
+
+    o = OnlineStats.sethyperparams!(o, μ_up, λ_up, α_up, β_up, α_dp_up;
+                                    comp_birth_thres=ϵ_birth_up,
+                                    comp_death_thres=ϵ_death_up,
+                                    n_comp_max=K_max_up)
+
+    μ_up_test, λ_up_test, α_up_test, β_up_test = OnlineStats.transformnatural⁻¹(
+        o.η₁_prior, o.η₂_prior, o.η₃_prior, o.η₄_prior)
+
+    @test μ_up      == μ_up_test
+    @test λ_up      == λ_up_test
+    @test α_up      == α_up_test
+    @test β_up      == β_up_test
+    @test o.α_dp    == α_dp_up
+    @test o.ϵ_birth == ϵ_birth_up
+    @test o.ϵ_death == ϵ_death_up
+end
+
 @testset "DPMM max number of components test" begin
     μ    = 0.0
     λ    = 1e-5
@@ -81,5 +133,5 @@ end
     fit!(o, -100:1:100)
     @test length(o) == 5
     q = value(o)
-    @test length(Distributions.components(q)) == 5
+    @test length(q.components) == 5
 end

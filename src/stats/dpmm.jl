@@ -5,6 +5,22 @@
 # 26, 2013.
 # Only univariate mixtures are currently supported.
 
+function transformnatural(μ::Real, λ::Real, α::Real, β::Real)
+    η₁ = λ*μ
+    η₂ = -β - λ.*μ.^2/2
+    η₃ = α - 1/2
+    η₄ = λ/-2
+    η₁, η₂, η₃, η₄
+end
+
+function transformnatural⁻¹(η₁::Real, η₂::Real, η₃::Real, η₄::Real)
+    λ = η₄*-2
+    μ = η₁ ./ (η₄*-2)
+    α = η₃ .+ 1/2
+    β = -η₂ + (η₁.^2 ./ (4*η₄))
+    μ, λ, α, β
+end
+
 """
     DPMM(comp_mu::Real,
          comp_lambda::Real,
@@ -34,6 +50,9 @@ The variational distribution is the mean-field family defined as
 Since the model is nonparametric, mixture components are added depending on the
 birth threshold `comp_birth_thres` (higher means less frequen births) and 
 existing components are pruned depending on the death threshold `comp_death_thres`.
+
+DPMMs tend to be very sensitive to its hyperparameters. Therefore, it is important
+to monitor the fitted result and tweak the hyperparameters accordingly.
 
 # Example
     n    = 1024
@@ -80,10 +99,9 @@ mutable struct DPMM{T <: Real} <: OnlineStat{Number}
         λ₀ = comp_lambda
         α₀ = comp_alpha
         β₀ = comp_beta
-        η₁_prior = λ₀*μ₀
-        η₂_prior = -β₀ - λ₀.*μ₀.^2/2
-        η₃_prior = α₀ - 1/2
-        η₄_prior = λ₀/-2
+
+        η₁_prior, η₂_prior, η₃_prior, η₄_prior = transformnatural(μ₀, λ₀, α₀, β₀)
+
         new{T}(0, n_comp_max, dirichlet_alpha,
                comp_birth_thres, comp_death_thres,
                η₁_prior, η₂_prior, η₃_prior, η₄_prior,
@@ -148,6 +166,40 @@ function _fit!(o::DPMM, x::Real)
     o.n  = n
 end
 """
+    sethyperparams!(o::DPMM; )
+
+Reset the hyperparameters of an existing DPMM object. The state of the DPMM is 
+kept unchanged.
+"""
+
+function sethyperparams!(o::DPMM{T},
+                         comp_mu::T,
+                         comp_lambda::T,
+                         comp_alpha::T,
+                         comp_beta::T,
+                         dirichlet_alpha::T;
+                         comp_birth_thres=o.ϵ_birth,
+                         comp_death_thres=o.ϵ_death,
+                         n_comp_max=o.K_max) where {T <: Real}
+    μ₀ = comp_mu
+    λ₀ = comp_lambda
+    α₀ = comp_alpha
+    β₀ = comp_beta
+
+    η₁_prior, η₂_prior, η₃_prior, η₄_prior = transformnatural(μ₀, λ₀, α₀, β₀)
+
+    o.K_max    = n_comp_max
+    o.α_dp     = comp_alpha
+    o.ϵ_birth  = comp_birth_thres
+    o.ϵ_death  = comp_death_thres
+    o.η₁_prior = η₁_prior
+    o.η₂_prior = η₂_prior
+    o.η₃_prior = η₃_prior
+    o.η₄_prior = η₄_prior
+    o
+end
+
+"""
     value(o::DPMM)
 
 Realize the mixture model where each component is the marginal predictive
@@ -167,10 +219,7 @@ function value(o::DPMM)
         o.η₁, o.η₂, o.η₃, o.η₄
     end
 
-    l = η₄*-2
-    m = η₁ ./ (η₄*-2)
-    a = η₃ .+ 1/2
-    b = -η₂ + (η₁.^2 ./ (4*η₄))
+    m, l, a, b = transformnatural⁻¹.(η₁, η₂, η₃, η₄)
 
     μ  = m
     ν  = 2*a
