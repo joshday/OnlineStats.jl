@@ -8,6 +8,7 @@ import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, ent
     fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
 import StatsFuns: logsumexp
 import SpecialFunctions: loggamma
+import Distributions: MixtureModel, TDist
 
 import AbstractTrees: AbstractTrees
 

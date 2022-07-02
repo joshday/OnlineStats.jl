@@ -5,6 +5,7 @@ version = "1.5.13"
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 OnlineStatsBase = "925886fa-5bf2-5e8e-b522-a9147a512338"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
