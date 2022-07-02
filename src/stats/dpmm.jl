@@ -172,10 +172,11 @@ function value(o::DPMM)
     a = η₃ .+ 1/2
     b = -η₂ + (η₁.^2 ./ (4*η₄))
 
-    μ = m
-    ν = 2*a
-    σ = sqrt.(b./a.*((l .+ 1)./l))
-    w = o.w / sum(o.w)
-    w, ν, μ, σ
+    μ  = m
+    ν  = 2*a
+    σ  = sqrt.(b./a.*((l .+ 1)./l))
+    w  = o.w / sum(o.w)
+    qₖ = TDist.(ν).*σ + μ
+    MixtureModel(qₖ, w)
 end
 

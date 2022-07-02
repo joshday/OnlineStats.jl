@@ -80,9 +80,6 @@ end
                 comp_death_thres=1e-10, n_comp_max=5)   
     fit!(o, -100:1:100)
     @test length(o) == 5
-    w, ν, μ, σ = value(o)
-    @test length(w) == 5
-    @test length(ν) == 5
-    @test length(μ) == 5
-    @test length(σ) == 5
+    q = value(o)
+    @test length(Distributions.components(q)) == 5
 end
