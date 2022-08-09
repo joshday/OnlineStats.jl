@@ -3,11 +3,13 @@ using Documenter, OnlineStats, OnlineStatsBase, InteractiveUtils
 makedocs(
     format = Documenter.HTML(
         assets = [
-            asset("assets/style.css", islocal=true), 
-            asset("assets/favicon.ico", islocal=true), 
-        ]
+            asset("assets/style.css", islocal=true),
+            asset("assets/favicon.ico", islocal=true),
+        ],
+        sidebar_sitename=false,
+        edit_link = nothing
     ),
-    sitename = "OnlineStats Docs",
+    sitename = "OnlineStats Documentation",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
     clean = true,

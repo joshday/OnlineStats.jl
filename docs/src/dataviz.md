@@ -7,10 +7,10 @@ gr(size=(816,400), margin=6Plots.mm)
 Random.seed!(1234)
 ```
 
-# Data Vizualization
+# Data Visualization
 
 !!! note
-    Each of the following examples plots one million data points, but can scale to infinitely many 
+    Each of the following examples plots one million data points, but can scale to infinitely many
     observations, since only a summary (`OnlineStat`) of the data is plotted.
 
 ## Partitions
@@ -100,7 +100,7 @@ of binning the x variable (centroids vs. intervals), similar to that of [`KHist`
 For the sake of performance, you must provide a **function** that creates
 the OnlineStat you wish to calculate for the y variable.
 
-```@example setup 
+```@example setup
 x = randn(10^6)
 y = x + randn(10^6)
 
@@ -118,7 +118,7 @@ plot(s, link = :x, label = ["KHist" "Hist" "ExpandingHist"])
 
 ## Average Shifted Histograms (ASH)
 
-- ASH is a semi-parametric density estimation method that is similar to Kernel Density Estimation, 
+- ASH is a semi-parametric density estimation method that is similar to Kernel Density Estimation,
   but uses a fine partition histogram instead of individual observations to perform the smoothing.
 
 ```@example setup
@@ -128,7 +128,7 @@ plot(o)
 
 ## Approximate CDF
 
-```@example setup 
+```@example setup
 o = fit!(OrderStats(1000), randn(10^6))
 
 plot(o)
@@ -141,7 +141,7 @@ It is typically more useful than a bar plot, as class probabilities are given by
 widths.
 
 ```@example setup
-using RDatasets 
+using RDatasets
 t = dataset("ggplot2", "diamonds")
 
 o = Mosaic(eltype(t.Cut), eltype(t.Color))
@@ -164,7 +164,7 @@ plot(o)
 ```
 
 
-```@example setup 
+```@example setup
 plot(o, marginals=false, legend=true)
 ```
 
