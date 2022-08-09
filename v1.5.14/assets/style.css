@@ -1,0 +1,9 @@
+img, svg {
+    border-radius: 4px;
+    margin-left: 6px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    /* margin-bottom: 8px;
+    display: block;
+    width: 100%; */
+}
