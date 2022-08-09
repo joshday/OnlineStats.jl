@@ -7,3 +7,30 @@ img, svg {
     display: block;
     width: 100%; */
 }
+
+.docs-sidebar {
+    border-right: 0px !important;
+}
+
+li.is-active {
+    border-top: 0px !important;
+    border-bottom: 0px !important;
+}
+
+.content pre {
+    border: 0px;
+    border-radius: 4px;
+}
+
+ul.internal {
+    border: 0px !important;
+}
+
+ul.internal li:last-child {
+    margin-bottom: 8px !important;
+}
+
+header.docs-navbar {
+    visibility: hidden !important;
+    min-height: 0px !important;
+}
