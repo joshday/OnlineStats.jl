@@ -18,6 +18,7 @@ StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 
 [compat]
 AbstractTrees = "0.3, 0.4"
+Distributions = "0.25"
 OnlineStatsBase = "1.4.7, 1.5"
 OrderedCollections = "1.1"
 RecipesBase = "0.7, 0.8, 1.0, 1.1"
