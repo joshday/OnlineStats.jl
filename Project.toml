@@ -21,6 +21,7 @@ AbstractTrees = "0.3, 0.4"
 OnlineStatsBase = "1.4.7, 1.5"
 OrderedCollections = "1.1"
 RecipesBase = "0.7, 0.8, 1.0, 1.1"
+SpecialFunctions = "2.1"
 StatsBase = "0.32, 0.33"
 julia = "1.0"
 
