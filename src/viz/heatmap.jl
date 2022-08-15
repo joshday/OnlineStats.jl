@@ -6,7 +6,7 @@ Create a two dimensional histogram with the bin partition created by `xedges` an
 When fitting a new observation, the first value will be associated with X, the second with Y.
 
 - If `left`, the bins will be left-closed.
-- If `closed`, the bins on the ends will be closed.  See [OnlineStats.Hist](@ref).
+- If `closed`, the bins on the ends will be closed.  See [`Hist`](@ref).
 
 # Example
 

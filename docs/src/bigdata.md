@@ -22,7 +22,7 @@ url = "https://gist.githubusercontent.com/joshday/df7bdaa1d58b398592e7656395de63
 
 rows = CSV.Rows(download(url); reusebuffer = true)
 
-itr = (row.variety => parse(Float64, row.sepal_length) for row in rows)
+itr = (string(row.variety) => parse(Float64, row.sepal_length) for row in rows)
 
 o = GroupBy(String, Hist(4:0.25:8))
 
