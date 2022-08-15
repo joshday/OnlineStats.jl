@@ -1,3 +1,7 @@
+body {
+    color: #1f2937;
+}
+
 img, svg {
     border-radius: 4px;
     margin-left: 6px;
@@ -30,7 +34,30 @@ ul.internal li:last-child {
     margin-bottom: 8px !important;
 }
 
-header.docs-navbar {
+.docs-settings-button {
     visibility: hidden !important;
     min-height: 0px !important;
+}
+
+#documenter .docs-sidebar ul.docs-menu > li > .tocitem {
+    font-weight: normal;
+}
+#documenter .docs-sidebar ul.docs-menu ul.internal .tocitem::before {
+    content: "  "
+}
+
+#documenter .docs-sidebar {
+    background-color: #FFFFFF;
+}
+
+.tocitem {
+    background-color: #FFFFFF !important;
+}
+
+.tocitem:hover {
+    background-color: whitesmoke !important;
+}
+
+{
+
 }
