@@ -7,7 +7,8 @@ makedocs(
             asset("assets/favicon.ico", islocal=true),
         ],
         sidebar_sitename=false,
-        edit_link = nothing
+        edit_link = nothing,
+        footer = "© 2022 Josh Day"
     ),
     sitename = "OnlineStats Documentation",
     modules = [OnlineStats, OnlineStatsBase],
