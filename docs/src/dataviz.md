@@ -122,7 +122,7 @@ plot(s, link = :x, label = ["KHist" "Hist" "ExpandingHist"])
   but uses a fine partition histogram instead of individual observations to perform the smoothing.
 
 ```@example setup
-o = fit!(Ash(ExpandingHist(1000)), randn(10^6))
+o = fit!(Ash(ExpandingHist(1000), 5), randn(10^6))
 plot(o)
 ```
 
