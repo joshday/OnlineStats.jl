@@ -9,10 +9,13 @@ body {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
 }
 
-#documenter .docs-sidebar ul.docs-menu ul.internal .tocitem::before {
+ul.internal .tocitem::before {
     content: "" !important;
-    margin-right: 0.4em;
-    margin-left: 1em;
+    margin: 0px !important;
+    /* margin-right: 0.4em; */
+}
+ul.internal .tocitem {
+    margin-left: 16px;
 }
 
 .tocitem {
@@ -75,8 +78,14 @@ ul.internal {
 
 .docs-menu {
     border-top: 0px !important;
+    padding-left: 16px !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal !important;
+}
+
+#documenter-search-results {
+    list-style-type: decimal !important;
+    padding-bottom: 16px;
 }
