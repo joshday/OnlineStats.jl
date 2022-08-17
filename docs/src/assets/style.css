@@ -14,6 +14,8 @@ ul.internal .tocitem::before {
     margin: 0px !important;
     /* margin-right: 0.4em; */
 }
+
+/* Indentation of TOC level 2 */
 ul.internal .tocitem {
     margin-left: 16px;
 }
@@ -78,7 +80,11 @@ ul.internal {
 
 .docs-menu {
     border-top: 0px !important;
-    padding-left: 16px !important;
+    margin-top: 16px !important;
+    overflow-x: hidden;
+}
+#documenter > nav > ul > li > a {
+    margin-left: 16px !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
