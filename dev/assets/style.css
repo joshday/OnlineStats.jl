@@ -95,3 +95,7 @@ h1, h2, h3, h4, h5, h6 {
     list-style-type: decimal !important;
     padding-bottom: 16px;
 }
+
+.docs-version-selector {
+    border-top: 0px;
+}
