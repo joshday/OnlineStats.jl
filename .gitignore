@@ -13,3 +13,5 @@ test/experiment.jl
 *site/
 docs/build
 docs/Manifest.toml
+
+quartodocs
