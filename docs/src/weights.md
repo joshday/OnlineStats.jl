@@ -25,6 +25,29 @@ end # hide
 p # hide
 ```
 
+!!! info
+    The notion of weighting in **OnlineStats** is fundamentally different than `StatsBase.AbstractWeights`.
+
+- In **OnlineStats**, a weight determines the influence of an observation *compared to the current state of the statistic*.
+- In **StatsBase**, a weight determines the influence of an observation *in the overall calculation of the statistic*.
+```@repl
+using OnlineStats, StatsBase
+
+x = 1:99;
+w = fill(0.1, 99);
+
+# StatsBase: All weights == 0.1
+mean(x) ≈ mean(x, aweights(w)) ≈ mean(x, fweights(w)) ≈ mean(x, pweights(w))
+
+# OnlineStats: All weights == 0.1
+o = fit!(Mean(weight = n -> 0.1), x)
+
+
+mean(x)  # Every observation has equal influence over statistic.
+value(o)  # Recent observations have higher influence over statistic.
+```
+
+
 ## Weight Types
 
 ```@docs

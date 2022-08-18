@@ -2,7 +2,7 @@
 using OnlineStats
 ```
 
-# How `fit!` Works
+# Details of Updating (`fit!`)
 
 ## Core Principles
 

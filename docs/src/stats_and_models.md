@@ -11,7 +11,7 @@ ENV["GKS_ENCODING"]="utf8"
 |:----------------------|:--------------------------------------------|
 | Mean                  | [`Mean`](@ref)                              |
 | Variance              | [`Variance`](@ref)                          |
-| Quantiles             | [`Quantile`](@ref) and [`P2Quantile`](@ref) |
+| Quantiles             | [`Quantile`](@ref), [`OrderStats`](@ref), and [`P2Quantile`](@ref) |
 | Maximum/Minimum       | [`Extrema`](@ref)                           |
 | Skewness and kurtosis | [`Moments`](@ref)                           |
 | Sum                   | [`Sum`](@ref)                               |
@@ -98,7 +98,7 @@ ENV["GKS_ENCODING"]="utf8"
 | Group by categorical variable | [`GroupBy`](@ref)                    |
 
 
-## Stochastic Approximation with [`StatLearn`](@ref) 
+## Stochastic Approximation with [`StatLearn`](@ref)
 
 ### Regression and Classification Losses
 
@@ -110,14 +110,14 @@ ENV["GKS_ENCODING"]="utf8"
 | ``L_{1}`` Hinge Loss                         | [`OnlineStats.l1hingeloss`](@ref)  |
 | Generalized distance weighted discrimination | [`OnlineStats.DWDLoss`](@ref)      |
 
-### Penalty/regularization functions 
+### Penalty/regularization functions
 
 | Penalty                    | Function                         |
 |:---------------------------|:---------------------------------|
 | None                       | `zero`                           |
 | LASSO (``L_{1}`` penalty)  | `abs`                            |
 | Ridge  (``L_{2}`` penalty) | `abs2`                           |
-| Elastic Net                | [`OnlineStats.ElasticNet`](@ref) |      
+| Elastic Net                | [`OnlineStats.ElasticNet`](@ref) |
 
 ### Optimization Algorithms
 

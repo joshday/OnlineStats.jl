@@ -1,4 +1,4 @@
-# Machine Learning with [`StatLearn`](@ref)
+# Statistical Learning
 
 The `StatLearn` (short for statistical learning) OnlineStat uses stochastic approximation methods to estimate models that take the form:
 
