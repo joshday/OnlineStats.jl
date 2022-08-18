@@ -9,6 +9,7 @@ makedocs(
         sidebar_sitename=false,
         footer = "© 2022 Josh Day"
     ),
+    repo = "https://github.com/joshday/OnlineStats.jl",
     sitename = "OnlineStats Documentation",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
