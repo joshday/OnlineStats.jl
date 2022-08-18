@@ -17,7 +17,7 @@ For example, [LASSO Regression](https://en.wikipedia.org/wiki/Lasso_(statistics)
 
 OnlineStats implements interchangeable loss and penalty functions to use for both regression and classification problems.  See the [`StatLearn`](@ref) docstring for details.
 
-### Stochastic Approximation
+## Stochastic Approximation
 
 An important note is that [`StatLearn`](@ref) is unable to estimate coefficients exactly (For precision in regression problems, see [`LinReg`](@ref)).  The upside is that it makes estimating certain models *possible* in an online fashion.
 
@@ -25,7 +25,7 @@ For example, it is **not possible** to get the same coefficients for logistic re
 
 **All this to say: `StatLearn` lets you do things that would otherwise not be possible at the cost of returning noisy estimates.**
 
-### Algorithms
+## Algorithms
 
 Besides the loss and penalty functions, you can also plug in a variety of fitting algorithms to `StatLearn`.  Some of these methods are based on the stochastic gradient (gradient of loss evaluated on a single observation).  Other methods are based on the [majorization-minimization (MM)](https://en.wikipedia.org/wiki/MM_algorithm) principle[^1], which offers some guarantees on numerical stability (sometimes at the cost of slower learning).
 
