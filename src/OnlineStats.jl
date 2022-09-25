@@ -37,7 +37,7 @@ export
     Diff,
     Extrema, ExpandingHist,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
-    FastNode, FastTree, FastForest, FTSeries,
+    FastNode, FastTree, FastForest,
     GeometricMean,
     Group, GroupBy,
     HeatMap, Hist, HyperLogLog,
@@ -119,4 +119,3 @@ include("viz/heatmap.jl")
 include("viz/hexlattice.jl")
 include("viz/ash.jl")
 end
-

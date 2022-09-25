@@ -93,7 +93,7 @@ ENV["GKS_ENCODING"]="utf8"
 
 | Statistic/Model               | OnlineStat                           |
 |:------------------------------|:-------------------------------------|
-| Univariate data stream        | [`Series`](@ref), [`FTSeries`](@ref) |
+| Univariate data stream        | [`Series`](@ref)                     |
 | Multivariate data streams     | [`Group`](@ref)                      |
 | Group by categorical variable | [`GroupBy`](@ref)                    |
 
