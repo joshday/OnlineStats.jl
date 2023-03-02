@@ -265,6 +265,8 @@ Approximate K-Means clustering of `k` clusters.
     o = fit!(KMeans(2, 2), eachrow(x))
 
     sort!(o; rev=true)  # Order clusters by number of observations
+
+    classify(o, x[1])  # returns index of cluster closest to x[1]
 """
 mutable struct KMeans{T, C <: NTuple{N, Cluster{T}} where N, W} <: OnlineStat{VectorOb}
     value::C
@@ -304,6 +306,8 @@ function _fit!(o::KMeans{T}, x) where {T}
         smooth!(cluster.value, x, o.rate(cluster.n += 1))
     end
 end
+
+classify(o::KMeans, x) = findmin(c -> norm(x .- c.value), o.value)[2]
 
 #-----------------------------------------------------------------------# MovingTimeWindow
 """
