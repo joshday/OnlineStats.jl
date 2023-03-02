@@ -299,6 +299,10 @@ end
     o = fit!(KMeans(2), eachrow(ymat))
     sort!(o, rev=true)
     @test o.value[1].n ≥ o.value[2].n
+    
+    x = [repeat([[1.0, 1.0]], 3); repeat([[-1.0, -1.0]], 3)]
+    o = fit!(KMeans(2), (ξ for ξ ∈ x))
+    @test classify(o, x[1]) ≠ classify(o, x[4])
 end
 #-----------------------------------------------------------------------# LinReg
 @testset "LinReg" begin
