@@ -198,10 +198,14 @@ nobs(o::FitMvNormal) = nobs(o.cov)
 _fit!(o::FitMvNormal, y) = _fit!(o.cov, y)
 function value(o::FitMvNormal)
     c = cov(o.cov)
-    if isposdef(c)
+    if isposdef(c) || iszero(c)
         return mean(o.cov), c
     else
         return zeros(nvars(o)), Matrix(1.0I, nvars(o), nvars(o))
     end
 end
 _merge!(o::FitMvNormal, o2::FitMvNormal) = _merge!(o.cov, o2.cov)
+
+Statistics.mean(o::FitMvNormal) = mean(o.cov)
+Statistics.var(o::FitMvNormal) = var(o.cov)
+Statistics.cov(o::FitMvNormal) = cov(o.cov)
