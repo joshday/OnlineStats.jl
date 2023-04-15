@@ -198,7 +198,7 @@ nobs(o::FitMvNormal) = nobs(o.cov)
 _fit!(o::FitMvNormal, y) = _fit!(o.cov, y)
 function value(o::FitMvNormal)
     c = cov(o.cov)
-    if isposdef(c) || iszero(c)
+    if isposdef(c) || (iszero(c) && nobs(o) > 1)
         return mean(o.cov), c
     else
         return zeros(nvars(o)), Matrix(1.0I, nvars(o), nvars(o))
