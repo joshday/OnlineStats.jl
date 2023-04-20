@@ -7,14 +7,14 @@
 
 s = Series(Mean(), Variance())
 
-fit!(s, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Series{Number, Tuple{Mean{Float64, EqualWeight}, Variance{Float64, Float64, EqualWeight}}}
-├─ Mean{Float64, EqualWeight}: n=1_000 | value=0.501529
-└─ Variance{Float64, Float64, EqualWeight}: n=1_000 | value=0.0842243
+fit!(s, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Series
+├─ Mean: n=1_000 | value=0.487435
+└─ Variance: n=1_000 | value=0.0866538
 </code></pre><h2 id="Group"><a class="docs-heading-anchor" href="#Group"><code>Group</code></a><a id="Group-1"></a><a class="docs-heading-anchor-permalink" href="#Group" title="Permalink"></a></h2><p>A <a href="../api/#OnlineStatsBase.Group"><code>Group</code></a> tracks stats that should be applied to <strong>different</strong> data streams.</p><pre><code class="language-julia hljs">g = Group(Mean(), CountMap(Bool))
 
 itr = zip(randn(100), rand(Bool, 100))
 
-fit!(g, itr)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Group{Tuple{Mean{Float64, EqualWeight}, CountMap{Bool, OrderedCollections.OrderedDict{Bool, Int64}}}, Union{Tuple{Number, Union{Bool, Pair{&lt;:Bool, &lt;:Integer}}}, AbstractVector, NamedTuple{names, R} where R&lt;:Tuple{Number, Union{Bool, Pair{&lt;:Bool, &lt;:Integer}}}} where names}
-├─ Mean{Float64, EqualWeight}: n=100 | value=0.142526
-└─ CountMap{Bool, OrderedCollections.OrderedDict{Bool, Int64}}: n=100 | value=OrderedCollections.OrderedDict{Bool, Int64}(0=&gt;48, 1=&gt;52)
-</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../dataviz/">« Data Visualization</a><a class="docs-footer-nextpage" href="../howfitworks/">Details of Updating (<code>fit!</code>) »</a><div class="flexbox-break"></div><p class="footer-message">© 2022 Josh Day</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Thursday 13 April 2023 00:45">Thursday 13 April 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fit!(g, itr)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Group
+├─ Mean: n=100 | value=0.247845
+└─ CountMap: n=100 | value=OrderedCollections.OrderedDict{Bool, Int64}(0=&gt;44, 1=&gt;56)
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../dataviz/">« Data Visualization</a><a class="docs-footer-nextpage" href="../howfitworks/">Details of Updating (<code>fit!</code>) »</a><div class="flexbox-break"></div><p class="footer-message">© 2022 Josh Day</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Thursday 20 April 2023 12:48">Thursday 20 April 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
