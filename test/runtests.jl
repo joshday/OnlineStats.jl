@@ -127,9 +127,14 @@ end
     end
     @testset "FitMvNormal" begin
         @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
-        a, b = mergevals(FitMvNormal(2), OnlineStatsBase.eachrow([y y2]), OnlineStatsBase.eachrow([y2 y]))
-        @test a[1] ≈ b[1]
-        @test a[2] ≈ b[2]
+        a, b = mergestats(FitMvNormal(2), OnlineStatsBase.eachrow([y y2]), OnlineStatsBase.eachrow([y2 y]))
+        @test value(a)[1] ≈ value(b)[1]
+        @test value(a)[2] ≈ value(b)[2]
+
+        @test all(mean(a) .≈ mean(ys))
+        @test all(var(a) .≈ var(ys))
+        @test cov(a)[1] ≈ cov(a)[4] ≈ var(ys)
+        @test cov(a)[2] ≈ cov(a)[3]
     end
 end
 #-----------------------------------------------------------------------# FastNode
