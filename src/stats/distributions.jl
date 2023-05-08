@@ -118,13 +118,16 @@ struct FitNormal{V <: Variance} <: OnlineStat{Number}
     v::V
 end
 FitNormal(;kw...) = FitNormal(Variance(;kw...))
+FitNormal(T::Type;kw...) = FitNormal(Variance(T;kw...))
 _fit!(o::FitNormal, y::Real) = _fit!(o.v, y)
 nobs(o::FitNormal) = nobs(o.v)
 function value(o::FitNormal)
     if nobs(o) > 1
         return mean(o.v), std(o.v)
     else
-        return 0.0, 1.0
+        mT = o.v.μ
+        vT = o.v.σ2
+        return zero(mT), one(vT)
     end
 end
 _merge!(o::FitNormal, o2::FitNormal) = _merge!(o.v, o2.v)
@@ -189,10 +192,11 @@ Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
     y = randn(100, 2)
     o = fit!(FitMvNormal(2), eachrow(y))
 """
-struct FitMvNormal <: OnlineStat{VectorOb}
-    cov::CovMatrix{Float64}
-    FitMvNormal(p::Integer) = new(CovMatrix(p))
+struct FitMvNormal{C <: CovMatrix} <: OnlineStat{VectorOb}
+    cov::C
 end
+FitMvNormal(p::Integer) = FitMvNormal(CovMatrix(p))
+FitMvNormal(T::Type, p::Integer) = FitMvNormal(CovMatrix(T, p))
 nvars(o::FitMvNormal) = nvars(o.cov)
 nobs(o::FitMvNormal) = nobs(o.cov)
 _fit!(o::FitMvNormal, y) = _fit!(o.cov, y)
@@ -201,7 +205,9 @@ function value(o::FitMvNormal)
     if isposdef(c) || (iszero(c) && nobs(o) > 1)
         return mean(o.cov), c
     else
-        return zeros(nvars(o)), Matrix(1.0I, nvars(o), nvars(o))
+        # this could also be the definition of `eltype(o::FitMvNormal)`
+        T = eltype(o.cov.value)
+        return zeros(T, nvars(o)), Matrix{T}(1.0I, nvars(o), nvars(o))
     end
 end
 _merge!(o::FitMvNormal, o2::FitMvNormal) = _merge!(o.cov, o2.cov)
