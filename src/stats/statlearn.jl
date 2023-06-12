@@ -221,11 +221,11 @@ function _merge!(o::StatLearn, o2::StatLearn)
     smooth!(o.λ, o2.λ, γ)
 end
 
-predict(o::StatLearn, x::VectorOb) = dot(x, o.β)
+predict(o::StatLearn, x::VectorOb{Number}) = dot(x, o.β)
 predict(o::StatLearn, x::AbstractMatrix) = x * o.β
 classify(o::StatLearn, x) = sign.(predict(o, x))
 
-function objective(o::StatLearn, x::AbstractMatrix, y::VectorOb)
+function objective(o::StatLearn, x::AbstractMatrix, y::VectorOb{Number})
     mean(o.loss.(y, predict(o,x))) + sum(o.λ .* o.penalty.(o.β))
 end
 

@@ -58,9 +58,9 @@ export
     OnlineStat, BiasVec
 
 #-----------------------------------------------------------------------------# utils
-const Tup = Union{Tuple, NamedTuple}
-const VectorOb = Union{AbstractVector, Tup}
-const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names,Tuple{T,S}}} where {names,T<:AbstractVector{<:Number},S<:Number}
+const Tup{T} = Union{NTuple{N,T} where {N}, NamedTuple{names, Tuple{N,<:T} where {N}} where {names}}
+const VectorOb{T} = Union{AbstractVector{<:T}, Tup{T}}
+const XY{T,S} = Union{Tuple{T,S}, Pair{T,S}, NamedTuple{names,Tuple{T,S}}} where {names,T<:VectorOb{Number},S<:Number}
 
 const ϵ = 1e-7  # avoid dividing by 0 in some cases
 

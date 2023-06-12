@@ -116,7 +116,7 @@ end
     end
     @testset "FitMultinomial" begin
         o = FitMultinomial(5)
-        @test value(o)[2] == ones(5) / 5
+        @test value(o)[2] == ones(5) ./ 5
         data = [1 2 3 4 5; 1 2 3 4 5]
         @test value(fit!(o, eachrow(data)))[2] == collect(2:2:10) ./ sum(data)
 
@@ -304,7 +304,7 @@ end
     o = fit!(KMeans(2), eachrow(ymat))
     sort!(o, rev=true)
     @test o.value[1].n ≥ o.value[2].n
-    
+
     x = [repeat([[1.0, 1.0]], 3); repeat([[-1.0, -1.0]], 3)]
     o = fit!(KMeans(2), (ξ for ξ ∈ x))
     @test classify(o, x[1]) ≠ classify(o, x[4])

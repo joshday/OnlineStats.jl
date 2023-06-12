@@ -34,7 +34,7 @@ end
 end
 
 #-----------------------------------------------------------------------# residual plot
-@recipe function f(o::OnlineStat{VectorOb}, x::AbstractMatrix, y::AbstractVector)
+@recipe function f(o::OnlineStat{VectorOb{Number}}, x::AbstractMatrix, y::AbstractVector)
     yguide --> "Residual"
     xguide --> "Observation Index"
     legend --> false

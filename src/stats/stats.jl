@@ -268,7 +268,7 @@ Approximate K-Means clustering of `k` clusters.
 
     classify(o, x[1])  # returns index of cluster closest to x[1]
 """
-mutable struct KMeans{T, C <: NTuple{N, Cluster{T}} where N, W} <: OnlineStat{VectorOb}
+mutable struct KMeans{T, C <: NTuple{N, Cluster{T}} where N, W} <: OnlineStat{VectorOb{Number}}
     value::C
     buffer::Vector{T}
     rate::W

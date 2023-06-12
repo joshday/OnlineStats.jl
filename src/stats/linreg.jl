@@ -79,7 +79,7 @@ parameter `λ`.  An intercept (`bias`) term is added by default.
 
     coef(o; y=7, x=[2,5,4])
 """
-mutable struct LinRegBuilder{W} <: OnlineStat{VectorOb}
+mutable struct LinRegBuilder{W} <: OnlineStat{VectorOb{Number}}
     A::Matrix{Float64}  #  x'x, pretend that x = [x, 1]
     weight::W
     n::Int

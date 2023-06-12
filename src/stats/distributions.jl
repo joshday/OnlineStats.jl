@@ -166,7 +166,7 @@ distribution is returned as 1.
     x = [1 2 3; 4 8 12]
     fit!(FitMultinomial(3), x)
 """
-mutable struct FitMultinomial{T} <: OnlineStat{VectorOb}
+mutable struct FitMultinomial{T} <: OnlineStat{VectorOb{Number}}
     grp::Group{T}
 end
 
@@ -176,7 +176,7 @@ nobs(o::FitMultinomial) = nobs(o.grp)
 function value(o::FitMultinomial)
     m = value.(o.grp.stats)
     p = length(o.grp)
-    outvec = all(x-> x==0.0, m) ? ones(p) ./ p : collect(m) ./ sum(m)
+    outvec = all(iszero, m) ? ones(p) ./ p : collect(m) ./ sum(m)
     return 1, outvec
 end
 _merge!(o::FitMultinomial, o2::FitMultinomial) = _merge!(o.grp, o2.grp)
@@ -192,7 +192,7 @@ Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
     y = randn(100, 2)
     o = fit!(FitMvNormal(2), eachrow(y))
 """
-struct FitMvNormal{C <: CovMatrix} <: OnlineStat{VectorOb}
+struct FitMvNormal{C <: CovMatrix} <: OnlineStat{VectorOb{Number}}
     cov::C
 end
 FitMvNormal(p::Integer) = FitMvNormal(CovMatrix(p))
