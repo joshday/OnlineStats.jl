@@ -54,7 +54,7 @@ $$
 \mu^{(t)} = [1 - w(t)] \mu^{(t-1)} + w(t) y_t.
 $$
 
-Therefore, for example, $w(t) = t{-1}$ returns the analytical mean and $w(t) = \lambda \; (0 < \lambda < 1)$ returns an exponentially weighted mean.
+Therefore, for example, $w(t) = t^{-1}$ returns the analytical mean and $w(t) = \lambda \; (0 < \lambda < 1)$ returns an exponentially weighted mean.
 
 ## Merging
 
