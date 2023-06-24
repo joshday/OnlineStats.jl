@@ -3,25 +3,13 @@ abstract type HistogramStat{T} <: OnlineStat{T} end
 
 # Index of `edges` that `y` belongs in, depending on if bins are `left` closed and if
 # the bin on the end is `closed` instead of half-open.
-function binindex(edges::AbstractVector, y, left::Bool, closed::Bool)
+function binindex(edges, y, left::Bool, closed::Bool)
     a, b = extrema(edges)
     y < a && return 0
     y > b && return length(edges)
-    closed && y == a && return 1
-    closed && y == b && return length(edges) - 1
-    if left
-        if isa(edges, AbstractRange)
-            return floor(Int, (y - a) / step(edges)) + 1
-        else
-            return searchsortedlast(edges, y)
-        end
-    else
-        if isa(edges, AbstractRange)
-            return ceil(Int, (y - a) / step(edges))
-        else
-            return searchsortedfirst(edges, y) - 1
-        end
-    end
+    y == a && (closed || left) && return 1
+    y == b && (closed || !left) && return length(edges) - 1
+    return left ? searchsortedlast(edges, y) : searchsortedfirst(edges, y) - 1
 end
 
 # requires: edges(o), midpoints(o), counts(o)
