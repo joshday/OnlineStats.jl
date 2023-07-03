@@ -8,13 +8,13 @@
 s = Series(Mean(), Variance())
 
 fit!(s, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Series
-├─ Mean: n=1_000 | value=0.494429
-└─ Variance: n=1_000 | value=0.0805009
+├─ Mean: n=1_000 | value=0.495424
+└─ Variance: n=1_000 | value=0.083917
 </code></pre><h2 id="Group"><a class="docs-heading-anchor" href="#Group"><code>Group</code></a><a id="Group-1"></a><a class="docs-heading-anchor-permalink" href="#Group" title="Permalink"></a></h2><p>A <a href="../api/#OnlineStatsBase.Group"><code>Group</code></a> tracks stats that should be applied to <strong>different</strong> data streams.</p><pre><code class="language-julia hljs">g = Group(Mean(), CountMap(Bool))
 
 itr = zip(randn(100), rand(Bool, 100))
 
 fit!(g, itr)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Group
-├─ Mean: n=100 | value=0.177689
-└─ CountMap: n=100 | value=OrderedDict{Bool, Int64}(0=&gt;58, 1=&gt;42)
-</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../dataviz/">« Data Visualization</a><a class="docs-footer-nextpage" href="../howfitworks/">Details of Updating (<code>fit!</code>) »</a><div class="flexbox-break"></div><p class="footer-message">© 2022 Josh Day</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Sunday 25 June 2023 00:12">Sunday 25 June 2023</span>. Using Julia version 1.9.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+├─ Mean: n=100 | value=-0.0559196
+└─ CountMap: n=100 | value=OrderedDict{Bool, Int64}(0=&gt;49, 1=&gt;51)
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../dataviz/">« Data Visualization</a><a class="docs-footer-nextpage" href="../howfitworks/">Details of Updating (<code>fit!</code>) »</a><div class="flexbox-break"></div><p class="footer-message">© 2022 Josh Day</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Monday 3 July 2023 14:18">Monday 3 July 2023</span>. Using Julia version 1.9.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
