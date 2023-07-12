@@ -351,6 +351,8 @@ end
 end
 #-----------------------------------------------------------------------# MovingWindow
 @testset "MovingWindow" begin
+    @test MovingWindow(10,Int) == MovingWindow(Int, 10)
+    string(MovingWindow)
     o = fit!(MovingWindow(10, Int), 1:12)
     for i in 1:10
         @test o[i] == (1:12)[i + 2]

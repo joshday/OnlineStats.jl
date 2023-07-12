@@ -381,6 +381,7 @@ end
 MovingWindow(b::Int, T::Type) = MovingWindow(T[], b, 1, 0)
 MovingWindow(T::Type, b::Int) = MovingWindow(b, T)
 function value(o::MovingWindow)
+    o.n < o.b && return o.value
     perm = vcat(collect(o.first:o.b), collect(1:(o.first-1)))
     o.first = 1
     permute!(o.value, perm)
