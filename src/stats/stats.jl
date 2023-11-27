@@ -53,13 +53,13 @@ struct AutoCov{T, W} <: OnlineStat{Number}
     cross::Vector{Float64}
     m1::Vector{Float64}
     m2::Vector{Float64}
-    lag::CircBuff{T}         # y_{t-1}, y_{t-2}, ...
-    wlag::CircBuff{Float64}  # γ_{t-1}, γ_{t-2}, ...
-    v::Variance{W}
+    lag::CircBuff{T, true}         # y_{t-1}, y_{t-2}, ...
+    wlag::CircBuff{Float64, true}  # γ_{t-1}, γ_{t-2}, ...
+    v::Variance{T, T, W}
 end
 function AutoCov(k::Integer, T = Float64; kw...)
     d = k + 1
-    AutoCov(zeros(d), zeros(d), zeros(d), CircBuff(T,d;rev=true), CircBuff(Float64,d;rev=true), Variance(;kw...))
+    AutoCov(zeros(d), zeros(d), zeros(d), CircBuff(T,d;rev=true), CircBuff(Float64,d;rev=true), Variance(T, ;kw...))
 end
 nobs(o::AutoCov) = nobs(o.v)
 
