@@ -35,6 +35,17 @@ mergevals(o1::OnlineStat, y1, y2) = map(value, mergestats(o1, y1, y2))
     @test autocov(o) ≈ autocov(y, 0:10)
     @test autocor(o) ≈ autocor(y, 0:10)
     @test nobs(o) == n
+    # validate type stability
+    # we cannot do @inferred o.cross or @inferred getfield(o, :cross) directly
+    # because that does not do constant propagation. So we need a function barrier
+    # Furthermore, since @inferred either throws or returns the result, we need to
+    # test if for equality manually.
+    @test (@inferred ((o) -> o.cross)(o)) === o.cross
+    @test (@inferred ((o) -> o.m1)(o))    === o.m1
+    @test (@inferred ((o) -> o.m2)(o))    === o.m2
+    @test (@inferred ((o) -> o.lag)(o))   === o.lag
+    @test (@inferred ((o) -> o.wlag)(o))  === o.wlag
+    @test (@inferred ((o) -> o.v)(o))     === o.v
 end
 #-----------------------------------------------------------------------# Bootstrap
 @testset "Bootstrap" begin
