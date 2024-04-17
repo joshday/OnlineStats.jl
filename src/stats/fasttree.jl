@@ -173,11 +173,11 @@ Calculate a random forest where each variable is summarized by `stat`.
 
 # Keyword Arguments
 
-- `nt=100)`: Number of trees in the forest
+- `nt=100`: Number of trees in the forest
 - `b=floor(Int, sqrt(p))`: Number of random features for each tree to receive
 - `maxsize=1000`: Maximum size for any tree in the forest
 - `splitsize=5000`: Number of observations in any given node before splitting
-- `λ = .05`: Probability that each tree is updated on a new observation
+- `λ = 5 * (1 / nt)`: Probability that each tree is updated on a new observation
 
 # Example
 
