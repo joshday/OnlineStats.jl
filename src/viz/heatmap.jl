@@ -71,11 +71,15 @@ end
     link --> :x
     z = Float64.(o.counts)
     z[z .== 0] .= NaN
+    xlims = extrema(o.xedges)
+    ylims = extrema(o.yedges)
     @series begin
         s = marginals ? 3 : 1
         subplot --> s
         seriestype --> :heatmap
         legend --> false
+        xlims --> xlims
+        ylims --> ylims
         o.xedges, o.yedges, z'
     end
     if marginals
@@ -95,6 +99,7 @@ end
             linewidth --> 0
             line_alpha --> 0
             seriestype --> :bar
+            xlims --> xlims
             o.xedges, vec(sum(o.counts, dims=2))
         end
         @series begin
@@ -104,6 +109,7 @@ end
             line_alpha --> 0
             orientation --> :h
             seriestype --> :bar
+            ylims --> ylims
             o.yedges, vec(sum(o.counts, dims=1))
         end
     end
