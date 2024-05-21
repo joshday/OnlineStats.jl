@@ -186,7 +186,7 @@ counts(o::ExpandingHist) = o.counts
 edges(o::ExpandingHist) = o.edges
 
 function _fit!(o::ExpandingHist, y)
-    isfinite(y) || error("ExpandingHist requires finite values.  Found $y.")
+    isfinite(y) || error("ExpandingHist requires `isfinite` values.  Found $y.")
     o.n += 1
 
     # init

@@ -71,12 +71,25 @@ end
 end
 
 #-----------------------------------------------------------------------# GroupBy
-@recipe function f(o::GroupBy{<:Any, <:Any, <:Union{KHist, ExpandingHist, Hist}})
+@recipe function f(o::GroupBy{<:Any, <:Any, <:Union{KHist, ExpandingHist, Hist, HeatMap}})
     sort!(o.value)
     link --> :all
     for (k, v) in pairs(o.value)
         @series begin
             label --> string(k)
+            v
+        end
+    end
+end
+@recipe function f(o::GroupBy{<:Any, <:Any, <:HeatMap})
+    sort!(o.value)
+    link --> :all
+    layout --> length(o.value)
+    for (i, (k, v)) in enumerate(pairs(o.value))
+        @series begin
+            subplot --> i
+            marginals --> false
+            title --> string(k)
             v
         end
     end
