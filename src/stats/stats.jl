@@ -644,6 +644,8 @@ nobs(o::Quantile) = nobs(o.eh)
 Create a sample without replacement of size `k`.  After running through `n` observations,
 the probability of an observation being in the sample is `1 / n`.
 
+If you need more advanced reservoir sampling methods consider using `StreamSampling.jl`.
+
 # Example
 
     fit!(ReservoirSample(100, Int), 1:1000)
