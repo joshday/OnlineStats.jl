@@ -42,7 +42,7 @@ function _fit!(o::ZScoreDetector{T}, y::Real) where {T}
         o.signal = 0
         fit!(o.filtered, y)
     else
-        if abs(y - o.center) > o.threshold * o.stds
+        if abs(y - o.center) > (o.threshold * o.stds)
             y > o.center ? (o.signal = 1) : (o.signal = -1)
             fit!(o.filtered, o.influence * y + (1 - o.influence) * o.filtered[end])
         else
