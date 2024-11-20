@@ -54,6 +54,7 @@ export
     Trace,
     Variance,
     DPMM,
+    ZScoreDetector,
 # other
     OnlineStat, BiasVec
 
@@ -109,6 +110,7 @@ include("stats/pca.jl")
 include("stats/statlearn.jl")
 include("stats/trace.jl")
 include("stats/dpmm.jl")
+include("stats/peak_detection.jl")
 #-----------------------------------------------------------------------------# viz
 include("viz/khist.jl")
 include("viz/khist2d.jl")
