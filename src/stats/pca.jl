@@ -78,7 +78,7 @@ Base.lastindex(o::CCIPCA) = outdim(o)
 Base.size(o::CCIPCA) = (indim(o), outdim(o))
 @inline outdim(o::CCIPCA) = length(o.lambda)
 @inline indim(o::CCIPCA) = length(o.center)
-function _fit!(o::CCIPCA, x::Vector{Float64})
+function _fit!(o::CCIPCA, x::AbstractVector{<:Real})
     if o.indimdet == false
         # Now indim is known so we set up accordingly
         idim = length(x)
