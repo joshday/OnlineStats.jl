@@ -177,3 +177,13 @@ end
         end
     end
 end
+
+@testset "Is CCIPCA resistant against accidental misuse?" begin
+    o = CCIPCA(2, 4)
+    u1 = rand(4)
+    # if we repeatedly fit with the same vector 
+    # we should not fail by having an eigenval of NaN
+    fit!(o, u1)
+    fit!(o, u1)
+    @test !any(isnan.(OnlineStats.eigenvalues(o)))
+end
