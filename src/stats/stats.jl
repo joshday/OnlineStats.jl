@@ -451,6 +451,12 @@ function ecdf(o::OrderStats)
     ecdf(vcat(a, value(o), b))
 end
 
+Extrema(o::OrderStats) = copy(o.ex)
+Base.minimum(o::OrderStats) = Base.minimum(o.ex)
+Base.extrema(o::OrderStats) = Base.extrema(o.ex)
+Base.maximum(o::OrderStats) = Base.maximum(o.ex)
+Base.convert(::Type{Extrema}, o::OrderStats) = Extrema(o)
+
 # # tree/nbc help:
 # function pdf(o::OrderStats, x)
 #     if x ≤ first(o.value)

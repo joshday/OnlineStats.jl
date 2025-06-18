@@ -387,6 +387,17 @@ end
     o = fit!(OrderStats(n), y)
     @test value(o) == sort(y)
     @test quantile(o, 0:.25:1) == quantile(y, 0:.25:1)
+    _min = minimum(o)
+    _max = maximum(o)
+    _ex = Extrema(o)
+    @test extrema(o) == (_min, _max)
+    @test extrema(o) == extrema(_ex)
+    @test _min <= quantile(o, 0)
+    @test _max >= quantile(o, 1)
+    @test convert(Extrema, o) == _ex
+    fit!(_ex, _max + oneunit(_max))
+    fit!(_ex, _min - oneunit(_min))
+    @test extrema(o) != extrema(_ex)
 end
 #-----------------------------------------------------------------------# Partition
 @testset "Partition" begin
