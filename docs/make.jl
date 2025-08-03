@@ -1,4 +1,6 @@
-using Documenter, OnlineStats, OnlineStatsBase, InteractiveUtils
+using OnlineStats, OnlineStatsBase, InteractiveUtils
+using Documenter
+using Documenter.Remotes: GitHub
 
 makedocs(
     format = Documenter.HTML(
@@ -10,7 +12,7 @@ makedocs(
         footer = "© 2022 Josh Day",
         analytics = "G-5LKX04JX9B"
     ),
-    repo = "https://github.com/joshday/OnlineStats.jl",
+    repo = GitHub("joshday/OnlineStats.jl"),
     sitename = "OnlineStats Documentation",
     modules = [OnlineStats, OnlineStatsBase],
     authors = "Josh Day",
