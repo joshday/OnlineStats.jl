@@ -1,0 +1,101 @@
+@import url('https://rsms.me/inter/inter.css');
+html { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  html { font-family: 'Inter var', sans-serif; }
+}
+
+
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
+}
+
+ul.internal .tocitem::before {
+    content: "" !important;
+    margin: 0px !important;
+    /* margin-right: 0.4em; */
+}
+
+/* Indentation of TOC level 2 */
+ul.internal .tocitem {
+    margin-left: 16px;
+}
+
+.tocitem {
+    font-weight: normal !important;
+}
+
+img, svg {
+    border-radius: 4px;
+    margin-left: 6px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+}
+
+.docs-sidebar {
+    border-right: 0px !important;
+}
+
+li.is-active {
+    border-top: 0px !important;
+    border-bottom: 0px !important;
+}
+
+.content pre {
+    border: 0px !important;
+    border-radius: 4px;
+}
+
+ul.internal {
+    border: 0px !important;
+}
+
+#documenter > nav > ul > li.is-active {
+    padding-bottom: 4px;
+}
+
+.admonition {
+    border-width: 0px !important;
+}
+
+.admonition-header {
+    font-weight: normal !important;
+    border-radius: 4px 4px 0px 0px;
+}
+
+#documenter .docs-main header.docs-navbar {
+    border-bottom: 0px;
+}
+
+.docstring {
+    border-radius: 4px !important;
+}
+.docstring > header {
+    border-radius: 4px 4px 0px 0px !important;
+    border-bottom: 0px !important;
+}
+
+#documenter-search-query {
+    border: 0px !important;
+}
+
+.docs-menu {
+    border-top: 0px !important;
+    margin-top: 16px !important;
+    overflow-x: hidden;
+}
+#documenter > nav > ul > li > a {
+    margin-left: 16px !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal !important;
+}
+
+#documenter-search-results {
+    list-style-type: decimal !important;
+    padding-bottom: 16px;
+}
+
+.docs-version-selector {
+    border-top: 0px !important;
+}
