@@ -100,12 +100,12 @@ function _fit!(o::CCIPCA, x::AbstractVector{<:Real})
     @inbounds for i in 1:outdim(o)
         if i == n
             o.lambda[i] = norm(o.xi)
-            o.U[:, i] = o.xi / o.lambda[i]
+            o.U[:, i] = o.xi / (o.lambda[i]+OnlineStats.ϵ)
             break
         end
         o.v = (1-f) * o.lambda[i] * o.U[:, i] + f * dot(o.U[:, i], o.xi) * o.xi
         o.lambda[i] = norm(o.v)
-        o.U[:, i] = o.v/o.lambda[i]
+        o.U[:, i] = o.v/(o.lambda[i]+OnlineStats.ϵ)
         o.xi = o.xi .- (dot(o.U[:, i], o.xi) * o.U[:, i])
     end
     o.n = n
