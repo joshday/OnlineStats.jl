@@ -3,7 +3,7 @@ module OnlineStats
 using Statistics, LinearAlgebra, Dates
 
 import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, nvars, Weight, eachrow, eachcol, TwoThings
+    smooth_syr!, nvars, Weight, eachrow, eachcol, TwoThings, Extrema
 import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
 import StatsFuns: logsumexp
