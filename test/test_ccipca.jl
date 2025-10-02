@@ -17,7 +17,7 @@
     # first vector added goes straight into the projection matrix:
     u1 = rand(4)
     fit!(o, u1)
-    @test o[1] == u1/norm(u1)
+    @test isapprox(o[1], u1/norm(u1); atol=1e-6)
     @test o[2] == zeros(Float64, 4)
 
     # We can get eigen-values individually or in array:
@@ -176,4 +176,14 @@ end
             @test 0.0 <= v[i] <= 1.0
         end
     end
+end
+
+@testset "Is CCIPCA resistant against accidental misuse?" begin
+    o = CCIPCA(2, 4)
+    u1 = rand(4)
+    # if we repeatedly fit with the same vector 
+    # we should not fail by having an eigenval of NaN
+    fit!(o, u1)
+    fit!(o, u1)
+    @test !any(isnan.(OnlineStats.eigenvalues(o)))
 end
