@@ -135,14 +135,16 @@ Use `StatLearn` with caution, as stochastic approximation algorithms are inheren
 
 # Example
 
-    x = randn(1000, 5)
-    y = x * range(-1, stop=1, length=5) + randn(1000)
+```julia
+x = randn(1000, 5)
+y = x * range(-1, stop=1, length=5) + randn(1000)
 
-    o = fit!(StatLearn(MSPI()), zip(eachrow(x), y))
-    coef(o)
+o = fit!(StatLearn(MSPI()), zip(eachrow(x), y))
+coef(o)
 
-    o = fit!(StatLearn(OnlineStats.l1regloss, ADAGRAD()), zip(eachrow(x), y))
-    coef(o)
+o = fit!(StatLearn(OnlineStats.l1regloss, ADAGRAD()), zip(eachrow(x), y))
+coef(o)
+```
 """
 mutable struct StatLearn{A<:Algorithm, L, P, W} <: OnlineStat{XY}
     β::Vector{Float64}

@@ -10,18 +10,20 @@ A difference from the above reference is that the minimum and maximum values are
 
 # Example
 
-    o = fit!(KHist(25), randn(10^6))
+```julia
+o = fit!(KHist(25), randn(10^6))
 
-    # Approximate statistics
-    using Statistics
-    mean(o)
-    var(o)
-    std(o)
-    quantile(o)
-    median(o)
+# Approximate statistics
+using Statistics
+mean(o)
+var(o)
+std(o)
+quantile(o)
+median(o)
 
-    using Plots
-    plot(o)
+using Plots
+plot(o)
+```
 """
 struct KHist{T} <: HistogramStat{T}
     bins::Vector{Pair{T, Int}}  # loc => count

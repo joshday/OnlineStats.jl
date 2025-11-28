@@ -5,7 +5,10 @@
 Online parameter estimate of a Beta distribution (Method of Moments).
 
 # Example
-    o = fit!(FitBeta(), rand(1000))
+
+```julia
+o = fit!(FitBeta(), rand(1000))
+```
 """
 struct FitBeta{V<:Variance} <: OnlineStat{Number}
     var::V
@@ -35,7 +38,10 @@ approximated quantiles.  See [`Quantile`](@ref) and [`ExpandingHist`](@ref) for 
 distribution is estimated.
 
 # Example
-    o = fit!(FitCauchy(), randn(1000))
+
+```julia
+o = fit!(FitCauchy(), randn(1000))
+```
 """
 mutable struct FitCauchy{T} <: OnlineStat{Number}
     q::Quantile{T}
@@ -60,8 +66,11 @@ _merge!(o::FitCauchy, o2::FitCauchy) = _merge!(o.q, o2.q)
 Online parameter estimate of a Gamma distribution (Method of Moments).
 
 # Example
-    using Random
-    o = fit!(FitGamma(), randexp(10^5))
+
+```julia
+using Random
+o = fit!(FitGamma(), randexp(10^5))
+```
 """
 struct FitGamma <: OnlineStat{Number}
     v::Variance
@@ -88,7 +97,10 @@ _merge!(o::FitGamma, o2::FitGamma) = _merge!(o.v, o2.v)
 Online parameter estimate of a LogNormal distribution (MLE).
 
 # Example
-    o = fit!(FitLogNormal(), exp.(randn(10^5)))
+
+```julia
+o = fit!(FitLogNormal(), exp.(randn(10^5)))
+```
 """
 struct FitLogNormal <: OnlineStat{Number}
     v::Variance
@@ -112,7 +124,10 @@ _merge!(o::FitLogNormal, o2::FitLogNormal) = _merge!(o.v, o2.v)
 Calculate the parameters of a normal distribution via maximum likelihood.
 
 # Example
-    o = fit!(FitNormal(), randn(1000))
+
+```julia
+o = fit!(FitNormal(), randn(1000))
+```
 """
 struct FitNormal{V <: Variance} <: OnlineStat{Number}
     v::V
@@ -163,8 +178,11 @@ to be consistent across observations.  Therefore, the `n` parameter of the Multi
 distribution is returned as 1.
 
 # Example
-    x = [1 2 3; 4 8 12]
-    fit!(FitMultinomial(3), x)
+
+```julia
+x = [1 2 3; 4 8 12]
+fit!(FitMultinomial(3), x)
+```
 """
 mutable struct FitMultinomial{T} <: OnlineStat{VectorOb{Number}}
     grp::Group{T}
@@ -189,8 +207,10 @@ Online parameter estimate of a `d`-dimensional MvNormal distribution (MLE).
 
 # Example
 
-    y = randn(100, 2)
-    o = fit!(FitMvNormal(2), eachrow(y))
+```julia
+y = randn(100, 2)
+o = fit!(FitMvNormal(2), eachrow(y))
+```
 """
 struct FitMvNormal{C <: CovMatrix} <: OnlineStat{VectorOb{Number}}
     cov::C

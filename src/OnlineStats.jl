@@ -80,7 +80,9 @@ Lightweight wrapper of a vector which adds a bias/intercept term at the end.
 
 # Example
 
-    BiasVec(rand(5))
+```julia
+BiasVec(rand(5))
+```
 """
 struct BiasVec{T, A <: VectorOb} <: AbstractVector{T}
     x::A

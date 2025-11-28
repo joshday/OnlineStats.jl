@@ -12,9 +12,11 @@ so that `value(o::Lag)[1]` is the most recent observation and `value(o::Lag)[end
 
 # Example
 
-    o = fit!(Lag(Int, 10), 1:12)
-    o[1]
-    o[end]
+```julia
+o = fit!(Lag(Int, 10), 1:12)
+o[1]
+o[end]
+```
 """
 mutable struct Lag{T} <: OnlineStat{T}
     value::Vector{T}
@@ -43,11 +45,13 @@ Calculate the auto-covariance/correlation for lags 0 to `b` for a data stream of
 
 # Example
 
-    y = cumsum(randn(100))
-    o = AutoCov(5)
-    fit!(o, y)
-    autocov(o)
-    autocor(o)
+```julia
+y = cumsum(randn(100))
+o = AutoCov(5)
+fit!(o, y)
+autocov(o)
+autocor(o)
+```
 """
 struct AutoCov{T, W} <: OnlineStat{Number}
     cross::Vector{Float64}
@@ -102,9 +106,11 @@ any given replicate will be updated `rand(d)` times (default is double or nothin
 
 # Example
 
-    o = Bootstrap(Variance())
-    fit!(o, randn(1000))
-    confint(o, .95)
+```julia
+o = Bootstrap(Variance())
+fit!(o, randn(1000))
+confint(o, .95)
+```
 """
 struct Bootstrap{T, O <: OnlineStat{T}, D} <: OnlineStat{T}
     stat::O
@@ -146,8 +152,10 @@ Call `f(o)` every time the OnlineStat `o` gets updated.
 
 # Example
 
-    o = CallFun(Mean(), println)
-    fit!(o, [0,0,1,1])
+```julia
+o = CallFun(Mean(), println)
+fit!(o, [0,0,1,1])
+```
 """
 struct CallFun{T, O <: OnlineStat{T}, F <: Function} <: OnlineStat{T}
     stat::O
@@ -168,10 +176,12 @@ Track the difference and the last value.
 
 # Example
 
-    o = Diff()
-    fit!(o, [1.0, 2.0])
-    last(o)
-    diff(o)
+```julia
+o = Diff()
+fit!(o, [1.0, 2.0])
+last(o)
+diff(o)
+```
 """
 mutable struct Diff{T <: Number} <: OnlineStat{Number}
     diff::T
@@ -202,7 +212,9 @@ Calculate the geometric mean of a data stream, stored as type `T`.
 
 # Example
 
-    o = fit!(GeometricMean(), 1:100)
+```julia
+o = fit!(GeometricMean(), 1:100)
+```
 """
 struct GeometricMean{T<:Mean} <: OnlineStat{Number}
     m::T
@@ -221,7 +233,9 @@ Track a moving window (previous `b` copies) of `stat`.
 
 # Example
 
-    fit!(StatLag(Mean(), 10), 1:20)
+```julia
+fit!(StatLag(Mean(), 10), 1:20)
+```
 """
 struct StatLag{T, O<:OnlineStat{T}} <: OnlineStatsBase.StatWrapper{T}
     lag::CircBuff{O}
@@ -260,13 +274,15 @@ Approximate K-Means clustering of `k` clusters.
 
 # Example
 
-    x = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]
+```julia
+x = [randn() + 5i for i in rand(Bool, 10^6), j in 1:2]
 
-    o = fit!(KMeans(2, 2), eachrow(x))
+o = fit!(KMeans(2, 2), eachrow(x))
 
-    sort!(o; rev=true)  # Order clusters by number of observations
+sort!(o; rev=true)  # Order clusters by number of observations
 
-    classify(o, x[1])  # returns index of cluster closest to x[1]
+classify(o, x[1])  # returns index of cluster closest to x[1]
+```
 """
 mutable struct KMeans{T, C <: NTuple{N, Cluster{T}} where N, W} <: OnlineStat{VectorOb{Number}}
     value::C
@@ -326,12 +342,14 @@ are discarded on every `fit!`.
 
 # Example
 
-    using Dates
-    dts = Date(2010):Day(1):Date(2011)
-    y = rand(length(dts))
+```julia
+using Dates
+dts = Date(2010):Day(1):Date(2011)
+y = rand(length(dts))
 
-    o = MovingTimeWindow(Day(4); timetype=Date, valtype=Float64)
-    fit!(o, zip(dts, y))
+o = MovingTimeWindow(Day(4); timetype=Date, valtype=Float64)
+fit!(o, zip(dts, y))
+```
 """
 mutable struct MovingTimeWindow{T<:TimeType, S, D<:Period} <: OnlineStat{TwoThings{T,S}}
     values::Vector{Pair{T,S}}
@@ -369,8 +387,10 @@ Track a moving window of `b` items of type `T`.  Also known as a circular buffer
 
 # Example
 
-    o = MovingWindow(10, Int)
-    fit!(o, 1:14)
+```julia
+o = MovingWindow(10, Int)
+fit!(o, 1:14)
+```
 """
 mutable struct MovingWindow{T} <: OnlineStat{T}
     value::Vector{T}
@@ -410,11 +430,13 @@ Average order statistics with batches of size `b`.
 
 # Example
 
-    o = fit!(OrderStats(100), randn(10^5))
-    quantile(o, [.25, .5, .75])
+```julia
+o = fit!(OrderStats(100), randn(10^5))
+quantile(o, [.25, .5, .75])
 
-    f = ecdf(o)
-    f(0)
+f = ecdf(o)
+f(0)
+```
 """
 mutable struct OrderStats{T, W, E<:Extrema} <: OnlineStat{Number}
     value::Vector{T}
@@ -482,9 +504,11 @@ Track a dictionary that maps unique values to its probability.  Similar to
 
 # Example
 
-    o = ProbMap(Int)
-    fit!(o, rand(1:10, 1000))
-    probs(o)
+```julia
+o = ProbMap(Int)
+fit!(o, rand(1:10, 1000))
+probs(o)
+```
 """
 mutable struct ProbMap{T, A<:AbstractDict{T,Float64}, W} <: OnlineStat{T}
     value::A
@@ -532,7 +556,9 @@ Ref: <https://www.cse.wustl.edu/~jain/papers/ftp/psqr.pdf>
 
 # Example
 
-    fit!(P2Quantile(.5), rand(10^5))
+```julia
+fit!(P2Quantile(.5), rand(10^5))
+```
 """
 mutable struct P2Quantile <: OnlineStat{Number}
     q::Vector{Float64}  # marker heights
@@ -622,13 +648,15 @@ number will increase accuracy at the cost of speed.
 
 # Example
 
-    q = [.25, .5, .75]
-    x = randn(10^6)
+```julia
+q = [.25, .5, .75]
+x = randn(10^6)
 
-    o = fit!(Quantile(q, b=1000), randn(10^6))
-    value(o)
+o = fit!(Quantile(q, b=1000), randn(10^6))
+value(o)
 
-    quantile(x, q)
+quantile(x, q)
+```
 """
 struct Quantile{T<:ExpandingHist} <: OnlineStat{Number}
     q::Vector{Float64}
@@ -654,7 +682,9 @@ If you need more advanced reservoir sampling methods consider using `StreamSampl
 
 # Example
 
-    fit!(ReservoirSample(100, Int), 1:1000)
+```julia
+fit!(ReservoirSample(100, Int), 1:1000)
+```
 """
 mutable struct ReservoirSample{T} <: OnlineStat{T}
     value::Vector{T}
@@ -696,11 +726,13 @@ Ref: <https://www.nowozin.net/sebastian/blog/streaming-log-sum-exp-computation.h
 
 # Example
 
-    x = randn(1000)
+```julia
+x = randn(1000)
 
-    fit!(LogSumExp(), x)
+fit!(LogSumExp(), x)
 
-    log(sum(exp.(x))) # should be very close
+log(sum(exp.(x))) # should be very close
+```
 """
 mutable struct LogSumExp{T<:Number} <: OnlineStat{Number}
     r::T

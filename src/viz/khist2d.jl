@@ -21,9 +21,11 @@ and [`KIndexedPartition`](@ref) instead.
 
 # Example
 
-    x = randn(10^4)
-    y = x + randn(10^4)
-    plot(fit!(KHist2D(), zip(x, y)))
+```julia
+x = randn(10^4)
+y = x + randn(10^4)
+plot(fit!(KHist2D(), zip(x, y)))
+```
 """
 struct KHist2D <: OnlineStat{TwoThings{<:Number, <:Number}}
     value::Vector{Bin2D}

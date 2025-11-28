@@ -42,17 +42,19 @@ Create a histogram with bin partition defined by `edges`.
 
 # Example
 
-    o = fit!(Hist(-5:.1:5), randn(10^6))
+```julia
+o = fit!(Hist(-5:.1:5), randn(10^6))
 
-    # approximate statistics
-    using Statistics
+# approximate statistics
+using Statistics
 
-    mean(o)
-    var(o)
-    std(o)
-    quantile(o)
-    median(o)
-    extrema(o)
+mean(o)
+var(o)
+std(o)
+quantile(o)
+median(o)
+extrema(o)
+```
 """
 struct Hist{T, R} <: HistogramStat{T}
     edges::R
@@ -132,10 +134,13 @@ An adaptive histogram where the bin edges keep doubling in size in order to cont
 - `[a, b)`, `[b, c)`, `[c, d]`
 
 # Example
-    o = fit!(ExpandingHist(200), randn(10^6))
 
-    using Plots
-    plot(o)
+```julia
+o = fit!(ExpandingHist(200), randn(10^6))
+
+using Plots
+plot(o)
+```
 
 # Details
 

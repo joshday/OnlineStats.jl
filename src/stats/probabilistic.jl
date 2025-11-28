@@ -11,15 +11,17 @@ This lets you calculate an upper bound on the number of occurrences of some valu
 
 # Example
 
-    o = CountMinSketch()
+```julia
+o = CountMinSketch()
 
-    y = rand(1:100, 10^6)
+y = rand(1:100, 10^6)
 
-    fit!(o, y)
+fit!(o, y)
 
-    value(o, 1)
+value(o, 1)
 
-    sum(y .== 1)
+sum(y .== 1)
+```
 
 # References
 
@@ -74,17 +76,19 @@ The original HyperLogLog estimator [2] can be retrieved with the option `origina
 
 # Example
 
-    o = HyperLogLog()
-    fit!(o, rand(1:100, 10^6))
+```julia
+o = HyperLogLog()
+fit!(o, rand(1:100, 10^6))
 
-    using Random
-    o2 = HyperLogLog(String)
-    fit!(o2, [randstring(20) for i in 1:1000])
+using Random
+o2 = HyperLogLog(String)
+fit!(o2, [randstring(20) for i in 1:1000])
 
-    # by default the improved estimator is returned:
-    value(o)
-    # the original HyperLogLog estimator can be retrieved via:
-    value(o; original_estimator=true)
+# by default the improved estimator is returned:
+value(o)
+# the original HyperLogLog estimator can be retrieved via:
+value(o; original_estimator=true)
+```
 
 # References
 
