@@ -4,7 +4,7 @@
 Estimate the probability density of a univariate distribution at `k` approximately
 equally-spaced points.
 
-Ref: [https://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf](https://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf)
+Ref: <https://www.jmlr.org/papers/volume11/ben-haim10a/ben-haim10a.pdf>
 
 A difference from the above reference is that the minimum and maximum values are not allowed to merge into another bin.
 

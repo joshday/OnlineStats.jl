@@ -23,7 +23,7 @@ This lets you calculate an upper bound on the number of occurrences of some valu
 
 # References
 
-- https://florian.github.io/count-min-sketch/
+- <https://florian.github.io/count-min-sketch/>
 
 """
 mutable struct CountMinSketch{T, IntType} <: OnlineStat{T}
