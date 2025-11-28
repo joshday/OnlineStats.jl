@@ -56,7 +56,7 @@ end
 
 Track a univariate mean. Uses a compensation term for the update.
 
-#Note
+# Note
 
 This should be more accurate as [`Mean`](@ref) in most cases but the guarantees
 of [`KahanSum`](@ref) do not apply. [`merge!`](@ref) can have some accuracy
@@ -118,7 +118,7 @@ Base.copy(o::KahanMean) = KahanMean(o.μ, o.c, o.weight, o.n)
 
 Track the univariate variance. Uses compensation terms for a higher accuracy.
 
-#Note
+# Note
 
 This should be more accurate as [`Variance`](@ref) in most cases but the
 guarantees of [`KahanSum`](@ref) do not apply. [`merge!`](@ref) can have
