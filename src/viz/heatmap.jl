@@ -10,16 +10,18 @@ When fitting a new observation, the first value will be associated with X, the s
 
 # Example
 
-    using Plots
+```julia
+using Plots
 
-    xy = zip(randn(10^6), randn(10^6))
-    o = fit!(HeatMap(-5:.1:5, -5:.1:5), xy)
-    plot(o)
+xy = zip(randn(10^6), randn(10^6))
+o = fit!(HeatMap(-5:.1:5, -5:.1:5), xy)
+plot(o)
 
-    xy = zip(1 .+ randn(10^6) ./ 10, randn(10^6))
-    o = HeatMap(xy)
-    plot(o, marginals=false)
-    plot(o)
+xy = zip(1 .+ randn(10^6) ./ 10, randn(10^6))
+o = HeatMap(xy)
+plot(o, marginals=false)
+plot(o)
+```
 """
 mutable struct HeatMap{EX, EY} <: OnlineStat{TwoThings}
     xedges::EX

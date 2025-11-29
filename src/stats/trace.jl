@@ -7,15 +7,17 @@ case is visualizing state changes as observations are added.
 
 # Example
 
-    using OnlineStats, Plots
+```julia
+using OnlineStats, Plots
 
-    o = Trace(Mean(), 10)
+o = Trace(Mean(), 10)
 
-    fit!(o, 1:100)
+fit!(o, 1:100)
 
-    OnlineStats.snapshots(o)
+OnlineStats.snapshots(o)
 
-    plot(o)
+plot(o)
+```
 """
 mutable struct Trace{T, O <: OnlineStat{T}} <: OnlineStat{T}
     parts::Vector{Pair{Tuple{Int,Int}, O}}

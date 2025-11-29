@@ -2,7 +2,9 @@
 
 The `StatLearn` (short for statistical learning) OnlineStat uses stochastic approximation methods to estimate models that take the form:
 
-``\hat\beta = \argmin_\beta \frac{1}{n} \sum_i f(y_i, x_i'\beta) + \sum_j \lambda_j g(\beta_j),``
+```math
+\hat\beta = \argmin_\beta \frac{1}{n} \sum_i f(y_i, x_i'\beta) + \sum_j \lambda_j g(\beta_j),
+```
 
 where
 

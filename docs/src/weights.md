@@ -36,11 +36,9 @@ using OnlineStats, StatsBase
 x = 1:99;
 w = fill(0.1, 99);
 
-# StatsBase: All weights == 0.1
-mean(x) ≈ mean(x, aweights(w)) ≈ mean(x, fweights(w)) ≈ mean(x, pweights(w))
+mean(x) ≈ mean(x, aweights(w)) ≈ mean(x, fweights(w)) ≈ mean(x, pweights(w)) # StatsBase: All weights == 0.1
 
-# OnlineStats: All weights == 0.1
-o = fit!(Mean(weight = n -> 0.1), x)
+o = fit!(Mean(weight = n -> 0.1), x) # OnlineStats: All weights == 0.1
 
 
 mean(x)  # Every observation has equal influence over statistic.

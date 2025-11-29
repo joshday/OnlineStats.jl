@@ -7,13 +7,15 @@ and kernel function `kernel`.  Built-in kernels are available in the `OnlineStat
 
 # Example
 
-    using OnlineStats, Plots
+```julia
+using OnlineStats, Plots
 
-    o = fit!(Ash(ExpandingHist(1000)), randn(10^6))
+o = fit!(Ash(ExpandingHist(1000)), randn(10^6))
 
-    plot(o)
-    plot(o, 20)
-    plot(o, OnlineStats.Kernels.epanechnikov, 4)
+plot(o)
+plot(o, 20)
+plot(o, OnlineStats.Kernels.epanechnikov, 4)
+```
 """
 mutable struct Ash{H, T} <: OnlineStat{Number}
     hist::H

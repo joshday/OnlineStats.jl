@@ -4,7 +4,7 @@
 
 Loss function between continuous response `y` and linear predictor `xβ` based on the ``L_2`` norm:
 
-``.5 * (y - xβ) ^ 2``
+``0.5 * (y - xβ) ^ 2``
 """
 l2regloss(y, yhat) = .5 * abs2(y - yhat)
 deriv(::typeof(l2regloss), y, yhat) = yhat - y
@@ -24,7 +24,7 @@ deriv(::typeof(l1regloss), y, yhat) = sign(yhat - y)
 
 Loss function between boolean response `y ∈ {-1, 1}` and linear predictor `xβ` for logistic regression:
 
-``log(1 + exp(-y * xβ))``
+``\\log(1 + \\exp(-y * xβ))``
 """
 logisticloss(y, yhat) = log1p(exp(-y * yhat))
 deriv(::typeof(logisticloss), y, yhat) = -y / (1 + exp(y * yhat))
@@ -34,7 +34,7 @@ deriv(::typeof(logisticloss), y, yhat) = -y / (1 + exp(y * yhat))
 
 Loss function between boolean response `y ∈ {-1, 1}` and linear predictor `xβ` for support vector machines:
 
-``max(1 - y * xβ, 0)``
+``\\max(1 - y * xβ, 0)``
 """
 l1hingeloss(y, yhat) = max(1 - y*yhat, zero(yhat))
 deriv(::typeof(l1hingeloss), y, yhat) = (u = y*yhat; u ≥ 1 ? zero(y) : -y)
@@ -77,7 +77,7 @@ prox(::typeof(abs), x::T, s::Number) where {T} = sign(x) * max(T(0), abs(x) - s)
 
 Weighted average of Ridge (`abs`) and LASSO (`abs2`) penalty functions.
 
-``(1 - α) * Ridge + α * LASSO``
+``(1 - α) * \\text{Ridge} + α * \\text{LASSO}``
 """
 struct ElasticNet{T}
     α::T
@@ -95,7 +95,9 @@ end
 Fit a model (via stochastic approximation) that is linear in the parameters.  The (offline)
 objective function that StatLearn approximately minimizes is
 
-``(1/n) ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),``
+```math
+\\frac{1}{n} ∑ᵢ f(yᵢ, xᵢ'β) + ∑ⱼ λⱼ g(βⱼ),
+```
 
 where ``fᵢ`` are loss functions of a response variable and linear predictor, ``λⱼ``s are
 nonnegative regularization parameters, and ``g`` is a penalty function.
@@ -135,14 +137,16 @@ Use `StatLearn` with caution, as stochastic approximation algorithms are inheren
 
 # Example
 
-    x = randn(1000, 5)
-    y = x * range(-1, stop=1, length=5) + randn(1000)
+```julia
+x = randn(1000, 5)
+y = x * range(-1, stop=1, length=5) + randn(1000)
 
-    o = fit!(StatLearn(MSPI()), zip(eachrow(x), y))
-    coef(o)
+o = fit!(StatLearn(MSPI()), zip(eachrow(x), y))
+coef(o)
 
-    o = fit!(StatLearn(OnlineStats.l1regloss, ADAGRAD()), zip(eachrow(x), y))
-    coef(o)
+o = fit!(StatLearn(OnlineStats.l1regloss, ADAGRAD()), zip(eachrow(x), y))
+coef(o)
+```
 """
 mutable struct StatLearn{A<:Algorithm, L, P, W} <: OnlineStat{XY}
     β::Vector{Float64}

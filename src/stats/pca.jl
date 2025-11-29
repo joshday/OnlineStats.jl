@@ -28,18 +28,20 @@ approximation to (batch) PCA.
 
 # Example
 
-    o = CCIPCA(2, 10)                # Project 10-dimensional vectors into 2D
-    u1 = rand(10)
-    fit!(o, u1)                      # Fit to u1
-    u2 = rand(10)
-    fit!(o, u2)                      # Fit to u2
-    u3 = rand(10)
-    OnlineStats.transform(o, u3)     # Project u3 into PCA space fitted to u1 and u2 but don't change the projection
-    u4 = rand(10)
-    OnlineStats.fittransform!(o, u4) # Fit u4 and then project u4 into the space
-    sort!(o)                         # Sort from high to low eigenvalues
-    o[1]                             # Get primary (1st) eigenvector
-    OnlineStats.relativevariances(o)         # Get the variation (explained) "by" each eigenvector
+```julia
+o = CCIPCA(2, 10)                # Project 10-dimensional vectors into 2D
+u1 = rand(10)
+fit!(o, u1)                      # Fit to u1
+u2 = rand(10)
+fit!(o, u2)                      # Fit to u2
+u3 = rand(10)
+OnlineStats.transform(o, u3)     # Project u3 into PCA space fitted to u1 and u2 but don't change the projection
+u4 = rand(10)
+OnlineStats.fittransform!(o, u4) # Fit u4 and then project u4 into the space
+sort!(o)                         # Sort from high to low eigenvalues
+o[1]                             # Get primary (1st) eigenvector
+OnlineStats.relativevariances(o)         # Get the variation (explained) "by" each eigenvector
+```
 """
 mutable struct CCIPCA <: OnlineStat{AbstractVector{<:Real}}
     lambda::Vector{Float64} # Eigenvalues, one per outdim

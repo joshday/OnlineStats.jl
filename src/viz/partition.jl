@@ -7,11 +7,13 @@ Split a data stream into `nparts` (default 100) where each part is summarized by
 
 # Example
 
-    o = Partition(Extrema())
-    fit!(o, cumsum(randn(10^5)))
+```julia
+o = Partition(Extrema())
+fit!(o, cumsum(randn(10^5)))
 
-    using Plots
-    plot(o)
+using Plots
+plot(o)
+```
 """
 mutable struct Partition{T, I, O <: OnlineStat{T}} <: OnlineStat{T}
     parts::Vector{Pair{Tuple{Int,Int}, O}} # (a,b) => stat
@@ -74,12 +76,14 @@ variable of type `T`.
 
 # Example
 
-    x, y = randn(10^5), randn(10^6)
-    o = IndexedPartition(Float64, KHist(10))
-    fit!(o, zip(x, y))
+```julia
+x, y = randn(10^5), randn(10^6)
+o = IndexedPartition(Float64, KHist(10))
+fit!(o, zip(x, y))
 
-    using Plots
-    plot(o)
+using Plots
+plot(o)
+```
 """
 mutable struct IndexedPartition{I, T, O <: OnlineStat{T}, P <: Pair{<:Tuple, O}} <: OnlineStat{TwoThings{I,T}}
     parts::Vector{P}
@@ -134,13 +138,16 @@ rather than intervals.
 - Note: `stat_init` must be a function e.g. `() -> Mean()`
 
 # Example
-    using Plots
 
-    o = KIndexedPartition(Float64, () -> KHist(10))
+```julia
+using Plots
 
-    fit!(o, zip(randn(10^6), randn(10^6)))
+o = KIndexedPartition(Float64, () -> KHist(10))
 
-    plot(o)
+fit!(o, zip(randn(10^6), randn(10^6)))
+
+plot(o)
+```
 """
 mutable struct KIndexedPartition{I,T,O<:OnlineStat{T},F} <: OnlineStat{TwoThings{I,T}}
     parts::Vector{Pair{I,O}}

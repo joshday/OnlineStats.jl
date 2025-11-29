@@ -113,13 +113,15 @@ Each variable is summarized by `stat`, which can be `FitNormal()` or `Hist(nbins
 
 # Example
 
-    x = randn(10^5, 10)
-    y = rand([1,2], 10^5)
+```julia
+x = randn(10^5, 10)
+y = rand([1,2], 10^5)
 
-    o = fit!(FastTree(10), zip(eachrow(x),y))
+o = fit!(FastTree(10), zip(eachrow(x),y))
 
-    xi = randn(10)
-    classify(o, xi)
+xi = randn(10)
+classify(o, xi)
+```
 """
 struct FastTree{T<:FastNode} <: OnlineStat{XY}
     tree::Vector{T}
@@ -181,11 +183,13 @@ Calculate a random forest where each variable is summarized by `stat`.
 
 # Example
 
-    x, y = randn(10^5, 10), rand(1:2, 10^5)
+```julia
+x, y = randn(10^5, 10), rand(1:2, 10^5)
 
-    o = fit!(FastForest(10), zip(eachrow(x),y))
+o = fit!(FastForest(10), zip(eachrow(x),y))
 
-    classify(o, x[1,:])
+classify(o, x[1,:])
+```
 """
 mutable struct FastForest{T<:FastTree} <: OnlineStat{XY}
     forest::Vector{T}

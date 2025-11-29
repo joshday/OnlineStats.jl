@@ -10,7 +10,9 @@ details.
 
 # Example
 
-    fit!(KahanSum(Float64), fill(1, 100))
+```julia
+fit!(KahanSum(Float64), fill(1, 100))
+```
 """
 mutable struct KahanSum{T<:Number} <: OnlineStat{Number}
     sum::T
@@ -54,7 +56,7 @@ end
 
 Track a univariate mean. Uses a compensation term for the update.
 
-#Note
+# Note
 
 This should be more accurate as [`Mean`](@ref) in most cases but the guarantees
 of [`KahanSum`](@ref) do not apply. [`merge!`](@ref) can have some accuracy
@@ -66,7 +68,9 @@ issues.
 
 # Example
 
-    @time fit!(KahanMean(), randn(10^6))
+```julia
+@time fit!(KahanMean(), randn(10^6))
+```
 """
 mutable struct KahanMean{W, T<:Number} <: OnlineStat{Number}
     μ::T
@@ -114,7 +118,7 @@ Base.copy(o::KahanMean) = KahanMean(o.μ, o.c, o.weight, o.n)
 
 Track the univariate variance. Uses compensation terms for a higher accuracy.
 
-#Note
+# Note
 
 This should be more accurate as [`Variance`](@ref) in most cases but the
 guarantees of [`KahanSum`](@ref) do not apply. [`merge!`](@ref) can have
@@ -122,10 +126,12 @@ accuracy issues.
 
 # Example
 
-    o = fit!(KahanVariance(), randn(10^6))
-    mean(o)
-    var(o)
-    std(o)
+```julia
+o = fit!(KahanVariance(), randn(10^6))
+mean(o)
+var(o)
+std(o)
+```
 """
 mutable struct KahanVariance{W, T<:Number} <: OnlineStat{Number}
     σ2::T

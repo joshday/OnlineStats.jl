@@ -118,8 +118,8 @@ plot(s, link = :x, label = ["KHist" "Hist" "ExpandingHist"])
 
 ## Average Shifted Histograms (ASH)
 
-- ASH is a semi-parametric density estimation method that is similar to Kernel Density Estimation,
-  but uses a fine partition histogram instead of individual observations to perform the smoothing.
+ASH is a semi-parametric density estimation method that is similar to Kernel Density Estimation,
+but uses a fine partition histogram instead of individual observations to perform the smoothing.
 
 ```@example setup
 o = fit!(Ash(ExpandingHist(1000), 5), randn(10^6))

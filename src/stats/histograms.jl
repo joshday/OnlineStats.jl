@@ -42,17 +42,19 @@ Create a histogram with bin partition defined by `edges`.
 
 # Example
 
-    o = fit!(Hist(-5:.1:5), randn(10^6))
+```julia
+o = fit!(Hist(-5:.1:5), randn(10^6))
 
-    # approximate statistics
-    using Statistics
+# approximate statistics
+using Statistics
 
-    mean(o)
-    var(o)
-    std(o)
-    quantile(o)
-    median(o)
-    extrema(o)
+mean(o)
+var(o)
+std(o)
+quantile(o)
+median(o)
+extrema(o)
+```
 """
 struct Hist{T, R} <: HistogramStat{T}
     edges::R
@@ -132,10 +134,13 @@ An adaptive histogram where the bin edges keep doubling in size in order to cont
 - `[a, b)`, `[b, c)`, `[c, d]`
 
 # Example
-    o = fit!(ExpandingHist(200), randn(10^6))
 
-    using Plots
-    plot(o)
+```julia
+o = fit!(ExpandingHist(200), randn(10^6))
+
+using Plots
+plot(o)
+```
 
 # Details
 
@@ -146,14 +151,14 @@ of edges/counts as follows:
 |1|2|5|3|2|
 ```
 
-- Now we observe a data point that is not contained in the bin edges:
+Now we observe a data point that is not contained in the bin edges:
 
 ```
 |1|2|5|3|2|       *
 ```
 
-- In order to contain the point, the range of the edges doubles in the direction of the new
-  data point and adjacent bins merge their counts:
+In order to contain the point, the range of the edges doubles in the direction of the new
+data point and adjacent bins merge their counts:
 
 ```
 |1|2|5|3|2|       *
@@ -162,8 +167,8 @@ of edges/counts as follows:
 | 3 | 8 | 2 | 0 | 1 |
 ```
 
-- Note that multiple iterations of bin-doubling may occur until the new point is contained by the
-  bin edges.
+Note that multiple iterations of bin-doubling may occur until the new point is contained by the
+bin edges.
 """
 mutable struct ExpandingHist{T, R <: StepRangeLen} <: HistogramStat{T}
     edges::R
