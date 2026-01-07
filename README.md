@@ -6,10 +6,10 @@
   <strong>Online Algorithms for Statistics, Models, and Big Data Viz</strong>
 </p>
 
-- ⚡ High-performance single-pass algorithms for statistics and data viz.
-- ➕ Updated one observation at a time.
-- ✅ Algorithms use O(1) memory.
-- 📈 Perfect for streaming and big data.
+- High-performance single-pass algorithms for statistics and data viz.
+- Updated one observation at a time.
+- Algorithms use O(1) memory.
+- Perfect for streaming and big data.
 
 <p align="center">
   <img width="550" style="border-radius: 5px;" src="https://user-images.githubusercontent.com/8075494/111988551-07ed4200-8ae7-11eb-985e-2ea5f60273ff.gif">
@@ -44,14 +44,14 @@ value(o)  # (value(mean), value(variance), value(extrema))
 ```
 <br>
 
-## 📖 Documentation
+## Documentation
 
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable)
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest)
 
 <br>
 
-## ✨ Contributing
+## Contributing
 
 - Pull requests are very welcome!
 - For major changes, you'll probably want to first discuss the changes via issue/email/slack with [`@joshday`](https://github.com/joshday).
@@ -65,7 +65,3 @@ value(o)  # (value(mean), value(variance), value(extrema))
 - Many algorithms developed under mentorship of [**Hua Zhou (@Hua-Zhou)**](https://github.com/Hua-Zhou)
 
 See also the list of [contributors](https://github.com/joshday/OnlineStats.jl/contributors) to OnlineStats.
-
-<a href="https://github.com/joshday/onlinestats.jl/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=joshday/onlinestats.jl" />
-</a>
