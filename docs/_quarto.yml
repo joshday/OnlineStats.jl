@@ -26,6 +26,9 @@ book:
         - changelog.qmd
         - coverage.qmd
 
+  page-footer:
+    center: "Built on __BUILD_DATE__"
+
 format:
   html:
     css: styles.css

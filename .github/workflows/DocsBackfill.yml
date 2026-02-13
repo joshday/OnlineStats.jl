@@ -1,0 +1,182 @@
+name: Backfill Docs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Save docs infrastructure from main (without coverage — too slow for backfill)
+      - name: Save docs infrastructure
+        run: |
+          cp -r docs /tmp/docs-infrastructure
+          rm -f /tmp/docs-infrastructure/coverage.qmd
+
+          # Remove coverage chapter from _quarto.yml
+          python3 -c "
+          import re
+          with open('/tmp/docs-infrastructure/_quarto.yml') as f:
+              content = f.read()
+          content = re.sub(r'\n\s*- coverage\.qmd', '', content)
+          with open('/tmp/docs-infrastructure/_quarto.yml', 'w') as f:
+              f.write(content)
+          "
+
+          # Remove LocalCoverage from docs/Project.toml
+          sed -i '/LocalCoverage/d' /tmp/docs-infrastructure/Project.toml
+
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v2
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      # Prepare gh-pages
+      - name: Setup gh-pages
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code origin gh-pages; then
+            git clone --branch gh-pages --single-branch \
+              "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+              gh-pages-deploy
+          else
+            mkdir gh-pages-deploy
+            cd gh-pages-deploy
+            git init
+            git checkout --orphan gh-pages
+            git commit --allow-empty -m "Initialize gh-pages"
+          fi
+
+      # Build docs for every version tag
+      - name: Build all versions
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          TAGS=$(git tag -l 'v*' | sort -V)
+          if [ -z "$TAGS" ]; then
+            echo "No version tags found, nothing to backfill."
+            exit 0
+          fi
+
+          BUILT=()
+          SKIPPED=()
+
+          for TAG in $TAGS; do
+            echo ""
+            echo "=========================================="
+            echo "Building docs for $TAG"
+            echo "=========================================="
+
+            # Skip if already deployed
+            if [ -d "gh-pages-deploy/$TAG" ]; then
+              echo "Already deployed, skipping."
+              BUILT+=("$TAG")
+              continue
+            fi
+
+            # Checkout tag (force to discard overlaid docs from previous iteration)
+            git checkout -f "$TAG"
+
+            # Overlay Quarto docs infrastructure from main
+            rm -rf docs
+            cp -r /tmp/docs-infrastructure docs
+
+            # Install and build
+            if ! julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'; then
+              echo "WARNING: Pkg setup failed for $TAG, skipping."
+              SKIPPED+=("$TAG")
+              continue
+            fi
+
+            # Stamp build date
+            sed -i "s/__BUILD_DATE__/$(date -u +'%Y-%m-%d')/" docs/_quarto.yml
+
+            if ! quarto render docs; then
+              echo "WARNING: Quarto render failed for $TAG, skipping."
+              SKIPPED+=("$TAG")
+              continue
+            fi
+
+            cp -r docs/_site "gh-pages-deploy/$TAG"
+            BUILT+=("$TAG")
+            echo "Success: $TAG"
+          done
+
+          # Return to main
+          git checkout -f main
+
+          # --- Update gh-pages metadata ---
+          cd gh-pages-deploy
+
+          # Rebuild versions.json from deployed version directories
+          python3 -c "
+          import json, os, re
+          versions = [d for d in os.listdir('.')
+                      if re.match(r'^v\d', d) and os.path.isdir(d)]
+          def semver_key(v):
+              return tuple(int(n) for n in re.findall(r'\d+', v))
+          versions.sort(key=semver_key, reverse=True)
+          with open('versions.json', 'w') as f:
+              json.dump(versions, f, indent=2)
+          print('versions.json:', versions)
+          "
+
+          # Stable redirect → latest version
+          LATEST=$(python3 -c "
+          import json
+          with open('versions.json') as f:
+              vs = json.load(f)
+          print(vs[0] if vs else '')
+          ")
+
+          if [ -n "$LATEST" ]; then
+            mkdir -p stable
+            cat > stable/index.html << STABLE_EOF
+          <!DOCTYPE html>
+          <html>
+          <head><meta http-equiv="refresh" content="0; url=/${REPO_NAME}/${LATEST}/"></head>
+          <body>Redirecting to <a href="/${REPO_NAME}/${LATEST}/">latest stable</a>...</body>
+          </html>
+          STABLE_EOF
+          fi
+
+          # Root redirect → stable
+          cat > index.html << ROOT_EOF
+          <!DOCTYPE html>
+          <html>
+          <head><meta http-equiv="refresh" content="0; url=/${REPO_NAME}/stable/"></head>
+          <body>Redirecting to <a href="/${REPO_NAME}/stable/">stable docs</a>...</body>
+          </html>
+          ROOT_EOF
+
+          touch .nojekyll
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Backfill docs for all versions"
+            git push "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:gh-pages
+          fi
+
+          # Summary
+          echo ""
+          echo "=========================================="
+          echo "SUMMARY"
+          echo "=========================================="
+          echo "Built: ${BUILT[*]}"
+          echo "Skipped: ${SKIPPED[*]}"
