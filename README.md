@@ -1,3 +1,8 @@
+[![CI](https://github.com/joshday/OnlineStats.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/joshday/OnlineStats.jl/actions/workflows/CI.yml)
+[![Docs Build](https://github.com/joshday/OnlineStats.jl/actions/workflows/Docs.yml/badge.svg)](https://github.com/joshday/OnlineStats.jl/actions/workflows/Docs.yml)
+[![Stable Docs](https://img.shields.io/badge/docs-stable-blue)](https://joshday.github.io/OnlineStats.jl/stable/)
+[![Dev Docs](https://img.shields.io/badge/docs-dev-blue)](https://joshday.github.io/OnlineStats.jl/dev/)
+
 <p align="center">
   <img width="460" src="https://user-images.githubusercontent.com/8075494/185400143-1b9494b7-f5ed-41ee-8a25-b0c82a27a638.png">
 </p>
@@ -46,8 +51,6 @@ value(o)  # (value(mean), value(variance), value(extrema))
 
 ## Documentation
 
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://joshday.github.io/OnlineStats.jl/stable)
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://joshday.github.io/OnlineStats.jl/latest)
 
 <br>
 

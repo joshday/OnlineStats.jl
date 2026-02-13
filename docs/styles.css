@@ -1,0 +1,7 @@
+.sidebar-item-section {
+    margin-top: 2rem !important;
+}
+
+.sidebar-item-section > .sidebar-item-container > .sidebar-item-text {
+    font-weight: bold;
+}

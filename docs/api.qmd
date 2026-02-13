@@ -1,0 +1,54 @@
+---
+title: "API"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using OnlineStats
+```
+
+```{julia}
+#| echo: false
+#| output: asis
+export_names = filter(!=(:OnlineStats), names(OnlineStats))
+
+println("""
+<button class="btn btn-sm btn-outline-secondary mb-3" id="toggle-all-callouts">Expand All</button>
+<script>
+document.getElementById('toggle-all-callouts').addEventListener('click', function() {
+  var btn = this;
+  var bodies = document.querySelectorAll('.callout-collapse.collapse');
+  var allOpen = Array.from(bodies).every(function(el) { return el.classList.contains('show'); });
+  bodies.forEach(function(el) {
+    var bsCollapse = bootstrap.Collapse.getOrCreateInstance(el, {toggle: false});
+    allOpen ? bsCollapse.hide() : bsCollapse.show();
+  });
+  btn.textContent = allOpen ? 'Expand All' : 'Collapse All';
+});
+</script>
+""")
+
+# Table of contents
+for name in export_names
+    binding = getfield(OnlineStats, name)
+    kind = binding isa Type ? "type" : binding isa Function ? "function" : "constant"
+    println("- [`$name`](#$(lowercase(string(name)))) *($(kind))*")
+end
+println()
+
+# Detailed sections
+for name in export_names
+    binding = getfield(OnlineStats, name)
+    kind = binding isa Type ? "type" : binding isa Function ? "function" : "constant"
+    doc = string(Docs.doc(binding))
+    println("""
+    ::: {.callout-note collapse="true" appearance="minimal"}
+    ## `$name` [*($(kind))*]{.text-muted} {#$(lowercase(string(name)))}
+
+    $doc
+    :::
+    """)
+end
+```
