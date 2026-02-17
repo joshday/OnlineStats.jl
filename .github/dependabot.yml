@@ -1,11 +1,21 @@
 version: 2
 updates:
+  # Keep GitHub Actions up to date
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Keep Julia dependencies up to date
   - package-ecosystem: "julia"
     directory: "/"
     schedule:
       interval: "weekly"
-
+    groups:
+      julia-deps:
+        patterns:
+          - "*"
