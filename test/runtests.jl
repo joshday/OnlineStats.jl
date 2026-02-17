@@ -1,4 +1,4 @@
-using OnlineStats, OnlineStatsBase, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
+using OnlineStats, Test, LinearAlgebra, Random, StatsBase, Statistics, Dates
 
 start_time = now()
 
@@ -131,14 +131,14 @@ end
         data = [1 2 3 4 5; 1 2 3 4 5]
         @test value(fit!(o, eachrow(data)))[2] == collect(2:2:10) ./ sum(data)
 
-        data1 = OnlineStatsBase.eachrow(rand(1:4, 10, 3))
-        data2 = OnlineStatsBase.eachrow(rand(2:7, 11, 3))
+        data1 = eachrow(rand(1:4, 10, 3))
+        data2 = eachrow(rand(2:7, 11, 3))
         a, b = mergevals(FitMultinomial(3), data1, data2)
         @test ≈(a[2], b[2])
     end
     @testset "FitMvNormal" begin
         @test value(FitMvNormal(2)) == (zeros(2), Matrix(I, 2, 2))
-        a, b = mergestats(FitMvNormal(2), OnlineStatsBase.eachrow([y y2]), OnlineStatsBase.eachrow([y2 y]))
+        a, b = mergestats(FitMvNormal(2), eachrow([y y2]), eachrow([y2 y]))
         @test value(a)[1] ≈ value(b)[1]
         @test value(a)[2] ≈ value(b)[2]
 
@@ -333,7 +333,7 @@ end
 end
 #-----------------------------------------------------------------------# LinRegBuilder
 @testset "LinRegBuilder" begin
-    @test ≈(mergevals(LinRegBuilder(), OnlineStatsBase.eachrow(ymat), OnlineStatsBase.eachrow(ymat2))...)
+    @test ≈(mergevals(LinRegBuilder(), eachrow(ymat), eachrow(ymat2))...)
 
     o = fit!(LinRegBuilder(), eachrow(ymat))
     for i in 1:5

@@ -1,4 +1,11 @@
-```@setup setup
+---
+title: "Data Visualization"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
 import Random
 using Dates
 using OnlineStats
@@ -7,21 +14,20 @@ gr(size=(816,400), margin=6Plots.mm)
 Random.seed!(1234)
 ```
 
-# Data Visualization
-
-!!! note
-    Each of the following examples plots one million data points, but can scale to infinitely many
-    observations, since only a summary (`OnlineStat`) of the data is plotted.
+::: {.callout-note}
+Each of the following examples plots one million data points, but can scale to infinitely many
+observations, since only a summary (`OnlineStat`) of the data is plotted.
+:::
 
 ## Partitions
 
-The [`Partition`](@ref) type summarizes sections of a data stream using any `OnlineStat`,
+The `Partition` type summarizes sections of a data stream using any `OnlineStat`,
 and is therefore extremely useful in visualizing huge datasets, as summaries are plotted
 rather than every single observation.
 
 #### Continuous Data
 
-```@example setup
+```{julia}
 y = cumsum(randn(10^6)) + 100randn(10^6)
 
 o = Partition(KHist(10))
@@ -32,7 +38,7 @@ plot(o)
 ```
 
 
-```@example setup
+```{julia}
 o = Partition(Series(Mean(), Extrema()))
 
 fit!(o, y)
@@ -43,7 +49,7 @@ plot(o)
 
 #### Categorical Data
 
-```@example setup
+```{julia}
 y = rand(["a", "a", "b", "c"], 10^6)
 
 o = Partition(CountMap(String), 75)
@@ -60,7 +66,7 @@ The `Partition` type can only track the number of observations in the x-axis.  I
 to plot one variable against another, you can use an `IndexedPartition`.
 
 
-```@example setup
+```{julia}
 x = randn(10^6)
 y = x + randn(10^6)
 
@@ -70,7 +76,7 @@ plot(o)
 ```
 
 
-```@example setup
+```{julia}
 x = rand(10^6)
 y = rand(1:5, 10^6)
 
@@ -81,7 +87,7 @@ plot(o, xlab = "X", ylab = "Y")
 
 Due to a limitation with Plots.jl, `Date` and `DateTime` will sometimes be converted to their `Dates.value` when plotted.  To get human-readable tick labels, you can use the `xformatter` keyword argument to `plot`.
 
-```@example setup
+```{julia}
 using Dates
 
 x = rand(Date(2019):Day(1):Date(2020), 10^6)
@@ -94,13 +100,13 @@ plot(o, xformatter = x -> string(Date(Dates.UTInstant(Day(x)))))
 
 ## K-Indexed Partitions
 
-A [`KIndexedPartition`](@ref) is simlar to an [`IndexedPartition`](@ref), but uses a different method
-of binning the x variable (centroids vs. intervals), similar to that of [`KHist`](@ref).
+A `KIndexedPartition` is similar to an `IndexedPartition`, but uses a different method
+of binning the x variable (centroids vs. intervals), similar to that of `KHist`.
 
 For the sake of performance, you must provide a **function** that creates
 the OnlineStat you wish to calculate for the y variable.
 
-```@example setup
+```{julia}
 x = randn(10^6)
 y = x + randn(10^6)
 
@@ -111,7 +117,7 @@ plot(o)
 
 ## Histograms
 
-```@example setup
+```{julia}
 s = fit!(Series(KHist(25), Hist(-5:.2:5), ExpandingHist(100)), randn(10^6))
 plot(s, link = :x, label = ["KHist" "Hist" "ExpandingHist"])
 ```
@@ -121,14 +127,14 @@ plot(s, link = :x, label = ["KHist" "Hist" "ExpandingHist"])
 ASH is a semi-parametric density estimation method that is similar to Kernel Density Estimation,
 but uses a fine partition histogram instead of individual observations to perform the smoothing.
 
-```@example setup
+```{julia}
 o = fit!(Ash(ExpandingHist(1000), 5), randn(10^6))
 plot(o)
 ```
 
 ## Approximate CDF
 
-```@example setup
+```{julia}
 o = fit!(OrderStats(1000), randn(10^6))
 
 plot(o)
@@ -136,11 +142,11 @@ plot(o)
 
 ## Mosaic Plots
 
-The [`Mosaic`](@ref) type allows you to plot the relationship between two categorical variables.
+The `Mosaic` type allows you to plot the relationship between two categorical variables.
 It is typically more useful than a bar plot, as class probabilities are given by the horizontal
 widths.
 
-```@example setup
+```{julia}
 using RDatasets
 t = dataset("ggplot2", "diamonds")
 
@@ -153,7 +159,7 @@ plot(o, legendtitle="Color", xlabel="Cut")
 
 ## HeatMap
 
-```@example setup
+```{julia}
 o = HeatMap(-5:.1:5, -0:.1:10)
 
 x, y = randn(10^6), 5 .+ randn(10^6)
@@ -164,16 +170,16 @@ plot(o)
 ```
 
 
-```@example setup
+```{julia}
 plot(o, marginals=false, legend=true)
 ```
 
 
 ## Traces
 
-A [`Trace`](@ref) will take snapshots of an OnlineStat as it is fitted, allowing you view how the value changed as observations were added.  This can be useful for identifying [concept drift](https://en.wikipedia.org/wiki/Concept_drift) or finding optimal hyperparameters for stochastic approximation methods like [`StatLearn`](@ref).
+A `Trace` will take snapshots of an OnlineStat as it is fitted, allowing you view how the value changed as observations were added.  This can be useful for identifying [concept drift](https://en.wikipedia.org/wiki/Concept_drift) or finding optimal hyperparameters for stochastic approximation methods like `StatLearn`.
 
-```@example setup
+```{julia}
 y = range(1, 20, length=10^6) .* randn(10^6)
 
 o = Trace(Extrema())
@@ -186,9 +192,9 @@ plot(o)
 
 ## Naive Bayes Classifier
 
-The [`NBClassifier`](@ref) type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
+The `NBClassifier` type stores conditional histograms of the predictor variables, allowing you to plot approximate "group by" distributions:
 
-```@example setup
+```{julia}
 # make data
 x = randn(10^6, 5)
 y = x * [1,3,5,7,9] .> 0

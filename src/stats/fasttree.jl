@@ -164,7 +164,7 @@ end
 
 classify(o::FastTree, x::VectorOb) = classify(whichleaf(o, x))
 function classify(o::FastTree, x::AbstractMatrix)
-    [classify(o, xi) for xi in OnlineStatsBase.eachrow(x)]
+    [classify(o, xi) for xi in eachrow(x)]
 end
 
 #-----------------------------------------------------------------------# FastForest
@@ -219,7 +219,7 @@ end
 function _fit!(o::FastForest, xy)
     x, y = xy
     o.n += 1
-    for (tree, subset) in zip(o.forest, OnlineStatsBase.eachcol(o.subsets))
+    for (tree, subset) in zip(o.forest, eachcol(o.subsets))
         rand() < o.λ && fit!(tree, (x[subset], y))
     end
 end
@@ -235,5 +235,5 @@ end
 classify(o::FastForest, x::VectorOb) = _classify(o, x, zeros(Int, nkeys(o)))
 function classify(o::FastForest, x::AbstractMatrix)
     buffer = zeros(Int, nkeys(o))
-    [_classify(o, xi, buffer) for xi in OnlineStatsBase.eachrow(x)]
+    [_classify(o, xi, buffer) for xi in eachrow(x)]
 end

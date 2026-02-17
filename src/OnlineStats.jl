@@ -1,21 +1,17 @@
 module OnlineStats
 
-using Statistics, LinearAlgebra, Dates
-
-import OnlineStatsBase: value, name, _fit!, _merge!, bessel, pdf, probs, smooth, smooth!,
-    smooth_syr!, nvars, Weight, eachrow, eachcol, TwoThings, Extrema, name
-import StatsBase: fit!, nobs, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
+import StatsBase: StatsBase, autocov, autocor, confint, skewness, kurtosis, entropy, midpoints,
     fweights, sample, coef, predict, Histogram, ecdf, transform, log1p
 import StatsFuns: logsumexp
 import SpecialFunctions: loggamma
 import Distributions: MixtureModel, TDist
 
-import AbstractTrees: AbstractTrees
+using RecipesBase
 
-using OrderedCollections: OrderedDict
-
-using OnlineStatsBase, RecipesBase
-using OnlineStatsBase: neighbors
+include("base.jl")
+include("weight.jl")
+include("base_stats.jl")
+include("wrappers.jl")
 
 export
 # Statistics
@@ -24,7 +20,7 @@ export
     fit!, nobs, value, autocov, autocor, predict, confint, probs, skewness, kurtosis,
     classify, coef, ecdf, eachrow, eachcol,
 # weights
-    EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
+    Weight, EqualWeight, ExponentialWeight, LearningRate, LearningRate2, HarmonicWeight,
     McclainWeight, Bounded, Scaled,
 # algorithms
     ADAGRAD, ADAM, ADAMAX, ADADELTA, MSPI, OMAS, OMAP, RMSPROP, SGD,
@@ -32,9 +28,10 @@ export
     Ash,
     AutoCov,
     Bootstrap,
-    CallFun, Counter, CountMap, CountMinSketch, CountMissing, CovMatrix, CCIPCA,
+    CallFun, CircBuff, Counter, CountMap, CountMinSketch, CountMissing, CovMatrix, CCIPCA,
     Diff,
-    Extrema, ExpandingHist,
+    Extrema, ExtremeValues, ExpandingHist,
+    FilterTransform,
     FitBeta, FitCauchy, FitGamma, FitLogNormal, FitNormal, FitMultinomial, FitMvNormal,
     FastNode, FastTree, FastForest,
     GeometricMean,
@@ -49,8 +46,9 @@ export
     Part, Partition, PlotNN, ProbMap, P2Quantile,
     Quantile,
     ReservoirSample,
-    Series, SGDStat, StatLag, StatLearn, Sum,
+    Series, SGDStat, SkipMissing, StatLag, StatLearn, Sum,
     Trace,
+    TryCatch,
     Variance,
     DPMM,
 # other

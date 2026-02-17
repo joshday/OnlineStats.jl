@@ -1,0 +1,46 @@
+project:
+  type: book
+  output-dir: _site
+
+engine: julia
+julia:
+  project: "."
+
+book:
+  title: "OnlineStats.jl"
+  navbar:
+    right:
+      - icon: star
+        href: https://github.com/joshday/OnlineStats.jl/stargazers
+        text: "Star"
+      - icon: github
+        href: https://github.com/joshday/OnlineStats.jl
+  chapters:
+    - part: "Docs"
+      chapters:
+        - index.qmd
+        - stats_and_models.qmd
+        - howfitworks.qmd
+        - weights.qmd
+        - collections.qmd
+        - bigdata.qmd
+        - dataviz.qmd
+        - ml.qmd
+    - part: "Reference"
+      chapters:
+        - api.qmd
+        - changelog.qmd
+        - coverage.qmd
+
+  page-footer:
+    center: "Built on __BUILD_DATE__"
+
+format:
+  html:
+    css: styles.css
+    number-sections: false
+    theme:
+      light: flatly
+      dark: darkly
+    include-after-body:
+      - file: _version-selector.html

@@ -237,7 +237,7 @@ Track a moving window (previous `b` copies) of `stat`.
 fit!(StatLag(Mean(), 10), 1:20)
 ```
 """
-struct StatLag{T, O<:OnlineStat{T}} <: OnlineStatsBase.StatWrapper{T}
+struct StatLag{T, O<:OnlineStat{T}} <: StatWrapper{T}
     lag::CircBuff{O}
     stat::O
 end

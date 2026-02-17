@@ -1,0 +1,37 @@
+---
+title: "Collections of Stats"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using OnlineStats
+```
+
+There are a few special `OnlineStats` that group together other `OnlineStats`: `Series` and `Group`.
+
+<img src="https://user-images.githubusercontent.com/8075494/57342826-bf088c00-710e-11e9-9ac0-f3c1e5aa7a7d.png" style="width:400px">
+
+## `Series`
+A `Series` tracks stats that should be applied to the **same** data stream.
+
+```{julia}
+y = rand(1000)
+
+s = Series(Mean(), Variance())
+
+fit!(s, y)
+```
+
+## `Group`
+
+A `Group` tracks stats that should be applied to **different** data streams.
+
+```{julia}
+g = Group(Mean(), CountMap(Bool))
+
+itr = zip(randn(100), rand(Bool, 100))
+
+fit!(g, itr)
+```

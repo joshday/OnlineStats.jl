@@ -1,0 +1,28 @@
+---
+title: "Coverage"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using LocalCoverage
+coverage = generate_coverage("OnlineStats"; run_test=true)
+html_coverage(coverage; dir=joinpath(@__DIR__, "_site", "coverage"), open=false)
+rm(joinpath(dirname(@__DIR__), "coverage"); recursive=true, force=true)
+```
+
+<iframe id="coverage-iframe" src="coverage/index.html" width="100%" style="border:none; overflow:hidden;" scrolling="no"></iframe>
+
+<script>
+(function() {
+    var iframe = document.getElementById('coverage-iframe');
+    function resize() {
+        try {
+            iframe.style.height = iframe.contentDocument.documentElement.scrollHeight + 'px';
+        } catch(e) {}
+    }
+    iframe.addEventListener('load', resize);
+    window.addEventListener('resize', resize);
+})();
+</script>

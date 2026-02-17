@@ -1,0 +1,49 @@
+---
+title: "OnlineStats.jl"
+engine: julia
+---
+
+# Welcome!
+
+**OnlineStats** does statistics and data visualization for big/streaming data via [online algorithms](https://en.wikipedia.org/wiki/Online_algorithm).  Each algorithm:
+
+1. processes data one observation at a time.
+2. uses O(1) memory.
+
+
+## Basics
+
+### 1) Creating
+
+- Stats are subtypes of `OnlineStat{T}` where `T` is the type of a single observation.
+
+```{julia}
+using OnlineStats
+m = Mean()
+supertype(Mean)
+```
+
+### 2) Updating
+
+- Stats can be updated with single or multiple observations e.g. `fit!(m, 1)` and `fit!(m, [1,2,3])`.
+
+```{julia}
+y = randn(100);
+fit!(m, y)
+value(m)
+```
+
+### 3) Merging
+
+- Stats can be merged.
+
+```{julia}
+y2 = randn(100);
+m2 = fit!(Mean(), y2)
+merge!(m, m2)
+```
+
+::: {.callout-warning}
+Some `OnlineStat`s are not analytically mergeable.  In these cases, you will see a warning that
+either no merging occurred or that the merge is approximate.
+:::

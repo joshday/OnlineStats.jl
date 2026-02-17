@@ -1,0 +1,139 @@
+---
+title: "Statistics and Models"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using OnlineStats
+```
+
+## Univariate Statistics
+
+| Statistic             | OnlineStat                                  |
+|:----------------------|:--------------------------------------------|
+| Mean                  | `Mean`                              |
+| Variance              | `Variance`                          |
+| Quantiles             | `Quantile`, `OrderStats`, and `P2Quantile` |
+| Maximum/Minimum       | `Extrema`                           |
+| Skewness and kurtosis | `Moments`                           |
+| Sum                   | `Sum`                               |
+| Geometric Mean        | `GeometricMean`                     |
+
+## Plotting (See [Data Visualization](dataviz.qmd))
+
+::: {.callout-note}
+Many `OnlineStat`s have Plot recipes beyond what is listed here.
+:::
+
+| Plot         | OnlineStat                                                                   |
+|:-------------|:-----------------------------------------------------------------------------|
+| Big Data Viz | `Partition`, `IndexedPartition`, `KIndexedPartition` |
+| Mosaic Plot  | `Mosaic`                                                             |
+| HeatMap      | `HeatMap`                                                            |
+
+## Time Series
+
+| Statistic                      | OnlineStat                         |
+|:-------------------------------|:-----------------------------------|
+| Difference                     | `Diff`                     |
+| Lag                            | `Lag`                      |
+| Autocorrelation/autocovariance | `AutoCov`                  |
+| Tracked history                | `Trace`, `StatLag` |
+
+## Multivariate Analysis
+
+| Statistic/Model                | OnlineStat                            |
+|:-------------------------------|:--------------------------------------|
+| Covariance/correlation matrix  | `CovMatrix`                   |
+| Principal components analysis  | `CovMatrix`, `CCIPCA` |
+| K-means clustering             | `KMeans`                      |
+| Multiple univariate statistics | `Group`                       |
+
+## Nonparametric Density Estimation
+
+| Statistic/Model                              | OnlineStat                                                   |
+|:---------------------------------------------|:-------------------------------------------------------------|
+| Histograms/continuous density                | `Hist`, `KHist`, and `ExpandingHist` |
+| ASH density (semiparametric, similar to KDE) | `Ash`                                                |
+| Approximate order statistics                 | `OrderStats`                                         |
+| Count for each unique value                  | `CountMap`                                           |
+| Approximate CDF                              | `OrderStats`                                         |
+
+## Parametric Density Estimation
+
+| Distribution | OnlineStat               |
+|:-------------|:-------------------------|
+| Beta         | `FitBeta`        |
+| Cauchy       | `FitCauchy`      |
+| Gamma        | `FitGamma`       |
+| LogNormal    | `FitLogNormal`   |
+| Normal       | `FitNormal`      |
+| Multinomial  | `FitMultinomial` |
+| MvNormal     | `FitMvNormal`    |
+
+## Machine/Statistical Learning
+
+| Model                           | OnlineStat                                |
+|:--------------------------------|:------------------------------------------|
+| Linear (also ridge) regression  | `LinReg`, `LinRegBuilder` |
+| Decision Trees                  | `FastTree`                        |
+| Random Forest                   | `FastForest`                      |
+| Naive Bayes Classifier          | `NBClassifier`                    |
+| ML via Stochastic Approximation | `StatLearn`                       |
+
+## Other
+
+| Statistic/Model                    | OnlineStat                                                               |
+|:-----------------------------------|:-------------------------------------------------------------------------|
+| Handling Missing Data              | `FilterTransform`, `CountMissing`, `SkipMissing` |
+| Statistical Bootstrap              | `Bootstrap`                                                      |
+| Approx. count of distinct elements | `HyperLogLog`                                                    |
+| Approx. count of occurrences       | `CountMinSketch`                                                 |
+| Random sample                      | `ReservoirSample`                                                |
+| Moving Window                      | `MovingWindow`, `MovingTimeWindow`                       |
+
+## Collection of Stats
+
+| Statistic/Model               | OnlineStat                           |
+|:------------------------------|:-------------------------------------|
+| Univariate data stream        | `Series`                     |
+| Multivariate data streams     | `Group`                      |
+| Group by categorical variable | `GroupBy`                    |
+
+
+## Stochastic Approximation with `StatLearn`
+
+### Regression and Classification Losses
+
+| Loss                                         | Function                           |
+|:---------------------------------------------|:-----------------------------------|
+| $L_{2}$ Loss (squared error)               | `OnlineStats.l2regloss`    |
+| $L_{1}$ Loss (absolute error)              | `OnlineStats.l1regloss`    |
+| Logistic Loss                                | `OnlineStats.logisticloss` |
+| $L_{1}$ Hinge Loss                         | `OnlineStats.l1hingeloss`  |
+| Generalized distance weighted discrimination | `OnlineStats.DWDLoss`      |
+
+### Penalty/regularization functions
+
+| Penalty                    | Function                         |
+|:---------------------------|:---------------------------------|
+| None                       | `zero`                           |
+| LASSO ($L_{1}$ penalty)  | `abs`                            |
+| Ridge  ($L_{2}$ penalty) | `abs2`                           |
+| Elastic Net                | `OnlineStats.ElasticNet` |
+
+### Optimization Algorithms
+
+| Algorithm                                                  | Constructor        |
+|:-----------------------------------------------------------|:-------------------|
+| Stochastic Gradient Descent                                | `SGD`      |
+| RMSProp                                                    | `RMSPROP`  |
+| AdaGrad                                                    | `ADAGRAD`  |
+| AdaDelta                                                   | `ADADELTA` |
+| ADAM                                                       | `ADAM`     |
+| ADAMax                                                     | `ADAMAX`   |
+| MSPI (Majorized Stochastic Proximal Iteration)             | `MSPI`     |
+| Online Majorization-Minimization (MM) - averaged surrogate | `OMAS`     |
+| Online MM - Averaged Parameter                             | `OMAP`     |

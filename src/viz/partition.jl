@@ -24,7 +24,7 @@ end
 Partition(init::Function, b::Int=100) = Partition([(1,1) => init()], b, init, 0)
 Partition(o::OnlineStat, b::Int=100) = Partition(() -> copy(o), b)
 
-OnlineStatsBase.additional_info(o::Partition) = (;b = o.b)
+additional_info(o::Partition) = (;b = o.b)
 value(o::Partition) = (o.parts[1][1][1], o.parts[end][1][2]) => value(reduce(merge!, last.(o.parts), init=o.init()))
 
 function _fit!(o::Partition, y)
@@ -157,7 +157,7 @@ mutable struct KIndexedPartition{I,T,O<:OnlineStat{T},F} <: OnlineStat{TwoThings
 end
 function KIndexedPartition(I::Type, init::Base.Callable, k::Int=100)
     o = init()
-    T, O = OnlineStatsBase.input(o), typeof(o)
+    T, O = input(o), typeof(o)
     KIndexedPartition{I,T,O,typeof(init)}(Pair{I,O}[], k, init, 0)
 end
 value(o::KIndexedPartition) =

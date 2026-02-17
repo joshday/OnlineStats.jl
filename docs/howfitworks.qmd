@@ -1,8 +1,13 @@
-```@setup howfitworks
+---
+title: "Details of Updating (fit!)"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
 using OnlineStats
 ```
-
-# Details of Updating (`fit!`)
 
 ## Core Principles
 
@@ -19,18 +24,20 @@ using OnlineStats
 ### Reason 1: OnlineStats doesn't make assumptions on the shape of your data
 
 Consider `CovMatrix`, for which a single observation is an `AbstractVector`, `Tuple`, or `NamedTuple`.
-If I try to [`fit!`](@ref) it with a `Matrix`, it's ambiguous whether I want *rows* or *columns* of
+If I try to `fit!` it with a `Matrix`, it's ambiguous whether I want *rows* or *columns* of
 the matrix to be treated as individual observations.
 
-!!! note
-    See **`eachrow`** and **`eachcol`** (after typing `using LinearAlgebra`).
+::: {.callout-note}
+See **`eachrow`** and **`eachcol`** (after typing `using LinearAlgebra`).
+:::
 
-
-```@example howfitworks
+```{julia}
 x = randn(1000, 2)
 
 fit!(CovMatrix(), eachrow(x))
+```
 
+```{julia}
 fit!(CovMatrix(), eachcol(x'))
 ```
 
@@ -52,7 +59,8 @@ fit!(2Mean(), t)
 
 Consider the following example:
 
-```@repl howfitworks
+```{julia}
+#| error: true
 fit!(Mean(), "asdf")
 ```
 
