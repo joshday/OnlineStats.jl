@@ -583,4 +583,208 @@ end
     @test std(fit!(Variance(), [1, 2])) == sqrt(.5)
 end
 
+#-----------------------------------------------------------------------# Transducers
+println("\n\n")
+@info("Testing Transducers")
+
+@testset "Transducers" begin
+    @testset "Map" begin
+        # Map transforms input before fitting
+        o = fit!(Map(abs) |> Mean(), [-1.0, -2.0, -3.0])
+        @test mean(o) ≈ 2.0
+        @test nobs(o) == 3
+
+        # Map with Series
+        o = fit!(Map(abs) |> Series(Mean(), Variance()), -ones(100))
+        @test value(o)[1] ≈ 1.0
+
+        # Map with different function
+        o = fit!(Map(x -> x^2) |> Mean(), [1.0, 2.0, 3.0])
+        @test mean(o) ≈ mean([1.0, 4.0, 9.0])
+
+        # Merge
+        o1 = fit!(Map(abs) |> Mean(), -ones(50))
+        o2 = fit!(Map(abs) |> Mean(), -2 * ones(50))
+        merge!(o1, o2)
+        @test nobs(o1) == 100
+    end
+
+    @testset "Filter" begin
+        # Filter passes only matching observations
+        o = fit!(Filter(x -> x > 0) |> Mean(), [-1.0, 1.0, -2.0, 2.0, 3.0])
+        @test mean(o) ≈ 2.0
+        @test nobs(o) == 3
+        @test o.nfiltered == 2
+
+        # Filter all
+        o = fit!(Filter(x -> x > 100) |> Mean(), randn(100))
+        @test nobs(o) == 0
+        @test o.nfiltered == 100
+
+        # Merge preserves nfiltered
+        o1 = fit!(Filter(x -> x > 0) |> Sum(), [1.0, -1.0, 2.0])
+        o2 = fit!(Filter(x -> x > 0) |> Sum(), [-1.0, 3.0, -2.0])
+        merge!(o1, o2)
+        @test sum(o1.stat) ≈ 6.0
+        @test o1.nfiltered == 3
+    end
+
+    @testset "Scan" begin
+        # Running sum
+        o = fit!(Scan(+, 0.0) |> Mean(), [1.0, 2.0, 3.0])
+        @test mean(o) ≈ mean([1.0, 3.0, 6.0])
+        @test nobs(o) == 3
+
+        # Running max
+        o = fit!(Scan(max, -Inf) |> Extrema(), [3.0, 1.0, 4.0, 1.0, 5.0])
+        @test minimum(o) ≈ 3.0  # running max starts at 3
+        @test maximum(o) ≈ 5.0
+    end
+
+    @testset "Take" begin
+        o = fit!(Take(3) |> Mean(), 1.0:100.0)
+        @test mean(o) ≈ 2.0
+        @test nobs(o) == 3
+        @test o.nfiltered == 97
+
+        # Take more than available
+        o = fit!(Take(100) |> Mean(), [1.0, 2.0, 3.0])
+        @test mean(o) ≈ 2.0
+        @test nobs(o) == 3
+        @test o.nfiltered == 0
+    end
+
+    @testset "Drop" begin
+        o = fit!(Drop(2) |> Mean(), [1.0, 2.0, 3.0, 4.0, 5.0])
+        @test mean(o) ≈ 4.0
+        @test nobs(o) == 3
+        @test o.nfiltered == 2
+
+        # Drop more than available
+        o = fit!(Drop(100) |> Mean(), [1.0, 2.0, 3.0])
+        @test nobs(o) == 0
+        @test o.nfiltered == 3
+    end
+
+    @testset "Dedupe" begin
+        o = fit!(Dedupe() |> Mean(), [1.0, 1.0, 2.0, 2.0, 3.0])
+        @test mean(o) ≈ 2.0
+        @test nobs(o) == 3
+        @test o.nfiltered == 2
+
+        # No duplicates
+        o = fit!(Dedupe() |> Mean(), [1.0, 2.0, 3.0])
+        @test mean(o) ≈ 2.0
+        @test nobs(o) == 3
+        @test o.nfiltered == 0
+
+        # All duplicates
+        o = fit!(Dedupe() |> Mean(), ones(10))
+        @test mean(o) ≈ 1.0
+        @test nobs(o) == 1
+        @test o.nfiltered == 9
+    end
+
+    @testset "Composition" begin
+        # Map |> Filter |> stat
+        o = fit!(Map(abs) |> Filter(x -> x > 1) |> Mean(), [-3.0, -1.0, 0.0, 2.0])
+        @test mean(o) ≈ 2.5  # abs -> [3,1,0,2], filter >1 -> [3,2], mean -> 2.5
+        @test nobs(o) == 2
+
+        # Filter |> Map |> stat
+        o = fit!(Filter(x -> x > 0) |> Map(x -> x^2) |> Mean(), [-1.0, 2.0, -3.0, 4.0])
+        @test mean(o) ≈ mean([4.0, 16.0])
+
+        # Three transducers
+        o = fit!(Drop(1) |> Map(abs) |> Filter(x -> x > 1) |> Mean(), [-1.0, -3.0, 0.5, 2.0])
+        # Drop 1 -> [-3, 0.5, 2], abs -> [3, 0.5, 2], filter >1 -> [3, 2], mean -> 2.5
+        @test mean(o) ≈ 2.5
+
+        # Using ∘ (mathematical composition, right-to-left)
+        xf = Filter(x -> x > 1) ∘ Map(abs)  # abs first, then filter
+        o = fit!(xf |> Mean(), [-3.0, -1.0, 0.0, 2.0])
+        @test mean(o) ≈ 2.5
+
+        # Reuse composed transducer
+        xf = Map(abs) |> Filter(x -> x > 0)
+        o1 = fit!(xf |> Mean(), y)
+        o2 = fit!(xf |> Variance(), y)
+        @test nobs(o1) == nobs(o2)
+    end
+
+    @testset "transduce" begin
+        # With data
+        o = transduce(Map(abs), Mean(), [-1.0, -2.0, -3.0])
+        @test value(o) ≈ 2.0
+        @test nobs(o) == 3
+
+        # Without data
+        o = transduce(Filter(x -> x > 0), Mean())
+        fit!(o, [1.0, -1.0, 2.0])
+        @test value(o) ≈ 1.5
+    end
+
+    @testset "Transducers replace FTSeries" begin
+        # FTSeries(Mean(), Variance(); transform=abs)  equivalent:
+        # FTSeries with default filter applies transform to all observations
+        o_ft = fit!(FTSeries(Mean(), Variance(); transform=abs), y)
+        o_xf = fit!(Map(abs) |> Series(Mean(), Variance()), y)
+        @test value(o_ft)[1] ≈ value(o_xf)[1]
+        @test value(o_ft)[2] ≈ value(o_xf)[2]
+
+        # FTSeries with filter equivalent:
+        # FTSeries filters on raw input, then transforms what passes
+        data = [-1.0, 1.0, 2.0]
+        o_ft = fit!(FTSeries(Mean(); filter=x -> x > 0), data)
+        o_xf = fit!(Filter(x -> x > 0) |> Series(Mean()), data)
+        @test value(o_ft)[1] ≈ value(o_xf)[1]
+
+        # FTSeries with both transform and filter:
+        # FTSeries order: filter(raw) THEN transform(filtered)
+        # Transducer equivalent: Filter(pred) |> Map(transform)
+        o_ft = fit!(FTSeries(Mean(); transform=abs, filter=x -> x > 1), [-3.0, -1.0, 0.0, 2.0])
+        o_xf = fit!(Filter(x -> x > 1) |> Map(abs) |> Series(Mean()), [-3.0, -1.0, 0.0, 2.0])
+        @test value(o_ft)[1] ≈ value(o_xf)[1]
+
+        # Transducers allow transform-first ordering too (not possible with FTSeries)
+        o = fit!(Map(abs) |> Filter(x -> x > 1) |> Series(Mean()), [-3.0, -1.0, 0.0, 2.0])
+        @test value(o)[1] ≈ 2.5  # abs: [3,1,0,2], filter >1: [3,2], mean: 2.5
+    end
+
+    @testset "copy" begin
+        o = fit!(Map(abs) |> Mean(), [-1.0, -2.0])
+        o2 = copy(o)
+        fit!(o, [-3.0])
+        @test mean(o) ≈ 2.0
+        @test mean(o2) ≈ 1.5  # copy is independent
+    end
+
+    @testset "show" begin
+        o = Map(abs) |> Mean()
+        @test sprint(show, o) isa String
+        o = Map(abs) |> Filter(x -> x > 0) |> Mean()
+        @test sprint(show, o) isa String
+    end
+
+    @testset "with various stats" begin
+        # With Sum
+        o = fit!(Map(abs) |> Sum(), [-1.0, -2.0, -3.0])
+        @test sum(o.stat) ≈ 6.0
+
+        # With Extrema
+        o = fit!(Filter(x -> x > 0) |> Extrema(), [-5.0, 1.0, -3.0, 4.0, 2.0])
+        @test minimum(o) ≈ 1.0
+        @test maximum(o) ≈ 4.0
+
+        # With CountMap
+        o = fit!(Filter(x -> x != "skip") |> CountMap(String), ["a", "skip", "b", "a", "skip"])
+        @test nobs(o) == 3
+        @test o.nfiltered == 2
+
+        # With Group
+        o = fit!(Map(x -> abs.(x)) |> 3Mean(), [[-1.0, -2.0, -3.0], [4.0, 5.0, 6.0]])
+        @test all(value(o.stat[i]) > 0 for i in 1:3)
+    end
+end
+
 end #module

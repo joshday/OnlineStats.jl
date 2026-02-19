@@ -42,12 +42,15 @@ export
     ReservoirSample,
     Series, StatLearn, StatHistory, Sum,
     Variance,
-# other 
+# transducers
+    Transducer, TransducedStat, Map, Filter, Scan, Take, Drop, Dedupe, transduce,
+# other
     OnlineStat, BiasVec
 
 input(o::OnlineStat{T}) where {T} = T
 
 include("utils.jl")
+include("transducers.jl")
 include("algorithms.jl")
 include("stats/stats.jl")
 include("stats/distributions.jl")
