@@ -28,6 +28,45 @@ fit!(o, randn(1000))
 result = transduce(Map(abs), Mean(), [-1, -2, -3])
 value(result)  # 2.0
 ```
+
+## Comparison with JuliaFolds2/Transducers.jl
+
+This module implements a **self-contained** transducer system tailored for OnlineStats.
+The external `Transducers.jl` package (JuliaFolds2/Transducers.jl) also provides OnlineStats
+support via a package extension (`TransducersOnlineStatsBaseExt`).  Here's how they compare:
+
+### Similarities
+- Both use the same core transducer names: `Map`, `Filter`, `Scan`, `Take`, `Drop`, `Dedupe`.
+- Both support `|>` for left-to-right composition and `∘` for right-to-left.
+- Both expand composed transducers into nested wrappers (Transducers.jl: `Reduction`;
+  this module: nested `TransducedStat`).
+- Both support parallel/distributed merging via `merge!` on `OnlineStat`.
+
+### Differences
+
+| Feature                     | This module (built-in)                         | Transducers.jl extension                        |
+|-----------------------------|------------------------------------------------|-------------------------------------------------|
+| **Dependencies**            | None (self-contained in OnlineStats.jl)        | Requires Transducers.jl (~20 deps)              |
+| **Result type**             | `TransducedStat <: OnlineStat` — stays in the  | Returns bare `OnlineStat` from `foldl`/`foldxt`  |
+|                             | OnlineStat type system                         |                                                 |
+| **Usage syntax**            | `Map(f) \|> Mean()` returns a fittable stat    | `foldl(Mean(), Map(f), data)` — fold-based API  |
+| **Incremental fitting**     | `fit!(o, new_data)` works naturally on the     | Each `foldl` call is a one-shot operation;       |
+|                             | `TransducedStat`                               | no incremental fitting                          |
+| **Transducer library**      | 6 types (Map, Filter, Scan, Take, Drop,        | ~25 types including Cat, Partition, PartitionBy, |
+|                             | Dedupe)                                        | TakeWhile, DropWhile, Unique, Enumerate, etc.   |
+| **Early termination**       | Not supported (always processes all data)       | `Reduced` type, `ReduceIf`, `TakeWhile`         |
+| **Parallel fold**           | Manual: `merge!(fit!(o1,d1), fit!(o2,d2))`     | Built-in `foldxt` (threaded), `foldxd` (distrib)|
+| **OnlineStat as transducer**| N/A                                            | `Transducer(Mean())` emits running values        |
+|                             |                                                | downstream (Scan + Map(value))                  |
+| **Stat composition**        | Wraps existing `Series`, `Group` naturally      | Uses `TeeRF` / `ProductRF` for fan-out          |
+
+### When to use which
+- Use **this module** when you want lightweight, composable preprocessing that integrates
+  seamlessly with the `fit!`/`value`/`merge!` workflow and doesn't add external dependencies.
+- Use **Transducers.jl** when you need the full transducer library (windowing, partitioning,
+  early termination) or want threaded/distributed `foldxt`/`foldxd` with automatic work-splitting.
+- Both can coexist: a `TransducedStat` from this module will work as a reducing function
+  inside Transducers.jl's `foldl` since it is a valid `OnlineStat`.
 =#
 
 abstract type Transducer end
