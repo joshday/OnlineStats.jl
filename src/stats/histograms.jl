@@ -223,18 +223,22 @@ function expand!(o::ExpandingHist, y)
     w = w == 0.0 ? y - a : w
     halfnbin = round(Int, length(o.counts) / 2)
     @inbounds if y > b  # find K such that y <= a + 2^K * w
-        K = ceil(Int, log2((y - a) / w))
-        C = 2 ^ K
-        o.edges = range(a, stop = a + C*w, length=length(o.edges))
+        K = 0; Cw = w
+        while a + Cw < y
+            Cw *= 2; K += 1
+        end
+        o.edges = range(a, stop = a + Cw, length=length(o.edges))
         for _ in 1:min(K, halfnbin)
             for i in eachindex(o.counts)
                 o.counts[i] = i ≤ halfnbin ? sum(view(o.counts, (2i-1):(2i))) : 0
             end
         end
     elseif y < a # find K such that y >= b - 2^K * w
-        K = ceil(Int, log2((b - y) / w))
-        C = 2 ^ K
-        o.edges = range(b - C*w, stop = b, length=length(o.edges))
+        K = 0; Cw = w
+        while b - Cw > y
+            Cw *= 2; K += 1
+        end
+        o.edges = range(b - Cw, stop = b, length=length(o.edges))
         for _ in 1:min(K, halfnbin)
             n = length(o.counts)
             for i in 0:(length(o.counts) - 1)
